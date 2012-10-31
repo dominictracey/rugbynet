@@ -1,0 +1,20 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+	</ui:style>
+	<g:HTMLPanel>
+		These are the options that control the processes behind the scenes that fetch results, update game standings, etc.<br><!--  --></br>
+		<g:Label ui:field="status">Status</g:Label><br/>
+		<g:FlexTable ui:field="compTable" width="100%"/>
+		<g:FlexTable ui:field="game1Table" width="100%"/>
+		<g:HorizontalPanel>
+			<g:Label>Comps Complete:</g:Label>
+			<g:ListBox ui:field='compsComplete' visibleItemCount='5' multipleSelect='true'/>
+		</g:HorizontalPanel>
+		<g:Button styleName="{style.important}" ui:field="Save">Save</g:Button>
+	</g:HTMLPanel>
+</ui:UiBinder> 

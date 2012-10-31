@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<ui:style>
+		.panel {
+			background-color: ivory;
+		}
+
+		.newpanel {
+			background-color: lightgrey;
+			padding:5px;
+			margin: 5px;
+		}
+		.urlbox {
+			width:500px;
+
+		}
+		.editArea {
+			width:500px;
+			background-color:lightblue;
+		}
+	</ui:style>
+<g:HorizontalPanel>
+	<g:VerticalPanel styleName="{style.panel}">
+		<g:VerticalPanel styleName="{style.panel}">
+	
+			<g:Label ui:field="status">Status</g:Label>
+			<g:Tree ui:field="compTree"></g:Tree>
+		</g:VerticalPanel>
+		
+		<g:VerticalPanel styleName="{style.newpanel}">
+			<g:HTML><strong>Import Comp:&nbsp;</strong></g:HTML>
+			<g:HorizontalPanel styleName="{style.newpanel}">
+				<g:Label>Url:&nbsp;</g:Label>
+				<g:TextBox ui:field="url"  styleName="{style.urlbox}"></g:TextBox>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel styleName="{style.newpanel}">
+				<g:Label>ResultType:&nbsp;</g:Label>
+				<g:ListBox ui:field="resultType">
+				</g:ListBox>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel styleName="{style.newpanel}">
+				<g:Button ui:field="fetch">Fetch</g:Button>
+				<g:Button ui:field="save">bwat?</g:Button>
+				<g:Button ui:field="createAdmin">Create Admin</g:Button>
+				<g:Button ui:field="sanityCheck">Sanity Check</g:Button>
+			</g:HorizontalPanel>
+		</g:VerticalPanel>
+	</g:VerticalPanel>
+	<g:SimplePanel ui:field='editArea' styleName="{style.editArea}"></g:SimplePanel>
+</g:HorizontalPanel>
+</ui:UiBinder>

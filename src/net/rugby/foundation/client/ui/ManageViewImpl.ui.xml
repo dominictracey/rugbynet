@@ -1,0 +1,104 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+	</ui:style>
+<g:HTMLPanel>
+<g:VerticalPanel>
+			<g:HorizontalPanel>
+		<!-- COUNTRY STATUS -->
+		<g:VerticalPanel>
+		<g:HTMLPanel>
+		<div class="sectionHeader">
+			<g:Label>Your players, by country:</g:Label>
+			</div>
+			</g:HTMLPanel>
+			<g:cell>
+			<g:HTMLPanel>
+			<table id="playersByCountry" cellpadding="0" cellspacing="0">
+			<tr>
+				<th><g:Label>arg:</g:Label></th>
+				<th class="even"><g:Label>aus:</g:Label></th>
+				<th><g:Label>eng:</g:Label></th>
+				<th class="even"><g:Label>fra:</g:Label></th>
+				<th><g:Label>ire:</g:Label></th>
+				<th class="even"><g:Label>nzl:</g:Label></th>
+				<th><g:Label>rsa:</g:Label></th>
+				<th class="even"><g:Label>wal:</g:Label></th>
+			</tr>
+			<tr>
+				<td><g:Label ui:field="arg">6</g:Label></td>
+				<td class="even"><g:Label ui:field="aus">6</g:Label></td>
+				<td><g:Label ui:field="eng">6</g:Label></td>
+				<td class="even"><g:Label ui:field="fra">6</g:Label></td>
+				<td><g:Label ui:field="ire">6</g:Label></td>
+				<td class="even"><g:Label ui:field="nzl">6</g:Label></td>
+				<td><g:Label ui:field="rsa">6</g:Label></td>
+				<td class="even"><g:Label ui:field="wal">6</g:Label></td>
+			</tr>
+			</table>
+			</g:HTMLPanel>
+			</g:cell>
+		</g:VerticalPanel>
+		<g:HTMLPanel>
+						<div id="pointsRemaining">
+		<p><g:Label ui:field="remainingLabel">Points remaining: </g:Label><span class="points"><g:HTML ui:field="remaining">15000</g:HTML></span></p>
+	</div>
+			
+		</g:HTMLPanel>
+		<!-- END STATUS -->
+	</g:HorizontalPanel>
+	<!-- NAVIGATION -->
+		<g:VerticalPanel>
+			<g:Label>Your players, by position:</g:Label>
+			<g:cell>
+			<g:HTMLPanel>
+			<table id="playersByPosition" cellspacing="0" cellpadding="0">
+			<tr> <!--  FIRST ROW: heading info  -->
+				<td class="odd"><g:Anchor ui:field="prop" href="javascript:;">[PRP]</g:Anchor></td>
+				<td class="even"><g:Anchor ui:field="hooker" href="javascript:;">[HKR]</g:Anchor></td>
+				<td class="odd"><g:Anchor ui:field="lock">[LCK]</g:Anchor></td>
+				<td class="even"><g:Anchor ui:field="flanker" href="javascript:;">[FLA]</g:Anchor></td>
+				<td class="odd"><g:Anchor ui:field="numbereight" href="javascript:;">[NO8]</g:Anchor></td>
+				<td class="even"><g:Anchor ui:field="scrumhalf" href="javascript:;">[SCR]</g:Anchor></td>
+				<td class="odd"><g:Anchor ui:field="flyhalf" href="javascript:;">[FLY]</g:Anchor></td>
+				<td class="even"><g:Anchor ui:field="center" href="javascript:;">[CTR]</g:Anchor></td>
+				<td class="odd"><g:Anchor ui:field="wing" href="javascript:;">[WNG]</g:Anchor></td>
+				<td class="even"><g:Anchor ui:field="fullback" href="javascript:;">[FUL]</g:Anchor></td>
+			</tr>
+			<tr>
+				<td class="odd"><g:Label ui:field="numProp">0/4</g:Label></td>
+				<td class="even"><g:Label ui:field="numHooker">0/2</g:Label></td>
+				<td class="odd"><g:Label ui:field="numLock">0/4</g:Label></td>
+				<td class="even"><g:Label ui:field="numFlanker">0/4</g:Label></td>
+				<td class="odd"><g:Label ui:field="numNumber8">0/2</g:Label></td>
+				<td class="even"><g:Label ui:field="numScrumhalf">0/2</g:Label></td>
+				<td class="odd"><g:Label ui:field="numFlyhalf">0/2</g:Label></td>
+				<td class="even"><g:Label ui:field="numCenter">0/4</g:Label></td>
+				<td class="odd"><g:Label ui:field="numWing">0/4</g:Label></td>
+				<td class="even"><g:Label ui:field="numFullback">0/4</g:Label></td>
+			</tr>
+			</table>
+			</g:HTMLPanel>
+			</g:cell>
+
+		<g:HTMLPanel>
+		<div class="instructions">
+			<!--  INSTRUCTIONS -->
+			<g:HTML ui:field="instructions">
+					Pick a thirty player roster to carry you through the pool round of the World Cup.
+			</g:HTML>	
+			<!--  END INSTRUCTIONS -->	
+			<g:Button ui:field="previous">&lt;&lt; Previous</g:Button>
+			<g:Button ui:field="next">Next &gt;&gt;</g:Button>
+			<g:Button ui:field="done">Done!</g:Button>
+		</div>
+		</g:HTMLPanel>
+	</g:VerticalPanel>
+	<!-- END NAVIGATION -->	
+</g:VerticalPanel>
+</g:HTMLPanel>
+</ui:UiBinder> 

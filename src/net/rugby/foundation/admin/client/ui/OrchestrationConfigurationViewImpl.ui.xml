@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<g:HTMLPanel>
+		These are the options that control the actions that fetch results, update game standings, etc.<br><!--  --></br>
+		<g:Label ui:field="status">Status</g:Label><br/>
+		<g:FlexTable ui:field="compTable" width="100%"/>
+		<br></br>
+		<g:Button ui:field="Save">Save</g:Button>
+	</g:HTMLPanel>
+</ui:UiBinder>

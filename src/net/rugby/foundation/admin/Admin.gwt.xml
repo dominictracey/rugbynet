@@ -1,0 +1,19 @@
+<module rename-to="admin">
+	<inherits name="com.google.gwt.user.User"/>
+	<inherits name="com.google.gwt.user.theme.standard.Standard"/>
+	<inherits name="com.google.gwt.place.Place"/>
+	<inherits name="com.google.gwt.activity.Activity"/>
+	<inherits name="org.cobogw.gwt.user.User" />
+	<inherits name="com.googlecode.objectify.Objectify" />
+	<inherits name="net.rugby.foundation.model.Model" />
+<!-- 	<inherits name="net.rugby.foundation.game1.Game1" /> -->
+<!--  	<inherits name="net.rugby.foundation.core.Core" />  -->
+	<entry-point class="net.rugby.foundation.admin.client.Admin"/>
+	<replace-with class="net.rugby.foundation.admin.client.ClientFactoryImpl">
+		<when-type-is class="net.rugby.foundation.admin.client.ClientFactory"/>
+	</replace-with>
+	  <!-- Specify the paths for translatable code                    -->
+    <source path='client'/>
+    <source path='shared'/>
+
+</module>

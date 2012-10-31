@@ -1,0 +1,62 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+			 xmlns:c="urn:import:com.google.gwt.user.cellview.client">
+  <ui:style>
+    .playersViewButtonHPanel {
+      margin: 0px 0px 0x 0px;
+    }
+    .playersViewPlayersFlexTable {
+      margin: 5px 0px 5px 0px;
+    }
+
+  </ui:style>
+
+  <g:DecoratorPanel>
+		<g:StackLayoutPanel unit='PX' ui:field="stackPanel" addStyleNames="{style.playersViewButtonHPanel}">
+		  <g:stack>
+		    <g:customHeader  size='32' >
+		      <g:Label ui:field="myListHeader">My</g:Label>
+		    </g:customHeader>
+		    <c:CellList ui:field="myList" />
+		  </g:stack>
+		  <g:stack>
+		    <g:customHeader  size='32' >
+		      <g:Label ui:field="teamListHeader">Teams</g:Label>
+		    </g:customHeader>
+		    <c:CellList ui:field="teamList" />
+		  </g:stack>
+		  <g:stack>
+		    <g:customHeader  size='32' >
+		      <g:Label ui:field="positionListHeader">Positions</g:Label>
+		    </g:customHeader>
+		    <c:CellList ui:field="positionList" />
+		  </g:stack>
+		  <g:stack>
+		    <g:customHeader  size='32' >
+		      <g:Label ui:field="matchListHeader">Matches</g:Label>
+		    </g:customHeader>
+		    <c:CellList ui:field="matchList" />
+		  </g:stack>
+		  <g:stack>
+		    <g:customHeader  size='32' >
+		      <g:Label ui:field="poolTeamListHeader">Teams(Pool)</g:Label>
+		    </g:customHeader>
+		    <c:CellList ui:field="poolTeamList" />
+		  </g:stack>
+		  <g:stack>
+		    <g:customHeader  size='32' >
+		      <g:Label ui:field="poolPositionListHeader">Positions (Pool)</g:Label>
+		    </g:customHeader>
+		    <c:CellList ui:field="poolPositionList" />
+		  </g:stack>
+		  <g:stack>
+		    <g:customHeader  size='32' >
+		      <g:Label ui:field="poolMatchListHeader">Matches (Pool)</g:Label>
+		    </g:customHeader>
+		    <c:CellList ui:field="poolMatchList" />
+		  </g:stack>
+		 </g:StackLayoutPanel>
+  </g:DecoratorPanel>
+
+</ui:UiBinder>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+
+<g:HorizontalPanel>
+	<g:VerticalPanel>
+		<g:HTMLPanel ui:field="noLogonWelcome" styleName="panel">
+		<div class="leaderboardRow-header">Welcome to rugby.net's MatchUp</div> <div class="leaderboardRow">MatchUp is the game where you predict the winners of this weekend's matches. We've designed MatchUp to be easy enough for a young child or RFU administrator to play so jump right in! <g:Label ui:field="clubhouseToJoin"></g:Label><p>Click below to create a new account or sign in if you are a returning player.</p></div> 
+		</g:HTMLPanel>
+		<g:HTMLPanel ui:field="compNotUnderway" styleName="panel">
+		<div class="leaderboardRow-header">Competition Complete</div> <div class="leaderboardRow">MatchUp is now closed for the <g:Label ui:field="currentCompName"></g:Label><p>Have a look in the Competition menu above for other tournaments currently underway for which to to create entries.</p></div> 
+		</g:HTMLPanel>
+		<g:HTMLPanel ui:field="entryNames" />
+		<g:HorizontalPanel  styleName="buttonbox">
+			<g:Button ui:field="createNewEntry">Create New Entry</g:Button>
+			<g:Button ui:field="signInButton" styleName="highlight">Sign In</g:Button>
+			<g:Button ui:field="signUpButton" styleName="highlight">Sign Up</g:Button>
+		</g:HorizontalPanel>
+		<g:HTMLPanel styleName="panel" ui:field="createClubhousePanel">
+		<div class="leaderboardRow-header">Play 6N MatchUp Against Friends</div>
+		<div class="leaderboardRow">To play against your friends, co-workers and teammates simply <g:Anchor ui:field="createClubhouse" href="javascript:;">set up a new clubhouse</g:Anchor> and send out invitations.</div>
+		</g:HTMLPanel>
+	</g:VerticalPanel>
+	
+	<g:VerticalPanel styleName="onetwothree-panel">
+		<g:DecoratorPanel><g:HTMLPanel><div class="onetwothree-header">1. Sign Up</div><div class="onetwothree-body">If you don't have a rugby.net account yet, creating one is easy and free. <g:Anchor ui:field="signUp" href="javascript:;">Click here</g:Anchor> to begin. If you have an account, you can <g:Anchor ui:field="signIn" href="javascript:;">sign in</g:Anchor>.</div></g:HTMLPanel></g:DecoratorPanel>
+		<g:DecoratorPanel><g:HTMLPanel><div class="onetwothree-header">2. Create Entry</div><div class="onetwothree-body">To begin playing, create an entry for this competition. You can enter more than once to increase your chances.</div></g:HTMLPanel></g:DecoratorPanel>
+		<g:DecoratorPanel><g:HTMLPanel><div class="onetwothree-header">3. Pick Winners</div><div class="onetwothree-body">For each round of the competition, simply pick the winners of the matches. The owner of the entry atop the leaderboard at the end of the competition wins! </div></g:HTMLPanel></g:DecoratorPanel>
+	</g:VerticalPanel>
+	</g:HorizontalPanel>
+</ui:UiBinder>

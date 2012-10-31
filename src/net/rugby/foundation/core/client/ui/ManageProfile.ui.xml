@@ -1,0 +1,70 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:core='urn:import:net.rugby.foundation.core.client.ui'>
+	<g:VerticalPanel ui:field="topLevel">
+		<g:LayoutPanel styleName="accountPanel" ui:field="nonNativeLayer">
+			<g:layer>
+				<g:HTMLPanel>
+					First, tell us which of your accounts you would like to play with:
+					<core:ExternalAuthenticatorPanel
+						ui:field="nonNativeLogins" />
+					<g:Anchor ui:field="showNativeLink" href="javascript:;">Help me sign up
+						with an email address</g:Anchor>
+				</g:HTMLPanel>
+			</g:layer>
+		</g:LayoutPanel>
+		<g:LayoutPanel styleName="accountPanel" ui:field="facebookLayer">
+			<g:layer>
+				<g:HTMLPanel>
+					<core:FacebookRegistrationPanel
+						ui:field="facebookPanel" />
+				</g:HTMLPanel>
+			</g:layer>
+		</g:LayoutPanel>
+		<g:LayoutPanel ui:field="nativeLayer">
+			<g:layer>
+				<g:HTMLPanel>
+					<span id="nativeSon">
+						<g:VerticalPanel>
+							<g:HorizontalPanel>
+								<g:Label styleName="createAccountLabel">Email address (never displayed):</g:Label>
+								<g:TextBox ui:field="emailAddress" styleName="accountInput"></g:TextBox>
+							</g:HorizontalPanel>
+							<g:HorizontalPanel>
+								<g:Label styleName="createAccountLabel">Screen Name (displayed) *:</g:Label>
+								<g:TextBox ui:field="nickName" styleName="accountInput"></g:TextBox>
+							</g:HorizontalPanel>
+							<g:HorizontalPanel>
+								<g:Label styleName="createAccountLabel" ui:field="password1Label">Password:</g:Label>
+								<g:PasswordTextBox ui:field="password1"
+									styleName="accountInput"></g:PasswordTextBox>
+							</g:HorizontalPanel>
+							<g:HorizontalPanel>
+								<g:Label styleName="createAccountLabel" ui:field="password2Label">Password
+									(again):</g:Label>
+								<g:PasswordTextBox ui:field="password2"
+									styleName="accountInput"></g:PasswordTextBox>
+							</g:HorizontalPanel>
+							<!-- </g:VerticalPanel> -->
+							<!-- <g:VerticalPanel> -->
+							<g:HorizontalPanel>
+								<g:Button ui:field="submit">Sign Up</g:Button>
+								<g:Button ui:field="cancel">Cancel</g:Button>
+							</g:HorizontalPanel>							
+							<g:HTML styleName="tiebreakerInstructions">* - Please keep screen names and entry
+								names less than vulgar!</g:HTML>
+						</g:VerticalPanel>
+					</span>
+				</g:HTMLPanel>
+			</g:layer>
+		</g:LayoutPanel>
+		<g:LayoutPanel styleName="accountPanel" ui:field="changePasswordLayer">
+			<g:layer>
+				<g:HTMLPanel>
+					<core:ChangePasswordPanel ui:field="changePasswordPanel" />
+				</g:HTMLPanel>
+			</g:layer>
+		</g:LayoutPanel>
+		<g:Label ui:field="error" styleName="serverResponseLabelError"></g:Label>
+	</g:VerticalPanel>
+</ui:UiBinder>

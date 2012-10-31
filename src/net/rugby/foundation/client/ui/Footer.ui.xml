@@ -1,0 +1,13 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<!-- 	<div id="footerEmail"> -->
+<!-- 	 	<span ui:field="contact"/> -->
+<!-- 	</div> -->
+		<g:FlowPanel>
+		<g:Anchor ui:field="contact">Contact Us</g:Anchor><g:Label>    </g:Label><g:Anchor ui:field="admin" href="javascript:;" visible="false">admin</g:Anchor>
+		<g:HTML>&nbsp;<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Ffantasy.rugby.net%2F" scrolling="no" frameborder="0" style="height: 62px; width: 100%" allowTransparency="true"></iframe></g:HTML>
+<!-- 		<g:HTML><a href="http://www.pntrac.com/t/R0BIS0hMREBKR0ZIQ0BJSElGSA"><img src="http://www.pntrac.com/b/R0BIS0hMREBKR0ZIQ0BJSElGSA" border="0" width="728" height="90" title="Rugby World Cup" alt="Rugby World Cup"/></a></g:HTML> -->
+		</g:FlowPanel>
+
+</ui:UiBinder>

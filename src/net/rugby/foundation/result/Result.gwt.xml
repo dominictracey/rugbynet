@@ -1,0 +1,8 @@
+<module rename-to="result">
+ 	<inherits name="org.cobogw.gwt.user.User" />
+	<inherits name="com.google.gwt.user.theme.standard.Standard"/>
+	<inherits name="net.rugby.foundation.model.Model" />
+	<inherits name="net.rugby.foundation.core.Core" />
+	
+	<entry-point class="net.rugby.foundation.result.client.Result"/>
+</module>

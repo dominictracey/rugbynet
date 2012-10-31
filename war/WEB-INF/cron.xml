@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  <cron>
+    <url>/admin/workflow/</url>
+    <description>Trigger business processes</description>
+    <schedule>every 60 minutes</schedule>
+  </cron>
+    <cron>
+    <url>/game1/workflow/</url>
+    <description>Trigger business processes</description>
+    <schedule>every day 02:00</schedule>
+    <target>bpm</target>
+  </cron>
+</cronentries>

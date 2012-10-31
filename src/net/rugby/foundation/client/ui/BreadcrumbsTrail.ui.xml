@@ -1,0 +1,18 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+	</ui:style>
+		<g:HorizontalPanel styleName="breadcrumbs">
+			<g:Anchor text="Home" ui:field="home" styleName="h1 gwt-Anchor" href="javascript:;" horizontalAlignment="ALIGN_CENTER"/>
+			<g:Label text="&gt;" ui:field="alligator1" styleName="divider" horizontalAlignment="ALIGN_CENTER"/>
+			<g:Anchor text="Teams" ui:field="groupType" styleName="h1 gwt-Anchor" href="javascript:;" horizontalAlignment="ALIGN_CENTER"/>
+			<g:Label text=" &gt; " ui:field="alligator2" styleName="divider" horizontalAlignment="ALIGN_CENTER"/>
+			<g:Anchor text="List" ui:field="group" styleName="h1 gwt-Anchor" href="javascript:;" horizontalAlignment="ALIGN_CENTER"/>
+			<g:Label text="&gt; " ui:field="alligator3" styleName="divider" horizontalAlignment="ALIGN_CENTER"/>
+			<g:Anchor text="Player" ui:field="player" styleName="h1 gwt-Anchor" href="javascript:;" horizontalAlignment="ALIGN_CENTER"/>
+		</g:HorizontalPanel>
+</ui:UiBinder> 

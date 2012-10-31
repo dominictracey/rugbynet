@@ -1,0 +1,15 @@
+.svn/
+doc/
+gwt-unitCache/
+target/
+war/admin/
+war/core/
+war/game1/
+war/gwtfb/
+war/net.rugby.*/
+war/PlayerListMVP/
+war/result/
+war/WEB-INF/classes/
+war/WEB-INF/deploy/
+war/WEB-INF/lib/
+war/www-test/

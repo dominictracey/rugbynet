@@ -1,0 +1,18 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<ui:style>
+    .sponsor {
+    border: 0em;
+    width: 20em;
+    height: 6em;
+    float: right;
+    display: inline;
+    }
+</ui:style>
+<g:HTMLPanel ui:field="sponsor">
+<a href="http://www.pntrac.com/t/R0BIS0hHQ0BKR0ZIQ0BJSElGSA?website=158561"><img src="http://www.pntrac.com/b/R0BIS0hHQ0BKR0ZIQ0BJSElGSA?website=158561" border="0" width="160" height="600" title="Rugby World Cup" alt="Rugby World Cup"/></a>
+<!-- <a href="http://www.pntra.com/t/R0BIS0NLSkBKR0ZIQ0BIRURHTA"><img src="http://www.pntra.com/b/R0BIS0NLSkBKR0ZIQ0BIRURHTA" border="0" width="160" height="600" title="Shop 2011 Rugby World Cup today from WorldRugbyShop.com!" alt="Shop 2011 Rugby World Cup today from WorldRugbyShop.com!"/></a>-->
+</g:HTMLPanel>
+
+</ui:UiBinder> 

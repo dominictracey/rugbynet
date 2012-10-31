@@ -1,0 +1,313 @@
+/* #topLevel * { */
+/*     background-color: white; */
+/*     color: black; */
+/* } */
+/* body { */
+/*     background: url("resources/images/bodyBg.gif") no-repeat scroll 50% 0 #CCCCCC; */
+/*     margin: 0; */
+/*     padding: 0; */
+/*     font-family: Arial, sans-serif; */
+/* } */
+/* #header *, #stackPanel *, #breadCrumbs *, #appWidget .groupList *, .gwt-Anchor, #playersByCountry *, #detailsWidget .gwt-Label { */
+
+/* } */
+/* .sectionHeader { */
+/*     margin-top: 5px; */
+/* } */
+/* .gwt-Button { */
+/*     background: url("resources/images/stackHeader.jpg") repeat-x scroll 0 -5px transparent; */
+/*     font-weight: bold; */
+/* } */
+
+/* .gwt-Button:hover { */
+/*     background: url("resources/images/stackHeader_hilite.jpg") repeat-x scroll 0 -5px transparent; */
+/* } */
+/* .gwt-DialogBox { */
+/*     background: url("resources/images/dialogBg.png") repeat scroll 0 0 transparent; */
+/*     font-variant: small-caps; */
+/*     padding: 15px; */
+/*     text-transform: capitalize; */
+/* } */
+/* .gwt-DialogBox > div { */
+/*     border: 1px solid #999; */
+/*     padding: 11px 0 11px 11px; */
+/* 	background-color: white; */
+/* } */
+/* .gwt-DialogBox .Caption { */
+/*     font-weight: bold; */
+/*     margin-bottom: 10px; */
+/*     text-align: center; */
+/* } */
+/* .gwt-DialogBox .gwt-Label { */
+/*     margin-bottom: 5px; */
+/*     margin-right: 5px; */
+/* } */
+/* .gwt-TextBox, .gwt-PasswordTextBox { */
+/*     -moz-border-bottom-colors: none; */
+/*     -moz-border-image: none; */
+/*     -moz-border-left-colors: none; */
+/*     -moz-border-right-colors: none; */
+/*     -moz-border-top-colors: none; */
+/*     background: url("resources/images/dialogBg.png") repeat scroll 0 0 transparent; */
+/*     border-color: #666 #999 #666 #999; */
+/*     border-style: solid; */
+/*     border-width: 1px; */
+/*     margin-bottom: 5px; */
+/* } */
+.gwt-Anchor {
+    color: #008E24;
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 0 3px 0 0;
+    text-transform: capitalize;
+}
+#header .gwt-Anchor {
+    padding: 0 10px;
+}
+
+.dpt-panel {
+	background-color: white;
+}
+
+ .gwt-DecoratorPanel .middleCenter {
+   height: 100%;
+   width: 100%;
+   padding: 3px 3px 3px 3px;
+ }
+
+.gwt-Label {
+	padding: 5px;
+}
+
+.cbg-RPContainer {
+/*  	background: url("resources/images/tab_header_back.png") repeat-x scroll right top #2222E9;  */
+	background-color: beige;
+
+}
+
+
+/* #completeContent td { */
+/* 	vertical-align: top; */
+/* } */
+
+/* #joinLinkInstructions { */
+/* 	font-size: .75em; */
+/* } */
+
+/* .gwt-StackLayoutPanelContent, .gwt-StackLayoutPanelHeader { */
+/*     padding-left: 15px; */
+/* } */
+/* .gwt-StackLayoutPanelHeader { */
+/*     background: url("resources/images/stackHeader.jpg") repeat-x scroll right top #2222E9; */
+/*     color: black; */
+/*     font-size: 1.2em; */
+/*     font-weight: bold; */
+/* 	padding-top: 3px; */
+/* 	padding-bottom: 1px; */
+/*     border-bottom: 1px solid #999; */
+/*     border-top: 1px solid #999; */
+/* } */
+/* .gwt-StackLayoutPanelHeader:hover { */
+/*     background: url("resources/images/stackHeader_hilite.jpg") repeat-x scroll right top #2222E9; */
+/* } */
+/* #topLevel { */
+/*     margin: 0 auto; */
+/*     width: 980px; */
+/* } */
+
+/* #mainContent { */
+/*     border-right: 1px solid #999; */
+/*     border-left: 1px solid #999; */
+/*     background-color: white; */
+/* } */
+
+#header {
+    margin-bottom: 0;
+/*    padding: 140px 0 5px 612px; */
+	}
+
+#header .image span {
+    background: url("resources/images/header.gif") no-repeat scroll left top #CCCCCC;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+
+}
+
+#header table {
+		padding-left: 300px;
+}
+
+#header .image {
+	height: 161px;
+	position: relative;
+}
+
+#header .image h1, #header .image h2, #header .image p {
+	margin: 0;
+}
+
+/* #stackPanel, .breadcrumbs, #ads { */
+/*     border: medium none; */
+/* } */
+/* #footer, #ads { */
+/*     background-color: white; */
+/*     color: white; */
+/*     font-size: 3em; */
+/*     font-variant: small-caps; */
+/*     padding-top: 10px; */
+/*     text-align: center; */
+/* } */
+/* #ads { */
+/* 	border-top: 1px solid #999; */
+/*     height: 600px; */
+/* } */
+/* #stackPanel { */
+/*     -moz-border-bottom-colors: none; */
+/*     -moz-border-image: none; */
+/*     -moz-border-left-colors: none; */
+/*     -moz-border-right-colors: none; */
+/*     -moz-border-top-colors: none; */
+/*     border-color: -moz-use-text-color #999 #999; */
+/*     border-style: none solid solid none; */
+/*     border-width: medium 1px 1px; */
+/*     float: left; */
+/*     height: 510px; */
+/*     width: 215px; */
+/* } */
+
+
+
+/* #breadCrumbs { */
+/*     margin-bottom: 11px; */
+/* } */
+/* #breadCrumbs * { */
+/*     color: #008E24; */
+/* } */
+/* #breadCrumbs td { */
+/*     font-weight: bold; */
+/*     padding-right: 4px; */
+/* } */
+/* #breadCrumbs .h1 { */
+/*     font-size: 1.1em; */
+/*     font-weight: bold; */
+/*     text-decoration: underline; */
+/* } */
+/* .even * { */
+/*     background-color: #CCCCCC; */
+/* } */
+/* #appWidget { */
+/*     border-top: 1px solid #999; */
+/*     float: left; */
+/*     padding-left: 15px; */
+/*     padding-top: 13px; */
+/*     width: 530px; */
+/* } */
+/* #playersByCountry, #playersByPosition { */
+/*     border: 1px solid #CCCCCC; */
+/*     margin-bottom: 11px; */
+/*     padding: 4px; */
+/*     text-align: center; */
+/*     font-variant: small-caps; */
+/*     margin-top: 2px; */
+/* } */
+/* #playersByCountry .break th { */
+/*     border-top: 1px solid #333333; */
+/* } */
+/* #detailsWidget td { */
+/*     text-align: center; */
+/* } */
+
+/* #detailsWidget #homeViewImpl * { */
+/* 	text-align: left; */
+/* } */
+
+/* #footer { */
+/*     clear: both; */
+/*     height: 75px; */
+/* } */
+/* .popupHeader { */
+/*     background-color: #ccc; */
+/*     padding-right: 2px; */
+/* } */
+
+/* .popupHeader td { */
+/*     background-color: #ccc; */
+/*     padding: 0 4px; */
+/* } */
+/* .sendButton { */
+/*     display: block; */
+/*     font-size: 16pt; */
+/* } */
+/* .gwt-DialogBox { */
+/*     width: 400px; */
+/* } */
+/* .dialogVPanel { */
+/*     margin: 5px; */
+/* } */
+/* .serverResponseLabelError { */
+/*     color: red; */
+/* } */
+/* #closeButton { */
+/*     margin: 15px 6px 6px; */
+/* } */
+/* .dominic { */
+/*     font-size: 32pt; */
+/* } */
+/* .groupList { */
+/*     border: 1px solid silver; */
+/*     margin-bottom: 6px; */
+/*     margin-top: 11px; */
+/*     padding: 2px; */
+/* } */
+/* .groupList .gwt-HTML { */
+/*     padding-left: 4px; */
+/* } */
+
+/* .groupList .gwt-Anchor { */
+/* 	color: black; */
+/* 	text-decoration: none; */
+/* } */
+
+/* .groupListNumericColumn { */
+/*     text-align: right; */
+/*     width: 8em; */
+/* } */
+/* .groupListRemoveColumn { */
+/*     text-align: center; */
+/* } */
+/* .groupListHeader td { */
+/*     background: none repeat scroll 0 0 #CCCCCC; */
+/*     border-bottom: 1px solid #999999; */
+/*     border-top: 1px solid #999999; */
+/*     color: black; */
+/*     font-weight: bold; */
+/*     padding-left: 4px; */
+/* } */
+/* #pointsRemaining { */
+/*     clear: right; */
+/*     float: right; */
+/*     text-align: right; */
+/*     padding-left: 7px; */
+/* } */
+/* .instructions * { */
+/*     background-color: #e2f8fe; */
+/* } */
+/* .instructions { */
+/*     background-color: #e2f8fe; */
+/*     border: 1px solid #999; */
+/*     padding: 5px; */
+/*     text-align: center; */
+/* } */
+/* .points { */
+/*     clear: both; */
+/*     color: #2222E9; */
+/*     font-size: 3em; */
+/*     font-weight: bold; */
+/* } */
+/* .points div { */
+/* } */
+
+/* #footer { */
+/* 	font-size: .9em; */
+/* } */

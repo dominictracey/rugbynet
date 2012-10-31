@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+
+	<g:VerticalPanel>
+	<g:VerticalPanel ui:field="panel" styleName="fullwidth"/>
+		<g:HorizontalPanel>
+			<g:VerticalPanel>
+				
+				<g:HTMLPanel styleName="panel" ui:field="clubhouseInfo">
+					<div class="leaderboardRow-header"><g:Label ui:field="clubhouseName" /></div>
+					<div class="leaderboardRow">
+						<g:Label ui:field="clubhouseDescription" /><br/>To invite others to join, send them this link: <g:TextBox ui:field="joinLink"/>
+					</div>
+				</g:HTMLPanel>
+				
+				
+				<g:HTMLPanel styleName="panel" ui:field="noLeaderboard">
+					<div class="leaderboardRow-header">Leaderboard</div>
+					<div class="leaderboardRow">
+						Leaderboard available after first round of play
+						complete.
+					</div>
+				</g:HTMLPanel>
+				<g:HorizontalPanel  styleName="buttonbox">
+					<g:Button ui:field="createNewClubhouse">Create New Clubhouse</g:Button>
+				</g:HorizontalPanel>
+			</g:VerticalPanel>
+			<g:HTMLPanel styleName="panel" ui:field="clubhouseMembers">
+				<!-- <div class="leaderboardRow-header"><g:Label ui:field="clubhouseName"/></div> -->
+				<!-- <div class="leaderboardRow"> -->
+
+				<!-- </div> -->
+			</g:HTMLPanel>
+		</g:HorizontalPanel>
+	</g:VerticalPanel>
+</ui:UiBinder>

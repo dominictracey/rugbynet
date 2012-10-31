@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<ui:style>
+		.panel {
+			background-color: ivory;
+		}
+	</ui:style>
+	<g:VerticalPanel>
+		<g:HTMLPanel styleName="panel" ui:field="pickPlease">
+			<div class="leaderboardRow-header">Pick an Entry</div>
+			<div class="leaderboardRow">Please choose one of your existing entries from the
+				Entry menu above or click the button below to create a new entry.</div>
+			<g:Button ui:field="createNewEntry">Create New Entry</g:Button>
+		</g:HTMLPanel>
+		<g:HTMLPanel styleName="panel" ui:field="noLogin">
+			<div class="leaderboardRow-header">Sign in first</div>
+			<div class="leaderboardRow">Click below to create a new account or sign in with an
+				existing one.</div>
+			<g:HorizontalPanel styleName="buttonbox">
+				<g:Button ui:field="signInButton" styleName="highlight">Sign In</g:Button>
+				<g:Button ui:field="signUpButton" styleName="highlight">Sign Up</g:Button>
+			</g:HorizontalPanel>
+		</g:HTMLPanel>
+		<g:FlowPanel ui:field="playPanel" styleName="{style.panel}">
+			<g:TabBar ui:field="tabBar"></g:TabBar>
+			<g:HTMLPanel ui:field="pickArea"></g:HTMLPanel>
+			<g:VerticalPanel>
+				<g:HTMLPanel ui:field="tbInstructions">
+					To resolve draws (when two or more players pick the same number of
+					matches correctly) we use your
+					<b>prediction of the last match's score</b>
+					to rank the entries. Most importantly you need to pick the correct
+					winner, but you also want to predict both team's scores as
+					accurately as possible.
+				</g:HTMLPanel>
+				<g:HorizontalPanel>
+					<g:Label ui:field="tbHomeName" />
+					<g:TextBox ui:field="tbHomeScore" />
+				</g:HorizontalPanel>
+				<g:HorizontalPanel>
+					<g:Label ui:field="tbVisitName" />
+					<g:TextBox ui:field="tbVisitScore" />
+				</g:HorizontalPanel>
+			</g:VerticalPanel>
+
+			<g:Button ui:field="button" />
+		</g:FlowPanel>
+	</g:VerticalPanel>
+</ui:UiBinder>

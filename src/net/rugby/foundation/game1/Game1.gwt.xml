@@ -1,0 +1,21 @@
+<module rename-to="game1">
+	<inherits name="com.google.gwt.user.User"/>
+	<inherits name="com.google.gwt.user.theme.standard.Standard"/>
+	<inherits name="com.google.gwt.place.Place"/>
+	<inherits name="com.google.gwt.activity.Activity"/>
+	<inherits name="net.rugby.foundation.core.Core" />
+	<inherits name="com.googlecode.objectify.Objectify" />
+	<inherits name="net.rugby.foundation.result.Result" />
+	<inherits name="com.google.gwt.logging.Logging"/>
+	<inherits name="com.google.gwt.visualization.Visualization"/>
+	<entry-point class="net.rugby.foundation.game1.client.Game1"/>
+	<replace-with class="net.rugby.foundation.game1.client.ClientFactoryImpl">
+		<when-type-is class="net.rugby.foundation.game1.client.ClientFactory"/>
+	</replace-with>
+	<source path='client'/>
+    <source path='shared'/>
+    
+    <set-property name="gwt.logging.logLevel" value="FINE"/>         
+    <set-property name="gwt.logging.enabled" value="FALSE"/>            
+    <set-property name="gwt.logging.consoleHandler" value="DISABLED"/>  
+</module>

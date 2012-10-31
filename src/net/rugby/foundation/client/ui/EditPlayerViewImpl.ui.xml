@@ -1,0 +1,99 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:p1="urn:import:com.google.gwt.user.datepicker.client">
+  <ui:style>
+    .playersViewButtonHPanel {
+      margin: 5px 0px 0x 5px;
+    }
+    .playersViewPlayersFlexTable {
+      margin: 5px 0px 5px 0px;
+    }
+
+  </ui:style>
+
+
+  <g:DecoratorPanel>
+	<g:VerticalPanel>
+		<g:HorizontalPanel borderWidth="2">
+			<g:VerticalPanel>
+			<g:HorizontalPanel >
+			<g:Label text="First Name:"></g:Label>
+			<g:TextBox ui:field="firstName"></g:TextBox>
+		</g:HorizontalPanel>
+			<g:HorizontalPanel>
+			<g:Label text="Last Name:"></g:Label>
+			<g:TextBox ui:field="lastName"></g:TextBox>
+		</g:HorizontalPanel>
+			<g:HorizontalPanel>
+			<g:Label text="Display Name"/>
+			<g:TextBox ui:field="displayName"/>
+		</g:HorizontalPanel>
+			<g:HorizontalPanel>
+			<g:Label text="Position"/>
+			<g:ListBox ui:field="position">
+<!-- 				<g:item>NONE</g:item><g:item>PROP</g:item> -->
+<!-- 				<g:item>HOOKER</g:item><g:item>LOCK</g:item><g:item>FLANKER</g:item> -->
+<!-- 				<g:item>NUMBER8</g:item><g:item>SCRUMHALF</g:item><g:item>FLYHALF</g:item> -->
+<!-- 				<g:item>WING</g:item><g:item>CENTER</g:item><g:item>FULLBACK</g:item>  -->
+			</g:ListBox>
+			<g:Label text="Team"/>
+			<g:ListBox ui:field="team"/>
+		</g:HorizontalPanel>
+		</g:VerticalPanel>
+			<g:VerticalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="# caps"/>
+				<g:TextBox ui:field="numCaps"/>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="Data of Birth"/>
+				<p1:DateBox ui:field="dateOfBirth"/>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="Club"/>
+				<g:TextBox ui:field="club"/>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="Height (cm)"/>
+				<g:TextBox ui:field="height"/>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="Weight (kg)"/>
+				<g:TextBox ui:field="weight"/>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="Active"/>
+				<g:CheckBox ui:field="active"/>
+			</g:HorizontalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="Original Rating"/>
+				<g:TextBox ui:field="origRating"/>
+			</g:HorizontalPanel>
+		</g:VerticalPanel>
+		</g:HorizontalPanel>
+		<g:HorizontalPanel>
+			<g:VerticalPanel borderWidth="2">
+				<g:HorizontalPanel>
+					<g:Label text="Bio snippet (~250 chars"/>
+					<g:TextArea width="318px"  ui:field="bioSnippet"/>
+				</g:HorizontalPanel>
+				<g:HorizontalPanel>
+					<g:HorizontalPanel>
+						<g:Label text="Bio Credit"/>
+						<g:TextBox ui:field="bioCredit"/>
+					</g:HorizontalPanel>
+					<g:HorizontalPanel>
+						<g:Label text="Bio Url"/>
+						<g:TextBox ui:field="bioUrl"/>
+					</g:HorizontalPanel>
+				</g:HorizontalPanel>
+			</g:VerticalPanel>
+		</g:HorizontalPanel>
+		<g:HorizontalPanel addStyleNames="{style.playersViewButtonHPanel}">
+      		<g:Button ui:field="saveButton">Save</g:Button>
+      		<g:Button ui:field="cancelButton">Cancel</g:Button>
+		</g:HorizontalPanel>
+    </g:VerticalPanel>
+  </g:DecoratorPanel>
+
+</ui:UiBinder>

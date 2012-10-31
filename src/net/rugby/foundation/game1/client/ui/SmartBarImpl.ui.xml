@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<ui:style>
+		.panel {
+			background-color: ivory;
+		}
+	</ui:style>
+
+	<g:MenuBar ui:field="smartBar">
+		<g:MenuItem ui:field="entryMenuItem">
+			Entry
+			<g:MenuBar ui:field="entryBar" vertical="true">
+			</g:MenuBar>
+		</g:MenuItem>
+		<g:MenuItem ui:field="clubhouseMenuItem">
+			Clubhouse
+			<g:MenuBar ui:field="clubhouseBar" vertical="true">
+			</g:MenuBar>
+		</g:MenuItem>
+		<g:MenuItem ui:field="competitionMenuItem">
+			Competition
+			<g:MenuBar ui:field="competitionBar" vertical="true">
+			</g:MenuBar>
+		</g:MenuItem>
+
+	</g:MenuBar>
+</ui:UiBinder>
