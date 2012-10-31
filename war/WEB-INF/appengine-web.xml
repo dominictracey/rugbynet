@@ -20,5 +20,7 @@
 	</system-properties>
 
 	<sessions-enabled>true</sessions-enabled>
+	
+	<!-- needed for Juno -->
 	<threadsafe></threadsafe>
 </appengine-web-app>
