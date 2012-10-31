@@ -1,2 +1,0 @@
-# Module net.rugby.foundation.core.Core.JUnit
-# RPC service class, partial path of RPC policy file
