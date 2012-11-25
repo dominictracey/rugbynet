@@ -97,6 +97,11 @@ public class TestTeamFactory implements ITeamGroupFactory {
 			t.setShortName("Tigers");
 			((Group)t).setDisplayName("Leicester");
 			t.setColor("#004738");
+		} else if (id == 9209) {
+			t.setAbbr("SAR");
+			t.setShortName("Saracens");
+			((Group)t).setDisplayName("Saracens");
+			t.setColor("#000000");
 		}
 		((TeamGroup)t).setId(id);
 		((Group)t).setGroupType(GroupType.TEAM);

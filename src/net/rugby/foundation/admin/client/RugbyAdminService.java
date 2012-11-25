@@ -8,6 +8,7 @@ import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -32,6 +33,8 @@ public interface RugbyAdminService extends RemoteService {
 	List<IMatchResult> getResults(Long matchId);
 	ITeamGroup saveTeam(ITeamGroup teamGroup);
 	ITeamGroup getTeam(Long teamId);
+	IPlayer getPlayer(Long id);
+	IPlayer savePlayer(IPlayer player, String promisedHandle);
 	IMatchGroup saveMatch(IMatchGroup matchGroup);
 	IMatchGroup getMatch(Long matchId);
 	Boolean createAdmin();
