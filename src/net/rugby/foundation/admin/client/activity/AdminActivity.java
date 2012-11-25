@@ -6,11 +6,13 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminPlace;
+import net.rugby.foundation.admin.client.place.EmailHandlerPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditComp;
 import net.rugby.foundation.admin.client.ui.EditComp.Presenter;
 import net.rugby.foundation.admin.client.ui.EditMatch;
+import net.rugby.foundation.admin.client.ui.EditPlayer;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.WorkflowConfigurationView;
 import net.rugby.foundation.admin.client.ui.EditTeam;
@@ -20,8 +22,14 @@ import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
+
+import com.google.appengine.tools.pipeline.NoSuchObjectException;
+import com.google.appengine.tools.pipeline.OrphanedObjectException;
+import com.google.appengine.tools.pipeline.PipelineService;
+import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -32,7 +40,10 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 /**
  * Activities are started and stopped by an ActivityManager associated with a container Widget.
  */
-public class AdminActivity extends AbstractActivity implements AdminView.Presenter, CompetitionView.Presenter, WorkflowConfigurationView.Presenter, OrchestrationConfigurationView.Presenter, EditTeam.Presenter, Presenter, net.rugby.foundation.admin.client.ui.EditMatch.Presenter { //, Game1ConfigurationView.Presenter {
+public class AdminActivity extends AbstractActivity implements EditPlayer.Presenter, 
+						AdminView.Presenter, CompetitionView.Presenter, /*WorkflowConfigurationView.Presenter,*/ 
+						OrchestrationConfigurationView.Presenter, EditTeam.Presenter, Presenter, 
+						net.rugby.foundation.admin.client.ui.EditMatch.Presenter { //, Game1ConfigurationView.Presenter {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -45,6 +56,7 @@ public class AdminActivity extends AbstractActivity implements AdminView.Present
 	private  Map<String, IOrchestrationConfiguration> orchConfig = null;
 	private EditTeam et = null;  //@REX stupid
 	private EditComp ec = null;  //@REX stupid
+
 	private List<ICompetition> comps = null;
 	private EditMatch em;
 
@@ -55,6 +67,8 @@ public class AdminActivity extends AbstractActivity implements AdminView.Present
 	// temp storage for building up new comp
 	private List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
 	protected List<IRound> rounds = new ArrayList<IRound>();
+	private boolean handleEmail = false;
+	private EmailHandlerPlace emailHandlerPlace;
 
 	public AdminActivity(AdminPlace place, ClientFactory clientFactory) {
 		//this.name = place.getName();
@@ -77,59 +91,93 @@ public class AdminActivity extends AbstractActivity implements AdminView.Present
 
 	}
 
+	public AdminActivity(EmailHandlerPlace place, ClientFactory clientFactory) {
+		//this.name = place.getName();
+		this.clientFactory = clientFactory;
+		view = clientFactory.getAdminView();
+
+		// Select the tab corresponding to the token value
+		if (place.getToken() != null) {
+			view.selectTab(3);
+			handleEmail = true;	
+
+			emailHandlerPlace = place;
+		}
+	}
+
 	@Override
 	public void start(AcceptsOneWidget containerWidget, EventBus eventBus) {
 		view.setPresenter(this);
 
 		containerWidget.setWidget(view.asWidget());
 
-		//		if (showTab == 1) {  // competitions conf
-		clientFactory.getRpcService().getAllComps(new AsyncCallback<List<ICompetition>>() {
+		if (handleEmail) {
+			clientFactory.getRpcService().getPlayer(null, new AsyncCallback<IPlayer>() {
 
 
 
-			@Override
-			public void onFailure(Throwable caught) {
+				@Override
+				public void onFailure(Throwable caught) {
 
 
-			}
+				}
 
-			@Override
-			public void onSuccess(List<ICompetition> result) {
-				comps = result;
-				view.getCompView().addComps(result);
+				@Override
+				public void onSuccess(IPlayer result) {
+					view.getEditPlayer().ShowPlayer(result);
+					view.getEditPlayer().ShowPlace(emailHandlerPlace);
+				}
+			});
+			
+		} else {
 
-				//		} else if (showTab == 3) {  // workflow conf
-				clientFactory.getRpcService().getWorkflowConfiguration(new AsyncCallback<IWorkflowConfiguration>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
+			clientFactory.getRpcService().getAllComps(new AsyncCallback<List<ICompetition>>() {
 
 
-					}
 
-					@Override
-					public void onSuccess(final IWorkflowConfiguration workflowConfig) {
+				@Override
+				public void onFailure(Throwable caught) {
 
-						//view.getWorkflowConfig().setCompetitions(comps, workflowConfig);
 
-						// nest this to solve the asynchronous problem of creating two wfcs.
-						clientFactory.getRpcService().getOrchestrationConfiguration(new AsyncCallback<Map<String, IOrchestrationConfiguration>>() {
-							@Override
-							public void onFailure(Throwable caught) {
+				}
 
-								view.getOrchestrationConfig().showStatus(caught.getMessage());
-							}
+				@Override
+				public void onSuccess(List<ICompetition> result) {
+					comps = result;
+					view.getCompView().addComps(result);
 
-							@Override
-							public void onSuccess(Map<String, IOrchestrationConfiguration> result) {					
-								view.getOrchestrationConfig().setOrchConfigs(result);					
-							}
-						});
-					}
-				});	
-			}
-		});					
+					//		} else if (showTab == 3) {  // workflow conf
+					clientFactory.getRpcService().getWorkflowConfiguration(new AsyncCallback<IWorkflowConfiguration>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+
+
+						}
+
+						@Override
+						public void onSuccess(final IWorkflowConfiguration workflowConfig) {
+
+							//view.getWorkflowConfig().setCompetitions(comps, workflowConfig);
+
+							// nest this to solve the asynchronous problem of creating two wfcs.
+							clientFactory.getRpcService().getOrchestrationConfiguration(new AsyncCallback<Map<String, IOrchestrationConfiguration>>() {
+								@Override
+								public void onFailure(Throwable caught) {
+
+									view.getOrchestrationConfig().showStatus(caught.getMessage());
+								}
+
+								@Override
+								public void onSuccess(Map<String, IOrchestrationConfiguration> result) {					
+									view.getOrchestrationConfig().setOrchConfigs(result);					
+								}
+							});
+						}
+					});	
+				}
+			});		
+		}
 
 	}
 
@@ -318,22 +366,22 @@ public class AdminActivity extends AbstractActivity implements AdminView.Present
 		});				
 	}
 
-//	@Override
-//	public void saveWorkflowConfiguration(IWorkflowConfiguration wfc) {
-//		clientFactory.getRpcService().saveWorkflowConfig(wfc, new AsyncCallback<IWorkflowConfiguration>() {
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				view.getWorkflowConfig().showStatus(caught.getMessage());
-//			}
-//
-//			@Override
-//			public void onSuccess(IWorkflowConfiguration result) {
-//				view.getWorkflowConfig().showStatus("Success");
-//
-//			}
-//		});		
-//	}
+	//	@Override
+	//	public void saveWorkflowConfiguration(IWorkflowConfiguration wfc) {
+	//		clientFactory.getRpcService().saveWorkflowConfig(wfc, new AsyncCallback<IWorkflowConfiguration>() {
+	//
+	//			@Override
+	//			public void onFailure(Throwable caught) {
+	//				view.getWorkflowConfig().showStatus(caught.getMessage());
+	//			}
+	//
+	//			@Override
+	//			public void onSuccess(IWorkflowConfiguration result) {
+	//				view.getWorkflowConfig().showStatus("Success");
+	//
+	//			}
+	//		});		
+	//	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView.Presenter#saveClicked(java.util.Map)
@@ -345,7 +393,7 @@ public class AdminActivity extends AbstractActivity implements AdminView.Present
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getWorkflowConfig().showStatus(caught.getMessage());
+				view.getOrchestrationConfig().showStatus(caught.getMessage());
 			}
 
 			@Override
@@ -758,14 +806,42 @@ public class AdminActivity extends AbstractActivity implements AdminView.Present
 
 	}
 
+	@Override
+	public void savePlayerInfo(IPlayer player) {
+		if (emailHandlerPlace != null) {
+			clientFactory.getRpcService().savePlayer(player, emailHandlerPlace.getPromisedHandle(), new AsyncCallback<IPlayer>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+
+					Window.alert("Player not saved: " + caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(IPlayer result) {
+					//ec.SetPresenter(presenter);
+					//				if (result != null)
+					//					Window.alert("Match saved");
+					//				else
+					//					Window.alert("Comp not saved");
+					view.getEditPlayer().ShowPlayer(result);
+
+
+				}
+			});		
+
+		}
+		
+	}
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.client.ui.WorkflowConfigurationView.Presenter#saveWorkflowConfiguration(java.util.List)
 	 */
-	@Override
-	public void saveWorkflowConfiguration(List<IWorkflow> workflows) {
-		// TODO Auto-generated method stub
-
-	}
+	//	@Override
+	//	public void saveWorkflowConfiguration(List<IWorkflow> workflows) {
+	//		// TODO Auto-generated method stub
+	//
+	//	}
 
 
 }

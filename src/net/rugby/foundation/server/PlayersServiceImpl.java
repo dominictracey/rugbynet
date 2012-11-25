@@ -21,6 +21,7 @@ import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetitionTeam;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchRating;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Clubhouse;
 import net.rugby.foundation.model.shared.ClubhouseMembership;
@@ -324,7 +325,7 @@ public class PlayersServiceImpl extends RemoteServiceServlet implements
 	    		Iterator<MatchRating> it = mrList.iterator();
 	    		boolean found = false;
 	    		while (it.hasNext() && !found) {
-	    			MatchRating r = it.next();
+	    			IMatchRating r = it.next();
 	    			if (r.getPlayerID().equals(p.getId()) ) {
 	    				found = true;
 	    				if (poolMatch) 
@@ -373,7 +374,7 @@ public class PlayersServiceImpl extends RemoteServiceServlet implements
 	    		Iterator<MatchRating> it = mrList.iterator();
 	    		boolean found = false;
 	    		while (it.hasNext() && !found) {
-	    			MatchRating r = it.next();
+	    			IMatchRating r = it.next();
 	    			if (r.getPlayerID().equals(p.getId()) ) {
 	    				found = true;
 	    				if (poolMatch) 
@@ -986,7 +987,7 @@ private ArrayList<MatchPopupData> getMatchPopupData(Long playerid) {
 	 ArrayList<MatchPopupData> retval = new  ArrayList<MatchPopupData>();
     Query<MatchRating> q = ofy.query(MatchRating.class).filter("playerID", playerid);
     
-    for (MatchRating mr : q) {
+    for (IMatchRating mr : q) {
     	Key<Group> key = new Key<Group>(Group.class,mr.getMatchID());
     	Group match = ofy.get(key);
     	//@TODO implement match url 
@@ -1032,7 +1033,7 @@ public ArrayList<String> endRound(ArrayList<Long> matchIDs) {
 
 	//@TODO hardcode 6
 	Query<MatchRating> qr = ofy.query(MatchRating.class).filter("round >", 5);
-	for (MatchRating r : qr) {
+	for (IMatchRating r : qr) {
 		e.addRating(r.getPlayerID(), r.getPlayerRating().floatValue());
 	}
 	

@@ -163,6 +163,12 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 			g.setLocked(false);
 			cal.add(Calendar.DATE, 9);
 			g.setStatus(Status.SCHEDULED);
+		} else if (id == 208) {  // for testing 
+			g.setHomeTeamId(9209L);
+			g.setVisitingTeamId(9202L);
+			g.setLocked(false);
+			cal.add(Calendar.MINUTE, -120);
+			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
 		}
 		//if (g.getHomeTeamId() != 0L) {
 			tf.setId(g.getHomeTeamId());

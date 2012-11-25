@@ -21,6 +21,7 @@ public interface AdminView extends IsWidget {
 	}
 
 	CompetitionView getCompView();
-	WorkflowConfigurationView getWorkflowConfig();
+	//WorkflowConfigurationView getWorkflowConfig();
 	OrchestrationConfigurationView getOrchestrationConfig();
+	EditPlayer getEditPlayer();
 }
