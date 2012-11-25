@@ -32,7 +32,6 @@ import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
-import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.game1.server.factory.IEntryFactory;
@@ -48,16 +47,11 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
-import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.appengine.tools.pipeline.NoSuchObjectException;
-import com.google.appengine.tools.pipeline.OrphanedObjectException;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -78,7 +72,6 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private ITeamGroupFactory tf;
 	private IRoundFactory rf;
 	private OrchestrationHelper queuer;
-	private IPlayerFactory pf;
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
 
@@ -91,7 +84,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public void setFactories(IAppUserFactory auf, IOrchestrationConfigurationFactory ocf, 
 			ICompetitionFactory cf, IEntryFactory ef, 
 			IMatchGroupFactory mf, IMatchEntryFactory mef, IRoundEntryFactory ref, IForeignCompetitionFetcherFactory fcff,
-			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerFactory pf) {
+			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -103,8 +96,6 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.ccf = ccf;
 		this.tf = tf;
 		this.rf = rf;
-		this.pf = pf;
-		
 //		rf.setFactories(cf, mf);
 //		mf.setFactories(rf, tf);
 		
@@ -673,29 +664,6 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			Logger.getLogger("Admin").log(Level.SEVERE, "fetchScore: " + e.getMessage());
 			return null;
 		}
-	}
-
-	@Override
-	public IPlayer getPlayer(Long id) {
-		return pf.getById(id);
-	}
-
-	@Override
-	public IPlayer savePlayer(IPlayer player, String promisedHandle) {
-		player = pf.put(player);
-		if (!promisedHandle.isEmpty()) {
-			PipelineService service = PipelineServiceFactory.newPipelineService();
-			try {
-				service.submitPromisedValue(promisedHandle, player);
-			} catch (NoSuchObjectException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (OrphanedObjectException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return player;
 	}
 
 }

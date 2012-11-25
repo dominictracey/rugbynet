@@ -10,7 +10,6 @@ import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
-import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
@@ -63,10 +62,6 @@ public interface RugbyAdminServiceAsync {
 	 * @param asyncCallback
 	 */
 	public void getTeam(Long teamId, AsyncCallback<ITeamGroup> asyncCallback);
-	
-	public void getPlayer(Long id,  AsyncCallback<IPlayer> asyncCallback);
-	public void savePlayer(IPlayer player, String promisedHandle,  AsyncCallback<IPlayer> asyncCallback);
-
 	/**
 	 * @param asyncCallback
 	 */

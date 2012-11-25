@@ -9,7 +9,6 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
-import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestAppUserFactory;
@@ -19,7 +18,6 @@ import net.rugby.foundation.core.server.factory.test.TestCompetitionFactory;
 import net.rugby.foundation.core.server.factory.test.TestConfigurationFactory;
 import net.rugby.foundation.core.server.factory.test.TestMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestMatchResultFactory;
-import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.core.server.factory.test.TestRoundFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamFactory;
 
@@ -41,7 +39,6 @@ public class CoreTestModule extends AbstractModule {
 		bind(IConfigurationFactory.class).to(TestConfigurationFactory.class);
 		bind(IAccountManager.class).to(AccountManager.class);
 		bind(IExternalAuthticatorProviderFactory.class).to(ExternalAuthenticatorFactory.class);
-		bind(IPlayerFactory.class).to(TestPlayerFactory.class);
 	}
 }
 

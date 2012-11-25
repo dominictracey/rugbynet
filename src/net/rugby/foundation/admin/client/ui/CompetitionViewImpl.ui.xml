@@ -19,12 +19,6 @@
 		.editArea {
 			width:500px;
 			background-color:lightblue;
-			padding:20px;
-		}
-		.jobArea {
-			width:500px;
-			background-color:lightorange;
-			padding:20px;
 		}
 	</ui:style>
 <g:HorizontalPanel>
@@ -54,9 +48,6 @@
 			</g:HorizontalPanel>
 		</g:VerticalPanel>
 	</g:VerticalPanel>
-	<g:VerticalPanel>
 	<g:SimplePanel ui:field='editArea' styleName="{style.editArea}"></g:SimplePanel>
-	<g:SimplePanel ui:field='jobArea' styleName="{style.jobArea}"></g:SimplePanel>
-	</g:VerticalPanel>
 </g:HorizontalPanel>
 </ui:UiBinder>

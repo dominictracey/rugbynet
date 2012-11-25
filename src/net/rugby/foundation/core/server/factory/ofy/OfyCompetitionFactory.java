@@ -6,7 +6,6 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,11 +34,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 @Singleton
-public class OfyCompetitionFactory implements ICompetitionFactory, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -645530830404364424L;
+public class OfyCompetitionFactory implements ICompetitionFactory {
 	private Long id;
 	private final Objectify ofy;
 	private final IRoundFactory rf;

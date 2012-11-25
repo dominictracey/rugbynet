@@ -10,13 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.rugby.foundation.admin.server.workflow.AdminWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
-import net.rugby.foundation.admin.server.workflow.MatchResultFetchWF;
 import net.rugby.foundation.admin.shared.CompetitionWorkflow;
 
-import com.google.appengine.tools.pipeline.JobInfo;
-import com.google.appengine.tools.pipeline.NoSuchObjectException;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -57,26 +52,6 @@ public class WorkflowServlet extends HttpServlet {
 		String targetType = req.getParameter(AdminWorkflow.Targets.getKey());
 		String targetKey = req.getParameter(AdminWorkflow.Key);
 		String secondaryKey = req.getParameter(AdminWorkflow.SecondaryKey);
-		if (targetType.equals("MatchResultFetchWF")) {
-			
-			PipelineService service = PipelineServiceFactory.newPipelineService();
-			String pipelineId = service.startNewPipeline(new MatchResultFetchWF(), 11, 5, 7);
-
-			// Later, check on the status and get the final output
-			JobInfo jobInfo;
-			try {
-				jobInfo = service.getJobInfo(pipelineId);
-				JobInfo.State state = jobInfo.getJobState();
-				if (JobInfo.State.COMPLETED_SUCCESSFULLY == state){
-				  System.out.println("The output is " + jobInfo.getOutput());
-				} else {
-					System.out.println("The job is in state " + jobInfo.getJobState().toString());
-				}
-			} catch (NoSuchObjectException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 //		if (target.equals(AdminOrchestrationTargets.Targets.MATCH.toString())) {
 //	        wff.setId(Long.parseLong(req.getParameter("id")));  
 //	        IOrchestration<IMatchGroup> orch = of.get(mgf.getGame(), AdminOrchestrationActions.MatchActions.valueOf(AdminOrchestrationActions.MatchActions.class, action));

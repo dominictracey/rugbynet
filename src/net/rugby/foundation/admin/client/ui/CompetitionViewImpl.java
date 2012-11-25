@@ -47,7 +47,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiField Label status;
 	@UiField Tree compTree;
 	@UiField SimplePanel editArea;
-	@UiField SimplePanel jobArea;
 	@UiField Button createAdmin;
 	@UiField Button sanityCheck;
 	
@@ -217,7 +216,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						
 						if (editMatch == null) {
 							editMatch = new EditMatch();
-							editArea.clear();
 							editArea.add(editMatch);
 						}
 						editMatch.setVisible(true);

@@ -1,6 +1,5 @@
 package net.rugby.foundation.core.server.factory.test;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,11 +30,7 @@ import com.google.inject.Inject;
  *
  */
 
-public class TestCompetitionFactory implements ICompetitionFactory, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 788805092578913470L;
+public class TestCompetitionFactory implements ICompetitionFactory {
 	private Long id;
 	private final IRoundFactory rf;
 	private ICoreRuleFactory crf;

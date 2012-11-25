@@ -19,10 +19,9 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 
 	private Presenter listener;
 	private CompetitionViewImpl cv;
-	//private WorkflowConfigurationViewImpl wfc;
+	private WorkflowConfigurationView wfc;
 	private OrchestrationConfigurationViewImpl ocv;
 	//private Game1ConfigurationViewImpl g1cv;
-	private EditPlayer epv;
 	
 //	@UiField
 	TabPanel tabs;
@@ -43,14 +42,12 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 	{
 		cv = new CompetitionViewImpl();
 		ocv = new OrchestrationConfigurationViewImpl();
-		epv = new EditPlayer();
-		//wfc = new WorkflowConfigurationViewImpl();
+		wfc = new WorkflowConfigurationView();
 		//g1cv = new Game1ConfigurationViewImpl();
 
 		tabs.add(cv, "Competitions");
 		tabs.add(ocv, "Orchestration Config");
-		tabs.add(epv, "Edit Player");
-//		tabs.add(wfc,"Workflow Config");
+		tabs.add(wfc,"Workflow Config");
 		//tabs.add(g1cv,"Game1 Config");
 	}
 	
@@ -59,14 +56,9 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 		this.listener = listener;
 		if (listener instanceof CompetitionView.Presenter) {
 			cv.setPresenter((CompetitionView.Presenter)listener);
-//			wfc.setPresenter((CompetitionView.Presenter)listener, (WorkflowConfigurationView.Presenter)listener);
+			wfc.setPresenter((CompetitionView.Presenter)listener, (WorkflowConfigurationView.Presenter)listener);
 			ocv.setPresenter((OrchestrationConfigurationView.Presenter)listener);
 			//g1cv.setPresenter((Game1ConfigurationView.Presenter)listener);	
-			
-		}
-		
-		if (listener instanceof EditPlayer.Presenter) {
-			epv.SetPresenter((EditPlayer.Presenter)listener);
 		}
 		
 		tabs.selectTab(0);
@@ -81,10 +73,10 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 		return cv;
 	}
 
-//	@Override
-//	public WorkflowConfigurationView getWorkflowConfig() {
-//		return wfc;
-//	}
+	@Override
+	public WorkflowConfigurationView getWorkflowConfig() {
+		return wfc;
+	}
 	
 	@Override
 	public void selectTab(int index) {
@@ -120,11 +112,6 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 	@Override
 	public OrchestrationConfigurationView getOrchestrationConfig() {
 		return ocv;
-	}
-
-	@Override
-	public EditPlayer getEditPlayer() {
-		return epv;
 	}
 
 
