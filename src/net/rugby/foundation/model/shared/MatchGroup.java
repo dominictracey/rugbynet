@@ -34,6 +34,8 @@ public class MatchGroup extends Group implements IMatchGroup {
 	private Long visitingTeamID;
 
 	private Long roundId; //parent object id
+	private Long foreignId;
+	private String foreignUrl;
 	
 	@Override
 	public boolean equals(Object o) {
@@ -243,6 +245,26 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public Long getRoundId() {
 		return roundId;
+	}
+
+	@Override
+	public void setForeignId(Long foreignId) {
+		this.foreignId = foreignId;
+	}
+
+	@Override
+	public Long getForeignId() {
+		return foreignId;
+	}
+
+	@Override
+	public String getForeignUrl() {
+		return foreignUrl;
+	}
+
+	@Override
+	public void setForeignUrl(String foreignUrl) {
+		this.foreignUrl = foreignUrl;
 	}
 
 

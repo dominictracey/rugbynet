@@ -23,6 +23,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
 
@@ -833,6 +834,30 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 		}
 		
 	}
+
+	@Override
+	public void testMatchStatsClicked(Long matchId) {
+		clientFactory.getRpcService().testMatchStats(matchId, new AsyncCallback<List<IPlayerMatchStats>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+
+				Window.alert("Player not saved: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<IPlayerMatchStats> result) {
+				//ec.SetPresenter(presenter);
+				//				if (result != null)
+				//					Window.alert("Match saved");
+				//				else
+				//					Window.alert("Comp not saved");
+				//view.getEditPlayer().ShowPlayer(result);
+
+
+			}
+		});	
+		}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.client.ui.WorkflowConfigurationView.Presenter#saveWorkflowConfiguration(java.util.List)

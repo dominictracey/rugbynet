@@ -1,13 +1,6 @@
 package net.rugby.foundation.admin.server;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,17 +17,20 @@ import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
-import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
+import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.game1.server.factory.IEntryFactory;
 import net.rugby.foundation.game1.server.factory.IMatchEntryFactory;
 import net.rugby.foundation.game1.server.factory.IRoundEntryFactory;
@@ -49,11 +45,11 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
@@ -79,10 +75,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IRoundFactory rf;
 	private OrchestrationHelper queuer;
 	private IPlayerFactory pf;
+	private ITeamMatchStatsFactory tmsf;
+	private IPlayerMatchStatsFactory pmsf;
+	private ICountryFactory countryf;
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
 
-//		ofy = DataStoreFactory.getOfy();
+		//		ofy = DataStoreFactory.getOfy();
 		queuer = new OrchestrationHelper();
 
 	}
@@ -91,7 +90,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public void setFactories(IAppUserFactory auf, IOrchestrationConfigurationFactory ocf, 
 			ICompetitionFactory cf, IEntryFactory ef, 
 			IMatchGroupFactory mf, IMatchEntryFactory mef, IRoundEntryFactory ref, IForeignCompetitionFetcherFactory fcff,
-			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerFactory pf) {
+			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerFactory pf,
+			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -104,10 +104,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.tf = tf;
 		this.rf = rf;
 		this.pf = pf;
-		
-//		rf.setFactories(cf, mf);
-//		mf.setFactories(rf, tf);
-		
+		this.tmsf = tmsf;
+		this.pmsf = pmsf;
+		this.countryf = countryf;
+
+		//		rf.setFactories(cf, mf);
+		//		mf.setFactories(rf, tf);
+
 		fcff.setFactories(rf, mf);
 	}
 
@@ -155,25 +158,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		ccf.put(c);
 
 		//add it to the workflow configuration as well
-//		IWorkflowConfiguration wfc = wfcf.get();
-//		boolean found = false;
-//		for (Long id : wfc.getUnderwayCompetitions()) {
-//			if (id.equals(comp.getId())) {
-//				found = true;
-//				break;
-//			}
-//		}
-//		
-//		if (!found) {
-//			wfc.getUnderwayCompetitions().add(comp.getId());
-//			wfcf.put(wfc);
-//		}
+		//		IWorkflowConfiguration wfc = wfcf.get();
+		//		boolean found = false;
+		//		for (Long id : wfc.getUnderwayCompetitions()) {
+		//			if (id.equals(comp.getId())) {
+		//				found = true;
+		//				break;
+		//			}
+		//		}
+		//		
+		//		if (!found) {
+		//			wfc.getUnderwayCompetitions().add(comp.getId());
+		//			wfcf.put(wfc);
+		//		}
 
 		// and a blank orchestration config
 		ocf.setId(null);
 		ocf.setCompId(comp.getId());
 		IOrchestrationConfiguration oc = ocf.get();
-		
+
 		// if we didn't find one, make one
 		if (oc == null) {
 			ocf.setCompId(null);
@@ -182,7 +185,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			oc.setCompID(comp.getId());
 			ocf.put(oc);
 		}
-		
+
 		return comp;
 	}
 
@@ -209,18 +212,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public Map<String, ITeamGroup> saveTeams(Map<String, ITeamGroup> teams) {
-		
+
 		return teams; //deprecated
-//		ofy.put(teams.values());
-//		return teams;
+		//		ofy.put(teams.values());
+		//		return teams;
 	}
 
 
 	@Override
 	public List<IRound> saveRounds(List<IRound> rounds) {
 		return rounds; //deprecated
-//		ofy.put(rounds);
-//		return rounds;
+		//		ofy.put(rounds);
+		//		return rounds;
 	}
 
 
@@ -232,13 +235,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 		// do we have this in our database? If so, replace the fetched one with the one that already has an ID
 		// a round in the DB is considered the same if it contains the same matches
-		
+
 		Map<Integer,IRound> changes = new HashMap<Integer,IRound>();
-		
+
 		// have to do two-pass to avoid concurrentChangeException
 		for (IRound r : rounds) {
 			IRound roundDB = rf.find(r);
-			
+
 			if (roundDB != null) {
 				changes.put(rounds.indexOf(r), roundDB);
 			}
@@ -270,7 +273,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		//				}
 		//			}
 		//		}
-	
+
 		for (IMatchGroup m: matches.values()) {
 			IMatchGroup found = mf.find(m);
 			if (found != null) {
@@ -285,8 +288,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public Map<String, IMatchGroup> saveMatches(Map<String, IMatchGroup> matches) {
 		return matches; //deprecated
-//		ofy.put(matches.values());
-//		return matches;
+		//		ofy.put(matches.values());
+		//		return matches;
 	}
 
 
@@ -314,9 +317,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IWorkflowConfiguration saveWorkflowConfig(IWorkflowConfiguration wfc) {
 		// there may only be one...
-//		wfcf.put(wfc);
-//
-//		return wfc;
+		//		wfcf.put(wfc);
+		//
+		//		return wfc;
 		return null;
 	}
 
@@ -382,15 +385,15 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<ITeamGroup> getTeams(Long compId) {
 		return null; //deprecated
-//		Query<CompetitionTeam> qct = ofy.query(CompetitionTeam.class).filter("competitionID", compId);
-//		ArrayList<TeamGroup> tgs = new ArrayList<TeamGroup>();
-//
-//		for (ICompetitionTeam ct : qct) {
-//			Key<TeamGroup> ktg = new Key<TeamGroup>(TeamGroup.class,ct.getTeamID());
-//			tgs.add(ofy.get(ktg));
-//		}
-//
-//		return tgs;
+		//		Query<CompetitionTeam> qct = ofy.query(CompetitionTeam.class).filter("competitionID", compId);
+		//		ArrayList<TeamGroup> tgs = new ArrayList<TeamGroup>();
+		//
+		//		for (ICompetitionTeam ct : qct) {
+		//			Key<TeamGroup> ktg = new Key<TeamGroup>(TeamGroup.class,ct.getTeamID());
+		//			tgs.add(ofy.get(ktg));
+		//		}
+		//
+		//		return tgs;
 	}
 
 
@@ -400,13 +403,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IRound> getRounds(Long compId) {
 		return null; //deprecated
-//		ArrayList<Round> rs = new ArrayList<Round>();
-//		Key<Competition> kc = new Key<Competition>(Competition.class, compId);
-//		ICompetition c = ofy.get(kc);
-//		for (Long rid : c.getRoundIds()) {
-//			rs.add(0,ofy.get(new Key<Round>(Round.class,rid)));
-//		}
-//		return rs;
+		//		ArrayList<Round> rs = new ArrayList<Round>();
+		//		Key<Competition> kc = new Key<Competition>(Competition.class, compId);
+		//		ICompetition c = ofy.get(kc);
+		//		for (Long rid : c.getRoundIds()) {
+		//			rs.add(0,ofy.get(new Key<Round>(Round.class,rid)));
+		//		}
+		//		return rs;
 	}
 
 
@@ -416,14 +419,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IMatchGroup> getMatches(Long roundId) {
 		return null; //deprecated
-//		ArrayList<MatchGroup> ms = new ArrayList<MatchGroup>();
-//		IRound r = ofy.get(new Key<Round>(Round.class,roundId));
-//		if (r != null) {
-//			for (Long mid : r.getMatchIDs()) {
-//				ms.add(ofy.get(new Key<MatchGroup>(MatchGroup.class,mid)));
-//			}
-//		}
-//		return ms;
+		//		ArrayList<MatchGroup> ms = new ArrayList<MatchGroup>();
+		//		IRound r = ofy.get(new Key<Round>(Round.class,roundId));
+		//		if (r != null) {
+		//			for (Long mid : r.getMatchIDs()) {
+		//				ms.add(ofy.get(new Key<MatchGroup>(MatchGroup.class,mid)));
+		//			}
+		//		}
+		//		return ms;
 	}
 
 
@@ -433,12 +436,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IMatchResult> getResults(Long matchId) {
 		return null; //deprecated
-//		ArrayList<MatchResult> mrs = new ArrayList<MatchResult>();
-//		Query<MatchResult> qmr = ofy.query(MatchResult.class).filter("matchID",matchId);
-//		for (MatchResult mr : qmr) {
-//			mrs.add(mr);
-//		}
-//		return mrs;
+		//		ArrayList<MatchResult> mrs = new ArrayList<MatchResult>();
+		//		Query<MatchResult> qmr = ofy.query(MatchResult.class).filter("matchID",matchId);
+		//		for (MatchResult mr : qmr) {
+		//			mrs.add(mr);
+		//		}
+		//		return mrs;
 	}
 
 
@@ -535,12 +538,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					IRoundEntry re = e.getRoundEntries().get(r.getId());
 					if (re == null) {  // @REX shouldn't the factory or entity do this?!
 						re = ref.getNew();
-				
+
 						// last match of the round is the tiebreaker
 						re.setTieBreakerMatchId(r.getMatches().get(r.getMatches().size()-1).getId()); 
-						
+
 						re.setRoundId(r.getId());
-						
+
 						e.getRoundEntries().put(r.getId(),re);	
 					}
 					if (re != null) {
@@ -632,19 +635,19 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<String> lockMatch(Boolean lock, IMatchGroup match, Long compId, List<String> log) {
 		try {
 			ICompetition comp = getComp(compId);
-			
+
 			if (lock)
 				queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.LOCK, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
 			else 
 				queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.UNLOCK, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
-				
+
 			return log;
 		} catch (Throwable e) {
 			Logger.getLogger("Admin").log(Level.SEVERE, "lockMatch: " + e.getMessage());
 			return null;
 		}
 	}
-	
+
 	@Override
 	public ICompetition getComp(Long compId) {
 		try {
@@ -667,7 +670,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			ICompetition comp = getComp(compId);
 
 			queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.FETCH, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
-				
+
 			return log;
 		} catch (Throwable e) {
 			Logger.getLogger("Admin").log(Level.SEVERE, "fetchScore: " + e.getMessage());
@@ -696,6 +699,43 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			}
 		}
 		return player;
+	}
+
+	@Override
+	public List<IPlayerMatchStats> testMatchStats(Long matchId) {
+
+		PipelineService service = PipelineServiceFactory.newPipelineService();
+		mf.setId(matchId);
+		IMatchGroup match = mf.getGame();
+
+		if (match == null) {
+			return null;
+		}
+
+		String pipelineId = "";
+		try {
+			pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tf, tmsf, pmsf, countryf), match);
+
+			while (true) {
+				Thread.sleep(2000);
+				JobInfo jobInfo = service.getJobInfo(pipelineId);
+				switch (jobInfo.getJobState()) {
+				case COMPLETED_SUCCESSFULLY:
+					return (List<IPlayerMatchStats>) jobInfo.getOutput();
+				case RUNNING:
+					break;
+				case STOPPED_BY_ERROR:
+					throw new RuntimeException("Job stopped " + jobInfo.getError());
+				case STOPPED_BY_REQUEST:
+					throw new RuntimeException("Job stopped by request.");
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 
 }

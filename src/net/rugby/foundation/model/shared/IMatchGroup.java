@@ -50,5 +50,9 @@ public interface IMatchGroup {
 	public abstract void setRoundId(Long id);
 	public abstract Long getRoundId();
 	
+	public abstract void setForeignId(Long foreignId);
+	public abstract Long getForeignId();
+	public abstract String getForeignUrl();
+	public abstract void setForeignUrl(String foreignUrl);
 	
 }

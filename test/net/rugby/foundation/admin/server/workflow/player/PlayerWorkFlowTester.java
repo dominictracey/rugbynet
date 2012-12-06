@@ -16,6 +16,7 @@ import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.workflow.matchrating.FetchPlayerByScrumId;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -54,6 +55,8 @@ public class PlayerWorkFlowTester extends PipelineTest {
 
 	private transient IPlayerFactory pf;
 
+	private ICountryFactory countryf;
+
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -75,9 +78,10 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	}
 
 	@Inject
-	public void setFactory(ICompetitionFactory cf, IPlayerFactory pf) {
+	public void setFactory(ICompetitionFactory cf, IPlayerFactory pf, ICountryFactory countryf) {
 		this.cf = cf;
 		this.pf = pf;
+		this.countryf = countryf;
 	}
 	
 	@Test
@@ -175,7 +179,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.getCompetition();
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(pf), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(pf, countryf), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 14505L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -219,7 +223,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.getCompetition();
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(pf), /*pf,*/ comp, "Neil Best", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 15048L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(pf, countryf), /*pf,*/ comp, "Neil Best", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 15048L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -263,7 +267,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.getCompetition();
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(pf), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 92047L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(pf, countryf), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 92047L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;

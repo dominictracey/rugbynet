@@ -7,19 +7,27 @@ import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyAppUserFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyCompetitionFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyConfigurationFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyCountryFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchResultFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyPlayerFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
 import com.google.inject.AbstractModule;
 
 public class CoreMainModule extends AbstractModule {
@@ -38,6 +46,10 @@ public class CoreMainModule extends AbstractModule {
 		bind(IConfigurationFactory.class).to(OfyConfigurationFactory.class);
 		bind(IAccountManager.class).to(AccountManager.class);
 		bind(IExternalAuthticatorProviderFactory.class).to(ExternalAuthenticatorFactory.class);
+		bind(IPlayerFactory.class).to(OfyPlayerFactory.class);
+		bind(ITeamMatchStatsFactory.class).to(OfyTeamMatchStatsFactory.class);
+		bind(IPlayerMatchStatsFactory.class).to(OfyPlayerMatchStatsFactory.class);
+		bind(ICountryFactory.class).to(OfyCountryFactory.class);
 	}
 }
 

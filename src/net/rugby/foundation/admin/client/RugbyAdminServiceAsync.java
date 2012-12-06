@@ -11,6 +11,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
@@ -97,4 +98,5 @@ public interface RugbyAdminServiceAsync {
 	public void getComp(Long compId, AsyncCallback<ICompetition> asyncCallback);
 	
 	public void fetchMatchScore(IMatchGroup match, Long compId, List<String> log, AsyncCallback<List<String>> asyncCallback);
+	public void testMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchStats>> asyncCallback);
 }

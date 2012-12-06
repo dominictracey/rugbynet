@@ -56,7 +56,7 @@ public class EditPlayer extends Composite {
 	@UiHandler("save")
 	void onClick(ClickEvent e) {
 		((IPlayer)player).setDisplayName(displayName.getText());
-		player.setCountry(country.getText());
+		//player.setCountry(country.getText());
 		player.setNumCaps(Integer.parseInt(numCaps.getText()));
 		player.setBirthDate(birthDate.getHighlightedDate());
 		listener.savePlayerInfo(player);
@@ -65,7 +65,7 @@ public class EditPlayer extends Composite {
 	public void ShowPlayer(IPlayer result) {
 		player = result;
 		displayName.setText(result.getDisplayName());
-		country.setText(result.getCountry());
+		//country.setText(result.getCountry());
 		birthDate.setValue(result.getBirthDate());
 		if (result.getNumCaps() != null) {
 			numCaps.setText(result.getNumCaps().toString());

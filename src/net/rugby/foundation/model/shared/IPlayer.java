@@ -1,6 +1,5 @@
 package net.rugby.foundation.model.shared;
 
-import java.net.URI;
 import java.util.Date;
 
 public interface IPlayer {
@@ -44,8 +43,8 @@ public interface IPlayer {
 	public abstract String getImageUri();
 	public abstract void setImageUri(String imageUri);
 	
-	public abstract String getCountry();
-	public abstract void setCountry(String country);
+	public abstract ICountry getCountry();
+	public abstract void setCountry(ICountry country);
 	
 	public abstract Position.position getPosition();
 	public abstract void setPosition(Position.position position);

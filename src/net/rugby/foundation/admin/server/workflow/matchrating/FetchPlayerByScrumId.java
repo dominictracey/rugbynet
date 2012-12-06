@@ -11,7 +11,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.UrlCacher;
+import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.Player;
@@ -32,10 +34,12 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 
 	private static final long serialVersionUID = 483113213168220162L;
 	private IPlayerFactory pf;
+	private ICountryFactory cf;
 
 	//@Inject
-	public FetchPlayerByScrumId(IPlayerFactory pf) {
+	public FetchPlayerByScrumId(IPlayerFactory pf, ICountryFactory cf) {
 		this.pf = pf;
+		this.cf = cf;
 	}
 
 //	@SuppressWarnings("serial")
@@ -98,7 +102,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 
 		IPlayer player = pf.getById(null);  //empty
 		
-		String playerURL = "http://www.espnscrum.com/anglo-welsh-cup-2012-13" + "/rugby/player/" + scrumPlayerId + ".html";
+		String playerURL = "http://www.espnscrum.com/scrum" + "/rugby/player/" + scrumPlayerId + ".html";
 		
 		Date dateRead = null;
         boolean found = false;
@@ -122,7 +126,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
             	if (line.contains("scrumPlayerName")) {
             		player.setDisplayName(line.split("<|>")[2].trim());
             	} else if (line.contains("scrumPlayerCountry")) {
-            		player.setCountry(line.split("<|>")[2].trim());
+            		player.setCountry(cf.getByName(line.split("<|>")[2].trim()));
             	} else if (line.contains("Born")) {
             		line = it.next();
             		if (line != null && !line.contains(",")) {

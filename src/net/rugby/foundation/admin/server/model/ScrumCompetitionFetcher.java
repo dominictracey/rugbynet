@@ -53,6 +53,10 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams) {
 		ICompetition comp = new Competition();
 		comp.setForeignURL(homePage);
+		if (homePage.split("[/|.]").length > 7)
+			comp.setForeignID(Long.parseLong(homePage.split("[/|.]")[7]));
+		else
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Couldn't get scrum id from " + homePage + " (too short)");
 		comp.setTeams(teams);
 		
         try {
@@ -311,7 +315,8 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		String hour = "";
 		String minute = "";
 		String zone = "";
-
+		Long scrumId = 0L;
+		
         try {
             URL url = new URL(tableURL);
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -353,9 +358,20 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
             			}
             		}
             		
+            		// get the scrum match Id out
+            		String spl[] = line.split("[/|.]");
+            		int i=0;
+            		while (i < spl.length && !spl[i].equals("match")) {
+            			++i;
+            		}
+            		
+            		if (i+1<spl.length) {
+            			scrumId = Long.parseLong(spl[i+1]);
+            		}
+            		
             		String homeName = "";
             		String visitName = "";
-            		int i = 0;
+            		i = 0;
             		String tok = tmp.trim().split(" ")[i++];
             		while (!tok.equals("v")) {
             			if (!homeName.equals(""))
@@ -402,6 +418,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
             		//match.setHomeTeamId(teams.get(homeName).getId());
             		match.setVisitingTeam(teams.get(visitName));
             		//match.setVisitingTeamId(teams.get(visitName).getId());
+            		match.setForeignId(scrumId);
             		if (match instanceof MatchGroup) {
             			((MatchGroup)match).setDisplayName(teams.get(homeName), teams.get(visitName)); 
             		}

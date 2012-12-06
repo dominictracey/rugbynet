@@ -32,7 +32,7 @@ public class ScrumPlayer implements IPlayer, Serializable {
 
 	private String imageUri;
 
-	private String country;
+	private ICountry country;
 
 	private Position.position position;
 
@@ -111,12 +111,12 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	}
 
 	@Override
-	public String getCountry() {
+	public ICountry getCountry() {
 		return country;
 	}
 
 	@Override
-	public void setCountry(String country) {
+	public void setCountry(ICountry country) {
 		this.country = country;
 	}
 

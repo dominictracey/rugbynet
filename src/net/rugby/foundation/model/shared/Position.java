@@ -11,20 +11,20 @@ import com.googlecode.objectify.annotation.NotSaved;
 @SuppressWarnings("serial")
 @Entity
 public abstract class Position implements Serializable {
-	
+
 	@Id
 	Long id;
-//	@NotSaved(IfDefault.class)
+	//	@NotSaved(IfDefault.class)
 	private position primary;
 	@NotSaved
 	private ArrayList<position> positionList;
 	//static private HashMap<grouping, ArrayList<position>> groupingMap;
 
-	
+
 	//internationalization support
 	public abstract String getName(position p);
 	public abstract String getName(grouping g);
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -40,16 +40,16 @@ public abstract class Position implements Serializable {
 	public String getPrimaryName() {
 		return getName(primary);
 	}
-	
+
 	public void setPrimary(position primary) {
 		this.primary = primary;
 		if (!positionList.contains(primary))
 			positionList.add(primary);
 	}
 
-//	public enum position { 
-//			NONE, TIGHTHEAD, HOOKER, LOOSEHEAD, LEFTLOCK, RIGHTLOCK, BLINDSIDE, OPENSIDE, NUMBER8, 
-//			SCRUMHALF, FLYHALF, LEFTWING, INSIDECENTER, OUTSIDECENTER, RIGHTWING, FULLBACK }
+	//	public enum position { 
+	//			NONE, TIGHTHEAD, HOOKER, LOOSEHEAD, LEFTLOCK, RIGHTLOCK, BLINDSIDE, OPENSIDE, NUMBER8, 
+	//			SCRUMHALF, FLYHALF, LEFTWING, INSIDECENTER, OUTSIDECENTER, RIGHTWING, FULLBACK }
 
 	public enum position { 
 		NONE ("None", "---"), 
@@ -63,16 +63,16 @@ public abstract class Position implements Serializable {
 		CENTER ("Center", "CTR"), 
 		WING ("Wing", "WNG"), 
 		FULLBACK ("Fullback", "FUL"); 
-		
+
 		private String enUsName;
 		private String abbr;
-		
+
 		private position(String enUSname, String abbr)
 		{
 			this.enUsName = enUSname;
 			this.abbr = abbr;
 		}
-		
+
 		public position getNext() {
 			return values()[(ordinal()+1) % values().length];
 		}
@@ -82,30 +82,30 @@ public abstract class Position implements Serializable {
 		public static position getAt(int i) {
 			return values()[i];
 		}
-		
+
 		public String getName()
 		{
 			return enUsName;
 		}
-		
+
 		public String getAbbr() {
 			return abbr;
 		}
-		
+
 		public int getNumberRequired(Stage.stageType stage, int round)  { 
 			switch (ordinal()) {
 			case 1: 
-					if (stage == Stage.stageType.POOL) {
-						if (round == 0)
-							return CoreConfiguration.getNumPropsPoolRoster();
-						else
-							return CoreConfiguration.getNumPropsPoolRound();
-					} else {
-						if (round == 0)
-							return CoreConfiguration.getNumPropsKnockoutRoster();
-						else
-							return CoreConfiguration.getNumPropsKnockoutRound();							
-					}
+				if (stage == Stage.stageType.POOL) {
+					if (round == 0)
+						return CoreConfiguration.getNumPropsPoolRoster();
+					else
+						return CoreConfiguration.getNumPropsPoolRound();
+				} else {
+					if (round == 0)
+						return CoreConfiguration.getNumPropsKnockoutRoster();
+					else
+						return CoreConfiguration.getNumPropsKnockoutRound();							
+				}
 			case 2 :
 				if (stage == Stage.stageType.POOL) {
 					if (round == 0)
@@ -219,9 +219,9 @@ public abstract class Position implements Serializable {
 		}
 	}
 
-	
+
 	public enum grouping { ALL, FORWARD, BACK, FRONTROW, PROP, BACKFIVE, LOCK, FLANKER, BACKROW, HALFBACK, CENTER, BACKTHREE, WING }
-		
+
 	public Position()
 	{
 		positionList  = new ArrayList<position>();
@@ -238,14 +238,44 @@ public abstract class Position implements Serializable {
 		primary = p;
 		positionList = l; 
 	}
-	
+
 	ArrayList<position> GetPositions()
 	{
 		return positionList;
 	}
-	
+
 	public void SetPositions(ArrayList<position> p)
 	{
 		positionList = p;
 	}
-}
+
+	public static position getFromScrum(String scrumName) {
+		
+		// substitutes often have their positions listed in parens
+		scrumName = scrumName.split("(|)")[0];
+		
+		if (scrumName.equals("FB")) {
+			return position.FULLBACK;
+		} else if (scrumName.equals("W")) {
+			return position.WING;
+		} else if (scrumName.equals("C")) {
+			return position.CENTER;
+		} else if (scrumName.equals("FH")) {
+			return position.FLYHALF;
+		} else if (scrumName.equals("SH")) {
+			return position.SCRUMHALF;
+		} else if (scrumName.equals("P")) {
+			return position.PROP;
+		} else if (scrumName.equals("H")) {
+			return position.HOOKER;
+		} else if (scrumName.equals("L")) {
+			return position.LOCK;
+		} else if (scrumName.equals("F")) {
+			return position.FLANKER;
+		} else if (scrumName.equals("N8")) {
+			return position.NUMBER8;
+		} else
+			return position.NONE;
+	}
+
+	}

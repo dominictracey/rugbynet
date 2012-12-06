@@ -51,6 +51,7 @@
 				<g:Button ui:field="save">bwat?</g:Button>
 				<g:Button ui:field="createAdmin">Create Admin</g:Button>
 				<g:Button ui:field="sanityCheck">Sanity Check</g:Button>
+				<g:Button ui:field="testMatchStats">Fetch Match Stats</g:Button>
 			</g:HorizontalPanel>
 		</g:VerticalPanel>
 	</g:VerticalPanel>

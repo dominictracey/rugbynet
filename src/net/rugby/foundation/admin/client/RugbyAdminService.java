@@ -9,8 +9,11 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("rugbyAdminService")
@@ -65,4 +68,6 @@ public interface RugbyAdminService extends RemoteService {
 	 * @return
 	 */
 	List<String> fetchMatchScore(IMatchGroup match, Long compId, List<String> log);
+	
+	List<IPlayerMatchStats> testMatchStats(Long matchId);
 }

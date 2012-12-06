@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server.factory.test;
 
+import java.io.Serializable;
+
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -8,7 +10,11 @@ import net.rugby.foundation.model.shared.Group.GroupType;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
 
-public class TestTeamFactory implements ITeamGroupFactory {
+public class TestTeamFactory implements ITeamGroupFactory, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4807160728169022839L;
 	private Long id;
 	
 	@Inject

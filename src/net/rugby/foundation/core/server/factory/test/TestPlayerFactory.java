@@ -7,10 +7,14 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import com.google.inject.Inject;
+
+import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.ScrumPlayer;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.Country;
 
 /**
  * @author home
@@ -22,7 +26,12 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 5267158546061782777L;
+	private ICountryFactory cf;
 
+	@Inject
+	public TestPlayerFactory(ICountryFactory cf) {
+		this.cf = cf;
+	}
 
 
 	/* (non-Javadoc)
@@ -81,7 +90,7 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 		p.setId(1001L);
 		p.setScrumId(14505L);
 		p.setDisplayName("Hugo Southwell");
-		p.setCountry("Scotland");
+		p.setCountry(cf.getById(1L));
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.set(Calendar.MONTH, 5); 
 		cal.set(Calendar.DAY_OF_MONTH, 14);

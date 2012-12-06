@@ -169,6 +169,17 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 			g.setLocked(false);
 			cal.add(Calendar.MINUTE, -120);
 			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
+			/*
+			 * RWC 11
+			 */
+		} else if (id == 300) {  
+			g.setHomeTeamId(9001L);
+			g.setVisitingTeamId(9002L);
+			g.setLocked(true);
+			g.setForeignId(93503L);
+			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
+			cal.set(2011, 10, 16);
+			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
 		}
 		//if (g.getHomeTeamId() != 0L) {
 			tf.setId(g.getHomeTeamId());
