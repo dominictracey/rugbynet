@@ -19,8 +19,54 @@ public class CountryLoader {
 		c =  new Country(5004L, "France", "FRANCE", "FRA", "Les Bleus");
 		cf.put(c);
 
-		c =  new Country(5005L, "England", "ENGLAND", "ENG", "Roses");
+		c =  new Country(5005L, "England", "ENGLAND", "ENG", "");
 		cf.put(c);
+		
+		c =  new Country(5006L, "Ireland", "IRELAND", "IRE", "" );
+		cf.put(c);
+		
+		c =  new Country(5007L, "Samoa", "SAMOA", "SAM", "Manu Samoa" );
+		cf.put(c);
+		
+		c =  new Country(5008L, "Argentina", "ARGENTINA", "ARG", "Los Pumas" );
+		cf.put(c);
+		
+		c =  new Country(5009L, "Wales", "WALES", "WAL", "The Red Dragons" );
+		cf.put(c);
+		
+		c =  new Country(5010L, "Italy", "ITALY", "ITA", "Azzurri" );
+		cf.put(c);
+		
+		c =  new Country(5011L, "Tonga", "TONGA", "TGA", "Ikale Tahi" );
+		cf.put(c);
+		
+		c =  new Country(5012L, "Scotland", "SCOTLAND", "SCO", "" );
+		cf.put(c);
+		
+		c =  new Country(5013L, "Fiji", "FIJI", "FJI", "Flying Fijians" );
+		cf.put(c);
+		
+		c =  new Country(5014L, "Canada", "CANADA", "CAN", "Canucks" );
+		cf.put(c);
+		
+		c =  new Country(5015L, "Japan", "JAPAN", "JPN", "The Cherry Blossoms" );
+		cf.put(c);
+		
+		c =  new Country(5016L, "USA", "USA", "USA", "The Eagles" );
+		cf.put(c);
+		
+		c =  new Country(5017L, "Georgia", "GEORGIA", "GEO", "The Lelos" );
+		cf.put(c);
+		
+		c =  new Country(5018L, "Spain", "SPAIN", "ESP", "Los Leones" );
+		cf.put(c);
+		
+		c =  new Country(5019L, "Romania", "ROMANIA", "ROM", "The Oaks" );
+		cf.put(c);
+		
+		c =  new Country(5020L, "Russia", "RUSSIA", "RUS", "Bears" );
+		cf.put(c);
+		
 		
 		return true;
 
