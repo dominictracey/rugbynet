@@ -58,9 +58,11 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         	if (line.contains("<h2>Match stats")) {
         		
         		line = it.next(); // table
-        		line = it.next(); // tbody
+        		//line = it.next(); // tbody
         		
         		Triplet trip = getTriplet(it);  //team names
+        		
+        		line = it.next(); // random blank line
         		
         		trip = getTriplet(it);
         		if (trip.attr.equals("Tries")) {
@@ -114,7 +116,14 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		trip = getTriplet(it);
         		if (trip.attr.equals("Dropped goals")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
-        				tms.setDropGoalsMade(Integer.parseInt(trip.homeVal));
+        				//1 (1 missed)
+        				tms.setDropGoalsMade(Integer.parseInt(trip.homeVal.split(" ")[0]));
+        				if (trip.homeVal.contains("(")) {
+        					tms.setDropGoalsAttempted(Integer.parseInt(trip.homeVal.split("[ |(]")[2]) + tms.getDropGoalsMade());
+        					
+        				} else {
+        					tms.setDropGoalsAttempted(tms.getDropGoalsMade());
+        				}
         			} else {
         				tms.setDropGoalsMade(Integer.parseInt(trip.visitVal));
         			}
@@ -122,7 +131,7 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
 
         		
         		// Kick/pass/run
-        		for (int i=0; i<8; ++i) {
+        		for (int i=0; i<7; ++i) {
         			line = it.next();
         		}
         		
@@ -175,7 +184,7 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		} 
         		
         		// Attacking
-        		for (int i=0; i<8; ++i) {
+        		for (int i=0; i<7; ++i) {
         			line = it.next();
         		}
         		
@@ -247,13 +256,13 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		trip = getTriplet(it);
         		if (trip.attr.equals("Rucks won")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
-            			String made = trip.homeVal.split("from|(")[0].trim();
-            			String attempts = trip.homeVal.split("from|(")[1].trim();
+            			String made = trip.homeVal.split("[from|(]")[0].trim();
+            			String attempts = trip.homeVal.split("[from|(]")[4].trim();
             			tms.setRucksWon(Integer.parseInt(made));
         				tms.setRucks(Integer.parseInt(attempts));
         			} else {
-            			String made = trip.visitVal.split("from|(")[0].trim();
-            			String attempts = trip.visitVal.split("from|(")[1].trim();
+            			String made = trip.visitVal.split("[from|(]")[0].trim();
+            			String attempts = trip.visitVal.split("[from|(]")[4].trim();
             			tms.setRucksWon(Integer.parseInt(made));
         				tms.setRucks(Integer.parseInt(attempts));
         			}
@@ -262,16 +271,17 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         			return null;
         		}
         		
+        		line = it.next();
         		trip = getTriplet(it);
         		if (trip.attr.equals("Mauls won")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
-            			String made = trip.homeVal.split("from|(")[0].trim();
-            			String attempts = trip.homeVal.split("from|(")[1].trim();
+            			String made = trip.homeVal.split("[from|(]")[0].trim();
+            			String attempts = trip.homeVal.split("[from|(]")[4].trim();
             			tms.setMaulsWon(Integer.parseInt(made));
         				tms.setMauls(Integer.parseInt(attempts));
         			} else {
-            			String made = trip.visitVal.split("from|(")[0].trim();
-            			String attempts = trip.visitVal.split("from|(")[1].trim();
+            			String made = trip.visitVal.split("[from|(]")[0].trim();
+            			String attempts = trip.visitVal.split("[from|(]")[4].trim();
             			tms.setMaulsWon(Integer.parseInt(made));
         				tms.setMauls(Integer.parseInt(attempts));
         			}
@@ -293,7 +303,7 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		}
         		
         		// Defensive
-        		for (int i=0; i<8; ++i) {
+        		for (int i=0; i<7; ++i) {
         			line = it.next();
         		}
         		
@@ -319,7 +329,7 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		trip = getTriplet(it);
         		
         		// Set pieces
-        		for (int i=0; i<8; ++i) {
+        		for (int i=0; i<7; ++i) {
         			line = it.next();
         		}
 
@@ -360,7 +370,7 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		}
         		
         		// Discipline
-        		for (int i=0; i<8; ++i) {
+        		for (int i=0; i<7; ++i) {
         			line = it.next();
         		}
         		
@@ -380,12 +390,12 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		if (trip.attr.equals("Yellow/red cards")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
             			String yellow = trip.homeVal.split("/")[0].trim();
-            			String red = trip.homeVal.split("/")[2].trim();
+            			String red = trip.homeVal.split("/")[1].trim();
             			tms.setYellowCards(Integer.parseInt(yellow));
         				tms.setRedCards(Integer.parseInt(red));
         			} else {
             			String yellow = trip.visitVal.split("/")[0].trim();
-            			String red = trip.visitVal.split("/")[2].trim();
+            			String red = trip.visitVal.split("/")[1].trim();
             			tms.setYellowCards(Integer.parseInt(yellow));
         				tms.setRedCards(Integer.parseInt(red));        			}
         			found = true;
@@ -411,11 +421,31 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
 		Triplet triplet = new Triplet();
 		String line = it.next(); // <tr>
 		line = it.next();
-		triplet.homeVal = line.split("<|>")[2].trim();
+		if (line.split("<|>").length == 1) {
+			triplet.homeVal = line.split("<|>")[0].trim();
+		} else if (line.split("<|>").length > 2)  {
+			triplet.homeVal = line.split("<|>")[2].trim();
+		} else { //over two lines
+			line = it.next();
+			triplet.homeVal = line.split("<|>")[0].trim();
+		}
+		while  (it.hasNext() && !line.contains("</td")) {
+			line = it.next();
+		}
 		line = it.next();
 		triplet.attr = line.split("<|>")[2].trim();
 		line = it.next();
-		triplet.visitVal = line.split("<|>")[2].trim();
+		if (line.split("<|>").length == 1) {
+			triplet.visitVal = line.split("<|>")[0].trim();
+		} else if (line.split("<|>").length > 2)  {
+			triplet.visitVal = line.split("<|>")[2].trim();
+		} else {
+			line = it.next();
+			triplet.visitVal = line.split("<|>")[0].trim();
+		}
+		while (it.hasNext() && !line.contains("</td")) {
+			line = it.next();
+		}
 		line = it.next(); //</tr>
 		return triplet;
 	}

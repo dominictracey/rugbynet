@@ -9,7 +9,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
-import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
@@ -33,7 +33,7 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 		cal.setTime(new Date());
 		IMatchGroup g = new MatchGroup();
 		((MatchGroup)g).setId(id);
-		((Group)g).setGroupType(GroupType.MATCH);
+		((IGroup)g).setGroupType(GroupType.MATCH);
 		g.setHomeTeamId(0L);
 		g.setVisitingTeamId(0L);
 		if (id == 100) {

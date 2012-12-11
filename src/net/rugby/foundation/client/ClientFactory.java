@@ -13,8 +13,8 @@ import net.rugby.foundation.client.ui.PlayerListView;
 import net.rugby.foundation.client.ui.PlayerPopupView;
 import net.rugby.foundation.model.shared.CoreConfiguration.selectionType;
 import net.rugby.foundation.model.shared.DraftWizardState;
-import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.ManagementEngine;
 import net.rugby.foundation.model.shared.Player;
@@ -30,7 +30,7 @@ public interface ClientFactory
 {
 
 	public interface GroupCallback {
-		void onGroupFetched(Group g);
+		void onGroupFetched(IGroup g);
 	}
 	
 	public interface AppUserNicknameCallback {

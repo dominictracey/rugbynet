@@ -16,6 +16,7 @@ import net.rugby.foundation.client.place.Manage;
 import net.rugby.foundation.client.ui.groupStack.GroupStack;
 import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.Group.GroupType;
 import net.rugby.foundation.model.shared.MyGroup;
@@ -289,7 +290,7 @@ public class GroupBrowser extends Composite implements DoneStackInitEventHandler
 					if (groupID != ((Browse)event.getNewPlace()).getGroupID()) {
 						groupID = ((Browse)event.getNewPlace()).getGroupID(); 
 						if (groupID > 0L) {
-							Group group = groupsByID.get(groupID);
+							IGroup group = groupsByID.get(groupID);
 							if (group != null) {
 								String name = group.getDisplayName();								
 							} else {
@@ -361,7 +362,7 @@ public class GroupBrowser extends Composite implements DoneStackInitEventHandler
 
 	}
 	
-	private <T extends Group> void setStackGroupContents(final GroupType type, final GroupStack<T> stack, final Long compID) {
+	private <T extends IGroup> void setStackGroupContents(final GroupType type, final GroupStack<T> stack, final Long compID) {
   	    // get groups of proper type to populate stack
 		clientFactory.getRpcService().getGroupsByGroupType(type, new AsyncCallback<ArrayList<Group>>() {
 		      @SuppressWarnings("unchecked")
@@ -393,7 +394,7 @@ public class GroupBrowser extends Composite implements DoneStackInitEventHandler
 		});
 	}
 	
-	private <T extends Group> void setStackGroupContentsByCompetition(final GroupType type, final GroupStack<T> stack, final Long compID) {
+	private <T extends IGroup> void setStackGroupContentsByCompetition(final GroupType type, final GroupStack<T> stack, final Long compID) {
   	    // get groups of proper type to populate stack
 		clientFactory.getRpcService().getGroupsByGroupTypeByComp(type, compID, new AsyncCallback<ArrayList<Group>>() {
 		      @SuppressWarnings("unchecked")

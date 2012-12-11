@@ -48,12 +48,22 @@ public class FetchTeamFromScrumReport extends Job2<ITeamGroup, Home_or_Visitor, 
 			// seems to have this tag around the 
 			if (line.contains("liveSubNavText1")) {
 				line = it.next();
-				homeName = line.split("\"")[1].trim();
-				line = it.next();
-				line = it.next();
-				line = it.next();
-				visitName = line.split("\"")[1].trim();
+				// New Zealand <span class="liveSubNavText2">(14)</span> 20 - 6 <span class="liveSubNavText2">(6)</span> Australia <span class="liveSubNavText2">(FT)</span>
+				if (line.split("<").length > 0) {
+					homeName = line.split("<")[0].trim();
+				} else {
+					homeName = null;
+					found = false;
+					break;
+				}
 
+				if (line.split("</span>").length > 1) {
+					String endChunk = line.split("</span>")[2];
+					if (endChunk.split("<").length > 1) {
+						visitName = endChunk.split("<")[0].trim();
+					}
+				}
+				
 				if (homeName != null && visitName != null) {
 					found = true;
 				}

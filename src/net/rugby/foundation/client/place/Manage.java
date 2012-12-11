@@ -1,8 +1,8 @@
 package net.rugby.foundation.client.place;
 
 import net.rugby.foundation.model.shared.CoreConfiguration;
-import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.Group.GroupType;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.Stage.stageType;
 
 import com.google.gwt.place.shared.Place;
@@ -143,7 +143,7 @@ public class Manage extends Place
 		this.round = 1;
 		this._step=step.START;
 		this.edit = true;
-		this.groupType = Group.GroupType.MY;
+		this.groupType = GroupType.MY;
 	}
 	
 

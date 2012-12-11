@@ -3,6 +3,8 @@
  */
 package net.rugby.foundation.model.shared;
 
+import java.util.List;
+
 /**
  * @author home
  *
@@ -42,4 +44,7 @@ public interface ITeamGroup {
 	 * @parameter color in #RRGGBB html format
 	 */
 	public void setColor(String color);
+
+	
+	
 }

@@ -75,7 +75,7 @@ public class ManagementEngineFactory<T,S> {
 		
 
 		//@TODO only get the teams available for the comp.
-		for (Group g : teams) {
+		for (IGroup g : teams) {
 			managementEngine.addTeamConstraint(g.getId(), new CheckNumberFromTeam(g.getId(), maxPerTeam));
 		}
 		

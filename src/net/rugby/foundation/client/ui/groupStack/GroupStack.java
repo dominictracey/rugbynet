@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import net.rugby.foundation.client.ClientFactory;
 import net.rugby.foundation.client.place.Browse;
 import net.rugby.foundation.client.ui.GroupBrowser;
-import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.Position;
 import net.rugby.foundation.model.shared.Group.GroupType;
 
@@ -17,7 +17,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 
-public class GroupStack<T extends Group> {
+public class GroupStack<T extends IGroup> {
 	private CellList<T> cellList;
 	private Label header;
 	private ArrayList<T> arrayList = null;

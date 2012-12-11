@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import net.rugby.foundation.client.ClientFactory;
 import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Player;
 import net.rugby.foundation.model.shared.Group.GroupType;
@@ -529,7 +530,7 @@ public class EditPlayerViewFieldDefinitions<T> {
 	    	  		    	  Iterator<Group> iter = result.iterator();
 	    	  		    	  int index = 0;
 	    	  		    	  while (iter.hasNext()) 	  {
-	    	  		    		  Group g = iter.next();
+	    	  		    		  IGroup g = iter.next();
 	    	  		    		  if (g instanceof TeamGroup) {
 	    	  			    		  teamList.addItem(((ITeamGroup)g).getAbbr());
 	    	  			    		  teamMap.put(index, (TeamGroup)g);

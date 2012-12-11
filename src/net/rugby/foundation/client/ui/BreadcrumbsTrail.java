@@ -8,8 +8,8 @@ import net.rugby.foundation.client.place.Home;
 import net.rugby.foundation.client.place.Home.actions;
 import net.rugby.foundation.client.place.Manage;
 import net.rugby.foundation.client.place.Manage.step;
-import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.Group.GroupType;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.MyGroup;
 import net.rugby.foundation.model.shared.Player;
 import com.google.gwt.core.client.GWT;
@@ -134,13 +134,13 @@ public class BreadcrumbsTrail extends Composite  {
 					}
 					
 					if (groupID > 0L) {
-							Group g = clientFactory.getGroupBrowser().getGroupsByID().get(groupID);
+							IGroup g = clientFactory.getGroupBrowser().getGroupsByID().get(groupID);
 							if (g == null) {
 								// we need to get the group info because this isn't in the stack panel
 								// get it from the server. Currently this is when the user is browsing the leaderboard
 								clientFactory.getGroupAsync(groupID, new GroupCallback() {								
 									@Override
-									public void onGroupFetched(Group g) {
+									public void onGroupFetched(IGroup g) {
 										group.setVisible(true);
 										alligator2.setVisible(true);
 										if (g != null) {

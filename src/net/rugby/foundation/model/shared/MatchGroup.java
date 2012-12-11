@@ -193,7 +193,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 			visitingTeamName = visitingTeam.getDisplayName();
 		}
 		
-		((Group)this).setDisplayName(homeTeamName + " vs. " + visitingTeamName); 
+		((IGroup)this).setDisplayName(homeTeamName + " vs. " + visitingTeamName); 
 		
 	}
 

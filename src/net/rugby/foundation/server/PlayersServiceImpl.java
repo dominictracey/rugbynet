@@ -20,6 +20,7 @@ import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetitionTeam;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchRating;
 import net.rugby.foundation.model.shared.IRound;
@@ -101,7 +102,7 @@ public class PlayersServiceImpl extends RemoteServiceServlet implements
 	}
 	
 	Query<Group> qt = ofy.query(Group.class).filter("groupType", "TEAM");
-	for (Group t : qt) {
+	for (IGroup t : qt) {
 		if (t instanceof TeamGroup)
 			teamCache.put(t.getId(),(TeamGroup)t);
 	}
@@ -276,7 +277,7 @@ public class PlayersServiceImpl extends RemoteServiceServlet implements
   public ArrayList<PlayerRowData> getPlayerRowDataByGroup(Long groupID, boolean poolMatch) {
 	    ArrayList<PlayerRowData> PlayerRowData = new ArrayList<PlayerRowData>();
 	    
-	    Group group = ofy.get(Group.class, groupID);
+	    IGroup group = ofy.get(Group.class, groupID);
 	    if (group instanceof PositionGroup) {
 	    	// we build the member list on the fly - though we could maintain them also?
 	    	position pos = ((PositionGroup) group).getPosition();
@@ -296,8 +297,8 @@ public class PlayersServiceImpl extends RemoteServiceServlet implements
 	    }
 	    else if (group instanceof MatchGroup) {
 	    	// we build the member list on the fly - though we could maintain them also?
-	    	Group home = ofy.get(new Key<Group>(Group.class,((IMatchGroup)group).getHomeTeam().getId()));
-	    	Group visit = ofy.get(new Key<Group>(Group.class,((IMatchGroup)group).getVisitingTeam().getId()));
+	    	IGroup home = ofy.get(new Key<Group>(Group.class,((IMatchGroup)group).getHomeTeam().getId()));
+	    	IGroup visit = ofy.get(new Key<Group>(Group.class,((IMatchGroup)group).getVisitingTeam().getId()));
 	    	
 //	    	ArrayList<Long>ids = new ArrayList<Long>();
 //	    	ids.add(home.getId());
@@ -499,7 +500,7 @@ private TeamGroup getPlayersTeamInComp(Long playerID, Long compID) {
 @Override
 public String getGroupInfo(Long id) {
 	Key<Group> key = new Key<Group>(Group.class,id);
-	Group g = ofy.get(key);
+	IGroup g = ofy.get(key);
 	if (g != null) {
 		if (g.getGroupInfo() != null)
 			return g.getGroupInfo();
@@ -756,7 +757,7 @@ private IAppUser getAppUser()
 public ArrayList<PlayerRowData> getMyGroup(stageType st, int round) {
     ArrayList<PlayerRowData> PlayerRowData = new ArrayList<PlayerRowData>();
     
-    Group group = ofy.query(Group.class).filter("stageT",st).filter("round",round).get();
+    IGroup group = ofy.query(Group.class).filter("stageT",st).filter("round",round).get();
     
     if (group != null) {
 	    if (group instanceof MyGroup) {	    	
@@ -786,7 +787,7 @@ private LoginInfo getLoginInfo(IAppUser u) {
 		loginInfo.getRoundsComplete().add(new Boolean(false));
 	  }
     if (!groups.isEmpty()) {
-  	  for (Group g : groups) {
+  	  for (IGroup g : groups) {
   		  //@TODO grep 5 fix
   		  if (((MyGroup)g).getRound() == 5L)
   		  	loginInfo.setDraftID(g.getId());
@@ -853,7 +854,7 @@ public Long doRandomDraft(stageType stage, Long compID) {
 	    		//don't take inactive players
 	    		if (p.isActive()) {
 	    			// don't take players from teams not in the comp
-	    			Group team = getPlayersTeamInComp(p.getId(),compID);
+	    			IGroup team = getPlayersTeamInComp(p.getId(),compID);
 		    		if (team != null) {
 			    		// don't take players from maxed teams
 			    		if (managementEngine.getNumSelectedTeam(team.getId()) < maxPerTeam) {
@@ -989,7 +990,7 @@ private ArrayList<MatchPopupData> getMatchPopupData(Long playerid) {
     
     for (IMatchRating mr : q) {
     	Key<Group> key = new Key<Group>(Group.class,mr.getMatchID());
-    	Group match = ofy.get(key);
+    	IGroup match = ofy.get(key);
     	//@TODO implement match url 
     	retval.add(new MatchPopupData(match.getDisplayName(),"", mr.getPlayerRating(), 0L, 0L));
     }
@@ -1473,7 +1474,7 @@ public ArrayList<Group> getGroupsByGroupTypeByComp(GroupType type, Long compID) 
 public ArrayList<PlayerRowData> getPlayerRowDataByPositionAndComp(Long groupID, Long compID, boolean showInactive, boolean isPool) {
     ArrayList<PlayerRowData> PlayerRowData = new ArrayList<PlayerRowData>();
 
-    Group group = ofy.get(Group.class, groupID);
+    IGroup group = ofy.get(Group.class, groupID);
     if (group instanceof PositionGroup) {
     	// we build the member list on the fly - though we could maintain them also?
     	position pos = ((PositionGroup) group).getPosition();
@@ -1530,7 +1531,7 @@ public Boolean copyLastRoundsPick() {
 	IAppUser au = getAppUser();
 	if (au.isActive()) {
 		Query<Group> gq = ofy.query(Group.class).filter("AppUserID", au.getId()).order("-round");
-		Group latestPick = gq.get();
+		IGroup latestPick = gq.get();
 		if (latestPick != null) {
 			if (latestPick instanceof MyGroup) {
 				//@TODO Let's clean this up and get the Configuration's idea of currentRound lined up with the Round class instances 

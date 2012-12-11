@@ -10,6 +10,7 @@ import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ClubhouseMembership;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.MyGroup;
 import net.rugby.foundation.model.shared.Player;
