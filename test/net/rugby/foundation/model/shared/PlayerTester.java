@@ -38,20 +38,20 @@ import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 public class PlayerTester {
 	  private ITeamGroupFactory tf;
 
-	    private final LocalServiceTestHelper helper =
-	            new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-
-		private IPlayerFactory pf;
-
-	        @Before
-	        public void setUp() {
-	            helper.setUp();
-	        }
-	  	  
-	  	  @After
-	  	  public void tearDown() {
-	  		  helper.tearDown();
-	  	  }
+//	    private final LocalServiceTestHelper helper =
+//	            new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+//
+	private IPlayerFactory pf;
+//
+//	        @Before
+//	        public void setUp() {
+//	            helper.setUp();
+//	        }
+//	  	  
+//	  	  @After
+//	  	  public void tearDown() {
+//	  		  helper.tearDown();
+//	  	  }
 	  	  
 	  @Inject
 	  public void setFactory(ITeamGroupFactory tf, IPlayerFactory pf) {//, ILeaderboardFactory lbf, ILeagueFactory lf) {
@@ -74,7 +74,7 @@ public class PlayerTester {
 	  }
 	  
 	  @Test
-	  public void testGetCountryByName() {
+	  public void testGetNewZealandPlayers() {
 		  
 		  ITeamGroup t = tf.getTeamByName("New Zealand");
 		  assertTrue(t != null);
@@ -92,7 +92,25 @@ public class PlayerTester {
 		  Logger.getLogger("TestPlayer").log(Level.INFO, "Found " + count + " players for " + t.getAbbr());
 		  
 	  }
-
+	  @Test
+	  public void testGetAustraliaPlayers() {
+		  
+		  ITeamGroup t = tf.getTeamByName("Australia");
+		  assertTrue(t != null);
+		  assertTrue(t.getAbbr().equals("AUS"));
+		  
+		  Iterator<IPlayer> it = ((IGroup)t).getMembers();
+		  int count = 0;
+		  IPlayer p;
+		  while (it.hasNext()) {
+			  p = it.next();
+			  Logger.getLogger("TestPlayer").log(Level.INFO, "Found " + p.getDisplayName());
+			  count++;
+		  }
+		  
+		  Logger.getLogger("TestPlayer").log(Level.INFO, "Found " + count + " players for " + t.getAbbr());
+		  
+	  }
 //	  @Test
 //	  public void testLoader()  {
 //		  CountryLoader cl = new CountryLoader();

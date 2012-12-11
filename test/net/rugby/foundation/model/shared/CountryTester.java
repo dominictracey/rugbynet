@@ -34,18 +34,18 @@ import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 public class CountryTester {
 	  private ICountryFactory cf;
 
-	    private final LocalServiceTestHelper helper =
-	            new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-
-	        @Before
-	        public void setUp() {
-	            helper.setUp();
-	        }
-	  	  
-	  	  @After
-	  	  public void tearDown() {
-	  		  helper.tearDown();
-	  	  }
+//	    private final LocalServiceTestHelper helper =
+//	            new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+//
+//	        @Before
+//	        public void setUp() {
+//	            helper.setUp();
+//	        }
+//	  	  
+//	  	  @After
+//	  	  public void tearDown() {
+//	  		  helper.tearDown();
+//	  	  }
 	  	  
 	  @Inject
 	  public void setFactory(ICountryFactory cf) {//, ILeaderboardFactory lbf, ILeagueFactory lf) {
