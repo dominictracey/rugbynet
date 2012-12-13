@@ -1,6 +1,8 @@
 package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Id;
 
@@ -45,6 +47,10 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	private Long teamId;
 
 	private position pos;
+	private String name;
+	
+	private List<IPlayerMatchStatTimeLog> timeLogs; // = new ArrayList<IPlayerMatchStatTimeLog>();
+	private Integer timePlayed;
 	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IPlayerMatchStats#getId()
@@ -344,5 +350,47 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	public void setPosition(Position.position pos) {
 		this.pos = pos;
 	}
+	@Override
+	public void addTimeLog(IPlayerMatchStatTimeLog log) {
+		if (timeLogs == null) {
+			timeLogs = new ArrayList<IPlayerMatchStatTimeLog>();
+		}
+		
+		timeLogs.add(log);
+		
+	}
+	@Override
+	public void removeTimeLog(Long logId) {
+		if (timeLogs == null) {
+			return;
+		}
+		
+		for (IPlayerMatchStatTimeLog log : timeLogs) {
+			if (log.getId().equals(id)) {
+				timeLogs.remove(log);
+			}
+		}
+	}
+	@Override
+	public List<IPlayerMatchStatTimeLog> getTimeLogs() {
+		return timeLogs;
+	}
+	@Override
+	public String getName() {
+		return name;
+	}
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+	@Override
+	public Integer getTimePlayed() {
+		return timePlayed;
+	}
+	@Override
+	public void setTimePlayed(Integer timePlayed) {
+		this.timePlayed = timePlayed;
+	}
+
 	
 }

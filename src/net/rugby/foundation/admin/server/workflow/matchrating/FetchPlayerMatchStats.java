@@ -3,8 +3,6 @@ package net.rugby.foundation.admin.server.workflow.matchrating;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.appengine.tools.pipeline.Job2;
-import com.google.appengine.tools.pipeline.Job4;
 import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.Value;
 
@@ -33,6 +31,7 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 	public Value<IPlayerMatchStats> run(IPlayer player, IMatchGroup match, Home_or_Visitor hov, Integer slot, String url) {
 		IPlayerMatchStats stats = pmsf.getById(null);
 		
+		
 		Boolean found = true;
     	UrlCacher urlCache = new UrlCacher(url);
     	List<String> lines = urlCache.get();
@@ -42,6 +41,8 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
         if (lines == null) {
         	return null;
         }
+        
+        // first get the playing time
         
         int countTabs = 0;
         Iterator<String> it = lines.iterator();
@@ -68,6 +69,7 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
         		stats.setPosition(Position.getFromScrum(line.split(">")[1]));
         		
         		line = it.next(); //name
+        		stats.setName(line.split("<|>")[2]); 
         		
         		line = it.next(); //tries/assists
         		stats.setTries(Integer.parseInt(line.split("<|/|>")[2]));

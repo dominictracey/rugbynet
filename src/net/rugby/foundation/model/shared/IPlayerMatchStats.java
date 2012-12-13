@@ -1,5 +1,7 @@
 package net.rugby.foundation.model.shared;
 
+import java.util.List;
+
 import net.rugby.foundation.model.shared.Position.position;
 
 public interface IPlayerMatchStats {
@@ -96,5 +98,22 @@ public interface IPlayerMatchStats {
 	public abstract Integer getRedCards();
 
 	public abstract void setRedCards(Integer redCards);
+	
+	public abstract void addTimeLog(IPlayerMatchStatTimeLog log);
+	
+	public abstract void removeTimeLog(Long logId);
+	
+	public abstract List<IPlayerMatchStatTimeLog> getTimeLogs();
+	
+	public abstract void setName(String string);
+	
+	public abstract String getName();
+
+	public abstract Integer getTimePlayed();
+
+	public abstract void setTimePlayed(Integer timePlayed);
+	
+
+	
 
 }
