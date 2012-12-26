@@ -6,15 +6,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.appengine.tools.pipeline.Job3;
+import com.google.appengine.tools.pipeline.Job4;
 import com.google.appengine.tools.pipeline.Value;
 
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_or_Visitor, String> {
+public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatchGroup, Home_or_Visitor, String> {
 
 	/**
 	 * 
@@ -37,7 +39,7 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
 
 	
 	@Override
-	public Value<ITeamMatchStats> run(ITeamGroup team, Home_or_Visitor home_or_visitor, String url) {
+	public Value<ITeamMatchStats> run(ITeamGroup team, IMatchGroup match, Home_or_Visitor home_or_visitor, String url) {
 		
 		boolean found = false;
 		
@@ -45,6 +47,8 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
     	List<String> lines = urlCache.get();
         String line;
 		ITeamMatchStats tms = tmsf.getById(null);
+		tms.setTeamId(team.getId());
+		tms.setMatchId(match.getId());
 		
         if (lines == null) {
         	return null;
@@ -113,6 +117,7 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		
         		trip = getTriplet(it); // ignore kick at goal success
         		
+        		// dropgoals
         		trip = getTriplet(it);
         		if (trip.attr.equals("Dropped goals")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
@@ -126,6 +131,12 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         				}
         			} else {
         				tms.setDropGoalsMade(Integer.parseInt(trip.visitVal));
+        				if (trip.visitVal.contains("(")) {
+        					tms.setDropGoalsAttempted(Integer.parseInt(trip.visitVal.split("[ |(]")[2]) + tms.getDropGoalsMade());
+        					
+        				} else {
+        					tms.setDropGoalsAttempted(tms.getDropGoalsMade());
+        				}
         			}
         		}
 
@@ -361,8 +372,8 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         			} else {
             			String won = trip.visitVal.split(" ")[0].trim();
             			String lost = trip.visitVal.split(" ")[2].trim();
-            			tms.setScrumsWonOnOwnPut(Integer.parseInt(won));
-        				tms.setScrumsPutIn(Integer.parseInt(lost)+Integer.parseInt(won));
+            			tms.setLineoutsWonOnOwnThrow(Integer.parseInt(won));
+        				tms.setLineoutsThrownIn(Integer.parseInt(lost)+Integer.parseInt(won));
         			}
         		} else {
         			Logger.getLogger("FetchTeamStats").log(Level.SEVERE, "Failed to find Lineouts on own throw");
@@ -405,9 +416,10 @@ public class FetchTeamMatchStats extends Job3<ITeamMatchStats, ITeamGroup, Home_
         		}
         	}
         }	
-        if (found == true)
+        if (found == true) {
+        	tmsf.put(tms);
         	return immediate(tms);
-        else 
+        } else 
         	return null;
     }
 	

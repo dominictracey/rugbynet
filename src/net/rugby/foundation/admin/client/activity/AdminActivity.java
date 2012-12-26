@@ -26,6 +26,7 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.ScrumPlayer;
 
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
@@ -858,6 +859,12 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 			}
 		});	
 		}
+
+	@Override
+	public IPlayer getNewPlayer() {
+		// TODO Auto-generated method stub
+		return new ScrumPlayer();
+	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.client.ui.WorkflowConfigurationView.Presenter#saveWorkflowConfiguration(java.util.List)

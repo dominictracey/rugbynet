@@ -1,6 +1,9 @@
 package net.rugby.foundation.admin.server;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +15,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import net.rugby.foundation.admin.client.RugbyAdminService;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
+import net.rugby.foundation.admin.server.init.CountryLoader;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
@@ -42,14 +46,19 @@ import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.Group.GroupType;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.MatchGroup;
+import net.rugby.foundation.model.shared.TeamGroup;
 
 import com.google.appengine.tools.pipeline.JobInfo;
+import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
@@ -709,12 +718,61 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		IMatchGroup match = mf.getGame();
 
 		if (match == null) {
-			return null;
+
+			CountryLoader cloader = new CountryLoader();
+			cloader.Run(countryf);
+			
+			for (Long id = 9001L; id<9003L; ++id) {
+				tf.setId(null);
+				ITeamGroup t = tf.getTeam();
+				if (id == 9001) {
+					t.setAbbr("NZL");
+					t.setShortName("All Blacks");
+					((IGroup)t).setDisplayName("New Zealand");
+					t.setColor("#000000");
+				} else if (id == 9002) {
+					t.setAbbr("AUS");
+					t.setShortName("Wallabies");
+					((IGroup)t).setDisplayName("Australia");
+					t.setColor("#f0af00");
+				}
+				((TeamGroup)t).setId(id);
+				((IGroup)t).setGroupType(GroupType.TEAM);
+
+				tf.put(t);
+			}
+
+
+			Calendar cal = new GregorianCalendar();
+			cal.setTime(new Date());
+			mf.setId(null);
+			IMatchGroup g = mf.getGame();
+			((MatchGroup)g).setId(300L);
+			((IGroup)g).setGroupType(GroupType.MATCH);
+
+			g.setHomeTeamId(9001L);
+			g.setVisitingTeamId(9002L);
+			g.setLocked(true);
+			g.setForeignId(93503L);
+			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
+			cal.set(2011, 10, 16);
+			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
+			tf.setId(g.getHomeTeamId());
+			g.setHomeTeam(tf.getTeam());
+			tf.setId(g.getVisitingTeamId());
+			g.setVisitingTeam(tf.getTeam());
+			g.setDisplayName();	
+
+			g.setDate(cal.getTime());
+
+			mf.put(g);
+			match = g;
 		}
 
 		String pipelineId = "";
 		try {
-			pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tf, tmsf, pmsf, countryf), match);
+			
+			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, pf, tmsf, pmsf, countryf, new JobSetting.MaxAttempts(2));
 
 			while (true) {
 				Thread.sleep(2000);

@@ -1,5 +1,6 @@
 package net.rugby.foundation.admin.server.workflow.matchrating;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,40 +11,29 @@ import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchRating;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 import com.google.appengine.tools.pipeline.FutureList;
 import com.google.appengine.tools.pipeline.FutureValue;
-import com.google.appengine.tools.pipeline.Job1;
+import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.Value;
 
-public class GenerateMatchRatings extends Job1<List<IMatchRating>, IMatchGroup> {
+
+public class GenerateMatchRatings extends Job5<List<IMatchRating>, IMatchGroup, IPlayerFactory, ITeamMatchStatsFactory, IPlayerMatchStatsFactory, ICountryFactory> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
-	private static final int MAX_ROSTER = 23;
-	private IPlayerFactory pf;
-	private ITeamGroupFactory tf;
-	private ITeamMatchStatsFactory tmsf;
-	private IPlayerMatchStatsFactory pmsf;
-	private ICountryFactory cf;
+
 	
 	public enum Home_or_Visitor { HOME, VISITOR }
 	
-	//@Inject
-	public GenerateMatchRatings(IPlayerFactory pf, ITeamGroupFactory tf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory cf) {
-		this.pf = pf;
-		this.tf = tf;
-		this.tmsf = tmsf;
-		this.pmsf = pmsf;
-		this.cf = cf;
+	public GenerateMatchRatings() {
+
 	}
 	
 	
@@ -54,17 +44,17 @@ public class GenerateMatchRatings extends Job1<List<IMatchRating>, IMatchGroup> 
 	 * 			Long adminID
 	 */		
 	@Override
-	public Value<List<IMatchRating>> run(IMatchGroup match) {
+	public Value<List<IMatchRating>> run(IMatchGroup match, IPlayerFactory pf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory cf) {
 		
 		String url = match.getForeignUrl();
 
 		Logger.getLogger("FetchedPlayer").log(Level.INFO,"Starting generate match ratings for url " + url);
 
-	    FutureValue<ITeamGroup> homeTeam = futureCall(new FetchTeamFromScrumReport(tf), immediate(Home_or_Visitor.HOME), immediate(url));
-	    FutureValue<ITeamGroup> visitTeam = futureCall(new FetchTeamFromScrumReport(tf), immediate(Home_or_Visitor.VISITOR), immediate(url));
+//	    FutureValue<ITeamGroup> homeTeam = futureCall(new FetchTeamFromScrumReport(tf), immediate(Home_or_Visitor.HOME), immediate(url));
+//	    FutureValue<ITeamGroup> visitTeam = futureCall(new FetchTeamFromScrumReport(tf), immediate(Home_or_Visitor.VISITOR), immediate(url));
 	    
-	    FutureValue<ITeamMatchStats> homeTeamStats = futureCall(new FetchTeamMatchStats(tmsf), homeTeam, immediate(Home_or_Visitor.HOME), immediate(url));
-	    FutureValue<ITeamMatchStats> visitorTeamStats = futureCall(new FetchTeamMatchStats(tmsf), visitTeam, immediate(Home_or_Visitor.VISITOR), immediate(url));
+	    FutureValue<ITeamMatchStats> homeTeamStats = futureCall(new FetchTeamMatchStats(tmsf), immediate(match.getHomeTeam()), immediate(match), immediate(Home_or_Visitor.HOME), immediate(url));
+	    FutureValue<ITeamMatchStats> visitorTeamStats = futureCall(new FetchTeamMatchStats(tmsf), immediate(match.getVisitingTeam()), immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(url));
 	    
 	    List<Long> homeIds = getIds(Home_or_Visitor.HOME, url);
 	    List<Long> visitIds = getIds(Home_or_Visitor.VISITOR, url);
@@ -72,40 +62,46 @@ public class GenerateMatchRatings extends Job1<List<IMatchRating>, IMatchGroup> 
 	    List<FutureValue<IPlayer>> homePlayers = new ArrayList<FutureValue<IPlayer>>();
 	    List<FutureValue<IPlayer>> visitorPlayers = new ArrayList<FutureValue<IPlayer>>();
 	    
+	    int count = 0;
 	    for (Long id : homeIds) {
-	    	FutureValue<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(pf, cf), immediate((ICompetition)null), immediate("player name"),  immediate(url), immediate(id), immediate(1L));
+	    	FutureValue<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(pf, cf), immediate((ICompetition)null), immediate("home player " + count++),  immediate(url), immediate(id), immediate(1L));
 	    	homePlayers.add(homePlayer);
 	    }
 	    
+	    count = 0;
 	    for (Long id : visitIds) {
-	    	FutureValue<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(pf, cf), immediate((ICompetition)null), immediate("player name"),  immediate(url), immediate(id), immediate(1L));
+	    	FutureValue<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(pf, cf), immediate((ICompetition)null), immediate("visit player " + count++),  immediate(url), immediate(id), immediate(1L));
 	    	visitorPlayers.add(visitPlayer);
 	    }	   
-
+	    
 	    List<FutureValue<IPlayerMatchStats>> homePlayerMatchStats = new ArrayList<FutureValue<IPlayerMatchStats>>();
 	    List<FutureValue<IPlayerMatchStats>> visitorPlayerMatchStats = new ArrayList<FutureValue<IPlayerMatchStats>>();
 
-	    int count = 0;
+	    count = 0;
 	    for (FutureValue<IPlayer> fp : homePlayers) {
-	    	FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(pmsf), fp, immediate(match), immediate(Home_or_Visitor.HOME), immediate(count), immediate(url));
+	    	FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(pmsf), fp, immediate(match), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url));
 	    	homePlayerMatchStats.add(stats);
+	    	
 	    }
 	    
 	    FutureList<IPlayerMatchStats> hpms = new FutureList<IPlayerMatchStats>(homePlayerMatchStats);
 	   
 	    count = 0;
 	    for (FutureValue<IPlayer> fp : visitorPlayers) {
-	    	FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(pmsf), fp, immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(count), immediate(url));
+	    	FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(pmsf), fp, immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(count++), immediate(url));
 	    	visitorPlayerMatchStats.add(stats);
+	    	
 	    }
 	    FutureList<IPlayerMatchStats> vpms = new FutureList<IPlayerMatchStats>(visitorPlayerMatchStats);
 	    
-	    assert(visitorPlayerMatchStats.size() == MAX_ROSTER);
+	  //  assert(visitorPlayerMatchStats.size() == MAX_ROSTER);
 
 	    // now we can invoke the engine
 	    FutureValue<List<IMatchRating>> ratings = futureCall(new CreateMatchRatings(), hpms, vpms, homeTeamStats, visitorTeamStats);
 	    
 		return ratings;
+		
+		//return null;
 
 	}
 
@@ -155,7 +151,7 @@ public class GenerateMatchRatings extends Job1<List<IMatchRating>, IMatchGroup> 
         			line = it.next();
         		}
   
-        		// get 8 home subs
+        		// get 7 home subs
         		for (int i=0; i<7; ++i) {
         			Long id = getId(it);
         			if (!isVisitor)
@@ -187,7 +183,7 @@ public class GenerateMatchRatings extends Job1<List<IMatchRating>, IMatchGroup> 
         			line = it.next();
         		}
   
-        		// get 8 home subs
+        		// get 7 visitor subs
         		for (int i=0; i<7; ++i) {
         			Long id = getId(it);
         			if (isVisitor)
@@ -206,7 +202,11 @@ public class GenerateMatchRatings extends Job1<List<IMatchRating>, IMatchGroup> 
         }
 	}
 	
+	/*
+	 * sets playerOn to be true/false depending on how they finished the match
+	 */
 	Long getId(Iterator<String> it) {
+		
 		String line = "";
 		// there are 15 lines to a player section
 		for (int i=0; i<7; ++i) {

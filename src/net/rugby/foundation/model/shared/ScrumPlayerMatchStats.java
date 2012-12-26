@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -49,8 +50,32 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	private position pos;
 	private String name;
 	
+	//@REX should implement to be able to save list of Longs.
+	@Transient
 	private List<IPlayerMatchStatTimeLog> timeLogs; // = new ArrayList<IPlayerMatchStatTimeLog>();
 	private Integer timePlayed;
+	
+	public ScrumPlayerMatchStats() {
+		tries = 0;                   
+		tryAssists = 0;              
+		points = 0;                  
+		kicks = 0;                   
+		passes = 0;                  
+		runs = 0;                    
+		metersRun = 0;               
+		cleanBreaks = 0;             
+		defendersBeaten = 0;         
+		offloads = 0;                
+		turnovers = 0;               
+		tacklesMade = 0;             
+		tacklesMissed = 0;           
+		lineoutsWonOnThrow = 0;      
+		lineoutsStolenOnOppThrow = 0;
+		penaltiesConceded = 0;       
+		yellowCards = 0;             
+		redCards = 0;     
+		pos = position.NONE;
+	}
 	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IPlayerMatchStats#getId()
@@ -390,6 +415,76 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	@Override
 	public void setTimePlayed(Integer timePlayed) {
 		this.timePlayed = timePlayed;
+	}
+	@Override
+	public void playerOn(int i) {
+		if (timeLogs == null) {
+			timeLogs = new ArrayList<IPlayerMatchStatTimeLog>();
+		}
+		
+		IPlayerMatchStatTimeLog tl;
+		if (timeLogs.size() == 0) {
+			tl = new ScrumPlayerMatchStatTimeLog();
+			tl.start(i, pos, playerId, matchId);
+			timeLogs.add(tl);
+		} else {
+		
+			tl = timeLogs.get(timeLogs.size()-1);
+			if (i != 0 && tl.getTimeOff() == 0) {
+				// this is bad -- somehow we think they are already on
+				throw new RuntimeException("playerOn: The player " + name + " in match " + matchId +  " is already on the field at " + i + " minutes.");			
+			} else {
+				// they are re-entering the game - blood bin?
+				tl = new ScrumPlayerMatchStatTimeLog();
+				tl.start(i, pos, playerId, matchId);
+				timeLogs.add(tl);
+			}
+		}
+		
+	}
+	@Override
+	public void playerOff(int i) {
+		if (timeLogs == null) {
+			timeLogs = new ArrayList<IPlayerMatchStatTimeLog>();
+		}
+		
+		IPlayerMatchStatTimeLog tl;
+		if (timeLogs.size() == 0) {
+			// this is bad -- somehow we think they never got on
+			throw new RuntimeException("playerOff: The player " + name + " in match " + matchId +  " isn't on the field at " + i + " minutes.");		
+		}
+		
+		tl = timeLogs.get(timeLogs.size()-1);
+		if (tl.getTimeOff() != 0) {
+			// this is bad -- somehow we think they never got on
+			throw new RuntimeException("playerOff: The player " + name + " in match " + matchId +  " isn't on the field at " + i + " minutes.");			
+		} else {
+			tl.stop(i);
+		}
+		
+		
+	}
+	@Override
+	public void matchOver(int time) {
+		if (timeLogs != null) {
+			if (timeLogs.size() == 0) {
+				return;
+			} else {
+				IPlayerMatchStatTimeLog tl = timeLogs.get(timeLogs.size()-1);
+				if (tl.getTimeOff() == 0) {
+					tl.stop(time);
+				}
+				
+			}
+		} 
+		
+		timePlayed = 0;
+		for (IPlayerMatchStatTimeLog tl : timeLogs) {
+			timePlayed += tl.getTimeOff()-tl.getTimeOn();
+		}
+		
+		return;
+		
 	}
 
 	

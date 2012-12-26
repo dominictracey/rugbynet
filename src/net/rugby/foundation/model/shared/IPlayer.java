@@ -43,6 +43,8 @@ public interface IPlayer {
 	public abstract String getImageUri();
 	public abstract void setImageUri(String imageUri);
 	
+	public abstract Long getCountryId();
+	public abstract void setCountryId(Long id);
 	public abstract ICountry getCountry();
 	public abstract void setCountry(ICountry country);
 	
@@ -51,5 +53,21 @@ public interface IPlayer {
 	
 	public abstract Integer getNumCaps();
 	public abstract void setNumCaps(Integer numCaps);
+	public abstract void setSurName(String string);
+	public abstract String getSurName();
+	
+	public abstract void setGivenName(String givenName);
+	public abstract String getGivenName();
+	/**
+	 * 
+	 * @return name as it appears on stat sheets
+	 */
+	public abstract String getShortName();
+	/**
+	 * 
+	 * @param name as it appears on stat sheets
+	 */
+	public abstract void setShortName(String shortName);
+	
 	
 }

@@ -32,6 +32,8 @@ public class EditPlayer extends Composite {
 
 	public interface Presenter {
 		void savePlayerInfo(IPlayer player);
+
+		IPlayer getNewPlayer();
 	} 
 	
 	public EditPlayer() {
@@ -55,6 +57,9 @@ public class EditPlayer extends Composite {
 	
 	@UiHandler("save")
 	void onClick(ClickEvent e) {
+		if (player == null) {
+			player = listener.getNewPlayer();
+		}
 		((IPlayer)player).setDisplayName(displayName.getText());
 		//player.setCountry(country.getText());
 		player.setNumCaps(Integer.parseInt(numCaps.getText()));

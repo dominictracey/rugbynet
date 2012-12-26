@@ -3,6 +3,8 @@
  */
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.io.Serializable;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
@@ -16,8 +18,12 @@ import net.rugby.foundation.model.shared.IAppUser;
  * @author home
  *
  */
-public class OfyAppUserFactory implements IAppUserFactory {
+public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2901553975138064910L;
 	private Long id;
 	private String email;
 	private String nickName;

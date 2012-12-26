@@ -1,5 +1,6 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.google.inject.Inject;
@@ -16,7 +17,12 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Round;
 
-public class OfyCompetitionTeamFactory implements ICompetitionTeamFactory {
+public class OfyCompetitionTeamFactory implements ICompetitionTeamFactory, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 //	private Long id;
 //	private final Objectify ofy;
 //	

@@ -1,12 +1,11 @@
 package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.util.Date;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import com.googlecode.objectify.annotation.Entity;
 
 @Entity
@@ -32,13 +31,17 @@ public class ScrumPlayer implements IPlayer, Serializable {
 
 	private String imageUri;
 
+	private Long countryId;
+	@Transient
 	private ICountry country;
 
 	private Position.position position;
 
 	private Integer numCaps;
 
-
+	private String givenName;
+	private String surName;
+	private String shortName;
 
 	@Override
 	public Long getId() {
@@ -138,6 +141,40 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	@Override
 	public void setNumCaps(Integer numCaps) {
 		this.numCaps = numCaps;
+	}
+
+	@Override
+	public Long getCountryId() {
+		return countryId;
+	}
+
+	@Override
+	public void setCountryId(Long id) {
+		this.countryId = id;
+	}
+	@Override
+	public String getGivenName() {
+		return givenName;
+	}
+	@Override
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+	@Override
+	public String getSurName() {
+		return surName;
+	}
+	@Override
+	public void setSurName(String surName) {
+		this.surName = surName;
+	}
+	@Override
+	public String getShortName() {
+		return shortName;
+	}
+	@Override
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
 	}
 
 }

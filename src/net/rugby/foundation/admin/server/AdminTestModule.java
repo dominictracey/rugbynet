@@ -22,7 +22,7 @@ import com.google.inject.AbstractModule;
 public class AdminTestModule extends AbstractModule {
 	@Override
 	 protected void configure() {
-		//bind(IWorkflowConfigurationFactory.class).to(TestWorkflowConfigurationFactory.class);
+		bind(IWorkflowConfigurationFactory.class).to(TestWorkflowConfigurationFactory.class);
 		bind(IOrchestrationConfigurationFactory.class).to(TestOrchestrationConfigurationFactory.class);
 		//bind(IWorkflow.class).to(CompetitionWorkflow.class);
 		bind(IOrchestrationFactory.class).to(OrchestrationFactory.class);

@@ -16,6 +16,8 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 
 	@Id
 	private Long id;
+	private Long matchId;
+	private Long teamId;
 	
 	private Integer tries;
 	
@@ -485,6 +487,22 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	@Override
 	public void setRedCards(Integer redCards) {
 		this.redCards = redCards;
+	}
+	@Override
+	public Long getMatchId() {
+		return matchId;
+	}
+	@Override
+	public void setMatchId(Long matchId) {
+		this.matchId = matchId;
+	}
+	@Override
+	public Long getTeamId() {
+		return teamId;
+	}
+	@Override
+	public void setTeamId(Long teamId) {
+		this.teamId = teamId;
 	}
 	
 }

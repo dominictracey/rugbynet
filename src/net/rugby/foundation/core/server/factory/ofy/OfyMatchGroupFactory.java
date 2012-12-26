@@ -6,6 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +27,11 @@ import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
 
-public class OfyMatchGroupFactory implements IMatchGroupFactory {
+public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5536925770981961238L;
 	private Long id;
 	private final Objectify ofy;
 	private ITeamGroupFactory tf;
@@ -152,7 +157,9 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory {
 	
 			syncCache.put(id, yourBytes);
 			// force top-level reload
-			rf.build(g.getRoundId());
+			if (g.getRoundId() != null) {
+				rf.build(g.getRoundId());
+			}
 			
 			return g;
 		} catch (Throwable ex) {

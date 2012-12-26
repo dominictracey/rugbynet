@@ -643,6 +643,9 @@ private IPlayer aliWilliams() {
 	p.setId(9001018L);
 	p.setScrumId(14094L);
 	p.setDisplayName("Ali Williams");
+	p.setGivenName("Ali");
+	p.setSurName("Williams");
+	p.setShortName("AJ Williams");
 	p.setCountry(cf.getById(5001L));  //NZ
 	GregorianCalendar cal = new GregorianCalendar();
 	cal.set(Calendar.MONTH, 4); 
@@ -751,6 +754,8 @@ private IPlayer sonnybillWilliams() {
 	p.setId(9001022L);
 	p.setScrumId(27386L);
 	p.setDisplayName("Sonny Bill Williams");
+	p.setGivenName("Sonny Bill");
+	p.setSurName("Williams");
 	p.setCountry(cf.getById(5001L));  //NZ
 	GregorianCalendar cal = new GregorianCalendar();
 	cal.set(Calendar.MONTH, 8); 

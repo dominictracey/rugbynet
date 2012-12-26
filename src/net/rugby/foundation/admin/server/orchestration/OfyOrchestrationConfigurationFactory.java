@@ -31,10 +31,10 @@ public class OfyOrchestrationConfigurationFactory implements
 	private IWorkflowConfigurationFactory wfcf;
 
 
-	//@Inject
-	public void setFactories() {
+	@Inject
+	public void setFactories(IWorkflowConfigurationFactory wfcf) {
 
-		//this.wfcf = wfcf;
+		this.wfcf = wfcf;
 
 	}
 	public OfyOrchestrationConfigurationFactory() {
@@ -109,12 +109,14 @@ public class OfyOrchestrationConfigurationFactory implements
 		// if we've deleted them all, rebuild with empties
 		if (all.isEmpty()) {
 			compId = null;
-			for (Long underwayId : wfcf.get().getUnderwayCompetitions()) {
-				id = null;
-				IOrchestrationConfiguration oc = get();
-				oc.setCompID(underwayId);
-				put(oc);
-				all.add(oc);
+			if (wfcf.get() != null) {
+				for (Long underwayId : wfcf.get().getUnderwayCompetitions()) {
+					id = null;
+					IOrchestrationConfiguration oc = get();
+					oc.setCompID(underwayId);
+					put(oc);
+					all.add(oc);
+				}
 			}
 		}
 		return all;

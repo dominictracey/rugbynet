@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.io.Serializable;
+
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
@@ -10,7 +12,11 @@ import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.MatchResult;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 
-public class OfyMatchResultFactory implements IMatchResultFactory {
+public class OfyMatchResultFactory implements IMatchResultFactory, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -63026632234487370L;
 	private Long id;
 	private final Objectify ofy;
 	

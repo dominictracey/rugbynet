@@ -4,10 +4,13 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+
+import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
+import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
@@ -24,10 +27,13 @@ public class OfyPlayerFactory implements IPlayerFactory, Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 5267158546061782777L;
-	private Objectify ofy;
+	//private Objectify ofy;
+	private ICountryFactory cf;
 
-	public OfyPlayerFactory() {
-		this.ofy = DataStoreFactory.getOfy();
+	@Inject
+	public OfyPlayerFactory(ICountryFactory cf) {
+		this.cf = cf;
+		//this.ofy = DataStoreFactory.getOfy();
 	}
 	
 	/* (non-Javadoc)
@@ -35,20 +41,25 @@ public class OfyPlayerFactory implements IPlayerFactory, Serializable {
 	 */
 	@Override
 	public IPlayer getById(Long id) {
-		if (id != null)
-			return ofy.get(new Key<ScrumPlayer>(ScrumPlayer.class,id));
-		else
-			return null;
+		Objectify ofy = DataStoreFactory.getOfy();
+		if (id != null) {
+			IPlayer p = ofy.get(new Key<ScrumPlayer>(ScrumPlayer.class,id));
+			if (p.getCountryId() != null) {
+				p.setCountry(cf.getById(p.getCountryId()));
+			}
+			return p;
+		} else
+			return new ScrumPlayer();
 	}
 
 	@Override
 	public IPlayer getByScrumId(Long id) {
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		if (id != null) {
 			Query<ScrumPlayer> qsp = ofy.query(ScrumPlayer.class).filter("scrumId", id);
 			return qsp.get();
 		} else {
-			return null;
+			return new ScrumPlayer();
 		}
 	}
 	
@@ -57,6 +68,7 @@ public class OfyPlayerFactory implements IPlayerFactory, Serializable {
 	 */
 	@Override
 	public IPlayer put(IPlayer player) {
+		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.put(player);
 		return player;
 	}

@@ -126,4 +126,12 @@ public interface ITeamMatchStats {
 
 	public abstract void setMetersRun(Integer metersRun);
 
+	void setTeamId(Long teamId);
+
+	Long getTeamId();
+
+	void setMatchId(Long matchId);
+
+	Long getMatchId();
+
 }

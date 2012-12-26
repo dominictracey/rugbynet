@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.io.Serializable;
+
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
@@ -11,14 +13,18 @@ import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
 
-public class OfyTeamFactory implements ITeamGroupFactory {
+public class OfyTeamFactory implements ITeamGroupFactory, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7135535109216170518L;
 	private Long id;
-	private final Objectify ofy;
+	//private final Objectify ofy;
 	
-	@Inject
-	OfyTeamFactory() {
-		this.ofy = DataStoreFactory.getOfy();
-	}
+//	@Inject
+//	OfyTeamFactory() {
+//		this.ofy = DataStoreFactory.getOfy();
+//	}
 		@Override
 	public void setId(Long id) {
 		this.id = id;
@@ -26,6 +32,11 @@ public class OfyTeamFactory implements ITeamGroupFactory {
 
 	@Override
 	public ITeamGroup getTeam() {
+		if (id == null) {
+			return new TeamGroup();
+		}
+		
+		Objectify ofy = DataStoreFactory.getOfy();
 		ITeamGroup t = (ITeamGroup)ofy.get(new Key<Group>(Group.class,id));
 		return t;
 	}
@@ -35,7 +46,7 @@ public class OfyTeamFactory implements ITeamGroupFactory {
 			team = new TeamGroup();
 			team.setShortName("TDB");
 		}
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.put(team);
 		
 		return team;
@@ -45,6 +56,7 @@ public class OfyTeamFactory implements ITeamGroupFactory {
 	 */
 	@Override
 	public ITeamGroup getTeamByName(String name) {
+		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Group> team = ofy.query(Group.class).filter("displayName", name);
 		
 		assert(team.count() == 1);

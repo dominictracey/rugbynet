@@ -6,6 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +27,11 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Round;
 
-public class OfyRoundFactory implements IRoundFactory {
+public class OfyRoundFactory implements IRoundFactory, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2311118171036828094L;
 	private Long id;
 	private final Objectify ofy;
 	private IMatchGroupFactory gf;

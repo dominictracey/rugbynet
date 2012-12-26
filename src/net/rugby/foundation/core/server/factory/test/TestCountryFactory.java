@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import net.rugby.foundation.admin.server.init.CountryLoader;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICountry;
@@ -20,6 +21,11 @@ public class TestCountryFactory implements Serializable, ICountryFactory {
 	 */
 	private static final long serialVersionUID = -8226478123240704157L;
 
+	public TestCountryFactory() {
+		CountryLoader loader = new CountryLoader();
+		loader.Run(this);
+	}
+	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.test.ICountryFactory#getById(java.lang.Long)
 	 */

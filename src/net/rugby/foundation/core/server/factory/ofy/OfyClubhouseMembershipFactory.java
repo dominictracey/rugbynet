@@ -3,6 +3,7 @@
  */
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,12 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
  * @author home
  *
  */
-public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactory {
+public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactory, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Long id;
 	private Long clubhouseId;
 	private Long appUserId;

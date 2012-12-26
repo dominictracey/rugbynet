@@ -44,6 +44,11 @@ public class DataStoreFactory {
 			ObjectifyService.register(MatchResult.class);
 			ObjectifyService.register(SimpleScoreMatchResult.class);
 			ObjectifyService.register(CoreConfiguration.class);
+			ObjectifyService.register(Country.class);
+			ObjectifyService.register(ScrumPlayer.class);
+			ObjectifyService.register(ScrumPlayerMatchStats.class);
+			ObjectifyService.register(ScrumPlayerMatchStatTimeLog.class);
+			ObjectifyService.register(ScrumTeamMatchStats.class);
 		}
 		
 		return ofy;

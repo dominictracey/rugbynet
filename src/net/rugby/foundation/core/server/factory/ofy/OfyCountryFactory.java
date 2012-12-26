@@ -20,13 +20,18 @@ import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ICountry;
+import java.io.Serializable;
 
-public class OfyCountryFactory implements ICountryFactory {
+public class OfyCountryFactory implements ICountryFactory, Serializable {
 
-	private final Objectify ofy;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7571451805671318324L;
+	//private final Objectify ofy;
 	private static String memCachePrefix="C001-";
 	public OfyCountryFactory() {
-		this.ofy = DataStoreFactory.getOfy();
+		//this.ofy = DataStoreFactory.getOfy();
 	}
 	
 	@Override
@@ -133,7 +138,7 @@ public class OfyCountryFactory implements ICountryFactory {
 			
 			syncCache.put(memCachePrefix + country.getName(), yourBytes);
 			syncCache.put(memCachePrefix + country.getId(), yourBytes);
-			
+			Objectify ofy = DataStoreFactory.getOfy();
 			ofy.put(country);
 			return country;
 		} catch (Throwable ex) {
@@ -146,12 +151,13 @@ public class OfyCountryFactory implements ICountryFactory {
 		if (id == null) {
 			return new Country();
 		}
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		return ofy.get(new Key<Country>(Country.class,id));
 	}
 	
 	protected ICountry getFromDB(String name) {
 		if (name != null) {
+			Objectify ofy = DataStoreFactory.getOfy();
 			Query<Country> qsp = ofy.query(Country.class).filter("name", name);
 			return qsp.get();
 		} else {
@@ -161,7 +167,7 @@ public class OfyCountryFactory implements ICountryFactory {
 	
 	@Override
 	public Iterator<Country> getAll() {
-
+		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Country> qsp = ofy.query(Country.class);
 		if (qsp.count() > 0) {
 			return qsp.fetch().iterator();

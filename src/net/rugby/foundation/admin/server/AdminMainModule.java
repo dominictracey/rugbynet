@@ -15,6 +15,7 @@ import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
 import net.rugby.foundation.admin.server.workflow.OfyWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.OfyWorkflowFactory;
+import net.rugby.foundation.admin.server.workflow.TestWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.TestWorkflowFactory;
 import net.rugby.foundation.admin.shared.CompetitionWorkflow;
 
@@ -23,6 +24,7 @@ import com.google.inject.AbstractModule;
 public class AdminMainModule extends AbstractModule {
 	@Override
 	 protected void configure() {
+		bind(IWorkflowConfigurationFactory.class).to(OfyWorkflowConfigurationFactory.class);
 		bind(IOrchestrationConfigurationFactory.class).to(OfyOrchestrationConfigurationFactory.class);
 		bind(IOrchestrationFactory.class).to(OrchestrationFactory.class);
 		bind(ICoreRuleFactory.class).to(CoreRuleFactory.class);

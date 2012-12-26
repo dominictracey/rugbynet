@@ -252,7 +252,8 @@ public abstract class Position implements Serializable {
 	public static position getFromScrum(String scrumName) {
 		
 		// substitutes often have their positions listed in parens
-		scrumName = scrumName.split("(|)")[0];
+		if (scrumName.contains("("))
+			scrumName = scrumName.split("[(|)]")[1];
 		
 		if (scrumName.equals("FB")) {
 			return position.FULLBACK;

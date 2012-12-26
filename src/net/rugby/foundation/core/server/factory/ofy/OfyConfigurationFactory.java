@@ -3,6 +3,8 @@
  */
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.io.Serializable;
+
 import com.google.inject.Inject;
 import com.googlecode.objectify.Objectify;
 
@@ -17,8 +19,12 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
  * @author home
  *
  */
-public class OfyConfigurationFactory implements IConfigurationFactory {
+public class OfyConfigurationFactory implements IConfigurationFactory, Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final Objectify ofy;
 	private ICompetitionFactory cf;
 

@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.Player;
 import net.rugby.foundation.model.shared.ScrumPlayer;
@@ -42,21 +44,21 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 		this.cf = cf;
 	}
 
-//	@SuppressWarnings("serial")
-//	class DiffJob extends Job2<Integer, Integer, Integer> {
-//		@Override
-//		public Value<Integer> run(Integer a, Integer b) {
-//			return immediate(a - b);
-//		}
-//	}
-//
-//	@SuppressWarnings("serial")
-//	class MultJob extends Job2<Integer, Integer, Integer> {
-//		@Override
-//		public Value<Integer> run(Integer a, Integer b) {
-//			return immediate(a*b);
-//		}
-//	}
+	//	@SuppressWarnings("serial")
+	//	class DiffJob extends Job2<Integer, Integer, Integer> {
+	//		@Override
+	//		public Value<Integer> run(Integer a, Integer b) {
+	//			return immediate(a - b);
+	//		}
+	//	}
+	//
+	//	@SuppressWarnings("serial")
+	//	class MultJob extends Job2<Integer, Integer, Integer> {
+	//		@Override
+	//		public Value<Integer> run(Integer a, Integer b) {
+	//			return immediate(a*b);
+	//		}
+	//	}
 	/**
 	 * return IPlayer reference
 	 * params String compName
@@ -69,110 +71,126 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 		// first see if we have it in the database
 		IPlayer player = pf.getByScrumId(scrumPlayerId);
 		//player.setDisplayName("Hugo Southwell");
-		
+
 		if (player != null) {
 			return immediate(player);
 		} else { // didn't find, so go looking
 			player = getPlayerFromScrum(pf, comp, scrumPlayerId);
-			
+
 			if (player != null) {
 				return immediate(player);
 			} else {
 				//still didn't find, need human to get this going.
 				PromisedValue<IPlayer> x = newPromise(IPlayer.class);
 
-				Logger.getLogger("Scrum.com Player Parser").log(Level.INFO, "http://localhost:8888/Admin.html?gwt.codesvr=127.0.0.1:9997#HandleEmailPlace:promisedHandle=" + x.getHandle() + "&name=" + URLEncoder.encode(playerName)+ "&referringURL=" + URLEncoder.encode(referringURL));
-				//SendEmail(x.getHandle());
-				//FutureValue<IPlayer> p = futureCall(new FetchPlayerManually(pf), immediate(comp),immediate(playerName),immediate(referringURL),immediate(scrumPlayerId), immediate(adminId));
-				return futureCall(new FetchPlayerManually(pf), x);
+				String url = "http://localhost:8888/Admin.html?gwt.codesvr=127.0.0.1:9997#HandleEmailPlace:promisedHandle=" + x.getHandle() + "&name=" + URLEncoder.encode(playerName)+ "&referringURL=" + URLEncoder.encode(referringURL);
+				Logger.getLogger("Scrum.com Player Parser").log(Level.INFO, url);
+				SendEmail(x.getHandle(), comp, playerName, referringURL, scrumPlayerId, adminId, url);
+
+				return x;
 			}
-//			DiffJob diffJob = new DiffJob();
-//			MultJob multJob = new MultJob();
-//			FutureValue<Integer> r = futureCall(diffJob, immediate(x), immediate(y));
-//			FutureValue<Integer> s = futureCall(diffJob, immediate(x), immediate(z));
-//			FutureValue<Integer> t = futureCall(multJob, r, s);
-//			FutureValue<Integer> u = futureCall(diffJob, t, immediate(2));
-//			return u;
 
 		}
 	}
-	
+
 
 	private IPlayer getPlayerFromScrum(IPlayerFactory pf, ICompetition comp, Long scrumPlayerId)  {
-
+		
 		IPlayer player = pf.getById(null);  //empty
-		
-		String playerURL = "http://www.espnscrum.com/scrum" + "/rugby/player/" + scrumPlayerId + ".html";
-		
-		Date dateRead = null;
-        boolean found = false;
-        
-        try {
-//            URL url = new URL(resultURL);
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-        	UrlCacher urlCache = new UrlCacher(playerURL);
-        	List<String> lines = urlCache.get();
-            String line;
 
-            if (lines == null) {
-            	return null;
-            }
-            
-            Iterator<String> it = lines.iterator();
-            while (it.hasNext() && !found) {
-            	
-            	line = it.next();
-            	// first we scan to the right date
-            	if (line.contains("scrumPlayerName")) {
-            		player.setDisplayName(line.split("<|>")[2].trim());
-            	} else if (line.contains("scrumPlayerCountry")) {
-            		player.setCountry(cf.getByName(line.split("<|>")[2].trim()));
-            	} else if (line.contains("Born")) {
-            		line = it.next();
-            		if (line != null && !line.contains(",")) {
-            			line = it.next();
-            		}
-        			if (!line.contains(",")) {
-        				break;
-        			} else {
-        				//String month = line.split(" |,")[0].trim();
-        				String monthday = line.split(",")[0].trim();
-        				String year = line.split(",")[1].trim();
-        				DateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
-	            		dateRead = dateFormatter.parse(monthday + ", " + year);
-	            		if (dateRead != null) {
-	            			player.setBirthDate(dateRead);
-	            		}
-            		} 
-            	} else if (line.contains("All Tests")) {
-           			line = it.next();
-           			line = it.next();
-           			//line = it.next();
-            		player.setNumCaps(Integer.parseInt(line.split("<|>")[2].trim()));
-            		found = true;
-            	}
-            }
-        } catch (ParseException e) {
-            Logger.getLogger("Scrum.com").log(Level.SEVERE, e.getMessage());
-            return null;
-        }
-		
-        if (found)
-        	return player;
-        else
-        	return null;
-	}
-	
-	private void SendEmail(String promiseHandle) {
-		PipelineService service = PipelineServiceFactory.newPipelineService();
+		String playerURL = "http://www.espnscrum.com/scrum" + "/rugby/player/" + scrumPlayerId + ".html";
+
+		Date dateRead = null;
+		boolean found = false;
+
 		try {
-			service.submitPromisedValue(promiseHandle, pf.getByScrumId(14505L));
-		} catch (NoSuchObjectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OrphanedObjectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//            URL url = new URL(resultURL);
+			//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			UrlCacher urlCache = new UrlCacher(playerURL);
+			List<String> lines = urlCache.get();
+			String line;
+
+			if (lines == null) {
+				return null;
+			}
+
+			Iterator<String> it = lines.iterator();
+			while (it.hasNext() && !found) {
+
+				line = it.next();
+				// first we scan to the name
+				if (line.contains("scrumPlayerName")) {
+					player.setDisplayName(line.split("<|>")[2].trim());
+					if (!player.getDisplayName().isEmpty()) {
+						if (player.getDisplayName().split(" ").length > 1) {
+							player.setSurName(player.getDisplayName().split(" ")[player.getDisplayName().split(" ").length-1]);
+							String givenName = player.getDisplayName().split(" ")[0];
+							for (int i=1; i<player.getDisplayName().split(" ").length-1; ++i) {
+								givenName += player.getDisplayName().split(" ")[i];
+							}
+							player.setGivenName(givenName);
+						}
+					}
+				} else if (line.contains("scrumPlayerCountry")) {
+					ICountry country = cf.getByName(line.split("<|>")[2].trim());
+					player.setCountry(country);
+					player.setCountryId(country.getId());
+				} else if (line.contains("Full name")) {
+					//line = it.next();
+					String fullName = line.split("</b>|</div>")[1].trim();
+					// the short name is the first letters of all names except last <space> last name. 
+					//e.g. Full name Jonathan James Vaughan Davies ==> JJV Davies
+					String shortName = "";
+					int size = fullName.split(" ").length;
+					for (int i=0; i<size-1; ++i) {
+						shortName += fullName.split(" ")[i].substring(0, 1);
+					}
+					shortName += " " + player.getSurName();
+					player.setShortName(shortName);
+				} else if (line.contains("Born")) {
+					line = it.next();
+					if (line != null && !line.contains(",")) {
+						line = it.next();
+					}
+					if (!line.contains(",")) {
+						break;
+					} else {
+						//String month = line.split(" |,")[0].trim();
+						String monthday = line.split(",")[0].trim();
+						String year = line.split(",")[1].trim();
+						DateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
+						dateRead = dateFormatter.parse(monthday + ", " + year);
+						if (dateRead != null) {
+							player.setBirthDate(dateRead);
+						}
+					} 
+				} else if (line.contains("All Tests")) {
+					line = it.next();
+					line = it.next();
+					//line = it.next();
+					player.setNumCaps(Integer.parseInt(line.split("<|>")[2].trim()));
+					found = true;
+				}
+			}
+		} catch (ParseException e) {
+			Logger.getLogger("Scrum.com").log(Level.SEVERE, e.getMessage());
+			return null;
 		}
+
+		if (found) {
+			player.setScrumId(scrumPlayerId);
+			pf.put(player);
+			return player;
+		} else
+			return null;
+	}
+
+	private void SendEmail(String promiseHandle, ICompetition comp, String playerName, String referringURL, Long scrumPlayerId, Long adminId, String adminUrl) {
+
+		AdminEmailer emailer = new AdminEmailer();
+		
+		emailer.setSubject("Player info needed for comp " + comp.getShortName() + ": " + playerName);
+		emailer.setMessage("For whatever reason, we couldn't automatically load the information about " + playerName + "in the competition " + comp.getLongName() + " from the url " + referringURL + ". Can you please follow this link: " + adminUrl + " and enter the player's information manually so we can continue the match rating processing. Thanks!");
+		emailer.send();
 	}
 }
