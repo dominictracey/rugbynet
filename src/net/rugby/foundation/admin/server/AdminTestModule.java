@@ -10,13 +10,10 @@ import net.rugby.foundation.admin.server.orchestration.OrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.TestOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.rules.CoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
-import net.rugby.foundation.admin.server.workflow.IWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
 import net.rugby.foundation.admin.server.workflow.TestWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.TestWorkflowFactory;
-import net.rugby.foundation.admin.shared.CompetitionWorkflow;
-
 import com.google.inject.AbstractModule;
 
 public class AdminTestModule extends AbstractModule {

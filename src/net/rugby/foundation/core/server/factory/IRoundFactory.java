@@ -19,6 +19,9 @@ public interface IRoundFactory {
 	 */
 	void build(Long roundId);
 
+//	void setFactories(ICompetitionFactory ofyCompetitionFactory,
+//			IMatchGroupFactory mf);
+
 	/**
 	 * @param ofyCompetitionFactory
 	 * @param mf

@@ -1,13 +1,7 @@
 package net.rugby.foundation.game1.client.ui;
 
 import java.util.List;
-import java.util.Map;
-
-import net.rugby.foundation.game1.shared.IConfiguration;
-import net.rugby.foundation.game1.shared.IEntry;
 import net.rugby.foundation.game1.shared.IMatchStats;
-import net.rugby.foundation.model.shared.IClubhouse;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 

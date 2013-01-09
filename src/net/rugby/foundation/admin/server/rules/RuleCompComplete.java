@@ -6,7 +6,6 @@ package net.rugby.foundation.admin.server.rules;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.admin.server.orchestration.LockMatchOrchestration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 

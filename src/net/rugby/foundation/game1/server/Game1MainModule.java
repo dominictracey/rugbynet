@@ -21,14 +21,15 @@ import net.rugby.foundation.game1.server.factory.ofy.OfyMatchEntryFactory;
 import net.rugby.foundation.game1.server.factory.ofy.OfyMatchStatsFactory;
 import net.rugby.foundation.game1.server.factory.ofy.OfyRoundEntryFactory;
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 public class Game1MainModule extends AbstractModule {
 	@Override
 	 protected void configure() {
 		bind(Game1ServiceImpl.class);
 		bind(IEntryFactory.class).to(OfyEntryFactory.class);
-		bind(IRoundEntryFactory.class).to(OfyRoundEntryFactory.class);
-		bind(IMatchEntryFactory.class).to(OfyMatchEntryFactory.class);
+		bind(IRoundEntryFactory.class).to(OfyRoundEntryFactory.class).in(Singleton.class);
+		bind(IMatchEntryFactory.class).to(OfyMatchEntryFactory.class).in(Singleton.class);
 		bind(ILeaderboardFactory.class).to(OfyLeaderboardFactory.class);
 		bind(ILeaderboardRowFactory.class).to(OfyLeaderBoardRowFactory.class);
 		bind(ICoreRuleFactory.class).to(CoreRuleFactory.class);

@@ -5,8 +5,6 @@ package net.rugby.foundation.game1.client.activity;
 
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.game1.client.ClientFactory;
-import net.rugby.foundation.game1.client.place.Game1Place;
-import net.rugby.foundation.game1.client.place.JoinClubhouse;
 import net.rugby.foundation.game1.client.place.Profile;
 
 import com.google.gwt.activity.shared.Activity;

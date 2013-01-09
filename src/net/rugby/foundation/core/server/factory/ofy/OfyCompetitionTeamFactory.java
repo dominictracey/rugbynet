@@ -1,21 +1,7 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-
-import com.google.inject.Inject;
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-
 import net.rugby.foundation.core.server.factory.ICompetitionTeamFactory;
-import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
-import net.rugby.foundation.model.shared.CompetitionTeam;
-import net.rugby.foundation.model.shared.DataStoreFactory;
-import net.rugby.foundation.model.shared.ICompetitionTeam;
-import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.Round;
 
 public class OfyCompetitionTeamFactory implements ICompetitionTeamFactory, Serializable {
 

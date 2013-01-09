@@ -10,6 +10,7 @@ import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.model.ScrumSimpleScoreResultFetcher;
 import net.rugby.foundation.admin.server.model.ScrumSuperRugbySimpleScoreResultFetcher;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
@@ -18,10 +19,12 @@ import net.rugby.foundation.model.shared.IRound;
 public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 
 	private ICompetitionFactory cf;
+	private IMatchGroupFactory mf;
 
 	@Inject
-	public void setFactories(ICompetitionFactory cf) {
+	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory mf) {
 		this.cf = cf;
+		this.mf = mf;
 	}
 	
 	@Override
@@ -30,19 +33,26 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 			cf.setId(sourceCompID);
 			ICompetition comp = cf.getCompetition();
 			
+			if (comp == null) {
+				Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized compId specified: " + sourceCompID);
+				return null;
+			}
+			
 			IResultFetcher fetcher = null;
-			if (!comp.getLongName().contains("Super Rugby")) {
-				fetcher =  new ScrumSimpleScoreResultFetcher();
+			if (comp != null && !comp.getLongName().contains("Super Rugby")) {
+				fetcher =  new ScrumSimpleScoreResultFetcher(mf);
 			} else {
-				fetcher =  new ScrumSuperRugbySimpleScoreResultFetcher();
+				fetcher =  new ScrumSuperRugbySimpleScoreResultFetcher(mf);
 			}
 
-			
-
-			fetcher.setComp(comp);
-			fetcher.setRound(comp.getPrevRound());
+			if (comp != null) {
+				fetcher.setComp(comp);
+				fetcher.setRound(comp.getPrevRound());
+			}
 			
 			return fetcher;
+		} else if (resultType == ResultType.MATCHES) {
+			return new ScrumSuperRugbySimpleScoreResultFetcher(mf);
 		} else {
 			Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized resultType requested " + resultType.toString());
 			return null;

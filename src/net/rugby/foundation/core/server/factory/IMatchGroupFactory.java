@@ -13,6 +13,8 @@ public interface IMatchGroupFactory {
 	IMatchGroup find(IMatchGroup match);
 	IMatchGroup put(IMatchGroup g);
 
+//	void setFactories(IRoundFactory rf, ITeamGroupFactory tf);
+
 	/**
 	 * @param rf
 	 * @param tf

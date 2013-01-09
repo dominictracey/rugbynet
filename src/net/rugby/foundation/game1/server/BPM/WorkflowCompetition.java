@@ -58,7 +58,7 @@ public class WorkflowCompetition implements IWorkflow {
 	private IRoundEntryFactory ref;
 	private IEntryFactory ef;
 	
-	public WorkflowCompetition(IClubhouseLeagueMapFactory chlmf, ICompetitionFactory cf, ICoreRuleFactory crf, ILeagueFactory lf, IClubhouseFactory chf, IMatchEntryFactory mef, IRoundEntryFactory ref, IEntryFactory ef) {		
+	public WorkflowCompetition(IClubhouseLeagueMapFactory chlmf, ICompetitionFactory cf, ICoreRuleFactory crf, ILeagueFactory lf, IClubhouseFactory chf, IMatchEntryFactory mef, IRoundEntryFactory ref, IEntryFactory ef, IWorkflowConfigurationFactory wfcf) {		
 		this.cf = cf;
 		this.wfcf = wfcf;
 		this.crf = crf;

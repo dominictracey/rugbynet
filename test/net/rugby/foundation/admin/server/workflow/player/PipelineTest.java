@@ -14,13 +14,13 @@ package net.rugby.foundation.admin.server.workflow.player;
 //License for the specific language governing permissions and limitations under
 //the License.
 
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalTaskQueueTestConfig;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.apphosting.api.ApiProxy;
+//import com.google.appengine.api.taskqueue.dev.LocalTaskQueueCallback;
 
 import junit.framework.TestCase;
 
@@ -36,15 +36,15 @@ public class PipelineTest extends TestCase implements Serializable {
 	protected transient ApiProxy.Environment apiProxyEnvironment;
 
 	public PipelineTest() {
-		LocalTaskQueueTestConfig taskQueueConfig = new LocalTaskQueueTestConfig();
-		taskQueueConfig.setCallbackClass(TestingTaskQueueCallback.class);
-		taskQueueConfig.setDisableAutoTaskExecution(false);
-		taskQueueConfig.setShouldCopyApiProxyEnvironment(true);
-		helper = new LocalServiceTestHelper(
-				new LocalDatastoreServiceTestConfig()
-				.setDefaultHighRepJobPolicyUnappliedJobPercentage(
-						isHrdSafe() ? 100 : 0),
-						taskQueueConfig);
+//		LocalTaskQueueTestConfig taskQueueConfig = new LocalTaskQueueTestConfig();
+//		taskQueueConfig.setCallbackClass(TestingTaskQueueCallback.class);
+//		taskQueueConfig.setDisableAutoTaskExecution(false);
+//		taskQueueConfig.setShouldCopyApiProxyEnvironment(true);
+//		helper = new LocalServiceTestHelper(
+//				new LocalDatastoreServiceTestConfig()
+//				.setDefaultHighRepJobPolicyUnappliedJobPercentage(
+//						isHrdSafe() ? 100 : 0),
+//						taskQueueConfig);
 	}
 
 	/**

@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity;
 import net.rugby.foundation.core.client.Identity.Presenter;
-import net.rugby.foundation.core.client.Identity.checkLoginStatusCallback;
 import net.rugby.foundation.game1.client.mvp.AppActivityMapper;
 import net.rugby.foundation.game1.client.mvp.AppPlaceHistoryMapper;
 import net.rugby.foundation.game1.client.ClientFactory;

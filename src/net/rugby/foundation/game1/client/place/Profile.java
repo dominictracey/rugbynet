@@ -4,9 +4,6 @@ import net.rugby.foundation.core.client.Identity;
 import net.rugby.foundation.core.client.Identity.Actions;
 import net.rugby.foundation.core.client.Identity.Keys;
 import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
-import net.rugby.foundation.model.shared.LoginInfo.Selector;
-
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;

@@ -70,7 +70,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
-		url.setText("http://www.espnscrum.com/super-rugby-2012/rugby/series/144545.html");
+		url.setText("http://www.espnscrum.com/premiership-2012-13/rugby/series/166258.html");
 		resultType.addItem("basicMatchResult");
 		save.setVisible(false);
 		fetch.setText("Fetch teams");
@@ -148,7 +148,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiHandler("testMatchStats")
 	void ontestMatchStatsClick(ClickEvent e) {
 		
-		listener.testMatchStatsClicked(300L);
+		listener.testMatchStatsClicked(41142L);
 	}
 	
 	@Override
@@ -179,14 +179,12 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						if (event.getSelectedItem().getText().equals("Competition")) {
 							// they clicked on the importer "Competition" - should say "Import" or something
 						}	else {
+							editArea.clear();
 							if (editComp == null) {
 								editComp = new EditComp();								
-								editArea.add(editComp);
 							}
-							if (editTeam != null)
-								editTeam = null;
-							if (editMatch != null)
-								editMatch = null;
+
+							editArea.add(editComp);
 							editComp.setVisible(true);
 							listener.compClicked(editComp, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
 						}							
@@ -198,15 +196,12 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						}							
 					} else if (depth == 3) { // specific team or round clicked
 						if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
+							editArea.clear();
 							if (editTeam == null) {
 								editTeam = new EditTeam();
-								editArea.add(editTeam);
 							}
+							editArea.add(editTeam);
 							editTeam.setVisible(true);
-							if (editComp != null)
-								editComp = null;
-							if (editMatch != null)
-								editMatch = null;
 							
 							Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]);
 							Long teamId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
@@ -217,18 +212,13 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 									Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
 						}
 					} else if (depth == 4) { // match clicked
-						if (editComp != null) 
-							editComp = null;
-						if (editTeam != null)
-							editTeam = null;
+						editArea.clear();
 						
 						if (editMatch == null) {
 							editMatch = new EditMatch();
-							editArea.clear();
-							editArea.add(editMatch);
 						}
+						editArea.add(editMatch);
 						editMatch.setVisible(true);
-
 						
 						// find roundId and compId
 						Long roundId = Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]);
@@ -247,71 +237,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 				}
 			}
 		});
-		
-//		compTree.addOpenHandler( new OpenHandler<TreeItem>() {
-//
-//			@Override
-//			public void onOpen(OpenEvent<TreeItem> event) {
-//				//see how far down we are
-//				int depth = 0;
-//				TreeItem cursor = event.getTarget();
-//				while (!cursor.equals(base)) {
-//					depth++;
-//					cursor = cursor.getParentItem();
-//				}
-//				if (depth == 1) {  //comp clicked
-//					if (event.getTarget().getText().equals("Competition")) {
-//						// they clicked on the importer "Competition" - should say "Import" or something
-//						listener.setCurrentCompId(0L);
-//					}	else {
-//						listener.setCurrentCompId(Long.parseLong(event.getTarget().getParentItem().getText().split("\\|")[1]));
-//					}							
-//				} else if (depth == 2) {  //teams or rounds clicked
-//					if (event.getTarget().getText().equals("teams")) {
-//						listener.setTeamId(0L); // I don't think the importer has the Ids yet
-//						listener.setCurrentCompId(0L);
-//					}	else {
-//						listener.setRoundId(Long.parseLong(event.getTarget().getParentItem().getText().split("\\|")[1]));
-//					}							
-//				} else if (depth == 3) { // specific team or round clicked
-//					if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
-//						if (editTeam == null) {
-//							editTeam = new EditTeam();
-//							editArea.add(editTeam);
-//						}
-//						editTeam.setVisible(true);
-//						if (editComp != null)
-//							editComp = null;
-//						if (editMatch != null)
-//							editMatch = null;
-//						listener.editTeamInit(editTeam, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
-//					} else { // round, so show matches
-//						// params are compId and roundId
-//						listener.roundClicked(Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),
-//								Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
-//					}
-//				} else if (depth == 4) { // match clicked
-//					if (editMatch == null) {
-//						editMatch = new EditMatch();
-//						editArea.add(editMatch);
-//					}
-//					editMatch.setVisible(true);
-//					if (editComp != null)
-//						editComp.setVisible(false);
-//					if (editTeam != null)
-//						editTeam.setVisible(false);
-//					listener.editMatchInit(editMatch, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
-//
-//				} else if (depth == 5) { // results?
-//					if (event.getSelectedItem().getText().equals("results")) {
-//						listener.resultsClicked(
-//								Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]),  // compId
-//								Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),  // roundId
-//								Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));  //matchId
-//					}
-//				}			
-//			}
-//		});
 			
 		compTree.removeItems();
 		base = new TreeItem("Competitions");
@@ -343,9 +268,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public void showRounds(List<IRound>  rds) {
 		roundMap = rds;
 		rounds.removeItems();
-//		for (IRound r : rds) {
-//			rounds.addItem(r.getName());
-//		}
+
 		save.setEnabled(true);
 		fetch.setEnabled(true);
 	}
@@ -373,6 +296,10 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	}
 
 
+	/**
+	 * when the user clicks Fetch Competition button, the server goes and gets the comp info 
+	 * and the activity calls this method from it's onSuccess.
+	 */
 	@Override
 	public void showCompetition(ICompetition result) {
 		comp = result;
@@ -403,19 +330,19 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			addTeams(c.getId(), c.getTeams());
 			ti.addItem("rounds");
 			addRounds(c,c.getRounds());
-			for (IRound r : c.getRounds()) {
-				addRound(c,r,r.getMatches());
-				for (IMatchGroup m: r.getMatches()) {
-					List<IMatchResult> results = new ArrayList<IMatchResult>();
-					ISimpleScoreMatchResult score = m.getSimpleScoreMatchResult();
-					if (score != null) {
-						results.add((IMatchResult) m.getSimpleScoreMatchResult());
-					}
-					if (!results.isEmpty()) {
-						addResults(c.getId(), r, m, results);
-					}
-				}
-			}
+//			for (IRound r : c.getRounds()) {
+//				addRound(c,r,r.getMatches());
+//				for (IMatchGroup m: r.getMatches()) {
+//					List<IMatchResult> results = new ArrayList<IMatchResult>();
+//					ISimpleScoreMatchResult score = m.getSimpleScoreMatchResult();
+//					if (score != null) {
+//						results.add((IMatchResult) m.getSimpleScoreMatchResult());
+//					}
+//					if (!results.isEmpty()) {
+//						addResults(c.getId(), r, m, results);
+//					}
+//				}
+//			}
 		}
 		
 	}

@@ -22,14 +22,15 @@ import net.rugby.foundation.game1.server.factory.test.TestMatchStatsFactory;
 import net.rugby.foundation.game1.server.factory.test.TestRoundEntryFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 public class Game1TestModule extends AbstractModule {
 	@Override
 	 protected void configure() {
 		bind(Game1ServiceImpl.class);
 		bind(IEntryFactory.class).to(TestEntryFactory.class);
-		bind(IRoundEntryFactory.class).to(TestRoundEntryFactory.class);
-		bind(IMatchEntryFactory.class).to(TestMatchEntryFactory.class);
+		bind(IRoundEntryFactory.class).to(TestRoundEntryFactory.class).in(Singleton.class);
+		bind(IMatchEntryFactory.class).to(TestMatchEntryFactory.class).in(Singleton.class);
 		bind(ILeaderboardFactory.class).to(TestLeaderboardFactory.class);
 		bind(ILeaderboardRowFactory.class).to(TestLeaderboardRowFactory.class);
 		bind(ICoreRuleFactory.class).to(CoreRuleFactory.class);

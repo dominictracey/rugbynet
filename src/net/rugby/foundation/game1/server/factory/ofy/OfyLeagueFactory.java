@@ -15,7 +15,6 @@ import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.game1.server.factory.IEntryFactory;
 import net.rugby.foundation.game1.server.factory.ILeagueFactory;
-import net.rugby.foundation.game1.shared.ClubhouseLeagueMap;
 import net.rugby.foundation.game1.shared.IEntry;
 import net.rugby.foundation.game1.shared.ILeague;
 import net.rugby.foundation.game1.shared.League;

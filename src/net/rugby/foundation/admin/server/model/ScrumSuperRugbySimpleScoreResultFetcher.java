@@ -12,12 +12,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.UrlCacher;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 
 public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreResultFetcher implements IResultFetcher {
+
+	public ScrumSuperRugbySimpleScoreResultFetcher(IMatchGroupFactory mf) {
+		super(mf);
+	}
 
 	@Override
 	public IMatchResult getResult(IMatchGroup match)  {

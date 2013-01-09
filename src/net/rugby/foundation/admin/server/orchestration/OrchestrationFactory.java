@@ -6,7 +6,6 @@ package net.rugby.foundation.admin.server.orchestration;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
-import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.IOrchestrationActions;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;

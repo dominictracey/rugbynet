@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.Competition;
@@ -26,6 +27,7 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
+import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 
 
 public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
@@ -38,25 +40,41 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	//private String resultType;
 	private IRoundFactory rf;
 	private IMatchGroupFactory mf;
+	private IResultFetcherFactory srff;
 	
 	@SuppressWarnings("unused")
 	private ScrumCompetitionFetcher() {
 		// use the quasi-injector
 	}
 	
-	public ScrumCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf) {
+	public ScrumCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory srff) {
 		this.rf = rf;
 		this.mf = mf;
+		this.srff = srff;
 	}
 	
 	@Override
 	public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams) {
 		ICompetition comp = new Competition();
 		comp.setForeignURL(homePage);
-		if (homePage.split("[/|.]").length > 7)
-			comp.setForeignID(Long.parseLong(homePage.split("[/|.]")[7]));
-		else
+		if (homePage.split("[/|.]").length > 7) {
+			int i = 0;
+			boolean found = false;
+			String parts[] = homePage.split("[/|.]");
+			while (i < parts.length && found == false) {
+				if (parts[i].equals("series"))
+					found = true;
+				++i;
+			}
+			if (found)
+				comp.setForeignID(Long.parseLong(parts[i]));
+			else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Couldn't get scrum id from " + homePage + " (couldn't find series token)");
+			}
+		} else {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Couldn't get scrum id from " + homePage + " (too short)");
+		}
+		
 		comp.setTeams(teams);
 		
         try {
@@ -308,6 +326,9 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	public Map<String, IMatchGroup> getMatches(String baseUrl,
 			Map<String, ITeamGroup> teams) {
 
+		IResultFetcher pastMatchFetcher = srff.getResultFetcher(null, null, ResultType.MATCHES);  //don't need any of the parameters
+		matchMap = pastMatchFetcher.getMatches(baseUrl, teams);
+		
 		String tableURL = baseUrl + "?template=fixtures";
 		String month = "";
 		String year = "";
@@ -433,7 +454,9 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
             		zone = gmt.trim().split(":| ")[2];
             		match.setDate(getDate(day, month, year, hour, minute, zone));
             		
-            		
+            		if (matchMap == null) {
+            			matchMap = new HashMap<String,IMatchGroup>();
+            		}
             		matchMap.put(match.getDisplayName(), match);
             	}
             }

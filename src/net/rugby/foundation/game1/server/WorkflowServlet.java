@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import net.rugby.foundation.admin.server.workflow.AdminWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
-import net.rugby.foundation.admin.shared.CompetitionWorkflow;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.game1.server.BPM.WorkflowCompetition;
@@ -50,11 +49,12 @@ public class WorkflowServlet extends HttpServlet {
 	private IMatchEntryFactory mef;
 	private IRoundEntryFactory ref;
 	private IEntryFactory ef;
+	private IWorkflowConfigurationFactory wfcf;
 
 	@Inject
 	public WorkflowServlet(ICompetitionFactory cf, ICoreRuleFactory crf, 
 			IClubhouseLeagueMapFactory chlmf, ILeagueFactory lf, IClubhouseFactory chf,
-			IMatchEntryFactory mef, IRoundEntryFactory ref, IEntryFactory ef) {
+			IMatchEntryFactory mef, IRoundEntryFactory ref, IEntryFactory ef, IWorkflowConfigurationFactory wfcf) {
 		this.cf = cf;
 		this.crf = crf;
 		this.chlmf = chlmf;
@@ -63,6 +63,7 @@ public class WorkflowServlet extends HttpServlet {
 		this.mef = mef;
 		this.ref = ref;
 		this.ef = ef;
+		this.wfcf = wfcf;
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -72,7 +73,7 @@ public class WorkflowServlet extends HttpServlet {
 		String targetKey = req.getParameter(AdminWorkflow.Key);
 		String secondaryKey = req.getParameter(AdminWorkflow.SecondaryKey);
 		
-		wf = new WorkflowCompetition(chlmf, cf, (ICoreRuleFactory) crf, lf, chf, mef, ref, ef);  //@REX something screwy w/ 3rd param
+		wf = new WorkflowCompetition(chlmf, cf, (ICoreRuleFactory) crf, lf, chf, mef, ref, ef, wfcf);  //@REX something screwy w/ 3rd param
 		
 		ArrayList<String> log = new ArrayList<String>();
 		wf.setLog(log);

@@ -14,21 +14,10 @@ import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
-import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.Player;
-import net.rugby.foundation.model.shared.ScrumPlayer;
-
-import com.google.appengine.tools.pipeline.FutureValue;
-import com.google.appengine.tools.pipeline.Job4;
 import com.google.appengine.tools.pipeline.Job5;
-import com.google.appengine.tools.pipeline.Job6;
-import com.google.appengine.tools.pipeline.NoSuchObjectException;
-import com.google.appengine.tools.pipeline.OrphanedObjectException;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 

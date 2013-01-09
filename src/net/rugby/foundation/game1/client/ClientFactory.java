@@ -3,7 +3,6 @@ package net.rugby.foundation.game1.client;
 import net.rugby.foundation.core.client.CoreClientFactory;
 import net.rugby.foundation.game1.client.ui.Game1View;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 
 /**

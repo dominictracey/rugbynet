@@ -2,8 +2,6 @@ package net.rugby.foundation.core.client.ui;
 
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.LoginInfo.Selector;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;

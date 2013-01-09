@@ -2,7 +2,6 @@ package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
 
-import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;

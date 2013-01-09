@@ -1,33 +1,22 @@
 package net.rugby.foundation.game1.client.ui;
 
 import java.util.List;
-import java.util.Map;
-
-import net.rugby.foundation.game1.shared.IConfiguration;
-import net.rugby.foundation.game1.shared.IEntry;
 import net.rugby.foundation.game1.shared.IMatchStats;
-import net.rugby.foundation.model.shared.IClubhouse;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.dom.client.MouseEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
-import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.Color;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.LegendPosition;
 import com.google.gwt.visualization.client.VisualizationUtils;
@@ -35,8 +24,6 @@ import com.google.gwt.visualization.client.visualizations.ImageChart;
 import com.google.gwt.visualization.client.visualizations.ImageChart.AnnotationColumn;
 import com.google.gwt.visualization.client.visualizations.ImageChart.AnnotationColumn.Priority;
 import com.google.gwt.visualization.client.visualizations.ImageChart.Options;
-
-import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
 
 public class MatchStatsViewImpl extends Composite implements MatchStatsView {
 

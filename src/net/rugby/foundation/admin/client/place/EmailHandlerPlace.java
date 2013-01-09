@@ -1,7 +1,5 @@
 package net.rugby.foundation.admin.client.place;
 
-import java.net.URLDecoder;
-
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;

@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;

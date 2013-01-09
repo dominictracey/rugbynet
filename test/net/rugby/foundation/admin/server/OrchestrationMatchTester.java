@@ -19,8 +19,6 @@ import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.inject.Inject;
 import junit.framework.Assert;
 

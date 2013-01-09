@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
-import net.rugby.foundation.model.shared.LoginInfo.Selector;
 
 /**
  * @author home

@@ -15,12 +15,14 @@ import org.apache.commons.codec.digest.DigestUtils;
 import net.rugby.foundation.admin.client.RugbyAdminService;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
+import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.init.CountryLoader;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
+import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
@@ -87,6 +89,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private ITeamMatchStatsFactory tmsf;
 	private IPlayerMatchStatsFactory pmsf;
 	private ICountryFactory countryf;
+	private IWorkflowConfigurationFactory wfcf;
+	private IResultFetcherFactory srff;
+	
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
 
@@ -100,7 +105,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			ICompetitionFactory cf, IEntryFactory ef, 
 			IMatchGroupFactory mf, IMatchEntryFactory mef, IRoundEntryFactory ref, IForeignCompetitionFetcherFactory fcff,
 			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerFactory pf,
-			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf) {
+			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
+			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -116,11 +122,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.tmsf = tmsf;
 		this.pmsf = pmsf;
 		this.countryf = countryf;
+		this.wfcf = wfcf;
+		this.srff = srff;
 
 		//		rf.setFactories(cf, mf);
 		//		mf.setFactories(rf, tf);
 
-		fcff.setFactories(rf, mf);
+		//fcff.setFactories(rf, mf);
 	}
 
 	@Override
@@ -269,7 +277,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public Map<String, IMatchGroup> fetchMatches(String url, Map<String,ITeamGroup> teams) {
-		IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf);
+		IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff);
 
 		Map<String, IMatchGroup> matches = fetcher.getMatches(url, teams);
 
@@ -505,7 +513,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IWorkflowConfiguration getWorkflowConfiguration() {
 
-		return null; //wfcf.get();
+		return wfcf.get();
 	}
 
 	@Override
@@ -535,7 +543,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 		// for every entry, if for the first round of the competition, they don't have a picklist,
 		// create one with picks for all the winning teams.
-		List<Long> compIds = null; //wfcf.get().getUnderwayCompetitions();
+		List<Long> compIds = wfcf.get().getUnderwayCompetitions();
 		for (Long compId: compIds) {
 			cf.setId(compId);
 			ICompetition comp = cf.getCompetition();

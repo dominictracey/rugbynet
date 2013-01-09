@@ -7,13 +7,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.inject.Inject;
-
 import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
-import net.rugby.foundation.game1.server.BPM.RuleCheckLeague;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 

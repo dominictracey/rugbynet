@@ -11,5 +11,5 @@ public interface IForeignCompetitionFetcherFactory {
 	 * @param rf
 	 * @param mf
 	 */
-	void setFactories(IRoundFactory rf, IMatchGroupFactory mf);
+	//void setFactories(IRoundFactory rf, IMatchGroupFactory mf);
 }

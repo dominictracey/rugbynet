@@ -3,26 +3,18 @@ package net.rugby.foundation.model.shared;
 
 import static org.junit.Assert.*;
 
-import java.text.ParseException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.inject.Inject;
 
-import net.rugby.foundation.admin.server.factory.espnscrum.ScrumResultFetcherFactory;
 import net.rugby.foundation.admin.server.init.CountryLoader;
-import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
-import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;

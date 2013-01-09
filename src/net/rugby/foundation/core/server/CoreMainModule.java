@@ -29,14 +29,15 @@ import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 public class CoreMainModule extends AbstractModule {
 	@Override
 	 protected void configure() {
 //		bind(CoreServiceImpl.class);
 		bind(ICompetitionFactory.class).to(OfyCompetitionFactory.class);
-		bind(IRoundFactory.class).to(OfyRoundFactory.class);
-		bind(IMatchGroupFactory.class).to(OfyMatchGroupFactory.class);
+		bind(IRoundFactory.class).to(OfyRoundFactory.class).in(Singleton.class);
+		bind(IMatchGroupFactory.class).to(OfyMatchGroupFactory.class).in(Singleton.class);
 		bind(ITeamGroupFactory.class).to(OfyTeamFactory.class);
 		bind(IMatchResultFactory.class).to(OfyMatchResultFactory.class);
 		bind(IAppUserFactory.class).to(OfyAppUserFactory.class);

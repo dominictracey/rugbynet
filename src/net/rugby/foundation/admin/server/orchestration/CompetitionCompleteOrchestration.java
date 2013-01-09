@@ -18,7 +18,6 @@ import net.rugby.foundation.model.shared.ICompetition;
  * @author home
  *
  */
-@SuppressWarnings("deprecation")
 public class CompetitionCompleteOrchestration extends OrchestrationCore<ICompetition> {
 	private ICompetitionFactory cf;
 	private IWorkflowConfigurationFactory wfcf;

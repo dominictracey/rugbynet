@@ -21,7 +21,6 @@ import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
  * @author home
  *
  */
-@SuppressWarnings("deprecation")
 public class FetchBasicScoreMatchResultOrchestration extends OrchestrationCore<IMatchGroup> {
 	
 	private Long compId;

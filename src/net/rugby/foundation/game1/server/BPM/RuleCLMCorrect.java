@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import net.rugby.foundation.admin.server.rules.CoreRule;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.game1.server.factory.IClubhouseLeagueMapFactory;
-import net.rugby.foundation.game1.server.factory.IEntryFactory;
 import net.rugby.foundation.game1.server.factory.ILeagueFactory;
 import net.rugby.foundation.game1.server.factory.IMatchEntryFactory;
 import net.rugby.foundation.game1.server.factory.IRoundEntryFactory;

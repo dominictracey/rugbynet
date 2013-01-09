@@ -1,6 +1,5 @@
 package net.rugby.foundation.core.server.factory;
 
-import java.util.Date;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.ICompetition;

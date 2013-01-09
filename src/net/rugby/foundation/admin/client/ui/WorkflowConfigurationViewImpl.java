@@ -8,7 +8,6 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.server.workflow.IWorkflow;
 import net.rugby.foundation.admin.shared.CompetitionWorkflow;
-import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 
 import com.google.gwt.core.client.GWT;

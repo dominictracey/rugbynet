@@ -1,41 +1,12 @@
 package net.rugby.foundation.core.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.text.ParseException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import net.rugby.foundation.core.client.Identity;
-import net.rugby.foundation.core.client.Identity.Actions;
-import net.rugby.foundation.core.client.Identity.Keys;
-import net.rugby.foundation.core.server.factory.IAppUserFactory;
-import net.rugby.foundation.model.shared.IAppUser;
-import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
-import net.rugby.foundation.model.shared.LoginInfo.Selector;
-
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-
-//import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

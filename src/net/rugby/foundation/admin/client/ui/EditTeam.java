@@ -65,6 +65,7 @@ public class EditTeam extends Composite {
 		displayName.setText(result.getDisplayName());
 		shortName.setText(result.getShortName());
 		abbr.setText(result.getAbbr());
+		color.setText(result.getColor());
 	}
 
 	public void SetPresenter(Presenter p) {

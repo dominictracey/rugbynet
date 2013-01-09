@@ -16,9 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 
 import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
-import net.rugby.foundation.model.shared.LoginInfo.Selector;
-
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;

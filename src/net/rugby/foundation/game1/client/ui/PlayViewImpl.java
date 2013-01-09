@@ -1,11 +1,8 @@
 package net.rugby.foundation.game1.client.ui;
 
-import java.util.List;
-
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity;
 import net.rugby.foundation.game1.shared.IEntry;
-import net.rugby.foundation.game1.shared.IMatchStats;
 import net.rugby.foundation.game1.shared.IRoundEntry;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -90,7 +87,9 @@ public class PlayViewImpl extends Composite implements PlayView {
 
 			@Override
 			public void onSelection(SelectionEvent<Integer> event) {
-				showRound(comp.getRounds().get(event.getSelectedItem()),entry);				
+				if (entry != null) {
+					showRound(comp.getRounds().get(event.getSelectedItem()),entry);		
+				}
 			}
 		
 		});

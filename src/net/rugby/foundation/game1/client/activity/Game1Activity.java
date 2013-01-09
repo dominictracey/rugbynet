@@ -6,7 +6,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.core.client.Core;
-import net.rugby.foundation.core.client.Identity;
 import net.rugby.foundation.game1.client.ClientFactory;
 import net.rugby.foundation.game1.client.place.Game1Place;
 import net.rugby.foundation.game1.client.ui.Game1ConfigurationView;
@@ -37,7 +36,6 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;

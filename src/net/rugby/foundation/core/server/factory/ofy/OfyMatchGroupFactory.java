@@ -39,11 +39,11 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	private IRoundFactory rf;
 	
 	@Inject
-	OfyMatchGroupFactory(IMatchResultFactory mrf, ITeamGroupFactory tf) {
+	OfyMatchGroupFactory(IMatchResultFactory mrf, ITeamGroupFactory tf, IRoundFactory rf) {
 		this.ofy = DataStoreFactory.getOfy();
 		this.tf = tf;
 		this.mrf = mrf;
-////		this.rf = rf;
+		this.rf = rf;
 	}
 
 	@Override
@@ -173,6 +173,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	 */
 	@Override
 	public IMatchGroup find(IMatchGroup match) {
+		// @REX should we just check the match - don't we need to also cross-check against comp as well?
 		Query<Group> qg = ofy.query(Group.class).filter("displayName",match.getDisplayName()).filter("date", match.getDate());
 		
 		if (qg.count() != 1) {

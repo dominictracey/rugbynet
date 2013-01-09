@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import com.google.inject.Inject;
 
-import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;

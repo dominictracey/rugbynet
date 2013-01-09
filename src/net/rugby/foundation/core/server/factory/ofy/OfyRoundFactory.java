@@ -22,7 +22,6 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
-import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Round;
@@ -37,16 +36,17 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 	private IMatchGroupFactory gf;
 	private ICompetitionFactory cf;
 	
-	//@Inject
-	OfyRoundFactory() {
+	@Inject
+	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf) {
 		this.ofy = DataStoreFactory.getOfy();
-
-	}
-	
-	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
 		this.gf = gf;
 		this.cf = cf;
 	}
+	
+//	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
+//		this.gf = gf;
+//		this.cf = cf;
+//	}
 	
 	@Override
 	public void setId(Long id) {

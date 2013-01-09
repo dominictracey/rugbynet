@@ -4,16 +4,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
-import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IPlayer;
 
 import com.google.appengine.tools.pipeline.Job1;
-import com.google.appengine.tools.pipeline.Job5;
-import com.google.appengine.tools.pipeline.Job6;
-import com.google.appengine.tools.pipeline.NoSuchObjectException;
-import com.google.appengine.tools.pipeline.OrphanedObjectException;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.appengine.tools.pipeline.Value;
 
 public class FetchPlayerManually extends Job1<IPlayer, IPlayer> {

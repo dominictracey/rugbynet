@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
-import net.rugby.foundation.model.shared.LoginInfo.Selector;
-
 public class LoginInfo implements Serializable {
 
 	public static enum ProviderType { openid, facebook }

@@ -30,14 +30,15 @@ import net.rugby.foundation.core.server.factory.test.TestTeamFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamMatchStatsFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 public class CoreTestModule extends AbstractModule {
 	@Override
 	 protected void configure() {
 //		bind(CoreServiceImpl.class);
 		bind(ICompetitionFactory.class).to(TestCompetitionFactory.class);
-		bind(IRoundFactory.class).to(TestRoundFactory.class);
-		bind(IMatchGroupFactory.class).to(TestMatchGroupFactory.class);
+		bind(IRoundFactory.class).to(TestRoundFactory.class).in(Singleton.class);
+		bind(IMatchGroupFactory.class).to(TestMatchGroupFactory.class).in(Singleton.class);
 		bind(ITeamGroupFactory.class).to(TestTeamFactory.class);
 		bind(IMatchResultFactory.class).to(TestMatchResultFactory.class);
 		bind(IAppUserFactory.class).to(TestAppUserFactory.class);

@@ -13,7 +13,7 @@ import net.rugby.foundation.model.shared.IMatchGroup.Status;
  */
 public interface IMatchResult {
 
-	enum ResultType {SIMPLE_SCORE}
+	enum ResultType {SIMPLE_SCORE, MATCHES}
 
 	public abstract Long getId();
 

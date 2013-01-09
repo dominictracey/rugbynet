@@ -13,7 +13,6 @@ import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.MatchRule;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.RoundRule;
 import net.rugby.foundation.admin.server.rules.IRule;
-import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.Workflow;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;

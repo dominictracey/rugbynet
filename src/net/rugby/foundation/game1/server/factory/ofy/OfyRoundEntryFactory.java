@@ -87,8 +87,10 @@ public class OfyRoundEntryFactory implements IRoundEntryFactory {
 					me = imf.put(me);
 					newList.add(me.getId());
 					// is this the same one? If not mark the old version for deleshunz
-					if (!re.getMatchPickMap().get(match.getId()).equals(me) )
-						killList.add(re.getMatchPickMap().get(match.getId()).getId());
+					if (re.getMatchPickMap().get(match.getId()) != null) {
+						if (!re.getMatchPickMap().get(match.getId()).equals(me) )
+							killList.add(re.getMatchPickMap().get(match.getId()).getId());
+					}
 				}
 
 			}

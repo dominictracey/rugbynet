@@ -3,8 +3,6 @@
  */
 package net.rugby.foundation.model.shared;
 
-import java.util.List;
-
 /**
  * @author home
  *

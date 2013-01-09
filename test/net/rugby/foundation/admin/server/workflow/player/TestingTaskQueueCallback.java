@@ -33,6 +33,10 @@ import java.util.logging.Logger;
 * @author rudominer@google.com (Mitch Rudominer)
 */
 public class TestingTaskQueueCallback implements LocalTaskQueueCallback {
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 Logger logger = Logger.getLogger(TestingTaskQueueCallback.class.getName());
 
 /**

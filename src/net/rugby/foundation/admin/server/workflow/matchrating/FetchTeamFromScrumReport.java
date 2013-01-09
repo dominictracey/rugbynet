@@ -1,11 +1,7 @@
 package net.rugby.foundation.admin.server.workflow.matchrating;
 
-import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.google.appengine.tools.pipeline.Job2;
 import com.google.appengine.tools.pipeline.Value;
 
