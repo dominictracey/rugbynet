@@ -3,13 +3,18 @@ package net.rugby.foundation.core.server.factory.test;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -19,11 +24,13 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 	private Long id;
 	private ITeamGroupFactory tf;
 	private final IMatchResultFactory mrf;
+	private IRoundFactory rf;
 	
 	@Inject
-	TestMatchGroupFactory(ITeamGroupFactory tf, IMatchResultFactory mrf) {
+	TestMatchGroupFactory(ITeamGroupFactory tf, IMatchResultFactory mrf, IRoundFactory rf) {
 		this.tf = tf;
 		this.mrf = mrf;
+		this.rf = rf;
 	}
 
 	@Override
@@ -237,6 +244,19 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 	public IMatchGroup find(IMatchGroup match) {
 		// hard to implement
 		return null;
+	}
+
+	@Override
+	public List<IMatchGroup> getMatchesForRound(Long roundId) {
+		// @TODO haven't tested this
+		rf.setId(roundId);
+		IRound r = rf.getRound();
+		if (r != null) {
+			return r.getMatches();
+		} else {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Could not find requested Round " + roundId);
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)

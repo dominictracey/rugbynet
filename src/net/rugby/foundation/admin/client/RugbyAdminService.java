@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -69,4 +70,6 @@ public interface RugbyAdminService extends RemoteService {
 	List<String> fetchMatchScore(IMatchGroup match, Long compId, List<String> log);
 	
 	List<IPlayerMatchStats> testMatchStats(Long matchId);
+	
+	List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId);
 }

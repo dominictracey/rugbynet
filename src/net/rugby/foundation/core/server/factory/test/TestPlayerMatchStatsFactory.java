@@ -2,6 +2,7 @@ package net.rugby.foundation.core.server.factory.test;
 
 
 import java.io.Serializable;
+import java.util.List;
 
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -39,5 +40,11 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	@Override
 	public Boolean delete(IPlayerMatchStats val) {
 		return true;
+	}
+
+	@Override
+	public List<? extends IPlayerMatchStats> getByMatchId(Long matchId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

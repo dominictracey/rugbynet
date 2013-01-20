@@ -3,6 +3,8 @@ package net.rugby.foundation.admin.client.ui;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
+import net.rugby.foundation.admin.shared.PlayerMatchInfo;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -72,9 +74,10 @@ public interface CompetitionView extends IsWidget {
 		void compClicked(EditComp editComp, long compId);
 		/**
 		 * @param editMatch
+		 * @param editMatchStats 
 		 * @param matchId
 		 */
-		void editMatchInit(EditMatch editMatch, long matchId, long roundId, long compId);
+		void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerMatchInfo> editMatchStats, long matchId, long roundId, long compId);
 		void testMatchStatsClicked(Long matchId);
 
 	}
@@ -108,7 +111,7 @@ public interface CompetitionView extends IsWidget {
 	 * @param roundId
 	 * @param result
 	 */
-	void addRound(ICompetition comp, IRound round, List<IMatchGroup> result);
+	void addRound(Long compId, Long roundId, List<IMatchGroup> result);
 
 
 }

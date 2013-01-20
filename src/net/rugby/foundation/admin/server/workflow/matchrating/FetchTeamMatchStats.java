@@ -212,6 +212,8 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
         			return null;
         		}
         		
+        		// sometimes Territory doesn't appear
+        		boolean skipTerritory = false;
         		trip = getTriplet(it);
         		if (trip.attr.equals("Territory")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
@@ -223,10 +225,12 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
         			}
         		}   else {
         			Logger.getLogger("FetchTeamStats").log(Level.SEVERE, "Failed to find Territory");
-        			return null;
+        			skipTerritory = true;
         		}
         		
-        		trip = getTriplet(it);
+        		if (!skipTerritory)
+        			trip = getTriplet(it);
+        		
         		if (trip.attr.equals("Clean breaks")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
         				tms.setCleanBreaks(Integer.parseInt(trip.homeVal));

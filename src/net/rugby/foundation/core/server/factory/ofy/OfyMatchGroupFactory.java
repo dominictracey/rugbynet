@@ -7,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +28,7 @@ import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.Round;
 
 public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	/**
@@ -191,6 +194,17 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public List<IMatchGroup> getMatchesForRound(Long roundId) {
+		Round r = ofy.get(new Key<Round>(Round.class,roundId));
+		if (r != null) {
+			return r.getMatches();
+		} else {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Could not find requested Round " + roundId);
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)

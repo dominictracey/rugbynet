@@ -112,6 +112,10 @@ public interface IPlayerMatchStats {
 	public abstract Integer getTimePlayed();
 
 	public abstract void setTimePlayed(Integer timePlayed);
+	
+	public abstract Integer getSlot();
+
+	public abstract void setSlot(Integer slot);
 
 	public abstract void playerOn(int i);
 	

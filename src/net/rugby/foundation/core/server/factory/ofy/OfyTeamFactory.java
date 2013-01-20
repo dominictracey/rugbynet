@@ -57,9 +57,7 @@ public class OfyTeamFactory implements ITeamGroupFactory, Serializable {
 	public ITeamGroup getTeamByName(String name) {
 		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Group> team = ofy.query(Group.class).filter("displayName", name);
-		
-		assert(team.count() == 1);
-		
+				
 		if (team.count() == 1) {
 			return (ITeamGroup)team.get();
 		}

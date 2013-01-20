@@ -1,6 +1,9 @@
 package net.rugby.foundation.admin.client;
 
 import net.rugby.foundation.admin.client.ui.AdminView;
+import net.rugby.foundation.client.ui.PlayerPopupView;
+import net.rugby.foundation.model.shared.IPlayer;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
 
@@ -16,4 +19,6 @@ public interface ClientFactory {
 	PlaceController getPlaceController();
 	public AdminView getAdminView();
 	RugbyAdminServiceAsync getRpcService();
+
+	PlayerPopupView<IPlayer> getPlayerPopupView();
 }

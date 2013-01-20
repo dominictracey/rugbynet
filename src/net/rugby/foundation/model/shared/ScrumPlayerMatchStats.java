@@ -40,6 +40,7 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	private Integer penaltiesConceded;
 	private Integer yellowCards;
 	private Integer redCards;
+	private Integer slot;
 
 	private Long playerId;
 
@@ -485,6 +486,14 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 		
 		return;
 		
+	}
+
+	public Integer getSlot() {
+		return slot;
+	}
+
+	public void setSlot(Integer slot) {
+		this.slot = slot;
 	}
 
 	

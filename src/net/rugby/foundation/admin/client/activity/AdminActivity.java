@@ -15,7 +15,9 @@ import net.rugby.foundation.admin.client.ui.EditMatch;
 import net.rugby.foundation.admin.client.ui.EditPlayer;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.EditTeam;
+import net.rugby.foundation.admin.client.ui.PlayerListView;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -39,7 +41,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 public class AdminActivity extends AbstractActivity implements EditPlayer.Presenter, 
 						AdminView.Presenter, CompetitionView.Presenter, /*WorkflowConfigurationView.Presenter,*/ 
 						OrchestrationConfigurationView.Presenter, EditTeam.Presenter, Presenter, 
-						net.rugby.foundation.admin.client.ui.EditMatch.Presenter { //, Game1ConfigurationView.Presenter {
+						net.rugby.foundation.admin.client.ui.EditMatch.Presenter, net.rugby.foundation.admin.client.ui.PlayerListView.Presenter<IPlayerMatchInfo>,
+						PlayerListView.Listener<IPlayerMatchInfo> { //, Game1ConfigurationView.Presenter {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -65,6 +68,7 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 	protected List<IRound> rounds = new ArrayList<IRound>();
 	private boolean handleEmail = false;
 	private EmailHandlerPlace emailHandlerPlace;
+	private PlayerListView<IPlayerMatchInfo> plv;
 
 	public AdminActivity(AdminPlace place, ClientFactory clientFactory) {
 		//this.name = place.getName();
@@ -463,7 +467,7 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 			@Override
 			public void onSuccess(List<IMatchGroup> result) {
 
-//				view.getCompView().addRound(compId, roundId, result);
+				view.getCompView().addRound(compId, roundId, result);
 
 			}
 		});			
@@ -647,9 +651,13 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 	 * @see net.rugby.foundation.admin.client.ui.CompetitionView.Presenter#editMatchInit(net.rugby.foundation.admin.client.ui.EditMatch, long)
 	 */
 	@Override
-	public void editMatchInit(EditMatch editMatch, long matchId, long roundId, long compId) {
+	public void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerMatchInfo> editMatchInfo, final long matchId, long roundId, long compId) {
 		final EditMatch.Presenter presenter = this;  // there must be a way to do this...
 		em = editMatch;
+		
+		final PlayerListView.Presenter presenter2 = this;  // there must be a way to do this...
+		plv = editMatchInfo;
+		
 		setCurrentRoundId(roundId);
 		setCurrentCompId(compId);
 		clientFactory.getRpcService().getMatch(matchId, new AsyncCallback<IMatchGroup>() {
@@ -664,7 +672,21 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 			public void onSuccess(IMatchGroup result) {
 				em.SetPresenter(presenter);
 				em.ShowMatch(result);
+				
+				clientFactory.getRpcService().getPlayerMatchInfo(matchId, new AsyncCallback<List<IPlayerMatchInfo>>() {
 
+					@Override
+					public void onFailure(Throwable caught) {
+		
+		
+					}
+		
+					@Override
+					public void onSuccess(List<IPlayerMatchInfo> result) {
+						plv.setPresenter(presenter2);
+						plv.setPlayers(result);
+					}
+				});
 			}
 		});			
 	}
@@ -858,6 +880,78 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 	public IPlayer getNewPlayer() {
 		// TODO Auto-generated method stub
 		return new ScrumPlayer();
+	}
+
+	@Override
+	public void onButton1Clicked() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onButton2Clicked() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onButton3Clicked() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onButton4Clicked() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onItemSelected(IPlayerMatchInfo pmi) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onItemClicked(IPlayerMatchInfo pmi) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSaveGroupInfoClicked(String info) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showDraftAnalysis() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isSelected(IPlayerMatchInfo player) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void showEditPlayer(IPlayerMatchInfo player) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showEditStats(IPlayerMatchInfo player) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showEditRating(IPlayerMatchInfo player) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/* (non-Javadoc)

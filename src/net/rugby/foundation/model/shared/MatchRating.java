@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import com.googlecode.objectify.annotation.Entity;
 
 @Entity
-public class MatchRating implements IMatchRating {
+public class MatchRating implements  IMatchRating {
 	@Id
 	private Long matchRatingID;
 	private Long playerID;

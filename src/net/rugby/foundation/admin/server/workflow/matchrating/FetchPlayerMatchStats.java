@@ -37,6 +37,11 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 		assert(player != null);
 		assert(match != null);
 		assert(!url.isEmpty());
+		
+		if (player.getDisplayName() == null) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Bad name for player - bailing!!");
+			return immediate(null);
+		}
 
 		IPlayerMatchStats stats = pmsf.getById(null);
 		stats.setMatchId(match.getId()); // native ID, not scrum's
@@ -45,7 +50,8 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 			stats.setTeamId(match.getHomeTeamId());
 		else
 			stats.setTeamId(match.getVisitingTeamId());		
-
+		stats.setSlot(slot);
+		
 		Boolean found = false;
 		UrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
@@ -57,6 +63,7 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 		}
 
 		int countTabs = 0;
+		boolean foundMatchTab = false;
 		Iterator<String> it = lines.iterator();
 
 		// get the player stats
@@ -65,14 +72,20 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 		while (it.hasNext() && !found) {
 
 			line = getNext(it);
-			// first we scan to the right tab 3rd tab is home, 4th visitor
+			// first we scan to the match stats tab. Home is next after and visitor is after thtat
 			if (line.contains("tabbertab")) {
-				++countTabs;
+				
+				line = getNext(it);
+				if (line.contains("Match stats"))
+					foundMatchTab = true;
+				else if (foundMatchTab) {
+					countTabs++;
+				}
 			}
 
-			if ((countTabs == 7 && hov == Home_or_Visitor.HOME) || (countTabs == 8 && hov == Home_or_Visitor.VISITOR)) {
+			if ((countTabs == 1 && hov == Home_or_Visitor.HOME) || (countTabs == 2 && hov == Home_or_Visitor.VISITOR)) {
 				line = getNext(it);
-				line = getNext(it);
+				//line = getNext(it);
 				//line = getNext();
 
 				skipPlayer(it); // header row

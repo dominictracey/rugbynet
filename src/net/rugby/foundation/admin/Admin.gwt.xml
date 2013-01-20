@@ -6,6 +6,7 @@
 	<inherits name="org.cobogw.gwt.user.User" />
 	<inherits name="com.googlecode.objectify.Objectify" />
 	<inherits name="net.rugby.foundation.model.Model" />
+	<inherits name="com.google.gwt.logging.Logging"/>
 <!-- 	<inherits name="net.rugby.foundation.game1.Game1" /> -->
 <!--  	<inherits name="net.rugby.foundation.core.Core" />  -->
 	<entry-point class="net.rugby.foundation.admin.client.Admin"/>
@@ -16,4 +17,7 @@
     <source path='client'/>
     <source path='shared'/>
 
+    <set-property name="gwt.logging.logLevel" value="FINEST"/>         
+    <set-property name="gwt.logging.enabled" value="FALSE"/>            
+    <set-property name="gwt.logging.consoleHandler" value="ENABLED"/> 
 </module>

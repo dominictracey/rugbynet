@@ -33,21 +33,6 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 		this.cf = cf;
 	}
 
-	//	@SuppressWarnings("serial")
-	//	class DiffJob extends Job2<Integer, Integer, Integer> {
-	//		@Override
-	//		public Value<Integer> run(Integer a, Integer b) {
-	//			return immediate(a - b);
-	//		}
-	//	}
-	//
-	//	@SuppressWarnings("serial")
-	//	class MultJob extends Job2<Integer, Integer, Integer> {
-	//		@Override
-	//		public Value<Integer> run(Integer a, Integer b) {
-	//			return immediate(a*b);
-	//		}
-	//	}
 	/**
 	 * return IPlayer reference
 	 * params String compName
@@ -83,7 +68,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 	}
 
 
-	private IPlayer getPlayerFromScrum(IPlayerFactory pf, ICompetition comp, Long scrumPlayerId)  {
+	private IPlayer getPlayerFromScrum(IPlayerFactory pf, ICompetition comp1, Long scrumPlayerId)  {
 		
 		IPlayer player = pf.getById(null);  //empty
 
@@ -122,8 +107,12 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 					}
 				} else if (line.contains("scrumPlayerCountry")) {
 					ICountry country = cf.getByName(line.split("<|>")[2].trim());
-					player.setCountry(country);
-					player.setCountryId(country.getId());
+					if (country != null) {
+						player.setCountry(country);
+						player.setCountryId(country.getId());
+					} else {
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Unable to find player " + player.getDisplayName() + "'s country: " + line.split("<|>")[2].trim());
+					}
 				} else if (line.contains("Full name")) {
 					//line = it.next();
 					String fullName = line.split("</b>|</div>")[1].trim();
@@ -151,6 +140,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 						dateRead = dateFormatter.parse(monthday + ", " + year);
 						if (dateRead != null) {
 							player.setBirthDate(dateRead);
+							found = true;
 						}
 					} 
 				} else if (line.contains("All Tests")) {
@@ -158,7 +148,6 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 					line = it.next();
 					//line = it.next();
 					player.setNumCaps(Integer.parseInt(line.split("<|>")[2].trim()));
-					found = true;
 				}
 			}
 		} catch (ParseException e) {
@@ -168,6 +157,9 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 
 		if (found) {
 			player.setScrumId(scrumPlayerId);
+			if (player.getNumCaps() == null) {
+				player.setNumCaps(0);
+			}
 			pf.put(player);
 			return player;
 		} else
@@ -178,8 +170,8 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, /*IPlayerFactory,*/ ICom
 
 		AdminEmailer emailer = new AdminEmailer();
 		
-		emailer.setSubject("Player info needed for comp " + comp.getShortName() + ": " + playerName);
-		emailer.setMessage("For whatever reason, we couldn't automatically load the information about " + playerName + "in the competition " + comp.getLongName() + " from the url " + referringURL + ". Can you please follow this link: " + adminUrl + " and enter the player's information manually so we can continue the match rating processing. Thanks!");
+		emailer.setSubject("Player info needed for: " + playerName);
+		emailer.setMessage("For whatever reason, we couldn't automatically load the information about " + playerName + " from the url " + referringURL + ". Can you please follow this link: " + adminUrl + " and enter the player's information manually so we can continue the match rating processing. Thanks!");
 		emailer.send();
 	}
 }

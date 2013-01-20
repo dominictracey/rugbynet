@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server.factory;
 
+import java.util.List;
+
 import net.rugby.foundation.model.shared.IMatchGroup;
 
 public interface IMatchGroupFactory {
@@ -12,6 +14,8 @@ public interface IMatchGroupFactory {
 	 */
 	IMatchGroup find(IMatchGroup match);
 	IMatchGroup put(IMatchGroup g);
+
+	List<IMatchGroup> getMatchesForRound(Long roundId);
 
 //	void setFactories(IRoundFactory rf, ITeamGroupFactory tf);
 

@@ -26,7 +26,9 @@ import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
+import net.rugby.foundation.admin.shared.PlayerMatchInfo;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
@@ -209,6 +211,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public Map<String, ITeamGroup> fetchTeams(String url, String resultType) {
+		CountryLoader cloader = new CountryLoader();
+		cloader.Run(countryf);
+		
 		IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
 
 		Map<String, ITeamGroup> teams = fetcher.getTeams();
@@ -435,15 +440,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	 */
 	@Override
 	public List<IMatchGroup> getMatches(Long roundId) {
-		return null; //deprecated
-		//		ArrayList<MatchGroup> ms = new ArrayList<MatchGroup>();
-		//		IRound r = ofy.get(new Key<Round>(Round.class,roundId));
-		//		if (r != null) {
-		//			for (Long mid : r.getMatchIDs()) {
-		//				ms.add(ofy.get(new Key<MatchGroup>(MatchGroup.class,mid)));
-		//			}
-		//		}
-		//		return ms;
+
+				List<IMatchGroup> ms = mf.getMatchesForRound(roundId);
+				
+				return ms;
 	}
 
 
@@ -708,10 +708,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			try {
 				service.submitPromisedValue(promisedHandle, player);
 			} catch (NoSuchObjectException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (OrphanedObjectException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -724,11 +722,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		mf.setId(matchId);
 		IMatchGroup match = mf.getGame();
-
+		
+		CountryLoader cloader = new CountryLoader();
+		cloader.Run(countryf);
+		
 		if (match == null) {
 
-			CountryLoader cloader = new CountryLoader();
-			cloader.Run(countryf);
+
 			
 			for (Long id = 9001L; id<9003L; ++id) {
 				tf.setId(null);
@@ -780,13 +780,15 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		String pipelineId = "";
 		try {
 			
-			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, pf, tmsf, pmsf, countryf, new JobSetting.MaxAttempts(2));
-
+			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, pf, tmsf, pmsf, countryf, new JobSetting.MaxAttempts(1));
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+			
 			while (true) {
 				Thread.sleep(2000);
 				JobInfo jobInfo = service.getJobInfo(pipelineId);
 				switch (jobInfo.getJobState()) {
 				case COMPLETED_SUCCESSFULLY:
+					service.deletePipelineRecords(pipelineId);
 					return (List<IPlayerMatchStats>) jobInfo.getOutput();
 				case RUNNING:
 					break;
@@ -802,6 +804,28 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;
 		}
 
+	}
+
+	@Override
+	public List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId) {
+		try {
+			 List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
+			 mf.setId(matchId);
+			 IMatchGroup m = mf.getGame();
+			 
+			 if (m != null) {
+				 List<? extends IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
+				 for (IPlayerMatchStats pms : pmsl) {
+					 // TODO replace null with playerMatchRatingFactory.get(pms.getPlayerId(),pms.getMatchId());
+					 list.add(new PlayerMatchInfo(pms));
+				 }
+			 }
+			 
+			 return list;
+		} catch (Throwable e) {
+			Logger.getLogger("Admin").log(Level.SEVERE, "fetchScore: " + e.getMessage());
+			return null;
+		}
 	}
 
 }

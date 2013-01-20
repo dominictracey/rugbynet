@@ -1,11 +1,16 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
+
+import net.rugby.foundation.admin.shared.PlayerMatchInfo;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 
@@ -48,5 +53,14 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.delete(val);
 		return true;
+	}
+
+	@Override
+	public List<? extends IPlayerMatchStats> getByMatchId(Long matchId) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		
+		Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId",matchId).order("slot");
+		
+		return qpms.list();
 	}
 }
