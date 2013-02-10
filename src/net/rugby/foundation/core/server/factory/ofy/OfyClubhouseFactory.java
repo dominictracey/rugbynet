@@ -27,10 +27,9 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Long id;
-	private Objectify ofy;
+	 
 	
 	public OfyClubhouseFactory() {
-		this.ofy = DataStoreFactory.getOfy();
 	}
 	
 	/* (non-Javadoc)
@@ -49,7 +48,8 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 		if (id == null) {
 			return new Clubhouse();
 		}
-		
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		IClubhouse ch = ofy.find(new Key<Clubhouse>(Clubhouse.class,id));
 
 		if (ch == null) {
@@ -64,6 +64,8 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 	 */
 	@Override
 	public IClubhouse put(IClubhouse ch) {
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		ofy.put(ch);
 
 		//@TODO put the ClubhouseMembership list too?
@@ -76,6 +78,8 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 	@Override
 	public List<IClubhouse> getAll() {
 		List<IClubhouse> all = new ArrayList<IClubhouse>();
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		Query<Clubhouse> qch = ofy.query(Clubhouse.class).filter("active", true);
 		for (Clubhouse ch : qch) {
 			all.add(ch);

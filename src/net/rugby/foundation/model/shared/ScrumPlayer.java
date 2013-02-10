@@ -177,4 +177,9 @@ public class ScrumPlayer implements IPlayer, Serializable {
 		this.shortName = shortName;
 	}
 
+	@Override
+	public String getForeignUrl() {
+		return "http://www.espnscrum.com/scrum/rugby/player/" + scrumId.toString() + ".html";
+	}
+
 }

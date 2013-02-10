@@ -1,17 +1,16 @@
-package net.rugby.foundation.admin.client.ui;
+package net.rugby.foundation.admin.client.ui.playerlistview;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
-import net.rugby.foundation.admin.client.ui.PlayerListView.Listener;
-import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
+import net.rugby.foundation.admin.client.ui.ColumnDefinition;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.Listener;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.PlayerRating;
 
 public class PlayerListViewColumnDefinitions<T> {
 
@@ -36,36 +35,21 @@ public class PlayerListViewColumnDefinitions<T> {
 	      });
 	
 	      columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-	        public Widget render(final IPlayerMatchInfo c) {
-	        	Anchor a =  new Anchor(c.getPlayerMatchStats().getName());
-	        	a.addClickHandler( new ClickHandler() {
-	        		@Override
-	        		public void onClick(ClickEvent event) {
-	        			listener.showEditPlayer(c);
-	        		}	
-	        	});
 
-	        	return a;
-	          //return new HTML(c.getDisplayName());
+	        public Widget render(IPlayerMatchInfo c) {
+	        	String name = c.getPlayerMatchStats().getName();
+	          return new HTML(name);
 	        }
 	     
-	
 	        public boolean isClickable() {
 	          return true;
 	        }
 	      });
 	      
 	      columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-		        public Widget render(final IPlayerMatchInfo c) {
-		        	Anchor a =  new Anchor(c.getPlayerMatchStats().getId().toString());
-		        	a.addClickHandler( new ClickHandler() {
-		        		@Override
-		        		public void onClick(ClickEvent event) {
-		        			listener.showEditStats(c);
-		        		}	
-		        	});
-
-		        	return a;
+	    	  public Widget render(IPlayerMatchInfo c) {
+		        	String name = c.getPlayerMatchStats().getId().toString();
+		          return new HTML(name);
 		        }
 		
 		        public boolean isClickable() {
@@ -74,55 +58,25 @@ public class PlayerListViewColumnDefinitions<T> {
 		  });
 	      
 	      columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-		        public Widget render(final IPlayerMatchInfo c) {
-		        	Anchor a = new Anchor("--");
-//		        	if (c.ge() != null) {
-//		        		a =  new Anchor(c.getPlayerMatchStats().getName());
-//		        	}
-		        	a.addClickHandler( new ClickHandler() {
-		        		@Override
-		        		public void onClick(ClickEvent event) {
-		        			listener.showEditStats(c);
-		        		}	
-		        	});
-
-		        	return a;
-		          //return new HTML(c.getDisplayName());
-		        }
-		     
+	    	  
+	    	  public Widget render(IPlayerMatchInfo c) {
+		        	String name = "--";
+		        	if ((PlayerRating)c.getMatchRating() != null && ((PlayerRating)c.getMatchRating()).getRating() != null) {
+		        		name = ((PlayerRating)c.getMatchRating()).getRating().toString();
+		        	}
+		        	return new HTML(name);
+		        }     
 		
 		        public boolean isClickable() {
 		          return true;
 		        }
 		      });
 	      
-//	      columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-//		        public Widget render(IPlayerMatchInfo c) {
-//		        	String image = "resources/arrow_Up_Green.gif";
-//		        	if (c.getMovement() == Player.movement.DOWN)
-//		        		image = "resources/arrow_Down_Red.gif";
-//		        	else if (c.getMovement() == movement.UNCHANGED)
-//		        		image = "resources/unchanged_Blue.gif";
-//		        	String rating = "--";
-//		        	if (c.getOverallRating() != null)
-//		        		rating = c.getOverallRating().toString();
-//		          return new HTML( rating + "<img src=" + image + ">");
-//		        }
-//		      });
 
 	      columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
 		        public Widget render(IPlayerMatchInfo c) {
 		        	String pos = c.getPlayerMatchStats().getPosition().name();
 		          return new HTML(pos);
-		        }
-		      });
-	      
-	      columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-		        public Widget render(IPlayerMatchInfo c) {
-		        	String rating = "--";
-//		        	if (c.getMatchRating().getPlayerRating() != null)
-//		        		rating = c.getMatchRating().getPlayerRating().toString();
-		          return new HTML(rating);
 		        }
 		      });
 	      
@@ -241,7 +195,6 @@ public class PlayerListViewColumnDefinitions<T> {
 		headers.add( "Stats");
 		headers.add( "Rating");		
 		headers.add( "Pos");
-		headers.add( "Rating");
 		headers.add( "T/A");
 		headers.add( "Pts");
 		headers.add( "K/P/R");

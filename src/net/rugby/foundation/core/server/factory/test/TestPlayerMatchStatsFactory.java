@@ -5,8 +5,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.model.shared.IPlayerMatchStatTimeLog;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
+import net.rugby.foundation.model.shared.Position.position;
 
 public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Serializable  {
 	/**
@@ -21,7 +23,19 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	public IPlayerMatchStats getById(Long id) {
 		if (id == null) {
 			return new ScrumPlayerMatchStats();
-		}
+		} 
+//		else if (id.equals(1000L)) {
+//			return new ScrumPlayerMatchStats(id, 1, 0,
+//				 5,  2,  4, 7,
+//					65, 1, 0,
+//					0, 0, 12,
+//					1, 2,
+//					0, 1,
+//					0, 0, 14, 9001014L,
+//					300L, 9001L, position.FLANKER, "McCaw",
+//					null, 80);
+//			
+//		}
 		
 		return null;
 	}
@@ -43,7 +57,7 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	}
 
 	@Override
-	public List<? extends IPlayerMatchStats> getByMatchId(Long matchId) {
+	public List<IPlayerMatchStats> getByMatchId(Long matchId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

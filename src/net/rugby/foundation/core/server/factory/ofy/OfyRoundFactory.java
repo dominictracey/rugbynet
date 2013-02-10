@@ -32,13 +32,11 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 	 */
 	private static final long serialVersionUID = 2311118171036828094L;
 	private Long id;
-	private final Objectify ofy;
 	private IMatchGroupFactory gf;
 	private ICompetitionFactory cf;
 	
 	@Inject
 	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf) {
-		this.ofy = DataStoreFactory.getOfy();
 		this.gf = gf;
 		this.cf = cf;
 	}
@@ -104,7 +102,8 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 		if (id == null) {
 			return new Round();
 		}
-		
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		Round r = ofy.get(new Key<Round>(Round.class,id));
 		
 		if (r != null) {
@@ -124,7 +123,9 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 	public IRound put(IRound r) {
 
 		try {
-			if (r != null) {
+			Objectify ofy = DataStoreFactory.getOfy();
+
+			if (r != null) {			
 				((Round)r).setMatchIDs(new ArrayList<Long>());
 				if (r.getId() == null)
 					ofy.put(r); // get an id to pass down to the matches
@@ -175,6 +176,9 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 	 */
 	@Override
 	public IRound find(IRound round) {
+		
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		// Find the rounds with the same name
 		Query<Round> qr = ofy.query(Round.class).filter("name", round.getName());
 		

@@ -24,6 +24,10 @@ public class ScrumPlayerMatchStatTimeLog implements Serializable, IPlayerMatchSt
 	private Long playerId;
 	private Long matchId;
 	
+	public ScrumPlayerMatchStatTimeLog() {
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IPlayerMatchStatTimeLog#start(int, net.rugby.foundation.model.shared.Position.position, java.lang.Long, java.lang.Long)
 	 */

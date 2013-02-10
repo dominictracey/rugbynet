@@ -12,6 +12,6 @@ public interface IPlayerMatchStatsFactory {
 
 	public abstract Boolean delete(IPlayerMatchStats val);
 
-	public abstract List<? extends IPlayerMatchStats> getByMatchId(Long matchId);
+	public abstract List<IPlayerMatchStats> getByMatchId(Long matchId);
 
 }

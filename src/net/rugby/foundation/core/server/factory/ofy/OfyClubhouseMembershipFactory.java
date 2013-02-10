@@ -29,10 +29,9 @@ public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactor
 	private Long id;
 	private Long clubhouseId;
 	private Long appUserId;
-	private Objectify ofy;
 	
 	public OfyClubhouseMembershipFactory() {
-		this.ofy = DataStoreFactory.getOfy();
+
 	}
 	
 	/* (non-Javadoc)
@@ -97,7 +96,7 @@ public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactor
 		}
 		
 		Query<ClubhouseMembership> qchm = null;
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		if (!doubleFilter) {
 			qchm = ofy.query(ClubhouseMembership.class).filter(filter, id);
 		} else {
@@ -117,6 +116,7 @@ public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactor
 	 */
 	@Override
 	public IClubhouseMembership put(IClubhouseMembership chm) {
+		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.put(chm);
 		return chm;
 	}
@@ -128,6 +128,7 @@ public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactor
 	 */
 	@Override
 	public List<IClubhouseMembership> put(List<IClubhouseMembership> r) {
+		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.put(r);
 		return r;
 	}
@@ -142,7 +143,7 @@ public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactor
 		if (id == null) {
 			return new ClubhouseMembership();
 		}
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		IClubhouseMembership chm = ofy.find(new Key<ClubhouseMembership>(ClubhouseMembership.class,id));
 		return chm;
 	}

@@ -6,43 +6,46 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminPlace;
-import net.rugby.foundation.admin.client.place.EmailHandlerPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditComp;
 import net.rugby.foundation.admin.client.ui.EditComp.Presenter;
 import net.rugby.foundation.admin.client.ui.EditMatch;
-import net.rugby.foundation.admin.client.ui.EditPlayer;
+import net.rugby.foundation.admin.client.ui.FieldDefinition;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.EditTeam;
-import net.rugby.foundation.admin.client.ui.PlayerListView;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
+import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
+import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
+import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.ScrumPlayer;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Activities are started and stopped by an ActivityManager associated with a container Widget.
  */
-public class AdminActivity extends AbstractActivity implements EditPlayer.Presenter, 
-						AdminView.Presenter, CompetitionView.Presenter, /*WorkflowConfigurationView.Presenter,*/ 
-						OrchestrationConfigurationView.Presenter, EditTeam.Presenter, Presenter, 
-						net.rugby.foundation.admin.client.ui.EditMatch.Presenter, net.rugby.foundation.admin.client.ui.PlayerListView.Presenter<IPlayerMatchInfo>,
-						PlayerListView.Listener<IPlayerMatchInfo> { //, Game1ConfigurationView.Presenter {
+public class AdminActivity extends AbstractActivity implements  
+AdminView.Presenter, CompetitionView.Presenter, /*WorkflowConfigurationView.Presenter,*/ 
+OrchestrationConfigurationView.Presenter, EditTeam.Presenter, Presenter, 
+net.rugby.foundation.admin.client.ui.EditMatch.Presenter,
+PlayerListView.Listener<IPlayerMatchInfo>, PlayerPopupView.Presenter<IPlayer>,
+PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -50,8 +53,7 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 	private ClientFactory clientFactory;
 	AdminView view = null;
 	private String url;
-	//private int showTab = 0;
-	//private IWorkflowConfiguration workflowConfig = null;
+	private SelectionModel<IPlayerMatchInfo> selectionModel;
 	private  Map<String, IOrchestrationConfiguration> orchConfig = null;
 	private EditTeam et = null;  //@REX stupid
 	private EditComp ec = null;  //@REX stupid
@@ -66,15 +68,14 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 	// temp storage for building up new comp
 	private List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
 	protected List<IRound> rounds = new ArrayList<IRound>();
-	private boolean handleEmail = false;
-	private EmailHandlerPlace emailHandlerPlace;
 	private PlayerListView<IPlayerMatchInfo> plv;
 
 	public AdminActivity(AdminPlace place, ClientFactory clientFactory) {
 		//this.name = place.getName();
 		this.clientFactory = clientFactory;
 		view = clientFactory.getAdminView();
-
+		selectionModel = new SelectionModel<IPlayerMatchInfo>();
+		
 		// Select the tab corresponding to the token value
 		if (place.getToken() != null) {
 			// By default the first tab is selected
@@ -91,93 +92,66 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 
 	}
 
-	public AdminActivity(EmailHandlerPlace place, ClientFactory clientFactory) {
-		//this.name = place.getName();
-		this.clientFactory = clientFactory;
-		view = clientFactory.getAdminView();
 
-		// Select the tab corresponding to the token value
-		if (place.getToken() != null) {
-			view.selectTab(3);
-			handleEmail = true;	
-
-			emailHandlerPlace = place;
-		}
-	}
 
 	@Override
 	public void start(AcceptsOneWidget containerWidget, EventBus eventBus) {
 		view.setPresenter(this);
+		clientFactory.getPlayerPopupView().setPresenter(this);
+		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
 		containerWidget.setWidget(view.asWidget());
 
-		if (handleEmail) {
-			clientFactory.getRpcService().getPlayer(null, new AsyncCallback<IPlayer>() {
+
+
+		clientFactory.getRpcService().getAllComps(new AsyncCallback<List<ICompetition>>() {
 
 
 
-				@Override
-				public void onFailure(Throwable caught) {
+			@Override
+			public void onFailure(Throwable caught) {
 
 
-				}
+			}
 
-				@Override
-				public void onSuccess(IPlayer result) {
-					view.getEditPlayer().ShowPlayer(result);
-					view.getEditPlayer().ShowPlace(emailHandlerPlace);
-				}
-			});
-			
-		} else {
+			@Override
+			public void onSuccess(List<ICompetition> result) {
+				comps = result;
+				view.getCompView().addComps(result);
 
-			clientFactory.getRpcService().getAllComps(new AsyncCallback<List<ICompetition>>() {
+				//		} else if (showTab == 3) {  // workflow conf
+				clientFactory.getRpcService().getWorkflowConfiguration(new AsyncCallback<IWorkflowConfiguration>() {
 
-
-
-				@Override
-				public void onFailure(Throwable caught) {
+					@Override
+					public void onFailure(Throwable caught) {
 
 
-				}
+					}
 
-				@Override
-				public void onSuccess(List<ICompetition> result) {
-					comps = result;
-					view.getCompView().addComps(result);
+					@Override
+					public void onSuccess(final IWorkflowConfiguration workflowConfig) {
 
-					//		} else if (showTab == 3) {  // workflow conf
-					clientFactory.getRpcService().getWorkflowConfiguration(new AsyncCallback<IWorkflowConfiguration>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
+						//view.getWorkflowConfig().setCompetitions(comps, workflowConfig);
 
 
-						}
+						// nest this to solve the asynchronous problem of creating two wfcs.
+						clientFactory.getRpcService().getOrchestrationConfiguration(new AsyncCallback<Map<String, IOrchestrationConfiguration>>() {
+							@Override
+							public void onFailure(Throwable caught) {
 
-						@Override
-						public void onSuccess(final IWorkflowConfiguration workflowConfig) {
+								view.getOrchestrationConfig().showStatus(caught.getMessage());
+							}
 
-							//view.getWorkflowConfig().setCompetitions(comps, workflowConfig);
+							@Override
+							public void onSuccess(Map<String, IOrchestrationConfiguration> result) {					
+								view.getOrchestrationConfig().setOrchConfigs(result);	
+							}
+						});
+					}
+				});	
+			}
+		});		
 
-							// nest this to solve the asynchronous problem of creating two wfcs.
-							clientFactory.getRpcService().getOrchestrationConfiguration(new AsyncCallback<Map<String, IOrchestrationConfiguration>>() {
-								@Override
-								public void onFailure(Throwable caught) {
-
-									view.getOrchestrationConfig().showStatus(caught.getMessage());
-								}
-
-								@Override
-								public void onSuccess(Map<String, IOrchestrationConfiguration> result) {					
-									view.getOrchestrationConfig().setOrchConfigs(result);					
-								}
-							});
-						}
-					});	
-				}
-			});		
-		}
 
 	}
 
@@ -654,10 +628,10 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 	public void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerMatchInfo> editMatchInfo, final long matchId, long roundId, long compId) {
 		final EditMatch.Presenter presenter = this;  // there must be a way to do this...
 		em = editMatch;
-		
-		final PlayerListView.Presenter presenter2 = this;  // there must be a way to do this...
+
+		final PlayerListView.Listener<IPlayerMatchInfo> presenter2 = this;  // there must be a way to do this...
 		plv = editMatchInfo;
-		
+
 		setCurrentRoundId(roundId);
 		setCurrentCompId(compId);
 		clientFactory.getRpcService().getMatch(matchId, new AsyncCallback<IMatchGroup>() {
@@ -672,18 +646,18 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 			public void onSuccess(IMatchGroup result) {
 				em.SetPresenter(presenter);
 				em.ShowMatch(result);
-				
+
 				clientFactory.getRpcService().getPlayerMatchInfo(matchId, new AsyncCallback<List<IPlayerMatchInfo>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-		
-		
+
+
 					}
-		
+
 					@Override
 					public void onSuccess(List<IPlayerMatchInfo> result) {
-						plv.setPresenter(presenter2);
+						plv.setListener(presenter2);
 						plv.setPlayers(result);
 					}
 				});
@@ -811,8 +785,18 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 	 */
 	@Override
 	public void fetchMatchStats(IMatchGroup matchGroup) {
-		// TODO Auto-generated method stub
+		clientFactory.getRpcService().fetchMatchStats(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
 
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed fetching Match Stats: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<IPlayerMatchInfo> result) {
+				view.getCompView().getPlayerListView().setPlayers(result);
+			}
+		});	
 	}
 
 	/* (non-Javadoc)
@@ -824,33 +808,6 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 
 	}
 
-	@Override
-	public void savePlayerInfo(IPlayer player) {
-		if (emailHandlerPlace != null) {
-			clientFactory.getRpcService().savePlayer(player, emailHandlerPlace.getPromisedHandle(), new AsyncCallback<IPlayer>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-
-					Window.alert("Player not saved: " + caught.getMessage());
-				}
-
-				@Override
-				public void onSuccess(IPlayer result) {
-					//ec.SetPresenter(presenter);
-					//				if (result != null)
-					//					Window.alert("Match saved");
-					//				else
-					//					Window.alert("Comp not saved");
-					view.getEditPlayer().ShowPlayer(result);
-
-
-				}
-			});		
-
-		}
-		
-	}
 
 	@Override
 	public void testMatchStatsClicked(Long matchId) {
@@ -864,104 +821,142 @@ public class AdminActivity extends AbstractActivity implements EditPlayer.Presen
 
 			@Override
 			public void onSuccess(List<IPlayerMatchStats> result) {
-				//ec.SetPresenter(presenter);
-				//				if (result != null)
-				//					Window.alert("Match saved");
-				//				else
-				//					Window.alert("Comp not saved");
-				//view.getEditPlayer().ShowPlayer(result);
 
+				Window.alert(result.toString());
 
 			}
 		});	
+	}
+
+
+	@Override
+	public boolean onItemSelected(IPlayerMatchInfo c) {
+		if (selectionModel.isSelected(c)) {
+			selectionModel.removeSelection(c);
 		}
 
-	@Override
-	public IPlayer getNewPlayer() {
-		// TODO Auto-generated method stub
-		return new ScrumPlayer();
+		else {
+			selectionModel.addSelection(c);
+		}
+
+		return true;
 	}
 
 	@Override
-	public void onButton1Clicked() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onButton2Clicked() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onButton3Clicked() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onButton4Clicked() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onItemSelected(IPlayerMatchInfo pmi) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onItemClicked(IPlayerMatchInfo pmi) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onSaveGroupInfoClicked(String info) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showDraftAnalysis() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isSelected(IPlayerMatchInfo player) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isSelected(IPlayerMatchInfo c) {
+		return selectionModel.isSelected(c);
 	}
 
 	@Override
 	public void showEditPlayer(IPlayerMatchInfo player) {
-		// TODO Auto-generated method stub
-		
+		clientFactory.getRpcService().getPlayer(player.getPlayerMatchStats().getPlayerId(), new AsyncCallback<IPlayer>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+
+				Window.alert("Player info not fetched for editing: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(IPlayer result) {
+				clientFactory.getPlayerPopupView().setPlayer(result);
+				((DialogBox) clientFactory.getPlayerPopupView()).center();
+			}
+		});	
+
+
 	}
 
 	@Override
-	public void showEditStats(IPlayerMatchInfo player) {
-		// TODO Auto-generated method stub
-		
+	public void showEditStats(IPlayerMatchInfo info) {
+		clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getPlayerMatchStats());
+		((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
 	}
 
 	@Override
 	public void showEditRating(IPlayerMatchInfo player) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.ui.WorkflowConfigurationView.Presenter#saveWorkflowConfiguration(java.util.List)
-	 */
-	//	@Override
-	//	public void saveWorkflowConfiguration(List<IWorkflow> workflows) {
-	//		// TODO Auto-generated method stub
-	//
-	//	}
+	@Override
+	public ClientFactory getClientFactory() {
+		return clientFactory;
+	}
+
+	@Override
+	public void onSaveEditPlayerClicked(IPlayer player) {
+		
+		clientFactory.getRpcService().savePlayer(player, null, new AsyncCallback<IPlayer>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+
+				Window.alert("Player not saved: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(IPlayer result) {
+
+				Window.alert("Player saved");
+				((DialogBox) clientFactory.getPlayerPopupView()).hide();
+
+
+			}
+		});		
+
+
+	}
+
+	@Override
+	public void onCancelEditPlayerClicked() {
+		((DialogBox) clientFactory.getPlayerPopupView()).hide();
+	}
+
+	@Override
+	public void onSavePlayerMatchStatsClicked(final IPlayerMatchStats pms) {
+		
+		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerMatchInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+
+				Window.alert("Player Stats not saved: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(IPlayerMatchInfo result) {
+
+				view.getCompView().getPlayerListView().updatePlayerMatchStats(result);
+//				Window.alert("Player Stats saved");
+//				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
+//				clientFactory.getRpcService().getMatch(pms.getMatchId(), new AsyncCallback<IMatchGroup>() {
+//
+//					@Override
+//					public void onFailure(Throwable caught) {
+//
+//
+//					}
+//
+//					@Override
+//					public void onSuccess(IMatchGroup result) {
+//						fetchMatchStats(result);
+//					}
+//				});	
+				
+			}
+		});			
+	}
+
+
+
+	@Override
+	public void onCancelEditPlayerMatchStatsClicked() {
+		((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
+	}
+
+
+
 
 
 }

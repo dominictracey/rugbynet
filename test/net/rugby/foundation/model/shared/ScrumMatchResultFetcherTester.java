@@ -56,6 +56,7 @@ public class ScrumMatchResultFetcherTester {
 	  /**
 	   * Add as many tests as you like.
 	   */
+	  @Test
 	  public void testSimple() {                                              // (3)
 	    assert(true);
 	  }

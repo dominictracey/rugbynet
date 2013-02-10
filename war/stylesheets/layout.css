@@ -149,6 +149,10 @@
 	margin:2px:
 }
 
+.leaderboardCell:hover {
+	background-color:darkgrey;
+}
+
 .leaderboardRow-header {
 	font-weight:bold;
 	background-color:lightgrey;

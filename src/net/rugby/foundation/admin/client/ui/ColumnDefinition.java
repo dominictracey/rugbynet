@@ -12,4 +12,8 @@ public abstract class ColumnDefinition<T> {
     public boolean isSelectable() {
       return false;
     }
+    
+    public void clear() {
+    	
+    }
   }

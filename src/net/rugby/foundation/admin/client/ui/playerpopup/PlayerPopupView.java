@@ -1,8 +1,10 @@
-package net.rugby.foundation.admin.client.ui;
+package net.rugby.foundation.admin.client.ui.playerpopup;
 
 import java.util.List;
 
-import com.google.gwt.place.shared.Place;
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.ui.FieldDefinition;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -18,8 +20,9 @@ public interface PlayerPopupView<T> extends IsWidget
 	
 	public interface Presenter<T>
 	{
-		void goTo(Place place);
-		void onCloseButtonClicked();
+		ClientFactory getClientFactory();
+		void onSaveEditPlayerClicked(T player);
+		void onCancelEditPlayerClicked();
 
 	}
 

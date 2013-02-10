@@ -1,73 +1,57 @@
 package net.rugby.foundation.admin.server.workflow.matchrating;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.rugby.foundation.model.shared.IMatchRating;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
+import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
+import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130121;
+import net.rugby.foundation.core.server.BPMServletContextListener;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-import com.google.appengine.tools.pipeline.Job4;
+import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.Value;
+import com.google.inject.Injector;
 
-public class CreateMatchRatings extends Job4<List<IMatchRating>, List<IPlayerMatchStats>, List<IPlayerMatchStats>, ITeamMatchStats, ITeamMatchStats> {
+public class CreateMatchRatings extends Job5<List<IPlayerMatchRating>, IMatchGroup, List<IPlayerMatchStats>, List<IPlayerMatchStats>, ITeamMatchStats, ITeamMatchStats> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5676927821878573678L;
+	private transient IMatchRatingEngineFactory mref;
 
 
-	public Value<List<IMatchRating>> run(List<IPlayerMatchStats> homePlayerStats, List<IPlayerMatchStats> visitorPlayerStats,
-//			IPlayerMatchStats h1,
-//			IPlayerMatchStats h2,
-//			IPlayerMatchStats h3,
-//			IPlayerMatchStats h4,
-//			IPlayerMatchStats h5,
-//			IPlayerMatchStats h6,
-//			IPlayerMatchStats h7,
-//			IPlayerMatchStats h8,
-//			IPlayerMatchStats h9,
-//			IPlayerMatchStats h10,
-//			IPlayerMatchStats h11,
-//			IPlayerMatchStats h12,
-//			IPlayerMatchStats h13,
-//			IPlayerMatchStats h14,
-//			IPlayerMatchStats h15,
-//			IPlayerMatchStats h16,
-//			IPlayerMatchStats h17,
-//			IPlayerMatchStats h18,
-//			IPlayerMatchStats h19,
-//			IPlayerMatchStats h20,
-//			IPlayerMatchStats h21,
-//			IPlayerMatchStats h22,
-//			IPlayerMatchStats h23,
-//			IPlayerMatchStats v1,
-//			IPlayerMatchStats v2,
-//			IPlayerMatchStats v3,
-//			IPlayerMatchStats v4,
-//			IPlayerMatchStats v5,
-//			IPlayerMatchStats v6,
-//			IPlayerMatchStats v7,
-//			IPlayerMatchStats v8,
-//			IPlayerMatchStats v9,
-//			IPlayerMatchStats v10,
-//			IPlayerMatchStats v11,
-//			IPlayerMatchStats v12,
-//			IPlayerMatchStats v13,
-//			IPlayerMatchStats v14,
-//			IPlayerMatchStats v15,
-//			IPlayerMatchStats v16,
-//			IPlayerMatchStats v17,
-//			IPlayerMatchStats v18,
-//			IPlayerMatchStats v19,
-//			IPlayerMatchStats v20,
-//			IPlayerMatchStats v21,
-//			IPlayerMatchStats v22,
-//			IPlayerMatchStats v23,
-			ITeamMatchStats hStats,
-			ITeamMatchStats vStats ) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public CreateMatchRatings() {
+
+
+	}
+
+	
+	
+	
+	public Value<List<IPlayerMatchRating>> run(IMatchGroup match, List<IPlayerMatchStats> homePlayerStats, List<IPlayerMatchStats> visitorPlayerStats,
+			ITeamMatchStats hStats,	ITeamMatchStats vStats ) {
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Injector injector = BPMServletContextListener.getInjectorForNonServlets();
+		//this.pf = injector.getInstance(IPlayerFactory.class);
+		this.mref = injector.getInstance(IMatchRatingEngineFactory.class);
+		//this.pmrf = injector.getInstance(IPlayerMatchRatingFactory.class);
+		
+		IMatchRatingEngineSchema mres = new ScrumMatchRatingEngineSchema20130121();
+		IMatchRatingEngine mre = mref.get(mres);
+		
+		mre.setPlayerStats(homePlayerStats, visitorPlayerStats);
+		mre.setTeamStats(hStats, vStats);		
+		
+		return immediate(mre.generate(mres, match));
 	}
 
 }

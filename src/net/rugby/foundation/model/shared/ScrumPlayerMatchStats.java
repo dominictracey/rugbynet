@@ -3,6 +3,8 @@ package net.rugby.foundation.model.shared;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -10,6 +12,7 @@ import javax.persistence.Transient;
 import net.rugby.foundation.model.shared.Position.position;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Indexed;
 
 @Entity
 public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
@@ -17,11 +20,23 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -5287287099345934745L;
-	
+	private static final long serialVersionUID = 1L;
+
+//	@Override
+//	public void matchOver(int time) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+
+
+	/**
+	 * 
+	 */
+	//private static final long serialVersionUID = -5287287099345934745L;
+
 	@Id
 	private Long id;
-	
+
 	private Integer tries;
 	private Integer tryAssists;
 	private Integer points;
@@ -40,22 +55,19 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	private Integer penaltiesConceded;
 	private Integer yellowCards;
 	private Integer redCards;
+	//@Indexed
 	private Integer slot;
-
 	private Long playerId;
-
 	private Long matchId;
-
 	private Long teamId;
-
 	private position pos;
 	private String name;
-	
+
 	//@REX should implement to be able to save list of Longs.
 	@Transient
-	private List<IPlayerMatchStatTimeLog> timeLogs; // = new ArrayList<IPlayerMatchStatTimeLog>();
+	private transient List<IPlayerMatchStatTimeLog> timeLogs; // = new ArrayList<IPlayerMatchStatTimeLog>();
 	private Integer timePlayed;
-	
+
 	public ScrumPlayerMatchStats() {
 		tries = 0;                   
 		tryAssists = 0;              
@@ -77,7 +89,46 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 		redCards = 0;     
 		pos = position.NONE;
 	}
-	
+
+
+	public ScrumPlayerMatchStats(Long id, Integer tries, Integer tryAssists,
+			Integer points, Integer kicks, Integer passes, Integer runs,
+			Integer metersRun, Integer cleanBreaks, Integer defendersBeaten,
+			Integer offloads, Integer turnovers, Integer tacklesMade,
+			Integer tacklesMissed, Integer lineoutsWonOnThrow,
+			Integer lineoutsStolenOnOppThrow, Integer penaltiesConceded,
+			Integer yellowCards, Integer redCards, Integer slot, Long playerId,
+			Long matchId, Long teamId, position pos, String name,
+			List<IPlayerMatchStatTimeLog> timeLogs, Integer timePlayed) {
+		//super();
+		this.id = id;
+		this.tries = tries;
+		this.tryAssists = tryAssists;
+		this.points = points;
+		this.kicks = kicks;
+		this.passes = passes;
+		this.runs = runs;
+		this.metersRun = metersRun;
+		this.cleanBreaks = cleanBreaks;
+		this.defendersBeaten = defendersBeaten;
+		this.offloads = offloads;
+		this.turnovers = turnovers;
+		this.tacklesMade = tacklesMade;
+		this.tacklesMissed = tacklesMissed;
+		this.lineoutsWonOnThrow = lineoutsWonOnThrow;
+		this.lineoutsStolenOnOppThrow = lineoutsStolenOnOppThrow;
+		this.penaltiesConceded = penaltiesConceded;
+		this.yellowCards = yellowCards;
+		this.redCards = redCards;
+		this.slot = slot;
+		this.playerId = playerId;
+		this.matchId = matchId;
+		this.teamId = teamId;
+		this.pos = pos;
+		this.name = name;
+		this.timeLogs = timeLogs;
+		this.timePlayed = timePlayed;
+	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IPlayerMatchStats#getId()
 	 */
@@ -376,21 +427,21 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	public void setPosition(Position.position pos) {
 		this.pos = pos;
 	}
-	@Override
+//	@Override
 	public void addTimeLog(IPlayerMatchStatTimeLog log) {
 		if (timeLogs == null) {
 			timeLogs = new ArrayList<IPlayerMatchStatTimeLog>();
 		}
-		
+
 		timeLogs.add(log);
-		
+
 	}
 	@Override
 	public void removeTimeLog(Long logId) {
 		if (timeLogs == null) {
 			return;
 		}
-		
+
 		for (IPlayerMatchStatTimeLog log : timeLogs) {
 			if (log.getId().equals(id)) {
 				timeLogs.remove(log);
@@ -401,6 +452,13 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	public List<IPlayerMatchStatTimeLog> getTimeLogs() {
 		return timeLogs;
 	}
+	
+	@Override
+	public void setTimeLogs(List<IPlayerMatchStatTimeLog> logs) {
+		timeLogs = logs;
+		
+	}
+	
 	@Override
 	public String getName() {
 		return name;
@@ -422,18 +480,18 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 		if (timeLogs == null) {
 			timeLogs = new ArrayList<IPlayerMatchStatTimeLog>();
 		}
-		
+
 		IPlayerMatchStatTimeLog tl;
 		if (timeLogs.size() == 0) {
 			tl = new ScrumPlayerMatchStatTimeLog();
 			tl.start(i, pos, playerId, matchId);
 			timeLogs.add(tl);
 		} else {
-		
+
 			tl = timeLogs.get(timeLogs.size()-1);
 			if (i != 0 && tl.getTimeOff() == 0) {
 				// this is bad -- somehow we think they are already on
-				throw new RuntimeException("playerOn: The player " + name + " in match " + matchId +  " is already on the field at " + i + " minutes.");			
+				throw new RuntimeException("playerOn: The player " + name + " in slot " + slot + " of match " + matchId +  " is already on the field at " + i + " minutes.");			
 			} else {
 				// they are re-entering the game - blood bin?
 				tl = new ScrumPlayerMatchStatTimeLog();
@@ -441,20 +499,20 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 				timeLogs.add(tl);
 			}
 		}
-		
+
 	}
 	@Override
 	public void playerOff(int i) {
 		if (timeLogs == null) {
 			timeLogs = new ArrayList<IPlayerMatchStatTimeLog>();
 		}
-		
+
 		IPlayerMatchStatTimeLog tl;
 		if (timeLogs.size() == 0) {
 			// this is bad -- somehow we think they never got on
 			throw new RuntimeException("playerOff: The player " + name + " in match " + matchId +  " isn't on the field at " + i + " minutes.");		
 		}
-		
+
 		tl = timeLogs.get(timeLogs.size()-1);
 		if (tl.getTimeOff() != 0) {
 			// this is bad -- somehow we think they never got on
@@ -462,8 +520,8 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 		} else {
 			tl.stop(i);
 		}
-		
-		
+
+
 	}
 	@Override
 	public void matchOver(int time) {
@@ -475,17 +533,21 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 				if (tl.getTimeOff() == 0) {
 					tl.stop(time);
 				}
-				
+
 			}
 		} 
-		
+
 		timePlayed = 0;
-		for (IPlayerMatchStatTimeLog tl : timeLogs) {
-			timePlayed += tl.getTimeOff()-tl.getTimeOn();
+		if (timeLogs != null) {
+			for (IPlayerMatchStatTimeLog tl : timeLogs) {
+				timePlayed += tl.getTimeOff()-tl.getTimeOn();
+			}
+		} else {
+			//throw new RuntimeException("No time logs for " + name + playerId);
 		}
-		
+
 		return;
-		
+
 	}
 
 	public Integer getSlot() {
@@ -496,5 +558,9 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 		this.slot = slot;
 	}
 
-	
+
+
+
+
+
 }

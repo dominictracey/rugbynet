@@ -3,9 +3,11 @@
  */
 package net.rugby.foundation.model.shared;
 
+import net.rugby.foundation.admin.shared.AdminTask;
+import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
+import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.OrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.WorkflowConfiguration;
-import net.rugby.foundation.admin.shared.PlayerMatchInfo;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
@@ -50,7 +52,13 @@ public class DataStoreFactory {
 			ObjectifyService.register(ScrumPlayerMatchStats.class);
 			ObjectifyService.register(ScrumPlayerMatchStatTimeLog.class);
 			ObjectifyService.register(ScrumTeamMatchStats.class);
+			ObjectifyService.register(PlayerRating.class);
+			ObjectifyService.register(PlayerMatchRating.class);
 			ObjectifyService.register(PlayerMatchInfo.class);
+			ObjectifyService.register(AdminTask.class);
+			ObjectifyService.register(EditPlayerAdminTask.class);
+			ObjectifyService.register(EditPlayerMatchStatsAdminTask.class);
+			
 		}
 		
 		return ofy;

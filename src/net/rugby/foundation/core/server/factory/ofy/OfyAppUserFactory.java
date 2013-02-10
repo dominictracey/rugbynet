@@ -27,10 +27,9 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 	private Long id;
 	private String email;
 	private String nickName;
-	private Objectify ofy;
 	
 	public OfyAppUserFactory() {
-		this.ofy = DataStoreFactory.getOfy();
+
 	}
 	
 	/* (non-Javadoc)
@@ -69,6 +68,8 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 	}
 	
 	private IAppUser getByEmail() {
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		Query<AppUser> q = ofy.query(AppUser.class).filter("emailAddress", email );
 		if (q.count() == 0) {
 			return null; //empty
@@ -80,6 +81,8 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 	}
 
 	private IAppUser getByNickname() {
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		Query<AppUser> q = ofy.query(AppUser.class).filter("nickname", nickName);
 		if (q.count() == 0) {
 			return null; //empty
@@ -91,6 +94,8 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 	}
 	
 	private IAppUser getById() {
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		AppUser u = ofy.get(new Key<AppUser>(AppUser.class,id));
 
 		return u;
@@ -104,6 +109,8 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 		// normalize the email
 		String email = appUser.getEmailAddress().toLowerCase();
 		appUser.setEmailAddress(email);
+		Objectify ofy = DataStoreFactory.getOfy();
+
 		ofy.put((AppUser)appUser);
 		return appUser;
 	}

@@ -5,11 +5,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Transient;
+
 import com.google.appengine.tools.pipeline.Job4;
 import com.google.appengine.tools.pipeline.Value;
+import com.google.inject.Injector;
 
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITeamGroup;
@@ -28,17 +32,22 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 		public String attr;	
 	}
 
-	
-	private ITeamMatchStatsFactory tmsf;
+	private transient ITeamMatchStatsFactory tmsf;
 
-	public FetchTeamMatchStats(ITeamMatchStatsFactory tmsf) {
-		this.tmsf = tmsf;
+	public FetchTeamMatchStats() {
+
 	}
+	
 	
 
 	
 	@Override
 	public Value<ITeamMatchStats> run(ITeamGroup team, IMatchGroup match, Home_or_Visitor home_or_visitor, String url) {
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Injector injector = BPMServletContextListener.getInjectorForNonServlets();
+
+		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
 		
 		boolean found = false;
 		

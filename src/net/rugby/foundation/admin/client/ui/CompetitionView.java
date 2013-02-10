@@ -3,11 +3,12 @@ package net.rugby.foundation.admin.client.ui;
 import java.util.List;
 import java.util.Map;
 
-import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
-import net.rugby.foundation.admin.shared.PlayerMatchInfo;
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
@@ -112,6 +113,8 @@ public interface CompetitionView extends IsWidget {
 	 * @param result
 	 */
 	void addRound(Long compId, Long roundId, List<IMatchGroup> result);
+	void setClientFactory(ClientFactory clientFactory);
+	PlayerListView<IPlayerMatchInfo> getPlayerListView();
 
 
 }

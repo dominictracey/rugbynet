@@ -1,10 +1,8 @@
 package net.rugby.foundation.admin.server;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -13,28 +11,31 @@ import java.util.logging.Logger;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import net.rugby.foundation.admin.client.RugbyAdminService;
+import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
+import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
-import net.rugby.foundation.admin.server.init.CountryLoader;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
+import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
+import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
-import net.rugby.foundation.admin.shared.PlayerMatchInfo;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -46,21 +47,20 @@ import net.rugby.foundation.game1.shared.IEntry;
 import net.rugby.foundation.game1.shared.IMatchEntry;
 import net.rugby.foundation.game1.shared.IRoundEntry;
 import net.rugby.foundation.game1.shared.MatchEntry;
+import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.Group.GroupType;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
-import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
-import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.TeamGroup;
-
+import net.rugby.foundation.model.shared.Position.position;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
@@ -72,7 +72,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class RugbyAdminServiceImpl extends RemoteServiceServlet implements RugbyAdminService{
+public class RugbyAdminServiceImpl extends RemoteServiceServlet implements RugbyAdminService {
 
 	//private Objectify ofy;
 	private IAppUserFactory auf;
@@ -93,6 +93,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private ICountryFactory countryf;
 	private IWorkflowConfigurationFactory wfcf;
 	private IResultFetcherFactory srff;
+	private IMatchRatingEngineFactory mref;
+	private IPlayerMatchRatingFactory pmrf;
+	private IAdminTaskFactory atf;
+	private IPlayerMatchInfoFactory pmif;
 	
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -108,7 +112,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IMatchGroupFactory mf, IMatchEntryFactory mef, IRoundEntryFactory ref, IForeignCompetitionFetcherFactory fcff,
 			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerFactory pf,
 			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
-			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff) {
+			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
+			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -126,7 +131,11 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.countryf = countryf;
 		this.wfcf = wfcf;
 		this.srff = srff;
-
+		this.mref = mref;
+		this.pmrf = pmrf;
+		this.atf = atf;
+		this.pmif = pmif;
+		
 		//		rf.setFactories(cf, mf);
 		//		mf.setFactories(rf, tf);
 
@@ -213,7 +222,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public Map<String, ITeamGroup> fetchTeams(String url, String resultType) {
 		CountryLoader cloader = new CountryLoader();
 		cloader.Run(countryf);
-		
+
 		IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
 
 		Map<String, ITeamGroup> teams = fetcher.getTeams();
@@ -441,9 +450,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IMatchGroup> getMatches(Long roundId) {
 
-				List<IMatchGroup> ms = mf.getMatchesForRound(roundId);
-				
-				return ms;
+		List<IMatchGroup> ms = mf.getMatchesForRound(roundId);
+
+		return ms;
 	}
 
 
@@ -701,16 +710,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public IPlayer savePlayer(IPlayer player, String promisedHandle) {
+	public IPlayer savePlayer(IPlayer player, IAdminTask task) {
 		player = pf.put(player);
-		if (!promisedHandle.isEmpty()) {
-			PipelineService service = PipelineServiceFactory.newPipelineService();
-			try {
-				service.submitPromisedValue(promisedHandle, player);
-			} catch (NoSuchObjectException e) {
-				e.printStackTrace();
-			} catch (OrphanedObjectException e) {
-				e.printStackTrace();
+		if (task != null) {
+			if (task.getPromise() != null) {
+				PipelineService service = PipelineServiceFactory.newPipelineService();
+				try {
+					service.submitPromisedValue(task.getPromise(), player);
+				} catch (NoSuchObjectException e) {
+					e.printStackTrace();
+				} catch (OrphanedObjectException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return player;
@@ -719,77 +730,151 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IPlayerMatchStats> testMatchStats(Long matchId) {
 
+//		PipelineService service = PipelineServiceFactory.newPipelineService();
+//		mf.setId(matchId);
+//		IMatchGroup match = mf.getGame();
+//
+//		CountryLoader cloader = new CountryLoader();
+//		cloader.Run(countryf);
+//
+//		if (match == null) {
+//
+//
+//
+//			for (Long id = 9001L; id<9003L; ++id) {
+//				tf.setId(null);
+//				ITeamGroup t = tf.getTeam();
+//				if (id == 9001) {
+//					t.setAbbr("NZL");
+//					t.setShortName("All Blacks");
+//					((IGroup)t).setDisplayName("New Zealand");
+//					t.setColor("#000000");
+//				} else if (id == 9002) {
+//					t.setAbbr("AUS");
+//					t.setShortName("Wallabies");
+//					((IGroup)t).setDisplayName("Australia");
+//					t.setColor("#f0af00");
+//				}
+//				((TeamGroup)t).setId(id);
+//				((IGroup)t).setGroupType(GroupType.TEAM);
+//
+//				tf.put(t);
+//			}
+//
+//
+//			Calendar cal = new GregorianCalendar();
+//			cal.setTime(new Date());
+//			mf.setId(null);
+//			IMatchGroup g = mf.getGame();
+//			((MatchGroup)g).setId(300L);
+//			((IGroup)g).setGroupType(GroupType.MATCH);
+//
+//			g.setHomeTeamId(9001L);
+//			g.setVisitingTeamId(9002L);
+//			g.setLocked(true);
+//			g.setForeignId(93503L);
+//			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
+//			cal.set(2011, 10, 16);
+//			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
+//			tf.setId(g.getHomeTeamId());
+//			g.setHomeTeam(tf.getTeam());
+//			tf.setId(g.getVisitingTeamId());
+//			g.setVisitingTeam(tf.getTeam());
+//			g.setDisplayName();	
+//
+//			g.setDate(cal.getTime());
+//
+//			mf.put(g);
+//			match = g;
+//		}
+//
+//		String pipelineId = "";
+//		try {
+//
+//			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(1));
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+//
+//			while (true) {
+//				Thread.sleep(2000);
+//				JobInfo jobInfo = service.getJobInfo(pipelineId);
+//				switch (jobInfo.getJobState()) {
+//				case COMPLETED_SUCCESSFULLY:
+//					//service.deletePipelineRecords(pipelineId);
+//					return (List<IPlayerMatchStats>) jobInfo.getOutput();
+//				case RUNNING:
+//					break;
+//				case STOPPED_BY_ERROR:
+//					throw new RuntimeException("Job stopped " + jobInfo.getError());
+//				case STOPPED_BY_REQUEST:
+//					throw new RuntimeException("Job stopped by request.");
+//				}
+//			}
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
+
+		return (List<IPlayerMatchStats>) pmsf.getByMatchId(matchId);
+	}
+
+	@Override
+	public List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId) {
+		return pmif.getForMatch(matchId); 
+	}
+
+	@Override
+	public List<ICountry> fetchCountryList() {
+		List<ICountry> list = new ArrayList<ICountry>();
+		Iterator<Country> it = countryf.getAll();
+
+		if (it == null || !it.hasNext()) {
+			CountryLoader cloader = new CountryLoader();
+			cloader.Run(countryf);
+			it = countryf.getAll();
+		}
+
+		while (it.hasNext()) {
+			Country c = it.next();
+			list.add(c);
+		}
+		return list;
+	}
+
+	@Override
+	public List<position> fetchPositionList() {
+		List<position> list = new ArrayList<position>();
+
+		for (position p : position.values()) {
+			list.add(p);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<IPlayerMatchInfo> fetchMatchStats(Long matchId) {
+		Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
+		countryf.put(c);
+
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		mf.setId(matchId);
 		IMatchGroup match = mf.getGame();
-		
-		CountryLoader cloader = new CountryLoader();
-		cloader.Run(countryf);
-		
-		if (match == null) {
-
-
-			
-			for (Long id = 9001L; id<9003L; ++id) {
-				tf.setId(null);
-				ITeamGroup t = tf.getTeam();
-				if (id == 9001) {
-					t.setAbbr("NZL");
-					t.setShortName("All Blacks");
-					((IGroup)t).setDisplayName("New Zealand");
-					t.setColor("#000000");
-				} else if (id == 9002) {
-					t.setAbbr("AUS");
-					t.setShortName("Wallabies");
-					((IGroup)t).setDisplayName("Australia");
-					t.setColor("#f0af00");
-				}
-				((TeamGroup)t).setId(id);
-				((IGroup)t).setGroupType(GroupType.TEAM);
-
-				tf.put(t);
-			}
-
-
-			Calendar cal = new GregorianCalendar();
-			cal.setTime(new Date());
-			mf.setId(null);
-			IMatchGroup g = mf.getGame();
-			((MatchGroup)g).setId(300L);
-			((IGroup)g).setGroupType(GroupType.MATCH);
-
-			g.setHomeTeamId(9001L);
-			g.setVisitingTeamId(9002L);
-			g.setLocked(true);
-			g.setForeignId(93503L);
-			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
-			cal.set(2011, 10, 16);
-			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
-			tf.setId(g.getHomeTeamId());
-			g.setHomeTeam(tf.getTeam());
-			tf.setId(g.getVisitingTeamId());
-			g.setVisitingTeam(tf.getTeam());
-			g.setDisplayName();	
-
-			g.setDate(cal.getTime());
-
-			mf.put(g);
-			match = g;
-		}
 
 		String pipelineId = "";
 		try {
-			
-			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, pf, tmsf, pmsf, countryf, new JobSetting.MaxAttempts(1));
+
+			//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
+			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(1));
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
-			
+
 			while (true) {
 				Thread.sleep(2000);
 				JobInfo jobInfo = service.getJobInfo(pipelineId);
 				switch (jobInfo.getJobState()) {
 				case COMPLETED_SUCCESSFULLY:
 					service.deletePipelineRecords(pipelineId);
-					return (List<IPlayerMatchStats>) jobInfo.getOutput();
+					return getPlayerMatchInfo(matchId); // (List<IPlayerMatchStats>) jobInfo.getOutput();
 				case RUNNING:
 					break;
 				case STOPPED_BY_ERROR:
@@ -799,33 +884,43 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				}
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
 
 	}
+	
+	@Override
+	public IPlayerMatchStats getPlayerMatchStats(Long id) {
+		return pmsf.getById(id);
+	}
 
 	@Override
-	public List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId) {
-		try {
-			 List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
-			 mf.setId(matchId);
-			 IMatchGroup m = mf.getGame();
-			 
-			 if (m != null) {
-				 List<? extends IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
-				 for (IPlayerMatchStats pms : pmsl) {
-					 // TODO replace null with playerMatchRatingFactory.get(pms.getPlayerId(),pms.getMatchId());
-					 list.add(new PlayerMatchInfo(pms));
-				 }
-			 }
-			 
-			 return list;
-		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "fetchScore: " + e.getMessage());
-			return null;
+	public IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats stats, IAdminTask task) {
+		pmsf.put(stats);
+		if (task != null) {
+			atf.put(task);
 		}
+		return pmif.getForPlayerMatchStats(stats.getId());
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<IAdminTask> getAllOpenAdminTasks() {
+		return (List<IAdminTask>) atf.getAllOpen();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<IAdminTask> deleteTasks(List<IAdminTask> selectedItems) {
+		return (List<IAdminTask>) atf.delete(selectedItems);
+	}
+
+	@Override
+	public IAdminTask getTask(Long id) {
+		return atf.get(id);
+	}
+
+
 
 }

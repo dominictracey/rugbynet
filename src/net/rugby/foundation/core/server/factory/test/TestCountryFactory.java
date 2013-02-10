@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.rugby.foundation.admin.server.init.CountryLoader;
+import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICountry;

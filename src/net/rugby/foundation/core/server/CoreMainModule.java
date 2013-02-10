@@ -11,6 +11,7 @@ import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -24,10 +25,13 @@ import net.rugby.foundation.core.server.factory.ofy.OfyCountryFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchResultFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
+
+import com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 
@@ -51,6 +55,8 @@ public class CoreMainModule extends AbstractModule {
 		bind(ITeamMatchStatsFactory.class).to(OfyTeamMatchStatsFactory.class);
 		bind(IPlayerMatchStatsFactory.class).to(OfyPlayerMatchStatsFactory.class);
 		bind(ICountryFactory.class).to(OfyCountryFactory.class);
+		bind(IPlayerMatchRatingFactory.class).to(OfyPlayerMatchRatingFactory.class);
+		bind(PipelineServlet.class).in(Singleton.class);
 	}
 }
 

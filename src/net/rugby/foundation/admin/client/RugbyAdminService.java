@@ -3,16 +3,19 @@ package net.rugby.foundation.admin.client;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.Position.position;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -37,7 +40,8 @@ public interface RugbyAdminService extends RemoteService {
 	ITeamGroup saveTeam(ITeamGroup teamGroup);
 	ITeamGroup getTeam(Long teamId);
 	IPlayer getPlayer(Long id);
-	IPlayer savePlayer(IPlayer player, String promisedHandle);
+	IPlayer savePlayer(IPlayer player, IAdminTask task);
+	//IPlayerMatchStats savePlayerMatchStats(IPlayerMatchStats stats, IAdminTask task);
 	IMatchGroup saveMatch(IMatchGroup matchGroup);
 	IMatchGroup getMatch(Long matchId);
 	Boolean createAdmin();
@@ -72,4 +76,15 @@ public interface RugbyAdminService extends RemoteService {
 	List<IPlayerMatchStats> testMatchStats(Long matchId);
 	
 	List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId);
+	List<ICountry> fetchCountryList();
+	List<position> fetchPositionList();
+	List<IPlayerMatchInfo> fetchMatchStats(Long matchId);
+	
+	List<IAdminTask> getAllOpenAdminTasks();
+	List<IAdminTask> deleteTasks(List<IAdminTask> selectedItems);
+	IAdminTask getTask(Long id);
+	
+	IPlayerMatchStats getPlayerMatchStats(Long id);
+	
+	IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
 }

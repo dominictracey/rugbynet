@@ -1,9 +1,16 @@
 package net.rugby.foundation.admin.server;
 
+import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
+import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumCompetitionFetcherFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.ScrumMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.ofy.OfyAdminTaskFactory;
+import net.rugby.foundation.admin.server.factory.ofy.OfyPlayerMatchInfoFactory;
+import net.rugby.foundation.admin.server.factory.test.TestAdminTaskFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OfyOrchestrationConfigurationFactory;
@@ -26,6 +33,9 @@ public class AdminMainModule extends AbstractModule {
 		bind(IResultFetcherFactory.class).to(ScrumResultFetcherFactory.class);
 		bind(IForeignCompetitionFetcherFactory.class).to(ScrumCompetitionFetcherFactory.class);
 		bind(IWorkflowFactory.class).to(OfyWorkflowFactory.class);
+		bind(IMatchRatingEngineFactory.class).to(ScrumMatchRatingEngineFactory.class);
+		bind(IAdminTaskFactory.class).to(OfyAdminTaskFactory.class);
+		bind(IPlayerMatchInfoFactory.class).to(OfyPlayerMatchInfoFactory.class);
 	}
 	
 }

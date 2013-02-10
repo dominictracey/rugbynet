@@ -41,7 +41,6 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	 */
 	private static final long serialVersionUID = -645530830404364424L;
 	private Long id;
-	private final Objectify ofy;
 	private final IRoundFactory rf;
 	private ITeamGroupFactory tf;
 	private IClubhouseFactory chf;
@@ -51,7 +50,6 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	
 	@Inject
 	OfyCompetitionFactory(IRoundFactory rf, ITeamGroupFactory tf, IClubhouseFactory chf, IMatchGroupFactory mf) {
-		this.ofy = DataStoreFactory.getOfy();
 
 		this.rf = rf;
 		this.mf = mf;
@@ -142,6 +140,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	
 	protected ICompetition getFromDB() {
 		loading = true;
+		Objectify ofy = DataStoreFactory.getOfy();
 		Competition c = ofy.get(new Key<Competition>(Competition.class,id));
 		
 		if (c != null) {
@@ -169,7 +168,9 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	public ICompetition put(ICompetition c) {
 
 		try {
+			Objectify ofy = DataStoreFactory.getOfy();
 			if (c != null) {
+				
 				c.setLastSaved(new Date());	
 				if (c.getId() == null) {
 					ofy.put(c); // get an id to pass down to the rounds
@@ -257,7 +258,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	@Override
 	public List<ICompetition> getUnderwayComps() {
 		List<ICompetition> list = new ArrayList<ICompetition>();
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Competition> cq = ofy.query(Competition.class).filter("underway", true);
 		for (Competition c : cq) {
 			
@@ -276,7 +277,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	@Override
 	public List<ICompetition> getAllComps() {
 		List<ICompetition> list = new ArrayList<ICompetition>();
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Competition> cq = ofy.query(Competition.class);
 		for (Competition c : cq) {
 			

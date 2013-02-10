@@ -11,8 +11,9 @@
 		<!-- Add GWT widgets here. Enter < and hit Ctrl-Space to auto-complete 
 			widget names. The ui:field attribute binds an element to a field in the owner 
 			class. See the GWT docs on UI Binder for more details. -->
-
+<table><tr><td>
 				Display Name: <g:TextBox ui:field='displayName'></g:TextBox><br/>
+				</td></tr></table>
 				Short Name:  <g:TextBox ui:field='shortName'></g:TextBox><br/>
 				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
 				Color (#RRGGBB): <g:TextBox ui:field='color'></g:TextBox><br/>

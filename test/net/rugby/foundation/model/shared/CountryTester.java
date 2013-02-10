@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 import com.google.inject.Inject;
 
-import net.rugby.foundation.admin.server.init.CountryLoader;
+import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;

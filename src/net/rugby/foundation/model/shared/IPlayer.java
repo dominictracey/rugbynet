@@ -68,6 +68,7 @@ public interface IPlayer {
 	 * @param name as it appears on stat sheets
 	 */
 	public abstract void setShortName(String shortName);
+	public abstract String getForeignUrl();
 	
 	
 }

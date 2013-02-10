@@ -1,0 +1,373 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:d="urn:import:com.google.gwt.user.datepicker.client" >
+
+    <ui:style>
+    .playersViewButtonHPanel {
+      margin: 5px 0px 0x 5px;
+    }
+    .playersViewPlayersFlexTable {
+      margin: 5px 0px 5px 0px;
+    }
+		.important {
+			font-weight: bold;
+		}
+    </ui:style>
+
+    <!-- <g:DialogBox ui:field="popupBox" > -->
+
+    <g:HTMLPanel>
+
+        <!--
+    private Long id;
+	private Integer tries;
+	private Integer tryAssists;
+	private Integer points;
+	private Integer kicks;
+	private Integer passes;
+	private Integer runs;
+	private Integer metersRun;
+	private Integer cleanBreaks;
+	private Integer defendersBeaten;
+	private Integer offloads;
+	private Integer turnovers;
+	private Integer tacklesMade;
+	private Integer tacklesMissed;
+	private Integer lineoutsWonOnThrow;
+	private Integer lineoutsStolenOnOppThrow;
+	private Integer penaltiesConceded;
+	private Integer yellowCards;
+	private Integer redCards;
+	//@Indexed
+	private Integer slot;
+	private Long playerId;
+	private Long matchId;
+	private Long teamId;
+	private position pos;
+	private String name;
+	private transient List<IPlayerMatchStatTimeLog> timeLogs; // = new ArrayList<IPlayerMatchStatTimeLog>();
+	private Integer timePlayed;
+        -->
+        <!--
+             Add GWT widgets here. Enter < and hit Ctrl-Space to auto-complete 
+			widget names. The ui:field attribute binds an element to a field in the owner 
+			class. See the GWT docs on UI Binder for more details.
+        -->
+
+        <table>
+
+            <tr>
+
+                <td>
+Name/Id:
+                </td>
+
+                <td>
+
+                    <g:Label ui:field="nameAndId" >
+                    </g:Label>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Player/Id:
+                </td>
+
+                <td>
+
+                    <g:Label ui:field="playerAndId" >
+                    </g:Label>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Match/Id:
+                </td>
+
+                <td>
+
+                    <g:Label ui:field="matchAndId" >
+                    </g:Label>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Scrum slot:
+                </td>
+
+                <td>
+
+                    <g:Label ui:field="slot" >
+                    </g:Label>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Position:
+                </td>
+
+                <td>
+
+                    <g:ListBox ui:field="position" >
+                    </g:ListBox>
+                </td>
+                                <td>
+Time Played:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="timePlayed" >
+                    </g:TextBox>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Tries:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="tries" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Try Assists:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="tryAssists" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Points:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="points" >
+                    </g:TextBox>
+                </td>
+            </tr>
+            <tr>
+
+                <td>
+Runs:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="runs" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Passes:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="passes" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Kicks:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="kicks" >
+                    </g:TextBox>
+                </td>
+            </tr>
+                        <tr>
+
+                <td>
+Meters Run:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="metersRun" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Clean Breaks:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="cleanBreaks" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Defenders Beaten:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="defendersBeaten" >
+                    </g:TextBox>
+                </td>
+            </tr>
+                                    <tr>
+
+                <td>
+Offloads:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="offloads" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Turnovers:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="turnovers" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Tackles Made:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="tacklesMade" >
+                    </g:TextBox>
+                </td>
+            </tr>
+                                    <tr>
+
+                <td>
+Tackles Missed:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="tacklesMissed">
+                    </g:TextBox>
+                </td>
+
+                <td>
+Lineouts won on Throw:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="lineoutsWonOnThrow" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Lineouts stolen:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="lineoutsStolenOnOppThrow" >
+                    </g:TextBox>
+                </td>
+            </tr>
+                                    <tr>
+
+                <td>
+Penalties Conceded:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="penaltiesConceded">
+                    </g:TextBox>
+                </td>
+
+                <td>
+Yellow Cards:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="yellowCards" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Red Cards:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="redCards" >
+                    </g:TextBox>
+                </td>
+            </tr>
+
+
+            <tr>
+
+                <td>
+scrum.com link:
+                </td>
+
+                <td>
+
+                    <g:Anchor ui:field="scrumLink" >
+                    </g:Anchor>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td colspan="2" >
+
+                    <g:Button
+                        styleName="{style.important}"
+                        ui:field="saveButton" >
+Save
+                    </g:Button>
+
+                    <g:Button
+                        styleName="{style.important}"
+                        ui:field="cancelButton" >
+Cancel
+                    </g:Button>
+                </td>
+            </tr>
+        </table>
+    </g:HTMLPanel>
+    <!-- </g:DialogBox> -->
+
+</ui:UiBinder>

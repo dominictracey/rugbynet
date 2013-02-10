@@ -1,4 +1,4 @@
-package net.rugby.foundation.admin.server.init;
+package net.rugby.foundation.admin.server.util;
 
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.model.shared.Country;
@@ -7,7 +7,10 @@ public class CountryLoader {
 	
 
 	public Boolean Run(ICountryFactory cf) {
-		Country c = new Country(5001L, "New Zealand", "NEW ZEALAND", "NZL", "All Blacks");
+		Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
+		cf.put(c);
+		
+		c = new Country(5001L, "New Zealand", "NEW ZEALAND", "NZL", "All Blacks");
 		cf.put(c);
 		
 		c =  new Country(5002L, "South Africa", "SOUTH AFRICA", "RSA", "Springboks");
@@ -52,7 +55,7 @@ public class CountryLoader {
 		c =  new Country(5015L, "Japan", "JAPAN", "JPN", "The Cherry Blossoms" );
 		cf.put(c);
 		
-		c =  new Country(5016L, "USA", "USA", "USA", "The Eagles" );
+		c =  new Country(5016L, "United States of America", "USA", "USA", "The Eagles" );
 		cf.put(c);
 		
 		c =  new Country(5017L, "Georgia", "GEORGIA", "GEO", "The Lelos" );
@@ -77,9 +80,6 @@ public class CountryLoader {
 	}
 
 
-
-	private String longName;
-	private String abbr;
 
 
 

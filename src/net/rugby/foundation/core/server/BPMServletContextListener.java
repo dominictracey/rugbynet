@@ -18,11 +18,26 @@ import com.google.inject.servlet.GuiceServletContextListener;
  */
 public class BPMServletContextListener extends GuiceServletContextListener {
 
+	private static Injector injector;
+	private static boolean initialized = false;
+	
+	public static final Injector getInjectorForNonServlets() {
+//		if (!initialized) {
+//						injector = Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule());
+//			//injector = Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule());
+//			initialized = true;
+//		}
+//		
+//		return injector;
+		return Guice.createInjector(new Game1MainModule(), new CoreMainModule(), new AdminMainModule());
+//	return Guice.createInjector( new Game1TestModule(), new CoreTestModule(), new AdminTestModule());		
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.google.inject.servlet.GuiceServletContextListener#getInjector()
 	 */
 	@Override
-	protected Injector getInjector() {
+	public Injector getInjector() {
 		return Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule());
 //		return Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule());
 

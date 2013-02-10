@@ -1,5 +1,14 @@
 package net.rugby.foundation.admin.client.ui;
 
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.place.AdminPlace;
+import net.rugby.foundation.admin.client.place.AdminTaskPlace;
+import net.rugby.foundation.admin.client.ui.task.TaskView;
+import net.rugby.foundation.admin.client.ui.task.TaskView.TaskViewPresenter;
+import net.rugby.foundation.admin.client.ui.task.TaskViewColumnDefinitions;
+import net.rugby.foundation.admin.client.ui.task.TaskViewImpl;
+import net.rugby.foundation.admin.shared.IAdminTask;
+
 import org.cobogw.gwt.user.client.CSS;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -22,10 +31,11 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 	//private WorkflowConfigurationViewImpl wfc;
 	private OrchestrationConfigurationViewImpl ocv;
 	//private Game1ConfigurationViewImpl g1cv;
-	private EditPlayer epv;
+	private TaskView<IAdminTask> taskv;
 	
 //	@UiField
 	TabPanel tabs;
+	private ClientFactory clientFactory;
 
 	public AdminViewImpl() {
 //		initWidget(binder.createAndBindUi(this));
@@ -43,33 +53,35 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 	{
 		cv = new CompetitionViewImpl();
 		ocv = new OrchestrationConfigurationViewImpl();
-		epv = new EditPlayer();
+		taskv = new TaskViewImpl<IAdminTask>();
+		TaskViewColumnDefinitions<IAdminTask> taskCols = new TaskViewColumnDefinitions<IAdminTask>();
+		taskv.setColumnDefinitions(taskCols);
 		//wfc = new WorkflowConfigurationViewImpl();
 		//g1cv = new Game1ConfigurationViewImpl();
 
 		tabs.add(cv, "Competitions");
 		tabs.add(ocv, "Orchestration Config");
-		tabs.add(epv, "Edit Player");
+		tabs.add(taskv, "Admin Tasks");
 //		tabs.add(wfc,"Workflow Config");
 		//tabs.add(g1cv,"Game1 Config");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void setPresenter(Presenter listener) {
-		this.listener = listener;
+		this.setListener(listener);
 		if (listener instanceof CompetitionView.Presenter) {
 			cv.setPresenter((CompetitionView.Presenter)listener);
+			cv.setClientFactory(clientFactory);
 //			wfc.setPresenter((CompetitionView.Presenter)listener, (WorkflowConfigurationView.Presenter)listener);
 			ocv.setPresenter((OrchestrationConfigurationView.Presenter)listener);
 			//g1cv.setPresenter((Game1ConfigurationView.Presenter)listener);	
 			
 		}
 		
-		if (listener instanceof EditPlayer.Presenter) {
-			epv.SetPresenter((EditPlayer.Presenter)listener);
+		if (listener instanceof TaskViewPresenter<?>) {
+			taskv.setPresenter((TaskViewPresenter<IAdminTask>)listener);
 		}
-		
-		tabs.selectTab(0);
 
 		tabs.addSelectionHandler(this);
 
@@ -90,13 +102,20 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 	public void selectTab(int index) {
 	    if (index >=0 && index < tabs.getWidgetCount()) {
 	        if (index != tabs.getTabBar().getSelectedTab()) {
-	        	tabs.selectTab(index);
+
+	        		tabs.selectTab(index);
+	        	
 	        }
 	    }	
 	}
 
 	@Override
 	public void onSelection(SelectionEvent<Integer> event) {
+    	if (event.getSelectedItem() == 2) {
+    		listener.goTo(new AdminTaskPlace(""));
+    	} else {
+    		listener.goTo(new AdminPlace(""));
+    	}
 	    // Fire an history event corresponding to the tab selected
 //	    switch (event.getSelectedItem()) {
 //	    case 0:
@@ -123,8 +142,22 @@ public class AdminViewImpl extends Composite implements AdminView, SelectionHand
 	}
 
 	@Override
-	public EditPlayer getEditPlayer() {
-		return epv;
+	public TaskView<IAdminTask> getTaskView() {
+		return taskv;
+	}
+
+	@Override
+	public void setClientFactory(ClientFactory clientFactoryImpl) {
+		this.clientFactory = clientFactoryImpl;
+		
+	}
+
+	public Presenter getListener() {
+		return listener;
+	}
+
+	public void setListener(Presenter listener) {
+		this.listener = listener;
 	}
 
 

@@ -3,6 +3,7 @@ package net.rugby.foundation.core.server;
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
 import net.rugby.foundation.game1.server.Game1ServiceImpl;
 
+import com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet;
 import com.google.inject.servlet.ServletModule;
 
 public class BPMServletModule extends ServletModule {
@@ -18,7 +19,7 @@ public class BPMServletModule extends ServletModule {
 		serve("/login/*").with(LoginServlet.class);
 		serve("/util/facebook/channel.html").with(FacebookChannelServlet.class);
 		serve("/_ah/start").with(BackEndStartupServlet.class);
+//		serve("/_ah/pipeline/*").with(PipelineServlet.class); // not @Singleton
 	}
-
 }
 

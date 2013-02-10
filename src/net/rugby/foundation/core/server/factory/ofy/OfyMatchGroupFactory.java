@@ -36,14 +36,14 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	 */
 	private static final long serialVersionUID = 5536925770981961238L;
 	private Long id;
-	private final Objectify ofy;
+	
 	private ITeamGroupFactory tf;
 	private IMatchResultFactory mrf;
 	private IRoundFactory rf;
 	
 	@Inject
 	OfyMatchGroupFactory(IMatchResultFactory mrf, ITeamGroupFactory tf, IRoundFactory rf) {
-		this.ofy = DataStoreFactory.getOfy();
+
 		this.tf = tf;
 		this.mrf = mrf;
 		this.rf = rf;
@@ -52,6 +52,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	@Override
 	public IMatchGroup getGame() {
 		try {
+			Objectify ofy = DataStoreFactory.getOfy();
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			IMatchGroup m = null;
@@ -98,6 +99,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	protected IMatchGroup getFromDB() {
 		MatchGroup g = null;
 		if (id != null) {
+			Objectify ofy = DataStoreFactory.getOfy();
 			g = ofy.get(new Key<MatchGroup>(MatchGroup.class,id));
 			tf.setId(g.getHomeTeamId());
 			g.setHomeTeam(tf.getTeam());
@@ -144,7 +146,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 			
 			((MatchGroup)g).setHomeTeamId(g.getHomeTeam().getId());
 			((MatchGroup)g).setVisitingTeamId(g.getVisitingTeam().getId());
-			
+			Objectify ofy = DataStoreFactory.getOfy();
 			ofy.put(g);
 			
 			// now update the memcache version
@@ -176,6 +178,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	 */
 	@Override
 	public IMatchGroup find(IMatchGroup match) {
+		Objectify ofy = DataStoreFactory.getOfy();
 		// @REX should we just check the match - don't we need to also cross-check against comp as well?
 		Query<Group> qg = ofy.query(Group.class).filter("displayName",match.getDisplayName()).filter("date", match.getDate());
 		
@@ -198,6 +201,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 
 	@Override
 	public List<IMatchGroup> getMatchesForRound(Long roundId) {
+		Objectify ofy = DataStoreFactory.getOfy();
 		Round r = ofy.get(new Key<Round>(Round.class,roundId));
 		if (r != null) {
 			return r.getMatches();

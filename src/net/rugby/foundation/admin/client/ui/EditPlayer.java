@@ -3,7 +3,7 @@
  */
 package net.rugby.foundation.admin.client.ui;
 
-import net.rugby.foundation.admin.client.place.EmailHandlerPlace;
+import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.model.shared.IPlayer;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -77,8 +77,8 @@ public class EditPlayer extends Composite {
 		}
 	}
 	
-	public void ShowPlace(EmailHandlerPlace place) {
-		displayName.setText(place.getName());
+	public void ShowPlace(AdminTaskPlace place) {
+		//displayName.setText(place.getName());
 	}
 
 	public void SetPresenter(Presenter p) {

@@ -25,13 +25,11 @@ public class OfyConfigurationFactory implements IConfigurationFactory, Serializa
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final Objectify ofy;
 	private ICompetitionFactory cf;
 
 	
 	@Inject
 	OfyConfigurationFactory(ICompetitionFactory cf) {
-		this.ofy = DataStoreFactory.getOfy();
 		
 		this.cf = cf;
 	}
@@ -41,7 +39,7 @@ public class OfyConfigurationFactory implements IConfigurationFactory, Serializa
 	 */
 	@Override
 	public ICoreConfiguration get() {
-		
+		Objectify ofy = DataStoreFactory.getOfy();
 		// there should just be one...
 		ICoreConfiguration c = ofy.query(CoreConfiguration.class).get();
 		
@@ -69,6 +67,7 @@ public class OfyConfigurationFactory implements IConfigurationFactory, Serializa
 			// set it to the first one
 			conf.setDefaultCompId(conf.getCompsUnderway().get(0));
 		}
+		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.put(conf);
 		return conf;
 	}

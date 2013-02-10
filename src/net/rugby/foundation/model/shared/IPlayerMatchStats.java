@@ -105,6 +105,8 @@ public interface IPlayerMatchStats {
 	
 	public abstract List<IPlayerMatchStatTimeLog> getTimeLogs();
 	
+	public abstract void  setTimeLogs(List<IPlayerMatchStatTimeLog> logs);
+	
 	public abstract void setName(String string);
 	
 	public abstract String getName();

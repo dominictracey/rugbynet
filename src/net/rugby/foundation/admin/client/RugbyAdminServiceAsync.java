@@ -5,16 +5,19 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.Position.position;
 
 
 public interface RugbyAdminServiceAsync {
@@ -67,7 +70,8 @@ public interface RugbyAdminServiceAsync {
 	public void getTeam(Long teamId, AsyncCallback<ITeamGroup> asyncCallback);
 	
 	public void getPlayer(Long id,  AsyncCallback<IPlayer> asyncCallback);
-	public void savePlayer(IPlayer player, String promisedHandle,  AsyncCallback<IPlayer> asyncCallback);
+	public void savePlayer(IPlayer player, IAdminTask task, AsyncCallback<IPlayer> asyncCallback);
+	//public void savePlayerMatchStats(IPlayerMatchStats stats, IAdminTask task, AsyncCallback<IPlayerMatchStats> asyncCallback);
 
 	/**
 	 * @param asyncCallback
@@ -102,4 +106,15 @@ public interface RugbyAdminServiceAsync {
 	public void testMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchStats>> asyncCallback);
 	
 	public void getPlayerMatchInfo(Long matchId, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+	public void fetchCountryList(AsyncCallback<List<ICountry>> asyncCallback);
+	public void fetchPositionList(AsyncCallback<List<position>> asyncCallback);
+	public void fetchMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+	
+	public void getAllOpenAdminTasks(AsyncCallback<List<IAdminTask>> asyncCallback);
+	public void deleteTasks(List<IAdminTask> selectedItems,
+			AsyncCallback<List<IAdminTask>> asyncCallback);
+	public void getTask(Long id, AsyncCallback<IAdminTask> asyncCallback);
+	public void getPlayerMatchStats(Long id, AsyncCallback<IPlayerMatchStats> asyncCallback);
+	public void savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target,
+			AsyncCallback<IPlayerMatchInfo> asyncCallback);
 }

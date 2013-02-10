@@ -26,7 +26,7 @@ import com.google.inject.Singleton;
 public class Game1MainModule extends AbstractModule {
 	@Override
 	 protected void configure() {
-		bind(Game1ServiceImpl.class);
+//		bind(Game1ServiceImpl.class);
 		bind(IEntryFactory.class).to(OfyEntryFactory.class);
 		bind(IRoundEntryFactory.class).to(OfyRoundEntryFactory.class).in(Singleton.class);
 		bind(IMatchEntryFactory.class).to(OfyMatchEntryFactory.class).in(Singleton.class);

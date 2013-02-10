@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
+
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
@@ -39,6 +41,14 @@ public class OfyTeamMatchStatsFactory implements ITeamMatchStatsFactory, Seriali
 	@Override
 	public ITeamMatchStats put(ITeamMatchStats tms) {
 		Objectify ofy = DataStoreFactory.getOfy();
+		
+		// first delete any existing entries for this team in this match
+		ScrumTeamMatchStats existing = ofy.query(ScrumTeamMatchStats.class).filter("teamId", tms.getTeamId()).filter("matchId", tms.getMatchId()).get();
+
+		if (existing != null) {
+			ofy.delete(existing);
+		}
+		
 		ofy.put(tms);
 		return tms;
 	}

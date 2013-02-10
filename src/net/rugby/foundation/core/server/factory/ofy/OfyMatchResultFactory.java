@@ -18,11 +18,9 @@ public class OfyMatchResultFactory implements IMatchResultFactory, Serializable 
 	 */
 	private static final long serialVersionUID = -63026632234487370L;
 	private Long id;
-	private final Objectify ofy;
 	
-	@Inject
+	//@Inject
 	OfyMatchResultFactory() {
-		this.ofy = DataStoreFactory.getOfy();
 	}
 		@Override
 	public void setId(Long id) {
@@ -34,9 +32,10 @@ public class OfyMatchResultFactory implements IMatchResultFactory, Serializable 
 	 */
 	@Override
 	public IMatchResult get() {
-		if (id != null)
+		if (id != null) {
+			Objectify ofy = DataStoreFactory.getOfy();
 			return ofy.get(new Key<SimpleScoreMatchResult>(SimpleScoreMatchResult.class,id));
-		else
+		} else
 			return null;
 	}
 	/* (non-Javadoc)
@@ -44,8 +43,9 @@ public class OfyMatchResultFactory implements IMatchResultFactory, Serializable 
 	 */
 	@Override
 	public IMatchResult put(IMatchResult g) {
+		Objectify ofy = DataStoreFactory.getOfy();
 
-		// don't need instanceof here?
+		// TODO don't need instanceof here?
 		ofy.put((MatchResult)g);
 		
 		return g;

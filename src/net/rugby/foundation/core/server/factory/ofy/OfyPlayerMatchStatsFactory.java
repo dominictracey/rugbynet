@@ -1,18 +1,20 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
-import net.rugby.foundation.admin.shared.PlayerMatchInfo;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.PlayerMatchInfo;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
+import net.rugby.foundation.model.shared.ScrumTeamMatchStats;
 
 public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Serializable {
 	/**
@@ -44,6 +46,14 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 	@Override
 	public IPlayerMatchStats put(IPlayerMatchStats tms) {
 		Objectify ofy = DataStoreFactory.getOfy();
+		
+		// only one per player per match
+		ScrumPlayerMatchStats existing = ofy.query(ScrumPlayerMatchStats.class).filter("playerId", tms.getPlayerId()).filter("matchId", tms.getMatchId()).get();
+
+		if (existing != null) {
+			ofy.delete(existing);
+		}
+		
 		ofy.put(tms);
 		return tms;
 	}
@@ -56,11 +66,18 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 	}
 
 	@Override
-	public List<? extends IPlayerMatchStats> getByMatchId(Long matchId) {
+	public List<IPlayerMatchStats> getByMatchId(Long matchId) {
 		Objectify ofy = DataStoreFactory.getOfy();
 		
-		Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId",matchId).order("slot");
+		Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId",matchId).order("teamId").order("slot");
 		
-		return qpms.list();
+		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
+		
+		for (ScrumPlayerMatchStats spms : qpms) {
+			list.add(spms);
+		}
+		
+		return list;
+		//return qpms.list();  // wish we could do this
 	}
 }

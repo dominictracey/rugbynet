@@ -74,19 +74,24 @@ public class Game1ServiceImpl extends RemoteServiceServlet implements Game1Servi
 	private IConfigurationFactory configf;
 	private IMatchStatsFactory msf;
 	private IMatchEntryFactory mef;
+	
+	private static boolean dbRegistrationsComplete = false;
 
 	public Game1ServiceImpl() {
 		//this.ofy = DataStoreFactory.getOfy();
 
-		ObjectifyService.register(Entry.class);
-		ObjectifyService.register(RoundEntry.class);
-		ObjectifyService.register(MatchEntry.class);
-		ObjectifyService.register(Leaderboard.class);
-		ObjectifyService.register(LeaderboardRow.class);
-		ObjectifyService.register(League.class);
-		ObjectifyService.register(ClubhouseLeagueMap.class);
-		ObjectifyService.register(Configuration.class);
-		ObjectifyService.register(MatchStats.class);
+		if (!dbRegistrationsComplete) {
+			ObjectifyService.register(Entry.class);
+			ObjectifyService.register(RoundEntry.class);
+			ObjectifyService.register(MatchEntry.class);
+			ObjectifyService.register(Leaderboard.class);
+			ObjectifyService.register(LeaderboardRow.class);
+			ObjectifyService.register(League.class);
+			ObjectifyService.register(ClubhouseLeagueMap.class);
+			ObjectifyService.register(Configuration.class);
+			ObjectifyService.register(MatchStats.class);
+			dbRegistrationsComplete = true;
+		}
 	}
 
 	@Inject

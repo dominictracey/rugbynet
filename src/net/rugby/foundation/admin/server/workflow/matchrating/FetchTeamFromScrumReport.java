@@ -2,6 +2,9 @@ package net.rugby.foundation.admin.server.workflow.matchrating;
 
 import java.util.Iterator;
 import java.util.List;
+
+import javax.persistence.Transient;
+
 import com.google.appengine.tools.pipeline.Job2;
 import com.google.appengine.tools.pipeline.Value;
 
@@ -16,6 +19,7 @@ public class FetchTeamFromScrumReport extends Job2<ITeamGroup, Home_or_Visitor, 
 	 * 
 	 */
 	private static final long serialVersionUID = 3101992931956737933L;
+	@Transient
 	private ITeamGroupFactory tf;
 
 	public FetchTeamFromScrumReport(ITeamGroupFactory tf) {

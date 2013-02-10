@@ -2,8 +2,9 @@ package net.rugby.foundation.admin.client.mvp;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.activity.AdminActivity;
+import net.rugby.foundation.admin.client.activity.TaskActivity;
 import net.rugby.foundation.admin.client.place.AdminPlace;
-import net.rugby.foundation.admin.client.place.EmailHandlerPlace;
+import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
@@ -29,8 +30,8 @@ public class AppActivityMapper implements ActivityMapper {
 	  
 		if (place instanceof AdminPlace)
 			return new AdminActivity((AdminPlace) place, clientFactory);
-		if (place instanceof EmailHandlerPlace)
-			return new AdminActivity((EmailHandlerPlace) place, clientFactory);
+		if (place instanceof AdminTaskPlace)
+			return new TaskActivity((AdminTaskPlace) place, clientFactory);
 
 		return null;
 	}

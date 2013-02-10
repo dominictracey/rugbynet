@@ -5,14 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.rugby.foundation.admin.shared.IPlayerMatchInfo;
-import net.rugby.foundation.admin.shared.PlayerMatchInfo;
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.PlayerMatchInfo;
 import net.rugby.foundation.model.shared.PlayerRowData;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 import com.google.gwt.core.client.GWT;
@@ -71,6 +75,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	PlayerListView<IPlayerMatchInfo> editMatchStats = null;
 	
 	private Step step;
+
+	private ClientFactory clientFactory;
 
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
@@ -152,7 +158,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiHandler("testMatchStats")
 	void ontestMatchStatsClick(ClickEvent e) {
 		
-		listener.testMatchStatsClicked(41114L);
+		listener.testMatchStatsClicked(12L);
 	}
 	
 	@Override
@@ -235,10 +241,13 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 							  editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
 							  editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
 
+							  jobArea.add(editMatchStats);
+							  editMatchStats.asWidget().setVisible(true);
+
 						}
-						jobArea.add(editMatchStats);
-						editMatchStats.asWidget().setVisible(true);
 						
+						editMatchStats.showWait();
+						  
 						// find roundId and compId
 						Long roundId = Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]);
 						Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]);
@@ -409,8 +418,12 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public void addRound(Long compId, Long roundId, List<IMatchGroup> result) {
 		int i = 0;
 		int j = 0;
+		String cid = "null";
+		if (compId != null) {
+			cid = compId.toString();
+		}
 		while (i < base.getChildCount()) {
-			if (base.getChild(i).getText().contains(compId.toString())) {
+			if (base.getChild(i).getText().contains(cid)) {
 				while (j < base.getChild(i).getChild(1).getChildCount()) {
 					String rid = "null";
 					if (roundId != null)
@@ -475,5 +488,16 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			++i;
 		}
 		
+	}
+
+	@Override
+	public void setClientFactory(ClientFactory clientFactory) {
+		this.clientFactory = clientFactory;
+		
+	}
+
+	@Override
+	public PlayerListView<IPlayerMatchInfo> getPlayerListView() {
+		return editMatchStats;
 	}
 }
