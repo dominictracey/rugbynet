@@ -3,7 +3,7 @@ package net.rugby.foundation.admin.client;
 import net.rugby.foundation.admin.client.mvp.AppActivityMapper;
 import net.rugby.foundation.admin.client.mvp.AppPlaceHistoryMapper;
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.place.AdminPlace;
+import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
@@ -18,7 +18,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 public class Admin implements EntryPoint {
   
 	private SimplePanel appWidget = new SimplePanel();
-	private Place defaultPlace = new AdminPlace("1");
+	private Place defaultPlace = new AdminCompPlace("1");
 	
 	public void onModuleLoad() {
 		

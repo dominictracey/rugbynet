@@ -6,10 +6,13 @@ import java.util.List;
 
 import javax.persistence.Transient;
 
+import com.googlecode.objectify.annotation.Subclass;
+
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 
+@Subclass
 public class EditPlayerMatchStatsAdminTask extends AdminTask implements Serializable {
 
 	/**

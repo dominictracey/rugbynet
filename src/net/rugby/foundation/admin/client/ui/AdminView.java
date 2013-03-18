@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface AdminView extends IsWidget {
   
-	void selectTab(int index);
+	void selectTab(int index, boolean fireEvents);
 	
 	void setPresenter(Presenter listener);
 

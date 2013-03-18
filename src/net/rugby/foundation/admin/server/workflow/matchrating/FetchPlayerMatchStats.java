@@ -34,7 +34,7 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 	private transient String url;
 	private transient IPlayerMatchStats stats;
 	private transient int time = 0;
-	
+
 	private static Injector injector = null;
 
 	public FetchPlayerMatchStats() {
@@ -75,11 +75,11 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 			else
 				stats.setTeamId(match.getVisitingTeamId());	
 		}
-		
+
 		if (player != null) {
 			stats.setPlayerId(player.getId());  // native ID, not scrum's
 		}
-		
+
 		stats.setSlot(slot);
 
 		if (player == null || match == null || player.getDisplayName() == null) {
@@ -89,7 +89,7 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 			atf.put(task);
 			return x;
 		}
-		
+
 		Boolean found = false;
 		UrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
@@ -131,51 +131,77 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 				skipPlayer(it); // header row
 
 				// starters will always be in their slot
-				if (slot < 16) { 
-					for (int i=0; i<slot; ++i) {
-						skipPlayer(it); // 17 lines
-					}
-					// get the goods
-					stats = getPlayerStats(it, stats);
-				} else {
-					// subs may be anywhere (or nowhere) in here since if they didn't run on they don't get a row here.
-					boolean foundSub = false;
+				//if (slot < 15) { 
+				//					for (int i=0; i<slot; ++i) {
+				//						stats = getPlayerStats(it, stats);
+				//						if (stats.getName().equals(player.getShortName()) || stats.getName().equals(player.getSurName())) {
+				//							found = true; //somehow they ended up in an earlier slot?!?
+				//						}
+				//					}
+				//
+				//					if (!found) {
+				//						// they should be here
+				//						stats = getPlayerStats(it, stats);
+				//					}
 
-					//skip over starters
-					for (int i=0; i<16; ++i) {
-						skipPlayer(it); // 17 lines
-					}
-
-					while (!foundSub && stats != null) {
-						stats = getPlayerStats(it, stats);
-						// match short name
-						if (stats != null && stats.getName().equals(player.getShortName())) {
-							foundSub = true;
+				// there is a weird case (http://www.espnscrum.com/scrum/rugby/current/match/166469.html?view=scorecard) 
+				// where the starter just doesn't show up in the stats. See [12	C Hudson Tonga'uiha].
+				// this not only hoses up that player, but everyone after him.
+				stats = getPlayerStats(it, stats);
+				if (!player.getSurName().equals(stats.getName()) && !player.getShortName().equals(stats.getName())) {
+					// keep looking
+					boolean stillLooking = true;
+					while(stats != null && stillLooking) {
+						stats = getPlayerStats(it,stats);
+						if (stats != null && (player.getSurName().equals(stats.getName()) || player.getShortName().equals(stats.getName()))) {
+							stillLooking = false;
+							break;
 						}
+					}
 
-						// look for their last name						
-						if (stats != null && stats.getName().equals(player.getSurName())) { 
-							foundSub = true;
+					// if we didn't find it, assume they didn't get a run on and create an AdminTask if they were a starter
+					if (stillLooking) {
+						stats = noRunOn();
+						if (slot > 14) {
+							return immediate(stats);
+						} else {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match data row for " + player.getDisplayName());
+							PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+							IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Couldn't get sufficient info for player " + player.getDisplayName() + " in slot " + slot + " from the match report at " + url, "No line in match stats - created empty stats record for your review", player, match, hov, slot, stats, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
+							atf.put(task);
+							return x;
 						}
 					}
-
-					// They were a sub who did not get to run on.
-					if (foundSub == false && stats == null) {
-						stats = pmsf.getById(null);
-						stats.setMatchId(match.getId()); // native ID, not scrum's
-						stats.setPlayerId(player.getId());  // native ID, not scrum's
-						if (hov == Home_or_Visitor.HOME) 
-							stats.setTeamId(match.getHomeTeamId());
-						else
-							stats.setTeamId(match.getVisitingTeamId());		
-						stats.setName(player.getSurName());
-						stats.setTimePlayed(0);
-						pmsf.put(stats);
-						return immediate(stats);
-					}
-
 
 				}
+				//}
+				//				} else {
+				//					// subs may be anywhere (or nowhere) in here since if they didn't run on they don't get a row here.
+				//					boolean foundSub = false;
+				//
+				//					//skip over starters - but check them
+				//					for (int i=0; i<16; ++i) {
+				//						stats = getPlayerStats(it, stats);
+				//						if (stats.getName().equals(player.getShortName()) || stats.getName().equals(player.getSurName())) {
+				//							foundSub = true; //somehow they ended up starting?!?
+				//						}
+				//					}
+				//
+				//					while (!foundSub && stats != null) {
+				//						stats = getPlayerStats(it, stats);
+				//						// match short name or last name
+				//						if (stats != null && (stats.getName().equals(player.getShortName()) || stats.getName().equals(player.getSurName()))) {
+				//							foundSub = true;
+				//						}
+				//					}
+				//
+				//					// They were a sub who did not get to run on.
+				//					if (foundSub == false && stats == null) {
+				//						stats = noRunOn();
+				//						return immediate(stats);
+				//					}
+				//
+				//				}
 
 				if (slot < 15) {  // starters
 					try {
@@ -229,10 +255,25 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 			pmsf.put(stats);
 			return immediate(stats);
 		} else {
-			
+
 			return null;
 		}
-			
+
+	}
+
+	private IPlayerMatchStats noRunOn() {
+		stats = pmsf.getById(null);
+		stats.setMatchId(match.getId()); // native ID, not scrum's
+		stats.setPlayerId(player.getId());  // native ID, not scrum's
+		stats.setSlot(slot);
+		if (hov == Home_or_Visitor.HOME) 
+			stats.setTeamId(match.getHomeTeamId());
+		else
+			stats.setTeamId(match.getVisitingTeamId());		
+		stats.setName(player.getSurName());
+		stats.setTimePlayed(0);
+		pmsf.put(stats);
+		return stats;
 	}
 
 	private IPlayerMatchStats getPlayerStats(Iterator<String> it, IPlayerMatchStats stats) {
@@ -361,9 +402,6 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 									pms.playerOff(time);
 								}
 							}
-							while (!line.contains("</tr>")) {
-								line = getNext(it);
-							}
 						}
 					}
 				}
@@ -375,6 +413,9 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 
 			}
 
+			while (!line.contains("</tr>")) {
+				line = getNext(it);
+			}
 
 			return false;
 		} else {

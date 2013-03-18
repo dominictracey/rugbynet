@@ -1,9 +1,13 @@
 package net.rugby.foundation.admin.client;
 
 import java.util.List;
-import net.rugby.foundation.admin.client.ui.AdminView;
+import net.rugby.foundation.admin.client.ui.CompetitionView;
+import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
+import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
+import net.rugby.foundation.admin.client.ui.task.TaskView;
+import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -12,6 +16,7 @@ import net.rugby.foundation.model.shared.Position.position;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * ClientFactory helpful to use a factory or dependency injection framework like GIN to obtain 
@@ -35,7 +40,6 @@ public interface ClientFactory {
 	EventBus getEventBus();
 
 	PlaceController getPlaceController();
-	public AdminView getAdminView();
 	RugbyAdminServiceAsync getRpcService();
 
 	PlayerPopupView<IPlayer> getPlayerPopupView();
@@ -44,4 +48,12 @@ public interface ClientFactory {
 	void getMatchGroupAsync(Long id, GetMatchGroupCallback cb);
 	
 	PlayerMatchStatsPopupView<IPlayerMatchStats> getPlayerMatchStatsPopupView();
+
+	CompetitionView getCompView();
+
+	OrchestrationConfigurationView getOrchestrationConfigurationView();
+
+	TaskView<IAdminTask> getTaskView();
+
+	SmartBar getMenuBar();
 }

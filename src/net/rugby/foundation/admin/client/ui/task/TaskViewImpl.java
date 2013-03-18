@@ -6,7 +6,9 @@ package net.rugby.foundation.admin.client.ui.task;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
+import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,6 +21,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -36,7 +39,7 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 			.create(TaskViewImplUiBinder.class);
 
 	@UiField FlexTable taskTable;
-
+	@UiField SimplePanel menuBarPanel;
 
 
 	private TaskViewColumnDefinitions<T> columnDefinitions;
@@ -44,6 +47,10 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 	private TaskViewPresenter<T> listener;
 
 	private ArrayList<String> headers;
+
+	private ClientFactory clientFactory;
+
+	private SmartBar smartBar;
 	
 	public TaskViewImpl()
 	{
@@ -174,8 +181,20 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 	@Override
 	public void setPresenter(TaskViewPresenter<T> p) {
 		listener = p;
+		if (listener instanceof SmartBar.Presenter) {
+			if (!menuBarPanel.getElement().hasChildNodes()) {
+				smartBar = clientFactory.getMenuBar();
+				menuBarPanel.add(smartBar);
+			}
+			smartBar.setPresenter((SmartBar.Presenter)listener);		
+		}
 	}
 
+	@Override
+	public TaskViewPresenter<T> getPresenter() {
+		return listener;
+	}
+	
 	@Override
 	public void showError(T task, int index, String message) {
 		Window.alert(message);
@@ -186,8 +205,13 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 	public void updateTaskRow(int i, T task) {
 		for (int j = 0; j < columnDefinitions.getColumnDefinitions().size(); ++j) {
 			ColumnDefinition<T> columnDefinition = columnDefinitions.getColumnDefinitions().get(j);
-			taskTable.setWidget(i, j, columnDefinition.render(task));
+			taskTable.setWidget(i+1, j, columnDefinition.render(task));
 		}		
+	}
+
+	@Override
+	public void setClientFactory(ClientFactory clientFactory) {
+		this.clientFactory = clientFactory;
 	}
 
 }

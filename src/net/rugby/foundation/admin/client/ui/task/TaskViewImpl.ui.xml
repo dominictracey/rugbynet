@@ -15,7 +15,10 @@
      		margin: 5px 0px 5px 0px;
     	}
     </ui:style>
-
+	<g:VerticalPanel>
+	    
+	 <g:SimplePanel ui:field='menuBarPanel'></g:SimplePanel>
+    
     <g:HTMLPanel>
 
         <g:FlexTable
@@ -23,5 +26,5 @@
             width="100%"
             ui:field="taskTable" />
     </g:HTMLPanel>
-
+</g:VerticalPanel>
 </ui:UiBinder>

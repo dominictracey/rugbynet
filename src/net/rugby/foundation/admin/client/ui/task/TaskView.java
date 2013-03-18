@@ -37,4 +37,8 @@ public interface TaskView<T extends IAdminTask> extends IsWidget {
 
 	public abstract void updateTaskRow(int index, T task);
 
+	TaskViewPresenter<T> getPresenter();
+
+	public abstract void setClientFactory(ClientFactory clientFactory);
+
 }

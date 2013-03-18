@@ -12,8 +12,10 @@ import com.google.gwt.user.client.ui.DialogBox;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
+import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
+import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.task.TaskView.TaskViewPresenter;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
@@ -23,27 +25,28 @@ import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 
 public class TaskActivity extends AbstractActivity implements  
-AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>,
+AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminTask> { 
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
 	 */
 	private ClientFactory clientFactory;
-	AdminView view = null;
 	private AdminTaskPlace adminTaskPlace;
 	SelectionModel<IAdminTask> selectionModel;
 	int index; // the task line item number
 	private IAdminTask target;
+	private TaskView<IAdminTask> view;
+	
 	public TaskActivity(AdminTaskPlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IAdminTask>();
 
 		this.clientFactory = clientFactory;
-		view = clientFactory.getAdminView();
+		view = clientFactory.getTaskView();
 		clientFactory.getPlayerPopupView().setPresenter(this);
 		// Select the tab corresponding to the token value
 		if (place.getToken() != null) {
-			view.selectTab(2);
+//			view.selectTab(2, false);
 
 			adminTaskPlace = place;
 		}
@@ -55,7 +58,6 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 		view.setPresenter(this);
 		clientFactory.getPlayerPopupView().setPresenter(this);
 		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
-
 		panel.setWidget(view.asWidget());
 
 		if (adminTaskPlace != null) {
@@ -68,7 +70,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 
 					@Override
 					public void onSuccess(List<IAdminTask> result) {
-						view.getTaskView().showList(result);
+						view.showList(result);
 
 						IAdminTask target = null;
 						index = 0;
@@ -90,7 +92,6 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 				});
 			}
 		}
-
 	}
 
 
@@ -111,7 +112,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 
 			@Override
 			public void onSuccess(List<IAdminTask> result) {
-				view.getTaskView().showList(result);
+				view.showList(result);
 			}
 		});
 	}
@@ -145,11 +146,11 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 				@Override
 				public void onSuccess(IPlayerMatchStats result) {
 					clientFactory.getPlayerMatchStatsPopupView().setTarget(result);
-					((DialogBox)clientFactory.getPlayerPopupView()).center();
+					((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).center();
 				}
 			});
 		} else if (target.getAction().equals(IAdminTask.Action.EDITTEAMMATCHSTATS)) {
-//							view.getTaskView().editPlayerMatchStats(result, index);
+//							view.editPlayerMatchStats(result, index);
 		}
 	}
 
@@ -214,7 +215,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 			
 			@Override
 			public void onSuccess(IAdminTask result) {
-				view.getTaskView().updateTaskRow(index, result);
+				view.updateTaskRow(index, result);
 			}
 		});
 	}
@@ -240,6 +241,12 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 	@Override
 	public void onCancelEditPlayerMatchStatsClicked() {
 		((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).hide();
+	}
+
+	@Override
+	public void compPicked(Long id) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

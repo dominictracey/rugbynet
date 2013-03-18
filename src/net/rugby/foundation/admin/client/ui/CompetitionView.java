@@ -115,6 +115,7 @@ public interface CompetitionView extends IsWidget {
 	void addRound(Long compId, Long roundId, List<IMatchGroup> result);
 	void setClientFactory(ClientFactory clientFactory);
 	PlayerListView<IPlayerMatchInfo> getPlayerListView();
+	boolean isAllSetup();
 
 
 }

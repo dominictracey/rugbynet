@@ -10,11 +10,11 @@ import com.google.gwt.place.shared.Prefix;
  * {@link PlaceHistoryHandler} automatically updates the browser URL corresponding to each 
  * {@link Place} in your app.
  */
-public class AdminPlace extends Place {
+public class AdminCompPlace extends Place {
   
 	private String token;
 
-	public AdminPlace(String token) {
+	public AdminCompPlace(String token) {
 		this.token = token;
 	}
 
@@ -25,17 +25,17 @@ public class AdminPlace extends Place {
 	/**
 	 * PlaceTokenizer knows how to serialize the Place's state to a URL token.
 	 */
-	@Prefix(value="admin")
-	public static class Tokenizer implements PlaceTokenizer<AdminPlace> {
+	@Prefix(value="AdminCompPlace")
+	public static class Tokenizer implements PlaceTokenizer<AdminCompPlace> {
 
 		@Override
-		public String getToken(AdminPlace place) {
+		public String getToken(AdminCompPlace place) {
 			return place.getToken();
 		}
 
 		@Override
-		public AdminPlace getPlace(String token) {
-			return new AdminPlace(token);
+		public AdminCompPlace getPlace(String token) {
+			return new AdminCompPlace(token);
 		}
 
 	}

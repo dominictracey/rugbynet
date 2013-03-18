@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<ui:style>
+		.panel {
+			background-color: ivory;
+		}
+	</ui:style>
+
+	<g:MenuBar ui:field="smartBar">
+		<g:MenuItem ui:field="compMenuItem">
+			Comp
+			<g:MenuBar ui:field="compBar" vertical="true">
+			    <g:MenuItem ui:field="compMenuAll">All</g:MenuItem>
+			    <g:MenuItem ui:field="compMenuNew">Import</g:MenuItem>
+			    <g:MenuItem ui:field="compMenuTestFetchMatchStats">Test Fetch Match Stats</g:MenuItem>		    			    
+			</g:MenuBar>
+		</g:MenuItem>
+		<g:MenuItem ui:field="orchMenuItem">
+			Workflow
+			<g:MenuBar ui:field="orchBar" vertical="true">
+			    <g:MenuItem ui:field="orchMenuShow">Show</g:MenuItem>
+			</g:MenuBar>
+		</g:MenuItem>
+		<g:MenuItem ui:field="taskMenuItem">
+			Task
+			<g:MenuBar ui:field="taskBar" vertical="true">
+			    <g:MenuItem ui:field="taskMenuShow">Show</g:MenuItem>
+			</g:MenuBar>
+		</g:MenuItem>
+		<g:MenuItem ui:field="adminMenuItem">
+			Admin
+			<g:MenuBar ui:field="adminBar" vertical="true">
+			    <g:MenuItem ui:field="adminMenuCreateAdmin">Create Admin</g:MenuItem>
+			    <g:MenuItem ui:field="adminMenuSanityCheck">Sanity Check</g:MenuItem>
+			</g:MenuBar>
+		</g:MenuItem>
+		
+	</g:MenuBar>
+</ui:UiBinder>

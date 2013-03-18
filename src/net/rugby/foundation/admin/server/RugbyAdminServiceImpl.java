@@ -1,6 +1,7 @@
 package net.rugby.foundation.admin.server;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -723,6 +724,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					e.printStackTrace();
 				}
 			}
+
+			atf.complete(task);
 		}
 		return player;
 	}
@@ -899,7 +902,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats stats, IAdminTask task) {
 		pmsf.put(stats);
 		if (task != null) {
-			atf.put(task);
+			if (task.getPromise() != null) {
+				PipelineService service = PipelineServiceFactory.newPipelineService();
+				try {
+					service.submitPromisedValue(task.getPromise(), stats);
+				} catch (NoSuchObjectException e) {
+					e.printStackTrace();
+				} catch (OrphanedObjectException e) {
+					e.printStackTrace();
+				}
+			}
+			atf.complete(task);
 		}
 		return pmif.getForPlayerMatchStats(stats.getId());
 	}

@@ -5,21 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.place.AdminPlace;
+import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditComp;
-import net.rugby.foundation.admin.client.ui.EditComp.Presenter;
 import net.rugby.foundation.admin.client.ui.EditMatch;
-import net.rugby.foundation.admin.client.ui.FieldDefinition;
-import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.EditTeam;
+import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
-import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
-import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -35,26 +30,22 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Activities are started and stopped by an ActivityManager associated with a container Widget.
  */
-public class AdminActivity extends AbstractActivity implements  
-AdminView.Presenter, CompetitionView.Presenter, /*WorkflowConfigurationView.Presenter,*/ 
-OrchestrationConfigurationView.Presenter, EditTeam.Presenter, Presenter, 
-net.rugby.foundation.admin.client.ui.EditMatch.Presenter,
-PlayerListView.Listener<IPlayerMatchInfo>, PlayerPopupView.Presenter<IPlayer>,
-PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
+public class CompActivity extends AbstractActivity implements  
+CompetitionView.Presenter, EditTeam.Presenter, EditComp.Presenter, 
+EditMatch.Presenter, PlayerListView.Listener<IPlayerMatchInfo>, PlayerPopupView.Presenter<IPlayer>,
+PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
 	 */
 	private ClientFactory clientFactory;
-	AdminView view = null;
+	CompetitionView view = null;
 	private String url;
 	private SelectionModel<IPlayerMatchInfo> selectionModel;
-	private  Map<String, IOrchestrationConfiguration> orchConfig = null;
 	private EditTeam et = null;  //@REX stupid
 	private EditComp ec = null;  //@REX stupid
 
@@ -70,25 +61,10 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 	protected List<IRound> rounds = new ArrayList<IRound>();
 	private PlayerListView<IPlayerMatchInfo> plv;
 
-	public AdminActivity(AdminPlace place, ClientFactory clientFactory) {
-		//this.name = place.getName();
+	public CompActivity(AdminCompPlace place, ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
-		view = clientFactory.getAdminView();
+		view = clientFactory.getCompView();
 		selectionModel = new SelectionModel<IPlayerMatchInfo>();
-		
-		// Select the tab corresponding to the token value
-		if (place.getToken() != null) {
-			// By default the first tab is selected
-			if (place.getToken().equals("") || place.getToken().equals("1")) {
-				view.selectTab(0);
-			} else if (place.getToken().equals("2")) {
-				view.selectTab(1);
-				//showTab = 1;
-			} else if (place.getToken().equals("3")) {
-				view.selectTab(2);
-				//showTab = 2;
-			}
-		}
 
 	}
 
@@ -102,56 +78,51 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 		containerWidget.setWidget(view.asWidget());
 
+		if (!view.isAllSetup()) {
+			clientFactory.getRpcService().getAllComps(new AsyncCallback<List<ICompetition>>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
 
 
-		clientFactory.getRpcService().getAllComps(new AsyncCallback<List<ICompetition>>() {
+				}
 
-
-
-			@Override
-			public void onFailure(Throwable caught) {
-
-
-			}
-
-			@Override
-			public void onSuccess(List<ICompetition> result) {
-				comps = result;
-				view.getCompView().addComps(result);
-
-				//		} else if (showTab == 3) {  // workflow conf
-				clientFactory.getRpcService().getWorkflowConfiguration(new AsyncCallback<IWorkflowConfiguration>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-
-
-					}
-
-					@Override
-					public void onSuccess(final IWorkflowConfiguration workflowConfig) {
-
-						//view.getWorkflowConfig().setCompetitions(comps, workflowConfig);
-
-
-						// nest this to solve the asynchronous problem of creating two wfcs.
-						clientFactory.getRpcService().getOrchestrationConfiguration(new AsyncCallback<Map<String, IOrchestrationConfiguration>>() {
-							@Override
-							public void onFailure(Throwable caught) {
-
-								view.getOrchestrationConfig().showStatus(caught.getMessage());
-							}
-
-							@Override
-							public void onSuccess(Map<String, IOrchestrationConfiguration> result) {					
-								view.getOrchestrationConfig().setOrchConfigs(result);	
-							}
-						});
-					}
-				});	
-			}
-		});		
-
+				@Override
+				public void onSuccess(List<ICompetition> result) {
+					comps = result;
+					view.addComps(result);
+//					clientFactory.getRpcService().getWorkflowConfiguration(new AsyncCallback<IWorkflowConfiguration>() {
+//
+//						@Override
+//						public void onFailure(Throwable caught) {
+//
+//
+//						}
+//
+//						@Override
+//						public void onSuccess(final IWorkflowConfiguration workflowConfig) {
+//
+//							//view.getWorkflowConfig().setCompetitions(comps, workflowConfig);
+//
+//
+//							// nest this to solve the asynchronous problem of creating two wfcs.
+//							clientFactory.getRpcService().getOrchestrationConfiguration(new AsyncCallback<Map<String, IOrchestrationConfiguration>>() {
+//								@Override
+//								public void onFailure(Throwable caught) {
+//
+//									view.getOrchestrationConfig().showStatus(caught.getMessage());
+//								}
+//
+//								@Override
+//								public void onSuccess(Map<String, IOrchestrationConfiguration> result) {					
+//									view.getOrchestrationConfig().setOrchConfigs(result);	
+//								}
+//							});
+//						}
+//					});	
+				}
+			});		
+		}
 
 	}
 
@@ -181,7 +152,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onSuccess(ICompetition result) {
-				view.getCompView().showCompetition(result);
+				view.showCompetition(result);
 
 			}
 		});
@@ -196,12 +167,12 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getCompView().showStatus(caught.getMessage());
+				view.showStatus(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(ICompetition result) {
-				view.getCompView().showCompetition(result);
+				view.showCompetition(result);
 
 			}
 		});			
@@ -220,7 +191,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 	//
 	//			@Override
 	//			public void onSuccess(Map<String, IMatchGroup> result) {
-	//				view.getCompView().showRound(result);
+	//				view.showRound(result);
 	//				
 	//			}
 	//		});	
@@ -234,7 +205,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getCompView().showStatus(caught.getMessage());
+				view.showStatus(caught.getMessage());
 
 			}
 
@@ -243,7 +214,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 				for (ITeamGroup t: result.values()) {
 					teams.add(t);
 				}
-				view.getCompView().showTeams(result);
+				view.showTeams(result);
 
 			}
 		});		
@@ -255,12 +226,12 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getCompView().showStatus(caught.getMessage());
+				view.showStatus(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(Map<String, IMatchGroup> result) {
-				view.getCompView().showMatches(result);
+				view.showMatches(result);
 
 			}
 		});		
@@ -272,13 +243,13 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getCompView().showStatus(caught.getMessage());
+				view.showStatus(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(List<IRound> result) {
 				rounds = result;
-				view.getCompView().showRounds(result);
+				view.showRounds(result);
 
 			}
 		});	
@@ -290,12 +261,12 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getCompView().showStatus(caught.getMessage());
+				view.showStatus(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(Map<String, IMatchGroup> result) {
-				view.getCompView().showMatches(result);
+				view.showMatches(result);
 
 			}
 		});		
@@ -308,12 +279,12 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getCompView().showStatus(caught.getMessage());
+				view.showStatus(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(List<IRound> result) {
-				view.getCompView().showRounds(result);
+				view.showRounds(result);
 
 			}
 		});		
@@ -323,18 +294,18 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 	@Override
 	public void saveTeamsClicked(Map<String, ITeamGroup> teamMap) {
 
-		//view.getCompView().showTeams(teamMap);
+		//view.showTeams(teamMap);
 
 		clientFactory.getRpcService().saveTeams(teamMap, new AsyncCallback<Map<String, ITeamGroup>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.getCompView().showStatus(caught.getMessage());
+				view.showStatus(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(Map<String, ITeamGroup> result) {
-				view.getCompView().showTeams(result);
+				view.showTeams(result);
 
 			}
 		});				
@@ -357,28 +328,6 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 	//		});		
 	//	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView.Presenter#saveClicked(java.util.Map)
-	 */
-	@Override
-	public Map<String, IOrchestrationConfiguration> saveClicked(Map<String, IOrchestrationConfiguration> configs) {
-
-		clientFactory.getRpcService().saveOrchestrationConfiguration(configs, new AsyncCallback<Map<String, IOrchestrationConfiguration>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.getOrchestrationConfig().showStatus(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(Map<String, IOrchestrationConfiguration> result) {
-				view.getOrchestrationConfig().showStatus("Success");
-				orchConfig = result;
-				Window.alert("Saved");
-			}
-		});
-		return orchConfig;	
-	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.client.ui.CompetitionView.Presenter#teamsClicked(long)
@@ -396,7 +345,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 			@Override
 			public void onSuccess(List<ITeamGroup> result) {
 
-				//view.getCompView().addTeams(compId,result);
+				//view.addTeams(compId,result);
 
 			}
 		});		
@@ -419,7 +368,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 			@Override
 			public void onSuccess(List<IRound> result) {
 
-				//view.getCompView().addRounds(compId,result);
+				//view.addRounds(compId,result);
 
 			}
 		});			
@@ -441,7 +390,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 			@Override
 			public void onSuccess(List<IMatchGroup> result) {
 
-				view.getCompView().addRound(compId, roundId, result);
+				view.addRound(compId, roundId, result);
 
 			}
 		});			
@@ -463,7 +412,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 			@Override
 			public void onSuccess(List<IMatchResult> result) {
 
-				//view.getCompView().addResults(compId, roundId, matchId, result);
+				//view.addResults(compId, roundId, matchId, result);
 
 			}
 		});	
@@ -486,7 +435,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 			@Override
 			public void onSuccess(ITeamGroup result) {
 
-				view.getCompView().showStatus("team info saved");
+				view.showStatus("team info saved");
 
 			}
 		});			
@@ -735,7 +684,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 				//					Window.alert("Match saved");
 				//				else
 				//					Window.alert("Comp not saved");
-				view.getCompView().showStatus(result.toString());
+				view.showStatus(result.toString());
 
 
 			}
@@ -764,7 +713,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 				//					Window.alert("Match saved");
 				//				else
 				//					Window.alert("Comp not saved");
-				view.getCompView().showStatus(result.toString());
+				view.showStatus(result.toString());
 
 
 			}
@@ -794,7 +743,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 			@Override
 			public void onSuccess(List<IPlayerMatchInfo> result) {
-				view.getCompView().getPlayerListView().setPlayers(result);
+				view.getPlayerListView().setPlayers(result);
 			}
 		});	
 	}
@@ -886,7 +835,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 	@Override
 	public void onSaveEditPlayerClicked(IPlayer player) {
-		
+
 		clientFactory.getRpcService().savePlayer(player, null, new AsyncCallback<IPlayer>() {
 
 			@Override
@@ -915,7 +864,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 
 	@Override
 	public void onSavePlayerMatchStatsClicked(final IPlayerMatchStats pms) {
-		
+
 		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerMatchInfo>() {
 
 			@Override
@@ -927,23 +876,23 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 			@Override
 			public void onSuccess(IPlayerMatchInfo result) {
 
-				view.getCompView().getPlayerListView().updatePlayerMatchStats(result);
-//				Window.alert("Player Stats saved");
-//				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
-//				clientFactory.getRpcService().getMatch(pms.getMatchId(), new AsyncCallback<IMatchGroup>() {
-//
-//					@Override
-//					public void onFailure(Throwable caught) {
-//
-//
-//					}
-//
-//					@Override
-//					public void onSuccess(IMatchGroup result) {
-//						fetchMatchStats(result);
-//					}
-//				});	
-				
+				view.getPlayerListView().updatePlayerMatchStats(result);
+				//				Window.alert("Player Stats saved");
+				//				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
+				//				clientFactory.getRpcService().getMatch(pms.getMatchId(), new AsyncCallback<IMatchGroup>() {
+				//
+				//					@Override
+				//					public void onFailure(Throwable caught) {
+				//
+				//
+				//					}
+				//
+				//					@Override
+				//					public void onSuccess(IMatchGroup result) {
+				//						fetchMatchStats(result);
+				//					}
+				//				});	
+
 			}
 		});			
 	}
@@ -953,6 +902,14 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats> {
 	@Override
 	public void onCancelEditPlayerMatchStatsClicked() {
 		((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
+	}
+
+
+
+	@Override
+	public void compPicked(Long id) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

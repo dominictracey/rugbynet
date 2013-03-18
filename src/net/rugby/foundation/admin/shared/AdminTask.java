@@ -253,7 +253,7 @@ public class AdminTask implements Serializable, IAdminTask {
 	}
 	@Override
 	public String getPipelineUrl() {
-		return "/_ah/pipeline/status.html?root=" + pipelineRoot + "#pipeline" + pipelineJob;
+		return "/_ah/pipeline/status.html?root=" + pipelineRoot + "#pipeline-" + pipelineJob;
 	}
 	
 	

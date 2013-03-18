@@ -2,6 +2,7 @@ package net.rugby.foundation.admin.client.ui;
 
 import java.util.Map;
 
+import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.CompActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
@@ -41,6 +42,8 @@ public class OrchestrationConfigurationViewImpl extends Composite implements Orc
 	
 	Map<String,IOrchestrationConfiguration> oc;
 	int row = 1;
+
+	private ClientFactory clientFactory;
 	
 	public OrchestrationConfigurationViewImpl() {
 		initWidget(binder.createAndBindUi(this));
@@ -169,6 +172,12 @@ public class OrchestrationConfigurationViewImpl extends Composite implements Orc
 	@Override
 	public void showStatus(String msg) {
 		status.setText(msg);
+		
+	}
+
+	@Override
+	public void setClientFactory(ClientFactory clientFactory) {
+		this.clientFactory = clientFactory;
 		
 	}
 }

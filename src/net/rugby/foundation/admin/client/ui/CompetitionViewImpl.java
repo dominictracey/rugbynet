@@ -58,6 +58,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiField Button createAdmin;
 	@UiField Button sanityCheck;
 	@UiField Button testMatchStats;
+	@UiField SimplePanel menuBarPanel;
 	
 	Presenter listener = null;
 	TreeItem base = null;
@@ -78,6 +79,10 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	private ClientFactory clientFactory;
 
+	private boolean isInitialized;
+
+	private SmartBar smartBar;
+
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
 		url.setText("http://www.espnscrum.com/premiership-2012-13/rugby/series/166258.html");
@@ -85,6 +90,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		save.setVisible(false);
 		fetch.setText("Fetch teams");
 		step = Step.TEAMS;
+		isInitialized = false;
+
 	}
 
 //	@UiHandler("load")
@@ -164,8 +171,18 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public void setPresenter(final Presenter listener) {
 		this.listener = listener;
+		
+				
+		if (listener instanceof SmartBar.Presenter) {
+			if (!menuBarPanel.getElement().hasChildNodes()) {
+				smartBar = clientFactory.getMenuBar();
+				menuBarPanel.add(smartBar);
+			}
+			smartBar.setPresenter((SmartBar.Presenter)listener);		
+		}
+		
 		compTree.addSelectionHandler( new SelectionHandler<TreeItem>() {
-
+			
 			private EditComp editComp = null;
 			private EditMatch editMatch = null;
 			private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions;
@@ -266,14 +283,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			}
 		});
 			
-		compTree.removeItems();
-		base = new TreeItem("Competitions");
-		root = new TreeItem("Competition");
-		compTree.addItem(base);
-		base.addItem(root);
-		root.addItem(teams);
-		root.addItem(rounds);	
-		root.addItem(matches);
+
 	}
 
 
@@ -347,6 +357,15 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public void addComps(List<ICompetition> result) {
 
+		compTree.removeItems();
+		base = new TreeItem("Competitions");
+		root = new TreeItem("Competition");
+		compTree.addItem(base);
+		base.addItem(root);
+		root.addItem(teams);
+		root.addItem(rounds);	
+		root.addItem(matches);
+		
 		if (compMap == null) {
 			compMap = new HashMap<String,ICompetition>();
 		}
@@ -372,7 +391,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 				}
 			}
 		}
-		
+		isInitialized = true;
 	}
 
 	/* (non-Javadoc)
@@ -428,10 +447,11 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 					String rid = "null";
 					if (roundId != null)
 						rid = roundId.toString().toString();
-					if (base.getChild(i).getChild(1).getChild(j).getText().contains(rid)) {
-						base.getChild(i).getChild(1).getChild(j).removeItems();
+					TreeItem round = base.getChild(i).getChild(1).getChild(j);
+					if (round.getText().contains(rid)) {
+						round.removeItems();
 						for (IMatchGroup mg : result) {
-							TreeItem ti = base.getChild(i).getChild(1).getChild(j).addItem(mg.getDisplayName() + "|" + mg.getId());
+							TreeItem ti = round.addItem(mg.getDisplayName() + "|" + mg.getId());
 							ti.addItem(mg.getDate().toString());
 							if (mg.getLocked() != null) {
 								if (mg.getLocked()) {
@@ -493,11 +513,15 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public void setClientFactory(ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
-		
 	}
 
 	@Override
 	public PlayerListView<IPlayerMatchInfo> getPlayerListView() {
 		return editMatchStats;
+	}
+
+	@Override
+	public boolean isAllSetup() {
+		return isInitialized;
 	}
 }

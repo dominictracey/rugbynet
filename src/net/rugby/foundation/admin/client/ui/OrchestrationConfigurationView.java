@@ -2,6 +2,7 @@ package net.rugby.foundation.admin.client.ui;
 
 import java.util.Map;
 
+import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -22,4 +23,6 @@ public interface OrchestrationConfigurationView extends IsWidget {
 		 */
 		Map<String,IOrchestrationConfiguration> saveClicked(Map<String,IOrchestrationConfiguration> configs);
 	}
+
+	void setClientFactory(ClientFactory clientFactory);
 }
