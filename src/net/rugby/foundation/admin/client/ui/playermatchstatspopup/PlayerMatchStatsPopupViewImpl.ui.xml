@@ -12,7 +12,12 @@
     }
 		.important {
 			font-weight: bold;
-		}
+		}
+		a:link {color:#FF0000;}      /* unvisited link */
+		a:visited {color:#00FF00;}  /* visited link */
+		a:hover {color:#FF00FF;}  /* mouse over link */
+		a:active {color:#0000FF;}  /* selected link */
+	
     </ui:style>
 
     <!-- <g:DialogBox ui:field="popupBox" > -->
@@ -73,13 +78,13 @@ Name/Id:
             <tr>
 
                 <td>
-Player/Id:
+Player/Id (Link):
                 </td>
 
                 <td>
 
-                    <g:Label ui:field="playerAndId" >
-                    </g:Label>
+                    <g:Anchor ui:field="playerAndId" >
+                    </g:Anchor>
                 </td>
             </tr>
 

@@ -1,5 +1,8 @@
 package net.rugby.foundation.admin.client.place;
 
+import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
+import net.rugby.foundation.core.client.Identity.Keys;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
@@ -13,13 +16,43 @@ import com.google.gwt.place.shared.Prefix;
 public class AdminCompPlace extends Place {
   
 	private String token;
-
+	public enum Filter { ALL, UNDERWAY }
+	private Filter filter;
+	private String seps = "[=&]";
+	
 	public AdminCompPlace(String token) {
 		this.token = token;
+		String[] tok = token.split(seps);
+
+		for (int i=0; i<tok.length; i+=2) {
+
+			if (tok[i].toLowerCase().equals("filter")) {
+				if (tok.length >= i+1)
+					setFilter(Filter.valueOf(tok[i+1]));
+			}
+		}
+	}
+
+	public AdminCompPlace(Filter filter) {
+		this.filter = filter;
 	}
 
 	public String getToken() {
-		return token;
+		String retval = ""; 
+
+		if (filter != null) {
+			retval += "filter=" + filter.toString();	
+		}
+		
+		return retval;
+	}
+
+	public Filter getFilter() {
+		return filter;
+	}
+
+	public void setFilter(Filter filter) {
+		this.filter = filter;
 	}
 
 	/**

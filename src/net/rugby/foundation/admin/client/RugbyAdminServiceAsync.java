@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -29,7 +30,7 @@ public interface RugbyAdminServiceAsync {
 	public void saveRounds(List<IRound> rounds, AsyncCallback<List<IRound>> cb);
 	public void fetchMatches(String url, Map<String, ITeamGroup> teams, AsyncCallback<Map<String, IMatchGroup>> cb);
 	public void saveMatches(Map<String, IMatchGroup> rounds, AsyncCallback<Map<String, IMatchGroup>> cb);
-	public void  getAllComps(AsyncCallback<List<ICompetition>> cb);
+	public void  getComps(Filter filter, AsyncCallback<List<ICompetition>> cb);
 	public void saveWorkflowConfig(IWorkflowConfiguration wfc, AsyncCallback<IWorkflowConfiguration> asyncCallback);
 	public void getOrchestrationConfiguration(AsyncCallback<Map<String, IOrchestrationConfiguration>> asyncCallback);
 	public void saveOrchestrationConfiguration(	Map<String, IOrchestrationConfiguration> configs,AsyncCallback<Map<String, IOrchestrationConfiguration>> asyncCallback);
@@ -102,7 +103,6 @@ public interface RugbyAdminServiceAsync {
 	
 	public void getComp(Long compId, AsyncCallback<ICompetition> asyncCallback);
 	
-	public void fetchMatchScore(IMatchGroup match, Long compId, List<String> log, AsyncCallback<List<String>> asyncCallback);
 	public void testMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchStats>> asyncCallback);
 	
 	public void getPlayerMatchInfo(Long matchId, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
@@ -117,4 +117,8 @@ public interface RugbyAdminServiceAsync {
 	public void getPlayerMatchStats(Long id, AsyncCallback<IPlayerMatchStats> asyncCallback);
 	public void savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target,
 			AsyncCallback<IPlayerMatchInfo> asyncCallback);
+	public void repairComp(ICompetition comp,
+			AsyncCallback<ICompetition> asyncCallback);
+	public void fetchMatchScore(IMatchGroup matchGroup, Long currentCompId,
+			List<String> log, AsyncCallback<IMatchGroup> asyncCallback);
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
+import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.game1.shared.IConfiguration;
 import net.rugby.foundation.game1.shared.IEntry;
@@ -32,6 +33,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	MenuBar smartBar;
 	@UiField MenuItem compMenuNew;
 	@UiField MenuItem compMenuAll;
+	@UiField MenuItem compMenuUnderway;
 	@UiField
 	MenuBar compBar;
 	@UiField MenuItem orchMenuShow;
@@ -63,9 +65,15 @@ public class SmartBarImpl extends Composite implements SmartBar {
 		compMenuAll.setCommand(new Command() {
 			@Override
 			public void execute() {
-				listener.goTo(new AdminCompPlace(""));
+				listener.goTo(new AdminCompPlace(Filter.ALL));
 			}
-			});
+		});
+		compMenuUnderway.setCommand(new Command() {
+			@Override
+			public void execute() {
+				listener.goTo(new AdminCompPlace(Filter.UNDERWAY));
+			}
+		});
 	}
 
 	/* (non-Javadoc)

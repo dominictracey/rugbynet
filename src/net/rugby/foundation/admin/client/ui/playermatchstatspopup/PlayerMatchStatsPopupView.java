@@ -23,6 +23,6 @@ public interface PlayerMatchStatsPopupView<T> extends IsWidget
 		ClientFactory getClientFactory();
 		void onSavePlayerMatchStatsClicked(T player);
 		void onCancelEditPlayerMatchStatsClicked();
-
+		void showPlayerPopup(T target);
 	}
 }

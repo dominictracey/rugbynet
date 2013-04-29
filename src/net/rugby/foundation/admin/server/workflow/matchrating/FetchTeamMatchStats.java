@@ -138,7 +138,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
         					tms.setDropGoalsAttempted(tms.getDropGoalsMade());
         				}
         			} else {
-        				tms.setDropGoalsMade(Integer.parseInt(trip.visitVal));
+        				tms.setDropGoalsMade(Integer.parseInt(trip.homeVal.split(" ")[0]));  // handle: "0 (1 missed)"
         				if (trip.visitVal.contains("(")) {
         					tms.setDropGoalsAttempted(Integer.parseInt(trip.visitVal.split("[ |(]")[2]) + tms.getDropGoalsMade());
         					

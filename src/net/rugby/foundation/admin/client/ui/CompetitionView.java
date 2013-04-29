@@ -116,6 +116,8 @@ public interface CompetitionView extends IsWidget {
 	void setClientFactory(ClientFactory clientFactory);
 	PlayerListView<IPlayerMatchInfo> getPlayerListView();
 	boolean isAllSetup();
+	void setInitialized(boolean b);
+	void showWait(boolean show);
 
 
 }

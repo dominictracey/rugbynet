@@ -25,6 +25,8 @@ public interface ICompetitionFactory {
 	 * @param compId
 	 */
 	void build(Long compId);
+
+	ICompetition repair(ICompetition comp);
 	
 //	/**
 //	 * @return the timestamp of when this competition was last updated. Useful for server-side caching

@@ -113,21 +113,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 				line = it.next();
 				// first we scan to the name
 				if (line.contains("scrumPlayerName")) {
-					player.setDisplayName(line.split("<|>")[2].trim());
-					if (!player.getDisplayName().isEmpty()) {
-						if (player.getDisplayName().split(" ").length > 1) {
-							player.setSurName(player.getDisplayName().split(" ")[player.getDisplayName().split(" ").length-1]);
-							String givenName = player.getDisplayName().split(" ")[0];
-							for (int i=1; i<player.getDisplayName().split(" ").length-1; ++i) {
-								givenName += player.getDisplayName().split(" ")[i];
-							}
-							player.setGivenName(givenName);
-						} else {
-							errorDetails.add("Only one name");
-						}
-					} else {
-						errorDetails.add("Display name appears empty");
-					}
+					setPlayerNames(line, player, errorDetails);
 				} else if (line.contains("scrumPlayerCountry")) {
 					ICountry country = cf.getByName(line.split("<|>")[2].trim());
 					player.setCountry(country);
@@ -142,15 +128,8 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 				} else if (line.contains("Full name")) {
 					try {
 						String fullName = line.split("</b>|</div>")[1].trim();
-						// the short name is the first letters of all names except last <space> last name. 
-						//e.g. Full name Jonathan James Vaughan Davies ==> JJV Davies
-						String shortName = "";
-						int size = fullName.split(" ").length;
-						for (int i=0; i<size-1; ++i) {
-							shortName += fullName.split(" ")[i].substring(0, 1);
-						}
-						shortName += " " + player.getSurName();
-						player.setShortName(shortName);
+						
+						setShortName(player, fullName);
 					} catch (Exception e) {
 						errorDetails.add("Couldn't set player's short name");
 					}
@@ -273,5 +252,67 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 			// if player is null this is bad;
 			return null;
 		}
+	}
+
+	private void setPlayerNames(String line, IPlayer player, List<String> errorDetails) {
+		// must be able to handle CJ van der Linde, Jean de Villiers, Jannie du Plessis and Fourie du Preez
+		player.setDisplayName(line.split("<|>")[2].trim());
+		if (!player.getDisplayName().isEmpty()) {
+			int length = player.getDisplayName().split(" ").length;
+			if (length > 1) {
+				String last = player.getDisplayName().split(" ")[length-1];
+				String secondToLast = player.getDisplayName().split(" ")[length-2];
+				boolean afrikaans2 = secondToLast.equals(secondToLast.toLowerCase());
+				boolean afrikaans3 = false;
+				// if the second- and third-to-last name is not capitalized, it is part of the surname.
+				if (player.getDisplayName().split(" ").length > 2) {
+					// if the second to last word is lower case, then it is part of the surname
+					if (afrikaans2) {
+						player.setSurName(secondToLast + " " + last);
+					}
+					String thirdToLast = player.getDisplayName().split(" ")[length-3];
+					afrikaans3 = thirdToLast.equals(thirdToLast.toLowerCase());
+					
+					if (afrikaans3) {
+						player.setSurName(thirdToLast + " " + player.getSurName());
+					}
+
+				}
+				
+				if (!afrikaans2 && !afrikaans3) {
+					player.setSurName(player.getDisplayName().split(" ")[length-1]);
+				} else if (afrikaans3) {
+					length -= 2; // don't take the second to last token in the first name
+				} else { //afrikaans2
+					length--;
+				}
+				
+				String givenName = player.getDisplayName().split(" ")[0];
+				for (int i=1; i<length-1; ++i) {
+					givenName += player.getDisplayName().split(" ")[i];
+				}
+				
+				player.setGivenName(givenName);
+			} else {
+				errorDetails.add("Only one name");
+			}
+		} else {
+			errorDetails.add("Display name appears empty");
+		}
+		
+	}
+
+	private void setShortName(IPlayer player, String fullName) {
+		// the short name is the first letters of all names except last <space> last name. 
+		//e.g. Full name Jonathan James Vaughan Davies ==> JJV Davies
+		// also have to deal with Bismarck Wilhelm du Plessis ==> BW du Plessis
+		String shortName = "";
+		int size = fullName.split("[ |-]").length - player.getSurName().split(" ").length;
+		for (int i=0; i<size; ++i) {
+			shortName += fullName.split("[ |-]")[i].substring(0, 1);
+		}
+		shortName += " " + player.getSurName();
+		player.setShortName(shortName);
+		
 	}
 }

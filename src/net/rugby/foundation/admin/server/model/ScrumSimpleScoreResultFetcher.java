@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -39,13 +40,15 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 
 	protected String homeTeamName;
 	protected String visitTeamName;
-	private IMatchGroupFactory mf;
+	protected IMatchGroupFactory mf;
 
 	// when we are parsing all the matches out, this is where we keep the date of the matches being read
 	private Date dateCursor;
+	protected IMatchResultFactory mrf;
 	 
-	public ScrumSimpleScoreResultFetcher(IMatchGroupFactory mf) {
+	public ScrumSimpleScoreResultFetcher(IMatchGroupFactory mf, IMatchResultFactory mrf) {
 		this.mf = mf;
+		this.mrf = mrf;
 	}
 
 	@Override

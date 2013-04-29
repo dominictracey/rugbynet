@@ -3,6 +3,7 @@ package net.rugby.foundation.admin.client;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -29,7 +30,7 @@ public interface RugbyAdminService extends RemoteService {
 	List<IRound> saveRounds(List<IRound> rounds);
 	Map<String, IMatchGroup> fetchMatches(String url, Map<String, ITeamGroup> teams);
 	Map<String, IMatchGroup> saveMatches(Map<String, IMatchGroup> matches);
-	List<ICompetition> getAllComps();
+	List<ICompetition> getComps(Filter filter);
 	IWorkflowConfiguration saveWorkflowConfig(IWorkflowConfiguration wfc);
 	Map<String, IOrchestrationConfiguration> getOrchestrationConfiguration();
 	Map<String, IOrchestrationConfiguration> saveOrchestrationConfiguration(	Map<String, IOrchestrationConfiguration> configs);
@@ -71,7 +72,7 @@ public interface RugbyAdminService extends RemoteService {
 	 * @param log
 	 * @return
 	 */
-	List<String> fetchMatchScore(IMatchGroup match, Long compId, List<String> log);
+	IMatchGroup fetchMatchScore(IMatchGroup match, Long compId, List<String> log);
 	
 	List<IPlayerMatchStats> testMatchStats(Long matchId);
 	
@@ -87,4 +88,5 @@ public interface RugbyAdminService extends RemoteService {
 	IPlayerMatchStats getPlayerMatchStats(Long id);
 	
 	IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
+	ICompetition repairComp(ICompetition comp);
 }

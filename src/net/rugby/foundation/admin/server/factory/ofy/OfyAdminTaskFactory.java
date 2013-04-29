@@ -74,7 +74,12 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 			IPlayer player, boolean sendEmail, String pipelineRoot,
 			String pipelineJob, String promiseHandle) {
 		
-		return new EditPlayerAdminTask(null, Action.EDITPLAYER, DEFAULTADMINID, new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob, player.getId(), player);
+		Long id = null;
+		if (player != null) {
+			id = player.getId();
+		}
+		
+		return new EditPlayerAdminTask(null, Action.EDITPLAYER, DEFAULTADMINID, new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob, id, player);
 	}
 
 	@Override

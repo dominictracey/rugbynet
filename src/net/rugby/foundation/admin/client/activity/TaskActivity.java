@@ -130,7 +130,11 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 
 				@Override
 				public void onSuccess(IPlayer result) {
-					clientFactory.getPlayerPopupView().setPlayer(result);
+					if (result != null) {
+						clientFactory.getPlayerPopupView().setPlayer(result);
+					} else {
+						clientFactory.getPlayerPopupView().clear();
+					}
 					((DialogBox)clientFactory.getPlayerPopupView()).center();
 				}
 			});
@@ -145,7 +149,11 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 
 				@Override
 				public void onSuccess(IPlayerMatchStats result) {
-					clientFactory.getPlayerMatchStatsPopupView().setTarget(result);
+					if (result != null) {
+						clientFactory.getPlayerMatchStatsPopupView().setTarget(result);
+					} else {
+						clientFactory.getPlayerMatchStatsPopupView().clear();
+					}
 					((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).center();
 				}
 			});
@@ -246,6 +254,23 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 	@Override
 	public void compPicked(Long id) {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showPlayerPopup(IPlayerMatchStats target) {
+		clientFactory.getRpcService().getPlayer(target.getPlayerId(), new AsyncCallback<IPlayer>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch player to edit");
+			}
+
+			@Override
+			public void onSuccess(IPlayer result) {
+				clientFactory.getPlayerPopupView().setPlayer(result);
+				((DialogBox)clientFactory.getPlayerPopupView()).center();
+			}
+		});
 		
 	}
 

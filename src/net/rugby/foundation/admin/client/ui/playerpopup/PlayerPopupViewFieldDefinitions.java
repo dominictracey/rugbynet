@@ -54,8 +54,10 @@ public class PlayerPopupViewFieldDefinitions<T> {
 	        
 	        @Override
 			public Widget render(IPlayer c) {
-	        	w.setText(c.getId().toString());
-	        		
+	        	if (c != null && c.getId() != null) {
+	        		w.setText(c.getId().toString());
+	        	}
+	        	
 	        	return w;
 	        }
 
@@ -84,7 +86,8 @@ public class PlayerPopupViewFieldDefinitions<T> {
 	        
 	        @Override
 			public Widget render(IPlayer c) {
-	        	w.setText(c.getScrumId().toString());
+	        	if (c != null && c.getScrumId() != null)
+	        		w.setText(c.getScrumId().toString());
 	        		
 	        	return w;
 	        }
@@ -440,7 +443,9 @@ public class PlayerPopupViewFieldDefinitions<T> {
 	        
 	        @Override
 			public Widget render(IPlayer c) {
-	        	w.setText(c.getNumCaps().toString());
+	        	if (c != null && c.getNumCaps() != null) {
+	        		w.setText(c.getNumCaps().toString());
+	        	}
 	        		
 	        	return w;
 	        }
@@ -575,7 +580,9 @@ public class PlayerPopupViewFieldDefinitions<T> {
         @Override
 		public Widget render(final IPlayer c) {
         	w.setText("Link to player on scrum.com");
-        	w.setHref("http://www.espnscrum.com/scrum/rugby/player/" + c.getScrumId().toString() + ".html");
+        	if (c != null && c.getScrumId() != null) {
+        		w.setHref("http://www.espnscrum.com/scrum/rugby/player/" + c.getScrumId().toString() + ".html");
+        	}
         	w.setTarget("_blank");
         	
         	

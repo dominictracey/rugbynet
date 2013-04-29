@@ -28,12 +28,15 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -50,7 +53,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiField ListBox resultType;	
 	@UiField Button save;
 	@UiField Button fetch;
-//	@UiField Button load;
+	@UiField VerticalPanel treePane;
 	@UiField Label status;
 	@UiField Tree compTree;
 	@UiField SimplePanel editArea;
@@ -82,6 +85,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	private boolean isInitialized;
 
 	private SmartBar smartBar;
+
+	private Image waitCursor;
 
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
@@ -391,6 +396,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 				}
 			}
 		}
+		showWait(false);
 		isInitialized = true;
 	}
 
@@ -523,5 +529,29 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public boolean isAllSetup() {
 		return isInitialized;
+	}
+
+	@Override
+	public void setInitialized(boolean b) {
+		isInitialized = b;
+		
+	}
+	
+	@Override
+	public void showWait(boolean show) {
+		if (show) {
+			compTree.removeItems();	
+			if (waitCursor == null) {
+				waitCursor = new Image("/resources/images/ajax-loader.gif");
+			}
+			treePane.add(waitCursor); //new HTML("Stand by...")); //
+		} else {
+			if (waitCursor != null) {
+				if (waitCursor.isAttached()) {
+					treePane.remove(waitCursor);
+				}
+			}
+		}
+		
 	}
 }

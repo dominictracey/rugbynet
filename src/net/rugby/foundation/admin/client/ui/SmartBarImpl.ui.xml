@@ -13,6 +13,7 @@
 			Comp
 			<g:MenuBar ui:field="compBar" vertical="true">
 			    <g:MenuItem ui:field="compMenuAll">All</g:MenuItem>
+			    <g:MenuItem ui:field="compMenuUnderway">Underway</g:MenuItem>
 			    <g:MenuItem ui:field="compMenuNew">Import</g:MenuItem>
 			    <g:MenuItem ui:field="compMenuTestFetchMatchStats">Test Fetch Match Stats</g:MenuItem>		    			    
 			</g:MenuBar>

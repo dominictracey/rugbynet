@@ -149,6 +149,9 @@ public class EditMatch extends Composite {
 		if (match.getSimpleScoreMatchResult() != null) {
 			homeScore.setText(Integer.toString(match.getSimpleScoreMatchResult().getHomeScore()));
 			visitorScore.setText(Integer.toString(match.getSimpleScoreMatchResult().getVisitScore()));
+		} else {
+			homeScore.setText("");
+			visitorScore.setText("");
 		}
 	}
 

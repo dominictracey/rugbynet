@@ -31,7 +31,7 @@ public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements Playe
 	}
 
 	@UiField Label   nameAndId;
-	@UiField Label   playerAndId;
+	@UiField Anchor   playerAndId;
 	@UiField Label   matchAndId;
 	@UiField Label   slot;
 	@UiField ListBox position;
@@ -62,7 +62,7 @@ public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements Playe
 	@Override
 	public void setFieldDefinitions(List<FieldDefinition<T>> FieldDefinition) {
 		this.fieldDefinitions = FieldDefinition;
-		fieldDefinitions.get(0).bind( nameAndId);               
+		fieldDefinitions.get(0).bind( nameAndId);    
 		fieldDefinitions.get(1).bind( playerAndId);                   
 		fieldDefinitions.get(2).bind( matchAndId);                  
 		fieldDefinitions.get(3).bind( slot);                            
@@ -90,6 +90,11 @@ public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements Playe
 		
 	}
 
+	@UiHandler("playerAndId")
+	public void onShowPlayerPopUp(ClickEvent event) {
+		presenter.showPlayerPopup(target);
+	}
+	
 	private PlayerMatchStatsPopupViewPresenter<T> presenter;
 	private T target;
 

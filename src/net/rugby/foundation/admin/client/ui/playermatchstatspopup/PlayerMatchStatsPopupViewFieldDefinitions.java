@@ -1,24 +1,17 @@
 package net.rugby.foundation.admin.client.ui.playermatchstatspopup;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DatePicker;
-
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.ClientFactory.GetCountryListCallback;
 import net.rugby.foundation.admin.client.ClientFactory.GetPositionListCallback;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
-import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -60,7 +53,9 @@ public class PlayerMatchStatsPopupViewFieldDefinitions<T> {
 				@Override
 				public Widget render(IPlayerMatchStats c) {
 					assert (w instanceof Label);
-					((Label)w).setText(c.getName() + "/" + c.getId().toString());
+					if (c != null && c.getId() != null) {
+						((Label)w).setText(c.getName() + "/" + c.getId().toString());
+					}
 
 					return w;
 				}
@@ -83,16 +78,17 @@ public class PlayerMatchStatsPopupViewFieldDefinitions<T> {
 
 				@Override
 				public Widget render(IPlayerMatchStats c) {
-					assert (w instanceof Label);
-					((Label)w).setText(c.getPlayerId().toString());
-
+					assert (w instanceof Anchor);
+					if (c != null && c.getPlayerId() != null) {
+						((Anchor)w).setText(c.getPlayerId().toString());
+					}
 					return w;
 				}
 
 				@Override
 				public void clear() {
-					assert (w instanceof Label);
-					((Label)w).setText(null);
+					assert (w instanceof Anchor);
+					((Anchor)w).setText(null);
 				}
 
 				@Override
@@ -109,8 +105,9 @@ public class PlayerMatchStatsPopupViewFieldDefinitions<T> {
 				@Override
 				public Widget render(IPlayerMatchStats c) {
 					assert (w instanceof Label);
-					((Label)w).setText(c.getMatchId().toString());
-
+					if (c != null && c.getMatchId() != null) {
+						((Label)w).setText(c.getMatchId().toString());
+					}
 					return w;
 				}
 
@@ -134,7 +131,9 @@ public class PlayerMatchStatsPopupViewFieldDefinitions<T> {
 				@Override
 				public Widget render(IPlayerMatchStats c) {
 					assert (w instanceof Label);
-					((Label)w).setText(c.getSlot().toString());
+					if (c != null && c.getSlot() != null) {
+						((Label)w).setText(c.getSlot().toString());
+					}
 
 					return w;
 				}
@@ -822,8 +821,9 @@ public class PlayerMatchStatsPopupViewFieldDefinitions<T> {
 				@Override
 				public Widget render(IPlayerMatchStats c) {
 					assert (w instanceof TextBox);
-					((TextBox)w).setText(c.getTimePlayed().toString());
-
+					if (c != null && c.getTimePlayed() != null) {
+						((TextBox)w).setText(c.getTimePlayed().toString());
+					}
 					return w;
 				}
 
@@ -861,15 +861,18 @@ public class PlayerMatchStatsPopupViewFieldDefinitions<T> {
 			        
 			        @Override
 					public Widget render(final IPlayerMatchStats c) {
-						clientFactory.getMatchGroupAsync(c.getMatchId(), new ClientFactory.GetMatchGroupCallback() {
-			
-							@Override
-							public void onMatchGroupFetched(IMatchGroup match) {
-								w.setText("Link to match report on scrum.com");
-					        	w.setHref(match.getForeignUrl());
-					        	w.setTarget("_blank");
-							}
-						});
+						if (c != null && c.getMatchId() != null) {
+
+							clientFactory.getMatchGroupAsync(c.getMatchId(), new ClientFactory.GetMatchGroupCallback() {
+				
+								@Override
+								public void onMatchGroupFetched(IMatchGroup match) {
+									w.setText("Link to match report on scrum.com");
+						        	w.setHref(match.getForeignUrl());
+						        	w.setTarget("_blank");
+								}
+							});
+						}
 			        	
 			        	return w;
 			        }

@@ -298,6 +298,12 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		
 	}
 
+	@Override
+	public ICompetition repair(ICompetition comp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 //	/* (non-Javadoc)
 //	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getLastUpdate(java.lang.Long)
 //	 */

@@ -19,5 +19,6 @@
 				Underway: <g:CheckBox ui:field="underway"/><br/>
 
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
+		<g:Button styleName="{style.important}" ui:field="repair">Repair</g:Button>
 	</g:HTMLPanel>
 </ui:UiBinder> 

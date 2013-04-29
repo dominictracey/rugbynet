@@ -45,7 +45,13 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	@Override
 	public Value<List<IPlayerMatchRating>> run(IMatchGroup match) {
 
-		String url = match.getForeignUrl();
+		if (match.getForeignUrl() == null) {
+			// need to get score and find match details url before we do this
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Need to get scores and populate match URL before trying to get match stats for match " + match.getDisplayName());
+			return null;
+		}
+		
+		String url = match.getForeignUrl()+"?view=scorecard";
 
 		//		// get the comp from the match
 		//		rf.setId(match.getRoundId());

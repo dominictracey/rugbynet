@@ -29,6 +29,7 @@ public class EditComp extends Composite {
 
 	public interface Presenter {
 		void saveCompInfo(ICompetition comp);
+		void repairComp(ICompetition comp);
 	} 
 	
 	public EditComp() {
@@ -37,6 +38,8 @@ public class EditComp extends Composite {
 
 	@UiField
 	Button save;
+	@UiField
+	Button repair;
 	@UiField
 	TextBox longName;
 	@UiField
@@ -52,13 +55,23 @@ public class EditComp extends Composite {
 	private Presenter listener;
 	
 	@UiHandler("save")
-	void onClick(ClickEvent e) {
+	void onClickSave(ClickEvent e) {
 		comp.setLongName(longName.getText());
 		comp.setShortName(shortName.getText());
 		comp.setAbbr(abbr.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
 		listener.saveCompInfo(comp);
+	}
+	
+	@UiHandler("repair")
+	void onClickRepair(ClickEvent e) {
+		comp.setLongName(longName.getText());
+		comp.setShortName(shortName.getText());
+		comp.setAbbr(abbr.getText());
+		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
+		comp.setUnderway(underway.getValue());
+		listener.repairComp(comp);
 	}
 
 	public void ShowComp(ICompetition comp) {

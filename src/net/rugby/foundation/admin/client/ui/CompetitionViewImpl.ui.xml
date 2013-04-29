@@ -38,7 +38,7 @@
 
             <g:VerticalPanel styleName="{style.panel}" >
 
-                <g:VerticalPanel styleName="{style.panel}" >
+                <g:VerticalPanel ui:field="treePane" styleName="{style.panel}" >
 
                     <g:Label ui:field="status" >
 Status

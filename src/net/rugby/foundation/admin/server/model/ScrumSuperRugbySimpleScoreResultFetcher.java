@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
@@ -20,8 +21,8 @@ import net.rugby.foundation.model.shared.IMatchGroup.Status;
 
 public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreResultFetcher implements IResultFetcher {
 
-	public ScrumSuperRugbySimpleScoreResultFetcher(IMatchGroupFactory mf) {
-		super(mf);
+	public ScrumSuperRugbySimpleScoreResultFetcher(IMatchGroupFactory mf, IMatchResultFactory mrf) {
+		super(mf,mrf);
 	}
 
 	@Override
@@ -64,9 +65,9 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 	            			if (dateRead.equals(matchDate)) {
 	            				foundDate = true;
 	            				break;
-	            			} else if (dateRead.after(matchDate)) { // we haven't found it and are looking at later dates so it's not posted yet
-	            				break;
-	            			}
+	            			} //else if (dateRead.after(matchDate)) { // we haven't found it and are looking at later dates so it's not posted yet
+	            				//break;
+	            			//}
 	            		}
             		}
             	}
@@ -84,6 +85,9 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 	               		if (line.contains("<!--")) {
 	               			line = it.next();
 	               		}
+	               		// get the match URL and id saved
+	               		saveMatchInfo(match, line);
+	               		
 	               		// postponed matches seem to not have a link to anywhere after a while - either way, no score
 	               		if (line.contains("P v P")) {
 	               			if (line.contains(homeTeamName) && line.contains(visitTeamName)) {
@@ -123,10 +127,29 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
             return null;
         }
 		
-        if (found)
+        if (found) {
+			mrf.put(result);
+			match.setSimpleScoreMatchResultId(result.getId());
+			match.setSimpleScoreMatchResult((ISimpleScoreMatchResult) result);
+			match.setStatus(result.getStatus());
+			match.setLocked(true);
+			mf.put(match);
+        
         	return result;
-        else
+        } else
         	return null;
+	}
+
+	private void saveMatchInfo(IMatchGroup match, String line) {
+		 // <a href="/premiership-2011-12/rugby/match/142520.html" class="fixtureTablePreview">London Irish&nbsp;42 - 24&nbsp;Worcester Warriors</a>
+		if (line.split("\"").length > 2) {
+			String foreignUrl = line.split("\"")[1];
+			match.setForeignUrl("http://www.espnscrum.com" + foreignUrl);
+			// and the matchId
+			if (foreignUrl.split("[/|.]").length > 3) {
+				match.setForeignId(Long.parseLong(foreignUrl.split("[/|.]")[4]));
+			}
+		}
 	}
 
 

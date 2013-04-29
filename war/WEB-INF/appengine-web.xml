@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
 	<application>fantasyrugbyengine</application>
-	<version>3</version>
+	<version>4</version>
 
 	<!-- Configure serving/caching of GWT files -->
 	<static-files>
@@ -22,5 +22,5 @@
 	<sessions-enabled>true</sessions-enabled>
 	
 	<!-- needed for Juno -->
-	<threadsafe></threadsafe>
+	<threadsafe>true</threadsafe>
 </appengine-web-app>

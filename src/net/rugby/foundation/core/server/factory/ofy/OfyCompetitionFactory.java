@@ -290,6 +290,30 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 		return list;
 	}
 
+	@Override
+	public ICompetition repair(ICompetition comp) {
+		// make sure teams are populated
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Requested repair comp " + comp.getLongName());
+		if (comp.getTeamIds() == null || comp.getTeamIds().isEmpty()) {
+			comp.setTeamIds(new ArrayList<Long>());
+			for (IRound r: comp.getRounds()) {
+				for (IMatchGroup m : r.getMatches()) {
+					if (!comp.getTeamIds().contains(m.getHomeTeamId())) {
+						comp.getTeamIds().add(m.getHomeTeamId());
+					}
+					if (!comp.getTeamIds().contains(m.getVisitingTeamId())) {
+						comp.getTeamIds().add(m.getVisitingTeamId());
+					}
+				}
+			}
+			put(comp);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Repaired comp by adding teamIds for comp " + comp.getLongName());
+
+		}
+		
+		return comp;
+	}
+
 //	/* (non-Javadoc)
 //	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getLastUpdate(java.lang.Long)
 //	 */
