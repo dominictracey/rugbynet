@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -24,5 +25,6 @@ public interface PlayerMatchStatsPopupView<T> extends IsWidget
 		void onSavePlayerMatchStatsClicked(T player);
 		void onCancelEditPlayerMatchStatsClicked();
 		void showPlayerPopup(T target);
+		void onRefetchEditPlayerMatchStatsClicked(T target);
 	}
 }

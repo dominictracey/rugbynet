@@ -56,6 +56,7 @@ public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements Playe
 	@UiField TextBox redCards;
 	@UiField Anchor scrumLink;
 	@UiField Button saveButton;
+	@UiField Button refetchButton;
 	@UiField Button cancelButton;
 
 	private List<FieldDefinition<T>> fieldDefinitions;
@@ -111,6 +112,13 @@ public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements Playe
 		}
 	}
 
+	@UiHandler("refetchButton")
+	void onRefetchButtonClicked(ClickEvent event) {	
+		if (presenter != null) {
+			presenter.onRefetchEditPlayerMatchStatsClicked(target);
+		}
+	}
+	
 	@UiHandler("saveButton")
 	void onSaveButtonClicked(ClickEvent event) {	
 		if (presenter != null) {

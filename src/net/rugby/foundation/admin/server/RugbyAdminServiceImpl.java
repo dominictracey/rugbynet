@@ -18,9 +18,11 @@ import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFacto
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
+import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumResultFetcherFactory;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
+import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
@@ -29,6 +31,7 @@ import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
+import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
@@ -104,6 +107,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IAdminTaskFactory atf;
 	private IPlayerMatchInfoFactory pmif;
 	private IMatchResultFactory mrf;
+	private IPlayerMatchStatsFetcherFactory pmsff;
 	
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -120,7 +124,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerFactory pf,
 			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
-			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf) {
+			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
+			IPlayerMatchStatsFetcherFactory pmsff) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -143,6 +148,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.atf = atf;
 		this.pmif = pmif;
 		this.mrf = mrf;
+		this.pmsff = pmsff;
 		
 		//		rf.setFactories(cf, mf);
 		//		mf.setFactories(rf, tf);
@@ -730,7 +736,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IPlayer savePlayer(IPlayer player, IAdminTask task) {
 		player = pf.put(player);
-		if (task != null) {
+		if (task != null && task.getAction().equals(IAdminTask.Action.EDITPLAYER)) {
 			if (task.getPromise() != null) {
 				PipelineService service = PipelineServiceFactory.newPipelineService();
 				try {
@@ -918,7 +924,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats stats, IAdminTask task) {
 		pmsf.put(stats);
-		if (task != null) {
+		if (task != null  && task.getAction().equals(IAdminTask.Action.EDITPLAYERMATCHSTATS)) {
 			if (task.getPromise() != null) {
 				PipelineService service = PipelineServiceFactory.newPipelineService();
 				try {
@@ -956,6 +962,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Service call equested repair comp " + comp.getLongName());
 
 		return cf.repair(comp);
+	}
+
+	@Override
+	public IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms) {
+		IPlayer player = pf.getById(pms.getPlayerId());
+		mf.setId(pms.getMatchId());
+		IMatchGroup match = mf.getGame();
+		
+		Home_or_Visitor side = Home_or_Visitor.HOME;
+		if (pms.getTeamId().equals(match.getVisitingTeamId())) {
+			side = Home_or_Visitor.VISITOR;
+		}
+		
+		IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(player, match, side, pms.getSlot(), match.getForeignUrl()+"?view=scorecard");
+		if (!fetcher.process()) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());			
+		}
+		
+		return fetcher.getStats();
 	}
 
 

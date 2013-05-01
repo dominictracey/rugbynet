@@ -70,6 +70,9 @@ public class CountryLoader {
 		c =  new Country(5020L, "Russia", "RUSSIA", "RUS", "Bears" );
 		cf.put(c);
 		
+		c =  new Country(5021L, "Namibia", "NAMIBIA", "NAM", "Welwitschias" );
+		cf.put(c);
+		
 		
 		return true;
 

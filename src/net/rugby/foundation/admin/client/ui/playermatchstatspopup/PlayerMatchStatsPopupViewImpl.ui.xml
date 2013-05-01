@@ -363,7 +363,13 @@ scrum.com link:
                         ui:field="saveButton" >
 Save
                     </g:Button>
+                    <g:Button
+                        styleName="{style.important}"
+                        ui:field="refetchButton" >
+Refetch
 
+
+                    </g:Button>
                     <g:Button
                         styleName="{style.important}"
                         ui:field="cancelButton" >

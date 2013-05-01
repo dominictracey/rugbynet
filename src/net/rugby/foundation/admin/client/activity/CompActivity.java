@@ -930,6 +930,25 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 
 
+	@Override
+	public void onRefetchEditPlayerMatchStatsClicked(IPlayerMatchStats target) {
+		clientFactory.getRpcService().refetchPlayerMatchStats(target, new AsyncCallback<IPlayerMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch playerMatchStats, see logs for details");
+			}
+
+			@Override
+			public void onSuccess(IPlayerMatchStats result) {
+				clientFactory.getPlayerMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).center();
+			}
+		});
+		
+	}
+
+
+
 
 
 }

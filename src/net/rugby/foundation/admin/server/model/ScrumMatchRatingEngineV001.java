@@ -67,9 +67,11 @@ public class ScrumMatchRatingEngineV001 implements
 		}
 		
 		for (IPlayerMatchStats pms : visitPlayerStats) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.getById(pms.getPlayerId()), match, 500, schema, pms);
-			pmrf.put(pmr);
-			mrl.add(pmr);
+			if (pms != null) {
+				IPlayerMatchRating pmr = pmrf.getNew(pf.getById(pms.getPlayerId()), match, 500, schema, pms);
+				pmrf.put(pmr);
+				mrl.add(pmr);
+			}
 		}
 		
 		return null;

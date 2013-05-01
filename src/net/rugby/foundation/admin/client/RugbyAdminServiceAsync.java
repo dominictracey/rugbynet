@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
+import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -121,4 +122,6 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<ICompetition> asyncCallback);
 	public void fetchMatchScore(IMatchGroup matchGroup, Long currentCompId,
 			List<String> log, AsyncCallback<IMatchGroup> asyncCallback);
+	public void refetchPlayerMatchStats(IPlayerMatchStats pms, AsyncCallback<IPlayerMatchStats> asyncCallback);
+
 }

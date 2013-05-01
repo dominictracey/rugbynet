@@ -253,6 +253,11 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		if (line.split("[/|.]").length > 4) {
 			id = line.split("[/|.]")[4].trim();
 		}
+		
+		String name = "unknown";
+		if (line.split("[<|>]").length > 5) {
+			name = line.split("[<|>]")[4];
+		}
 
 		//check for card
 		line = it.next();  //</td>
@@ -274,7 +279,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		if (id.isEmpty()) {
 			return null;
 		} else {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE,"Found player id " + id);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE,"Found player " + name + " (" + id + ")");
 			return Long.parseLong(id);
 		}
 
