@@ -16,6 +16,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -40,7 +41,7 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 
 	@UiField FlexTable taskTable;
 	@UiField SimplePanel menuBarPanel;
-
+	@UiField Button deleteSelected;
 
 	private TaskViewColumnDefinitions<T> columnDefinitions;
 	private List<T> taskList;
@@ -68,6 +69,13 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 		setColumnHeaders(columnDefinitions.getHeaders());
 	}
 
+	@UiHandler("deleteSelected")
+	void onDeleteClicked(ClickEvent event) {
+		if (listener != null) {
+			listener.deleteSelected();
+		}
+	}
+	
 	@UiHandler("taskTable")
 	void onTableClicked(ClickEvent event) {
 		if (listener != null) {

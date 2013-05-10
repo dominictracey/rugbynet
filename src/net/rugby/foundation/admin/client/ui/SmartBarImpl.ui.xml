@@ -30,6 +30,12 @@
 			    <g:MenuItem ui:field="taskMenuShow">Show</g:MenuItem>
 			</g:MenuBar>
 		</g:MenuItem>
+		<g:MenuItem ui:field="PortalMenuItem">
+			Portal
+			<g:MenuBar ui:field="portalBar" vertical="true">
+			    <g:MenuItem ui:field="portalMenuShow">Show</g:MenuItem>
+			</g:MenuBar>
+		</g:MenuItem>
 		<g:MenuItem ui:field="adminMenuItem">
 			Admin
 			<g:MenuBar ui:field="adminBar" vertical="true">

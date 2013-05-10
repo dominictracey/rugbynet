@@ -406,7 +406,9 @@ public class PlayerPopupViewFieldDefinitions<T> {
 			        	w.setItemSelected(i, true);
 		        	}
 	        	} else {
-	        		selectedId = c.getPosition().ordinal();
+	        		if (c != null && c.getPosition() != null) {
+	        			selectedId = c.getPosition().ordinal();
+	        		}
 	        	}
 	        		
 	        	return w;

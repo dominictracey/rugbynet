@@ -6,7 +6,8 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
-import net.rugby.foundation.admin.server.model.ScrumMatchRatingEngineV001;
+//import net.rugby.foundation.admin.server.model.ScrumMatchRatingEngineV001;
+import net.rugby.foundation.admin.server.model.ScrumMatchRatingEngineV100;
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130121;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
@@ -31,7 +32,7 @@ public class ScrumMatchRatingEngineFactory
 	@Override
 	public IMatchRatingEngine get(IMatchRatingEngineSchema schema) {
 		if (schema instanceof ScrumMatchRatingEngineSchema20130121) {
-			return new ScrumMatchRatingEngineV001(pf, pmrf);
+			return new ScrumMatchRatingEngineV100(pf, pmrf);
 		}
 		
 		return null;

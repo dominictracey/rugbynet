@@ -20,18 +20,8 @@ public class ScrumMatchRatingEngineV001 implements
 	List<IPlayerMatchStats> homePlayerStats;
 	List<IPlayerMatchStats> visitPlayerStats;
 	private List<IMatchRatingEngineSchema> supportedSchemas;
-	private final IPlayerMatchRatingFactory pmrf;
-	private final IPlayerFactory pf;
-	
-//	public void SetFactories(IPlayerMatchRatingFactory pmrf, IPlayerFactory pf) {
-//		this.pmrf = pmrf;
-//		this.pf = pf;
-//	}
-	
-//	public ScrumMatchRatingEngineV001() {
-//		supportedSchemas = new ArrayList<IMatchRatingEngineSchema>();
-//		supportedSchemas.add(new ScrumMatchRatingEngineSchema20130121());
-//	}
+	protected final IPlayerMatchRatingFactory pmrf;
+	protected final IPlayerFactory pf;
 	
 	public ScrumMatchRatingEngineV001(IPlayerFactory pf, IPlayerMatchRatingFactory pmrf) {
 		supportedSchemas = new ArrayList<IMatchRatingEngineSchema>();

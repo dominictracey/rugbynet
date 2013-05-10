@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -15,8 +16,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface PlayerListView<T extends IPlayerMatchInfo> extends IsWidget
 {
 
-
-	void setPlayers(List<T> result);
 	void setListener(Listener<T> listener);
 	void setColumnDefinitions(List<ColumnDefinition<T>> columnDefinitions);
 	
@@ -34,6 +33,7 @@ public interface PlayerListView<T extends IPlayerMatchInfo> extends IsWidget
 	void showWait();
 
 	void updatePlayerMatchStats(T newPmi);
+	void setPlayers(List<T> PlayerList, IMatchGroup match);
 
 
 }

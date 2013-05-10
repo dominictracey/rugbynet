@@ -1,0 +1,79 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:d="urn:import:com.google.gwt.user.datepicker.client" >
+
+    <ui:style>
+		/* Add CSS here. See the GWT docs on UI Binder for more details */
+		.important {
+			font-weight: bold;
+		}
+	    .playersViewButtonHPanel {
+      		margin: 5px 0px 0x 5px;
+    	}
+    	.playersViewPlayersFlexTable {
+     		margin: 5px 0px 5px 0px;
+    	}
+		.jobArea {
+			width:500px;
+			background-color:lightorange;
+			padding:20px;
+		}
+    </ui:style>
+
+    <g:VerticalPanel>
+
+        <g:SimplePanel ui:field="menuBarPanel" >
+        </g:SimplePanel>
+
+        <g:HorizontalPanel>
+
+            <g:HTMLPanel>
+Competition:
+
+                <br />
+
+                <g:ListBox ui:field="comp" />
+            </g:HTMLPanel>
+
+            <g:HTMLPanel>
+Round:
+
+                <br />
+
+                <g:ListBox ui:field="round" />
+            </g:HTMLPanel>
+
+            <g:HTMLPanel>
+Position:
+
+                <br />
+
+                <g:ListBox ui:field="pos" />
+            </g:HTMLPanel>
+
+            <g:HTMLPanel>
+Country:
+
+                <br />
+
+                <g:ListBox ui:field="country" />
+            </g:HTMLPanel>
+
+            <g:HTMLPanel>
+Team:
+
+                <br />
+
+                <g:ListBox ui:field="team" />
+            </g:HTMLPanel>
+            <g:Button ui:field="query">Query</g:Button>
+        </g:HorizontalPanel>
+
+       <g:SimplePanel
+                    styleName="{style.jobArea}"
+                    ui:field="jobArea" >
+       </g:SimplePanel>
+    </g:VerticalPanel>
+
+</ui:UiBinder>

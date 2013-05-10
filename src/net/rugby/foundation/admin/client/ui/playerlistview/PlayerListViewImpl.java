@@ -1,26 +1,39 @@
 package net.rugby.foundation.admin.client.ui.playerlistview;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.PlayerRating;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.CellPreviewEvent.Handler;
+import com.google.gwt.view.client.ListDataProvider;
 
 
 public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite implements PlayerListView<T>
@@ -38,109 +51,149 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 	{
 	}
 
-	@UiField FlexTable playersTable;
+	@UiField CellTable<T> playersTable;
 
+	private boolean columnsInitialized = false;
 
 
 	//	private Presenter<T> presenter;
 	private Listener<T> listener;
 	private ArrayList<String> headers;
+	private ListDataProvider<T> dataProvider;
 
 	public PlayerListViewImpl()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		playersTable.getRowFormatter().addStyleName(0, "groupListHeader");
+		//playersTable.getRowFormatter().addStyleName(0, "groupListHeader");
 		playersTable.addStyleName("groupList");
-		playersTable.getCellFormatter().addStyleName(0, 1, "groupListNumericColumn");
+		//playersTable.getCellFormatter().addStyleName(0, 1, "groupListNumericColumn");
 
 	}
 
 
 
-	@UiHandler("playersTable")
-	void onTableClicked(ClickEvent event) {
-		if (listener != null) {
-			HTMLTable.Cell cell = playersTable.getCellForEvent(event);
-
-			if (cell != null) {
-				if (cell.getRowIndex() == 0) { // we have a check box up and click the select all
-					if (cell.getCellIndex() == 0) {
-						if (columnDefinitions.get(0).isSelectable()) {
-							// select them all
-							for (int i = 1; i < playerList.size()+1; ++i) {
-								((CheckBox)playersTable.getWidget(i, 0).asWidget()).setValue(true);
-								listener.onItemSelected(playerList.get(i-1));
-							}	   			  
-						}  
-					}
-				} else { 					
-					if (shouldFireClickEvent(cell)) {
-						T info = playerList.get(cell.getRowIndex()-1);
-						if (cell.getCellIndex() == 1) {
-							listener.showEditPlayer(info);
-						} else if (cell.getCellIndex() == 2) {
-							listener.showEditStats(info);
-						} else if (cell.getCellIndex() == 3) {
-							listener.showEditRating(info);
-						} 					
-					}
-
-//					if (shouldFireSelectEvent(cell)) { // only do it if we have a checkbox up
-//						listener.onItemSelected(player);
-//						if (listener != null) {
-//							//important sanity check because we are clicking on the table and not the checkbox. And we can miss.
-//							int x = cell.getRowIndex();
-//							((CheckBox)playersTable.getWidget(x,0).asWidget()).setValue(listener.onItemSelected(player));
-//						}
-//					}
-				}
-			}
-		}
-	}
+	//	@UiHandler("playersTable")
+	//	void onTableClicked(TableCellElement event) {
+	//		if (listener != null) {
+	////			Element cell = playersTable.getCellParent(event);
+	//
+	//			if (cell != null) {
+	//				if (cell.getRowIndex() == 0) { // we have a check box up and click the select all
+	//					if (cell.getCellIndex() == 0) {
+	//						if (columnDefinitions.get(0).isSelectable()) {
+	//							// select them all
+	//							for (int i = 1; i < playerList.size()+1; ++i) {
+	//								((CheckBox)playersTable.getWidget(i, 0).asWidget()).setValue(true);
+	//								listener.onItemSelected(playerList.get(i-1));
+	//							}	   			  
+	//						}  
+	//					}
+	//				} else { 					
+	//					if (shouldFireClickEvent(cell)) {
+	//						T info = playerList.get(cell.getRowIndex()-1);
+	//						if (cell.getCellIndex() == 1) {
+	//							listener.showEditPlayer(info);
+	//						} else if (cell.getCellIndex() == 2) {
+	//							listener.showEditStats(info);
+	//						} else if (cell.getCellIndex() == 3) {
+	//							listener.showEditRating(info);
+	//						} 					
+	//					}
+	//
+	////					if (shouldFireSelectEvent(cell)) { // only do it if we have a checkbox up
+	////						listener.onItemSelected(player);
+	////						if (listener != null) {
+	////							//important sanity check because we are clicking on the table and not the checkbox. And we can miss.
+	////							int x = cell.getRowIndex();
+	////							((CheckBox)playersTable.getWidget(x,0).asWidget()).setValue(listener.onItemSelected(player));
+	////						}
+	////					}
+	//				}
+	//			}
+	//		}
+	//	}
 
 
 	@Override
-	public void setPlayers(List<T> PlayerList) {
+	public void setPlayers(List<T> PlayerList, IMatchGroup match) {
 		if (PlayerList != null) {
-			playersTable.removeAllRows();
-			this.playerList = PlayerList;
-			setHeaders();
-			String style = "leaderboardRow-odd";
+			if (!columnsInitialized) {
 
-			//	      Date begin = new Date();
-			for (int i = 1; i < PlayerList.size()+1; ++i) {
-				T t = PlayerList.get(i-1);
 				for (int j = 0; j < columnDefinitions.size(); ++j) {
-					ColumnDefinition<T> columnDefinition = columnDefinitions.get(j);
-
-					playersTable.setWidget(i, j, columnDefinition.render(t));
-					if (j < 4) {
-						// first four columns are clickable
-						playersTable.getCellFormatter().setStyleName(i, j, "leaderboardCell");
-					}
+					Column<T,?> col = columnDefinitions.get(j).getColumn();
+					playersTable.addColumn(col, headers.get(j));
 
 				}
-				playersTable.getRowFormatter().setStyleName(i, style);
-				if (style == "leaderboardRow-odd")
-					style = "leaderboardRow-even";
-				else
-					style = "leaderboardRow-odd";
-
+				columnsInitialized = true;
 			}
 
-			//	      Date end = new Date();
+			PlayerListViewColumnDefinitions.setMatch(match);
 
-			//	      Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,begin.toLocaleString() + " end: " + end.toLocaleString());
+			dataProvider = new ListDataProvider<T>();
+			playersTable.setLoadingIndicator(new Image("/resources/images/ajax-loader.gif"));
+			dataProvider.addDataDisplay(playersTable);
+
+			List<T> list = dataProvider.getList();
+			for (T t: PlayerList) {
+				list.add(t);
+			}
+
+			for (int j = 0; j < columnDefinitions.size(); ++j) {
+				AddColumnSorters(j,playersTable.getColumn(j),list);
+			}			
+			playersTable.setVisibleRange(0, list.size());
+			
+			playersTable.addCellPreviewHandler( new Handler<T>() {
+
+				@Override
+				public void onCellPreview(CellPreviewEvent<T> event) {
+					boolean isClick = "click".equals(event.getNativeEvent().getType());
+					if (isClick) {
+						listener.showEditStats(event.getValue());
+					}
+					
+				}
+				
+			});
+			//			playersTable.removeAllRows();
+			//			this.playerList = PlayerList;
+			//			setHeaders();
+			//			String style = "leaderboardRow-odd";
+			//
+			//			//	      Date begin = new Date();
+			//			for (int i = 1; i < PlayerList.size()+1; ++i) {
+			//				T t = PlayerList.get(i-1);
+			//				for (int j = 0; j < columnDefinitions.size(); ++j) {
+			//					ColumnDefinition<T> columnDefinition = columnDefinitions.get(j);
+			//
+			//					playersTable.setWidget(i, j, columnDefinition.render(t));
+			//					if (j < 4) {
+			//						// first four columns are clickable
+			//						playersTable.getCellFormatter().setStyleName(i, j, "leaderboardCell");
+			//					}
+			//
+			//				}
+			//				playersTable.getRowFormatter().setStyleName(i, style);
+			//				if (style == "leaderboardRow-odd")
+			//					style = "leaderboardRow-even";
+			//				else
+			//					style = "leaderboardRow-odd";
+			//
+			//			}
+			//
+			//			//	      Date end = new Date();
+			//
+			//			//	      Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,begin.toLocaleString() + " end: " + end.toLocaleString());
 		}
 	}
 
 	private void setHeaders() {
-		int i = 0;
-		for (String s : headers) {
-			playersTable.setHTML(0, i++, s);	
-		}
-
-		playersTable.getRowFormatter().addStyleName(0, "leaderboardRow-header");
+		//		int i = 0;
+		//		for (String s : headers) {
+		//			playersTable.setHTML(0, i++, s);	
+		//		}
+		//
+		//		playersTable.getRowFormatter().addStyleName(0, "leaderboardRow-header");
 
 
 	}
@@ -160,20 +213,20 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 		return shouldFireClickEvent;
 	}
 
-//	private boolean shouldFireSelectEvent(HTMLTable.Cell cell) {
-//		boolean shouldFireSelectEvent = false;
-//
-//		if (cell != null) {
-//			ColumnDefinition<T> columnDefinition =
-//					columnDefinitions.get(cell.getCellIndex());
-//
-//			if (columnDefinition != null) {
-//				shouldFireSelectEvent = columnDefinition.isSelectable();
-//			}
-//		}
-//
-//		return shouldFireSelectEvent;
-//	}
+	//	private boolean shouldFireSelectEvent(HTMLTable.Cell cell) {
+	//		boolean shouldFireSelectEvent = false;
+	//
+	//		if (cell != null) {
+	//			ColumnDefinition<T> columnDefinition =
+	//					columnDefinitions.get(cell.getCellIndex());
+	//
+	//			if (columnDefinition != null) {
+	//				shouldFireSelectEvent = columnDefinition.isSelectable();
+	//			}
+	//		}
+	//
+	//		return shouldFireSelectEvent;
+	//	}
 
 
 	@SuppressWarnings("unchecked")
@@ -181,7 +234,7 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 	public void setListener(Listener<T> listener) {
 		this.listener = listener;
 
-		PlayerListViewColumnDefinitions.setListener((Listener<IPlayerMatchInfo>) listener);
+		//		PlayerListViewColumnDefinitions.setListener((Listener<IPlayerMatchInfo>) listener);
 
 	}
 
@@ -194,37 +247,118 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 
 	@Override
 	public void showWait() {
-		playersTable.removeAllRows();
-		playersTable.setWidget(0,0,new HTML("Stand by...")); //new Image("/resources/images/ajax-loader.gif"));
-		
+		//		playersTable.removeAllRows();
+		//		playersTable.setWidget(0,0,new HTML("Stand by...")); //new Image("/resources/images/ajax-loader.gif"));
+
 	}
 
 
 
 	@Override
 	public void updatePlayerMatchStats(T newPmi) {
-		// find it in the playerList
-		boolean found = false;
+		List<T> list = dataProvider.getList();
+
 		int index = 0;
-		for (IPlayerMatchInfo pmi : playerList) {
-			if (pmi.getPlayerMatchStats().getId().equals(newPmi.getPlayerMatchStats().getId())) {
-				found = true;
-				break;
-			}
+		for (T t: list) {
 			index++;
-		}
-		
-		if (found) {
-			assert (index < playerList.size());
-			for (int j = 0; j < columnDefinitions.size(); ++j) {
-				ColumnDefinition<T> columnDefinition = columnDefinitions.get(j);
-
-				playersTable.setWidget(index, j, columnDefinition.render(newPmi));
-
-
+			if (t.getPlayerMatchStats().getId().equals(newPmi.getPlayerMatchStats().getId())) {
+				list.remove(t);
+				list.add(index-1, newPmi);
 			}
 		}
+		//		// find it in the playerList
+		//		boolean found = false;
+		//		int index = 0;
+		//		for (IPlayerMatchInfo pmi : playerList) {
+		//			if (pmi.getPlayerMatchStats().getId().equals(newPmi.getPlayerMatchStats().getId())) {
+		//				found = true;
+		//				break;
+		//			}
+		//			index++;
+		//		}
+		//		
+		//		if (found) {
+		//			assert (index < playerList.size());
+		//			for (int j = 0; j < columnDefinitions.size(); ++j) {
+		//				ColumnDefinition<T> columnDefinition = columnDefinitions.get(j);
+		//
+		//				playersTable.setWidget(index, j, columnDefinition.render(newPmi));
+		//
+		//
+		//			}
+		//		}
 	}
 
+	private boolean AddColumnSorters(int j, Column<T,?> col, List<T> PlayerList) {
+		if (j == 0) {
+			// Add a ColumnSortEvent.ListHandler to connect sorting to the
+			// java.util.List.
+			ListHandler<T> columnSortHandler = new ListHandler<T>(PlayerList);
+			columnSortHandler.setComparator(col,
+					new Comparator<T>() {
+				public int compare(T o1, T o2) {
+					if (o1.getPlayerMatchStats().getSlot().equals(o2.getPlayerMatchStats().getSlot())) {
+						return 0;
+					}
+
+					// Compare the name columns.
+					if (o1 != null) {
+						return (o2 != null) ? o1.getPlayerMatchStats().getSlot().compareTo(o2.getPlayerMatchStats().getSlot()) : 1;
+					}
+					return -1;
+				}
+			});
+			playersTable.addColumnSortHandler(columnSortHandler);
+
+			// We know that the data is sorted by slot by default.
+			// @TODO doesn't differentiate by HoV
+			playersTable.getColumnSortList().push(col);
+		} else if (j == 1) {
+			// Add a ColumnSortEvent.ListHandler to connect sorting to the
+			// java.util.List.
+			ListHandler<T> columnSortHandler = new ListHandler<T>(PlayerList);
+		columnSortHandler.setComparator(col, new Comparator<T>() {
+				public int compare(T o1, T o2) {
+					if (o1.getPlayerMatchStats().getName().equals(o2.getPlayerMatchStats().getName())) {
+						return 0;
+					}
+
+					// Compare the name columns.
+					if (o1 != null) {
+						return (o2 != null) ? o1.getPlayerMatchStats().getName().compareTo(o2.getPlayerMatchStats().getName()) : 1;
+					}
+					return -1;
+				}
+			});
+			playersTable.addColumnSortHandler(columnSortHandler);
+		} else if (j == 3) {
+			// Add a ColumnSortEvent.ListHandler to connect sorting to the
+			// java.util.List.
+			ListHandler<T> columnSortHandler = new ListHandler<T>(PlayerList);
+		columnSortHandler.setComparator(col, new Comparator<T>() {
+				public int compare(T o1, T o2) {
+					if (o1.getMatchRating() == null || ((PlayerRating) (o1.getMatchRating())).getRating() == null) {
+						return 1;
+					}
+					
+					if (o2.getMatchRating() == null || ((PlayerRating) (o2.getMatchRating())).getRating() == null) {
+						return -1;
+					}
+					if ( ((PlayerRating) (o1.getMatchRating())).getRating().equals(((PlayerRating) (o2.getMatchRating())).getRating())) {
+
+						return 0;
+					}
+
+					// Compare the name columns.
+					if (o1 != null) {
+						return (o2 != null) ? ((PlayerRating) (o1.getMatchRating())).getRating().compareTo(((PlayerRating) (o2.getMatchRating())).getRating()) : 1;
+					}
+					return -1;
+				}
+			});
+			playersTable.addColumnSortHandler(columnSortHandler);
+		}
+		return true;
+	}
 
 }

@@ -60,7 +60,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiField SimplePanel jobArea;
 	@UiField Button createAdmin;
 	@UiField Button sanityCheck;
-	@UiField Button testMatchStats;
 	@UiField SimplePanel menuBarPanel;
 	
 	Presenter listener = null;
@@ -165,12 +164,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	void onsanityCheckClick(ClickEvent e) {
 		
 		listener.sanityCheckClicked();
-	}
-	
-	@UiHandler("testMatchStats")
-	void ontestMatchStatsClick(ClickEvent e) {
-		
-		listener.testMatchStatsClicked(12L);
 	}
 	
 	@Override

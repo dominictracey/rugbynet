@@ -3,6 +3,7 @@ package net.rugby.foundation.admin.client.ui.task;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -48,6 +49,12 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 				public boolean isSelectable() {
 					return true;
 				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
+				}
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
@@ -60,6 +67,12 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 				public boolean isClickable() {
 					return true;
 				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
+				}
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
@@ -68,6 +81,12 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 					String pos = c.getDetails();
 					return new HTML(pos);
 				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
+				}
 			});
 			
 			columnDefinitions.add(new ColumnDefinition<T>() {
@@ -75,6 +94,12 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 				public Widget render(T c) {
 					String pos = c.getStatus().toString();
 					return new HTML(pos);
+				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
 				}
 			});
 
@@ -87,6 +112,12 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 
 				public boolean isClickable() {
 					return false;  // it's an a href
+				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
 				}
 			});
 

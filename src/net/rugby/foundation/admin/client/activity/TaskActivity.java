@@ -90,6 +90,29 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 						} 
 					}
 				});
+			} else /*if (adminTaskPlace.getFilter() != null)*/ {
+				clientFactory.getRpcService().getAllOpenAdminTasks( new AsyncCallback<List<IAdminTask>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to fetch admin tasks");
+					}
+
+					@Override
+					public void onSuccess(List<IAdminTask> result) {
+						view.showList(result);
+
+						IAdminTask target = null;
+						index = 0;
+						// find the task specified in the url
+						for (IAdminTask task : result) {
+							if (task.getId().toString().equals(adminTaskPlace.getTaskId())) {
+								target = task;
+								break;
+							}
+							++index;
+						}
+					}
+				});
 			}
 		}
 	}

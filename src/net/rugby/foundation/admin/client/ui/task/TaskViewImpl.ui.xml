@@ -20,11 +20,11 @@
 	 <g:SimplePanel ui:field='menuBarPanel'></g:SimplePanel>
     
     <g:HTMLPanel>
-
+	<g:Button ui:field="deleteSelected">Delete Selected</g:Button>
         <g:FlexTable
             addStyleNames="{style.playersViewPlayersFlexTable}"
-            width="100%"
-            ui:field="taskTable" />
+            
+width="100%"            ui:field="taskTable" />
     </g:HTMLPanel>
 </g:VerticalPanel>
 </ui:UiBinder>

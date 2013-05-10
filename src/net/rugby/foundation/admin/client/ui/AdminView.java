@@ -1,6 +1,7 @@
 package net.rugby.foundation.admin.client.ui;
 
 import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.shared.IAdminTask;
 
@@ -31,4 +32,6 @@ public interface AdminView extends IsWidget {
 	void setClientFactory(ClientFactory clientFactoryImpl);
 
 	TaskView<IAdminTask> getTaskView();
+	
+	PortalView getPortalView();
 }

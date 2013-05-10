@@ -570,7 +570,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 			public void onSuccess(IMatchGroup result) {
 				em.SetPresenter(presenter);
 				em.ShowMatch(result);
-
+				final IMatchGroup match = result;
 				clientFactory.getRpcService().getPlayerMatchInfo(matchId, new AsyncCallback<List<IPlayerMatchInfo>>() {
 
 					@Override
@@ -582,7 +582,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 					@Override
 					public void onSuccess(List<IPlayerMatchInfo> result) {
 						plv.setListener(presenter2);
-						plv.setPlayers(result);
+						plv.setPlayers(result, match);
 					}
 				});
 			}
@@ -703,7 +703,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 	 * @see net.rugby.foundation.admin.client.ui.EditMatch.Presenter#fetchMatchStats(net.rugby.foundation.model.shared.IMatchGroup)
 	 */
 	@Override
-	public void fetchMatchStats(IMatchGroup matchGroup) {
+	public void fetchMatchStats(final IMatchGroup matchGroup) {
 		clientFactory.getRpcService().fetchMatchStats(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
 
 			@Override
@@ -713,7 +713,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 			@Override
 			public void onSuccess(List<IPlayerMatchInfo> result) {
-				view.getPlayerListView().setPlayers(result);
+				view.getPlayerListView().setPlayers(result, matchGroup);
 			}
 		});	
 	}
@@ -725,26 +725,6 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 	public void fetchPlayerStats(IMatchGroup matchGroup) {
 		// TODO Auto-generated method stub
 
-	}
-
-
-	@Override
-	public void testMatchStatsClicked(Long matchId) {
-		clientFactory.getRpcService().testMatchStats(matchId, new AsyncCallback<List<IPlayerMatchStats>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-
-				Window.alert("Player not saved: " + caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(List<IPlayerMatchStats> result) {
-
-				Window.alert(result.toString());
-
-			}
-		});	
 	}
 
 
@@ -847,21 +827,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 			public void onSuccess(IPlayerMatchInfo result) {
 
 				view.getPlayerListView().updatePlayerMatchStats(result);
-				//				Window.alert("Player Stats saved");
-				//				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
-				//				clientFactory.getRpcService().getMatch(pms.getMatchId(), new AsyncCallback<IMatchGroup>() {
-				//
-				//					@Override
-				//					public void onFailure(Throwable caught) {
-				//
-				//
-				//					}
-				//
-				//					@Override
-				//					public void onSuccess(IMatchGroup result) {
-				//						fetchMatchStats(result);
-				//					}
-				//				});	
+				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
 
 			}
 		});			

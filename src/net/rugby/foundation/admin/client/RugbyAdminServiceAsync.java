@@ -123,5 +123,8 @@ public interface RugbyAdminServiceAsync {
 	public void fetchMatchScore(IMatchGroup matchGroup, Long currentCompId,
 			List<String> log, AsyncCallback<IMatchGroup> asyncCallback);
 	public void refetchPlayerMatchStats(IPlayerMatchStats pms, AsyncCallback<IPlayerMatchStats> asyncCallback);
+	public void aggregatePlayerMatchRatings(Long compId, Long roundId,
+			position posi, Long countryId, Long teamId,
+			AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
 
 }

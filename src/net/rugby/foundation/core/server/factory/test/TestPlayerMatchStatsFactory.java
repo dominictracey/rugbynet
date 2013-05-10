@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStatTimeLog;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
@@ -58,6 +59,13 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 
 	@Override
 	public List<IPlayerMatchStats> getByMatchId(Long matchId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<IPlayerMatchStats> query(List<Long> matchIds,
+			position posi, Long countryId, Long teamId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

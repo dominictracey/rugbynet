@@ -58,6 +58,7 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	//@Indexed
 	private Integer slot;
 	private Long playerId;
+	private Long countryId;
 	private Long matchId;
 	private Long teamId;
 	private position pos;
@@ -550,12 +551,23 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 
 	}
 
+	@Override
 	public Integer getSlot() {
 		return slot;
 	}
-
+	@Override
 	public void setSlot(Integer slot) {
 		this.slot = slot;
+	}
+
+	@Override
+	public Long getCountryId() {
+		return countryId;
+	}
+
+	@Override
+	public void setCountryId(Long countryId) {
+		this.countryId = countryId;
 	}
 
 

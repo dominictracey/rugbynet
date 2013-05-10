@@ -54,10 +54,8 @@ public class EditMatch extends Composite {
 		 */
 		void fetchMatchStats(IMatchGroup matchGroup);
 
-		/**
-		 * @param matchGroup
-		 */
 		void fetchPlayerStats(IMatchGroup matchGroup);
+
 	} 
 	
 	public EditMatch() {

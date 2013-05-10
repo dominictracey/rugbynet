@@ -1,5 +1,6 @@
 package net.rugby.foundation.admin.client.ui;
 
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.Widget;
 
 public abstract class ColumnDefinition<T> {
@@ -16,4 +17,6 @@ public abstract class ColumnDefinition<T> {
     public void clear() {
     	
     }
+
+	public abstract Column<T, ?> getColumn(); 
   }

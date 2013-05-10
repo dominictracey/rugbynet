@@ -208,7 +208,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
         		}
         		
         		trip = getTriplet(it);
-        		if (trip.attr.equals("Possession")) {
+        		if (trip.attr.contains("Possession")) {
         			if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
         				String num = stripPercentSign(trip.homeVal);
         				tms.setPossesion(Float.parseFloat(num));

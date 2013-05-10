@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.UrlCacher;
-import net.rugby.foundation.core.server.BPMServletModule;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -20,7 +19,6 @@ import com.google.appengine.tools.pipeline.FutureList;
 import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.Job1;
 import com.google.appengine.tools.pipeline.Value;
-import com.google.inject.Guice;
 
 //@Singleton
 public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchGroup> implements Serializable {
@@ -31,7 +29,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 
 
 	public GenerateMatchRatings() {
-		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
 
@@ -145,12 +143,85 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 				//skip down to players
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE,"Skipping down to teams...");
 
-				for (int i=0; i<38; ++i) {
+//				boolean foundTries = false;
+//				boolean foundCons = false;
+//				boolean foundPens = false;
+//				boolean foundDrops = false;
+//				// tries
+//				
+//				for (int i=0; i<10; ++i) {
+//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
+//					line = it.next(); 
+//					if (line.contains("Tries")) {
+//						foundTries = true;
+//					} else if (line.contains("Cons")) {
+//						foundCons = true;
+//					} else if (line.contains("Pens")) {
+//						foundPens = true;
+//					} else if (line.contains("Drops")) {
+//						foundDrops = true;
+//					}
+//				}
+//				
+//				// cons
+//				if (!foundCons !line.contains("<tr>")) {
+//					for (int i=0; i<10; ++i) {
+//						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
+//						line = it.next(); 
+//						if (line.contains("Tries")) {
+//							foundTries = true;
+//						} else if (line.contains("Cons")) {
+//							foundCons = true;
+//						} else if (line.contains("Pens")) {
+//							foundPens = true;
+//						} else if (line.contains("Drops")) {
+//							foundDrops = true;
+//						}
+//					}
+//				}
+//				
+//				// pens
+//				if (!foundPens && !line.contains("<tr>")) {
+//					for (int i=0; i<10; ++i) {
+//						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
+//						line = it.next(); 
+//						if (line.contains("Tries")) {
+//							foundTries = true;
+//						} else if (line.contains("Cons")) {
+//							foundCons = true;
+//						} else if (line.contains("Pens")) {
+//							foundPens = true;
+//						} else if (line.contains("Drops")) {
+//							foundDrops = true;
+//						}
+//					}
+//				}
+//				
+//				// drops
+//				if (!line.contains("<tr>")) {
+//					for (int i=0; i<10; ++i) {
+//						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
+//						line = it.next(); 
+//					}
+//				}
+				
+				// there can be a bunch of optional 10-line sections here for tries, cons, pens and drops
+				// easiest to just look for the top of the player section
+				while (it.hasNext() && !line.contains("<tr>")) {
+					line = it.next();
+				}
+				
+				if (!it.hasNext()) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Couldn't find top of the player section in teams tab when skipping through the summary headers (tries, cons, pens, drops)");
+					return null;
+				}
+				
+				// divTeams
+				for (int i=0; i<8; ++i) {
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
 					line = it.next(); 
 				}
-
-
+				
 				//line = it.next(); // tbody
 
 				// get 15 home starters

@@ -3,11 +3,14 @@ package net.rugby.foundation.admin.client.ui;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
+import net.rugby.foundation.admin.client.ui.portal.PortalView;
+import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresenter;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.task.TaskView.TaskViewPresenter;
 import net.rugby.foundation.admin.client.ui.task.TaskViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.task.TaskViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 
 import org.cobogw.gwt.user.client.CSS;
 
@@ -30,6 +33,7 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 	private TaskViewImpl<IAdminTask> taskv;
 	TabPanel tabs;
 	private ClientFactory clientFactory;
+	private PortalView<IPlayerMatchInfo> pv;
 
 	public AdminViewImpl() {
 
@@ -69,6 +73,9 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 		
 		if (listener instanceof TaskViewPresenter<?>) {
 			taskv.setPresenter((TaskViewPresenter<IAdminTask>)listener);
+		}
+		if (listener instanceof PortalViewPresenter<?>) {
+			pv.setPresenter((PortalViewPresenter<IPlayerMatchInfo>)listener);
 		}
 	}
 
@@ -144,6 +151,11 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 
 	public Presenter getListener() {
 		return listener;
+	}
+
+	@Override
+	public PortalView getPortalView() {
+		return pv;
 	}
 
 }

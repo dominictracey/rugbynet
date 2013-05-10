@@ -124,6 +124,10 @@ public interface IPlayerMatchStats {
 	public abstract void playerOff(int i);
 
 	public abstract void matchOver(int time);
+
+	public abstract Long getCountryId();
+
+	public abstract void setCountryId(Long countryId);
 	
 
 }

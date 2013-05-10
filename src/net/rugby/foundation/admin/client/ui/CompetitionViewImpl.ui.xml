@@ -14,11 +14,11 @@
 			margin: 5px;
 		}
 		.urlbox {
-			width:500px;
+			width:300px;
 
 		}
 		.editArea {
-			width:500px;
+			width:1000px;
 			background-color:lightblue;
 			padding:20px;
 		}
@@ -97,9 +97,6 @@ Create Admin
 Sanity Check
                         </g:Button>
 
-                        <g:Button ui:field="testMatchStats" >
-Fetch Match Stats
-                        </g:Button>
                     </g:HorizontalPanel>
                 </g:VerticalPanel>
             </g:VerticalPanel>

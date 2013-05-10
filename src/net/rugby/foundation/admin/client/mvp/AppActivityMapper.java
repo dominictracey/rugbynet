@@ -3,10 +3,12 @@ package net.rugby.foundation.admin.client.mvp;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.activity.CompActivity;
 import net.rugby.foundation.admin.client.activity.OrchestrationConfigurationActivity;
+import net.rugby.foundation.admin.client.activity.PortalActivity;
 import net.rugby.foundation.admin.client.activity.TaskActivity;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminOrchPlace;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
+import net.rugby.foundation.admin.client.place.PortalPlace;
 
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
@@ -36,6 +38,8 @@ public class AppActivityMapper implements ActivityMapper {
 			return new TaskActivity((AdminTaskPlace) place, clientFactory);
 		if (place instanceof AdminOrchPlace)
 			return new OrchestrationConfigurationActivity((AdminOrchPlace) place, clientFactory);
+		if (place instanceof PortalPlace)
+			return new PortalActivity((PortalPlace) place, clientFactory);
 
 		return null;
 	}

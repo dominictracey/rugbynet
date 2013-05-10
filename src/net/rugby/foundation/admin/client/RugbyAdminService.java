@@ -91,4 +91,5 @@ public interface RugbyAdminService extends RemoteService {
 	IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
 	ICompetition repairComp(ICompetition comp);
 	IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms);
+	List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId, Long roundId, position posi, Long countryId, Long teamId);
 }

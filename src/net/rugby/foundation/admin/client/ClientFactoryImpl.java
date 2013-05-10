@@ -1,6 +1,8 @@
 package net.rugby.foundation.admin.client;
 
 import java.util.List;
+
+import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.CompetitionViewImpl;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
@@ -8,12 +10,17 @@ import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationViewImpl;
 import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.SmartBarImpl;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupViewImpl;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewImpl;
+import net.rugby.foundation.admin.client.ui.portal.PortalView;
+import net.rugby.foundation.admin.client.ui.portal.PortalViewImpl;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.task.TaskViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.task.TaskViewImpl;
@@ -21,6 +28,7 @@ import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -41,13 +49,17 @@ public class ClientFactoryImpl implements ClientFactory {
 	private static final CompetitionView compView = new CompetitionViewImpl();
 	private static OrchestrationConfigurationView orchView = null;
 	private static TaskView<IAdminTask> taskView = null;
+	private static PortalView<IPlayerMatchInfo> portalView = null;
 	private static final RugbyAdminServiceAsync rpcService = GWT.create(RugbyAdminService.class);
 	private PlayerPopupView<IPlayer> playerPopupView;
 	private PlayerMatchStatsPopupView<IPlayerMatchStats> playerMatchStatsPopupView;
 
 	private List<FieldDefinition<IPlayer>> playerPopupViewFieldDefinitions;
 	private List<FieldDefinition<IPlayerMatchStats>> playerMatchStatsPopupViewFieldDefinitions;
-
+	
+	private PlayerListView<IPlayerMatchInfo> playerListView = null;
+	private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions =  null; 
+	
 	@Override
 	public EventBus getEventBus() {
 		return eventBus;
@@ -180,5 +192,31 @@ public class ClientFactoryImpl implements ClientFactory {
 	@Override
 	public SmartBar getMenuBar() {
 		return new SmartBarImpl();
+	}
+
+	@Override
+	public PlayerListView<IPlayerMatchInfo> getPlayerListView() {
+		if (playerListView == null) {
+			playerListView = new PlayerListViewImpl<IPlayerMatchInfo>();
+
+			//editMatchStats = new PlayerListViewImpl<IPlayerMatchInfo>();
+			  if (playerListViewColumnDefinitions == null) {
+				PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerMatchInfo>();
+			    playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
+			  }
+
+			  playerListView.setColumnDefinitions(playerListViewColumnDefinitions);
+			  playerListView.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
+		}
+		return playerListView;
+	}
+
+	@Override
+	public PortalView<IPlayerMatchInfo> getPortalView() {
+		if (portalView == null) {
+			portalView = new PortalViewImpl<IPlayerMatchInfo>();
+			portalView.setClientFactory(this);
+		}
+		return portalView;
 	}
 }

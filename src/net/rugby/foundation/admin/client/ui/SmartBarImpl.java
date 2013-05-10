@@ -6,6 +6,7 @@ import java.util.Map;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
+import net.rugby.foundation.admin.client.place.PortalPlace;
 import net.rugby.foundation.game1.shared.IConfiguration;
 import net.rugby.foundation.game1.shared.IEntry;
 import net.rugby.foundation.model.shared.IClubhouse;
@@ -42,7 +43,10 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@UiField MenuItem taskMenuShow;
 	@UiField
 	MenuBar taskBar;
-
+	@UiField
+	MenuBar portalBar;
+	@UiField MenuItem portalMenuShow;
+	
 	public SmartBarImpl() {
 		initWidget(binder.createAndBindUi(this));
 
@@ -58,7 +62,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 		taskMenuShow.setCommand(new Command() {
 			@Override
 			public void execute() {
-				listener.goTo(new AdminTaskPlace(""));
+				listener.goTo(new AdminTaskPlace("filter=ALL"));
 			}
 			
 		});
@@ -72,6 +76,12 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			@Override
 			public void execute() {
 				listener.goTo(new AdminCompPlace(Filter.UNDERWAY));
+			}
+		});
+		portalMenuShow.setCommand(new Command() {
+			@Override
+			public void execute() {
+				listener.goTo(new PortalPlace(""));
 			}
 		});
 	}

@@ -891,7 +891,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 
 			//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(1));
+			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(3));
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
 			while (true) {
@@ -981,6 +981,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 		
 		return fetcher.getStats();
+	}
+
+	@Override
+	public List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId,
+			Long roundId, position posi, Long countryId, Long teamId) {
+		return pmif.query(compId, roundId, posi, countryId, teamId);
 	}
 
 

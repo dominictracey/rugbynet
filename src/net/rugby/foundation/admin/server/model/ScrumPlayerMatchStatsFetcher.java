@@ -50,6 +50,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 		if (player != null) {
 			stats.setPlayerId(player.getId());  // native ID, not scrum's
+			stats.setCountryId(player.getCountryId());
 		}
 
 		stats.setSlot(slot);
@@ -189,6 +190,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		else
 			stats.setTeamId(match.getVisitingTeamId());		
 		stats.setName(player.getSurName());
+		stats.setCountryId(player.getCountryId());
 		stats.setTimePlayed(0);
 		pmsf.put(stats);
 		return stats;
@@ -312,7 +314,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				while (!line.contains(pms.getName()) && !line.contains("</tr>")) {
 					line = getNext(it);
 					if (line.contains(pms.getName())) {
-						if (pms.getName().equals(line.split("-")[0].trim())) {
+						if (line.split("[<|>|-]")[0].trim().equals(pms.getName()) ||line.split("[<|>|-]")[1].trim().equals(pms.getName()) || line.split("[<|>|-]")[2].trim().equals(pms.getName())) {
 							if (line.contains("sub")) {
 								if (line.split("sub")[1].trim().contains("on")) {
 									pms.playerOn(time);

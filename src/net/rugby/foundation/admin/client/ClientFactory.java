@@ -4,13 +4,16 @@ import java.util.List;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.SmartBar;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
+import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -56,4 +59,8 @@ public interface ClientFactory {
 	TaskView<IAdminTask> getTaskView();
 
 	SmartBar getMenuBar();
+
+	PlayerListView<IPlayerMatchInfo> getPlayerListView();
+
+	PortalView<IPlayerMatchInfo> getPortalView();
 }

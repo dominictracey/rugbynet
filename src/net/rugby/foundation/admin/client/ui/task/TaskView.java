@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.model.shared.ICompetition;
 
 public interface TaskView<T extends IAdminTask> extends IsWidget {
 	public interface TaskViewPresenter<T> {
