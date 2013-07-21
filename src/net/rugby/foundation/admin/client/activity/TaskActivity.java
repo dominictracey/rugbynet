@@ -17,16 +17,19 @@ import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchSta
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.task.TaskView.TaskViewPresenter;
+import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView.TeamMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
+import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 public class TaskActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
-PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminTask> { 
+PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, TaskViewPresenter<IAdminTask> { 
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -43,7 +46,6 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 
 		this.clientFactory = clientFactory;
 		view = clientFactory.getTaskView();
-		clientFactory.getPlayerPopupView().setPresenter(this);
 		// Select the tab corresponding to the token value
 		if (place.getToken() != null) {
 //			view.selectTab(2, false);
@@ -145,6 +147,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 		this.index = i;
 		if (target.getAction().equals(IAdminTask.Action.EDITPLAYER)) {	
 			assert (target instanceof EditPlayerAdminTask);
+			clientFactory.getPlayerPopupView().setPresenter(this);
 			clientFactory.getRpcService().getPlayer(((EditPlayerAdminTask)target).getPlayerId(), new AsyncCallback<IPlayer>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -164,6 +167,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 		}
 		else if (target.getAction().equals(IAdminTask.Action.EDITPLAYERMATCHSTATS)) {
 			assert (target instanceof EditPlayerMatchStatsAdminTask);
+			clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 			clientFactory.getRpcService().getPlayerMatchStats(((EditPlayerMatchStatsAdminTask)target).getPlayerMatchStatsId(), new AsyncCallback<IPlayerMatchStats>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -181,8 +185,24 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 				}
 			});
 		} else if (target.getAction().equals(IAdminTask.Action.EDITTEAMMATCHSTATS)) {
-//							view.editPlayerMatchStats(result, index);
-		}
+			assert (target instanceof EditTeamMatchStatsAdminTask);
+			clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
+			clientFactory.getRpcService().getTeamMatchStats(((EditTeamMatchStatsAdminTask)target).getMatchId(), ((EditTeamMatchStatsAdminTask)target).getTeamId(), new AsyncCallback<ITeamMatchStats>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Failed to fetch team match stats to edit");
+				}
+
+				@Override
+				public void onSuccess(ITeamMatchStats result) {
+					if (result != null) {
+						clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+					} else {
+						clientFactory.getTeamMatchStatsPopupView().clear();
+					}
+					((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+				}
+			});		}
 	}
 
 	@Override
@@ -192,6 +212,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 	
 	@Override
 	public void onSaveEditPlayerClicked(IPlayer player) {
+		clientFactory.getPlayerPopupView().setPresenter(this);
 		clientFactory.getRpcService().savePlayer(player, target, new AsyncCallback<IPlayer>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -282,6 +303,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 
 	@Override
 	public void showPlayerPopup(IPlayerMatchStats target) {
+		clientFactory.getPlayerPopupView().setPresenter(this);
 		clientFactory.getRpcService().getPlayer(target.getPlayerId(), new AsyncCallback<IPlayer>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -311,6 +333,42 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TaskViewPresenter<IAdminT
 				((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).center();
 			}
 		});
+		
+	}
+	
+	@Override
+	public void flushAllPipelineJobs() {
+		clientFactory.flushAllPipelineJobs();
+		
+	}
+
+	@Override
+	public void onSaveTeamMatchStatsClicked(ITeamMatchStats tms) {
+		clientFactory.getRpcService().saveTeamMatchStats(tms, target, new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save team match stats: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).hide();
+				updateTask();
+			}
+
+
+		});	
+		
+	}
+
+	@Override
+	public void onCancelEditTeamMatchStatsClicked() {
+		((DialogBox)clientFactory.getTeamMatchStatsPopupView()).hide();
+	}
+
+	@Override
+	public void onRefetchEditTeamMatchStatsClicked(ITeamMatchStats target) {
+		Window.alert("Not implemented");
 		
 	}
 

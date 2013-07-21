@@ -6,9 +6,14 @@ package net.rugby.foundation.model.shared;
 import net.rugby.foundation.admin.shared.AdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
+import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.OrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.admin.shared.WorkflowConfiguration;
 
+import com.google.appengine.tools.pipeline.impl.model.JobInstanceRecord;
+import com.google.appengine.tools.pipeline.impl.model.JobRecord;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
 
@@ -55,9 +60,14 @@ public class DataStoreFactory {
 			ObjectifyService.register(PlayerRating.class);
 			ObjectifyService.register(PlayerMatchRating.class);
 			ObjectifyService.register(PlayerMatchInfo.class);
+			
+			// these should be split off into another DAO manager thingie
 			ObjectifyService.register(AdminTask.class);
 			ObjectifyService.register(EditPlayerAdminTask.class);
 			ObjectifyService.register(EditPlayerMatchStatsAdminTask.class);
+			ObjectifyService.register(EditTeamMatchStatsAdminTask.class);
+			ObjectifyService.register(ScrumMatchRatingEngineSchema.class);
+			ObjectifyService.register(ScrumMatchRatingEngineSchema20130713.class);
 			
 		}
 		

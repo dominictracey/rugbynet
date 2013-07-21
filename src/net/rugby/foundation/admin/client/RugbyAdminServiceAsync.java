@@ -10,6 +10,8 @@ import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatin
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -19,6 +21,7 @@ import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
 
@@ -126,5 +129,30 @@ public interface RugbyAdminServiceAsync {
 	public void aggregatePlayerMatchRatings(Long compId, Long roundId,
 			position posi, Long countryId, Long teamId,
 			AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
-
+	public void reRateMatch(Long id, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+	public void  getTeamMatchStats(Long matchId, Long teamId, AsyncCallback<ITeamMatchStats> asyncCallback);
+	public void refetchTeamMatchStats(ITeamMatchStats target,
+			AsyncCallback<ITeamMatchStats> asyncCallback);
+	public void saveTeamMatchStats(ITeamMatchStats tms, IAdminTask target,
+			AsyncCallback<ITeamMatchStats> asyncCallback);
+	public void saveMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema schema,
+			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
+	public void getMatchRatingEngineSchema(Long schemaId,
+			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
+	public void saveMatchRatingEngineSchemaAsCopy(
+			ScrumMatchRatingEngineSchema schema,
+			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
+	public void deleteMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema20130713 schema,
+			AsyncCallback<Boolean> asyncCallback);
+	public void deleteRatingsForMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema20130713 schema,
+			AsyncCallback<Boolean> asyncCallback);
+	public void setMatchRatingEngineSchemaAsDefault(
+			ScrumMatchRatingEngineSchema20130713 schema,
+			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);	
+	public void getScrumSchemaList(AsyncCallback<List<ScrumMatchRatingEngineSchema>> asyncCallback);
+	
+	public void flushAllPipelineJobs(AsyncCallback<Boolean> asyncCallback);
 }

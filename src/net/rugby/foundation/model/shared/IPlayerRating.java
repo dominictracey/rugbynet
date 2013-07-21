@@ -1,5 +1,7 @@
 package net.rugby.foundation.model.shared;
 
+import java.util.Date;
+
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 
 public interface IPlayerRating {
@@ -35,4 +37,8 @@ public interface IPlayerRating {
 	public abstract IPlayer getPlayer();
 
 	public abstract Long getPlayerId();
+	
+	public abstract Date getGenerated();
+	
+	public abstract void setGenerated(Date generated);
 }

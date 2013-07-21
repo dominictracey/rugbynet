@@ -1,5 +1,7 @@
 package net.rugby.foundation.model.shared;
 
+import java.util.List;
+
 public interface ITeamMatchStats {
 
 	public abstract Long getId();
@@ -133,5 +135,7 @@ public interface ITeamMatchStats {
 	void setMatchId(Long matchId);
 
 	Long getMatchId();
+
+	public abstract void add(ITeamMatchStats stats);
 
 }

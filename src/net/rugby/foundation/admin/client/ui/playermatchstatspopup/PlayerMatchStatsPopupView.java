@@ -4,8 +4,6 @@ import java.util.List;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**

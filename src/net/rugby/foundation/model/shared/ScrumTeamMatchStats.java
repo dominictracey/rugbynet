@@ -1,7 +1,6 @@
 package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
-
 import javax.persistence.Id;
 
 import com.googlecode.objectify.annotation.Entity;
@@ -15,9 +14,9 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	private static final long serialVersionUID = 7786879877414979677L;
 
 	@Id
-	private Long id;
-	private Long matchId;
-	private Long teamId;
+	private Long 	id;
+	private Long 	matchId;
+	private Long 	teamId;
 	
 	private Integer tries;
 	
@@ -35,8 +34,8 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	private Integer runs;
 	private Integer metersRun;
 	
-	private Float possesion;
-	private Float territory;
+	private Float   possesion;
+	private Float   territory;
 	
 	private Integer cleanBreaks;
 	private Integer defendersBeaten;
@@ -62,6 +61,53 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	private Integer penaltiesConceded;
 	private Integer yellowCards;
 	private Integer redCards;
+	
+	public ScrumTeamMatchStats() {
+		tries = 0;                
+		                      
+		conversionsAttempted = 0; 
+		conversionsMade = 0;      
+		                      
+		penaltiesAttempted = 0;   
+		penaltiesMade = 0;        
+		                      
+		dropGoalsAttempted = 0;   
+		dropGoalsMade = 0;        
+		                      
+		kicksFromHand = 0;        
+		passes = 0;               
+		runs = 0;                 
+		metersRun = 0;            
+		                      
+		possesion = 0F;            
+		territory = 0F;            
+		                      
+		cleanBreaks = 0;          
+		defendersBeaten = 0;      
+		offloads = 0;             
+		                      
+		rucks = 0;                
+		rucksWon = 0;             
+		                      
+		mauls = 0;                
+		maulsWon = 0;             
+		                      
+		turnoversConceded = 0;    
+		                      
+		tacklesMade = 0;          
+		tacklesMissed = 0;        
+		                      
+		scrumsPutIn = 0;          
+		scrumsWonOnOwnPut = 0;    
+		                      
+		lineoutsThrownIn = 0;     
+		lineoutsWonOnOwnThrow = 0;
+		                      
+		penaltiesConceded = 0;    
+		yellowCards = 0;          
+		redCards = 0;             
+	}
+	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.ITeamMatchStats#getId()
 	 */
@@ -503,6 +549,53 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	@Override
 	public void setTeamId(Long teamId) {
 		this.teamId = teamId;
+	}
+	@Override
+	public void add(ITeamMatchStats s) {
+		tries += s.getTries();                
+        
+		conversionsAttempted += s.getConversionsAttempted(); 
+		conversionsMade += s.getConversionsMade();      
+		                      
+		penaltiesAttempted += s.getPenaltiesAttempted();   
+		penaltiesMade += s.getPenaltiesMade();        
+		                      
+		dropGoalsAttempted += s.getDropGoalsAttempted();   
+		dropGoalsMade += s.getDropGoalsMade();        
+		                      
+		kicksFromHand += s.getKicksFromHand();        
+		passes += s.getPasses();               
+		runs += s.getRuns();                 
+		metersRun += s.getMetersRun();            
+		                      
+		possesion += s.getPossesion();              
+		territory += s.getTerritory();              
+		                      
+		cleanBreaks += s.getCleanBreaks();          
+		defendersBeaten += s.getDefendersBeaten();      
+		offloads += s.getOffloads();             
+		                      
+		rucks += s.getRucks();                
+		rucksWon += s.getRucksWon();             
+		                      
+		mauls += s.getMauls();                
+		maulsWon += s.getMaulsWon();             
+		                      
+		turnoversConceded += s.getTurnoversConceded();    
+		                      
+		tacklesMade += s.getTacklesMade();          
+		tacklesMissed += s.getTacklesMissed();        
+		                      
+		scrumsPutIn += s.getScrumsPutIn();          
+		scrumsWonOnOwnPut += s.getScrumsWonOnOwnPut();    
+		                      
+		lineoutsThrownIn += s.getLineoutsThrownIn();     
+		lineoutsWonOnOwnThrow += s.getLineoutsWonOnOwnThrow();
+		                      
+		penaltiesConceded += s.getPenaltiesConceded();    
+		yellowCards += s.getYellowCards();          
+		redCards += s.getRedCards();             	
+		
 	}
 	
 }

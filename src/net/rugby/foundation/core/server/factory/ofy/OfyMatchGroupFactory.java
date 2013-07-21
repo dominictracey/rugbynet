@@ -25,6 +25,7 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -52,7 +53,6 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	@Override
 	public IMatchGroup getGame() {
 		try {
-			Objectify ofy = DataStoreFactory.getOfy();
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			IMatchGroup m = null;
@@ -89,7 +89,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 			return m;
 
 		} catch (Throwable ex) {
-			Logger.getLogger("Core Service: OfyMatchGroupFactory.Get").log(Level.SEVERE, ex.getMessage(), ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
 		
@@ -168,13 +168,15 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 			
 			return g;
 		} catch (Throwable ex) {
-			Logger.getLogger("Core Service: OfyMatchGroupFactory.Put").log(Level.SEVERE, ex.getMessage(), ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
 	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IMatchGroupFactory#find(net.rugby.foundation.model.shared.IMatchGroup)
+	 * 
+	 * It's ok not to cache this as it is just used (as of 7/13/13) in the competition import/set-up
 	 */
 	@Override
 	public IMatchGroup find(IMatchGroup match) {
@@ -201,8 +203,10 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 
 	@Override
 	public List<IMatchGroup> getMatchesForRound(Long roundId) {
-		Objectify ofy = DataStoreFactory.getOfy();
-		Round r = ofy.get(new Key<Round>(Round.class,roundId));
+//		Objectify ofy = DataStoreFactory.getOfy();
+//		Round r = ofy.get(new Key<Round>(Round.class,roundId));
+		rf.setId(roundId);
+		IRound r = rf.getRound();  //roundFactory handles memcaching
 		if (r != null) {
 			return r.getMatches();
 		} else {
@@ -211,13 +215,14 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.factory.IMatchGroupFactory#setFactories(net.rugby.foundation.core.server.factory.IRoundFactory, net.rugby.foundation.core.server.factory.ITeamGroupFactory)
-	 */
-//	@Override
-//	public void setFactories(IRoundFactory rf, ITeamGroupFactory tf) {
-//		this.tf = tf;
-//		this.rf = rf;		
-//	}
+	@Override
+	public List<? extends IMatchGroup> getMatchesWithPipelines() {
+		Objectify ofy = DataStoreFactory.getOfy();
+		// @REX should we just check the match - don't we need to also cross-check against comp as well?
+		Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("fetchMatchStatsPipelineId !=", null);
+		return qg.list();
+	}
+
+
 
 }

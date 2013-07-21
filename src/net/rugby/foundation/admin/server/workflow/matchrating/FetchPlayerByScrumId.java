@@ -19,6 +19,8 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
+
 import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
@@ -29,11 +31,12 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 	private static final long serialVersionUID = 483113213168220162L;
 	private transient IPlayerFactory pf;
 	private transient ICountryFactory cf;
-	private IAdminTaskFactory atf;
-	private String playerName;
-	private Long scrumPlayerId;
-	private Long adminId;
-
+	private transient IAdminTaskFactory atf;
+	private transient String playerName;
+	private transient Long scrumPlayerId;
+	private transient Long adminId;
+	private transient String referringURL;
+	
 	private static Injector injector = null;
 	
 	public FetchPlayerByScrumId() {
@@ -48,7 +51,9 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 	 */		
 	@Override
 	public Value<IPlayer> run(ICompetition comp, String playerName, String referringURL, Long scrumPlayerId, Long adminId) {
-		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINER);
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINER, "Looking for " + playerName);
+		
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();
 		}
@@ -60,12 +65,14 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 		this.playerName = playerName;
 		this.scrumPlayerId = scrumPlayerId;
 		this.adminId = adminId;
+		this.referringURL = referringURL;
 		
 		// first see if we have it in the database
 		IPlayer dbPlayer = pf.getByScrumId(scrumPlayerId);
 		//player.setDisplayName("Hugo Southwell");
 
-		if (dbPlayer != null) {
+		// will return a "blank player" if it can't find it in the DB so check if the returned player has a scrum ID set.
+		if (dbPlayer != null && dbPlayer.getScrumId() != null) {
 			return immediate(dbPlayer);
 		} else { // didn't find, so go looking
 			Value<IPlayer> player = getPlayerFromScrum(pf, scrumPlayerId);
@@ -314,5 +321,15 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 		shortName += " " + player.getSurName();
 		player.setShortName(shortName);
 		
+	}
+	
+	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown fetching player by scrumId: " + e.getLocalizedMessage());
+		//still didn't find, need human to get this going.
+		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
+		atf.put(task);
+
+		return x;
 	}
 }

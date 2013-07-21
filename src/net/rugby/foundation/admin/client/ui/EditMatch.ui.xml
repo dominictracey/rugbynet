@@ -18,12 +18,13 @@
 				Locked: <g:CheckBox ui:field='locked'></g:CheckBox><br/>
 				Home Score: <g:TextBox ui:field='homeScore'></g:TextBox>
 				Visitor Score: <g:TextBox ui:field='visitorScore'></g:TextBox><br/><br/>
+				Match Stats Pipeline: <g:Anchor ui:field='pipelineLink'></g:Anchor><br/>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 		<g:Button styleName="{style.important}" ui:field="lock">Lock</g:Button>
 		<g:Button styleName="{style.important}" ui:field="fetchScore">Fetch Score</g:Button>
-		<g:Button styleName="{style.important}" ui:field="fetchPlayers">Fetch Players</g:Button>
-		<g:Button styleName="{style.important}" ui:field="fetchMatchStats">Fetch Match Stats</g:Button>
-		<g:Button styleName="{style.important}" ui:field="fetchPlayerStats">Fetch Player Stats</g:Button>
-		
-	</g:HTMLPanel>
+		<g:Button styleName="{style.important}" ui:field="fetchMatchStats">Fetch Match Stats</g:Button>		
+		<g:Button styleName="{style.important}" ui:field="regenerateRatings">Re-rate</g:Button>	
+		<g:Button styleName="{style.important}" ui:field="showHomeTeamMatchStats">Home Team Match Stats</g:Button>		
+		<g:Button styleName="{style.important}" ui:field="showVisitingTeamMatchStats">Visiting Team Match Stats</g:Button>		
+					</g:HTMLPanel>
 </ui:UiBinder> 

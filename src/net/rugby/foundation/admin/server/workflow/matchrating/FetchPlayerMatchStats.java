@@ -1,8 +1,5 @@
 package net.rugby.foundation.admin.server.workflow.matchrating;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,7 +8,6 @@ import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
-import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
@@ -22,14 +18,19 @@ import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.Position;
 
 public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMatchGroup, Home_or_Visitor, Integer, String> {
 	private static Injector injector = null;
-	private IPlayerMatchStatsFetcherFactory pmsff;
-	private IPlayerMatchStatsFactory pmsf;
-	private IAdminTaskFactory atf;
-	private IPlayerMatchStatsFetcher fetcher;
+	private transient IPlayerMatchStatsFetcherFactory pmsff;
+	private transient IPlayerMatchStatsFactory pmsf;
+	private transient IAdminTaskFactory atf;
+	private transient IPlayerMatchStatsFetcher fetcher;
+	
+	protected transient IPlayer player;
+	protected  transient IMatchGroup match;
+	protected transient Home_or_Visitor hov;
+	protected transient Integer slot;
+	protected transient String url;
 	
 	public FetchPlayerMatchStats() {
 
@@ -43,6 +44,12 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 	@Override
 	public Value<IPlayerMatchStats> run(IPlayer player, IMatchGroup match, Home_or_Visitor hov, Integer slot, String url) {
 
+		this.player = player;
+		this.match = match;
+		this.hov = hov;
+		this.slot = slot;
+		this.url = url;
+		
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 		if (injector == null) {
 			injector  = BPMServletContextListener.getInjectorForNonServlets();
@@ -90,6 +97,14 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 			return x;
 		}
 
+	}
+	
+	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown getting player match stats for: " + e.getLocalizedMessage());
+		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+		IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Problem getting player match stats: for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot, e.getLocalizedMessage(), player, match, hov, slot, fetcher.getStats(), true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
+		atf.put(task);
+		return x;
 	}
 
 }

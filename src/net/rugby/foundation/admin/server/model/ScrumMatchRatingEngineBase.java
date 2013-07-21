@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130121;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -12,7 +12,7 @@ import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-public class ScrumMatchRatingEngineV001 implements
+public class ScrumMatchRatingEngineBase implements
 		IMatchRatingEngine  {
 
 	ITeamMatchStats homeTeamStats;
@@ -23,9 +23,9 @@ public class ScrumMatchRatingEngineV001 implements
 	protected final IPlayerMatchRatingFactory pmrf;
 	protected final IPlayerFactory pf;
 	
-	public ScrumMatchRatingEngineV001(IPlayerFactory pf, IPlayerMatchRatingFactory pmrf) {
+	public ScrumMatchRatingEngineBase(IPlayerFactory pf, IPlayerMatchRatingFactory pmrf) {
 		supportedSchemas = new ArrayList<IMatchRatingEngineSchema>();
-		supportedSchemas.add(new ScrumMatchRatingEngineSchema20130121());
+		supportedSchemas.add(new ScrumMatchRatingEngineSchema20130713());
 		this.pmrf = pmrf;
 		this.pf = pf;
 	}

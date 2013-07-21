@@ -8,7 +8,9 @@ import java.util.logging.Logger;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Objectify;
 
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
+import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
@@ -26,20 +28,20 @@ import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 
 public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 
-	private Objectify ofy;
 	private IPlayerMatchRatingFactory pmrf;
 	private IPlayerMatchStatsFactory pmsf;
 	private IMatchGroupFactory mf;
 	private ICompetitionFactory cf;
+	private IMatchRatingEngineSchemaFactory sf;
 	
 	@Inject
 	public OfyPlayerMatchInfoFactory(IPlayerMatchStatsFactory pmsf, IPlayerMatchRatingFactory pmrf, IMatchGroupFactory mf,
-			ICompetitionFactory cf) {
+			ICompetitionFactory cf, IMatchRatingEngineSchemaFactory sf) {
 		this.pmrf = pmrf;
 		this.pmsf = pmsf;
 		this.mf = mf;
 		this.cf = cf;
-		this.ofy = DataStoreFactory.getOfy();
+		this.sf = sf;
 	}
 
 
@@ -56,7 +58,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 	}
 
 	@Override
-	public List<IPlayerMatchInfo> getForMatch(Long matchId) {
+	public List<IPlayerMatchInfo> getForMatch(Long matchId, IMatchRatingEngineSchema schema) {
 		try {
 			List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
 			mf.setId(matchId);
@@ -66,7 +68,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 				List<? extends IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
 				for (IPlayerMatchStats pms : pmsl) {
 					if (pms instanceof ScrumPlayerMatchStats) {
-						IPlayerMatchRating pmr = pmrf.get(pms.getPlayerId(),pms.getId());
+						IPlayerMatchRating pmr = pmrf.get(pms,schema);
 						list.add(new PlayerMatchInfo(pms,pmr));
 					}
 				}
@@ -80,12 +82,16 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 	}
 
 	@Override
-	public IPlayerMatchInfo getForPlayerMatchStats(Long pmsId) {
+	public IPlayerMatchInfo getForPlayerMatchStats(Long pmsId, IMatchRatingEngineSchema schema) {
+		
+		if (schema == null) {
+			schema = sf.getDefault();
+		}
 		
 		IPlayerMatchStats pms = pmsf.getById(pmsId);
 		IPlayerMatchRating pmr = null;
 		if (pms instanceof ScrumPlayerMatchStats) {
-			pmr = pmrf.get(pms.getPlayerId(),pms.getId());
+			pmr = pmrf.get(pms,schema);
 		}
 		
 		return new PlayerMatchInfo(pms,pmr);
@@ -94,11 +100,16 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 
 	@Override
 	public List<IPlayerMatchInfo> query(Long compId, Long roundId,
-			position posi, Long countryId, Long teamId) {
+			position posi, Long countryId, Long teamId, Long schemaId) {
 		try {
 			List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
 
 			List<Long> matches = new ArrayList<Long	>();
+
+			if (schemaId == null) {
+				schemaId = sf.getDefault().getId();
+			}
+			
 			// so first we need a list of matches
 			ICompetition comp = null;
 			if (compId != null) {
@@ -129,7 +140,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 			for (IPlayerMatchStats stats : statsList) {
 				IPlayerMatchRating pmr = null;
 				if (stats instanceof ScrumPlayerMatchStats) {
-					pmr = pmrf.get(stats.getPlayerId(),stats.getId());
+					pmr = pmrf.get(stats,sf.getById(schemaId));
 				}
 				
 				list.add(new PlayerMatchInfo(stats,pmr));

@@ -36,11 +36,21 @@
 			    <g:MenuItem ui:field="portalMenuShow">Show</g:MenuItem>
 			</g:MenuBar>
 		</g:MenuItem>
+		<g:MenuItem ui:field="schemaMenuItem">
+			Schema
+			<g:MenuBar ui:field="schemaBar" vertical="true">
+			    <g:MenuItem ui:field="schemaMenuNew">Create</g:MenuItem>
+			    <g:MenuItem ui:field="schemaMenuEdit">Edit
+			        <g:MenuBar ui:field="schemaList" vertical="true"></g:MenuBar>
+			    </g:MenuItem>
+			</g:MenuBar>
+		</g:MenuItem>
 		<g:MenuItem ui:field="adminMenuItem">
 			Admin
 			<g:MenuBar ui:field="adminBar" vertical="true">
 			    <g:MenuItem ui:field="adminMenuCreateAdmin">Create Admin</g:MenuItem>
 			    <g:MenuItem ui:field="adminMenuSanityCheck">Sanity Check</g:MenuItem>
+			    <g:MenuItem ui:field="adminMenuFlushAllPipelineJobs">Flush All Pipeline Jobs</g:MenuItem>
 			</g:MenuBar>
 		</g:MenuItem>
 		

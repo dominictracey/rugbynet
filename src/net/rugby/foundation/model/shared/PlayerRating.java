@@ -2,6 +2,8 @@ package net.rugby.foundation.model.shared;
 
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.util.Date;
+
 import javax.persistence.Transient;
 
 import com.googlecode.objectify.annotation.Entity;
@@ -38,17 +40,18 @@ public class PlayerRating implements IPlayerRating, Serializable {
 	}
 
 	@Id
-	private Long id;
-	private Integer rating;
-	private Long groupId;
+	protected Long id;
+	protected Integer rating;
+	protected Long groupId;
+	protected Date generated;
 	@Transient
-	private transient IGroup group;
-	private Long schemaId;
+	protected transient IGroup group;
+	protected Long schemaId;
 	@Transient
-	private transient IMatchRatingEngineSchema schema;
-	private Long playerId;
+	protected transient IMatchRatingEngineSchema schema;
+	protected Long playerId;
 	@Transient
-	private transient IPlayer player;
+	protected transient IPlayer player;
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IPlayerRating#getId()
@@ -160,6 +163,14 @@ public class PlayerRating implements IPlayerRating, Serializable {
 	@Override
 	public void setSchema(IMatchRatingEngineSchema schema) {
 		this.schema = schema;
+	}
+
+	public Date getGenerated() {
+		return generated;
+	}
+
+	public void setGenerated(Date generated) {
+		this.generated = generated;
 	}
 
 }

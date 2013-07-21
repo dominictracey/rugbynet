@@ -60,7 +60,7 @@ public class PipelineTest extends TestCase implements Serializable {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		helper.setUp();
+//		helper.setUp();
 		apiProxyEnvironment = ApiProxy.getCurrentEnvironment();
 		System
 		.setProperty("com.google.appengine.api.pipeline.use-simple-guids-for-debugging", "true");
@@ -68,7 +68,7 @@ public class PipelineTest extends TestCase implements Serializable {
 
 	@Override
 	public void tearDown() throws Exception {
-		helper.tearDown();
+//		helper.tearDown();
 		super.tearDown();
 	}
 

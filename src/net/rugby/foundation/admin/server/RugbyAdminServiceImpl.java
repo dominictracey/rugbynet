@@ -1,7 +1,6 @@
 package net.rugby.foundation.admin.server;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,11 +16,12 @@ import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
-import net.rugby.foundation.admin.server.factory.espnscrum.ScrumResultFetcherFactory;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
+import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
@@ -30,12 +30,16 @@ import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurati
 import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
+import net.rugby.foundation.admin.server.workflow.matchrating.FetchTeamMatchStats;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
@@ -56,11 +60,13 @@ import net.rugby.foundation.game1.shared.IMatchEntry;
 import net.rugby.foundation.game1.shared.IRoundEntry;
 import net.rugby.foundation.game1.shared.MatchEntry;
 import net.rugby.foundation.model.shared.Country;
+import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -69,16 +75,24 @@ import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
+
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.tools.pipeline.Job;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
+import com.google.appengine.tools.pipeline.impl.model.JobInstanceRecord;
+import com.google.appengine.tools.pipeline.impl.model.JobRecord;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 @Singleton
 public class RugbyAdminServiceImpl extends RemoteServiceServlet implements RugbyAdminService {
@@ -108,6 +122,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IPlayerMatchInfoFactory pmif;
 	private IMatchResultFactory mrf;
 	private IPlayerMatchStatsFetcherFactory pmsff;
+	private IMatchRatingEngineSchemaFactory mresf;
 	
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -125,7 +140,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
 			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
-			IPlayerMatchStatsFetcherFactory pmsff) {
+			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -149,7 +164,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.pmif = pmif;
 		this.mrf = mrf;
 		this.pmsff = pmsff;
-		
+		this.mresf = mresf;
 		//		rf.setFactories(cf, mf);
 		//		mf.setFactories(rf, tf);
 
@@ -525,7 +540,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 			admin.setActive(true);
 			admin.setAdmin(true);
-			admin.setEmailAddress("d1@d1.com");
+			admin.setEmailAddress("dominic.tracey@gmail.com");
 			admin.setNickname("d1");
 			admin.setSuperadmin(true);
 			String pwhash = DigestUtils.md5Hex("asdasd");
@@ -846,7 +861,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId) {
-		return pmif.getForMatch(matchId); 
+		IMatchRatingEngineSchema schema = mresf.getDefault();
+		if (schema != null && matchId != null) {
+			return pmif.getForMatch(matchId, schema); 
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -878,6 +898,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		return list;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<IPlayerMatchInfo> fetchMatchStats(Long matchId) {
 		Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
@@ -889,9 +910,24 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 		String pipelineId = "";
 		try {
+			
+			// first check if this match already has a pipeline going and kill it if it does
+			if (match.getFetchMatchStatsPipelineId() != null && !match.getFetchMatchStatsPipelineId().isEmpty()) {
+				// delete adminTasks first
+				List<? extends IAdminTask> tasks = atf.getForPipeline(match.getFetchMatchStatsPipelineId());
+				atf.delete((List<IAdminTask>) tasks);
+				
+				// now the pipeline records
+				service.deletePipelineRecords(match.getFetchMatchStatsPipelineId(), true, false);
+				match.setFetchMatchStatsPipelineId(null);
+
+			}
 
 			//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
 			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(3));
+			match.setFetchMatchStatsPipelineId(pipelineId);
+			mf.put(match);
+			
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
 			while (true) {
@@ -937,7 +973,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			}
 			atf.complete(task);
 		}
-		return pmif.getForPlayerMatchStats(stats.getId());
+		return pmif.getForPlayerMatchStats(stats.getId(),null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -986,7 +1022,211 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId,
 			Long roundId, position posi, Long countryId, Long teamId) {
-		return pmif.query(compId, roundId, posi, countryId, teamId);
+		return pmif.query(compId, roundId, posi, countryId, teamId, null);
+	}
+
+	@Override
+	public List<IPlayerMatchInfo> reRateMatch(Long matchId) {
+		IMatchRatingEngineSchema mres = mresf.getDefault();
+		assert (mres != null);
+		IMatchRatingEngine mre = mref.get(mres);
+		assert (mre != null);
+		mf.setId(matchId);
+		IMatchGroup m = mf.getGame();
+				
+		List<IPlayerMatchStats> stats = pmsf.getByMatchId(matchId);
+		List<IPlayerMatchStats> homePlayerStats =  new ArrayList<IPlayerMatchStats>();
+		List<IPlayerMatchStats> visitorPlayerStats =  new ArrayList<IPlayerMatchStats>();
+		for (IPlayerMatchStats s : stats) {
+			if (s.getTeamId().equals(m.getHomeTeamId())) {
+				homePlayerStats.add(s);
+			} else {
+				visitorPlayerStats.add(s);
+			}
+		}
+		
+		mre.setPlayerStats(homePlayerStats, visitorPlayerStats);
+		
+		// now the team stats
+		ITeamMatchStats hStats = tmsf.getHomeStats(m);
+		ITeamMatchStats vStats = tmsf.getVisitStats(m);
+		
+		mre.setTeamStats(hStats, vStats);		
+		
+		mre.generate(mres, m);
+		
+		return pmif.getForMatch(matchId, mres);
+	}
+
+	@Override
+	public ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId) {
+		mf.setId(matchId);
+		IMatchGroup m = mf.getGame();
+		
+		if (m != null) {
+			if (m.getHomeTeamId().equals(teamId)) {
+				return tmsf.getHomeStats(m);
+			} else {
+				return tmsf.getVisitStats(m);
+			}
+		} else {
+			return null;  // couldn't find match
+		}
+	}
+
+	/**
+	 * Trying a different approach here, just try to re-run a new Pipeline with just the fetching task in it.
+	 */
+	@Override
+	public ITeamMatchStats refetchTeamMatchStats(ITeamMatchStats tms) {
+		tf.setId(tms.getTeamId());
+		ITeamGroup team = tf.getTeam();
+
+		
+		Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
+		countryf.put(c);
+
+		PipelineService service = PipelineServiceFactory.newPipelineService();
+		mf.setId(tms.getMatchId());
+		IMatchGroup match = mf.getGame();
+
+		Home_or_Visitor hov = Home_or_Visitor.VISITOR;
+		if (match.getHomeTeamId().equals(team.getId())) {
+			hov = Home_or_Visitor.HOME;
+		}
+		
+		String pipelineId = "";
+		try {
+
+			//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
+			pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), team, match, hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+
+			while (true) {
+				Thread.sleep(2000);
+				JobInfo jobInfo = service.getJobInfo(pipelineId);
+				switch (jobInfo.getJobState()) {
+				case COMPLETED_SUCCESSFULLY:
+					service.deletePipelineRecords(pipelineId);
+					return getTeamMatchStats(match.getId(),tms.getTeamId()); // (List<IPlayerMatchStats>) jobInfo.getOutput();
+				case RUNNING:
+					break;
+				case STOPPED_BY_ERROR:
+					throw new RuntimeException("Job stopped " + jobInfo.getError());
+				case STOPPED_BY_REQUEST:
+					throw new RuntimeException("Job stopped by request.");
+				case WAITING_TO_RETRY:
+					break;
+				default:
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	public ITeamMatchStats saveTeamMatchStats(ITeamMatchStats tms,
+			IAdminTask task) {
+		tmsf.put(tms);
+		if (task != null  && task.getAction().equals(IAdminTask.Action.EDITTEAMMATCHSTATS)) {
+			if (task.getPromise() != null) {
+				PipelineService service = PipelineServiceFactory.newPipelineService();
+				try {
+					service.submitPromisedValue(task.getPromise(), tms);
+				} catch (NoSuchObjectException e) {
+					e.printStackTrace();
+				} catch (OrphanedObjectException e) {
+					e.printStackTrace();
+				}
+			}
+			atf.complete(task);
+		}
+		return tms;
+	}
+
+	@Override
+	public ScrumMatchRatingEngineSchema saveMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema schema) {
+		mresf.put(schema);
+		return schema;
+	}
+
+	@Override
+	public ScrumMatchRatingEngineSchema getMatchRatingEngineSchema(Long schemaId) {
+		IMatchRatingEngineSchema schema = mresf.getById(schemaId);
+		if (schema instanceof ScrumMatchRatingEngineSchema) {
+			return (ScrumMatchRatingEngineSchema) schema;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public ScrumMatchRatingEngineSchema saveMatchRatingEngineSchemaAsCopy(
+			ScrumMatchRatingEngineSchema schema) {
+		schema.setId(null);
+		schema.setIsDefault(false);
+		mresf.put(schema);
+		return schema;
+	}
+
+	@Override
+	public Boolean deleteMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema20130713 schema) {
+		return mresf.delete(schema);
+	}
+
+	@Override
+	public Boolean deleteRatingsForMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema20130713 schema) {
+		pmrf.deleteForSchema(schema);
+		return null;
+	}
+
+	@Override
+	public ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(
+			ScrumMatchRatingEngineSchema20130713 schema) {
+		IMatchRatingEngineSchema s2 = mresf.setAsDefault(schema);
+		if (s2 instanceof ScrumMatchRatingEngineSchema)
+			return (ScrumMatchRatingEngineSchema) s2;
+		else 
+			return null; // not sure what this would be
+	}
+
+	@Override
+	public List<ScrumMatchRatingEngineSchema> getScrumSchemaList() {
+		return mresf.getScrumList();
+	}
+
+	@Override
+	public Boolean flushAllPipelineJobs() {
+		try {
+			PipelineService service = PipelineServiceFactory.newPipelineService();
+			
+			List<? extends IMatchGroup> list = mf.getMatchesWithPipelines();
+			Iterator<? extends IMatchGroup> it = list.iterator();
+			while (it.hasNext()) {
+				IMatchGroup m = it.next();
+				String id = m.getFetchMatchStatsPipelineId();
+				m.setFetchMatchStatsPipelineId(null);
+				mf.put(m);
+				try {
+					service.deletePipelineRecords(id,true,false);
+				} catch (NoSuchObjectException nsox) {
+					// it's ok, just was a dangling reference in the match record
+				}
+
+			}
+			
+			return true;
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "flushAllPipelineJobs " + ex.getLocalizedMessage());		
+			return false;
+		}
 	}
 
 

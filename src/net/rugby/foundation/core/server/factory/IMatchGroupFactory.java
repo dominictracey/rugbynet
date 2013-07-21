@@ -17,6 +17,8 @@ public interface IMatchGroupFactory {
 
 	List<IMatchGroup> getMatchesForRound(Long roundId);
 
+	List<? extends IMatchGroup> getMatchesWithPipelines();
+
 //	void setFactories(IRoundFactory rf, ITeamGroupFactory tf);
 
 	/**

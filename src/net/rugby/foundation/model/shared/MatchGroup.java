@@ -37,6 +37,9 @@ public class MatchGroup extends Group implements IMatchGroup {
 	private Long foreignId;
 	private String foreignUrl;
 	
+	protected String fetchMatchStatsPipelineId;
+	
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -265,6 +268,17 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public void setForeignUrl(String foreignUrl) {
 		this.foreignUrl = foreignUrl;
+	}
+
+	@Override
+	public void setFetchMatchStatsPipelineId(String pipelineId) {
+		this.fetchMatchStatsPipelineId = pipelineId;
+		
+	}
+
+	@Override
+	public String getFetchMatchStatsPipelineId() {
+		return fetchMatchStatsPipelineId;
 	}
 
 

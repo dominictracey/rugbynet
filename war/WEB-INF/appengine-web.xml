@@ -23,4 +23,8 @@
 	
 	<!-- needed for Juno -->
 	<threadsafe>true</threadsafe>
+	
+<!-- 	<admin-console> -->
+<!-- 	    <page name="Appstats" url="/appstats"/> -->
+<!-- 	</admin-console> -->
 </appengine-web-app>

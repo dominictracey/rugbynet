@@ -1,5 +1,6 @@
 package net.rugby.foundation.core.server.factory.test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -257,6 +258,12 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Could not find requested Round " + roundId);
 			return null;
 		}
+	}
+
+	@Override
+	public List<? extends IMatchGroup> getMatchesWithPipelines() {
+		
+		return new ArrayList<IMatchGroup>();
 	}
 
 	/* (non-Javadoc)

@@ -8,6 +8,7 @@ import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumTeamMatchStats;
 
@@ -59,4 +60,21 @@ public class OfyTeamMatchStatsFactory implements ITeamMatchStatsFactory, Seriali
 		ofy.delete(val);
 		return true;
 	}
+
+	@Override
+	public ITeamMatchStats getHomeStats(IMatchGroup m) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		ScrumTeamMatchStats s = ofy.query(ScrumTeamMatchStats.class).filter("teamId", m.getHomeTeamId()).filter("matchId", m.getId()).get();
+
+		
+		return (ITeamMatchStats)s;
+	}
+
+	@Override
+	public ITeamMatchStats getVisitStats(IMatchGroup m) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		ScrumTeamMatchStats s = ofy.query(ScrumTeamMatchStats.class).filter("teamId", m.getVisitingTeamId()).filter("matchId", m.getId()).get();
+
+		
+		return (ITeamMatchStats)s;	}
 }

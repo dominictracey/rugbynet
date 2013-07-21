@@ -4,6 +4,7 @@ package net.rugby.foundation.core.server.factory.test;
 import java.io.Serializable;
 
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumTeamMatchStats;
 
@@ -39,5 +40,17 @@ public class TestTeamMatchStatsFactory implements ITeamMatchStatsFactory, Serial
 	@Override
 	public Boolean delete(ITeamMatchStats val) {
 		return true;
+	}
+
+	@Override
+	public ITeamMatchStats getHomeStats(IMatchGroup m) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ITeamMatchStats getVisitStats(IMatchGroup m) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

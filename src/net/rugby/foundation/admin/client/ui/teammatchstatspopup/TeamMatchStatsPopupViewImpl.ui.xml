@@ -1,0 +1,501 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:d="urn:import:com.google.gwt.user.datepicker.client" >
+
+    <ui:style>
+    .playersViewButtonHPanel {
+      margin: 5px 0px 0x 5px;
+    }
+    .playersViewPlayersFlexTable {
+      margin: 5px 0px 5px 0px;
+    }
+		.important {
+			font-weight: bold;
+		}
+		a:link {color:#FF0000;}      /* unvisited link */
+		a:visited {color:#00FF00;}  /* visited link */
+		a:hover {color:#FF00FF;}  /* mouse over link */
+		a:active {color:#0000FF;}  /* selected link */
+    </ui:style>
+
+    <!-- <g:DialogBox ui:field="popupBox" > -->
+
+    <g:HTMLPanel>
+
+        <!--
+	private Long 	id;
+	private Long 	matchId;
+	private Long 	teamId;
+	
+	private Integer tries;
+	
+	private Integer conversionsAttempted;
+	private Integer conversionsMade;
+	
+	private Integer penaltiesAttempted;
+	private Integer penaltiesMade;
+	
+	private Integer dropGoalsAttempted;
+	private Integer dropGoalsMade;
+	
+	private Integer kicksFromHand;
+	private Integer passes;
+	private Integer runs;
+	private Integer metersRun;
+	
+	private Float   possesion;
+	private Float   territory;
+	
+	private Integer cleanBreaks;
+	private Integer defendersBeaten;
+	private Integer offloads;
+	
+	private Integer rucks;
+	private Integer rucksWon;
+	
+	private Integer mauls;
+	private Integer maulsWon;
+	
+	private Integer turnoversConceded;
+	
+	private Integer tacklesMade;
+	private Integer tacklesMissed;
+	
+	private Integer scrumsPutIn;
+	private Integer scrumsWonOnOwnPut;
+	
+	private Integer lineoutsThrownIn;
+	private Integer lineoutsWonOnOwnThrow;
+	
+	private Integer penaltiesConceded;
+	private Integer yellowCards;
+	private Integer redCards;
+        -->
+        <!--
+             Add GWT widgets here. Enter < and hit Ctrl-Space to auto-complete 
+			widget names. The ui:field attribute binds an element to a field in the owner 
+			class. See the GWT docs on UI Binder for more details.
+        -->
+
+        <table>
+
+            <tr>
+
+                <td>
+Name/Id:
+                </td>
+
+                <td>
+
+                    <g:Label ui:field="nameAndId" >
+                    </g:Label>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Team/Id (Link):
+                </td>
+
+                <td>
+
+                    <g:Anchor ui:field="teamAndId" >
+                    </g:Anchor>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Match/Id:
+                </td>
+
+                <td>
+
+                    <g:Label ui:field="matchAndId" >
+                    </g:Label>
+                </td>
+            </tr>
+
+
+            <tr>
+
+                <td>
+Tries:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="tries" >
+                    </g:TextBox>
+                </td>
+</tr>
+<tr>
+                <td>
+Cons Attempted:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="conversionsAttempted" >
+                    </g:TextBox>
+                </td>
+                                <td>
+Cons Made:
+
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="conversionsMade" >
+                    </g:TextBox>
+                </td>
+                </tr>
+<tr>
+                <td>
+Pens Attempted:
+
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="penaltiesAttempted" >
+                    </g:TextBox>
+                </td>
+                                <td>
+Pens Made:
+
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="penaltiesMade" >
+                    </g:TextBox>
+                </td>
+                </tr>
+<tr>
+                <td>
+Drops Attempted:
+
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="dropGoalsAttempted" >
+                    </g:TextBox>
+                </td>
+                                <td>
+Drops Made:
+
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="dropGoalsMade" >
+                    </g:TextBox>
+                </td>
+                </tr>
+
+
+            <tr>
+
+                <td>
+Runs:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="runs" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Passes:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="passes" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Kicks:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="kicks" >
+                    </g:TextBox>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Meters Run:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="metersRun" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Territory:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="territory" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Possession:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="possesion" >
+                    </g:TextBox>
+                </td>
+            </tr>
+<tr>
+                <td>
+Clean Breaks:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="cleanBreaks" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Defenders Beaten:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="defendersBeaten" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Offloads:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="offloads" >
+                    </g:TextBox>
+                </td>
+                    </tr>
+                    <tr>
+                <td>
+Rucks:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="rucks" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Rucks Won:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="rucksWon" >
+                    </g:TextBox>
+                </td>
+            </tr>
+
+                    <tr>
+                <td>
+Mauls:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="mauls" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Mauls Won:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="maulsWon" >
+                    </g:TextBox>
+                </td>
+            </tr>
+<tr>
+                    <td>
+Turnovers:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="turnovers" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Tackles Made:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="tacklesMade" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Tackles Missed:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="tacklesMissed" >
+                    </g:TextBox>
+                </td>
+</tr>
+<tr>
+                <td>
+Scrums Put In:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="scrumsPutIn" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Scrums won on own put:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="scrumsWonOnOwnPut" >
+                    </g:TextBox>
+                </td>
+            </tr>
+<tr>
+                <td>
+Lineouts Thrown In:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="lineoutsThrownIn" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Lineouts won on own throw:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="lineoutsWonOnOwnThrow" >
+                    </g:TextBox>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+Penalties Conceded:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="penaltiesConceded" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Yellow Cards:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="yellowCards" >
+                    </g:TextBox>
+                </td>
+
+                <td>
+Red Cards:
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="redCards" >
+                    </g:TextBox>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td>
+scrum.com link:
+                </td>
+
+                <td>
+
+                    <g:Anchor ui:field="scrumLink" >
+                    </g:Anchor>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td colspan="2" >
+
+                    <g:Button
+                        styleName="{style.important}"
+                        ui:field="saveButton" >
+Save
+                    </g:Button>
+
+                    <g:Button
+                        styleName="{style.important}"
+                        ui:field="refetchButton" >
+Refetch
+                    </g:Button>
+
+                    <g:Button
+                        styleName="{style.important}"
+                        ui:field="cancelButton" >
+Cancel
+                    </g:Button>
+                </td>
+            </tr>
+        </table>
+    </g:HTMLPanel>
+    <!-- </g:DialogBox> -->
+
+</ui:UiBinder>

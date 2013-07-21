@@ -22,6 +22,8 @@ import net.rugby.foundation.admin.shared.IAdminTask.Status;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -38,25 +40,30 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 	private IMatchGroupFactory mgf;
 	private IPlayerMatchStatsFactory pmsf;
 	private Objectify ofy;
+	private ITeamGroupFactory tf;
+	private ITeamMatchStatsFactory tmsf;
 	
 	@Inject
-	public OfyAdminTaskFactory(IPlayerFactory pf, IMatchGroupFactory mgf, IPlayerMatchStatsFactory pmsf) {
+	public OfyAdminTaskFactory(IPlayerFactory pf, IMatchGroupFactory mgf, IPlayerMatchStatsFactory pmsf, ITeamGroupFactory tf, ITeamMatchStatsFactory tmsf) {
 		this.pf = pf;
 		this.mgf = mgf;
 		this.pmsf = pmsf;
+		this.tf = tf;
+		this.tmsf = tmsf;
 		this.ofy = DataStoreFactory.getOfy();
 	}
 	
 	@Override
 	public IAdminTask get(Long id) {
-		return ofy.get(new Key<AdminTask>(AdminTask.class, id));
+		IAdminTask task = ofy.get(new Key<AdminTask>(AdminTask.class, id));
+
+		return task;
 	}
 
 	@Override
 	public List<? extends IAdminTask> getAllOpen() {
 		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("status", Status.OPEN);
 		return qat.list();
-
 	}
 	
 
@@ -112,6 +119,12 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 		return new EditTeamMatchStatsAdminTask(null, Action.EDITTEAMMATCHSTATS, DEFAULTADMINID,
 				 new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob,
 				 team, match, tms);
+	}
+
+	@Override
+	public List<? extends IAdminTask> getForPipeline(String fetchMatchStatsPipelineId) {
+		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("pipelineRoot", fetchMatchStatsPipelineId);
+		return qat.list();
 	}
 
 }

@@ -5,51 +5,28 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.mortbay.log.Log;
-
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
+import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
-public class ScrumMatchRatingEngineV100 extends ScrumMatchRatingEngineV001 implements
+public class ScrumMatchRatingEngineV100 extends ScrumMatchRatingEngineBase implements
 IMatchRatingEngine  {
 
-	public ScrumMatchRatingEngineV100(IPlayerFactory pf, IPlayerMatchRatingFactory pmrf) {
+	private ITeamMatchStatsFactory tmsf;
+
+	public ScrumMatchRatingEngineV100(IPlayerFactory pf, IPlayerMatchRatingFactory pmrf, ITeamMatchStatsFactory tmsf) {
 		super(pf, pmrf);
+		this.tmsf = tmsf;
 	}
 
-	private final Float triesWeight = .2F;
-	private final Float tryAssistsWeight = .2F;
-	private final Float pointsWeight = .3F;
-	private final Float kicksWeight = .05F;
-	private final Float passesWeight = .05F;
-	private final Float runsWeight = .1F;
-	private final Float metersRunWeight = .2F;
-	private final Float cleanBreaksWeight = .2F;
-	private final Float defendersBeatenWeight = .2F;
-	private final Float offloadsWeight = .2F;
-	private final Float turnoversWeight = -.2F;
-	private final Float tacklesMadeWeight = .3F;
-	private final Float tacklesMissedWeight = -.1F;
-	private final Float lineoutsWonOnThrowWeight = .2F;
-	private final Float lineoutsStolenOnOppThrowWeight = .3F;
-	private final Float penaltiesConcededWeight = -.1F;
-	private final Float yellowCardsWeight = -.2F;
-	private final Float redCardsWeight = -.3F;
 
-	// time-skewed team stats
-	private final Float scrumShareWeight = .3F;
-	private final Float lineoutShareWeight = .3F;
-	private final Float ruckShareWeight = .2F;
-	private final Float maulShareWeight = .2F;
-	private final Float minutesShareWeight = .2F;
-	
-	private final Float pointsDifferentialWeight = .3F;
 
 	// this is odd... it's different than the number of people who get on the field during the game (numPlayers below)
 	// need to think more about what this means. 
@@ -99,15 +76,18 @@ IMatchRatingEngine  {
 
 		private double smoothScore;
 
-		public PlayerStatShares(ITeamMatchStats tms, IPlayerMatchStats pms, IMatchGroup match, int totalTryAssists, int totalLineoutsStolen, int totalMinutes, int numPlayers) {
+		private IV1EngineWeightValues weights;
+
+		public PlayerStatShares(IV1EngineWeightValues weights, ITeamMatchStats tms, ITeamMatchStats combined, IPlayerMatchStats pms, IMatchGroup match, int totalTryAssists, int totalLineoutsStolen, int totalMinutes, int numPlayers) {
 			assert(tms.getTeamId().equals(pms.getTeamId()));
 
-			Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+			Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINEST);
 			
 			this.pms = pms;
-
+			this.weights = weights;
+			
 			if (!tms.getTries().equals(0)) {
-				tries = (float)pms.getTries() / (float)tms.getTries();
+				tries = (float)pms.getTries() / (float)combined.getTries();
 			} else {
 				tries = 0;
 			}
@@ -122,57 +102,57 @@ IMatchRatingEngine  {
 				points= 0;
 			}			
 			if (!tms.getKicksFromHand().equals(0)) {
-				kicks = (float) pms.getKicks() / (float)tms.getKicksFromHand();
+				kicks = (float) pms.getKicks() / (float)combined.getKicksFromHand();
 			} else {
 				kicks= 0;
 			}			
 			if (!tms.getPasses().equals(0)) {
-				passes = (float) pms.getPasses() / (float) tms.getPasses();
+				passes = (float) pms.getPasses() / (float) combined.getPasses();
 			} else {
 				passes= 0;
 			}			
 			if (!tms.getRuns().equals(0)) {
-				runs = (float) pms.getRuns() /(float) tms.getRuns();
+				runs = (float) pms.getRuns() /(float) combined.getRuns();
 			} else {
 				runs= 0;
 			}			
 			if (!tms.getMetersRun().equals(0)) {
-				metersRun = (float) pms.getMetersRun() /(float) tms.getMetersRun();
+				metersRun = (float) pms.getMetersRun() /(float) combined.getMetersRun();
 			} else {
 				metersRun= 0;
 			}			
 			if (!tms.getCleanBreaks().equals(0)) {
-				cleanBreaks = (float) pms.getCleanBreaks() /(float) tms.getCleanBreaks();
+				cleanBreaks = (float) pms.getCleanBreaks() /(float) combined.getCleanBreaks();
 			} else {
 				cleanBreaks= 0;
 			}			
 			if (!tms.getDefendersBeaten().equals(0)) {
-				defendersBeaten = (float) pms.getDefendersBeaten() /(float) tms.getDefendersBeaten();
+				defendersBeaten = (float) pms.getDefendersBeaten() /(float) combined.getDefendersBeaten();
 			} else {
 				defendersBeaten= 0;
 			}			
 			if (!tms.getOffloads().equals(0)) {
-				offloads = (float) pms.getOffloads() /(float) tms.getOffloads();
+				offloads = (float) pms.getOffloads() /(float) combined.getOffloads();
 			} else {
 				offloads= 0;
 			}			
 			if (!tms.getTurnoversConceded().equals(0)) {
-				turnovers = (float) pms.getTurnovers() /(float) tms.getTurnoversConceded();
+				turnovers = (float) pms.getTurnovers() /(float) combined.getTurnoversConceded();
 			} else {
 				turnovers= 0;
 			}			
 			if (!tms.getTacklesMade().equals(0)) {
-				tacklesMade = (float) pms.getTacklesMade() /(float) tms.getTacklesMade();
+				tacklesMade = (float) pms.getTacklesMade() /(float) combined.getTacklesMade();
 			} else {
 				tacklesMade= 0;
 			}			
 			if (!tms.getTacklesMissed().equals(0)) {
-				tacklesMissed = (float) pms.getTacklesMissed()/(float) tms.getTacklesMissed();
+				tacklesMissed = (float) pms.getTacklesMissed()/(float) combined.getTacklesMissed();
 			} else {
 				tacklesMissed= 0;
 			}			
 			if (!tms.getLineoutsWonOnOwnThrow().equals(0)) {
-				lineoutsWonOnThrow = (float) pms.getLineoutsWonOnThrow() /(float) tms.getLineoutsWonOnOwnThrow();
+				lineoutsWonOnThrow = (float) pms.getLineoutsWonOnThrow() /(float) combined.getLineoutsWonOnOwnThrow();
 			} else {
 				lineoutsWonOnThrow= 0;
 			}			
@@ -182,17 +162,17 @@ IMatchRatingEngine  {
 				lineoutsStolenOnOppThrow= 0;
 			}			
 			if (!tms.getPenaltiesConceded().equals(0)) {
-				penaltiesConceded = (float) pms.getPenaltiesConceded() / (float) tms.getPenaltiesConceded();
+				penaltiesConceded = (float) pms.getPenaltiesConceded() / (float) combined.getPenaltiesConceded();
 			} else {
 				penaltiesConceded = 0;
 			}			
 			if (!tms.getYellowCards().equals(0)) {
-				yellowCards = (float) pms.getYellowCards() /(float) tms.getYellowCards();
+				yellowCards = (float) pms.getYellowCards() /(float) combined.getYellowCards();
 			} else {
 				yellowCards= 0;
 			}			
 			if (!tms.getRedCards().equals(0)) {
-				redCards = (float) pms.getRedCards() /(float) tms.getRedCards();
+				redCards = (float) pms.getRedCards() /(float) combined.getRedCards();
 			} else {
 				redCards= 0;
 			}			
@@ -234,49 +214,57 @@ IMatchRatingEngine  {
 			if (!pms.getTeamId().equals(match.getHomeTeamId())) {
 				pointDifferential *= -1;
 			}
+			
+
 		}
 
 		private void Normalize() {
-			tries *= triesWeight;                   
-			tryAssists *= tryAssistsWeight;              
-			points *= pointsWeight;                  
-			kicks *= kicksWeight;                   
-			passes *= passesWeight;                  
-			runs *= runsWeight;                    
-			metersRun *= metersRunWeight;               
-			cleanBreaks *= cleanBreaksWeight;             
-			defendersBeaten *= defendersBeatenWeight;         
-			offloads *= offloadsWeight;                
-			turnovers *= turnoversWeight;               
-			tacklesMade *= tacklesMadeWeight;             
-			tacklesMissed *= tacklesMissedWeight;           
-			lineoutsWonOnThrow *= lineoutsWonOnThrowWeight;      
-			lineoutsStolenOnOppThrow *= lineoutsStolenOnOppThrowWeight;
-			penaltiesConceded *= penaltiesConcededWeight;       
-			yellowCards *= yellowCardsWeight;             
-			redCards *= redCardsWeight;                
+			tries *= weights.getTriesWeight();                   
+			tryAssists *= weights.getTryAssistsWeight();              
+			points *= weights.getPointsWeight();                  
+			kicks *= weights.getKicksWeight();                   
+			passes *= weights.getPassesWeight();                  
+			runs *= weights.getRunsWeight();                    
+			metersRun *= weights.getMetersRunWeight();               
+			cleanBreaks *= weights.getCleanBreaksWeight();             
+			defendersBeaten *= weights.getDefendersBeatenWeight();         
+			offloads *= weights.getOffloadsWeight();                
+			turnovers *= weights.getTurnoversWeight();               
+			tacklesMade *= weights.getTacklesMadeWeight();             
+			tacklesMissed *= weights.getTacklesMissedWeight();           
+			lineoutsWonOnThrow *= weights.getLineoutsWonOnThrowWeight();      
+			lineoutsStolenOnOppThrow *= weights.getLineoutsStolenOnOppThrowWeight();
+			penaltiesConceded *= weights.getPenaltiesConcededWeight();       
+			yellowCards *= weights.getYellowCardsWeight();             
+			redCards *= weights.getRedCardsWeight();                
 
-			scrumShare *= scrumShareWeight;              
-			lineoutShare *= lineoutShareWeight;            
-			ruckShare *= ruckShareWeight;               
-			maulShare *= maulShareWeight;               
-			minutesShare *= minutesShareWeight;            
+			scrumShare *= weights.getScrumShareWeight();              
+			lineoutShare *= weights.getLineoutShareWeight();            
+			ruckShare *= weights.getRuckShareWeight();               
+			maulShare *= weights.getMaulShareWeight();               
+			minutesShare *= weights.getMinutesShareWeight();  
+			
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST, pms.getName() +" T:"+tries+" TA:"+tryAssists+" Pts:"+points+" K:"+kicks+" R:"+runs+" P:"+passes+" MR:"+metersRun+
+					cleanBreaks+" DB:"+defendersBeaten+" OL:"+offloads+" TO:"+turnovers+" T:"+tacklesMade+" TM:"+tacklesMissed+" LO:"+lineoutsWonOnThrow+
+					" LOStolen:"+lineoutsStolenOnOppThrow+" P:"+penaltiesConceded+" YC:"+yellowCards+" RC: "+redCards+" ScrumShare:"+scrumShare+
+					" LOShare:"+lineoutShare+" RuckShare:"+ruckShare+" MSh:"+ maulShare+" MinShare:"+ minutesShare);
+			
 		}
 
 		private float getBackScore() {
 			backScore = (tries + tryAssists + points + kicks + passes + runs + metersRun + cleanBreaks + 
 					defendersBeaten + offloads + turnovers + tacklesMade + tacklesMissed + penaltiesConceded +
-					yellowCards + redCards + minutesShare) * 500 * playersOnField; // no ruckShare?
+					yellowCards + redCards + minutesShare); // * 500 * playersOnField; // no ruckShare?
 							return backScore;
 		}
 
 		private float getForwardScore() {
-			forwardScore = (lineoutsWonOnThrow + lineoutsStolenOnOppThrow + scrumShare + lineoutShare + ruckShare + maulShare) * 500 * playersOnField;
+			forwardScore = (lineoutsWonOnThrow + lineoutsStolenOnOppThrow + scrumShare + lineoutShare + ruckShare + maulShare); // * 500 * playersOnField;
 			return forwardScore;
 		}
 
 		private int isForward() {
-			if (pms.getPosition().equals(position.PROP) ||
+			if (	pms.getPosition().equals(position.PROP) ||
 					pms.getPosition().equals(position.HOOKER) ||
 					pms.getPosition().equals(position.LOCK) ||
 					pms.getPosition().equals(position.FLANKER) ||
@@ -300,12 +288,21 @@ IMatchRatingEngine  {
 		}
 
 		public float getPointDifferentialWeightedScore(float totalPlayerScore) {
+			
+			// the final of the last World Cup was decided by one point, making this negligible.
+			// Something needs to be said for winning the game so we'll just add some to it to make sure it is a significant amount
+//			if (pointDifferential > 0) {
+//				pointDifferential += 10;
+//			} else if (pointDifferential < 0) {
+//				pointDifferential -= 10;
+//			}
+			
 			float normalizedPlayerScore = getPlayerScore() / totalPlayerScore;
 			float lnPointDiff = (float) Math.log(Math.abs(pointDifferential) + 1);
 			if (pointDifferential < 0) {
 				lnPointDiff *= -1;
 			}
-			pointDifferentialWeightedScore = normalizedPlayerScore + (normalizedPlayerScore * pointsDifferentialWeight * lnPointDiff);// (normalizedPlayerScore * 0.2F * pointDifferential);
+			pointDifferentialWeightedScore = normalizedPlayerScore + (normalizedPlayerScore * weights.getPointsDifferentialWeight() * lnPointDiff);// (normalizedPlayerScore * 0.2F * pointDifferential);
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE, "pointDifferentialWeightedScore for: " + pms.getName() + " is " + pointDifferentialWeightedScore);
 			return pointDifferentialWeightedScore;
 		}
@@ -330,9 +327,14 @@ IMatchRatingEngine  {
 	@Override
 	public List<IPlayerMatchRating> generate(IMatchRatingEngineSchema schema, IMatchGroup match) {
 
+		// Have to have these weight values available in the schema to work
+		assert (schema instanceof IV1EngineWeightValues);
+		
 		List<PlayerStatShares> pss = new ArrayList<PlayerStatShares>();
 		List<IPlayerMatchRating> mrl = new ArrayList<IPlayerMatchRating>();
 
+		// these three we have to total across all the players because they aren't available in the TeamMatchStats
+		// like, say, tries or tackles.
 		int totalTryAssists = 0;
 		int totalLineoutsStolen = 0;
 		int totalMinutes = 0;
@@ -351,9 +353,14 @@ IMatchRatingEngine  {
 
 		float totalPlayerScore = 0F;
 
+		ITeamMatchStats combined = tmsf.getById(null); //emtpy one
+		combined.add(homeTeamStats);
+		combined.add(visitTeamStats);
+		
+		
 		for (IPlayerMatchStats pms : homePlayerStats) {
 			if (!pms.getPosition().equals(position.NONE)) {
-				PlayerStatShares score = new PlayerStatShares(homeTeamStats, pms, match, totalTryAssists, totalLineoutsStolen, totalMinutes, homePlayerStats.size() + visitPlayerStats.size());
+				PlayerStatShares score = new PlayerStatShares((IV1EngineWeightValues)schema, homeTeamStats, combined, pms, match, totalTryAssists, totalLineoutsStolen, totalMinutes, homePlayerStats.size() + visitPlayerStats.size());
 				pss.add(score);
 				totalPlayerScore += score.getPlayerScore();
 			} else {
@@ -363,7 +370,7 @@ IMatchRatingEngine  {
 
 		for (IPlayerMatchStats pms : visitPlayerStats) {
 			if (!pms.getPosition().equals(position.NONE)) {
-				PlayerStatShares score = new PlayerStatShares(visitTeamStats, pms, match, totalTryAssists, totalLineoutsStolen, totalMinutes, homePlayerStats.size() + visitPlayerStats.size());
+				PlayerStatShares score = new PlayerStatShares((IV1EngineWeightValues)schema, visitTeamStats, combined, pms, match, totalTryAssists, totalLineoutsStolen, totalMinutes, homePlayerStats.size() + visitPlayerStats.size());
 				pss.add(score);
 				totalPlayerScore += score.getPlayerScore();
 			} else {
@@ -389,4 +396,5 @@ IMatchRatingEngine  {
 
 		return mrl;
 	}
+
 }

@@ -48,10 +48,12 @@ public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRatin
 		this.playerMatchStats = playerMatchStats;
 	}
 
+	@Override
 	public Long getPlayerMatchStatsId() {
 		return playerMatchStatsId;
 	}
 
+	@Override
 	public void setPlayerMatchStatsId(Long playerMatchStatsId) {
 		this.playerMatchStatsId = playerMatchStatsId;
 	}

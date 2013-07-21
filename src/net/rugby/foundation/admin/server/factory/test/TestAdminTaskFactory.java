@@ -113,4 +113,9 @@ public class TestAdminTaskFactory implements IAdminTaskFactory {
 				 new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob,
 				 team, match, tms);
 	}
+
+	@Override
+	public List<? extends IAdminTask> getForPipeline(String fetchMatchStatsPipelineId) {
+		return new ArrayList<IAdminTask>();
+	}
 }

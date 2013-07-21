@@ -8,6 +8,8 @@ import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatin
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -17,8 +19,10 @@ import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("rugbyAdminService")
@@ -92,4 +96,20 @@ public interface RugbyAdminService extends RemoteService {
 	ICompetition repairComp(ICompetition comp);
 	IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms);
 	List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId, Long roundId, position posi, Long countryId, Long teamId);
+	List<IPlayerMatchInfo> reRateMatch(Long matchId);
+
+	ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId);
+	ITeamMatchStats refetchTeamMatchStats(ITeamMatchStats target);
+	ITeamMatchStats saveTeamMatchStats(ITeamMatchStats tms, IAdminTask target);
+	
+	// match rating engine schema
+	ScrumMatchRatingEngineSchema saveMatchRatingEngineSchema(ScrumMatchRatingEngineSchema schema);
+	ScrumMatchRatingEngineSchema getMatchRatingEngineSchema(Long schemaId);
+	ScrumMatchRatingEngineSchema saveMatchRatingEngineSchemaAsCopy(ScrumMatchRatingEngineSchema schema);
+	Boolean deleteMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
+	Boolean deleteRatingsForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
+	ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(ScrumMatchRatingEngineSchema20130713 schema);
+	List<ScrumMatchRatingEngineSchema> getScrumSchemaList();
+	Boolean flushAllPipelineJobs();
+	
 }

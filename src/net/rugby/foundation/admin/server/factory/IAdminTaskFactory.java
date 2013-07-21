@@ -27,5 +27,6 @@ public interface IAdminTaskFactory {
 	IAdminTask put(IAdminTask task);
 	IAdminTask complete(IAdminTask task);
 	List<? extends IAdminTask> delete(List<IAdminTask> selectedItems);
+	List<? extends IAdminTask> getForPipeline(String fetchMatchStatsPipelineId);
 
 }

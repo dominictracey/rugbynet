@@ -6,14 +6,11 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130121;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
-import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
-import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -39,7 +36,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 		if (id.equals(2000L)) {
 			mf.setId(300L);
 			return new PlayerMatchRating(723, pf.getById(9001014L), (IGroup)mf.getGame(),
-					new ScrumMatchRatingEngineSchema20130121(), pmsf.getById(1000L)) ;
+					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L)) ;
 		}
 		return null;
 	}
@@ -65,12 +62,18 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	}
 
 	@Override
-	public IPlayerMatchRating get(Long playerId, Long matchId) {
-		if (playerId.equals(9001014L)&& matchId.equals(300L)) {
+	public IPlayerMatchRating get(IPlayerMatchStats pms, IMatchRatingEngineSchema schema) {
+		if (pms.getPlayerId().equals(9001014L)&& pms.getMatchId().equals(300L)) {
 			mf.setId(300L);
 			return new PlayerMatchRating(723, pf.getById(9001014L), (IGroup)mf.getGame(),
-					new ScrumMatchRatingEngineSchema20130121(), pmsf.getById(1000L)) ;
+					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L)) ;
 		}
+		return null;
+	}
+
+	@Override
+	public Boolean deleteForSchema(IMatchRatingEngineSchema schema) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -45,16 +46,16 @@ public class EditMatch extends Composite {
 		void fetchScore(IMatchGroup matchGroup);
 
 		/**
-		 * @param matchGroup
-		 */
-		void fetchPlayers(IMatchGroup matchGroup);
-
-		/**
-		 * @param matchGroup
+		 * @param matchGroup - match we want to have the players stats re-rated WITHOUT going and re-fetching the stats
 		 */
 		void fetchMatchStats(IMatchGroup matchGroup);
 
-		void fetchPlayerStats(IMatchGroup matchGroup);
+		void reRateMatch(IMatchGroup matchGroup);
+
+		void showHomeTeamMatchStats(IMatchGroup matchGroup);
+
+		void showVisitingTeamMatchStats(IMatchGroup matchGroup);
+
 
 	} 
 	
@@ -69,11 +70,13 @@ public class EditMatch extends Composite {
 	@UiField
 	Button fetchScore;
 	@UiField
-	Button fetchPlayers;
-	@UiField
 	Button fetchMatchStats;
+	@UiField 
+	Button regenerateRatings;
 	@UiField
-	Button fetchPlayerStats;
+	Button showHomeTeamMatchStats;
+	@UiField
+	Button showVisitingTeamMatchStats;
 	@UiField
 	TextBox displayName;
 	@UiField
@@ -86,6 +89,8 @@ public class EditMatch extends Composite {
 	TextBox homeScore;
 	@UiField
 	TextBox visitorScore;
+	@UiField
+	Anchor pipelineLink;
 	
 	IMatchGroup matchGroup = null;
 	private Presenter listener;
@@ -109,21 +114,27 @@ public class EditMatch extends Composite {
 	void onClickFetchScore(ClickEvent e) {
 		listener.fetchScore(matchGroup);
 	}
-
-	@UiHandler("fetchPlayers")
-	void onClickFetchPlayers(ClickEvent e) {
-		listener.fetchPlayers(matchGroup);
-	}
 	
+	@UiHandler("regenerateRatings") 
+	void onClickReRate(ClickEvent e) {
+		listener.reRateMatch(matchGroup);
+	}
+
 	@UiHandler("fetchMatchStats")
 	void onClickFetchMatchStats(ClickEvent e) {
 		listener.fetchMatchStats(matchGroup);
 	}
 	
-	@UiHandler("fetchPlayerStats")
-	void onClickFetchPlayerStats(ClickEvent e) {
-		listener.fetchPlayerStats(matchGroup);
+	@UiHandler("showHomeTeamMatchStats")
+	void onClickShowHomeTeamMatchStats(ClickEvent e) {
+		listener.showHomeTeamMatchStats(matchGroup);
 	}
+	
+	@UiHandler("showVisitingTeamMatchStats")
+	void onClickShowVisitingTeamMatchStats(ClickEvent e) {
+		listener.showVisitingTeamMatchStats(matchGroup);
+	}
+	
 	public void ShowMatch(IMatchGroup match) {
 		matchGroup = match;
 		
@@ -151,6 +162,10 @@ public class EditMatch extends Composite {
 			homeScore.setText("");
 			visitorScore.setText("");
 		}
+		
+		pipelineLink.setHref("/_ah/pipeline/status.html?root=" + match.getFetchMatchStatsPipelineId());
+		pipelineLink.setTarget("top");
+		pipelineLink.setText("Fetch Match Stats Pipeline Status");
 	}
 
 	public void SetPresenter(Presenter p) {

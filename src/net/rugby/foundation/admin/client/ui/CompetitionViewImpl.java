@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -176,8 +177,14 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 				smartBar = clientFactory.getMenuBar();
 				menuBarPanel.add(smartBar);
 			}
-			smartBar.setPresenter((SmartBar.Presenter)listener);		
+			smartBar.setPresenter((SmartBar.Presenter)listener);	
+		}	
+		
+		if (listener instanceof SmartBar.SchemaPresenter) {
+			smartBar.setSchemaPresenter((SmartBar.SchemaPresenter)listener);	
 		}
+		
+		
 		
 		compTree.addSelectionHandler( new SelectionHandler<TreeItem>() {
 			
@@ -545,6 +552,12 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 				}
 			}
 		}
+		
+	}
+
+	@Override
+	public void setSchemaList(List<ScrumMatchRatingEngineSchema> result) {
+		smartBar.setSchemas(result);
 		
 	}
 }

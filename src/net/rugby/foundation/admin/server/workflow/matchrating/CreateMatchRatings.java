@@ -5,9 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
+import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130121;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
@@ -15,6 +16,7 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 import com.google.appengine.tools.pipeline.Job5;
+import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
@@ -25,7 +27,7 @@ public class CreateMatchRatings extends Job5<List<IPlayerMatchRating>, IMatchGro
 	 */
 	private static final long serialVersionUID = -5676927821878573678L;
 	private transient IMatchRatingEngineFactory mref;
-
+	private transient IMatchRatingEngineSchemaFactory mresf;
 
 
 	public CreateMatchRatings() {
@@ -43,15 +45,25 @@ public class CreateMatchRatings extends Job5<List<IPlayerMatchRating>, IMatchGro
 		Injector injector = BPMServletContextListener.getInjectorForNonServlets();
 		//this.pf = injector.getInstance(IPlayerFactory.class);
 		this.mref = injector.getInstance(IMatchRatingEngineFactory.class);
-		//this.pmrf = injector.getInstance(IPlayerMatchRatingFactory.class);
+		this.mresf = injector.getInstance(IMatchRatingEngineSchemaFactory.class);
 		
-		IMatchRatingEngineSchema mres = new ScrumMatchRatingEngineSchema20130121();
+		IMatchRatingEngineSchema mres = mresf.getDefault();
+		assert (mres != null);
 		IMatchRatingEngine mre = mref.get(mres);
+		assert (mre != null);
 		
 		mre.setPlayerStats(homePlayerStats, visitorPlayerStats);
 		mre.setTeamStats(hStats, vStats);		
 		
 		return immediate(mre.generate(mres, match));
+	}
+	
+	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown creating match ratings: " + e.getLocalizedMessage());
+//		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+//		IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Problem getting player match stats: for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot, e.getLocalizedMessage(), player, match, hov, slot, fetcher.getStats(), true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
+//		atf.put(task);
+		return immediate(null);
 	}
 
 }

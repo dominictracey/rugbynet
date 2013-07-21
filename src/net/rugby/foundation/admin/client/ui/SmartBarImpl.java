@@ -1,5 +1,6 @@
 package net.rugby.foundation.admin.client.ui;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -7,9 +8,9 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.place.PortalPlace;
-import net.rugby.foundation.game1.shared.IConfiguration;
-import net.rugby.foundation.game1.shared.IEntry;
-import net.rugby.foundation.model.shared.IClubhouse;
+import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -30,22 +31,23 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	private static final Binder binder = GWT.create(Binder.class);
 
 	private Presenter listener;
-	@UiField
-	MenuBar smartBar;
+	@UiField MenuBar smartBar;
 	@UiField MenuItem compMenuNew;
 	@UiField MenuItem compMenuAll;
 	@UiField MenuItem compMenuUnderway;
-	@UiField
-	MenuBar compBar;
+	@UiField MenuBar compBar;
 	@UiField MenuItem orchMenuShow;
-	@UiField
-	MenuBar orchBar;
+	@UiField MenuBar orchBar;
 	@UiField MenuItem taskMenuShow;
-	@UiField
-	MenuBar taskBar;
-	@UiField
-	MenuBar portalBar;
+	@UiField MenuBar taskBar;
+	@UiField MenuBar portalBar;
 	@UiField MenuItem portalMenuShow;
+	@UiField MenuBar schemaBar;
+	@UiField MenuItem schemaMenuNew;
+	@UiField MenuBar schemaList;
+	@UiField MenuItem adminMenuFlushAllPipelineJobs;
+
+	private SchemaPresenter schemaListener;
 	
 	public SmartBarImpl() {
 		initWidget(binder.createAndBindUi(this));
@@ -84,8 +86,29 @@ public class SmartBarImpl extends Composite implements SmartBar {
 				listener.goTo(new PortalPlace(""));
 			}
 		});
+		adminMenuFlushAllPipelineJobs.setCommand(new Command() {
+
+			@Override
+			public void execute() {
+				listener.flushAllPipelineJobs();	
+			}
+		
+		});
+
 	}
 
+	@Override
+	public void setSchemaPresenter(final SchemaPresenter listener) {
+		this.schemaListener = listener;
+		schemaMenuNew.setCommand(new Command() {
+			@Override
+			public void execute() {
+				schemaListener.createSchema();
+			}
+			
+		});
+	}
+		
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.game1.client.ui.SmartBar#setComps(java.util.Map)
 	 */
@@ -101,6 +124,27 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			    }
 			}));
 		}
+	}
+
+	@Override
+	public void setSchemas(List<ScrumMatchRatingEngineSchema> schemas) {
+		schemaList.clearItems();
+		Iterator<ScrumMatchRatingEngineSchema> it = schemas.iterator();
+		while (it.hasNext()) {
+			final IMatchRatingEngineSchema s = it.next();
+			String name = s.getName();
+			if (s.getIsDefault()) {
+				name += " (Default)";
+			}
+			schemaList.addItem(new MenuItem(name, new Command()
+			{
+			    public void execute()
+			    {
+			        schemaListener.editSchema(s);
+			    }
+			}));
+		}		
+		
 	}
 
 }

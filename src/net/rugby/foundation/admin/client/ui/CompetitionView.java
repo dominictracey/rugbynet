@@ -5,6 +5,7 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -117,6 +118,7 @@ public interface CompetitionView extends IsWidget {
 	boolean isAllSetup();
 	void setInitialized(boolean b);
 	void showWait(boolean show);
+	void setSchemaList(List<ScrumMatchRatingEngineSchema> result);
 
 
 }

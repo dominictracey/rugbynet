@@ -18,13 +18,8 @@ public class OfyTeamFactory implements ITeamGroupFactory, Serializable {
 	 */
 	private static final long serialVersionUID = -7135535109216170518L;
 	private Long id;
-	//private final Objectify ofy;
-	
-//	@Inject
-//	OfyTeamFactory() {
-//		this.ofy = DataStoreFactory.getOfy();
-//	}
-		@Override
+
+	@Override
 	public void setId(Long id) {
 		this.id = id;
 	}

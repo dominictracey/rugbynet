@@ -10,6 +10,9 @@ import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationViewImpl;
 import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.SmartBarImpl;
+import net.rugby.foundation.admin.client.ui.matchratingengineschemapopup.MatchRatingEngineSchemaPopupView;
+import net.rugby.foundation.admin.client.ui.matchratingengineschemapopup.MatchRatingEngineSchemaPopupViewFieldDefinitions;
+import net.rugby.foundation.admin.client.ui.matchratingengineschemapopup.MatchRatingEngineSchemaPopupViewImpl;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
@@ -24,18 +27,25 @@ import net.rugby.foundation.admin.client.ui.portal.PortalViewImpl;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.task.TaskViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.task.TaskViewImpl;
+import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView;
+import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewFieldDefinitions;
+import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -52,10 +62,13 @@ public class ClientFactoryImpl implements ClientFactory {
 	private static PortalView<IPlayerMatchInfo> portalView = null;
 	private static final RugbyAdminServiceAsync rpcService = GWT.create(RugbyAdminService.class);
 	private PlayerPopupView<IPlayer> playerPopupView;
-	private PlayerMatchStatsPopupView<IPlayerMatchStats> playerMatchStatsPopupView;
-
 	private List<FieldDefinition<IPlayer>> playerPopupViewFieldDefinitions;
+	private PlayerMatchStatsPopupView<IPlayerMatchStats> playerMatchStatsPopupView;
 	private List<FieldDefinition<IPlayerMatchStats>> playerMatchStatsPopupViewFieldDefinitions;
+	private TeamMatchStatsPopupView<ITeamMatchStats> teamMatchStatsPopupView;
+	private List<FieldDefinition<ITeamMatchStats>> teamMatchStatsPopupViewFieldDefinitions;
+	private MatchRatingEngineSchemaPopupView<ScrumMatchRatingEngineSchema20130713> matchRatingEngineSchemaPopupView;
+	private MatchRatingEngineSchemaPopupViewFieldDefinitions<ScrumMatchRatingEngineSchema20130713> matchRatingEngineSchemaPopupViewFieldDefinitions;
 	
 	private PlayerListView<IPlayerMatchInfo> playerListView = null;
 	private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions =  null; 
@@ -218,5 +231,53 @@ public class ClientFactoryImpl implements ClientFactory {
 			portalView.setClientFactory(this);
 		}
 		return portalView;
+	}
+
+	@Override
+	public TeamMatchStatsPopupView<ITeamMatchStats> getTeamMatchStatsPopupView() {
+        if (teamMatchStatsPopupView == null) {
+        	teamMatchStatsPopupView = new TeamMatchStatsPopupViewImpl<ITeamMatchStats>();
+			if (teamMatchStatsPopupViewFieldDefinitions == null) {
+				teamMatchStatsPopupViewFieldDefinitions = new TeamMatchStatsPopupViewFieldDefinitions<ITeamMatchStats>(this).getFieldDefinitions();
+	          }
+		
+			teamMatchStatsPopupView.setFieldDefinitions(teamMatchStatsPopupViewFieldDefinitions);
+        }
+
+		return teamMatchStatsPopupView;
+	}
+
+	@Override
+	public MatchRatingEngineSchemaPopupView<ScrumMatchRatingEngineSchema20130713> getMatchRatingEngineSchemaPopupView() {
+        if (matchRatingEngineSchemaPopupView == null) {
+        	matchRatingEngineSchemaPopupView = new MatchRatingEngineSchemaPopupViewImpl();
+			if (matchRatingEngineSchemaPopupViewFieldDefinitions == null) {
+				matchRatingEngineSchemaPopupViewFieldDefinitions = new MatchRatingEngineSchemaPopupViewFieldDefinitions<ScrumMatchRatingEngineSchema20130713>(this);
+	          }
+		
+			matchRatingEngineSchemaPopupView.setFieldDefinitions(matchRatingEngineSchemaPopupViewFieldDefinitions.getFieldDefinitions());
+        }
+
+		return matchRatingEngineSchemaPopupView;	}
+
+	@Override
+	public void flushAllPipelineJobs() {
+		getRpcService().flushAllPipelineJobs(new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error: Pipeline jobs not flushed: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result != null && result) {
+					Window.alert("Pipeline jobs flushed");
+				} else {
+					Window.alert("Pipeline jobs not flushed");
+				}
+
+			}
+		});		
 	}
 }

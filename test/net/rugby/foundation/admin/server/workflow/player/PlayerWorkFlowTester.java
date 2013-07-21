@@ -32,6 +32,8 @@ import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.appengine.tools.development.testing.LocalTaskQueueTestConfig;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
@@ -46,8 +48,8 @@ import junit.framework.Assert;
 @RunWith(GuiceJUnitRunner.class)
 @GuiceModules({ AdminTestModule.class, CoreTestModule.class, Game1TestModule.class })
 public class PlayerWorkFlowTester extends PipelineTest {
-	//    private final LocalServiceTestHelper helper =
-	//            new LocalServiceTestHelper(new LocalTaskQueueTestConfig());
+	    private final LocalServiceTestHelper helper =
+	            new LocalServiceTestHelper(new LocalTaskQueueTestConfig());
 	
 	private transient ICompetitionFactory cf;
 
@@ -64,12 +66,12 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		// helper.setUp();
+		helper.setUp();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		//		  helper.tearDown();
+		helper.tearDown();
 		super.tearDown();
 	}
 

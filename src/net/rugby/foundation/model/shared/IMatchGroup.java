@@ -54,5 +54,7 @@ public interface IMatchGroup {
 	public abstract Long getForeignId();
 	public abstract String getForeignUrl();
 	public abstract void setForeignUrl(String foreignUrl);
+	public abstract void setFetchMatchStatsPipelineId(String pipelineId);
+	public abstract String getFetchMatchStatsPipelineId();
 	
 }

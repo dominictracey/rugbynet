@@ -6,10 +6,13 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.datastore.QueryResultIterable;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.googlecode.objectify.Key;
@@ -165,12 +168,60 @@ public class OfyCountryFactory implements ICountryFactory, Serializable {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<Country> getAll() {
+		try {
+			
+			byte[] value = null;
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			Iterable<Country> c = null;
+	
+			value = (byte[])syncCache.get(memCachePrefix + "ALL");
+			if (value == null) {
+				c = getAllFromDB();
+				
+				List<Country> list = new ArrayList<Country>();
+				Iterator<Country> it = c.iterator();
+				while (it.hasNext()) {
+					list.add(it.next());
+				}
+
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutput out = new ObjectOutputStream(bos);   
+				out.writeObject(list);
+				byte[] yourBytes = bos.toByteArray(); 
+	
+				out.close();
+				bos.close();
+	
+				syncCache.put(memCachePrefix + "ALL", yourBytes);
+			} else {
+	
+				// send back the cached version
+				ByteArrayInputStream bis = new ByteArrayInputStream(value);
+				ObjectInput in = new ObjectInputStream(bis);
+				c = (List<Country>)in.readObject();
+	
+				bis.close();
+				in.close();
+	
+			}
+			return c.iterator();
+	
+		} catch (Throwable ex) {
+			Logger.getLogger("Core Service OfyCountryFactory.getById").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+
+	}
+
+	
+	private QueryResultIterable<Country> getAllFromDB() {
 		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Country> qsp = ofy.query(Country.class);
 		if (qsp.count() > 0) {
-			return qsp.fetch().iterator();
+			return qsp.fetch();
 		} else {
 			return null;
 		}

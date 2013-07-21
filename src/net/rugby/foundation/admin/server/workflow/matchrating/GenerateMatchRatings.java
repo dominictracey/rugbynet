@@ -2,8 +2,10 @@ package net.rugby.foundation.admin.server.workflow.matchrating;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,11 +15,13 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 import com.google.appengine.tools.pipeline.FutureList;
 import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.Job1;
+import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.Value;
 
 //@Singleton
@@ -33,7 +37,16 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	}
 
 
-
+	protected class NameAndId {
+		String name;
+		Long id;
+		
+		NameAndId(Long id, String name) {
+			this.id = id;
+			this.name = name;
+		}
+	}
+	
 	/**
 	 * return IPlayer reference
 	 * params String compName
@@ -65,21 +78,21 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		FutureValue<ITeamMatchStats> homeTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getHomeTeam()), immediate(match), immediate(Home_or_Visitor.HOME), immediate(url));
 		FutureValue<ITeamMatchStats> visitorTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getVisitingTeam()), immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(url));
 
-		List<Long> homeIds = getIds(Home_or_Visitor.HOME, url);
-		List<Long> visitIds = getIds(Home_or_Visitor.VISITOR, url);
+		List<NameAndId> homeIds = getIds(Home_or_Visitor.HOME, url);
+		List<NameAndId> visitIds = getIds(Home_or_Visitor.VISITOR, url);
 
 		List<FutureValue<IPlayer>> homePlayers = new ArrayList<FutureValue<IPlayer>>();
 		List<FutureValue<IPlayer>> visitorPlayers = new ArrayList<FutureValue<IPlayer>>();
 
 		int count = 0;
-		for (Long id : homeIds) {
-			FutureValue<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate("home player " + count++),  immediate(url), immediate(id), immediate(1L));
+		for (NameAndId info : homeIds) {
+			FutureValue<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
 			homePlayers.add(homePlayer);
 		}
 
 		count = 0;
-		for (Long id : visitIds) {
-			FutureValue<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate("visit player " + count++),  immediate(url), immediate(id), immediate(1L));
+		for (NameAndId info : visitIds) {
+			FutureValue<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
 			visitorPlayers.add(visitPlayer);
 		}	   
 
@@ -88,7 +101,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 
 		count = 0;
 		for (FutureValue<IPlayer> fp : homePlayers) {
-			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url));
+			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
 			homePlayerMatchStats.add(stats);
 
 		}
@@ -115,7 +128,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	}
 
 
-	private List<Long> getIds(Home_or_Visitor home, String url) {
+	private List<NameAndId> getIds(Home_or_Visitor home, String url) {
 		boolean found = false;
 		boolean isVisitor = false;
 
@@ -123,7 +136,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 			isVisitor = true;
 		}
 
-		List<Long> ids = new ArrayList<Long>();
+		List<NameAndId> ids = new ArrayList<NameAndId>();
 		UrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
 		String line;
@@ -142,68 +155,6 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 
 				//skip down to players
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE,"Skipping down to teams...");
-
-//				boolean foundTries = false;
-//				boolean foundCons = false;
-//				boolean foundPens = false;
-//				boolean foundDrops = false;
-//				// tries
-//				
-//				for (int i=0; i<10; ++i) {
-//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
-//					line = it.next(); 
-//					if (line.contains("Tries")) {
-//						foundTries = true;
-//					} else if (line.contains("Cons")) {
-//						foundCons = true;
-//					} else if (line.contains("Pens")) {
-//						foundPens = true;
-//					} else if (line.contains("Drops")) {
-//						foundDrops = true;
-//					}
-//				}
-//				
-//				// cons
-//				if (!foundCons !line.contains("<tr>")) {
-//					for (int i=0; i<10; ++i) {
-//						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
-//						line = it.next(); 
-//						if (line.contains("Tries")) {
-//							foundTries = true;
-//						} else if (line.contains("Cons")) {
-//							foundCons = true;
-//						} else if (line.contains("Pens")) {
-//							foundPens = true;
-//						} else if (line.contains("Drops")) {
-//							foundDrops = true;
-//						}
-//					}
-//				}
-//				
-//				// pens
-//				if (!foundPens && !line.contains("<tr>")) {
-//					for (int i=0; i<10; ++i) {
-//						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
-//						line = it.next(); 
-//						if (line.contains("Tries")) {
-//							foundTries = true;
-//						} else if (line.contains("Cons")) {
-//							foundCons = true;
-//						} else if (line.contains("Pens")) {
-//							foundPens = true;
-//						} else if (line.contains("Drops")) {
-//							foundDrops = true;
-//						}
-//					}
-//				}
-//				
-//				// drops
-//				if (!line.contains("<tr>")) {
-//					for (int i=0; i<10; ++i) {
-//						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
-//						line = it.next(); 
-//					}
-//				}
 				
 				// there can be a bunch of optional 10-line sections here for tries, cons, pens and drops
 				// easiest to just look for the top of the player section
@@ -226,7 +177,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 
 				// get 15 home starters
 				for (int i=0; i<15; ++i) {
-					Long id = getId(it);
+					NameAndId id = getId(it);
 					if (!isVisitor)
 						ids.add(id);
 				}
@@ -239,7 +190,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 				}
 
 				// get 6 or 7 home subs
-				Long id = getId(it);
+				NameAndId id = getId(it);
 				while (id != null) {
 					if (!isVisitor)
 						ids.add(id);
@@ -305,8 +256,8 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	/*
 	 * sets playerOn to be true/false depending on how they finished the match
 	 */
-	Long getId(Iterator<String> it) {
-
+	NameAndId getId(Iterator<String> it) {
+		
 		String line = it.next();
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
 
@@ -347,12 +298,27 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		}
 
 		// iterator on outer </tr>
-		if (id.isEmpty()) {
-			return null;
+		if (id == null || id.isEmpty()) {
+			if (name == null || name.isEmpty()) {
+				return null;
+			} else {
+				return new NameAndId(null,name);
+			}
 		} else {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE,"Found player " + name + " (" + id + ")");
-			return Long.parseLong(id);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINER,"Found player " + name + " (" + id + ")");
+			return new NameAndId(Long.parseLong(id),name);
 		}
 
+	}
+	
+	public Value<List<IPlayerMatchRating>>  handleFailure(Throwable e) {
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown in generator job for fetching match stats and creating ratings: " + e.getLocalizedMessage());
+		//still didn't find, need human to get this going.
+//		PromisedValue<ITeamGroup> x = newPromise(ITeamGroup.class);
+//		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
+//		atf.put(task);
+
+//		return x;
+		return immediate(null);
 	}
 }

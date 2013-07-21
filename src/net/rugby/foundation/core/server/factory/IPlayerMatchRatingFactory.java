@@ -13,5 +13,6 @@ public interface IPlayerMatchRatingFactory {
 	List<? extends IPlayerMatchRating> getForMatch(Long matchId);
 	IPlayerMatchRating getNew(IPlayer playerId, IMatchGroup matchId, Integer rating, IMatchRatingEngineSchema schemaId, IPlayerMatchStats playerMatchStatsId);
 	IPlayerMatchRating put(IPlayerMatchRating pmr);
-	IPlayerMatchRating get(Long playerId, Long matchId);
+	IPlayerMatchRating get(IPlayerMatchStats pms, IMatchRatingEngineSchema schema);
+	Boolean deleteForSchema(IMatchRatingEngineSchema schema);
 }

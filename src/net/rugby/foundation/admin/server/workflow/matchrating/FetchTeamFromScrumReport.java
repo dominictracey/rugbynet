@@ -2,15 +2,20 @@ package net.rugby.foundation.admin.server.workflow.matchrating;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.persistence.Transient;
 
 import com.google.appengine.tools.pipeline.Job2;
+import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
 public class FetchTeamFromScrumReport extends Job2<ITeamGroup, Home_or_Visitor, String> {
@@ -19,8 +24,8 @@ public class FetchTeamFromScrumReport extends Job2<ITeamGroup, Home_or_Visitor, 
 	 * 
 	 */
 	private static final long serialVersionUID = 3101992931956737933L;
-	@Transient
-	private ITeamGroupFactory tf;
+
+	private transient ITeamGroupFactory tf;
 
 	public FetchTeamFromScrumReport(ITeamGroupFactory tf) {
 		this.tf = tf;
@@ -81,6 +86,17 @@ public class FetchTeamFromScrumReport extends Job2<ITeamGroup, Home_or_Visitor, 
 			return immediate(team);
 		else
 			return null;
+	}
+	
+	public Value<ITeamGroup> handleFailure(Throwable e) {
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown fetching team from scrum report: " + e.getLocalizedMessage());
+		//still didn't find, need human to get this going.
+//		PromisedValue<ITeamGroup> x = newPromise(ITeamGroup.class);
+//		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
+//		atf.put(task);
+
+//		return x;
+		return immediate(null);
 	}
 
 }

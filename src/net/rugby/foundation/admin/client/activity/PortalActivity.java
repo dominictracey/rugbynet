@@ -46,7 +46,6 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 
 		this.clientFactory = clientFactory;
 		view = clientFactory.getPortalView();
-		clientFactory.getPlayerPopupView().setPresenter(this);
 		// Select the tab corresponding to the token value
 		if (place.getToken() != null) {
 			//			view.selectTab(2, false);
@@ -59,8 +58,6 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 
 		view.setPresenter(this);
-		clientFactory.getPlayerPopupView().setPresenter(this);
-		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 		panel.setWidget(view.asWidget());
 
 		if (place != null) {
@@ -136,6 +133,7 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 
 	@Override
 	public void showPlayerPopup(IPlayerMatchStats target) {
+		clientFactory.getPlayerPopupView().setPresenter(this);
 		clientFactory.getRpcService().getPlayer(target.getPlayerId(), new AsyncCallback<IPlayer>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -153,6 +151,8 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 
 	@Override
 	public void onRefetchEditPlayerMatchStatsClicked(IPlayerMatchStats target) {
+		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
+
 		clientFactory.getRpcService().refetchPlayerMatchStats(target, new AsyncCallback<IPlayerMatchStats>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -170,6 +170,7 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 
 	@Override
 	public void onSavePlayerMatchStatsClicked(final IPlayerMatchStats pms) {
+		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
 		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerMatchInfo>() {
 
@@ -267,6 +268,8 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 
 	@Override
 	public void showEditPlayer(IPlayerMatchInfo player) {
+		clientFactory.getPlayerPopupView().setPresenter(this);
+
 		clientFactory.getRpcService().getPlayer(player.getPlayerMatchStats().getPlayerId(), new AsyncCallback<IPlayer>() {
 
 			@Override
@@ -287,6 +290,8 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 
 	@Override
 	public void showEditStats(IPlayerMatchInfo info) {
+		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
+
 		clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getPlayerMatchStats());
 		((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
 	}
@@ -297,4 +302,9 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 
 	}
 
+	@Override
+	public void flushAllPipelineJobs() {
+		clientFactory.flushAllPipelineJobs();
+		
+	}
 }

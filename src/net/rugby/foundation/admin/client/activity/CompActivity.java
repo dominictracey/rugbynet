@@ -12,10 +12,14 @@ import net.rugby.foundation.admin.client.ui.EditComp;
 import net.rugby.foundation.admin.client.ui.EditMatch;
 import net.rugby.foundation.admin.client.ui.EditTeam;
 import net.rugby.foundation.admin.client.ui.SmartBar;
+import net.rugby.foundation.admin.client.ui.matchratingengineschemapopup.MatchRatingEngineSchemaPopupView.MatchRatingEngineSchemaPopupViewPresenter;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
-import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
+import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView.TeamMatchStatsPopupViewPresenter;
+import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -24,6 +28,8 @@ import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -38,7 +44,8 @@ import com.google.gwt.user.client.ui.DialogBox;
 public class CompActivity extends AbstractActivity implements  
 CompetitionView.Presenter, EditTeam.Presenter, EditComp.Presenter, 
 EditMatch.Presenter, PlayerListView.Listener<IPlayerMatchInfo>, PlayerPopupView.Presenter<IPlayer>,
-PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
+PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, 
+SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713> {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -75,8 +82,6 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 	@Override
 	public void start(AcceptsOneWidget containerWidget, EventBus eventBus) {
 		view.setPresenter(this);
-		clientFactory.getPlayerPopupView().setPresenter(this);
-		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
 		containerWidget.setWidget(view.asWidget());
 
@@ -85,14 +90,25 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 				@Override
 				public void onFailure(Throwable caught) {
-
-
+					Window.alert("Problem getting comp list: " + caught.getLocalizedMessage());
 				}
 
 				@Override
 				public void onSuccess(List<ICompetition> result) {
 					comps = result;
 					view.addComps(result);
+					clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Problem getting schema list: " + caught.getLocalizedMessage());
+						}
+
+						@Override
+						public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
+							view.setSchemaList(result);
+						}
+					});
 				}
 			});		
 		}
@@ -691,19 +707,12 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.ui.EditMatch.Presenter#fetchPlayers(net.rugby.foundation.model.shared.IMatchGroup)
-	 */
-	@Override
-	public void fetchPlayers(IMatchGroup matchGroup) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.client.ui.EditMatch.Presenter#fetchMatchStats(net.rugby.foundation.model.shared.IMatchGroup)
 	 */
 	@Override
 	public void fetchMatchStats(final IMatchGroup matchGroup) {
+		final EditMatch.Presenter presenter = this;  // there must be a way to do this...
+
 		clientFactory.getRpcService().fetchMatchStats(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
 
 			@Override
@@ -712,19 +721,46 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 			}
 
 			@Override
-			public void onSuccess(List<IPlayerMatchInfo> result) {
-				view.getPlayerListView().setPlayers(result, matchGroup);
+			public void onSuccess(final List<IPlayerMatchInfo> result) {
+				clientFactory.getRpcService().getMatch(matchGroup.getId(), new AsyncCallback<IMatchGroup>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed getting updated Match (for pipeline Id): " + caught.getMessage());
+						
+					}
+
+					@Override
+					public void onSuccess(IMatchGroup match) {
+						em.SetPresenter(presenter);
+						em.ShowMatch(match);
+						view.getPlayerListView().setPlayers(result, matchGroup);
+						
+					}
+					
+				});
+				
 			}
 		});	
 	}
 
 	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.ui.EditMatch.Presenter#fetchPlayerStats(net.rugby.foundation.model.shared.IMatchGroup)
+	 * @see net.rugby.foundation.admin.client.ui.EditMatch.Presenter#reRateMatch(net.rugby.foundation.model.shared.IMatchGroup)
 	 */
 	@Override
-	public void fetchPlayerStats(IMatchGroup matchGroup) {
-		// TODO Auto-generated method stub
+	public void reRateMatch(final IMatchGroup matchGroup) {
+		clientFactory.getRpcService().reRateMatch(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
 
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed re-rating match: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<IPlayerMatchInfo> result) {
+				view.getPlayerListView().setPlayers(result, matchGroup);
+			}
+		});	
 	}
 
 
@@ -748,6 +784,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 	@Override
 	public void showEditPlayer(IPlayerMatchInfo player) {
+		clientFactory.getPlayerPopupView().setPresenter(this);
 		clientFactory.getRpcService().getPlayer(player.getPlayerMatchStats().getPlayerId(), new AsyncCallback<IPlayer>() {
 
 			@Override
@@ -758,6 +795,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 			@Override
 			public void onSuccess(IPlayer result) {
+
 				clientFactory.getPlayerPopupView().setPlayer(result);
 				((DialogBox) clientFactory.getPlayerPopupView()).center();
 			}
@@ -768,6 +806,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 	@Override
 	public void showEditStats(IPlayerMatchInfo info) {
+		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 		clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getPlayerMatchStats());
 		((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
 	}
@@ -814,6 +853,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 	@Override
 	public void onSavePlayerMatchStatsClicked(final IPlayerMatchStats pms) {
+		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
 		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerMatchInfo>() {
 
@@ -845,7 +885,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 	@Override
 	public void compPicked(Long id) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
@@ -871,13 +911,14 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 
 			}
 		});			
-		
+
 	}
 
 
 
 	@Override
 	public void showPlayerPopup(IPlayerMatchStats target) {
+		clientFactory.getPlayerPopupView().setPresenter(this);
 		clientFactory.getRpcService().getPlayer(target.getPlayerId(), new AsyncCallback<IPlayer>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -891,13 +932,14 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 			}
 		});
 
-		
+
 	}
 
 
 
 	@Override
 	public void onRefetchEditPlayerMatchStatsClicked(IPlayerMatchStats target) {
+		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 		clientFactory.getRpcService().refetchPlayerMatchStats(target, new AsyncCallback<IPlayerMatchStats>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -910,9 +952,322 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, SmartBar.Presenter {
 				((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).center();
 			}
 		});
-		
+
 	}
 
+
+
+	@Override
+	public void showHomeTeamMatchStats(IMatchGroup matchGroup) {
+		clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
+		clientFactory.getRpcService().getTeamMatchStats(matchGroup.getId(), matchGroup.getHomeTeamId(), new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch team match stats to edit");
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+
+				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+			}
+		});
+	}
+
+
+
+	@Override
+	public void showVisitingTeamMatchStats(IMatchGroup matchGroup) {
+		clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
+		clientFactory.getRpcService().getTeamMatchStats(matchGroup.getId(), matchGroup.getVisitingTeamId(), new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch team match stats to edit");
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+			}
+		});		
+	}
+
+
+	/**
+	 * 
+	 * @param Team
+	 */
+	@Override
+	public void onSaveTeamMatchStatsClicked(ITeamMatchStats tms) {
+		clientFactory.getRpcService().saveTeamMatchStats(tms, null, new AsyncCallback<ITeamMatchStats>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+
+				Window.alert("Team Match Stats not saved: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+
+				//view.getPlayerListView().updatePlayerMatchStats(result);
+				((DialogBox) clientFactory.getTeamMatchStatsPopupView()).hide();
+
+			}
+		});		}
+
+
+
+	@Override
+	public void onCancelEditTeamMatchStatsClicked() {
+		((DialogBox)clientFactory.getTeamMatchStatsPopupView()).hide();
+
+	}
+
+
+
+	@Override
+	public void onRefetchEditTeamMatchStatsClicked(ITeamMatchStats target) {
+		clientFactory.getRpcService().refetchTeamMatchStats(target, new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch Team Match Stats, see logs for details");
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+			}
+		});
+
+	}
+
+
+
+
+
+
+
+	@Override
+	public void onCancelEditMatchRatingEngineSchemaClicked() {
+		((DialogBox)clientFactory.getMatchRatingEngineSchemaPopupView()).hide();
+
+	}
+
+
+
+	@Override
+	public void onDeleteRatingsForMatchRatingEngineSchemaClicked(ScrumMatchRatingEngineSchema20130713 schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
+		clientFactory.getRpcService().deleteRatingsForMatchRatingEngineSchema(schema, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to delete ratings match rating engine schema. Details:" + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Window.alert("Ratings successfully deleted");
+				} else {
+					Window.alert("Ratings not deleted.");
+				}
+			}
+		});
+	}
+
+
+
+	@Override
+	public void onDeleteMatchRatingEngineSchemaClicked(ScrumMatchRatingEngineSchema20130713 schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
+		clientFactory.getRpcService().deleteMatchRatingEngineSchema(schema, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to delete match rating engine schema, you probably have ratings you need to delete first, but check the logs to see what's up...");
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					((DialogBox)clientFactory.getMatchRatingEngineSchemaPopupView()).hide();
+					Window.alert("Schema successfully deleted");
+					clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Failed to refresh schema list");
+						}
+
+						@Override
+						public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
+							view.setSchemaList(result);
+						}
+						
+					});
+				} else {
+					Window.alert("Schema not deleted. You probably have ratings you need to delete first.");
+				}
+			}
+		});
+
+	}
+
+
+
+	@Override
+	public void editSchema(IMatchRatingEngineSchema schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
+		if (schema instanceof ScrumMatchRatingEngineSchema20130713) {
+			clientFactory.getMatchRatingEngineSchemaPopupView().setTarget((ScrumMatchRatingEngineSchema20130713)schema);
+			((DialogBox)clientFactory.getMatchRatingEngineSchemaPopupView()).center();
+		}
+
+	}
+
+
+
+	@Override
+	public void createSchema() {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
+		clientFactory.getRpcService().getMatchRatingEngineSchema(null, new AsyncCallback<ScrumMatchRatingEngineSchema>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save match rating engine schema, see logs for details");
+			}
+
+			@Override
+			public void onSuccess(ScrumMatchRatingEngineSchema result) {
+				if (result instanceof ScrumMatchRatingEngineSchema20130713) {
+					clientFactory.getMatchRatingEngineSchemaPopupView().setTarget((ScrumMatchRatingEngineSchema20130713)result);
+					((DialogBox)clientFactory.getMatchRatingEngineSchemaPopupView()).center();
+				}
+			}
+		});
+	}
+
+
+
+	@Override
+	public void onSaveMatchRatingEngineSchemaClicked(
+			ScrumMatchRatingEngineSchema20130713 schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>)this);
+		clientFactory.getRpcService().saveMatchRatingEngineSchema((ScrumMatchRatingEngineSchema)schema, new AsyncCallback<ScrumMatchRatingEngineSchema>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save match rating engine schema: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(ScrumMatchRatingEngineSchema result) {
+				if (result instanceof ScrumMatchRatingEngineSchema20130713) {
+					clientFactory.getMatchRatingEngineSchemaPopupView().setTarget((ScrumMatchRatingEngineSchema20130713)result);
+					((DialogBox)clientFactory.getMatchRatingEngineSchemaPopupView()).hide();
+					clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Failed to refresh schema list: " + caught.getLocalizedMessage());
+						}
+
+						@Override
+						public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
+							view.setSchemaList(result);
+						}
+						
+					});
+				} else {
+					Window.alert("Schema not saved. Didn't get a good schema back from server.");
+				}
+			}
+		});
+
+	}
+
+
+
+	@Override
+	public void onSaveAsCopyMatchRatingEngineSchemaClicked(
+			ScrumMatchRatingEngineSchema20130713 schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>)this);
+		clientFactory.getRpcService().saveMatchRatingEngineSchemaAsCopy((ScrumMatchRatingEngineSchema)schema, new AsyncCallback<ScrumMatchRatingEngineSchema>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save copy of match rating engine schema. Details: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(ScrumMatchRatingEngineSchema result) {
+				if (result instanceof ScrumMatchRatingEngineSchema20130713) {
+					clientFactory.getMatchRatingEngineSchemaPopupView().setTarget((ScrumMatchRatingEngineSchema20130713)result);
+					((DialogBox)clientFactory.getMatchRatingEngineSchemaPopupView()).hide();
+					clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Failed to refresh schema list: " + caught.getLocalizedMessage());
+						}
+
+						@Override
+						public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
+							view.setSchemaList(result);
+						}
+						
+					});
+				} else {
+					Window.alert("Schema not saved. Didn't get a good schema back from server.");
+				}
+			}
+		});
+
+	}
+
+
+
+	@Override
+	public void onSetMatchRatingEngineSchemaAsDefaultClicked(
+			ScrumMatchRatingEngineSchema20130713 schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>)this);
+		clientFactory.getRpcService().setMatchRatingEngineSchemaAsDefault(schema, new AsyncCallback<ScrumMatchRatingEngineSchema>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save copy of match rating engine schema. Details: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(ScrumMatchRatingEngineSchema result) {
+				if (result instanceof ScrumMatchRatingEngineSchema20130713) {
+					clientFactory.getMatchRatingEngineSchemaPopupView().setTarget((ScrumMatchRatingEngineSchema20130713)result);
+					((DialogBox)clientFactory.getMatchRatingEngineSchemaPopupView()).center();
+					clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Failed to refresh schema list: " + caught.getLocalizedMessage());
+						}
+
+						@Override
+						public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
+							view.setSchemaList(result);
+						}
+						
+					});
+				} else {
+					Window.alert("Schema not saved. Didn't get a good schema back from server.");
+				}
+			}
+		});	}
+
+
+
+	@Override
+	public void flushAllPipelineJobs() {
+		clientFactory.flushAllPipelineJobs();
+		
+	}
 
 
 
