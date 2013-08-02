@@ -30,6 +30,7 @@ public class EditComp extends Composite {
 	public interface Presenter {
 		void saveCompInfo(ICompetition comp);
 		void repairComp(ICompetition comp);
+		void deleteComp(ICompetition comp);
 	} 
 	
 	public EditComp() {
@@ -40,6 +41,8 @@ public class EditComp extends Composite {
 	Button save;
 	@UiField
 	Button repair;
+	@UiField
+	Button delete;
 	@UiField
 	TextBox longName;
 	@UiField
@@ -73,6 +76,12 @@ public class EditComp extends Composite {
 		comp.setUnderway(underway.getValue());
 		listener.repairComp(comp);
 	}
+	
+	@UiHandler("delete")
+	void onClickDelete(ClickEvent e) {
+		listener.deleteComp(comp);
+	}
+
 
 	public void ShowComp(ICompetition comp) {
 		this.comp = comp;

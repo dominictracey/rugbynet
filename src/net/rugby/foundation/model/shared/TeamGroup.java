@@ -149,4 +149,9 @@ public class TeamGroup extends Group implements ITeamGroup {
 		this.color = color;
 		
 	}
+
+//	@Override
+//	public void setDisplayName(String displayName) {
+//		this.displayName = displayName;
+//	}
 }

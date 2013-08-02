@@ -1,8 +1,8 @@
-<!-- Indices written at Sun, 21 Jul 2013 23:34:10 UTC -->
+<!-- Indices written at Fri, 2 Aug 2013 01:36:39 UTC -->
 
 <datastore-indexes>
 
-    <!-- Used 6 times in query history -->
+    <!-- Used 147 times in query history -->
     <datastore-index kind="ScrumPlayerMatchStats" ancestor="false" source="auto">
         <property name="matchId" direction="asc"/>
         <property name="teamId" direction="asc"/>

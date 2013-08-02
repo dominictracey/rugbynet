@@ -15,7 +15,7 @@ import com.googlecode.objectify.annotation.Entity;
 public class Group implements Serializable, IGroup {
   @Id
   private Long id;
-  private String displayName;
+  protected String displayName;
   private List<IPlayer> members;
   private GroupType groupType;
   protected String groupInfo;

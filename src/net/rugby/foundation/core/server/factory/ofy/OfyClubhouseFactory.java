@@ -6,12 +6,16 @@ package net.rugby.foundation.core.server.factory.ofy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
+import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.model.shared.Clubhouse;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IClubhouse;
@@ -27,9 +31,11 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Long id;
+	private IClubhouseMembershipFactory chmf;
 	 
-	
-	public OfyClubhouseFactory() {
+	@Inject
+	public OfyClubhouseFactory(IClubhouseMembershipFactory chmf) {
+		this.chmf = chmf;
 	}
 	
 	/* (non-Javadoc)
@@ -85,6 +91,24 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 			all.add(ch);
 		}
 		return all;
+	}
+
+	@Override
+	public boolean delete(Long id) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			setId(id);
+			IClubhouse c = get();
+			
+			// delete all the memberships
+			chmf.deleteForClubhouse(id);
+
+			ofy.delete(c);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;
 	}
 
 }

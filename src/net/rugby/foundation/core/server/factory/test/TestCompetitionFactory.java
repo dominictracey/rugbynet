@@ -304,6 +304,12 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		return null;
 	}
 
+	@Override
+	public boolean delete(Long compId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 //	/* (non-Javadoc)
 //	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getLastUpdate(java.lang.Long)
 //	 */

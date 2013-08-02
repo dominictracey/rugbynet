@@ -134,6 +134,12 @@ public class TestRoundFactory implements IRoundFactory {
 		
 	}
 
+	@Override
+	public boolean delete(Long roundId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IRoundFactory#setFactories(net.rugby.foundation.core.server.factory.ICompetitionFactory, net.rugby.foundation.core.server.factory.IMatchGroupFactory)
 	 */

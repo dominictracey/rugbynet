@@ -98,4 +98,10 @@ public class TestClubhouseFactory implements IClubhouseFactory {
 		return all;
 	}
 
+	@Override
+	public boolean delete(Long id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

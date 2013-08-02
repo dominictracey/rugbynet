@@ -202,10 +202,12 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 			@Override
 			public void onSuccess(Map<String, ITeamGroup> result) {
-				for (ITeamGroup t: result.values()) {
-					teams.add(t);
+				if (result != null) {
+					for (ITeamGroup t: result.values()) {
+						teams.add(t);
+					}
+					view.showTeams(result);
 				}
-				view.showTeams(result);
 
 			}
 		});		
@@ -700,7 +702,11 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			@Override
 			public void onSuccess(IMatchGroup result) {
 				//editMatchInit(em, plv, result.getId(), result.getRoundId(), currentCompId);
-				em.ShowMatch(result);
+				if (result != null) {
+					em.ShowMatch(result);
+				} else {
+					Window.alert("Something happened getting match score");
+				}
 
 			}
 		});		
@@ -1266,6 +1272,32 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	@Override
 	public void flushAllPipelineJobs() {
 		clientFactory.flushAllPipelineJobs();
+		
+	}
+
+
+
+	@Override
+	public void deleteComp(ICompetition comp) {
+		clientFactory.getRpcService().deleteComp(comp.getId(), new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Comp deletion failure: " + caught.getLocalizedMessage());
+				
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Window.alert("Comp deleted. Don't forget to flush memcache!");
+				} else {
+					Window.alert("Comp not deleted. See logs for details");
+				}
+				
+			}
+			
+		}); 
 		
 	}
 

@@ -18,6 +18,7 @@ import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
@@ -124,5 +125,20 @@ public class OfyMatchResultFactory implements IMatchResultFactory, Serializable 
 			return null;
 		}
 	}
+	@Override
+	public boolean delete(Long id) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			setId(id);
+			IMatchResult c = get();
+
+			ofy.delete(c);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;
+	}
+
 
 }

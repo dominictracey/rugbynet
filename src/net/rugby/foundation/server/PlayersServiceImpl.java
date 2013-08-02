@@ -1018,18 +1018,19 @@ public ArrayList<String> endRound(ArrayList<Long> matchIDs) {
 	Query<CompetitionTeam> qct = ofy.query(CompetitionTeam.class).filter("competitionID", comp.getId());
 	
 	ArrayList<Player> players = new ArrayList<Player>();
-	
-	for(ICompetitionTeam ct : qct) {
-		Query<TeamMembership> qtm = ofy.query(TeamMembership.class).filter("teamID", ct.getTeamID());
-		for (TeamMembership tm : qtm) {
-			Key<Player> pKey = new Key<Player>(Player.class,tm.getPlayerID());
-			Player p = ofy.get(pKey);
-			if (p.isActive()) {
-				players.add(p);
-				e.addRating(p.getId(), p.getOverallRating().floatValue());
-			}
-		}
-	}
+
+// getting rid of ICT DPT 7/31/31
+//	for(ICompetitionTeam ct : qct) {
+//		Query<TeamMembership> qtm = ofy.query(TeamMembership.class).filter("teamID", ct.getTeamID());
+//		for (TeamMembership tm : qtm) {
+//			Key<Player> pKey = new Key<Player>(Player.class,tm.getPlayerID());
+//			Player p = ofy.get(pKey);
+//			if (p.isActive()) {
+//				players.add(p);
+//				e.addRating(p.getId(), p.getOverallRating().floatValue());
+//			}
+//		}
+//	}
 	
 
 	//@TODO hardcode 6
@@ -1448,12 +1449,14 @@ public ArrayList<Group> getGroupsByGroupTypeByComp(GroupType type, Long compID) 
 		for (Group g: q) {
 			l.add(g);
 		}
-	} else if (type.equals(GroupType.TEAM)) {
-		Query<CompetitionTeam> ctq = ofy.query(CompetitionTeam.class).filter("competitionID",compID);
-		for( ICompetitionTeam ct : ctq) {
-			l.add(ofy.get(new Key<Group>(Group.class,ct.getTeamID())));	
-		}
-	} else if (type.equals(GroupType.MATCH)) {
+	} 
+//	else if (type.equals(GroupType.TEAM)) {
+//		Query<CompetitionTeam> ctq = ofy.query(CompetitionTeam.class).filter("competitionID",compID);
+//		for( ICompetitionTeam ct : ctq) {
+//			l.add(ofy.get(new Key<Group>(Group.class,ct.getTeamID())));	
+//		}
+//	} 
+	else if (type.equals(GroupType.MATCH)) {
 		// go through the rounds of the competition, appending the matches as we go.
 		ICompetition comp = ofy.get(new Key<Competition>(Competition.class,compID));
 		for (Long rid : comp.getRoundIds()) {

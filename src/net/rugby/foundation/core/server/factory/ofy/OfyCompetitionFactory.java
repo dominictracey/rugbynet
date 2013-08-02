@@ -9,19 +9,21 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
-import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
@@ -44,23 +46,18 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	private final IRoundFactory rf;
 	private ITeamGroupFactory tf;
 	private IClubhouseFactory chf;
+	private IConfigurationFactory ccf;
 	private boolean saving = false;
-	private IMatchGroupFactory mf;
-	private boolean loading = false;
-	
-	@Inject
-	OfyCompetitionFactory(IRoundFactory rf, ITeamGroupFactory tf, IClubhouseFactory chf, IMatchGroupFactory mf) {
 
+
+	@Inject
+	OfyCompetitionFactory(IRoundFactory rf, ITeamGroupFactory tf, IClubhouseFactory chf, IConfigurationFactory ccf) {
 		this.rf = rf;
-		this.mf = mf;
-		//rf.setFactories(this, mf);
-		//mf.setFactories(rf, tf);
 		this.tf = tf;
 		this.chf = chf;
-		
-		//Logger.getLogger("OfyCompFactory.Constructor").log(Level.WARNING, "Const " + this.toString() +  " MF " + mf.toString() + " loading " + loading + " saving " + saving);
+		this.ccf = ccf;
 	}
-	
+
 	@Override
 	public void setId(Long id) {
 		this.id = id;
@@ -73,7 +70,6 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			ICompetition c = null;
-			//Logger.getLogger("OfyCompFactory.getCompetition").log(Level.WARNING, "Const " + this.toString() +  " MF " + mf.toString() + " loading " + loading + " saving " + saving);
 
 			value = (byte[])syncCache.get(id);
 			if (value == null) {
@@ -86,18 +82,18 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 				ObjectOutput out = new ObjectOutputStream(bos);   
 				out.writeObject(c);
 				byte[] yourBytes = bos.toByteArray(); 
-	
+
 				out.close();
 				bos.close();
-	
+
 				syncCache.put(id, yourBytes);
 			} else {
-	
+
 				// send back the cached version
 				ByteArrayInputStream bis = new ByteArrayInputStream(value);
 				ObjectInput in = new ObjectInputStream(bis);
 				c = (ICompetition)in.readObject();
-	
+
 				bis.close();
 				in.close();
 
@@ -105,44 +101,44 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 			return c;
 
 		} catch (Throwable ex) {
-			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
-		
+
 	}
-	
+
 	@Override
 	public void build(Long compId) {
 		try {
 			if (!saving) {
 				// now update the memcache version
 				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-					
+
 				setId(compId);
 				ICompetition comp = getFromDB();
-	
+
 				syncCache.delete(comp.getId());
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				ObjectOutput out = new ObjectOutputStream(bos);   
 				out.writeObject(comp);
 				byte[] yourBytes = bos.toByteArray(); 
-		
+
 				out.close();
 				bos.close();
-		
+
 				syncCache.put(id, yourBytes);
 			}
-			
+
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 		}
 	}
-	
+
 	protected ICompetition getFromDB() {
-		loading = true;
+
 		Objectify ofy = DataStoreFactory.getOfy();
 		Competition c = ofy.get(new Key<Competition>(Competition.class,id));
-		
+
 		if (c != null) {
 			c.setRounds(new ArrayList<IRound>());
 			for (Long rid : c.getRoundIds()) {
@@ -150,7 +146,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 				IRound r = rf.getRound();
 				c.getRounds().add(r);
 			}
-			
+
 			c.setTeams(new ArrayList<ITeamGroup>());
 			for (Long tid : c.getTeamIds()) {
 				tf.setId(tid);
@@ -160,7 +156,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 		} else {
 			c = new Competition();
 		}
-		loading = false;
+
 		return c;
 	}
 
@@ -170,12 +166,12 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			if (c != null) {
-				
+
 				c.setLastSaved(new Date());	
 				if (c.getId() == null) {
 					ofy.put(c); // get an id to pass down to the rounds
 				}
-				
+
 				c.setRoundIds(new ArrayList<Long>());
 				if (c.getRounds() != null) {
 					for (IRound r : c.getRounds()) {
@@ -189,7 +185,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 					c.setRounds(new ArrayList<IRound>());
 					c.setRoundIds(new ArrayList<Long>());
 				}
-				
+
 				// re-populate teams out of the matches
 				c.setTeamIds(new ArrayList<Long>());
 				c.setTeams(new ArrayList<ITeamGroup>());
@@ -203,11 +199,11 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 							c.getTeamIds().add(m.getVisitingTeamId()); 
 							c.getTeams().add(m.getVisitingTeam()); 
 						}
-	
+
 					}
 				}
-	
-				
+
+
 				if (c.getCompClubhouseId() == null) {
 					chf.setId(null);
 					IClubhouse clubhouse = null;
@@ -218,19 +214,19 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 					clubhouse.setOwnerID(-99L);  //-99L is system owned
 					clubhouse.setPublicClubhouse(false);
 					// no join link
-					
+
 					clubhouse = chf.put(clubhouse);
-	
+
 					c.setCompClubhouseId(clubhouse.getId());
 				}
-				
+
 			} else {
 				c = new Competition();
 				c.setShortName("--");
 			}		
-			
+
 			ofy.put(c);
-			
+
 			// now update the memcache version
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(c.getId());
@@ -238,12 +234,12 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 			ObjectOutput out = new ObjectOutputStream(bos);   
 			out.writeObject(c);
 			byte[] yourBytes = bos.toByteArray(); 
-	
+
 			out.close();
 			bos.close();
-	
+
 			syncCache.put(id, yourBytes);
-			
+
 			return c;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -261,16 +257,16 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Competition> cq = ofy.query(Competition.class).filter("underway", true);
 		for (Competition c : cq) {
-			
+
 			// never let a competition out the door that you get back from Objectify. Always call getCompetition or 
 			// Bad Things (tm) will happen.			
 			setId(c.getId());
 			list.add(getCompetition());
 		}
-		
+
 		return list;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getUnderwayComps()
 	 */
@@ -280,13 +276,13 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Competition> cq = ofy.query(Competition.class);
 		for (Competition c : cq) {
-			
+
 			// never let a competition out the door that you get back from Objectify. Always call getCompetition or 
 			// Bad Things (tm) will happen.
 			setId(c.getId());
 			list.add(getCompetition());
 		}
-		
+
 		return list;
 	}
 
@@ -310,25 +306,87 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Repaired comp by adding teamIds for comp " + comp.getLongName());
 
 		}
-		
+
 		return comp;
 	}
 
-//	/* (non-Javadoc)
-//	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getLastUpdate(java.lang.Long)
-//	 */
-//	@Override
-//	public Date getLastUpdate(Long compId) {
-//		setId(compId);
-//		ICompetition c = getCompetition();
-//		if (c != null) {
-//			if (c.getLastSaved() == null) {
-//				c.setLastSaved(new Date());
-//				put(c);
-//			}
-//			return c.getLastSaved();
-//		}
-//		return null;
-//	}
+	@Override
+	public boolean delete(Long compId) {
+		Objectify ofy = DataStoreFactory.startTransaction();
+
+		try {
+			boolean ok = true;
+
+			setId(compId);
+			ICompetition c = getCompetition();
+			if (c != null) {
+				// save compClubhouse 
+				// can't have more than 5 entity types in the transaction so we have to break it up.
+				Long ccid = c.getCompClubhouseId();
+				
+				Iterator<Long> it = c.getRoundIds().iterator();
+
+				while (it.hasNext() && ok) {
+					ok = rf.delete(it.next());
+				}
+				
+				// the competition clubhouse
+				if (ok) {
+					ok = chf.delete(ccid);
+				}
+				
+				// the core configuration entry
+				if (ok) {
+					ICoreConfiguration cc = ccf.get();
+					ok = cc.deleteComp(compId);
+					if (ok) {
+						ccf.put(cc);
+					}
+				}
+				
+				//@REX workflow configuration
+				
+				//@REX game1 configuration
+				
+				if (ok) {
+					ofy.delete(c);
+				}
+				
+				if (ofy.getTxn().isActive()) {
+					if (ok) {
+						ofy.getTxn().commit();
+						return true;
+					} else {
+						ofy.getTxn().rollback();
+					}
+				}
+			}
+			
+			return false;
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			if (ofy.getTxn().isActive())
+				ofy.getTxn().rollback();
+			return false;
+		}
+	}
+
+	//	/* (non-Javadoc)
+	//	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getLastUpdate(java.lang.Long)
+	//	 */
+	//	@Override
+	//	public Date getLastUpdate(Long compId) {
+	//		setId(compId);
+	//		ICompetition c = getCompetition();
+	//		if (c != null) {
+	//			if (c.getLastSaved() == null) {
+	//				c.setLastSaved(new Date());
+	//				put(c);
+	//			}
+	//			return c.getLastSaved();
+	//		}
+	//		return null;
+	//	}
 
 }

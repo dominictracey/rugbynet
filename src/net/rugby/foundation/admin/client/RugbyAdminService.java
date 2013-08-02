@@ -71,6 +71,9 @@ public interface RugbyAdminService extends RemoteService {
 	 * @return
 	 */
 	ICompetition getComp(Long compId);
+	
+	Boolean deleteComp(Long id);
+	
 	/**
 	 * @param match
 	 * @param compId

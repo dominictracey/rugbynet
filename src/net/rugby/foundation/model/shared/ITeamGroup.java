@@ -7,7 +7,7 @@ package net.rugby.foundation.model.shared;
  * @author home
  *
  */
-public interface ITeamGroup {
+public interface ITeamGroup extends IGroup {
 
 	public abstract String getGroupInfo();
 
@@ -26,12 +26,15 @@ public interface ITeamGroup {
 
 	public abstract void setShortName(String shortName);
 
-	public abstract Long getId();
+//	public abstract Long getId();
 
-	/**
-	 * @return
-	 */
-	public abstract String getDisplayName();
+//	/**
+//	 * @return
+//	 */
+//	public abstract String getDisplayName();
+//	
+//	public abstract void setDisplayName(String displayName);
+
 	
 	/**
 	 * @return #rrggbb color for the team

@@ -15,4 +15,6 @@ public interface ITeamMatchStatsFactory {
 
 	public abstract ITeamMatchStats getVisitStats(IMatchGroup m);
 
+	public abstract boolean deleteForMatch(IMatchGroup m);
+
 }

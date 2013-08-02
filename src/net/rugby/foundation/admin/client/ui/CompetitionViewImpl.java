@@ -1,6 +1,7 @@
 package net.rugby.foundation.admin.client.ui;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -330,7 +331,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		matches.removeItems();
 		for (IMatchGroup m : mgs.values()) {
 			matches.addItem(m.getDisplayName());
-			if (mgs.get(m.getDisplayName()).getId() == null) {
+			if (m.getId() == null) {
 				matches.getChild(matches.getChildCount()-1).getElement().addClassName("gnu");
 			}
 		}		
@@ -560,4 +561,14 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		smartBar.setSchemas(result);
 		
 	}
+//	
+//	private String getMatchMapKey(IMatchGroup m) {
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(m.getDate());
+//		cal.set(Calendar.HOUR_OF_DAY, 0);
+//		cal.set(Calendar.MINUTE, 0);
+//		cal.set(Calendar.SECOND, 0);
+//		cal.set(Calendar.MILLISECOND, 0);
+//		return cal.getTime().toString() + "**" + m.getDisplayName();
+//	}
 }

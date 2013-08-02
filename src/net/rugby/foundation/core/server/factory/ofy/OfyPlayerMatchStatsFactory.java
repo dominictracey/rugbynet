@@ -20,7 +20,9 @@ import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 
@@ -303,5 +305,27 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 
 		return list;
 		//return (List<IPlayerMatchStats>)qpms.list();
+	}
+
+	@Override
+	public boolean deleteForMatch(IMatchGroup m) {
+		try {
+			if (m != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+	
+				List<IPlayerMatchStats> c = getByMatchId(m.getId());
+	
+				if (c != null) {
+					ofy.delete(c);
+				}
+				
+			} else {
+				return false; // null match
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;
 	}
 }

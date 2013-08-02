@@ -27,4 +27,6 @@ public interface IRoundFactory {
 	 * @param mf
 	 */
 	//void setFactories(ICompetitionFactory cf, IMatchGroupFactory mf);
+	
+	boolean delete(Long roundId);
 }

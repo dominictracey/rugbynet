@@ -106,4 +106,10 @@ public class TestMatchResultFactory implements IMatchResultFactory {
 		return g;
 	}
 
+	@Override
+	public boolean delete(Long id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

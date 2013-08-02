@@ -266,6 +266,12 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 		return new ArrayList<IMatchGroup>();
 	}
 
+	@Override
+	public boolean delete(Long matchId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IMatchGroupFactory#setFactories(net.rugby.foundation.core.server.factory.IRoundFactory, net.rugby.foundation.core.server.factory.ITeamGroupFactory)
 	 */

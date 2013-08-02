@@ -15,4 +15,6 @@ public interface IMatchResultFactory {
 	IMatchResult get();
 
 	IMatchResult put(IMatchResult g);
+
+	boolean delete(Long id);
 }

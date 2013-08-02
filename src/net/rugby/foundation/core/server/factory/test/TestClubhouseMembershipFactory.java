@@ -196,4 +196,10 @@ IClubhouseMembershipFactory {
 
 	}
 
+	@Override
+	public boolean deleteForClubhouse(Long id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -34,37 +34,37 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 	private Long id;
 	private IMatchGroupFactory gf;
 	private ICompetitionFactory cf;
-	
+
 	@Inject
 	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf) {
 		this.gf = gf;
 		this.cf = cf;
 	}
-	
-//	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
-//		this.gf = gf;
-//		this.cf = cf;
-//	}
-	
+
+	//	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
+	//		this.gf = gf;
+	//		this.cf = cf;
+	//	}
+
 	@Override
 	public void setId(Long id) {
 		this.id = id;
 
 	}
 
-	
+
 	@Override
 	public IRound getRound() {
 		try {
-			
+
 			if (id == null) {
 				return new Round(); // put(null) actually saves it, which we don't want really?
 			}
-			
+
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			IRound r = null;
-	
+
 			value = (byte[])syncCache.get(id);
 			if (value == null) {
 				setId(id);
@@ -74,30 +74,30 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 				ObjectOutput out = new ObjectOutputStream(bos);   
 				out.writeObject(r);
 				byte[] yourBytes = bos.toByteArray(); 
-	
+
 				out.close();
 				bos.close();
-	
+
 				syncCache.put(id, yourBytes);
 			} else {
-	
+
 				// send back the cached version
 				ByteArrayInputStream bis = new ByteArrayInputStream(value);
 				ObjectInput in = new ObjectInputStream(bis);
 				r = (IRound)in.readObject();
-	
+
 				bis.close();
 				in.close();
-	
+
 			}
 			return r;
-	
+
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service OfyRoundFactory.getRound").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
 	}
-	
+
 	protected IRound getFromDB() {
 		if (id == null) {
 			return new Round();
@@ -105,7 +105,7 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 		Objectify ofy = DataStoreFactory.getOfy();
 
 		Round r = ofy.get(new Key<Round>(Round.class,id));
-		
+
 		if (r != null) {
 			r.setMatches(new ArrayList<IMatchGroup>());
 			for (Long gid : r.getMatchIDs()) {
@@ -129,7 +129,7 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 				((Round)r).setMatchIDs(new ArrayList<Long>());
 				if (r.getId() == null)
 					ofy.put(r); // get an id to pass down to the matches
-				
+
 				if (r.getMatches() != null) {
 					for (IMatchGroup g : r.getMatches()) {
 						g.setRoundId(r.getId());
@@ -144,9 +144,9 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 				r = new Round();
 				r.setName("--");
 			}		
-			
+
 			ofy.put(r);
-			
+
 			// now update the memcache version
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(r.getId());
@@ -154,15 +154,15 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 			ObjectOutput out = new ObjectOutputStream(bos);   
 			out.writeObject(r);
 			byte[] yourBytes = bos.toByteArray(); 
-	
+
 			out.close();
 			bos.close();
-	
+
 			syncCache.put(id, yourBytes);
-	
+
 			// force top-level reload
 			cf.build(r.getCompId());
-			
+
 			return r;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service OfyRoundFactory.put").log(Level.SEVERE, ex.getMessage(), ex);
@@ -176,12 +176,12 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 	 */
 	@Override
 	public IRound find(IRound round) {
-		
+
 		Objectify ofy = DataStoreFactory.getOfy();
 
 		// Find the rounds with the same name
 		Query<Round> qr = ofy.query(Round.class).filter("name", round.getName());
-		
+
 		// now see if any of these have the same matches
 		for (Round r : qr) {			
 			if (r.equals(round)) {
@@ -201,7 +201,7 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 		try {
 			// now update the memcache version
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-				
+
 			setId(roundId);
 			IRound r = getFromDB();
 
@@ -210,17 +210,46 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 			ObjectOutput out = new ObjectOutputStream(bos);   
 			out.writeObject(r);
 			byte[] yourBytes = bos.toByteArray(); 
-	
+
 			out.close();
 			bos.close();
-	
+
 			syncCache.put(id, yourBytes);
-			
+
 			// and cascade up to comp
 			cf.build(r.getCompId());
-			
+
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
-		}	}
+		}	
+	}
+
+	@Override
+	public boolean delete(Long roundId) {
+		try {
+			setId(roundId);
+			IRound r = getRound();
+			boolean ok = true;
+			if (r != null) {
+				for (Long mid : r.getMatchIDs()) {
+					if (ok) 
+						ok = gf.delete(mid);
+				}
+				
+				if (ok) {
+					Objectify ofy = DataStoreFactory.getOfy();
+					ofy.delete(r);
+					return true;
+				}
+			}
+			
+			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return false;
+		}
+
+		return false;
+	}
 
 }

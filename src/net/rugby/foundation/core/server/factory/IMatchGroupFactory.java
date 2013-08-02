@@ -26,4 +26,6 @@ public interface IMatchGroupFactory {
 	 * @param tf
 	 */
 	//void setFactories(IRoundFactory rf, ITeamGroupFactory tf);
+	
+	boolean delete(Long matchId);
 }

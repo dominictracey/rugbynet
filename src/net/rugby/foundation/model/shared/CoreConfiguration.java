@@ -550,4 +550,18 @@ public class CoreConfiguration implements ICoreConfiguration, Serializable {
 		return CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL;
 	}
 
+	@Override
+	public boolean deleteComp(Long compId) {
+		if (compsUnderway.contains(compId)) {
+			compsUnderway.remove(compId);
+			if (defaultCompId.equals(compId)) {
+				defaultCompId = null;
+			}
+			return true;
+		}
+		
+		//didn't find it
+		return false;
+	}
+
 }

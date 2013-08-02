@@ -11,18 +11,21 @@ import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 
 public class ScrumCompetitionFetcherFactory implements IForeignCompetitionFetcherFactory {
 
 	private IRoundFactory rf = null;
 	private IMatchGroupFactory mf;
 	private IResultFetcherFactory rff;
+	private ITeamGroupFactory tf;
 
 	@Inject
-	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff) {
+	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf) {
 		this.rf  = rf;
 		this.mf = mf;
 		this.rff = rff;
+		this.tf = tf;
 	}
 
 	/* (non-Javadoc)
@@ -34,7 +37,7 @@ public class ScrumCompetitionFetcherFactory implements IForeignCompetitionFetche
 		assert(rf!=null);
 		
 		if (fetcherType == CompetitionFetcherType.ESPNSCRUM_BASIC) {
-			ScrumCompetitionFetcher scf =  new ScrumCompetitionFetcher(rf,mf,rff);
+			ScrumCompetitionFetcher scf =  new ScrumCompetitionFetcher(rf,mf,rff, tf);
 			scf.setURL(url);
 			return scf;
 		} else {

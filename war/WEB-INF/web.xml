@@ -76,12 +76,21 @@
 		
 	<!-- Default page to serve -->
 	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
+		<welcome-file>access.html</welcome-file>
 	</welcome-file-list>
 
 	<security-constraint>
 		<web-resource-collection>
 			<url-pattern>/Admin.html</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+	
+		<security-constraint>
+		<web-resource-collection>
+			<url-pattern>/index.html</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>admin</role-name>

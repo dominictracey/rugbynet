@@ -280,4 +280,24 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 		}
 
 	}
+
+	@Override
+	public boolean deleteForMatch(IMatchGroup m) {
+		try {
+			if (m != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+	
+				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("groupId", m.getId());
+				ofy.delete(qpmr);
+
+				
+			} else {
+				return false; // null match
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;
+	}
 }

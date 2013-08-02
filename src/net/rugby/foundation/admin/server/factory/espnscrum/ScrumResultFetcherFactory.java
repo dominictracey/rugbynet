@@ -29,19 +29,22 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 		this.mf = mf;
 		this.mrf = mrf;
 	}
-	
+
 	@Override
 	public IResultFetcher getResultFetcher(Long sourceCompID, IRound round, IMatchResult.ResultType resultType) {
+		ICompetition comp = null;
+		if (sourceCompID != null) {
 			cf.setId(sourceCompID);
-			ICompetition comp = cf.getCompetition();
-			
-			if (comp == null) {
-				//Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized compId specified: " + sourceCompID);
-				return new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf);
-			}
-			
-			if (resultType == ResultType.SIMPLE_SCORE) {
-		
+			comp = cf.getCompetition();
+		}
+
+		if (comp == null) {
+			//Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized compId specified: " + sourceCompID);
+			return new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf);
+		}
+
+		if (resultType == ResultType.SIMPLE_SCORE) {
+
 			IResultFetcher fetcher = null;
 			if (comp != null && !comp.getLongName().contains("Super Rugby")) {
 				fetcher =  new ScrumSimpleScoreResultFetcher(mf,mrf);
@@ -53,7 +56,7 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 				fetcher.setComp(comp);
 				fetcher.setRound(comp.getPrevRound());
 			}
-			
+
 			return fetcher;
 		} else if (resultType == ResultType.MATCHES) {
 			IResultFetcher fetcher = new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf);

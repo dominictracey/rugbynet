@@ -19,4 +19,6 @@ public interface IPlayerMatchStatsFactory {
 	public abstract List<IPlayerMatchStats> query(List<Long> matchIds,
 			position posi, Long countryId, Long teamId);
 
+	public abstract boolean deleteForMatch(IMatchGroup m);
+
 }

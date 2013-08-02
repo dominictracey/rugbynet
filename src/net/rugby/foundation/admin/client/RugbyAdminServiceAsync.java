@@ -155,4 +155,5 @@ public interface RugbyAdminServiceAsync {
 	public void getScrumSchemaList(AsyncCallback<List<ScrumMatchRatingEngineSchema>> asyncCallback);
 	
 	public void flushAllPipelineJobs(AsyncCallback<Boolean> asyncCallback);
+	public void deleteComp(Long id, AsyncCallback<Boolean> asyncCallback);
 }

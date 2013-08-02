@@ -6,6 +6,8 @@ package net.rugby.foundation.core.server.factory.ofy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
@@ -14,6 +16,7 @@ import com.googlecode.objectify.Query;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.model.shared.ClubhouseMembership;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 
 /**
@@ -156,6 +159,22 @@ public class OfyClubhouseMembershipFactory implements IClubhouseMembershipFactor
 		this.id = null;
 		this.clubhouseId = clubhouseId;
 		this.appUserId = appUserId;
+		
+	}
+
+	@Override
+	public boolean deleteForClubhouse(Long id) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			setClubhouseId(id);
+			List<IClubhouseMembership> c = getList();
+
+			ofy.delete(c);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;
 		
 	}
 

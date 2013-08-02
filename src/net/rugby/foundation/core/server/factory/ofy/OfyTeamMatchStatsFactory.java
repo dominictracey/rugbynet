@@ -1,6 +1,8 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
@@ -8,6 +10,7 @@ import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumTeamMatchStats;
@@ -77,4 +80,32 @@ public class OfyTeamMatchStatsFactory implements ITeamMatchStatsFactory, Seriali
 
 		
 		return (ITeamMatchStats)s;	}
+
+	@Override
+	public boolean deleteForMatch(IMatchGroup m) {
+		try {
+			if (m != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+	
+				ScrumTeamMatchStats s = ofy.query(ScrumTeamMatchStats.class).filter("teamId", m.getHomeTeamId()).filter("matchId", m.getId()).get();
+	
+				if (s != null) {
+					ofy.delete(s);
+				}
+				
+				s = ofy.query(ScrumTeamMatchStats.class).filter("teamId", m.getVisitingTeamId()).filter("matchId", m.getId()).get();
+				
+				if (s != null) {
+					ofy.delete(s);
+				}
+				
+			} else {
+				return false; // null match
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;
+	}
 }

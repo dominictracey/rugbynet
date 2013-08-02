@@ -15,4 +15,5 @@ public interface IPlayerMatchRatingFactory {
 	IPlayerMatchRating put(IPlayerMatchRating pmr);
 	IPlayerMatchRating get(IPlayerMatchStats pms, IMatchRatingEngineSchema schema);
 	Boolean deleteForSchema(IMatchRatingEngineSchema schema);
+	boolean deleteForMatch(IMatchGroup m);
 }

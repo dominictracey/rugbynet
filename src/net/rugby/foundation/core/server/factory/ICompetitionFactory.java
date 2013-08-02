@@ -32,4 +32,6 @@ public interface ICompetitionFactory {
 //	 * @return the timestamp of when this competition was last updated. Useful for server-side caching
 //	 */
 //	Date getLastUpdate(Long compId);
+
+	boolean delete(Long compId);
 }

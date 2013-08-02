@@ -69,4 +69,10 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean deleteForMatch(IMatchGroup m) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

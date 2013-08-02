@@ -61,13 +61,19 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 		boolean found = false;
 
 		try {
-			URL url = new URL(resultURL);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			String line;
-			while ((line = reader.readLine()) != null && !found) {
+			//URL url = new URL(resultURL);
+			//BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			UrlCacher urlCache = new UrlCacher(resultURL);
+			List<String> lines = urlCache.get();
+			String line = "";
+			Iterator<String> it = lines.iterator();
+			if (it.hasNext()) {
+				line = it.next();
+			}
+			while (it.hasNext() && !found) {
 
 				if( line.contains("fixtureTableDate")) {
-					line = reader.readLine();
+					line = it.next();
 					String date = line.split("<|>")[0].trim();
 					if (!date.isEmpty()) {
 						DateFormat dateFormatter = new SimpleDateFormat("MMM dd, yyyy");
@@ -84,14 +90,14 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 					}
 				}
 				if( line.contains("fixtureTblContent")) {
-					line = reader.readLine();  // there are multiple
-					line = reader.readLine();  // </td>
-					line = reader.readLine();  //  <td valign="top" class="fixtureTblContent">
+					line = it.next();  // there are multiple
+					line = it.next();  // </td>
+					line = it.next();  //  <td valign="top" class="fixtureTblContent">
 					// <a href="/premiership-2011-12/rugby/match/142520.html" class="fixtureTablePreview">London Irish&nbsp;42 - 24&nbsp;Worcester Warriors</a>
 
 					//sometimes there is a commented out line before the one we want
 					if (line.contains("<!--")) {
-						line = reader.readLine();
+						line = it.next();
 					}
 					// postponed matches seem to not have a link to anywhere after a while - either way, no score
 					if (line.contains("P v P")) {
@@ -108,7 +114,7 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 								((ISimpleScoreMatchResult)result).setHomeScore(Integer.parseInt(homeTeamStuff.split("&nbsp;|-")[1].trim()));
 							}
 
-							//line = reader.readLine(); //24&nbsp;Worcester Warriors</a>
+							//line = it.next(); //24&nbsp;Worcester Warriors</a>
 							String foundVisitName = line.split("&nbsp;|<")[3];
 							if (foundVisitName.equals(visitTeamName)) {
 								((ISimpleScoreMatchResult)result).setVisitScore(Integer.parseInt(homeTeamStuff.split("&nbsp;|-")[2].trim()));
@@ -125,14 +131,14 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 					}
 				}
 			}
-			reader.close();
+			//reader.close();
 
-		} catch (MalformedURLException e) {
-			Logger.getLogger("Scrum.com").log(Level.SEVERE, e.getMessage());
-			return null;
-		} catch (IOException e) {
-			Logger.getLogger("Scrum.com").log(Level.SEVERE, e.getMessage());
-			return null;
+//		} catch (MalformedURLException e) {
+//			Logger.getLogger("Scrum.com").log(Level.SEVERE, e.getMessage());
+//			return null;
+//		} catch (IOException e) {
+//			Logger.getLogger("Scrum.com").log(Level.SEVERE, e.getMessage());
+//			return null;
 		} catch (ParseException e) {
 			Logger.getLogger("Scrum.com").log(Level.SEVERE, e.getMessage());
 			return null;
@@ -203,8 +209,8 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 				}
 			}
 
-			line = it.next();
-			boolean more = true;
+			
+			boolean more = it.hasNext();
 			while (found && more) {
 				line = it.next();
 				// read until </tbody>
@@ -214,7 +220,7 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 					assert(line.contains("<tr>"));
 					IMatchGroup match = getMatch(it, teams);
 					if (match != null) {
-						result.put(match.getDisplayName(), match);
+						result.put(getMatchMapKey(match), match);
 						if (match.getDisplayName().equals("Saracens vs. London Irish")) {
 							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, match.getDisplayName());
 						}
@@ -393,6 +399,16 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 			}
 
 		}
+	}
+	
+	private String getMatchMapKey(IMatchGroup m) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(m.getDate());
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime().toString() + "**" + m.getDisplayName();
 	}
 
 

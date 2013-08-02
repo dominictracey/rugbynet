@@ -123,7 +123,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IMatchResultFactory mrf;
 	private IPlayerMatchStatsFetcherFactory pmsff;
 	private IMatchRatingEngineSchemaFactory mresf;
-	
+
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
 
@@ -256,13 +256,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 		Map<String, ITeamGroup> teams = fetcher.getTeams();
 
-		// do we have this in our database? If so, replace the fetched one with the one that already has an ID
-		for (ITeamGroup foundTeam: teams.values()) {
-			//Query<Group> team = ofy.query(Group.class).filter("displayName", name);
-			ITeamGroup t = tf.find(foundTeam);
-			if (t != null) {
-				teams.put(foundTeam.getDisplayName(), t);
-			}				
+		// sometimes the points table isn't up yet so we don't get anything back, this is ok.
+		if (teams != null && !teams.isEmpty()) {
+			// do we have this in our database? If so, replace the fetched one with the one that already has an ID
+			for (ITeamGroup foundTeam: teams.values()) {
+				//Query<Group> team = ofy.query(Group.class).filter("displayName", name);
+				ITeamGroup t = tf.find(foundTeam);
+				if (t != null) {
+					teams.put(foundTeam.getDisplayName(), t);
+				}				
+			}
 		}
 
 		return teams;
@@ -320,24 +323,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public Map<String, IMatchGroup> fetchMatches(String url, Map<String,ITeamGroup> teams) {
-		IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff);
+		IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff, tf);
 
 		Map<String, IMatchGroup> matches = fetcher.getMatches(url, teams);
 
-		//		for (MatchGroup mg : matches.values()) {
-		//			// matches are considered equal if they have the same teams and date
-		//			Query<Group> gq = ofy.query(Group.class).filter("displayName",mg.getDisplayName());
-		//			if (gq.count() > 0) {
-		//				if (((IMatchGroup)gq.get()).getDate().equals(mg.getDate()) ) {
-		//					matches.put(mg.getDisplayName(), (MatchGroup)gq.get());
-		//				}
-		//			}
-		//		}
-
-		for (IMatchGroup m: matches.values()) {
-			IMatchGroup found = mf.find(m);
-			if (found != null) {
-				matches.put(found.getDisplayName(), found);
+		if (matches != null) {
+			for (IMatchGroup m: matches.values()) {
+				IMatchGroup found = mf.find(m);
+				if (found != null) {
+					matches.put(found.getDisplayName(), found);
+				}
 			}
 		}
 
@@ -372,7 +367,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		if (filter == null) {
 			filter = Filter.ALL;
 		}
-		
+
 		if (filter.equals(Filter.ALL)) {
 			compList = cf.getAllComps();
 		} else if (filter.equals(Filter.UNDERWAY)) {
@@ -771,90 +766,90 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IPlayerMatchStats> testMatchStats(Long matchId) {
 
-//		PipelineService service = PipelineServiceFactory.newPipelineService();
-//		mf.setId(matchId);
-//		IMatchGroup match = mf.getGame();
-//
-//		CountryLoader cloader = new CountryLoader();
-//		cloader.Run(countryf);
-//
-//		if (match == null) {
-//
-//
-//
-//			for (Long id = 9001L; id<9003L; ++id) {
-//				tf.setId(null);
-//				ITeamGroup t = tf.getTeam();
-//				if (id == 9001) {
-//					t.setAbbr("NZL");
-//					t.setShortName("All Blacks");
-//					((IGroup)t).setDisplayName("New Zealand");
-//					t.setColor("#000000");
-//				} else if (id == 9002) {
-//					t.setAbbr("AUS");
-//					t.setShortName("Wallabies");
-//					((IGroup)t).setDisplayName("Australia");
-//					t.setColor("#f0af00");
-//				}
-//				((TeamGroup)t).setId(id);
-//				((IGroup)t).setGroupType(GroupType.TEAM);
-//
-//				tf.put(t);
-//			}
-//
-//
-//			Calendar cal = new GregorianCalendar();
-//			cal.setTime(new Date());
-//			mf.setId(null);
-//			IMatchGroup g = mf.getGame();
-//			((MatchGroup)g).setId(300L);
-//			((IGroup)g).setGroupType(GroupType.MATCH);
-//
-//			g.setHomeTeamId(9001L);
-//			g.setVisitingTeamId(9002L);
-//			g.setLocked(true);
-//			g.setForeignId(93503L);
-//			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
-//			cal.set(2011, 10, 16);
-//			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
-//			tf.setId(g.getHomeTeamId());
-//			g.setHomeTeam(tf.getTeam());
-//			tf.setId(g.getVisitingTeamId());
-//			g.setVisitingTeam(tf.getTeam());
-//			g.setDisplayName();	
-//
-//			g.setDate(cal.getTime());
-//
-//			mf.put(g);
-//			match = g;
-//		}
-//
-//		String pipelineId = "";
-//		try {
-//
-//			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(1));
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
-//
-//			while (true) {
-//				Thread.sleep(2000);
-//				JobInfo jobInfo = service.getJobInfo(pipelineId);
-//				switch (jobInfo.getJobState()) {
-//				case COMPLETED_SUCCESSFULLY:
-//					//service.deletePipelineRecords(pipelineId);
-//					return (List<IPlayerMatchStats>) jobInfo.getOutput();
-//				case RUNNING:
-//					break;
-//				case STOPPED_BY_ERROR:
-//					throw new RuntimeException("Job stopped " + jobInfo.getError());
-//				case STOPPED_BY_REQUEST:
-//					throw new RuntimeException("Job stopped by request.");
-//				}
-//			}
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return null;
-//		}
+		//		PipelineService service = PipelineServiceFactory.newPipelineService();
+		//		mf.setId(matchId);
+		//		IMatchGroup match = mf.getGame();
+		//
+		//		CountryLoader cloader = new CountryLoader();
+		//		cloader.Run(countryf);
+		//
+		//		if (match == null) {
+		//
+		//
+		//
+		//			for (Long id = 9001L; id<9003L; ++id) {
+		//				tf.setId(null);
+		//				ITeamGroup t = tf.getTeam();
+		//				if (id == 9001) {
+		//					t.setAbbr("NZL");
+		//					t.setShortName("All Blacks");
+		//					((IGroup)t).setDisplayName("New Zealand");
+		//					t.setColor("#000000");
+		//				} else if (id == 9002) {
+		//					t.setAbbr("AUS");
+		//					t.setShortName("Wallabies");
+		//					((IGroup)t).setDisplayName("Australia");
+		//					t.setColor("#f0af00");
+		//				}
+		//				((TeamGroup)t).setId(id);
+		//				((IGroup)t).setGroupType(GroupType.TEAM);
+		//
+		//				tf.put(t);
+		//			}
+		//
+		//
+		//			Calendar cal = new GregorianCalendar();
+		//			cal.setTime(new Date());
+		//			mf.setId(null);
+		//			IMatchGroup g = mf.getGame();
+		//			((MatchGroup)g).setId(300L);
+		//			((IGroup)g).setGroupType(GroupType.MATCH);
+		//
+		//			g.setHomeTeamId(9001L);
+		//			g.setVisitingTeamId(9002L);
+		//			g.setLocked(true);
+		//			g.setForeignId(93503L);
+		//			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
+		//			cal.set(2011, 10, 16);
+		//			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
+		//			tf.setId(g.getHomeTeamId());
+		//			g.setHomeTeam(tf.getTeam());
+		//			tf.setId(g.getVisitingTeamId());
+		//			g.setVisitingTeam(tf.getTeam());
+		//			g.setDisplayName();	
+		//
+		//			g.setDate(cal.getTime());
+		//
+		//			mf.put(g);
+		//			match = g;
+		//		}
+		//
+		//		String pipelineId = "";
+		//		try {
+		//
+		//			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(1));
+		//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+		//
+		//			while (true) {
+		//				Thread.sleep(2000);
+		//				JobInfo jobInfo = service.getJobInfo(pipelineId);
+		//				switch (jobInfo.getJobState()) {
+		//				case COMPLETED_SUCCESSFULLY:
+		//					//service.deletePipelineRecords(pipelineId);
+		//					return (List<IPlayerMatchStats>) jobInfo.getOutput();
+		//				case RUNNING:
+		//					break;
+		//				case STOPPED_BY_ERROR:
+		//					throw new RuntimeException("Job stopped " + jobInfo.getError());
+		//				case STOPPED_BY_REQUEST:
+		//					throw new RuntimeException("Job stopped by request.");
+		//				}
+		//			}
+		//		} catch (Exception e) {
+		//			// TODO Auto-generated catch block
+		//			e.printStackTrace();
+		//			return null;
+		//		}
 
 		return (List<IPlayerMatchStats>) pmsf.getByMatchId(matchId);
 	}
@@ -910,13 +905,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 		String pipelineId = "";
 		try {
-			
+
 			// first check if this match already has a pipeline going and kill it if it does
 			if (match.getFetchMatchStatsPipelineId() != null && !match.getFetchMatchStatsPipelineId().isEmpty()) {
 				// delete adminTasks first
 				List<? extends IAdminTask> tasks = atf.getForPipeline(match.getFetchMatchStatsPipelineId());
 				atf.delete((List<IAdminTask>) tasks);
-				
+
 				// now the pipeline records
 				service.deletePipelineRecords(match.getFetchMatchStatsPipelineId(), true, false);
 				match.setFetchMatchStatsPipelineId(null);
@@ -927,7 +922,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(3));
 			match.setFetchMatchStatsPipelineId(pipelineId);
 			mf.put(match);
-			
+
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
 			while (true) {
@@ -951,7 +946,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 
 	}
-	
+
 	@Override
 	public IPlayerMatchStats getPlayerMatchStats(Long id) {
 		return pmsf.getById(id);
@@ -1005,17 +1000,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		IPlayer player = pf.getById(pms.getPlayerId());
 		mf.setId(pms.getMatchId());
 		IMatchGroup match = mf.getGame();
-		
+
 		Home_or_Visitor side = Home_or_Visitor.HOME;
 		if (pms.getTeamId().equals(match.getVisitingTeamId())) {
 			side = Home_or_Visitor.VISITOR;
 		}
-		
+
 		IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(player, match, side, pms.getSlot(), match.getForeignUrl()+"?view=scorecard");
 		if (!fetcher.process()) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());			
 		}
-		
+
 		return fetcher.getStats();
 	}
 
@@ -1033,7 +1028,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		assert (mre != null);
 		mf.setId(matchId);
 		IMatchGroup m = mf.getGame();
-				
+
 		List<IPlayerMatchStats> stats = pmsf.getByMatchId(matchId);
 		List<IPlayerMatchStats> homePlayerStats =  new ArrayList<IPlayerMatchStats>();
 		List<IPlayerMatchStats> visitorPlayerStats =  new ArrayList<IPlayerMatchStats>();
@@ -1044,17 +1039,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				visitorPlayerStats.add(s);
 			}
 		}
-		
+
 		mre.setPlayerStats(homePlayerStats, visitorPlayerStats);
-		
+
 		// now the team stats
 		ITeamMatchStats hStats = tmsf.getHomeStats(m);
 		ITeamMatchStats vStats = tmsf.getVisitStats(m);
-		
+
 		mre.setTeamStats(hStats, vStats);		
-		
+
 		mre.generate(mres, m);
-		
+
 		return pmif.getForMatch(matchId, mres);
 	}
 
@@ -1062,7 +1057,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId) {
 		mf.setId(matchId);
 		IMatchGroup m = mf.getGame();
-		
+
 		if (m != null) {
 			if (m.getHomeTeamId().equals(teamId)) {
 				return tmsf.getHomeStats(m);
@@ -1082,7 +1077,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		tf.setId(tms.getTeamId());
 		ITeamGroup team = tf.getTeam();
 
-		
+
 		Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
 		countryf.put(c);
 
@@ -1094,7 +1089,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		if (match.getHomeTeamId().equals(team.getId())) {
 			hov = Home_or_Visitor.HOME;
 		}
-		
+
 		String pipelineId = "";
 		try {
 
@@ -1205,7 +1200,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public Boolean flushAllPipelineJobs() {
 		try {
 			PipelineService service = PipelineServiceFactory.newPipelineService();
-			
+
 			List<? extends IMatchGroup> list = mf.getMatchesWithPipelines();
 			Iterator<? extends IMatchGroup> it = list.iterator();
 			while (it.hasNext()) {
@@ -1220,13 +1215,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				}
 
 			}
-			
+
 			return true;
 
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "flushAllPipelineJobs " + ex.getLocalizedMessage());		
 			return false;
 		}
+	}
+
+	@Override
+	public Boolean deleteComp(Long id) {
+		return cf.delete(id);
 	}
 
 

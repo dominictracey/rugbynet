@@ -39,4 +39,6 @@ public interface ICoreConfiguration {
 	 * @param compId
 	 */
 	void addCompUnderway(Long compId);
+	
+	boolean deleteComp(Long compId);
 }

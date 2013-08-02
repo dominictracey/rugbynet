@@ -20,5 +20,7 @@
 
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 		<g:Button styleName="{style.important}" ui:field="repair">Repair</g:Button>
+		<g:Button styleName="{style.important}" ui:field="delete">Delete</g:Button>
+				
 	</g:HTMLPanel>
 </ui:UiBinder> 

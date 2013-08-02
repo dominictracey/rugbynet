@@ -63,7 +63,7 @@ public class OfyConfigurationFactory implements IConfigurationFactory, Serializa
 	 */
 	@Override
 	public ICoreConfiguration put(ICoreConfiguration conf) {
-		if (conf.getDefaultCompId() == null) {
+		if (conf.getDefaultCompId() == null && !conf.getCompsUnderway().isEmpty()) {
 			// set it to the first one
 			conf.setDefaultCompId(conf.getCompsUnderway().get(0));
 		}

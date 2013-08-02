@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.admin.shared.WorkflowConfiguration;
 
+import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.appengine.tools.pipeline.impl.model.JobInstanceRecord;
 import com.google.appengine.tools.pipeline.impl.model.JobRecord;
 import com.googlecode.objectify.Objectify;
@@ -24,6 +25,7 @@ import com.googlecode.objectify.ObjectifyService;
 public class DataStoreFactory {
 
 	private static Objectify ofy = null;
+	private static Objectify transaction = null;
 	
 	public static Objectify getOfy() {
 		if (ofy == null) {
@@ -46,7 +48,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(TeamMembership.class);
 			ObjectifyService.register(Competition.class);
 			ObjectifyService.register(Round.class);
-			ObjectifyService.register(CompetitionTeam.class);
+			//ObjectifyService.register(CompetitionTeam.class);
 			ObjectifyService.register(WorkflowConfiguration.class);
 			ObjectifyService.register(OrchestrationConfiguration.class);
 			ObjectifyService.register(MatchResult.class);
@@ -72,5 +74,17 @@ public class DataStoreFactory {
 		}
 		
 		return ofy;
+	}
+
+	@SuppressWarnings("unused")
+	public static Objectify startTransaction() {
+		// make sure we are registered
+		Objectify ofy = getOfy();
+		transaction =  ObjectifyService.beginTransaction();
+		return transaction;
+	}
+	
+	public static Objectify getTransaction() {
+		return transaction;
 	}
 }

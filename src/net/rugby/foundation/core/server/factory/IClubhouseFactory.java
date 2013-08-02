@@ -15,4 +15,6 @@ public interface IClubhouseFactory {
 	 * @return all active clubhouses
 	 */
 	List<IClubhouse> getAll();
+	
+	boolean delete(Long id);
 }

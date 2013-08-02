@@ -53,4 +53,10 @@ public class TestTeamMatchStatsFactory implements ITeamMatchStatsFactory, Serial
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean deleteForMatch(IMatchGroup m) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

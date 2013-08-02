@@ -36,4 +36,7 @@ public interface IClubhouseMembershipFactory {
 	 * @param appUserId
 	 */
 	public void setClubhouseAndAppUserIds(Long clubhouseId, Long appUserId);
+	
+
+	boolean deleteForClubhouse(Long id);
 }
