@@ -154,7 +154,7 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 	}
 
 	@Override
-	public PortalView getPortalView() {
+	public PortalView<IPlayerMatchInfo> getPortalView() {
 		return pv;
 	}
 

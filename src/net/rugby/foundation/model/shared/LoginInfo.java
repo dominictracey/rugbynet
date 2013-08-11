@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginInfo implements Serializable {
+
+public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
 	public static enum ProviderType { openid, facebook }
 
@@ -32,6 +33,9 @@ public class LoginInfo implements Serializable {
 	private LoginInfo.Selector selector = null;
 	private boolean mustChangePassword = false;
 
+	private boolean isTopTenContentContributor = false;
+	private boolean isTopTenContentEditor = false;
+	
 	public boolean isAdmin() {
 		return isAdmin;
 	}
@@ -190,5 +194,26 @@ public class LoginInfo implements Serializable {
 		this.mustChangePassword = mustChangePassword;
 	}
 
+	@Override
+	public boolean isTopTenContentEditor() {
+
+		return isTopTenContentEditor;
+	}
+
+	@Override
+	public boolean isTopTenContentContributor() {
+		return isTopTenContentContributor;
+	}
+
+
+	@Override
+	public void setTopTenContentEditor(boolean set) {
+		isTopTenContentEditor = set;
+	}
+
+	@Override
+	public void setTopTenContentContributor(boolean set) {
+		isTopTenContentContributor = set;
+	}
 
 }

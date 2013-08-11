@@ -27,7 +27,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 
 	interface Binder extends UiBinder<Widget, SmartBarImpl> {
 	}
-	
+
 	private static final Binder binder = GWT.create(Binder.class);
 
 	private Presenter listener;
@@ -48,7 +48,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@UiField MenuItem adminMenuFlushAllPipelineJobs;
 
 	private SchemaPresenter schemaListener;
-	
+
 	public SmartBarImpl() {
 		initWidget(binder.createAndBindUi(this));
 
@@ -66,7 +66,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			public void execute() {
 				listener.goTo(new AdminTaskPlace("filter=ALL"));
 			}
-			
+
 		});
 		compMenuAll.setCommand(new Command() {
 			@Override
@@ -92,7 +92,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			public void execute() {
 				listener.flushAllPipelineJobs();	
 			}
-		
+
 		});
 
 	}
@@ -105,10 +105,10 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			public void execute() {
 				schemaListener.createSchema();
 			}
-			
+
 		});
 	}
-		
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.game1.client.ui.SmartBar#setComps(java.util.Map)
 	 */
@@ -118,10 +118,10 @@ public class SmartBarImpl extends Composite implements SmartBar {
 		for (final Long id : result.keySet()) {
 			compBar.addItem(new MenuItem(result.get(id), new Command()
 			{
-			    public void execute()
-			    {
-			        listener.compPicked(id);
-			    }
+				public void execute()
+				{
+					listener.compPicked(id);
+				}
 			}));
 		}
 	}
@@ -129,22 +129,24 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@Override
 	public void setSchemas(List<ScrumMatchRatingEngineSchema> schemas) {
 		schemaList.clearItems();
-		Iterator<ScrumMatchRatingEngineSchema> it = schemas.iterator();
-		while (it.hasNext()) {
-			final IMatchRatingEngineSchema s = it.next();
-			String name = s.getName();
-			if (s.getIsDefault()) {
-				name += " (Default)";
-			}
-			schemaList.addItem(new MenuItem(name, new Command()
-			{
-			    public void execute()
-			    {
-			        schemaListener.editSchema(s);
-			    }
-			}));
-		}		
-		
+		if (schemas != null) {
+			Iterator<ScrumMatchRatingEngineSchema> it = schemas.iterator();
+			while (it.hasNext()) {
+				final IMatchRatingEngineSchema s = it.next();
+				String name = s.getName();
+				if (s.getIsDefault()) {
+					name += " (Default)";
+				}
+				schemaList.addItem(new MenuItem(name, new Command()
+				{
+					public void execute()
+					{
+						schemaListener.editSchema(s);
+					}
+				}));
+			}		
+
+		}
 	}
 
 }

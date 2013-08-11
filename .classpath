@@ -31,5 +31,6 @@
 	<classpathentry kind="lib" path="C:/Users/home/code/RugbyBase/war/WEB-INF/lib/appengine-pipeline.jar" sourcepath="/RemoteSystemsTempFiles/com/pipeline"/>
 	<classpathentry kind="lib" path="C:/Users/home/.eclipse/org.eclipse.platform_4.2.0_1709980481/plugins/com.google.appengine.eclipse.sdkbundle_1.7.2.1/appengine-java-sdk-1.7.2.1/lib/testing/appengine-testing.jar"/>
 	<classpathentry kind="lib" path="C:/Users/home/.eclipse/org.eclipse.platform_4.2.0_1709980481/plugins/com.google.appengine.eclipse.sdkbundle_1.7.2.1/appengine-java-sdk-1.7.2.1/lib/impl/appengine-api-stubs.jar"/>
+	<classpathentry kind="lib" path="C:/Users/home/git/gwtbootstrap.github.com/2.0.4.0/gwt-bootstrap-2.0.4.0.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

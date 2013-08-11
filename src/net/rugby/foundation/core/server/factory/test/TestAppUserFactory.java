@@ -6,6 +6,7 @@ package net.rugby.foundation.core.server.factory.test;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.model.shared.AppUser;
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.topten.model.shared.ITopTenUser;
 
 /**
  * @author home
@@ -56,48 +57,30 @@ public class TestAppUserFactory implements IAppUserFactory {
 	 * @return
 	 */
 	private IAppUser getByNickname() {
-		IAppUser au = new AppUser();
-		au.setActive(true);
-		au.setAdmin(false);
-		au.setSuperadmin(false);
-		au.setLastCompetitionId(1L);
-		au.setNickname(nickname);
-		au.setPwHash("a8f5f167f44f4964e6c998dee827110c");
 		
 		if (nickname.equals("A10")) {
-			au.setEmailAddress("a10@test.com");
-			au.setId(7000L);
-			au.setAdmin(true);
-			au.setLastClubhouseId(71L);
+			setId(7001L);		
 		} else if (nickname.equals("A11")) {
-			au.setEmailAddress("a11@test.com");
-			au.setId(7001L);
-			au.setLastClubhouseId(71L);
+			setId(7001L);
 		} else if (nickname.equals("A12")) {
-			au.setEmailAddress("a12@test.com");
-			au.setId(7002L);
-			au.setLastClubhouseId(71L);
+			setId(7002L);
 		} else if (nickname.equals("A13")) {
-			au.setEmailAddress("a13@test.com");
-			au.setId(7003L);
-			au.setLastClubhouseId(71L);
+			setId(7003L);
 		} else if (nickname.equals("A14")) {
-			au.setEmailAddress("a14@test.com");
-			au.setId(7004L);
-			au.setLastClubhouseId(72L);
+			setId(7004L);
 		} else if (nickname.equals("A15")) {
-			au.setEmailAddress("a15@test.com");
-			au.setId(7005L);
-			au.setLastClubhouseId(72L);
+			setId(7005L);
 		} else if (nickname.equals("A16")) {
-			au.setEmailAddress("a16@test.com");
-			au.setId(7006L);
-			au.setLastClubhouseId(72L);
+			setId(7006L);
+		} else if (nickname.equals("Top Ten Content Editor")) {
+			setId(8000L);
+		} else if (nickname.equals("Top Ten Content Contributor")) {
+			setId(8001L);
 		}
 		
-		au.setLastEntryId(id - 1000L);
+		return getById();
 		
-		return au;	}
+	}
 
 	private IAppUser getById() {
 		IAppUser au = new AppUser();
@@ -138,6 +121,22 @@ public class TestAppUserFactory implements IAppUserFactory {
 			au.setEmailAddress("a16@test.com");
 			au.setLastClubhouseId(72L);
 			au.setNickname("A16");
+		} else if (id == 8000) {
+			au.setEmailAddress("editor@test.com");
+			//au.setLastClubhouseId(72L);
+			au.setNickname("Top Ten Content Editor");
+			if (au instanceof ITopTenUser) {
+				((ITopTenUser)au).setTopTenContentContributor(true);
+				((ITopTenUser)au).setTopTenContentEditor(true);
+			}
+		} else if (id == 8001) {
+			au.setEmailAddress("contentcontributor@test.com");
+			//au.setLastClubhouseId(72L);
+			au.setNickname("Top Ten Content Contributor");
+			if (au instanceof ITopTenUser) {
+				((ITopTenUser)au).setTopTenContentContributor(true);
+				((ITopTenUser)au).setTopTenContentEditor(false);
+			}
 		}
 		
 		au.setLastEntryId(id - 1000L);
@@ -147,54 +146,28 @@ public class TestAppUserFactory implements IAppUserFactory {
 
 
 	private IAppUser getByEmail() {
-		IAppUser au = new AppUser();
-		au.setActive(true);
-		au.setAdmin(false);
-		au.setEmailAddress(email);
-		au.setSuperadmin(false);
-		au.setLastCompetitionId(1L);
-		au.setLastClubhouseId(72L);
-		au.setPwHash("a8f5f167f44f4964e6c998dee827110c");
 
 		if (email.equals("a10@test.com")) {
-			au.setId(7000L);
-			au.setNickname("A10");
-			au.setLastClubhouseId(71L);
-			au.setAdmin(true);
+			setId(7000L);
 		} else if (email.equals("a11@test.com")) {
-			au.setId(7001L);
-			au.setNickname("A11");
-			au.setLastClubhouseId(71L);
+			setId(7001L);
 		} else if (email.equals("a12@test.com")) {
-			au.setId(7002L);
-			au.setNickname("A12");
-			au.setLastClubhouseId(71L);
+			setId(7002L);
 		} else if (email.equals("a13@test.com")) {
-			au.setId(7003L);
-			au.setNickname("A13");
-			au.setLastClubhouseId(71L);
+			setId(7003L);
 		} else if (email.equals("a14@test.com")) {
-			au.setId(7004L);
-			au.setNickname("A14");
-			au.setLastClubhouseId(72L);
+			setId(7004L);
 		} else if (email.equals("a15@test.com")) {
-			au.setId(7005L);
-			au.setNickname("A15");
-			au.setLastClubhouseId(72L);
+			setId(7005L);
 		} else if (email.equals("a16@test.com")) {
-			au.setId(7006L);
-			au.setNickname("A16");
-			au.setLastClubhouseId(72L);
-		}
-		
-		if (au.getId() != null) {
-			au.setLastEntryId(au.getId() - 1000L);
-		} else {
-			// didn't find them, return null
-			au = null;
+			setId(7006L);
+		} else if (email.equals("editor@test.com")) {
+			setId(8000L);
+		} else if (email.toLowerCase().equals("contentcontributor@test.com")) {
+			setId(8001L);
 		}
 
-		return au;
+		return getById();
 	}
 
 	/* (non-Javadoc)

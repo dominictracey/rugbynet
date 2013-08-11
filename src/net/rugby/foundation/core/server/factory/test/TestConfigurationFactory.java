@@ -21,7 +21,7 @@ public class TestConfigurationFactory implements IConfigurationFactory {
 		ICoreConfiguration c = new CoreConfiguration();
 		c.addCompetition(1L, "Rugby.net Championships");
 		c.addCompetition(2L, "Heineken Cup");
-		c.setDefaultCompId(2L);
+		c.setDefaultCompId(1L);
 		return c;
 	}
 

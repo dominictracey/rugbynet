@@ -236,7 +236,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 					// sometimes Territory doesn't appear
 					boolean skipTerritory = false;
 					trip = getTriplet(it);
-					if (trip.attr.equals("Territory")) {
+					if (trip.attr.contains("Territory")) {
 						if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
 							String num = stripPercentSign(trip.homeVal);
 							tms.setTerritory(Float.parseFloat(num));

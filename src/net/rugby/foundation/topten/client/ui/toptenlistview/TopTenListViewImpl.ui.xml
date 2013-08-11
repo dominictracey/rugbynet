@@ -1,0 +1,69 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    		 xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+
+    <g:HTMLPanel width="100%" ui:field="topTenPanel">
+<b:Navbar>
+    <b:Brand>Rugby Network</b:Brand>
+    <b:Nav>
+        <b:NavPills>
+    		<b:Dropdown text="Competition" ui:field='compDropdown'>
+
+		  	</b:Dropdown>
+  		</b:NavPills>
+    </b:Nav>
+    <b:NavSearch size="2" placeholder="Search" alignment="RIGHT"/>
+    <b:Nav alignment="RIGHT">
+    	<b:NavPills ui:field="loginPanel" />
+    </b:Nav>
+</b:Navbar>
+
+    	<b:Hero>
+
+            <b:Heading size="2" ui:field="title">
+				
+            </b:Heading>
+
+            <b:Paragraph ui:field="details1">
+				
+            </b:Paragraph>
+
+            <b:Paragraph ui:field="details2">
+				
+            </b:Paragraph>
+             <b:Nav alignment="RIGHT">
+        	<b:NavWidget ui:field='buttonBar'></b:NavWidget>
+        </b:Nav>
+        </b:Hero>
+
+    	<b:Row>
+    	    <b:Column size ="11">
+    	        <b:Row><g:HTMLPanel ui:field="items"/></b:Row>
+    	        <b:Row>
+    	            <b:Nav>
+    	                <b:NavWidget>
+    	                    <b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
+    	                    <b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
+    	                </b:NavWidget>
+    	            </b:Nav>
+    	        </b:Row>
+    	    </b:Column>
+    		<b:Column size ="3" offset="11"><g:HTMLPanel>ADS
+        <script type="text/javascript"><!--
+google_ad_client = "ca-pub-9355939918394201";
+/* topten */
+google_ad_slot = "8721926166";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></g:HTMLPanel>
+</b:Column>
+</b:Row>
+    </g:HTMLPanel>
+
+
+</ui:UiBinder>

@@ -11,6 +11,9 @@ import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.NavPills;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -64,11 +67,11 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 
 	CoreClientFactory clientFactory = null;
-	HorizontalPanel parent = null;
-	Anchor signUpLink;
-	Anchor signInLink;
-	Anchor signOutLink;
-	Anchor editProfileLink;
+	NavPills parent = null;
+	Button signUpLink;
+	Button signInLink;
+	Button signOutLink;
+	Button editProfileLink;
 
 	Label sep = new HTML("&nbsp;&nbsp;| ");
 	private Presenter presenter = null;
@@ -89,11 +92,11 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		void onLoginStatusChecked(LoginInfo loginInfo);
 	}
 
-	public HorizontalPanel getParent() {
+	public NavPills getParent() {
 		return parent;
 	}
 
-	public void setParent(HorizontalPanel parent) {
+	public void setParent(NavPills parent) {
 		this.parent = parent;
 	}
 
@@ -114,7 +117,10 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			appId = FACEBOOK_PROD_APP_ID;
 		}
 
-		fbCore.init(appId, status, cookie, xfbml);
+		// commented out because no internet at lake on 8/9/13
+//		fbCore.init(appId, status, cookie, xfbml);
+		
+		
 		// if they are showing logged in via Facebook we need to check they are still logged in to facebook
 		// using the FB.getLoginStatus JS call.
 		loginStatusCallback = new LoginStatusCallback();
@@ -196,12 +202,13 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		if (clientFactory.getLoginInfo() != null && clientFactory.getLoginInfo().isLoggedIn()) {
 			if (clientFactory.getLoginInfo().getProviderType() == null || !clientFactory.getLoginInfo().getProviderType().equals(ProviderType.facebook)) {
 				// native or openid
-				signOutLink = new Anchor("sign out");
+				signOutLink = new Button("sign out");
+				signOutLink.setIcon(IconType.UNLOCK);
 				signOutLink.addClickHandler(signOutHandler);
-				editProfileLink = new Anchor(clientFactory.getLoginInfo().getNickname());
+				editProfileLink = new Button(clientFactory.getLoginInfo().getNickname());
 				editProfileLink.addClickHandler(editProfileHandler);
+				editProfileLink.setIcon(IconType.COG);
 				accountManagement.add(editProfileLink);			  		
-				accountManagement.add(sep);
 				accountManagement.add(signOutLink);
 				signOutLink.setVisible(true);
 				editProfileLink.setVisible(true);
@@ -213,13 +220,14 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 		}
 		else {
-			signInLink = new Anchor("sign in");
+			signInLink = new Button("sign in");
+			signInLink.setIcon(IconType.LOCK);
 			signInLink.addClickHandler(signInHandler);
-			signUpLink = new Anchor("sign up");
+			signUpLink = new Button("sign up");
+			signUpLink.setIcon(IconType.PLUS_SIGN);
 			signUpLink.addClickHandler(signUpHandler);
 
 			accountManagement.add(signInLink);
-			accountManagement.add(sep);
 			accountManagement.add(signUpLink);
 			signUpLink.setVisible(true);
 			signInLink.setVisible(true);
@@ -246,12 +254,13 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 			if (status.equals("connected")) {
 				// @TODO show the facebook user's name in the top bar & sign out link
-				signOutLink = new Anchor("sign out");
+				signOutLink = new Button("sign out");
+				signOutLink.setIcon(IconType.UNLOCK);
 				signOutLink.addClickHandler(signOutHandler);
-				editProfileLink = new Anchor(clientFactory.getLoginInfo().getNickname());
+				editProfileLink = new Button(clientFactory.getLoginInfo().getNickname());
+				editProfileLink.setIcon(IconType.COG);
 				editProfileLink.addClickHandler(editProfileHandler);	
 				accountManagement.add(editProfileLink);
-				accountManagement.add(sep);
 				accountManagement.add(signOutLink);
 				signOutLink.setVisible(true);
 				editProfileLink.setVisible(true);
@@ -262,13 +271,14 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				accountManagement.add(sep);				
 			} else {
 				// @TODO unknown - so they have de-authorized us. Just show the normal sign in | sign up
-				signInLink = new Anchor("sign in");
+				signInLink = new Button("sign in");
+				signInLink.setIcon(IconType.LOCK);
 				signInLink.addClickHandler(signInHandler);
-				signUpLink = new Anchor("sign up");
+				signUpLink = new Button("sign up");
+				signUpLink.setIcon(IconType.PLUS_SIGN);
 				signUpLink.addClickHandler(signUpHandler);
 
 				accountManagement.add(signInLink);
-				accountManagement.add(sep);
 				accountManagement.add(signUpLink);
 				signUpLink.setVisible(true);
 				signInLink.setVisible(true);

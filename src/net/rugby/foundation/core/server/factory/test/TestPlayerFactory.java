@@ -8,6 +8,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 
@@ -38,13 +40,15 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	private ITeamGroupFactory tf;
 
 	@Inject
-	public TestPlayerFactory(ICountryFactory cf) {
+	public TestPlayerFactory(ICountryFactory cf, ITeamGroupFactory tf) {
 		this.cf = cf;	
-	}
-
-	public void setTeamFactory(ITeamGroupFactory tf) {
 		this.tf = tf;
 		populate();
+	}
+
+	// @REX take out
+	public void setTeamFactory(ITeamGroupFactory tf) {
+		this.tf = tf;
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +60,12 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 			IPlayer player = new ScrumPlayer();		
 			return player;
 		} else {
-			return idMap.get(id);
+			if (idMap.containsKey(id)) {
+				return idMap.get(id);
+			} else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"No player found with Id " + id);
+				return null;
+			}
 		}
 	}
 

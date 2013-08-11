@@ -211,12 +211,17 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 
 			
 			boolean more = it.hasNext();
+			if (more) {
+				line = it.next();
+			}
+			
 			while (found && more) {
 				line = it.next();
 				// read until </tbody>
 				if (line.contains("</tbody>") || line.contains("</table>")) {
 					more = false;
 				} else {
+					
 					assert(line.contains("<tr>"));
 					IMatchGroup match = getMatch(it, teams);
 					if (match != null) {

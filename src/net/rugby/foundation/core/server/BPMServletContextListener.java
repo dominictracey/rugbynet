@@ -7,6 +7,8 @@ import net.rugby.foundation.admin.server.AdminMainModule;
 import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.game1.server.Game1MainModule;
 import net.rugby.foundation.game1.server.Game1TestModule;
+import net.rugby.foundation.topten.server.TopTenMainModule;
+import net.rugby.foundation.topten.server.TopTenTestModule;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -17,20 +19,11 @@ import com.google.inject.servlet.GuiceServletContextListener;
  *
  */
 public class BPMServletContextListener extends GuiceServletContextListener {
-
-	private static Injector injector;
-	private static boolean initialized = false;
 	
 	public static final Injector getInjectorForNonServlets() {
-//		if (!initialized) {
-//						injector = Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule());
-//			//injector = Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule());
-//			initialized = true;
-//		}
-//		
-//		return injector;
-		return Guice.createInjector(new Game1MainModule(), new CoreMainModule(), new AdminMainModule());
-//	return Guice.createInjector( new Game1TestModule(), new CoreTestModule(), new AdminTestModule());		
+
+//		return Guice.createInjector(new Game1MainModule(), new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
+	return Guice.createInjector( new Game1TestModule(), new CoreTestModule(), new AdminTestModule(), new TopTenTestModule());		
 	}
 	
 	/* (non-Javadoc)
@@ -38,8 +31,8 @@ public class BPMServletContextListener extends GuiceServletContextListener {
 	 */
 	@Override
 	public Injector getInjector() {
-		return Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule());
-//		return Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule());
+//		return Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
+		return Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule(), new TopTenTestModule());
 
 	}
 

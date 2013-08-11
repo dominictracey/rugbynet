@@ -32,12 +32,12 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long id;
 	private IClubhouseMembershipFactory chmf;
-	 
+
 	@Inject
 	public OfyClubhouseFactory(IClubhouseMembershipFactory chmf) {
 		this.chmf = chmf;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IClubhouseFactory#setId(java.lang.Long)
 	 */
@@ -61,7 +61,7 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 		if (ch == null) {
 			ch = new Clubhouse();
 		}
-		
+
 		return ch;
 	}
 
@@ -96,14 +96,18 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 	@Override
 	public boolean delete(Long id) {
 		try {
-			Objectify ofy = DataStoreFactory.getOfy();
-			setId(id);
-			IClubhouse c = get();
-			
-			// delete all the memberships
-			chmf.deleteForClubhouse(id);
+			if (id != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+				setId(id);
+				IClubhouse c = get();
 
-			ofy.delete(c);
+				if (c != null) {
+					// delete all the memberships
+					chmf.deleteForClubhouse(id);
+
+					ofy.delete(c);
+				}
+			}
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
 			return false;

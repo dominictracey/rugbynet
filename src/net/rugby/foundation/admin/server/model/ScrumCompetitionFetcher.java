@@ -520,7 +520,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 			}
 
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage());
 			return null;
 		} 
 

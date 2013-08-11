@@ -7,10 +7,12 @@ import java.util.List;
 
 import javax.persistence.Id;
 
+import net.rugby.foundation.topten.model.shared.ITopTenUser;
+
 import com.googlecode.objectify.annotation.Entity;
 
 @Entity
-public class AppUser implements Serializable, IAppUser {
+public class AppUser implements Serializable, IAppUser, ITopTenUser {
 
 	/**
 	 * 
@@ -48,7 +50,11 @@ public class AppUser implements Serializable, IAppUser {
 	private Boolean fbVerified;
 	private Date fbUpdatedTime;
 	private List<String> federatedIdentities;
-
+	
+	//TopTenUser
+	private boolean isTopTenContentContributor;
+	private boolean isTopTenContentEditor;
+	
 	private boolean mustChangePassword;
 
 	public AppUser() {
@@ -404,6 +410,26 @@ public class AppUser implements Serializable, IAppUser {
 	@Override
 	public void setMustChangePassword(boolean mustChangePassword) {
 		this.mustChangePassword = mustChangePassword;
+	}
+	
+	@Override
+	public boolean isTopTenContentContributor() {
+		return isTopTenContentContributor;
+	}
+	
+	@Override
+	public void setTopTenContentContributor(boolean isTopTenContentContributor) {
+		this.isTopTenContentContributor = isTopTenContentContributor;
+	}
+	
+	@Override
+	public boolean isTopTenContentEditor() {
+		return isTopTenContentEditor;
+	}
+	
+	@Override
+	public void setTopTenContentEditor(boolean isTopTenContentEditor) {
+		this.isTopTenContentEditor = isTopTenContentEditor;
 	}
 
 }

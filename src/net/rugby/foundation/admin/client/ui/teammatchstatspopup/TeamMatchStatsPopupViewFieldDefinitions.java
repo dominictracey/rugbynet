@@ -893,7 +893,7 @@ public class TeamMatchStatsPopupViewFieldDefinitions<T> {
 						return null;
 					}
 					if (l != null) {
-						p.setScrumsPutIn(l);
+						p.setScrumsWonOnOwnPut(l);
 					}
 					return p;
 				}

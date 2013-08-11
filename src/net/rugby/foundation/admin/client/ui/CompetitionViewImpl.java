@@ -22,6 +22,7 @@ import net.rugby.foundation.model.shared.PlayerMatchInfo;
 import net.rugby.foundation.model.shared.PlayerRowData;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -45,10 +46,10 @@ import com.google.gwt.user.client.ui.Widget;
  * Sample implementation of {@link AdminView}.
  */
 public class CompetitionViewImpl extends Composite implements CompetitionView {
-	
+
 	interface Binder extends UiBinder<Widget, CompetitionViewImpl> {
 	}
-	
+
 	private static final Binder binder = GWT.create(Binder.class);
 
 	@UiField TextBox url;
@@ -63,14 +64,14 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiField Button createAdmin;
 	@UiField Button sanityCheck;
 	@UiField SimplePanel menuBarPanel;
-	
+
 	Presenter listener = null;
 	TreeItem base = null;
 	TreeItem root = null;
 	TreeItem teams = new TreeItem("Teams");
 	TreeItem matches = new TreeItem("Matches");
 	TreeItem rounds = new TreeItem("Rounds");
-	
+
 	Map<String, ITeamGroup> teamMap = null;
 	List<IRound> roundMap = null;
 	Map<String, IMatchGroup> matchMap = null;
@@ -78,7 +79,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	Map<String, ICompetition> compMap = null;
 	EditTeam editTeam = null;
 	PlayerListView<IPlayerMatchInfo> editMatchStats = null;
-	
+
 	private Step step;
 
 	private ClientFactory clientFactory;
@@ -100,11 +101,11 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	}
 
-//	@UiHandler("load")
-//	void onLoadClick(ClickEvent e)  {
-//		listener.loadCompsClicked(base);
-//	}
- 	
+	//	@UiHandler("load")
+	//	void onLoadClick(ClickEvent e)  {
+	//		listener.loadCompsClicked(base);
+	//	}
+
 	@UiHandler("save")
 	void onSaveClick(ClickEvent e) {
 		if (step == Step.TEAMS) {
@@ -158,21 +159,21 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	@UiHandler("createAdmin")
 	void onCreateAdminClick(ClickEvent e) {
-		
+
 		listener.createAdminClicked();
 	}
-	
+
 	@UiHandler("sanityCheck")
 	void onsanityCheckClick(ClickEvent e) {
-		
+
 		listener.sanityCheckClicked();
 	}
-	
+
 	@Override
 	public void setPresenter(final Presenter listener) {
 		this.listener = listener;
-		
-				
+
+
 		if (listener instanceof SmartBar.Presenter) {
 			if (!menuBarPanel.getElement().hasChildNodes()) {
 				smartBar = clientFactory.getMenuBar();
@@ -180,15 +181,15 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			}
 			smartBar.setPresenter((SmartBar.Presenter)listener);	
 		}	
-		
+
 		if (listener instanceof SmartBar.SchemaPresenter) {
 			smartBar.setSchemaPresenter((SmartBar.SchemaPresenter)listener);	
 		}
-		
-		
-		
+
+
+
 		compTree.addSelectionHandler( new SelectionHandler<TreeItem>() {
-			
+
 			private EditComp editComp = null;
 			private EditMatch editMatch = null;
 			private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions;
@@ -236,7 +237,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 							}
 							editArea.add(editTeam);
 							editTeam.setVisible(true);
-							
+
 							Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]);
 							Long teamId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
 							listener.editTeamInit(editTeam, teamId, compId );
@@ -247,30 +248,30 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						}
 					} else if (depth == 4) { // match clicked
 						editArea.clear();
-						
+
 						if (editMatch == null) {
 							editMatch = new EditMatch();
 						}
 						editArea.add(editMatch);
 						editMatch.setVisible(true);
-						
+
 						if (editMatchStats == null) {
 							editMatchStats = new PlayerListViewImpl<IPlayerMatchInfo>();
-							  if (playerListViewColumnDefinitions == null) {
-									PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerMatchInfo>();
-								    playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
-								  }
+							if (playerListViewColumnDefinitions == null) {
+								PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerMatchInfo>();
+								playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
+							}
 
-							  editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
-							  editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
+							editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
+							editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
 
-							  jobArea.add(editMatchStats);
-							  editMatchStats.asWidget().setVisible(true);
+							jobArea.add(editMatchStats);
+							editMatchStats.asWidget().setVisible(true);
 
 						}
-						
+
 						editMatchStats.showWait();
-						  
+
 						// find roundId and compId
 						Long roundId = Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]);
 						Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]);
@@ -288,7 +289,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 				}
 			}
 		});
-			
+
 
 	}
 
@@ -302,7 +303,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			if (tgs.get(tg).getId() == null) {
 				teams.getChild(teams.getChildCount()-1).getElement().addClassName("gnu");
 			}
-			
+
 		}
 		save.setEnabled(true);
 		fetch.setEnabled(true);
@@ -327,16 +328,21 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	@Override
 	public void showMatches(Map<String, IMatchGroup> mgs) {
-		matchMap = mgs;
-		matches.removeItems();
-		for (IMatchGroup m : mgs.values()) {
-			matches.addItem(m.getDisplayName());
-			if (m.getId() == null) {
-				matches.getChild(matches.getChildCount()-1).getElement().addClassName("gnu");
-			}
-		}		
-		save.setEnabled(true);
-		fetch.setEnabled(true);
+		if (mgs == null) {
+			status.setText("No matches found");
+		} else {
+
+			matchMap = mgs;
+			matches.removeItems();
+			for (IMatchGroup m : mgs.values()) {
+				matches.addItem(m.getDisplayName());
+				if (m.getId() == null) {
+					matches.getChild(matches.getChildCount()-1).getElement().addClassName("gnu");
+				}
+			}		
+			save.setEnabled(true);
+			fetch.setEnabled(true);
+		}
 	}
 
 
@@ -348,7 +354,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public void showCompetition(ICompetition result) {
 		comp = result;
 		root.setText(result.getLongName() + "|" + result.getId());
-		
+
 		addRounds(result, result.getRounds());
 		for (IRound r: result.getRounds()) {
 			addRound(comp.getId(),r.getId(),r.getMatches());
@@ -371,13 +377,13 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		root.addItem(teams);
 		root.addItem(rounds);	
 		root.addItem(matches);
-		
+
 		if (compMap == null) {
 			compMap = new HashMap<String,ICompetition>();
 		}
 		for (ICompetition c : result) {
 			compMap.put(c.getId().toString(),c);
-			
+
 			TreeItem ti = base.addItem(c.getLongName() + "|" + c.getId());
 			ti.addItem("teams");
 			addTeams(c.getId(), c.getTeams());
@@ -405,17 +411,25 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	 * @see net.rugby.foundation.admin.client.ui.CompetitionView#addRounds(long, java.util.ArrayList)
 	 */
 	@Override
-	public void addRounds(ICompetition comp, List<IRound> result) {
+	public void addRounds(final ICompetition comp, final List<IRound> result) {
 		int i = 0;
 		while (i < base.getChildCount()) {
+
 			if (base.getChild(i).getText().contains(comp.getLongName())) {
 				base.getChild(i).getChild(1).removeItems();
 				for (IRound r : result) {
-					base.getChild(i).getChild(1).addItem(r.getName() + " (" + r.getBegin().toString() +") |" + r.getId());
+					final IRound rd = r;
+					final int id = i;
+					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+						public void execute() {
+							base.getChild(id).getChild(1).addItem(rd.getName() + " (" + rd.getBegin().toString() +") |" + rd.getId());
+						}
+					});
 				}
 				break;
 			}
 			++i;
+
 		}
 	}
 
@@ -478,8 +492,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			}
 			++i;
 		}
-		
-		
+
+
 	}
 
 	/* (non-Javadoc)
@@ -514,7 +528,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			}
 			++i;
 		}
-		
+
 	}
 
 	@Override
@@ -535,9 +549,9 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public void setInitialized(boolean b) {
 		isInitialized = b;
-		
+
 	}
-	
+
 	@Override
 	public void showWait(boolean show) {
 		if (show) {
@@ -553,22 +567,22 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 				}
 			}
 		}
-		
+
 	}
 
 	@Override
 	public void setSchemaList(List<ScrumMatchRatingEngineSchema> result) {
 		smartBar.setSchemas(result);
-		
+
 	}
-//	
-//	private String getMatchMapKey(IMatchGroup m) {
-//		Calendar cal = Calendar.getInstance();
-//		cal.setTime(m.getDate());
-//		cal.set(Calendar.HOUR_OF_DAY, 0);
-//		cal.set(Calendar.MINUTE, 0);
-//		cal.set(Calendar.SECOND, 0);
-//		cal.set(Calendar.MILLISECOND, 0);
-//		return cal.getTime().toString() + "**" + m.getDisplayName();
-//	}
+	//	
+	//	private String getMatchMapKey(IMatchGroup m) {
+	//		Calendar cal = Calendar.getInstance();
+	//		cal.setTime(m.getDate());
+	//		cal.set(Calendar.HOUR_OF_DAY, 0);
+	//		cal.set(Calendar.MINUTE, 0);
+	//		cal.set(Calendar.SECOND, 0);
+	//		cal.set(Calendar.MILLISECOND, 0);
+	//		return cal.getTime().toString() + "**" + m.getDisplayName();
+	//	}
 }

@@ -2,6 +2,7 @@ package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
 import net.rugby.foundation.game1.server.Game1ServiceImpl;
+import net.rugby.foundation.topten.server.TopTenServiceImpl;
 
 import com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet;
 import com.google.inject.servlet.ServletModule;
@@ -16,6 +17,7 @@ public class BPMServletModule extends ServletModule {
 		serve("/admin/workflow/*").with(net.rugby.foundation.admin.server.WorkflowServlet.class);
 		serve("/admin/rugbyAdminService").with(RugbyAdminServiceImpl.class);
 		serve("/core/CoreService").with(CoreServiceImpl.class);
+		serve("/topten/TopTenService").with(TopTenServiceImpl.class);
 		serve("/login/*").with(LoginServlet.class);
 		serve("/util/facebook/channel.html").with(FacebookChannelServlet.class);
 		serve("/_ah/start").with(BackEndStartupServlet.class);

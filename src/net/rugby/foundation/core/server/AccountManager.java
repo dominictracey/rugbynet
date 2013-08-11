@@ -37,6 +37,7 @@ import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
 import net.rugby.foundation.model.shared.LoginInfo.Selector;
+import net.rugby.foundation.topten.model.shared.ITopTenUser;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONException;
@@ -150,7 +151,11 @@ public class AccountManager implements IAccountManager {
 		loginInfo.setLastClubhouseId(u.getLastClubhouseId());
 		loginInfo.setLastCompetitionId(u.getLastCompetitionId());
 		loginInfo.setMustChangePassword(u.isMustChangePassword());
-
+		if (u instanceof ITopTenUser) {
+			loginInfo.setTopTenContentContributor(((ITopTenUser)u).isTopTenContentContributor());
+			loginInfo.setTopTenContentEditor(((ITopTenUser)u).isTopTenContentEditor());
+		}
+		
 		// see if they have done the draft and round picks yet.
 		//ArrayList<Group> groups = getGroupsByGroupType(GroupType.MY);
 		//	  for (int i=0; i<10; i++) {

@@ -53,11 +53,11 @@ public class Game1 implements EntryPoint, Presenter {
 		Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "Creating Identity manager");
 		final Identity i = clientFactory.getCoreClientFactory().getIdentityManager();		
 		// where we keep the sign in/sign out
-		HorizontalPanel acct = new HorizontalPanel();
-
-		i.setParent(acct);
-		i.setPresenter(this);
-		RootPanel.get("loginPanel").add(acct);
+//		HorizontalPanel acct = new HorizontalPanel();
+//
+//		i.setParent(acct);
+//		i.setPresenter(this);
+//		RootPanel.get("loginPanel").add(acct);
 		Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "Ready to call login");
 		Core.getCore().login(new AsyncCallback<LoginInfo>() {
 
