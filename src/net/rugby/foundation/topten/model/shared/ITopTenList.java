@@ -50,5 +50,7 @@ public interface ITopTenList {
 	Long getNextId();
 	Long getCompId();
 	void setCompId(Long compId);
+	void setItemIds(List<Long> itemIds);
+	List<Long> getItemIds();
 
 }

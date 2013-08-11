@@ -2,6 +2,7 @@ package net.rugby.foundation.topten.server.factory;
 
 import java.util.List;
 
+import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -14,5 +15,17 @@ public interface ITopTenListFactory {
 	public ITopTenList delete(ITopTenList list);
 	public ITopTenList publish(ITopTenList list);
 	public ITopTenItem submit(ITopTenItem item);
+	/**
+	 * 
+	 * @param compId
+	 * @return The last TopTenList published for this comp
+	 */
 	public ITopTenList getLatestForComp(Long compId);
+	/**
+	 * 
+	 * @param compId
+	 * @return The last TopTenList created for this comp (published or not)
+	 */
+	public ITopTenList getLastCreatedForComp(Long compId);
+	public ITopTenList create(TopTenSeedData tti);
 }

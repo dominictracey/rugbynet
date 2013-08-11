@@ -1,16 +1,30 @@
 package net.rugby.foundation.topten.server.factory;
 
+import java.util.ArrayList;
 import java.util.Date;
-import com.google.inject.Inject;
+import java.util.Iterator;
 
-import net.rugby.foundation.core.server.factory.ICompetitionFactory;
-import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
+import net.rugby.foundation.topten.model.shared.TopTenItem;
+import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
-	
+	private IMatchGroupFactory mf;
+	private ITeamGroupFactory tf;
+
+	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf) {
+		this.mf = mf;
+		this.tf = tf;
+	}
 
 	@Override
 	public ITopTenList delete(ITopTenList list) {
@@ -18,43 +32,43 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		ITopTenList prevPub = null;
 		ITopTenList next = null;
 		ITopTenList nextPub = null;
-		
+
 		if (list.getPrevId() != null) {
 			prev = get(list.getPrevId());
 		}
-		
+
 		if (list.getPrevPublishedId() != null) {
 			prevPub = get(list.getPrevPublishedId());
 		}
-		
+
 		if (list.getNextId() != null) {
 			next = get(list.getNextId());
 		}
-		
+
 		if (list.getNextPublishedId() != null) {
 			nextPub = get(list.getNextPublishedId());
 		}
-		
+
 		if (prev != null) {
 			prev.setNextId(list.getNextId());
 			put(prev);
 		}
-		
+
 		if (prevPub != null) {
 			prevPub.setNextPublishedId(list.getNextPublishedId());
 			put(prevPub);
 		}
-		
+
 		if (next != null) {
 			next.setPrevId(list.getPrevId());
 			put(next);
 		}
-		
+
 		if (nextPub != null) {
 			nextPub.setPrevPublishedId(list.getPrevPublishedId());
 			put(nextPub);
 		}
-		
+
 		return null;
 	}
 
@@ -62,19 +76,19 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	public ITopTenList publish(ITopTenList list) {
 		ITopTenList prevPub = null;
 		ITopTenList nextPub = null;
-		
+
 		if (list.getPrevPublishedId() != null) {
 			prevPub = get(list.getPrevPublishedId());
 		}
-		
+
 		if (list.getNextPublishedId() != null) {
 			nextPub = get(list.getNextPublishedId());
 		}
-		
+
 		if (list.getLive() == true) {  //unpublishing
 			list.setPublished(null);
 			list.setLive(false);
-			
+
 			//correct linked lists
 			if (prevPub != null) {
 				prevPub.setNextPublishedId(list.getNextPublishedId());
@@ -97,7 +111,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			if (list.getPrevId() != null) {
 				prev = get(list.getPrevId());
 			}
-			
+
 			boolean more = (prev != null);
 			while (!found && more) {
 				if (prev.getLive()) {
@@ -110,7 +124,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					}
 				}
 			}
-			
+
 			// if we found a previously published one, insert ourselves there
 			ITopTenList next = null;
 			if (found) {
@@ -131,7 +145,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				if (list.getNextId() != null) {
 					next = get(list.getNextId());
 				}
-				
+
 				more = (next != null);
 				while (!found && more) {
 					if (next.getLive()) {
@@ -144,7 +158,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 						}
 					}
 				}
-				
+
 				if (found) {
 					list.setNextPublishedId(next.getId());
 					next.setPrevPublishedId(list.getId());
@@ -155,5 +169,55 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		}
 		return list;
 	}
-	
+
+	@Override
+	public ITopTenList create(TopTenSeedData tti) {
+		ITopTenList list = new TopTenList();
+		list.setCompId(tti.getCompId());
+		list.setContent(tti.getDescription());
+		list.setCreated(new Date());
+		list.setEditorId(null);
+		list.setExpiration(null);
+		list.setLive(false);
+		list.setPipeLineId(null);
+		list.setPublished(null);
+		list.setTitle(tti.getTitle());
+		list.setList(new ArrayList<ITopTenItem>());
+
+		// create TTIs
+		if (tti.getPmiList() != null && tti.getPmiList().size() > 0) {
+			Iterator<IPlayerMatchInfo> it = tti.getPmiList().iterator();
+			int count = 0;
+			while (it.hasNext() && count < 10) {
+				IPlayerMatchInfo pmi = it.next();
+				mf.setId(pmi.getPlayerMatchStats().getMatchId());
+				IMatchGroup match = mf.getGame();
+				tf.setId(pmi.getPlayerMatchStats().getTeamId());
+				ITeamGroup team = tf.getTeam();
+				//TopTenItem(Long id, Long playerId, IPlayer player, String text,
+				//String image, Long contributorId, Long editorId, boolean isSubmitted, 
+				//String matchReportLink, String teamName)
+				ITopTenItem item = new TopTenItem(null, pmi.getMatchRating().getPlayerId(), pmi.getMatchRating().getPlayer(), "",
+						"", null, null, false, match.getForeignUrl(), team.getShortName());
+				list.getList().add(item);
+				count++;
+			}
+		}
+
+		//get an id
+		put(list);
+		assert(list.getId() != null);
+
+		// append it onto the comp's linked list
+		ITopTenList last = getLastCreatedForComp(list.getCompId());
+		assert (last.getNextId() == null);
+		last.setNextId(list.getId());
+		put(last);
+
+		list.setPrevId(last.getId());
+		put(list);
+
+		return list;
+	}
+
 }

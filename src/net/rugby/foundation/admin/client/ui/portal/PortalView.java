@@ -5,9 +5,11 @@ import java.util.List;
 import com.google.gwt.user.client.ui.IsWidget;
 
 import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Position.position;
 
 public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
@@ -17,6 +19,7 @@ public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
 
 		void submitPortalQuery(Long compId, Long roundId, position posi,
 				Long countryId, Long teamId);
+		void createTopTenList(TopTenSeedData data);
 
 	} 
 
@@ -36,5 +39,11 @@ public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
 	public abstract void setCountries(List<ICountry> result);
 
 	public abstract void showAggregatedMatchInfo(List<IPlayerMatchInfo> matchInfo);
+
+	ICompetition getCurrentComp();
+
+	IRound getCurrentRound();
+	
+	
 
 }

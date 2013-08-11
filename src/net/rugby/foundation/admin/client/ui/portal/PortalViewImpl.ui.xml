@@ -68,6 +68,7 @@ Team:
                 <g:ListBox ui:field="team" />
             </g:HTMLPanel>
             <g:Button ui:field="query">Query</g:Button>
+            <g:Button ui:field="topTen">Create Top Ten List</g:Button>
         </g:HorizontalPanel>
 
        <g:SimplePanel

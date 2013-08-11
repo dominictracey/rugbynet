@@ -22,6 +22,24 @@ public class TopTenList  implements Serializable, ITopTenList {
 	 */
 	private static final long serialVersionUID = -2463963348532297138L;
 
+	protected @Id Long id;
+	@Transient protected List<ITopTenItem> list;
+	protected List<Long> itemIds;
+	protected Date created;
+	protected Date published;
+	protected Date expiration;
+	protected Boolean live;
+	protected String summary;
+	protected Long editorId;
+	protected String pipeLineId;
+	protected String title;
+	protected String content;
+	protected Long nextId;
+	protected Long nextPublishedId;
+	protected Long prevId;
+	protected Long prevPublishedId;
+	protected Long compId;
+	
 	public class TopTenListSummary implements ITopTenListSummary {
 		protected Long id;
 		protected String title;
@@ -50,22 +68,7 @@ public class TopTenList  implements Serializable, ITopTenList {
 		}
 		
 	}
-	protected @Id Long id;
-	protected List<ITopTenItem> list;
-	protected Date created;
-	protected Date published;
-	protected Date expiration;
-	protected Boolean live;
-	protected String summary;
-	protected Long editorId;
-	protected String pipeLineId;
-	protected String title;
-	protected String content;
-	protected Long nextId;
-	protected Long nextPublishedId;
-	protected Long prevId;
-	protected Long prevPublishedId;
-	protected Long compId;
+
 
 	@Override
 	public Long getCompId() {
@@ -215,6 +218,14 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setSummary(String summary) {
 		this.summary = summary;
+	}
+	@Override
+	public List<Long> getItemIds() {
+		return itemIds;
+	}
+	@Override
+	public void setItemIds(List<Long> itemIds) {
+		this.itemIds = itemIds;
 	}
 
 }

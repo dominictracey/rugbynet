@@ -11,6 +11,7 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.Listener;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
+import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
@@ -55,9 +56,10 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
     @UiField ListBox team;
 
     @UiField Button query;
+    @UiField Button topTen;
     @UiField SimplePanel jobArea;
     
-	private List<T> PortalList;
+	private List<IPlayerMatchInfo> PortalList;
 	private PortalViewPresenter<T> listener;
 
 	private ClientFactory clientFactory;
@@ -65,6 +67,20 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	private SmartBar smartBar;
 
 	private List<ICompetition> comps;
+
+	private Long teamId;
+
+	private Long countryId;
+
+	private position posi;
+
+	private Long roundId;
+
+	private Long compId;
+
+	private ICompetition currentComp;
+
+	private IRound currentRound;
 
 	
 	public PortalViewImpl()
@@ -108,6 +124,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	@Override
 	public void setComps(List<ICompetition> result) {
 		this.comps = result;
+		comp.addItem("All","-1");
 		for (ICompetition c: result) {
 			comp.addItem(c.getLongName(), c.getId().toString());
 		}
@@ -118,13 +135,13 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 			public void onChange(ChangeEvent event) {
 				round.clear();
 				round.addItem("All","-1");
-				for (IRound r : comps.get(comp.getSelectedIndex()).getRounds()) {
+				for (IRound r : comps.get(comp.getSelectedIndex() - 1).getRounds()) {
 					round.addItem(r.getName(),r.getId().toString());
 				}
 				
 				team.clear();
 				team.addItem("All","-1");
-				for (ITeamGroup t : comps.get(comp.getSelectedIndex()).getTeams()) {
+				for (ITeamGroup t : comps.get(comp.getSelectedIndex() - 1).getTeams()) {
 					team.addItem(t.getDisplayName(), t.getId().toString());
 				}
 				
@@ -154,39 +171,61 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	
 	@UiHandler("query")
 	void onQueryClick(ClickEvent e) {
-		Long compId = null;
+
+		populateVals();
+		
+		listener.submitPortalQuery(compId, roundId, posi, countryId, teamId);
+	}
+	
+	
+	private void populateVals() {
+		compId = null;
 		if (comp.getSelectedIndex() > -1) {
-			compId = comps.get(comp.getSelectedIndex()).getId();
+			compId = comps.get(comp.getSelectedIndex()-1).getId();
+			currentComp = comps.get(comp.getSelectedIndex()-1);
 		}
 		
-		Long roundId = null;
+		roundId = null;
 		if (round.getSelectedIndex() > -1) {
 			if (!round.getValue(round.getSelectedIndex()).equals("-1")) {
 				roundId = comps.get(comp.getSelectedIndex()).getRounds().get(round.getSelectedIndex()-1).getId();
+				currentRound = comps.get(comp.getSelectedIndex()).getRounds().get(round.getSelectedIndex()-1);
 			}
 		}
 		
-		position posi = position.NONE;
+		posi = position.NONE;
 		if (pos.getSelectedIndex() > -1) {
 			posi = position.getAt(pos.getSelectedIndex());
 		}		
 		
-		Long countryId = null;
+		countryId = null;
 		if (country.getSelectedIndex() > -1) {
 			countryId = Long.parseLong(country.getValue(country.getSelectedIndex()));
 		}
 		
-		Long teamId = null;
+		teamId = null;
 		if (team.getSelectedIndex() > -1) {
 			teamId = Long.parseLong(team.getValue(team.getSelectedIndex()));
 		}
 		
-		listener.submitPortalQuery(compId, roundId, posi, countryId, teamId);
+	}
+
+
+	@UiHandler("topTen")
+	void onTopTenClick(ClickEvent e) {
+
+		populateVals();
+		
+		TopTenSeedData data = new TopTenSeedData((List<IPlayerMatchInfo>)PortalList, "", "", compId, roundId, posi, countryId, teamId);
+
+		listener.createTopTenList(data);
+
 	}
 	
 	@Override
 	public void showAggregatedMatchInfo(List<IPlayerMatchInfo> matchInfo) {
 		clientFactory.getPlayerListView().setPlayers(matchInfo, null);
+		PortalList = matchInfo;
 		jobArea.clear();
 		jobArea.add(clientFactory.getPlayerListView());
 		if (listener instanceof PlayerListView.Listener<?>) {
@@ -194,6 +233,26 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 		}
 		clientFactory.getPlayerListView().asWidget().setVisible(true);
 
+	}
+
+	@Override
+	public ICompetition getCurrentComp() {
+		return currentComp;
+	}
+
+
+	public void setCurrentComp(ICompetition currentComp) {
+		this.currentComp = currentComp;
+	}
+
+	@Override
+	public IRound getCurrentRound() {
+		return currentRound;
+	}
+
+
+	public void setCurrentRound(IRound currentRound) {
+		this.currentRound = currentRound;
 	}
 
 }

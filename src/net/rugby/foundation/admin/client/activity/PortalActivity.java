@@ -2,7 +2,11 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -17,8 +21,11 @@ import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
+import net.rugby.foundation.admin.client.ui.portal.EditTTIText;
+import net.rugby.foundation.admin.client.ui.portal.EditTTIText.EditTTITextPresenter;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresenter;
+import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -30,7 +37,7 @@ import net.rugby.foundation.model.shared.Position.position;
 public class PortalActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, PortalViewPresenter<IPlayerMatchInfo>,
-PlayerListView.Listener<IPlayerMatchInfo> { 
+PlayerListView.Listener<IPlayerMatchInfo>, EditTTITextPresenter { 
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -40,6 +47,7 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 	SelectionModel<IPlayerMatchInfo> selectionModel;
 	int index; // the task line item number
 	private PortalView<IPlayerMatchInfo> view;
+	private EditTTIText ttltext;
 
 	public PortalActivity(PortalPlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IPlayerMatchInfo>();
@@ -307,4 +315,45 @@ PlayerListView.Listener<IPlayerMatchInfo> {
 		clientFactory.flushAllPipelineJobs();
 		
 	}
+
+	@Override
+	public void createTopTenList(TopTenSeedData data) {
+		if (ttltext == null) {
+			ttltext = new EditTTIText();
+		}
+
+		ttltext.setText("Top Ten List Properties");
+		data.setTitle("Top Ten Performances for " + view.getCurrentComp().getShortName() + " - " + view.getCurrentRound().getName());
+		ttltext.setPresenter(this);
+		ttltext.showTTI(data);
+	}
+
+	@Override
+	public void saveTTIText(final TopTenSeedData tti) {
+		ttltext.hide();
+		clientFactory.getRpcService().createTopTenList(tti, new AsyncCallback<TopTenSeedData>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Problem creating top ten list: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(TopTenSeedData result) {
+				if (result != null) {
+					Window.alert("Top ten list created: " + result.getTitle());
+				} else {
+					Window.alert("Problem creating top ten list for " + tti.getTitle());
+				}
+			}
+		});	
+		
+	}
+
+	@Override
+	public void cancelTTITextEdit(TopTenSeedData tti) {
+		ttltext.hide();
+		
+	}
+
 }

@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
+import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -156,4 +157,5 @@ public interface RugbyAdminServiceAsync {
 	
 	public void flushAllPipelineJobs(AsyncCallback<Boolean> asyncCallback);
 	public void deleteComp(Long id, AsyncCallback<Boolean> asyncCallback);
+	public void createTopTenList(TopTenSeedData tti, AsyncCallback<TopTenSeedData> asyncCallback);
 }

@@ -1,7 +1,9 @@
 package net.rugby.foundation.core.server.factory.test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import com.google.inject.Inject;
 
@@ -23,6 +25,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	private IPlayerMatchStatsFactory pmsf;
 	private IMatchGroupFactory mf;
 	private IPlayerFactory pf;
+	private Random random = new Random();
 	
 	@Inject
 	TestPlayerMatchRatingFactory(IPlayerMatchStatsFactory pmsf, IMatchGroupFactory mgf, IPlayerFactory pf ) {
@@ -43,44 +46,54 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 
 	@Override
 	public List<? extends IPlayerMatchRating> getForMatch(Long matchId) {
-		// TODO Auto-generated method stub
-		return new ArrayList<PlayerMatchRating>();
+		
+		List<IPlayerMatchRating> list = new ArrayList<IPlayerMatchRating>();
+		
+		assert(matchId.equals(100L));
+		
+		List<IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
+		
+		Iterator<IPlayerMatchStats> it = pmsl.iterator();
+		IMatchRatingEngineSchema schema = new ScrumMatchRatingEngineSchema20130713();
+		
+		while (it.hasNext()) {
+			list.add(get(it.next(),schema));
+		}
+		return list;
+
 	}
 
 	@Override
 	public IPlayerMatchRating getNew(IPlayer playerId, IMatchGroup matchId,
 			Integer rating, IMatchRatingEngineSchema schemaId,
 			IPlayerMatchStats playerMatchStatsId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public IPlayerMatchRating put(IPlayerMatchRating pmr) {
-		// TODO Auto-generated method stub
 		return pmr;
 	}
 
 	@Override
 	public IPlayerMatchRating get(IPlayerMatchStats pms, IMatchRatingEngineSchema schema) {
-		if (pms.getPlayerId().equals(9001014L)&& pms.getMatchId().equals(300L)) {
-			mf.setId(300L);
-			return new PlayerMatchRating(723, pf.getById(9001014L), (IGroup)mf.getGame(),
-					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L)) ;
-		}
-		return null;
+		int rating = getRandomRating();
+		mf.setId(pms.getMatchId());
+		return new PlayerMatchRating(rating, pf.getById(pms.getPlayerId()), (IGroup)mf.getGame(), schema, pms);
+	}
+
+	private int getRandomRating() {
+		return random.nextInt(1000);
 	}
 
 	@Override
 	public Boolean deleteForSchema(IMatchRatingEngineSchema schema) {
-		// TODO Auto-generated method stub
-		return null;
+		return true;
 	}
 
 	@Override
 	public boolean deleteForMatch(IMatchGroup m) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

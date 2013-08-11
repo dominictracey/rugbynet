@@ -3,11 +3,14 @@ package net.rugby.foundation.topten.server.factory.test;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -22,7 +25,8 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 	protected ICompetitionFactory cf;
 
 	@Inject
-	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf) {
+	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf) {
+		super(mf,tf);
 		this.pf = pf;
 		this.cf = cf;
 	}
@@ -158,12 +162,20 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 
 	@Override
 	public ITopTenItem put(ITopTenItem item) {
+		if (item.getId() == null) {
+			Random r = new Random();
+			item.setId(r.nextLong());
+		}
 		return item;
 	}
 
 
 	@Override
 	public ITopTenList put(ITopTenList list) {
+		if (list.getId() == null) {
+			Random r = new Random();
+			list.setId(r.nextLong());
+		}
 		return list;
 		
 	}
@@ -179,6 +191,13 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 		if (compId.equals(1L)) return get(1001L);
 		else return null;
 		
+	}
+
+
+	@Override
+	public ITopTenList getLastCreatedForComp(Long compId) {
+		if (compId.equals(1L)) return get(1004L);
+		else return null;
 	}
 	
 }

@@ -40,6 +40,7 @@ import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
+import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
@@ -77,6 +78,8 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.pipeline.Job;
@@ -123,6 +126,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IMatchResultFactory mrf;
 	private IPlayerMatchStatsFetcherFactory pmsff;
 	private IMatchRatingEngineSchemaFactory mresf;
+	private ITopTenListFactory ttlf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -140,7 +144,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
 			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
-			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf) {
+			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -165,10 +169,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.mrf = mrf;
 		this.pmsff = pmsff;
 		this.mresf = mresf;
-		//		rf.setFactories(cf, mf);
-		//		mf.setFactories(rf, tf);
-
-		//fcff.setFactories(rf, mf);
+		this.ttlf = ttlf;
 	}
 
 	@Override
@@ -1226,7 +1227,23 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public Boolean deleteComp(Long id) {
-		return cf.delete(id);
+		try {
+			return cf.delete(id);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "deleteComp " + ex.getLocalizedMessage());		
+			return false;
+		}
+	}
+
+	@Override
+	public TopTenSeedData createTopTenList(TopTenSeedData tti) {
+		try {
+			ttlf.create(tti);
+			return tti;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "createTopTenList " + ex.getLocalizedMessage());		
+			return null;
+		}
 	}
 
 
