@@ -62,7 +62,7 @@ public class EditTTIText extends DialogBox {
 
 	public void showTTI(TopTenItemView v) {
 		this.v = v;
-		this.v.getItem().getPlayer().getDisplayName();
+		this.setText(this.v.getItem().getPlayer().getDisplayName());
 		text.setText(v.getItem().getText());
 	}
 

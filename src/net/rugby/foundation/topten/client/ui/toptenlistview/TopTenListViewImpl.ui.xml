@@ -3,6 +3,7 @@
 			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
     		 xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
 
+
     <g:HTMLPanel width="100%" ui:field="topTenPanel">
 <b:Navbar>
     <b:Brand>Rugby Network</b:Brand>
@@ -38,18 +39,20 @@
         </b:Hero>
 
     	<b:Row>
-    	    <b:Column size ="11">
+    	    <b:Column size ="12">
     	        <b:Row><g:HTMLPanel ui:field="items"/></b:Row>
     	        <b:Row>
-    	            <b:Nav>
-    	                <b:NavWidget>
-    	                    <b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
-    	                    <b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
-    	                </b:NavWidget>
-    	            </b:Nav>
+    	            <b:Column size="3" offset="5">
+	    	            <b:Nav alignment="RIGHT">
+	    	                <b:NavWidget>
+	    	                    <b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
+	    	                    <b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
+	    	                </b:NavWidget>
+	    	            </b:Nav>
+    	            </b:Column>
     	        </b:Row>
     	    </b:Column>
-    		<b:Column size ="3" offset="11"><g:HTMLPanel>ADS
+    		<b:Column size ="2" offset="1"><g:HTMLPanel>ADS
         <script type="text/javascript"><!--
 google_ad_client = "ca-pub-9355939918394201";
 /* topten */
@@ -63,6 +66,14 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script></g:HTMLPanel>
 </b:Column>
 </b:Row>
+<div id="push"></div>
+	<div id="footer">
+		<div class="container">
+			<p class="container copyright">
+			<p class="small">&copy; 2011-2013 RUGBY.NET LLC</p>
+			</p>
+		</div>
+	</div>
     </g:HTMLPanel>
 
 

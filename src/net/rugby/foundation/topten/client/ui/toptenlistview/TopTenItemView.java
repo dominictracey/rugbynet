@@ -55,7 +55,7 @@ public class TopTenItemView extends Composite
 		if (item instanceof ITopTenItem) {
 			if (item != null) {
 				if (((ITopTenItem)item).getPlayer() != null) {
-					name.setText(item.getPlayer().getDisplayName() + "(" +  item.getTeamName() + ")");
+					name.setText(item.getPlayer().getDisplayName() + " (" +  item.getTeamName() + ")");
 				}
 				text.setText(item.getText());
 			}	

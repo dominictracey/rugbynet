@@ -5,7 +5,7 @@
 
     <g:HTMLPanel>
 <b:Row>
-  <b:Column size="9" offset="2">
+  <b:Column size="10" offset="2">
     <b:Well>
         <b:Nav alignment="RIGHT">
         	<b:NavWidget ui:field='buttonBar'></b:NavWidget>
