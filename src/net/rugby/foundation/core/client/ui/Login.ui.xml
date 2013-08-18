@@ -11,8 +11,12 @@
 		.playersViewPlayersFlexTable {
 			margin: 5px 0px 5px 0px;
 		}
+
+		.bigpad {
+			margin: 20px 20px 20px 20px;
+		}
 	</ui:style>
-	<g:HorizontalPanel>
+	<g:HorizontalPanel styleName="{style.bigpad}">
 		<core:ExternalAuthenticatorPanel ui:field="nonNativeLogins"/>
 		<g:HTMLPanel>
 			<div id="floatContainer">

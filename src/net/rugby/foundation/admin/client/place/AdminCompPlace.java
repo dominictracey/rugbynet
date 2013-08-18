@@ -1,8 +1,5 @@
 package net.rugby.foundation.admin.client.place;
 
-import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
-import net.rugby.foundation.core.client.Identity.Keys;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;

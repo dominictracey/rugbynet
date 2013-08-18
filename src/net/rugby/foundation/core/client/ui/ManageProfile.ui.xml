@@ -1,15 +1,17 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:core='urn:import:net.rugby.foundation.core.client.ui'>
-	<g:VerticalPanel ui:field="topLevel">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:core='urn:import:net.rugby.foundation.core.client.ui'
+	xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+
+	<g:FlowPanel ui:field="topLevel">
 		<g:LayoutPanel styleName="accountPanel" ui:field="nonNativeLayer">
 			<g:layer>
 				<g:HTMLPanel>
-					First, tell us which of your accounts you would like to play with:
+					Choose one of your accounts with which to sign in:
 					<core:ExternalAuthenticatorPanel
 						ui:field="nonNativeLogins" />
-					<g:Anchor ui:field="showNativeLink" href="javascript:;">Help me sign up
-						with an email address</g:Anchor>
+					<g:Anchor ui:field="showNativeLink" href="javascript:;">Help me sign up	with an email address</g:Anchor>
 				</g:HTMLPanel>
 			</g:layer>
 		</g:LayoutPanel>
@@ -22,41 +24,32 @@
 			</g:layer>
 		</g:LayoutPanel>
 		<g:LayoutPanel ui:field="nativeLayer">
-			<g:layer>
-				<g:HTMLPanel>
-					<span id="nativeSon">
-						<g:VerticalPanel>
-							<g:HorizontalPanel>
-								<g:Label styleName="createAccountLabel">Email address (never displayed):</g:Label>
-								<g:TextBox ui:field="emailAddress" styleName="accountInput"></g:TextBox>
-							</g:HorizontalPanel>
-							<g:HorizontalPanel>
-								<g:Label styleName="createAccountLabel">Screen Name (displayed) *:</g:Label>
-								<g:TextBox ui:field="nickName" styleName="accountInput"></g:TextBox>
-							</g:HorizontalPanel>
-							<g:HorizontalPanel>
-								<g:Label styleName="createAccountLabel" ui:field="password1Label">Password:</g:Label>
-								<g:PasswordTextBox ui:field="password1"
-									styleName="accountInput"></g:PasswordTextBox>
-							</g:HorizontalPanel>
-							<g:HorizontalPanel>
-								<g:Label styleName="createAccountLabel" ui:field="password2Label">Password
-									(again):</g:Label>
-								<g:PasswordTextBox ui:field="password2"
-									styleName="accountInput"></g:PasswordTextBox>
-							</g:HorizontalPanel>
-							<!-- </g:VerticalPanel> -->
-							<!-- <g:VerticalPanel> -->
-							<g:HorizontalPanel>
-								<g:Button ui:field="submit">Sign Up</g:Button>
-								<g:Button ui:field="cancel">Cancel</g:Button>
-							</g:HorizontalPanel>							
-							<g:HTML styleName="tiebreakerInstructions">* - Please keep screen names and entry
-								names less than vulgar!</g:HTML>
-						</g:VerticalPanel>
-					</span>
-				</g:HTMLPanel>
-			</g:layer>
+
+					    	
+
+
+<g:layer>
+	<b:WellForm>
+	    <b:ControlLabel>Email address</b:ControlLabel>
+	    <b:TextBox placeholder="email" ui:field="emailAddress"></b:TextBox>
+	    <b:HelpBlock>We never share your email address. Promise.</b:HelpBlock>
+	    <b:ControlLabel>Screen Name</b:ControlLabel>
+	    <b:TextBox placeholder="nickname" ui:field="nickName"></b:TextBox>
+	    <b:HelpBlock>This is how others will see you.</b:HelpBlock>
+	    <b:ControlLabel ui:field="password1Label">Password</b:ControlLabel>
+	    <b:PasswordTextBox ui:field="password1"></b:PasswordTextBox>
+	   	<b:ControlLabel ui:field="password2Label">Password (again)</b:ControlLabel>
+	    <b:PasswordTextBox ui:field="password2"></b:PasswordTextBox>
+	    <b:HelpBlock>This is how others will see you.</b:HelpBlock>
+
+        <b:Nav alignment="RIGHT">
+        	<b:NavWidget ui:field='buttonBar'>
+        	    		<b:Button ui:field="submit" >Sign Up</b:Button>
+						<b:Button ui:field="cancel">Cancel</b:Button>	
+        	</b:NavWidget>
+        </b:Nav>
+	</b:WellForm>
+	</g:layer>
 		</g:LayoutPanel>
 		<g:LayoutPanel styleName="accountPanel" ui:field="changePasswordLayer">
 			<g:layer>
@@ -66,5 +59,5 @@
 			</g:layer>
 		</g:LayoutPanel>
 		<g:Label ui:field="error" styleName="serverResponseLabelError"></g:Label>
-	</g:VerticalPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

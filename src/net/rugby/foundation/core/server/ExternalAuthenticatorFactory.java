@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.inject.Inject;
-import net.rugby.foundation.core.client.Identity;
-import net.rugby.foundation.core.client.Identity.Actions;
-import net.rugby.foundation.core.client.Identity.Keys;
+import net.rugby.foundation.core.shared.IdentityTypes;
+import net.rugby.foundation.core.shared.IdentityTypes.Actions;
+import net.rugby.foundation.core.shared.IdentityTypes.Keys;
+//import net.rugby.foundation.core.client.Identity.Actions;
+//import net.rugby.foundation.core.client.Identity.Keys;
 import net.rugby.foundation.core.server.FacebookProvider.Base64Helper;
 import net.rugby.foundation.model.shared.LoginInfo;
 
@@ -34,9 +36,9 @@ public class ExternalAuthenticatorFactory implements
 	public String getUrl(Actions action, LoginInfo.ProviderType providerType, LoginInfo.Selector selector, String destination) {
 		String retval = null; 
 		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-			retval = "/index.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+			retval = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
 		else
-			retval = "/index.html?#Profile:";
+			retval = "/topten.html?#Profile:";
 
 
 		
@@ -90,10 +92,10 @@ public class ExternalAuthenticatorFactory implements
 		assert (tok[4].toLowerCase().equals(LoginInfo.ProviderType.openid.toString()) || tok[4].toLowerCase().equals(LoginInfo.ProviderType.facebook.toString()));
 
 		String providerTypeS = tok[4];
-		LoginInfo.ProviderType providerType = Identity.getProviderType(providerTypeS);
+		LoginInfo.ProviderType providerType = IdentityTypes.getProviderType(providerTypeS);
 		
 		String selectorS = tok[5];
-		LoginInfo.Selector selector = Identity.getSelector(selectorS);
+		LoginInfo.Selector selector = IdentityTypes.getSelector(selectorS);
 
 		String destination = req.getParameter("destination");
 

@@ -31,7 +31,7 @@ public interface ICompetition {
 
 	public abstract Boolean getUnderway();
 	public abstract void setUnderway(Boolean underway);
-
+	
 	public abstract List<IRound> getRounds();
 	public abstract void setRounds(List<IRound> rounds);
 

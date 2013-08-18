@@ -25,6 +25,8 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -113,9 +115,24 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 
 	@Override
 	public ICoreConfiguration getConfiguration() {
-		//TODO: memcache this
 		try {
 			ICoreConfiguration conf = configF.get();
+			// check that environment is set
+			if (conf.getEnvironment() == null) {
+				HttpServletRequest req = this.getThreadLocalRequest();
+				if (req.getServerName().contains("127.0.0.1")) {
+					conf.setEnvironment(Environment.LOCAL);
+				} else if (req.getServerName().contains("dev")) {
+					conf.setEnvironment(Environment.DEV);
+				} else if (req.getServerName().contains("beta")) {
+					conf.setEnvironment(Environment.BETA);
+				} else if (req.getServerName().contains("www")) {
+					conf.setEnvironment(Environment.PROD);
+				} else {
+					throw new RuntimeException("Could not determine environment for configuration");
+				}
+				conf = configF.put(conf);
+			}
 			return conf;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -204,6 +221,12 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			if (info == null)
 				info = new LoginInfo();
 			info.setLoggedIn(false);
+			
+			// uncheck various roles
+			info.setAdmin(false);
+			info.setTopTenContentContributor(false);
+			info.setTopTenContentEditor(false);
+			
 			return info;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);

@@ -122,7 +122,8 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 				if (line.contains("scrumPlayerName")) {
 					setPlayerNames(line, player, errorDetails);
 				} else if (line.contains("scrumPlayerCountry")) {
-					ICountry country = cf.getByName(line.split("<|>")[2].trim());
+					// added comma to the regex, will this then pick up the first country if they have two listed?
+					ICountry country = cf.getByName(line.split("<|>,")[2].trim());
 					player.setCountry(country);
 					if (country == null) {
 						// not finding a country is non-blocking
@@ -146,7 +147,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 						line = it.next();
 					}
 					if (!line.contains(",")) {
-						break;
+						errorDetails.add("Couldn't find valid birthday");
 					} else {
 						String monthday = line.split(",")[0].trim();
 						String year = line.split(",")[1].trim();

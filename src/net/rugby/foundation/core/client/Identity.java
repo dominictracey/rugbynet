@@ -7,6 +7,7 @@ import net.rugby.foundation.core.client.ui.ExternalAuthenticatorPanel;
 import net.rugby.foundation.core.client.ui.ChangePasswordPanel;
 import net.rugby.foundation.core.client.ui.Login;
 import net.rugby.foundation.core.client.ui.ManageProfile;
+import net.rugby.foundation.core.shared.IdentityTypes.Actions;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
@@ -36,32 +37,32 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		void onLoginComplete(String destination);
 	}
 
-	public enum Actions { login, logout, createFacebook, createOpenId, mergeFacebook, mergeOpenId, done, updateScreenName }
-	public enum Keys { action, selector, destination, providerType }
-
-	public static LoginInfo.ProviderType getProviderType(String string) {
-		if (string.toLowerCase().equals("openid")) {
-			return LoginInfo.ProviderType.openid;
-		} else if (string.toLowerCase().equals("facebook")) {
-			return LoginInfo.ProviderType.facebook;
-		}
-		return null;
-	}
-
-	public static LoginInfo.Selector getSelector(String string) {
-		if (string.toLowerCase().equals("google")) {
-			return LoginInfo.Selector.google;
-		} else if (string.toLowerCase().equals("yahoo")) {
-			return LoginInfo.Selector.yahoo;
-		} if (string.toLowerCase().equals("myspace")) {
-			return LoginInfo.Selector.myspace;
-		} if (string.toLowerCase().equals("aol")) {
-			return LoginInfo.Selector.aol;
-		} if (string.toLowerCase().equals("myopenid_com")) {
-			return LoginInfo.Selector.myopenid_com;
-		}
-		return null;
-	}
+//	public enum Actions { login, logout, createFacebook, createOpenId, mergeFacebook, mergeOpenId, done, updateScreenName }
+//	public enum Keys { action, selector, destination, providerType }
+//
+//	public static LoginInfo.ProviderType getProviderType(String string) {
+//		if (string.toLowerCase().equals("openid")) {
+//			return LoginInfo.ProviderType.openid;
+//		} else if (string.toLowerCase().equals("facebook")) {
+//			return LoginInfo.ProviderType.facebook;
+//		}
+//		return null;
+//	}
+//
+//	public static LoginInfo.Selector getSelector(String string) {
+//		if (string.toLowerCase().equals("google")) {
+//			return LoginInfo.Selector.google;
+//		} else if (string.toLowerCase().equals("yahoo")) {
+//			return LoginInfo.Selector.yahoo;
+//		} if (string.toLowerCase().equals("myspace")) {
+//			return LoginInfo.Selector.myspace;
+//		} if (string.toLowerCase().equals("aol")) {
+//			return LoginInfo.Selector.aol;
+//		} if (string.toLowerCase().equals("myopenid_com")) {
+//			return LoginInfo.Selector.myopenid_com;
+//		}
+//		return null;
+//	}
 
 	private FBCore fbCore;
 
@@ -419,7 +420,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	public void doLogin(String emailAddress, String password) {
 		clientFactory.getRpcService().nativeLogin(emailAddress, password, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
-				if (!result.isLoggedIn()) {
+				if (result==null || !result.isLoggedIn()) {
 					getLoginDialog().showError("Incorrect email or password");
 
 				} else { 

@@ -6,7 +6,7 @@ package net.rugby.foundation.core.server.factory.test;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.model.shared.AppUser;
 import net.rugby.foundation.model.shared.IAppUser;
-import net.rugby.foundation.topten.model.shared.ITopTenUser;
+import net.rugby.foundation.model.shared.ITopTenUser;
 
 /**
  * @author home

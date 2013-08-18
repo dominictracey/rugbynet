@@ -70,7 +70,7 @@ public interface RugbyAdminService extends RemoteService {
 	 * @return
 	 */
 	ICompetition getComp(Long compId);
-	
+	Boolean setCompAsDefault(Long compId);
 	Boolean deleteComp(Long id);
 	
 	/**

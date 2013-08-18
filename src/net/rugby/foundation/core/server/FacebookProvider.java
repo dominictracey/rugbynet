@@ -39,10 +39,10 @@ public class FacebookProvider implements IExternalAuthenticatorProvider {
 		public static final String FACEBOOK_GRAPH_URL = "https://graph.facebook.com/me?access_token=";
 
 		// facebook app Ids - @TODO not sure why the second one works local. See GWTFB.
-		public static final String FACEBOOK_DEV_APP_ID="341652969207503";
+		public static final String FACEBOOK_DEV_APP_ID="499268570161982";
 		private static final String FACEBOOK_BETA_APP_ID="401094413237618";
 		public static final String FACEBOOK_PROD_APP_ID="191288450939341";
-		public static final String FACEBOOK_DEV_SECRET="6df549982cc8366b905f292b3a7c48fa";
+		public static final String FACEBOOK_DEV_SECRET="c3550da86a7233c5398129a2b1317495";
 		private static final String FACEBOOK_BETA_SECRET="9a496ea2691617af45c9ee1bd8a52ccb";
 		public static final String FACEBOOK_PROD_SECRET="b6fffe19623cae54377c2bfaf8f65efb";
 

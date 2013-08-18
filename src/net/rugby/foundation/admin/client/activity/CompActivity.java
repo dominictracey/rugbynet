@@ -1319,5 +1319,30 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 
 
+			@Override
+			public void setCompAsDefault(ICompetition comp) {
+				clientFactory.getRpcService().setCompAsDefault(comp.getId(), new AsyncCallback<Boolean>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert("Set comp as default failure: " + caught.getLocalizedMessage());
+
+					}
+
+					@Override
+					public void onSuccess(Boolean result) {
+						if (result) {
+							Window.alert("Comp set as default. Don't forget to flush memcache!");
+						} else {
+							Window.alert("Comp not set as default. See logs for details");
+						}
+
+					}
+
+				}); 
+			}
+
+
+
 
 		}

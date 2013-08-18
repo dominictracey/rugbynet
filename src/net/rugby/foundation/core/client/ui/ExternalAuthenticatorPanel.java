@@ -63,9 +63,9 @@ public class ExternalAuthenticatorPanel extends Composite
 		presenter.doOpenIdLogin(LoginInfo.Selector.yahoo);
 	}	
 	
-	@UiHandler("facebook")
-	void onFacebookButtonClicked(ClickEvent event) {
-		presenter.doFacebookLogin();
-	}	
+//	@UiHandler("facebook")
+//	void onFacebookButtonClicked(ClickEvent event) {
+//		presenter.doFacebookLogin();
+//	}	
 	
 }

@@ -1,9 +1,6 @@
 package net.rugby.foundation.topten.client.activity;
 
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -55,49 +52,48 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(view.asWidget());
 		view.setPresenter(this);
-		if (place != null) {
-			if (place.getListId() != null) {
-				clientFactory.getRpcService().getTopTenList(place.getListId(), new AsyncCallback<ITopTenList>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						// fail silently
-						//Window.alert("Failed to fetch top ten list.");
-					}
+		// remember this is appears to be asynchronous but is really cached locally by the Core.
+		Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 
-					@Override
-					public void onSuccess(ITopTenList result) {
-						view.setList(result);
-						doSetup();
-					}	
-				});
-			} else { // no listId
-				// do we have a comp?
-				if (place.getCompId() == null) {
-					Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Hmm, something is wrong...");
+				//				Logger.getLogger("TopTenActivity").log(Level.SEVERE, "start.getConfiguration: " + caught.getMessage(), caught);
+			}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							Logger.getLogger("Game1Activity").log(Level.SEVERE, "start.getConfiguration: " + caught.getMessage(), caught);
-						}
+			@Override
+			public void onSuccess(final ICoreConfiguration config) {
+				coreConfig = config;
+				view.setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
+				if (place != null) {
+					if (place.getListId() != null) {
+						clientFactory.getRpcService().getTopTenList(place.getListId(), new AsyncCallback<ITopTenList>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								// fail silently
+								//Window.alert("Failed to fetch top ten list.");
+							}
 
-						@Override
-						public void onSuccess(final ICoreConfiguration config) {
-							coreConfig = config;
+							@Override
+							public void onSuccess(ITopTenList result) {
+								view.setList(result, coreConfig.getBaseToptenUrl());
+								doSetup();
+							}	
+						});
+					} else { // no listId
+						// do we have a comp?
+						if (place.getCompId() == null) {
 							TopTenListPlace newPlace = new TopTenListPlace();
 							newPlace.setCompId(coreConfig.getDefaultCompId());
 							clientFactory.getPlaceController().goTo(newPlace);
-//							showListForComp(coreConfig.getDefaultCompId());
-//							view.setComps(coreConfig.getCompetitionMap()); // do this twice by calling doSetup?
-//							doSetup();
-
+						} else {
+							// just use the comp from place
+							showListForComp(place.getCompId());
 						}
-					});
-				} else {
-					// just use the comp from place
-					showListForComp(place.getCompId());
+					}
 				}
 			}
-		}
+		});
 	}
 
 	private void showListForComp(Long compId) {
@@ -110,7 +106,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				view.setList(result);
+				view.setList(result, coreConfig.getBaseToptenUrl());
 				doSetup();
 			}	
 		});
@@ -137,36 +133,37 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 					//TODO take out for upstream environments
 					//								if (true)
-					i.doLoginDev("editor@test.com", "asdasd");
+					//i.doLoginDev("editor@test.com", "asdasd");
 					//								else  // this is kicked off at the end of the login process as well, so when we auto-login the test user we don't need to do it.
-					Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "login sucessful, ready to handleHistory");
+					//Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "login sucessful, ready to handleHistory");
 
 				}
 
 			});		
 
 
-			if (coreConfig == null) {
-				Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
-					@Override
-					public void execute() {
-						Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								Logger.getLogger("Game1Activity").log(Level.SEVERE, "start.getConfiguration: " + caught.getMessage(), caught);
-							}
-
-							@Override
-							public void onSuccess(final ICoreConfiguration config) {
-								coreConfig = config;
-								view.setComps(coreConfig.getCompetitionMap());
-
-							}
-						});
-					}
-				});
-			}
+//			if (coreConfig == null) {
+//				Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
+//					@Override
+//					public void execute() {
+//						Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
+//
+//							@Override
+//							public void onFailure(Throwable caught) {
+//
+//								//Logger.getLogger("Game1Activity").log(Level.SEVERE, "start.getConfiguration: " + caught.getMessage(), caught);
+//							}
+//
+//							@Override
+//							public void onSuccess(final ICoreConfiguration config) {
+//								coreConfig = config;
+//								view.setComps(coreConfig.getCompetitionMap());
+//
+//							}
+//						});
+//					}
+//				});
+//			}
 		} else {
 			refreshButtons();
 		}
@@ -188,7 +185,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 		//Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "onLoginComplete callback with destination: " + destination);
 		LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
 		view.getButtonBar().clear();
-		if (view.getItemViews() != null) {
+		if (view.getItemViews() != null && view.getList() != null) {
 
 			// next and prev buttons
 			if (login == null || login.isLoggedIn() == false || (login.isTopTenContentContributor() == false && login.isTopTenContentEditor() == false)) {
@@ -222,7 +219,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 					}
 					if (allSubmitted) {
 						publish.setType(ButtonType.DANGER);
-					} else if (view.getList().getLive().equals(true)) {
+					} else /*if (view.getList().getLive().equals(true))*/ {
 						publish.setEnabled(false);
 					}
 					view.getButtonBar().add(publish);
@@ -309,6 +306,8 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 						report.setHref(v.getItem().getMatchReportLink());
 						report.setTarget("blank");
 						v.getButtonBar().add(report);
+					} else {
+						v.getButtonBar().clear();
 					}
 				}
 			}
@@ -336,9 +335,12 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenItem result) {
-				v.setItem(result, v.getIndex());
+
+				v.setItem(result, v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrl());
 				view.getList().getList().set(v.getIndex(), result);  // if we don't do this the references diverge
+				// sometimes 
 				refreshButtons();
+				//Window.alert("submit");
 			}
 		});	
 	}
@@ -356,7 +358,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				list.setList(result);
+				list.setList(result, coreConfig.getBaseToptenUrl());
 				refreshButtons();
 			}
 		});	}
@@ -375,7 +377,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				list.setList(result);
+				list.setList(result, coreConfig.getBaseToptenUrl());
 			}
 		});
 	}
@@ -394,7 +396,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenItem result) {
-				v.setItem(result,v.getIndex());
+				v.setItem(result,v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrl());
 				view.getList().getList().set(v.getIndex(), result);  // if we don't do this the references diverge
 				clientFactory.getEditTTITextDialog().hide();
 			}

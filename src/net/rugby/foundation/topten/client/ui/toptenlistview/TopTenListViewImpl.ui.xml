@@ -2,6 +2,14 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
     		 xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+	<ui:style>
+		/* Add CSS here. See the GWT docs on UI Binder for more details */
+		.nobtn {
+			border: none;
+			background: none;
+			box-shadow: none;
+		}
+	</ui:style>
 
 
     <g:HTMLPanel width="100%" ui:field="topTenPanel">
@@ -14,9 +22,11 @@
 		  	</b:Dropdown>
   		</b:NavPills>
     </b:Nav>
-    <b:NavSearch size="2" placeholder="Search" alignment="RIGHT"/>
     <b:Nav alignment="RIGHT">
-    	<b:NavPills ui:field="loginPanel" />
+    	<g:HTML styleName="btn {style.nobtn}"><div class="fb-like"  data-href="http://dev.rugby.net/topten.html" data-width="450" data-layout="button_count" data-show-faces="false" data-send="true"></div></g:HTML>
+    </b:Nav>
+    <b:Nav alignment="RIGHT">
+        	<b:NavPills ui:field="loginPanel" />
     </b:Nav>
 </b:Navbar>
 
@@ -33,9 +43,11 @@
             <b:Paragraph ui:field="details2">
 				
             </b:Paragraph>
-             <b:Nav alignment="RIGHT">
+           <b:Nav alignment="LEFT">
         	<b:NavWidget ui:field='buttonBar'></b:NavWidget>
-        </b:Nav>
+        	<g:HTML><div id='fbLike' class="fb-like" data-width="450" data-show-faces="true" data-send="true"></div></g:HTML>
+           </b:Nav>
+        
         </b:Hero>
 
     	<b:Row>
@@ -52,11 +64,11 @@
     	            </b:Column>
     	        </b:Row>
     	    </b:Column>
-    		<b:Column size ="2" offset="1"><g:HTMLPanel>ADS
+    		<b:Column size ="2" offset="1"><g:HTMLPanel>
         <script type="text/javascript"><!--
 google_ad_client = "ca-pub-9355939918394201";
-/* topten */
-google_ad_slot = "8721926166";
+/* Top Ten */
+google_ad_slot = "1112444162";
 google_ad_width = 160;
 google_ad_height = 600;
 //-->

@@ -27,17 +27,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import net.rugby.foundation.core.client.Identity.Actions;
-import net.rugby.foundation.core.client.Identity.Keys;
 import net.rugby.foundation.core.server.FacebookProvider.Base64Helper;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
+import net.rugby.foundation.core.shared.IdentityTypes.Actions;
+import net.rugby.foundation.core.shared.IdentityTypes.Keys;
 import net.rugby.foundation.game1.client.place.Profile;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
 import net.rugby.foundation.model.shared.LoginInfo.Selector;
-import net.rugby.foundation.topten.model.shared.ITopTenUser;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONException;
@@ -332,9 +332,9 @@ public class AccountManager implements IAccountManager {
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
 			String url = "";
 			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/index.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+				url = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
 			else
-				url = "/index.html?#Profile:";
+				url = "/topten.html?#Profile:";
 
 			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
 				destination = Base64Helper.decode(destination);
@@ -356,9 +356,9 @@ public class AccountManager implements IAccountManager {
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
 			String url = "";
 			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/index.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+				url = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
 			else
-				url = "/index.html?#Profile:";
+				url = "/topten.html?#Profile:";
 
 			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
 				destination = Base64Helper.decode(destination);

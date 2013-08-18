@@ -8,6 +8,7 @@ import java.io.Serializable;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Objectify;
 
+import net.rugby.foundation.core.server.factory.BaseConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.model.shared.CoreConfiguration;
@@ -19,7 +20,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
  * @author home
  *
  */
-public class OfyConfigurationFactory implements IConfigurationFactory, Serializable {
+public class OfyConfigurationFactory extends BaseConfigurationFactory implements IConfigurationFactory, Serializable {
 	
 	/**
 	 * 
@@ -38,7 +39,7 @@ public class OfyConfigurationFactory implements IConfigurationFactory, Serializa
 	 * @see net.rugby.foundation.core.server.factory.IConfigurationFactory#get()
 	 */
 	@Override
-	public ICoreConfiguration get() {
+	public ICoreConfiguration getFromPersistentDatastore() {
 		Objectify ofy = DataStoreFactory.getOfy();
 		// there should just be one...
 		ICoreConfiguration c = ofy.query(CoreConfiguration.class).get();
@@ -62,7 +63,7 @@ public class OfyConfigurationFactory implements IConfigurationFactory, Serializa
 	 * @see net.rugby.foundation.core.server.factory.IConfigurationFactory#put(net.rugby.foundation.model.shared.ICoreConfiguration)
 	 */
 	@Override
-	public ICoreConfiguration put(ICoreConfiguration conf) {
+	public ICoreConfiguration putToPersistentDatastore(ICoreConfiguration conf) {
 		if (conf.getDefaultCompId() == null && !conf.getCompsUnderway().isEmpty()) {
 			// set it to the first one
 			conf.setDefaultCompId(conf.getCompsUnderway().get(0));

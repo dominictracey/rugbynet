@@ -50,4 +50,12 @@ public interface ITopTenItem {
 
 	void setTeamName(String teamName);
 
+//	ITopTenList getParent();
+//
+//	void setParent(ITopTenList parent);
+
+	Long getParentId();
+
+	void setParentId(Long parentId);
+
 }

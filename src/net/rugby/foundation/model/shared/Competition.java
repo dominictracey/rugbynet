@@ -27,6 +27,10 @@ public class Competition implements Serializable, ICompetition {
 	private Long compClubhouse;
 	private Date lastSaved;
 	
+	private int nextRoundIndex;
+	private int prevRoundIndex;
+
+	
 	List<Long> roundIDs = new ArrayList<Long>();
 	@Transient
 	List<IRound> rounds = new ArrayList<IRound>();
@@ -58,9 +62,7 @@ public class Competition implements Serializable, ICompetition {
 	public void setTeams(List<ITeamGroup> teams) {
 		this.teams = teams;
 	}
-	
-	private int nextRoundIndex;
-	private int prevRoundIndex;
+
 	
 	public List<Long> getRoundIDs() {
 		return roundIDs;
@@ -345,6 +347,7 @@ public class Competition implements Serializable, ICompetition {
 	public void setLastSaved(Date lastSaved) {
 		this.lastSaved = lastSaved;	
 	}
+
 
 
 

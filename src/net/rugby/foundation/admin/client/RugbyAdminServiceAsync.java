@@ -107,7 +107,7 @@ public interface RugbyAdminServiceAsync {
 	public void lockMatch(Boolean lock, IMatchGroup match, Long compId, List<String> log, AsyncCallback<List<String>> asyncCallback);
 	
 	public void getComp(Long compId, AsyncCallback<ICompetition> asyncCallback);
-	
+	public void setCompAsDefault(Long compId, AsyncCallback<Boolean> asyncCallback);
 	public void testMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchStats>> asyncCallback);
 	
 	public void getPlayerMatchInfo(Long matchId, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);

@@ -67,6 +67,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
@@ -211,7 +212,11 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		ICoreConfiguration c = ccf.get();
 
 		c.addCompetition(comp.getId(), comp.getShortName());
-		c.addCompUnderway(comp.getId());
+		if (comp.getUnderway()) {
+			c.addCompUnderway(comp.getId());
+		} else {
+			c.removeCompUnderway(comp.getId());
+		}
 		//c.setDefaultCompId(comp.getId());
 		ccf.put(c);
 
@@ -539,6 +544,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			admin.setEmailAddress("dominic.tracey@gmail.com");
 			admin.setNickname("d1");
 			admin.setSuperadmin(true);
+			if (admin instanceof ITopTenUser) {
+				((ITopTenUser)admin).setTopTenContentContributor(true);
+				((ITopTenUser)admin).setTopTenContentEditor(true);
+			}
 			String pwhash = DigestUtils.md5Hex("asdasd");
 			admin.setPwHash(pwhash);
 			auf.put(admin);
@@ -651,6 +660,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ICompetition saveCompInfo(ICompetition comp) {
 		try {
 			comp = cf.put(comp);
+			
+			ICoreConfiguration cc = ccf.get();
+			// add or remove from CoreConfiguration map depending on the Underway flag
+			if (comp.getUnderway()) {
+				cc.addCompUnderway(comp.getId());
+			} else {
+				cc.removeCompUnderway(comp.getId());
+			}
+			
+			ccf.put(cc);
 
 			return comp;
 		} catch (Throwable e) {
@@ -734,7 +753,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 			return match;
 		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "fetchScore: " + e.getMessage());
+			Logger.getLogger("Admin").log(Level.SEVERE, "fetchScore: " + e.getMessage(), e);
 			return null;
 		}
 	}
@@ -1241,8 +1260,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			ttlf.create(tti);
 			return tti;
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "createTopTenList " + ex.getLocalizedMessage());		
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "createTopTenList " + ex.getMessage(), ex);		
 			return null;
+		}
+	}
+
+	@Override
+	public Boolean setCompAsDefault(Long compId) {
+		try {
+			ICoreConfiguration cc = ccf.get();
+			cc.setDefaultCompId(compId);
+			cc = ccf.put(cc);
+			if (cc != null && cc.getDefaultCompId() != null) {
+				return cc.getDefaultCompId().equals(compId);
+			} else {
+				return false;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "createTopTenList " + ex.getMessage(), ex);		
+			return false;
 		}
 	}
 

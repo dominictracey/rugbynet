@@ -3,9 +3,9 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<g:HTMLPanel styleName="accountPanel">
 		<ul class="openId">
-			<li id="facebook" class="on">
-				<g:Anchor ui:field="facebook" />
-			</li>
+<!-- 			<li id="facebook" class="on"> -->
+<!-- 				<g:Anchor ui:field="facebook" /> -->
+<!-- 			</li> -->
 			<li id="google" class="">
 				<g:Anchor ui:field="google" />
 			</li>

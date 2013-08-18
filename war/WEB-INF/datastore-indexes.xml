@@ -26,5 +26,6 @@
         <property name="teamId" direction="asc"/>
         <property name="slot" direction="asc"/>
     </datastore-index>
+
     
 </datastore-indexes>

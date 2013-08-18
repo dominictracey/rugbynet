@@ -3,8 +3,6 @@
  */
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
-import net.rugby.foundation.topten.model.shared.ITopTenItem;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.google.gwt.core.client.GWT;

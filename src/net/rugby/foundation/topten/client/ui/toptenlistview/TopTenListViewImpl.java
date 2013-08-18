@@ -20,6 +20,8 @@ import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -29,6 +31,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -76,7 +79,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 
 
 	@Override
-	public void setList(ITopTenList result) {
+	public void setList(ITopTenList result, String baseUrl) {
 		list = result;
 		if (result != null) {
 			title.setText(result.getTitle());
@@ -100,12 +103,20 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 				itemList = new ArrayList<TopTenItemView>();
 
 				while (it.hasNext()) {
+					ITopTenItem item = it.next();
 
-					TopTenItemView item = new TopTenItemView(it.next(), count++);
-					itemList.add(item);
+					TopTenItemView itemView = new TopTenItemView(item, count++, result.getId(), item.getPlayerId(), baseUrl);
+					itemList.add(itemView);
 
-					items.add(item);
+					items.add(itemView);
 				}
+			}
+			
+			// set the fbLike div property
+			// data-href="http://dev.rugby.net/topten.html#List:listId=159002" 
+			Element e = Document.get().getElementById("fbLike");
+			if (e != null) {
+				e.setPropertyString("data-href", baseUrl +"#List:listId=" + list.getId());
 			}
 
 		} else {
@@ -127,9 +138,10 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 
 
 	@Override
-	public void setComps(Map<Long, String> competitionMap) {
-		Iterator<Long> it = competitionMap.keySet().iterator();
+	public void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway) {
+		Iterator<Long> it = compsUnderway.iterator();
 		if (it != null) {
+			compDropdown.clear();
 			while (it.hasNext()) {
 				final Long compId = it.next();
 				NavLink nl = new NavLink(competitionMap.get(compId));

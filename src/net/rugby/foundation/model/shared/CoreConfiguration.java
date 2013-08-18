@@ -30,6 +30,10 @@ public class CoreConfiguration implements ICoreConfiguration, Serializable {
 	// default compId
 	private Long defaultCompId;
 	
+	// environments
+	public enum Environment { LOCAL, DEV, BETA, PROD }
+	private Environment environment;
+	
 	public enum selectionType { POOLROSTER, POOLROUND, KNOCKOUTROSTER, KNOCKOUTROUND }
 	
 	private static final Long MAXPOINTS_POOL_ROSTER = 15000L;
@@ -124,6 +128,16 @@ public class CoreConfiguration implements ICoreConfiguration, Serializable {
 	private final static String CREATEACCT_OK = "Congratulations - account created!";
 	
 	private static final String DEFAULT_COMPETITION_SHORT_NAME = "2011 RWC Knockout"; 
+	
+	// Facebook
+	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/topten.html?gwt.codesvr=127.0.0.1:9997";
+	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/topten.html";
+	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/topten.html";
+	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/topten.html";
+	
+	private final static String FACEBOOK_APPID = "499268570161982";
+//	private final static String FACEBOOK_APPSECRET = "c3550da86a7233c5398129a2b1317495";
+	
 	
 	public CoreConfiguration() {
 		compNameMap = new HashMap<Long, String>();
@@ -546,6 +560,12 @@ public class CoreConfiguration implements ICoreConfiguration, Serializable {
 			compsUnderway.add(compId);
 	}
 
+	@Override
+	public void removeCompUnderway(Long compId) {
+		if (compsUnderway.contains(compId))
+			compsUnderway.remove(compId);
+	}
+	
 	public static String getCreateacctErrorNicknameCantBeNull() {
 		return CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL;
 	}
@@ -563,5 +583,34 @@ public class CoreConfiguration implements ICoreConfiguration, Serializable {
 		//didn't find it
 		return false;
 	}
+
+	@Override
+	public Environment getEnvironment() {
+		return environment;
+	}
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
+
+	@Override
+	public String getBaseToptenUrl() {
+		if (environment == Environment.PROD) {
+			return PROD_BASE_TOPTEN_URL;
+		} else if (environment == Environment.BETA){
+			return BETA_BASE_TOPTEN_URL;
+		} else if (environment == Environment.DEV){
+			return DEV_BASE_TOPTEN_URL;
+		} else if (environment == Environment.LOCAL){
+			return LOCAL_BASE_TOPTEN_URL;
+		} else {
+			throw (new RuntimeException("Environment not set"));
+		}
+	}
+	@Override
+	public String getFacebookAppid() {
+		return FACEBOOK_APPID;
+	}
+
 
 }

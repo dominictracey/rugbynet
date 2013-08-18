@@ -1,4 +1,4 @@
-package net.rugby.foundation.topten.model.shared;
+package net.rugby.foundation.model.shared;
 
 public interface ITopTenUser {
 	public abstract boolean isTopTenContentContributor();

@@ -6,6 +6,8 @@ package net.rugby.foundation.model.shared;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
+
 /**
  * @author home
  *
@@ -41,4 +43,9 @@ public interface ICoreConfiguration {
 	void addCompUnderway(Long compId);
 	
 	boolean deleteComp(Long compId);
+	Environment getEnvironment();
+	void setEnvironment(Environment environment);
+	String getBaseToptenUrl();
+	String getFacebookAppid();
+	void removeCompUnderway(Long compId);
 }

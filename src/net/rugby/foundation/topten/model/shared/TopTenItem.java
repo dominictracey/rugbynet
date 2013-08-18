@@ -28,6 +28,8 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected boolean isSubmitted;
 	protected String matchReportLink;
 	protected String teamName;
+	//@Transient protected ITopTenList parent;
+	protected Long parentId;
 
 	public TopTenItem() {
 		
@@ -35,7 +37,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 	
 	public TopTenItem(Long id, Long playerId, IPlayer player, String text,
 			String image, Long contributorId, Long editorId, boolean isSubmitted, 
-			String matchReportLink, String teamName) {
+			String matchReportLink, String teamName, ITopTenList list) {
 		super();
 		this.id = id;
 		this.playerId = playerId;
@@ -47,6 +49,9 @@ public class TopTenItem implements Serializable, ITopTenItem
 		this.isSubmitted = isSubmitted;
 		this.matchReportLink = matchReportLink;
 		this.teamName = teamName;
+		this.parentId = list.getId();
+		//this.parent = list;
+		this.parentId = list.getId();
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.ITopTenItem#getId()
@@ -180,6 +185,22 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setTeamName(String teamName) {
 		this.teamName = teamName;
+	}
+//	@Override
+//	public ITopTenList getParent() {
+//		return parent;
+//	}
+//	@Override
+//	public void setParent(ITopTenList parent) {
+//		this.parent = parent;
+//	}
+	@Override
+	public Long getParentId() {
+		return parentId;
+	}
+	@Override
+	public void setParentId(Long parentId) {
+		this.parentId = parentId;
 	}
 
 }

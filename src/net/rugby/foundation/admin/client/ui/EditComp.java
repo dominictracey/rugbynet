@@ -31,6 +31,7 @@ public class EditComp extends Composite {
 		void saveCompInfo(ICompetition comp);
 		void repairComp(ICompetition comp);
 		void deleteComp(ICompetition comp);
+		void setCompAsDefault(ICompetition comp);
 	} 
 	
 	public EditComp() {
@@ -53,6 +54,8 @@ public class EditComp extends Composite {
 	TextBox ccid;
 	@UiField
 	CheckBox underway;
+	@UiField
+	Button setAsDefault;
 	
 	ICompetition comp = null;
 	private Presenter listener;
@@ -82,7 +85,12 @@ public class EditComp extends Composite {
 		listener.deleteComp(comp);
 	}
 
-
+	
+	@UiHandler("setAsDefault")
+	void onClickSetAsDefault(ClickEvent e) {
+		listener.setCompAsDefault(comp);
+	}
+	
 	public void ShowComp(ICompetition comp) {
 		this.comp = comp;
 		longName.setText(comp.getLongName());

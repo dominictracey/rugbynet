@@ -124,6 +124,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	@Override
 	public void setComps(List<ICompetition> result) {
 		this.comps = result;
+		comp.clear();
 		comp.addItem("All","-1");
 		for (ICompetition c: result) {
 			comp.addItem(c.getLongName(), c.getId().toString());
@@ -188,8 +189,8 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 		roundId = null;
 		if (round.getSelectedIndex() > -1) {
 			if (!round.getValue(round.getSelectedIndex()).equals("-1")) {
-				roundId = comps.get(comp.getSelectedIndex()).getRounds().get(round.getSelectedIndex()-1).getId();
-				currentRound = comps.get(comp.getSelectedIndex()).getRounds().get(round.getSelectedIndex()-1);
+				roundId = comps.get(comp.getSelectedIndex()-1).getRounds().get(round.getSelectedIndex()-1).getId();
+				currentRound = comps.get(comp.getSelectedIndex()-1).getRounds().get(round.getSelectedIndex()-1);
 			}
 		}
 		

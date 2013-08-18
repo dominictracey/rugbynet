@@ -1,5 +1,6 @@
 package net.rugby.foundation.topten.client;
 
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListViewImpl;
@@ -19,22 +20,8 @@ public class ClientFactoryImpl implements ClientFactory {
 	@SuppressWarnings("deprecation")
 	private static final PlaceController placeController = new PlaceController(eventBus);
 	private static final TopTenListView<ITopTenItem> listView = new TopTenListViewImpl();
-//	private static OrchestrationConfigurationView orchView = null;
-//	private static TaskView<IAdminTask> taskView = null;
-//	private static PortalView<IPlayerMatchInfo> portalView = null;
 	private static final TopTenListServiceAsync rpcService = GWT.create(TopTenListService.class);
 	private static EditTTIText editTTIText = null;
-//	private PlayerPopupView<IPlayer> playerPopupView;
-//	private List<FieldDefinition<IPlayer>> playerPopupViewFieldDefinitions;
-//	private PlayerMatchStatsPopupView<IPlayerMatchStats> playerMatchStatsPopupView;
-//	private List<FieldDefinition<IPlayerMatchStats>> playerMatchStatsPopupViewFieldDefinitions;
-//	private TeamMatchStatsPopupView<ITeamMatchStats> teamMatchStatsPopupView;
-//	private List<FieldDefinition<ITeamMatchStats>> teamMatchStatsPopupViewFieldDefinitions;
-//	private MatchRatingEngineSchemaPopupView<ScrumMatchRatingEngineSchema20130713> matchRatingEngineSchemaPopupView;
-//	private MatchRatingEngineSchemaPopupViewFieldDefinitions<ScrumMatchRatingEngineSchema20130713> matchRatingEngineSchemaPopupViewFieldDefinitions;
-//	
-//	private PlayerListView<IPlayerMatchInfo> playerListView = null;
-//	private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions =  null; 
 	
 	@Override
 	public EventBus getEventBus() {
@@ -250,4 +237,5 @@ public class ClientFactoryImpl implements ClientFactory {
 		}
 		return editTTIText;
 	}
+
 }

@@ -1,5 +1,6 @@
 package net.rugby.foundation.topten.server.factory.ofy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,35 +39,38 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	}
 
 
-	public ITopTenList get(Long id) {
-		// @REX this will be getFromDB in memcache'd world
+	@Override
+	public ITopTenList getFromPeristentDatastore(Long id) {
+
 		try {
 			ITopTenList list = ofy.get(TopTenList.class, id);
-
+			list.setList(new ArrayList<ITopTenItem>());
 			if (list != null && list.getItemIds() != null) {
 				//hydrate items
 				Iterator<Long> it = list.getItemIds().iterator();
 				while (it.hasNext()) {
-					list.getList().add(getItem(it.next()));
+					list.getList().add(getItem(it.next(), list));
 				}
 			}
 
 			return list;
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "get()" + e.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "get()" + e.getLocalizedMessage(), e);
 			return null;
 		}
 
 	}
 
 
-	private ITopTenItem getItem(Long id) {
+	private ITopTenItem getItem(Long id, ITopTenList parent) {
 		try {
 			ITopTenItem item = ofy.get(TopTenItem.class,id);
 			item.setPlayer(pf.getById(item.getPlayerId()));
+			assert(parent.getId()==item.getParentId());
+			//item.setParent(parent);
 			return item;
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getItem()" + e.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getItem()" + e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
@@ -79,55 +83,50 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	}
 
 	@Override
-	public ITopTenItem put(ITopTenItem item) {
+	public ITopTenItem putToPersistentDatastore(ITopTenItem item) {
 		try {
 			ofy.put(item);
 			return item;
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put(item)" + e.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put(item)" + e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
 
 
 	@Override
-	public ITopTenList put(ITopTenList list) {
+	public ITopTenList putToPersistentDatastore(ITopTenList list) {
 		try {
 			ofy.put(list);
 			return list;
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put(list)" + e.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put(list)" + e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
 
-	@Override
-	public ITopTenItem submit(ITopTenItem item) {
-		try {
-			item.setSubmitted(!item.isSubmitted());
-			ofy.put(item);
-			return item;
-		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "submit()" + e.getLocalizedMessage());
-			return null;
-		}
-	}
+
 
 	@Override
 	public ITopTenList getLatestForComp(Long compId) {
-		// @REX - really need to memcache this!
 		try {
-			Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("isLive",true).filter("nextPublishedId", null);
-			if (q.count() == 0) {
-				return null;
-			} else if (q.count() == 1) {
-				return get(q.get().getId());
+			// first check memcache
+			ITopTenList ttl = super.getLatestForComp(compId);
+			if (ttl != null) {
+				return ttl;
 			} else {
-				// something really wrong!
-				return null;
+				Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("live",true).filter("nextPublishedId", null);
+				if (q.count() == 0) {
+					return null;
+				} else if (q.count() == 1) {
+					return get(q.get().getId());
+				} else {
+					// something really wrong!
+					return null;
+				}
 			}
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getLatestForComp()" + e.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getLatestForComp()" + e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
@@ -136,19 +135,31 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	@Override
 	public ITopTenList getLastCreatedForComp(Long compId) {
 		try {
-			Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("nextId", null);
-			if (q.count() == 0) {
-				return null;
-			} else if (q.count() == 1) {
-				return get(q.get().getId());
+			// first check memcache
+			ITopTenList ttl = super.getLastCreatedForComp(compId);
+			if (ttl != null) {
+				return ttl;
 			} else {
-				// something really wrong!
-				return null;
+				Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("nextId", null);
+				if (q.count() == 0) {
+					return null;
+				} else if (q.count() == 1 || q.count() == 2) {
+					// If it is 2 it is the case where we have created but haven't linked yet. Return the first in the list, which is the previously existing one.
+					return get(q.get().getId());
+				} else {
+					return null;
+				}
 			}
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getLastCreatedForComp()" + e.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getLastCreatedForComp()" + e.getLocalizedMessage(), e);
 			return null;
 		}
+	}
+
+
+	@Override
+	protected void deleteFromPersistentDatastore(ITopTenList list) {
+		ofy.delete(list);
 	}
 
 }

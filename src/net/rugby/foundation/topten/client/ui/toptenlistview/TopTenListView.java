@@ -25,9 +25,9 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	}
 	void setPresenter(TopTenListViewPresenter presenter);
  
-	void setList(ITopTenList result);
+	void setList(ITopTenList result, String baseUrl);
 
-	void setComps(Map<Long, String> competitionMap);
+	void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway);
 
 	void addLoginPanel(HorizontalPanel acct);
 

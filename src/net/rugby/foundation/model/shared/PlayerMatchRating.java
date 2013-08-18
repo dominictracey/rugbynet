@@ -10,7 +10,7 @@ import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import com.googlecode.objectify.annotation.Subclass;
 
 @Subclass
-public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRating, Serializable {
+public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRating, Serializable, Comparable<IPlayerMatchRating>{
 	
 	/**
 	 * 
@@ -56,6 +56,25 @@ public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRatin
 	@Override
 	public void setPlayerMatchStatsId(Long playerMatchStatsId) {
 		this.playerMatchStatsId = playerMatchStatsId;
+	}
+
+	@Override
+	public int compareTo(IPlayerMatchRating o) {
+		if (rating == null) { 
+			return 1;
+		}
+		
+		 if (o.getRating() == null) {
+				return -1;
+		}
+		 
+		if (rating.equals(o.getRating())) {
+			return 0;
+		} else if (rating < o.getRating()) {
+			return 1;
+		} else {
+			return -1;
+		}
 	}
 
 	

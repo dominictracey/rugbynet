@@ -1,8 +1,9 @@
 package net.rugby.foundation.game1.client.place;
 
 import net.rugby.foundation.core.client.Identity;
-import net.rugby.foundation.core.client.Identity.Actions;
-import net.rugby.foundation.core.client.Identity.Keys;
+import net.rugby.foundation.core.shared.IdentityTypes;
+import net.rugby.foundation.core.shared.IdentityTypes.Actions;
+import net.rugby.foundation.core.shared.IdentityTypes.Keys;
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
@@ -40,10 +41,10 @@ public class Profile extends Place {
 					setAction(Actions.valueOf(tok[i+1]));
 			} else if (tok[i].equals(Keys.providerType.toString())) {
 				if (tok.length >= i+1)
-					setProviderType(Identity.getProviderType(tok[i+1])); 
+					setProviderType(IdentityTypes.getProviderType(tok[i+1])); 
 			} else if (tok[i].equals(Keys.selector.toString())) {
 				if (tok.length >= i+1)
-					setSelector(Identity.getSelector(tok[i+1]));
+					setSelector(IdentityTypes.getSelector(tok[i+1]));
 			} 
 			else if (tok[i].equals(Keys.destination.toString())) {
 				if (tok.length >= i+1)

@@ -28,4 +28,7 @@ public interface ITopTenListFactory {
 	 */
 	public ITopTenList getLastCreatedForComp(Long compId);
 	public ITopTenList create(TopTenSeedData tti);
+	
+	void setLastCreatedForComp(ITopTenList ttl, Long compId);
+	void setLatestPublishedForComp(ITopTenList ttl, Long compId);
 }

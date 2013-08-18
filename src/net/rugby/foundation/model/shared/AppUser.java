@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.persistence.Id;
 
-import net.rugby.foundation.topten.model.shared.ITopTenUser;
 
 import com.googlecode.objectify.annotation.Entity;
 

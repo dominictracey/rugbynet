@@ -11,9 +11,8 @@
         	<b:NavWidget ui:field='buttonBar'></b:NavWidget>
         </b:Nav>
         <h3><g:HTML ui:field='name'></g:HTML></h3>
-        <b:Paragraph ui:field='text'>
-            
-        </b:Paragraph>
+        <b:Paragraph ui:field='text'></b:Paragraph>
+        <g:HTML ui:field='fblike'><div class="fb-like" id="fbPlayerLike" data-width="450" data-layout="button_count" data-show-faces="false" data-send="false"></div></g:HTML>
     </b:Well>
 
         

@@ -90,9 +90,17 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 					trip = getTriplet(it);
 					if (trip.attr.equals("Tries")) {
 						if (home_or_visitor.equals(Home_or_Visitor.HOME)) {
-							tms.setTries(Integer.parseInt(trip.homeVal));
+							if (trip.homeVal.contains("(")) {  // e.g. 9 (1 penalty try)
+								tms.setTries(Integer.parseInt(trip.homeVal.split("[ |(]")[0]));
+							} else {
+								tms.setTries(Integer.parseInt(trip.homeVal));
+							}
 						} else {
-							tms.setTries(Integer.parseInt(trip.visitVal));
+							if (trip.visitVal.contains("(")) {  // e.g. 9 (1 penalty try)
+								tms.setTries(Integer.parseInt(trip.visitVal.split("[ |(]")[0]));
+							} else {
+								tms.setTries(Integer.parseInt(trip.visitVal));
+							}
 						}
 					} else {
 						errMess += ("Failed to find Tries");
