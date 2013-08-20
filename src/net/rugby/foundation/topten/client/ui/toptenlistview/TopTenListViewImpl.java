@@ -123,7 +123,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 			items.clear();
 			title.setText("Top Rugby Performances");
 			details1.setText("Choose from the Competition menu above to view the latest picks for Top Ten Performances");
-			details2.setText("Check back every Monday for top ten performances from top competitions.");
+			details2.setText("Check back every Monday for top ten performances from competitions around the world.");
 			prevButton.setEnabled(false);
 			nextButton.setEnabled(false);
 		}

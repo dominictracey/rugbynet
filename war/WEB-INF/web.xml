@@ -76,7 +76,7 @@
 		
 	<!-- Default page to serve -->
 	<welcome-file-list>
-		<welcome-file>access.html</welcome-file>
+		<welcome-file>topten.html</welcome-file>
 	</welcome-file-list>
 
 	<security-constraint>

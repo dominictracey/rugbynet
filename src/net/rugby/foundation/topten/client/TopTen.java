@@ -50,7 +50,7 @@ public class TopTen implements EntryPoint {
 		final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
 		historyHandler.register(placeController, eventBus, defaultPlace);
 		historyHandler.handleCurrentHistory();	
-		RootPanel.get().add(appWidget);
+		RootPanel.get("app").add(appWidget);
 
 		Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "Creating Identity manager");
 		
