@@ -22,7 +22,7 @@
   		</b:NavPills>
     </b:Nav>
     <b:Nav alignment="RIGHT">
-    	<g:HTML styleName="btn {style.nobtn}"><div class="fb-like"  data-href="http://dev.rugby.net/topten.html" data-width="0" data-layout="button_count" data-show-faces="false" data-send="true"></div></g:HTML>
+    	<g:HTML styleName="btn {style.nobtn}"><div class="fb-like"  data-href="http://www.rugby.net/topten.html" data-width="0" data-layout="button_count" data-show-faces="false" data-send="true"></div></g:HTML>
     </b:Nav>
     <b:Nav alignment="RIGHT">
         	<b:NavPills ui:field="loginPanel" />
@@ -30,24 +30,5 @@
 </b:Navbar>
 
 
-<!--     	<b:Hero> -->
-
-<!--             <b:Heading size="2" ui:field="title"> -->
-				
-<!--             </b:Heading> -->
-
-<!--             <b:Paragraph ui:field="details1"> -->
-				
-<!--             </b:Paragraph> -->
-
-<!--             <b:Paragraph ui:field="details2"> -->
-				
-<!--             </b:Paragraph> -->
-<!--            <b:Nav alignment="LEFT"> -->
-<!--         	<b:NavWidget ui:field='buttonBar'></b:NavWidget> -->
-<!--         	<g:HTML><div id='fbLike' class="fb-like" data-width="450" data-show-faces="true" data-send="true"></div></g:HTML> -->
-<!--            </b:Nav> -->
-        
-<!--         </b:Hero> -->
 </g:HTMLPanel>
 </ui:UiBinder>

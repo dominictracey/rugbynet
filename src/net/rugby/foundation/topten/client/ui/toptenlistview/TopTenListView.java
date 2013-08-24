@@ -11,6 +11,7 @@ import com.github.gwtbootstrap.client.ui.NavPills;
 import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * View interface. Extends IsWidget so a view impl can easily provide
@@ -22,6 +23,8 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	public interface TopTenListViewPresenter {
 		void showNext();
 		void showPrev();
+		void setTTIButtons(TopTenItemView itemView);
+		void parse(Widget widget);
 	}
 	void setPresenter(TopTenListViewPresenter presenter);
  
@@ -43,5 +46,8 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	void hasPrev(boolean has);
 
 	void setClientFactory(ClientFactory clientFactory);
+
+	int getItemCount();
+	void setItemCount(int i);
 
 }

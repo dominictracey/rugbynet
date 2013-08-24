@@ -119,6 +119,8 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 				if (q.count() == 0) {
 					return null;
 				} else if (q.count() == 1) {
+					// memcache it
+					setLatestPublishedForComp(q.get(), compId);
 					return get(q.get().getId());
 				} else {
 					// something really wrong!
@@ -145,6 +147,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 					return null;
 				} else if (q.count() == 1 || q.count() == 2) {
 					// If it is 2 it is the case where we have created but haven't linked yet. Return the first in the list, which is the previously existing one.
+					setLastCreatedForComp(get(q.get().getId()),compId);
 					return get(q.get().getId());
 				} else {
 					return null;

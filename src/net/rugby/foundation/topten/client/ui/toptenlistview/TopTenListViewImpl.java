@@ -6,17 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.topten.client.ClientFactory;
-import net.rugby.foundation.topten.client.place.TopTenListPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Dropdown;
-import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavPills;
 import com.github.gwtbootstrap.client.ui.NavWidget;
-import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
@@ -25,12 +20,12 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -53,6 +48,9 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 
 	List<TopTenItemView> itemList;
 	private ITopTenList list;
+	private int itemCount;
+
+
 
 
 	private net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView.TopTenListViewPresenter presenter;
@@ -86,6 +84,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 	@Override
 	public void setList(final ITopTenList result, final String baseUrl) {
 		list = result;
+		//setVisible(false);
 		if (result != null) {
 			navbar.setHeroListInfo(result.getTitle(),result.getContent());
 
@@ -108,6 +107,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 
 				while (it.hasNext()) {
 					final ITopTenItem item = it.next();
+
 					final int fCount = count++;
 					Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
 						@Override
@@ -115,17 +115,16 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 
 							TopTenItemView itemView = new TopTenItemView(item, fCount, result.getId(), item.getPlayerId(), baseUrl);
 							itemList.add(itemView);
-
 							items.add(itemView);
+							presenter.setTTIButtons(itemView);
+							//presenter.parse(itemView);
 						}
 					});
 				}
 			}
 
-			// set the fbLike div property
-			// data-href="http://dev.rugby.net/topten.html#List:listId=159002" 
-			navbar.setFBLikeAttribute("data-href", baseUrl +"#List:listId=" + list.getId());
 
+			//setVisible(true);
 		} else {
 			items.clear();
 			navbar.setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
@@ -212,6 +211,16 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 			List<Long> compsUnderway) {
 		navbar.setComps(competitionMap, compsUnderway);
 
+	}
+	
+	@Override
+	public int getItemCount() {
+		return itemCount;
+	}
+
+	@Override
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
 	}
 
 }
