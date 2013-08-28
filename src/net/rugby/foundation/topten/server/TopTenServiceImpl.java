@@ -8,7 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
+import net.rugby.foundation.core.server.factory.ICachingFactory;
+import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.TopTenListService;
@@ -26,6 +29,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 
 	private IAppUserFactory auf;
 	private ITopTenListFactory ttlf;
+	private ICachingFactory<IContent> ctf;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -34,10 +38,11 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Inject
-	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf) {
+	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
+			this.ctf = ctf;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 		}
@@ -198,6 +203,41 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 				return ttlf.getLatestForComp(compId);
 			}
 		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Long getLatestListIdForComp(Long compId) {
+		try {
+			ITopTenList ttl = null;
+			IAppUser u = getAppUser();
+			if (u instanceof ITopTenUser && (((ITopTenUser)u).isTopTenContentContributor() || ((ITopTenUser)u).isTopTenContentEditor())) {
+				ttl = ttlf.getLastCreatedForComp(compId);
+			} else {
+				ttl = ttlf.getLatestForComp(compId);
+			}
+			if (ttl != null) {
+				return ttl.getId();
+			} else {
+				return null;
+			}
+		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public List<IContent> getContentItems() {
+		try {
+			
+			if (ctf instanceof IContentFactory) {
+				return ((IContentFactory)ctf).getAll(true);
+			}
+			return null;
+		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;
 		}

@@ -12,7 +12,7 @@ import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
  * @author home
  *
  */
-public interface ICoreConfiguration {
+public interface ICoreConfiguration extends HasId {
 	public abstract void addCompetition(Long id, String name);
 	public abstract Map<Long, String> getCompetitionMap();
 	
@@ -21,14 +21,6 @@ public interface ICoreConfiguration {
 	 * @param defaultCompId
 	 */
 	void setDefaultCompId(Long defaultCompId);
-	/**
-	 * @return
-	 */
-	Long getId();
-	/**
-	 * @param id
-	 */
-	void setId(Long id);
 	/**
 	 * @return
 	 */
@@ -48,4 +40,5 @@ public interface ICoreConfiguration {
 	String getBaseToptenUrl();
 	String getFacebookAppid();
 	void removeCompUnderway(Long compId);
+	String getBaseToptenUrlForFacebook();
 }

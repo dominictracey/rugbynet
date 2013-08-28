@@ -3,6 +3,7 @@ package net.rugby.foundation.topten.client.ui.toptenlistview;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
@@ -49,5 +50,7 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 
 	int getItemCount();
 	void setItemCount(int i);
+
+	void setContent(List<IContent> result);
 
 }

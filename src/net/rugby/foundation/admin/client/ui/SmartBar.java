@@ -3,8 +3,11 @@ package net.rugby.foundation.admin.client.ui;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.model.shared.IContent;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -32,6 +35,8 @@ public interface SmartBar extends IsWidget {
 		void compPicked(Long id);
 
 		void flushAllPipelineJobs();
+
+		void createContent();
 		
 
 	}
@@ -54,5 +59,8 @@ public interface SmartBar extends IsWidget {
 	 * 
 	 */
 	void setSchemas(List<ScrumMatchRatingEngineSchema> result);
+
+	void setContents(List<IContent> contents, EditContentPresenter listener);
+
 
 }

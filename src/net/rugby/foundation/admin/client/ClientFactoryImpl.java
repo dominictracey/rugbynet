@@ -5,6 +5,8 @@ import java.util.List;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.CompetitionViewImpl;
+import net.rugby.foundation.admin.client.ui.EditContent;
+import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationViewImpl;
@@ -33,6 +35,10 @@ import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPo
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
+import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.core.client.CoreService;
+import net.rugby.foundation.core.client.CoreServiceAsync;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -72,6 +78,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	
 	private PlayerListView<IPlayerMatchInfo> playerListView = null;
 	private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions =  null; 
+	private EditContent editContent = null;
 	
 	@Override
 	public EventBus getEventBus() {
@@ -280,4 +287,95 @@ public class ClientFactoryImpl implements ClientFactory {
 			}
 		});		
 	}
+	
+	@Override
+	public void createContent() {
+		String content = "";
+		Long id = null;
+		final EditContentPresenter listener = this;
+		getRpcService().createContent(id, content, new AsyncCallback<IContent>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Create content failure: " + caught.getLocalizedMessage());
+
+			}
+
+			@Override
+			public void onSuccess(IContent result) {
+				if (result != null) {
+					getEditContent().setContent(result, listener);
+					getEditContent().center();
+				} else {
+					Window.alert("Content not created. See logs for details");
+				}
+
+			}
+
+		});
+		
+	}
+	
+	@Override
+	public EditContent getEditContent() {
+		if (editContent == null) {
+			editContent = new EditContent();
+		}
+		
+		return editContent;
+	}
+
+	@Override
+	public void saveContent(IContent content) {
+		Core.getCore().saveContent(content, new AsyncCallback<IContent>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Save content failure: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(IContent result) {
+				if (result != null) {
+					getEditContent().hide();
+				} else {
+					Window.alert("Content not saved. See logs for details");
+				}
+
+			}
+
+		});
+		
+	}
+
+	@Override
+	public void cancelEditContent() {
+		editContent.hide();
+		
+	}
+
+	@Override
+	public void editContent(IContent content) {
+
+		final EditContentPresenter listener = this;
+		
+		Core.getCore().getContent(content.getId(), new AsyncCallback<IContent>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Get content failure: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(IContent result) {
+				if (result != null) {
+					getEditContent().setContent(result, listener);
+					getEditContent().center();
+				} else {
+					Window.alert("Content not fetched for editing. See logs for details");
+				}
+
+			}
+
+		});	}
 }

@@ -9,7 +9,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
  * @author home
  *
  */
-public interface IConfigurationFactory {
+public interface IConfigurationFactory extends ICachingFactory<ICoreConfiguration>{
 	public abstract ICoreConfiguration get();
-	public abstract ICoreConfiguration put(ICoreConfiguration conf);
+	//public abstract ICoreConfiguration put(ICoreConfiguration conf);
 }

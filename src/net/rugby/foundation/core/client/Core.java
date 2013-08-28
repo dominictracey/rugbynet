@@ -15,6 +15,7 @@ import net.rugby.foundation.core.client.ui.CreateClubhouse.Presenter;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 
@@ -77,6 +78,9 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	// the UI component for creating a new clubhouse
 	//	Login agnostic
 	private CreateClubhouse createClubhouse = null;
+	
+	// map that contains content
+	private Map<Long, IContent> contentMap = null; 
 	
 	/**
 	 * Use the static getInstance factory method
@@ -557,6 +561,51 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			AsyncCallback<LoginInfo> asyncCallback) {
 		assert false;
 		
+	}
+
+	@Override
+	public void getContent(final Long contentId, final AsyncCallback<IContent> cb) {
+		
+		if (getContentMap().containsKey(contentId)) {
+			cb.onSuccess(getContentMap().get(contentId));
+		} else {
+			clientFactory.getRpcService().getContent(contentId, new AsyncCallback<IContent> () {
+				@Override
+				public void onFailure(Throwable caught) {
+					cb.onFailure(caught);
+				}
+
+				@Override
+				public void onSuccess(IContent result) {	
+					getContentMap().put(contentId, result);
+					cb.onSuccess(result);
+				}
+			});
+		}	
+	}
+
+	public void saveContent(IContent content, final AsyncCallback<IContent> cb) {
+		clientFactory.getRpcService().saveContent(content, new AsyncCallback<IContent> () {
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(IContent content) {	
+				getContentMap().put(content.getId(), content);
+				cb.onSuccess(content);
+			}
+
+		});
+		
+	}
+	
+	private Map<Long, IContent> getContentMap() {
+		if (contentMap == null) {
+			contentMap = new HashMap<Long,IContent>();
+		}
+		return contentMap;
 	}
 
 }

@@ -21,6 +21,7 @@ import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -105,16 +106,28 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 						public void onSuccess(List<ICompetition> result) {
 							comps = result;
 							view.addComps(result);
-							clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
+							clientFactory.getRpcService().getContentList(true, new AsyncCallback<List<IContent>>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Window.alert("Problem getting schema list: " + caught.getLocalizedMessage());
+									Window.alert("Problem getting content list: " + caught.getLocalizedMessage());
 								}
 
 								@Override
-								public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
-									view.setSchemaList(result);
+								public void onSuccess(List<IContent> result) {
+									view.getSmartBar().setContents(result, clientFactory);
+									clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
+
+										@Override
+										public void onFailure(Throwable caught) {
+											Window.alert("Problem getting schema list: " + caught.getLocalizedMessage());
+										}
+
+										@Override
+										public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
+											view.setSchemaList(result);
+										}
+									});
 								}
 							});
 						}
@@ -1344,5 +1357,8 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 
 
-
+			@Override
+			public void createContent() {
+				clientFactory.createContent();
+			}
 		}

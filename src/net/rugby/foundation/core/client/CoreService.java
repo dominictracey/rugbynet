@@ -5,9 +5,11 @@ package net.rugby.foundation.core.client;
 
 import java.util.List;
 
+import net.rugby.foundation.model.shared.Content;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -103,4 +105,7 @@ public interface CoreService extends RemoteService {
 	 */
 	LoginInfo changePassword(String email, String oldPassword, String newPassword);
 	LoginInfo forgotPassword(String email);
+	
+	IContent getContent(Long contentId);
+	IContent saveContent(IContent content);
 }

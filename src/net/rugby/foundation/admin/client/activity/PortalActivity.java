@@ -356,4 +356,10 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTITextPresenter {
 		
 	}
 
+	@Override
+	public void createContent() {
+		clientFactory.createContent();
+	}
+	
+
 }

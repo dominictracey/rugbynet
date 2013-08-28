@@ -3,6 +3,7 @@ package net.rugby.foundation.core.server;
 import net.rugby.foundation.admin.server.rules.CoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
+import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -16,12 +17,13 @@ import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyContentFactory;
 import net.rugby.foundation.core.server.factory.test.TestAppUserFactory;
 import net.rugby.foundation.core.server.factory.test.TestClubhouseFactory;
 import net.rugby.foundation.core.server.factory.test.TestClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.test.TestCompetitionFactory;
 import net.rugby.foundation.core.server.factory.test.TestConfigurationFactory;
+import net.rugby.foundation.core.server.factory.test.TestContentFactory;
 import net.rugby.foundation.core.server.factory.test.TestCountryFactory;
 import net.rugby.foundation.core.server.factory.test.TestMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestMatchResultFactory;
@@ -31,9 +33,11 @@ import net.rugby.foundation.core.server.factory.test.TestPlayerMatchStatsFactory
 import net.rugby.foundation.core.server.factory.test.TestRoundFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamMatchStatsFactory;
+import net.rugby.foundation.model.shared.IContent;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 
 public class CoreTestModule extends AbstractModule {
 	@Override
@@ -56,6 +60,8 @@ public class CoreTestModule extends AbstractModule {
 		bind(IPlayerMatchStatsFactory.class).to(TestPlayerMatchStatsFactory.class);
 		bind(ICountryFactory.class).to(TestCountryFactory.class);
 		bind(IPlayerMatchRatingFactory.class).to(TestPlayerMatchRatingFactory.class);
+		bind(new TypeLiteral<ICachingFactory<IContent>>(){}).to(new TypeLiteral<TestContentFactory>(){});
+
 	}
 }
 

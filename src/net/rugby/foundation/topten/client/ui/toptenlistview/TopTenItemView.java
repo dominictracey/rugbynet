@@ -19,9 +19,9 @@ public class TopTenItemView extends Composite
 {
 	private static TopTenItemViewUiBinder uiBinder = GWT.create(TopTenItemViewUiBinder.class);
 
-
+	@UiField HTML image;
 	@UiField HTML name;
-	@UiField Paragraph text;
+	@UiField HTML text;
 	@UiField HTMLPanel fblike;
 	@UiField NavWidget buttonBar;
 
@@ -61,15 +61,24 @@ public class TopTenItemView extends Composite
 		this.setIndex(index);
 		if (item instanceof ITopTenItem) {
 			if (item != null) {
-				if (((ITopTenItem)item).getPlayer() != null) {
-					name.setText(index+1 + ". " + item.getPlayer().getDisplayName() + " (" +  item.getTeamName() + ")");
+				if (item.getTeamId() != null) {
+					image.setHTML( "<image src=\"/resources/" + item.getTeamId() + "/200.png\" width=\"75\"/>");
 				}
-				HTML html = new HTML(item.getText());
-				text.add(html);
+				
+				if (((ITopTenItem)item).getPlayer() != null) {
+					String pos = "";
+					if (item.getPosition() != null) {
+						pos = " (" +  item.getPosition().getName() + ")";
+					}
+					name.setText(index+1 + ". " + item.getPlayer().getDisplayName() + pos);
+				}
+
+				//HTML html = new HTML(item.getText());
+				text.setHTML(item.getText());
 
 				//Element e = fblike.getElement().getFirstChildElement();
 				fblike.clear();
-				String encodedUrl= URL.encode(baseUrl +"#List:listId=" + listId + "&playerId=" + playerId);
+				String encodedUrl= URL.encode(baseUrl + "?listId=" + listId + "&playerId=" + playerId +"#List:listId=" + listId + "&playerId=" + playerId);
 				fblike.add(new HTML("<div class=\"fb-like\" id=\"fbPlayerLike" + index + "\" data-width=\"450\" data-layout=\"button_count\" data-show-faces=\"false\" data-send=\"false\" data-href=\"" + encodedUrl + "\"></div>"));
 				//				if (e != null) {
 //					e.setAttribute("id", "fbPlayerLike-"+index);

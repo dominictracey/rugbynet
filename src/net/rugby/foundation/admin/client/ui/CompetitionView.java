@@ -120,5 +120,6 @@ public interface CompetitionView extends IsWidget {
 	void showWait(boolean show);
 	void setSchemaList(List<ScrumMatchRatingEngineSchema> result);
 
+	SmartBar getSmartBar();
 
 }

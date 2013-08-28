@@ -1,7 +1,9 @@
 package net.rugby.foundation.topten.client.mvp;
 
 import net.rugby.foundation.topten.client.ClientFactory;
+import net.rugby.foundation.topten.client.activity.ContentActivity;
 import net.rugby.foundation.topten.client.activity.TopTenListActivity;
+import net.rugby.foundation.topten.client.place.ContentPlace;
 import net.rugby.foundation.topten.client.place.TopTenListPlace;
 
 import com.google.gwt.activity.shared.Activity;
@@ -28,6 +30,8 @@ public class AppActivityMapper implements ActivityMapper {
 	  
 		if (place instanceof TopTenListPlace)
 			return new TopTenListActivity((TopTenListPlace) place, clientFactory);
+		if (place instanceof ContentPlace)
+			return new ContentActivity((ContentPlace) place, clientFactory);
 
 		return null;
 	}

@@ -40,7 +40,6 @@
 	    <b:PasswordTextBox ui:field="password1"></b:PasswordTextBox>
 	   	<b:ControlLabel ui:field="password2Label">Password (again)</b:ControlLabel>
 	    <b:PasswordTextBox ui:field="password2"></b:PasswordTextBox>
-	    <b:HelpBlock>This is how others will see you.</b:HelpBlock>
 
         <b:Nav alignment="RIGHT">
         	<b:NavWidget ui:field='buttonBar'>

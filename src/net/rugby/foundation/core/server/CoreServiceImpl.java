@@ -15,6 +15,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import net.rugby.foundation.core.client.CoreService;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
+import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -23,6 +24,7 @@ import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
@@ -49,10 +51,12 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	private IClubhouseMembershipFactory chmf;
 	private IAccountManager am;
 	private IExternalAuthticatorProviderFactory eapf;
+	private ICachingFactory<IContent> ctf;
 
 
 	@Inject
-	public CoreServiceImpl(ICompetitionFactory cf, IAppUserFactory auf, IClubhouseFactory chf,  IClubhouseMembershipFactory chmf, IConfigurationFactory configF, IAccountManager am, IExternalAuthticatorProviderFactory eapf) {
+	public CoreServiceImpl(ICompetitionFactory cf, IAppUserFactory auf, IClubhouseFactory chf,  IClubhouseMembershipFactory chmf, 
+			IConfigurationFactory configF, IAccountManager am, IExternalAuthticatorProviderFactory eapf, ICachingFactory<IContent> ctf) {
 		//		this.ofy = DataStoreFactory.getOfy();
 		this.cf = cf;
 		this.auf = auf;
@@ -61,6 +65,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 		this.configF = configF;
 		this.am = am;
 		this.eapf = eapf;
+		this.ctf = ctf;
 	}
 
 	/* (non-Javadoc)
@@ -69,43 +74,43 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	@Override
 	public ICompetition getComp(Long compId) {
 		try {
-//			byte[] value = null;
-//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-//			ICompetition c = null;
-//
-//			value = (byte[])syncCache.get(compId);
-//			if (value == null) {
-				cf.setId(compId);
-				return cf.getCompetition();
-//				if (c.getLastSaved() == null) {
-//					c.setLastSaved(new Date());
-//				}
-//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//				ObjectOutput out = new ObjectOutputStream(bos);   
-//				out.writeObject(c);
-//				byte[] yourBytes = bos.toByteArray(); 
-//
-//				out.close();
-//				bos.close();
-//
-//				syncCache.put(compId, yourBytes);
-//			} else {
-//				Date lastUpdate = cf.getLastUpdate(compId);
-//
-//				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-//				ObjectInput in = new ObjectInputStream(bis);
-//				c = (ICompetition)in.readObject();
-//
-//				bis.close();
-//				in.close();
-//
-//				// if there is a newer version flush the cache entry and re-try
-//				if (c.getLastSaved().before(lastUpdate)) {
-//					syncCache.delete(compId);
-//					return getComp(compId);
-//				}
-//			}
-//			return c;
+			//			byte[] value = null;
+			//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			//			ICompetition c = null;
+			//
+			//			value = (byte[])syncCache.get(compId);
+			//			if (value == null) {
+			cf.setId(compId);
+			return cf.getCompetition();
+			//				if (c.getLastSaved() == null) {
+			//					c.setLastSaved(new Date());
+			//				}
+			//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			//				ObjectOutput out = new ObjectOutputStream(bos);   
+			//				out.writeObject(c);
+			//				byte[] yourBytes = bos.toByteArray(); 
+			//
+			//				out.close();
+			//				bos.close();
+			//
+			//				syncCache.put(compId, yourBytes);
+			//			} else {
+			//				Date lastUpdate = cf.getLastUpdate(compId);
+			//
+			//				ByteArrayInputStream bis = new ByteArrayInputStream(value);
+			//				ObjectInput in = new ObjectInputStream(bis);
+			//				c = (ICompetition)in.readObject();
+			//
+			//				bis.close();
+			//				in.close();
+			//
+			//				// if there is a newer version flush the cache entry and re-try
+			//				if (c.getLastSaved().before(lastUpdate)) {
+			//					syncCache.delete(compId);
+			//					return getComp(compId);
+			//				}
+			//			}
+			//			return c;
 
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -221,12 +226,12 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			if (info == null)
 				info = new LoginInfo();
 			info.setLoggedIn(false);
-			
+
 			// uncheck various roles
 			info.setAdmin(false);
 			info.setTopTenContentContributor(false);
 			info.setTopTenContentEditor(false);
-			
+
 			return info;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -275,7 +280,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 				u.setLastEntryId(loginInfo.getLastEntryId());
 				u.setLastClubhouseId(loginInfo.getLastClubhouseId());
 				u.setLastCompetitionId(loginInfo.getLastCompetitionId());
-				
+
 				loginInfo = am.getLoginInfo(u);
 				HttpServletRequest request = this.getThreadLocalRequest();
 				HttpSession session = request.getSession();
@@ -482,13 +487,13 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			if (u == null) {
 				return new LoginInfo();
 			}
-			
+
 			LoginInfo loginInfo = am.updateAccount(u, email, screenName, this.getThreadLocalRequest());
-			
+
 			// set in accountManager
-//			HttpServletRequest request = this.getThreadLocalRequest();
-//			HttpSession session = request.getSession();
-//			session.setAttribute("loginInfo", loginInfo);
+			//			HttpServletRequest request = this.getThreadLocalRequest();
+			//			HttpSession session = request.getSession();
+			//			session.setAttribute("loginInfo", loginInfo);
 
 			return loginInfo;
 		} catch (Throwable ex) {
@@ -516,12 +521,12 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	@Override
 	public LoginInfo changePassword(String email, String oldPassword, String newPassword) {
 		try {
-			
+
 			LoginInfo loginInfo = am.changePassword(email, oldPassword, newPassword);
 			HttpServletRequest request = this.getThreadLocalRequest();
 			HttpSession session = request.getSession();
 			session.setAttribute("loginInfo", loginInfo);
-			
+
 			return loginInfo;
 		}  catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -539,12 +544,33 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			HttpServletRequest request = this.getThreadLocalRequest();
 			HttpSession session = request.getSession();
 			session.setAttribute("loginInfo", loginInfo);
-			
+
 			return loginInfo;
 		}  catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}	
+	}
+
+	@Override
+	public IContent getContent(Long contentId) {
+		try {
+			return ctf.get(contentId);
+		}  catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	@Override
+	public IContent saveContent(IContent content) {
+		try {
+			content = ctf.put(content);
+			return content;
+		}  catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
 	}
 
 

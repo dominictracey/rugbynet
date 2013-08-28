@@ -109,4 +109,9 @@ public class TopTenListPlace extends Place {
 		}
 
 	}
+
+	public void setListId(Long id) {
+		this.listId = id;
+		
+	}
 }

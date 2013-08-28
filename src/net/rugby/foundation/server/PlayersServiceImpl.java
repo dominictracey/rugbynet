@@ -20,6 +20,7 @@ import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetitionTeam;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchRating;
@@ -1262,7 +1263,7 @@ public Boolean setContent(Long id, String text) {
 @Override
 public String getContent(Long id) {
 	Key<Content> key = new Key<Content>(Content.class,id);
-	Content c = ofy.get(key);
+	IContent c = ofy.get(key);
 	if (c != null)
 		return c.getBody();
 	else

@@ -291,7 +291,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				//String image, Long contributorId, Long editorId, boolean isSubmitted, 
 				//String matchReportLink, String teamName, ITopTenList parent)
 				ITopTenItem item = new TopTenItem(null, pmr.getPlayerId(), pmr.getPlayer(), "",
-						"", null, null, false, match.getForeignUrl(), team.getDisplayName(), list);
+						"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pmr.getPlayerMatchStats().getPosition(), list);
 				put(item);
 				list.getList().add(item);
 				list.getItemIds().add(item.getId());
@@ -309,7 +309,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			put(last);
 
 			list.setPrevId(last.getId());
-		}
+
+ 		}
 
 		put(list);
 
@@ -548,7 +549,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}
 	}
-
+	@Override
 	public void setLatestPublishedForComp(ITopTenList ttl, Long compId){
 		try {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();

@@ -129,11 +129,16 @@ public class CoreConfiguration implements ICoreConfiguration, Serializable {
 	
 	private static final String DEFAULT_COMPETITION_SHORT_NAME = "2011 RWC Knockout"; 
 	
-	// Facebook
 	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/topten.html?gwt.codesvr=127.0.0.1:9997";
 	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/topten.html";
 	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/topten.html";
 	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/topten.html";
+	
+	// Facebook
+	private final static String FB_LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/fb/topten.html?gwt.codesvr=127.0.0.1:9997";
+	private final static String FB_DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/fb/topten.html";
+	private final static String FB_BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/fb/topten.html";
+	private final static String FB_PROD_BASE_TOPTEN_URL = "http://www.rugby.net/fb/topten.html";
 	
 	private final static String FACEBOOK_APPID = "499268570161982";
 //	private final static String FACEBOOK_APPSECRET = "c3550da86a7233c5398129a2b1317495";
@@ -607,6 +612,22 @@ public class CoreConfiguration implements ICoreConfiguration, Serializable {
 			throw (new RuntimeException("Environment not set"));
 		}
 	}
+	
+	@Override
+	public String getBaseToptenUrlForFacebook() {
+		if (environment == Environment.PROD) {
+			return FB_PROD_BASE_TOPTEN_URL;
+		} else if (environment == Environment.BETA){
+			return FB_BETA_BASE_TOPTEN_URL;
+		} else if (environment == Environment.DEV){
+			return FB_DEV_BASE_TOPTEN_URL;
+		} else if (environment == Environment.LOCAL){
+			return FB_LOCAL_BASE_TOPTEN_URL;
+		} else {
+			throw (new RuntimeException("Environment not set"));
+		}
+	}
+	
 	@Override
 	public String getFacebookAppid() {
 		return FACEBOOK_APPID;

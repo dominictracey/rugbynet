@@ -4,17 +4,7 @@ package net.rugby.foundation.topten.server.factory;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +23,6 @@ import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
-import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -633,6 +622,52 @@ public class TopTenFactoryTester {
 		assertTrue(last.getPrevPublishedId().equals(ttl2.getId()));
 		assertTrue(last.getNextPublishedId() == null);
 		
+		deleteAll();
+	}
+	
+	@Test
+	public void publishOneCreateOne() {
+
+		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
+
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null);
+		ITopTenList ttl = ttf.create(ttsd);
+
+
+		assertTrue(ttl != null);
+		assertFalse(ttl.getLive());
+		
+		// publish it
+		ttf.publish(ttl);
+		assertTrue(ttl.getLive());
+
+		// should be last and latest now
+		ITopTenList last = ttf.getLastCreatedForComp(2L);
+		assertTrue(ttl.getId().equals(last.getId()));
+
+		ITopTenList latest = ttf.getLatestForComp(2L);
+		assertTrue(ttl.getId().equals(latest.getId()));
+
+		// create a new one
+		ITopTenList ttl2 = ttf.create(ttsd);
+
+		latest = ttf.getLatestForComp(2L);
+		last = ttf.getLastCreatedForComp(2L);
+		assertTrue(latest != null);
+		assertTrue(latest.getId().equals(ttl.getId()));
+		
+		assertTrue(ttl2.getId().equals(last.getId()));
+		
+		// refresh ttl
+		ttl = ttf.get(ttl.getId());
+		
+		// make sure next and prev are right
+		assertTrue(ttl.getNextId().equals(ttl2.getId()));
+		assertTrue(ttl.getNextPublishedId() == null);
+		assertTrue(ttl2.getPrevId().equals(ttl.getId()));
+		
+		// so this is actually not true. Unpublished ttls don't maintain their published links
+		//assertTrue(ttl2.getPrevPublishedId().equals(ttl.getId()));
 		deleteAll();
 	}
 }

@@ -2,6 +2,8 @@ package net.rugby.foundation.admin.client;
 
 import java.util.List;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
+import net.rugby.foundation.admin.client.ui.EditContent;
+import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;
 import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.matchratingengineschemapopup.MatchRatingEngineSchemaPopupView;
@@ -30,7 +32,7 @@ import com.google.gwt.place.shared.PlaceController;
  * references to objects needed throughout your application like the {@link EventBus},
  * {@link PlaceController} and views.
  */
-public interface ClientFactory {
+public interface ClientFactory extends EditContentPresenter {
 
 	public interface GetCountryListCallback {
 		void onCountryListFetched(List<ICountry> countries);
@@ -73,4 +75,8 @@ public interface ClientFactory {
 	MatchRatingEngineSchemaPopupView<ScrumMatchRatingEngineSchema20130713> getMatchRatingEngineSchemaPopupView();
 
 	void flushAllPipelineJobs();
+
+	void createContent();
+
+	EditContent getEditContent();
 }

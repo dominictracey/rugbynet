@@ -8,8 +8,10 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.place.PortalPlace;
+import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
 import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.model.shared.IContent;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -46,9 +48,12 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@UiField MenuItem schemaMenuNew;
 	@UiField MenuBar schemaList;
 	@UiField MenuItem adminMenuFlushAllPipelineJobs;
+	@UiField MenuItem adminMenuCreateContent;
+	@UiField MenuBar contentList;
 
 	private SchemaPresenter schemaListener;
-
+	private EditContentPresenter contentListener;
+	
 	public SmartBarImpl() {
 		initWidget(binder.createAndBindUi(this));
 
@@ -109,6 +114,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 		});
 	}
 
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.game1.client.ui.SmartBar#setComps(java.util.Map)
 	 */
@@ -148,5 +154,35 @@ public class SmartBarImpl extends Composite implements SmartBar {
 
 		}
 	}
+	
 
+	@Override
+	public void setContents(List<IContent> contents, EditContentPresenter listener) {
+		this.contentListener = listener;
+		adminMenuCreateContent.setCommand(new Command() {
+			@Override
+			public void execute() {
+				contentListener.createContent();
+			}
+
+		});
+		
+		contentList.clearItems();
+		if (contents != null) {
+			Iterator<IContent> it = contents.iterator();
+			while (it.hasNext()) {
+				final IContent s = it.next();
+				String name = s.getTitle();
+
+				contentList.addItem(new MenuItem(name, new Command()
+				{
+					public void execute()
+					{
+						contentListener.editContent(s);
+					}
+				}));
+			}		
+
+		}
+	}
 }

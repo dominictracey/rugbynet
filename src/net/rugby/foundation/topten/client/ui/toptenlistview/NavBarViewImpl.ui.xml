@@ -19,10 +19,13 @@
     		<b:Dropdown text="Competition" ui:field='compDropdown'>
 
 		  	</b:Dropdown>
+		  	<b:Dropdown text="About Us" ui:field='contentDropdown'>
+
+		  	</b:Dropdown>
   		</b:NavPills>
     </b:Nav>
     <b:Nav alignment="RIGHT">
-    	<g:HTML styleName="btn {style.nobtn}"><div class="fb-like"  data-href="http://www.rugby.net/topten.html" data-width="0" data-layout="button_count" data-show-faces="false" data-send="true"></div></g:HTML>
+    	<g:HTML styleName="btn {style.nobtn}"><div class="fb-like"  data-href="http://www.rugby.net/fb/topten.html" data-width="0" data-layout="button_count" data-show-faces="false" data-send="true"></div></g:HTML>
     </b:Nav>
     <b:Nav alignment="RIGHT">
         	<b:NavPills ui:field="loginPanel" />

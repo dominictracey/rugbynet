@@ -1,6 +1,7 @@
 package net.rugby.foundation.topten.model.shared;
 
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.Position;
 
 import com.google.gwt.http.client.URL;
 
@@ -57,5 +58,12 @@ public interface ITopTenItem {
 	Long getParentId();
 
 	void setParentId(Long parentId);
+
+	public abstract Long getTeamId();
+	public abstract void setTeamId(Long teamId);
+
+	Position.position getPosition();
+
+	void setPosition(Position.position position);
 
 }

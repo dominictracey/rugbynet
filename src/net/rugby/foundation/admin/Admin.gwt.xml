@@ -9,7 +9,7 @@
 	<inherits name="com.google.gwt.logging.Logging"/>
 	<inherits name="com.github.gwtbootstrap.Bootstrap"/>
 <!-- 	<inherits name="net.rugby.foundation.game1.Game1" /> -->
-<!--  	<inherits name="net.rugby.foundation.core.Core" />  -->
+ 	<inherits name="net.rugby.foundation.core.Core" /> 
 	<entry-point class="net.rugby.foundation.admin.client.Admin"/>
 	<replace-with class="net.rugby.foundation.admin.client.ClientFactoryImpl">
 		<when-type-is class="net.rugby.foundation.admin.client.ClientFactory"/>

@@ -6,6 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.Position;
 
 import com.google.gwt.http.client.URL;
 import com.googlecode.objectify.annotation.Entity;
@@ -30,14 +31,16 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected String teamName;
 	//@Transient protected ITopTenList parent;
 	protected Long parentId;
-
+	protected Long teamId;
+	protected Position.position position;
+	
 	public TopTenItem() {
 		
 	}
 	
 	public TopTenItem(Long id, Long playerId, IPlayer player, String text,
 			String image, Long contributorId, Long editorId, boolean isSubmitted, 
-			String matchReportLink, String teamName, ITopTenList list) {
+			String matchReportLink, String teamName, Long teamId, Position.position position, ITopTenList list) {
 		super();
 		this.id = id;
 		this.playerId = playerId;
@@ -49,9 +52,11 @@ public class TopTenItem implements Serializable, ITopTenItem
 		this.isSubmitted = isSubmitted;
 		this.matchReportLink = matchReportLink;
 		this.teamName = teamName;
+		this.teamId = teamId;
 		this.parentId = list.getId();
 		//this.parent = list;
 		this.parentId = list.getId();
+		this.position = position;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.ITopTenItem#getId()
@@ -201,6 +206,22 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;
+	}
+	@Override
+	public Long getTeamId() {
+		return teamId;
+	}
+	@Override
+	public void setTeamId(Long teamId) {
+		this.teamId = teamId;
+	}
+	@Override
+	public Position.position getPosition() {
+		return position;
+	}
+	@Override
+	public void setPosition(Position.position position) {
+		this.position = position;
 	}
 
 }

@@ -575,14 +575,10 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		smartBar.setSchemas(result);
 
 	}
-	//	
-	//	private String getMatchMapKey(IMatchGroup m) {
-	//		Calendar cal = Calendar.getInstance();
-	//		cal.setTime(m.getDate());
-	//		cal.set(Calendar.HOUR_OF_DAY, 0);
-	//		cal.set(Calendar.MINUTE, 0);
-	//		cal.set(Calendar.SECOND, 0);
-	//		cal.set(Calendar.MILLISECOND, 0);
-	//		return cal.getTime().toString() + "**" + m.getDisplayName();
-	//	}
+
+
+	@Override
+	public SmartBar getSmartBar() {
+		return smartBar;
+	}
 }

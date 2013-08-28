@@ -10,8 +10,11 @@
         <b:Nav alignment="RIGHT">
         	<b:NavWidget ui:field='buttonBar'></b:NavWidget>
         </b:Nav>
-        <h3><g:HTML ui:field='name'></g:HTML></h3>
-        <b:Paragraph ui:field='text'></b:Paragraph>
+        <div style="text-align: left; margin: 10px 0px;"><div style="float: left; margin: 0px 10px 3px 0px;">
+            
+        <g:HTML ui:field='image'></g:HTML></div><h3><g:HTML ui:field='name'></g:HTML></h3> 
+            
+        <g:HTML ui:field='text'></g:HTML></div>
         <g:HTMLPanel ui:field='fblike'></g:HTMLPanel>
     </b:Well>
 

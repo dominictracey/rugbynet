@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -21,5 +22,8 @@ public interface TopTenListServiceAsync {
 	public void submitTopTenItem(ITopTenItem item,
 			AsyncCallback<ITopTenItem> asyncCallback);
 	public void getLatestForComp(Long compId, AsyncCallback<ITopTenList> asyncCallback);
+	public void getLatestListIdForComp(Long compId,
+			AsyncCallback<Long> asyncCallback);
+	public void getContentItems(AsyncCallback<List<IContent>> asyncCallback);
 
 }

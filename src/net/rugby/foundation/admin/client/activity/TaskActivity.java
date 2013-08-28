@@ -371,5 +371,10 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 		Window.alert("Not implemented");
 		
 	}
+	
+	@Override
+	public void createContent() {
+		clientFactory.createContent();
+	}
 
 }

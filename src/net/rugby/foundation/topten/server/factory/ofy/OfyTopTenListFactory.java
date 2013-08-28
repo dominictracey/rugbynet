@@ -162,6 +162,8 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 
 	@Override
 	protected void deleteFromPersistentDatastore(ITopTenList list) {
+		// first the items
+		ofy.delete(list.getList());
 		ofy.delete(list);
 	}
 

@@ -13,13 +13,13 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
  * @author home
  *
  */
-public class TestConfigurationFactory extends BaseConfigurationFactory implements IConfigurationFactory {
+public class TestConfigurationFactory extends BaseConfigurationFactory {
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IConfigurationFactory#get()
 	 */
 	@Override
-	public ICoreConfiguration getFromPersistentDatastore() {
+	public ICoreConfiguration getFromPersistentDatastore(Long id) {
 		ICoreConfiguration c = new CoreConfiguration();
 		c.addCompetition(1L, "Rugby.net Championships");
 		c.addCompetition(2L, "Heineken Cup");
@@ -35,6 +35,17 @@ public class TestConfigurationFactory extends BaseConfigurationFactory implement
 	public ICoreConfiguration putToPersistentDatastore(ICoreConfiguration conf) {
 		// NO-OP
 		return conf;
+	}
+
+	@Override
+	protected boolean deleteFromPersistentDatastore(ICoreConfiguration t) {
+		return true;
+	}
+
+	@Override
+	public ICoreConfiguration create() {
+		// TODO Auto-generated method stub
+		return new CoreConfiguration();
 	}
 
 }

@@ -42,8 +42,10 @@ import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
+import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
@@ -64,6 +66,7 @@ import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -128,6 +131,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IPlayerMatchStatsFetcherFactory pmsff;
 	private IMatchRatingEngineSchemaFactory mresf;
 	private ITopTenListFactory ttlf;
+	private ICachingFactory<IContent> ctf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -145,7 +149,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
 			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
-			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf) {
+			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, ICachingFactory<IContent> ctf) {
 		this.auf = auf;
 		this.ocf = ocf;
 		this.cf = cf;
@@ -171,6 +175,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		this.pmsff = pmsff;
 		this.mresf = mresf;
 		this.ttlf = ttlf;
+		this.ctf = ctf;
 	}
 
 	@Override
@@ -1279,6 +1284,43 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "createTopTenList " + ex.getMessage(), ex);		
 			return false;
+		}
+	}
+
+	@Override
+	public IContent createContent(Long id, String content) {
+		try {
+			IContent c = ctf.create();
+			if (id != null) {
+				c.setId(id);
+				ctf.put(c);
+			}
+			
+			if (content != null) {
+				c.setBody(content);
+				ctf.put(c);
+			}
+			
+			return c;
+			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public List<IContent> getContentList(boolean onlyActive) {
+		try {
+			List<IContent> lc = null;
+			if (ctf instanceof IContentFactory) {
+				lc = ((IContentFactory)ctf).getAll(onlyActive);
+			}
+			return lc;
+			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
 	}
 

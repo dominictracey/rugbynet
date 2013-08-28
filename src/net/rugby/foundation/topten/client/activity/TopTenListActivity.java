@@ -1,6 +1,8 @@
 package net.rugby.foundation.topten.client.activity;
 
 import java.util.Iterator;
+import java.util.List;
+
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -28,6 +30,7 @@ import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.TopTenListPlace;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText.EditTTITextPresenter;
@@ -105,36 +108,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 									public void onSuccess(ITopTenList result) {
 										view.setItemCount(0);
 
-										view.setList(result, coreConfig.getBaseToptenUrl());
-										
-										// do we have a player?
-										if (place.getPlayerId() != null) {
-											// find him in the list
-											IPlayer player = null;
-											Iterator<ITopTenItem> it = result.getList().iterator();
-											ITopTenItem item = null;
-											int count = 0;
-											while (it.hasNext() && player == null)	{
-												item = it.next();
-												if (item.getPlayerId().equals(place.getPlayerId())) {
-													player = item.getPlayer();
-												}
-												count++;
-											}
-											if (player != null) {
-												String title = "#" + count + ". " + item.getPlayer().getDisplayName() + " - " + result.getTitle();
-												Window.setTitle(title);
-											    NodeList<Element> tags = Document.get().getElementsByTagName("meta");
-											    for (int i = 0; i < tags.getLength(); i++) {
-											        MetaElement metaTag = ((MetaElement) tags.getItem(i));
-											        if (metaTag.getName().equals("title")) {
-											            metaTag.setContent(title);
-											        }
-											    }
-											} else {
-												Window.setTitle(result.getTitle());
-											}
-										}
+										view.setList(result, coreConfig.getBaseToptenUrlForFacebook());
 									}	
 								});
 							} else { // no listId
@@ -149,6 +123,21 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 								}
 							}
 						}
+						
+						// set up content list (ok to do it simultaneously for now)
+						clientFactory.getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// fail silent
+							}
+
+							@Override
+							public void onSuccess(List<IContent> result) {
+								view.setContent(result);
+							}
+							
+						});
 					}
 				});	
 			}
@@ -156,7 +145,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	}
 
 	private void showListForComp(Long compId) {
-		clientFactory.getRpcService().getLatestForComp(compId, new AsyncCallback<ITopTenList>() {
+		clientFactory.getRpcService().getLatestListIdForComp(compId, new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				// fail silently
@@ -164,16 +153,13 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 			}
 
 			@Override
-			public void onSuccess(ITopTenList result) {
-				view.setItemCount(0);
-				view.setList(result, coreConfig.getBaseToptenUrl());
-				Window.setTitle(result.getTitle());
-				//doSetup();
+			public void onSuccess(Long result) {
+				TopTenListPlace newPlace = new TopTenListPlace();
+				newPlace.setListId(result);
+				clientFactory.getPlaceController().goTo(newPlace);
 			}	
 		});
 	}
-
-
 
 
 	/* (non-Javadoc)
@@ -181,7 +167,6 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	 */
 	@Override
 	public void onLoginComplete(String destination) {
-
 		refreshButtons();
 	}
 
@@ -249,13 +234,6 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 					});
 				}
-
-				// Content Contributor buttons
-				it = view.getItemViews().iterator();
-				while (it.hasNext()) {
-					final TopTenItemView v = it.next();
-					setTTIButtons(v);
-				}
 			}
 		}
 	}
@@ -282,7 +260,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 			@Override
 			public void onSuccess(ITopTenItem result) {
 
-				v.setItem(result, v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrl());
+				v.setItem(result, v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrlForFacebook());
 				view.getList().getList().set(v.getIndex(), result);  // if we don't do this the references diverge
 
 				setTTIButtons(v); // admin buttons
@@ -305,7 +283,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				list.setList(result, coreConfig.getBaseToptenUrl());
+				list.setList(result, coreConfig.getBaseToptenUrlForFacebook());
 				refreshButtons();
 			}
 		});	}
@@ -324,7 +302,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				list.setList(result, coreConfig.getBaseToptenUrl());
+				list.setList(result, coreConfig.getBaseToptenUrlForFacebook());
 			}
 		});
 	}
@@ -343,7 +321,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenItem result) {
-				v.setItem(result,v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrl());
+				v.setItem(result,v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrlForFacebook());
 				view.getList().getList().set(v.getIndex(), result);  // if we don't do this the references diverge
 				clientFactory.getEditTTITextDialog().hide();
 			}
@@ -443,7 +421,9 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 		
 		// FB like for the whole list once all the items are set
 		if (view.getItemCount()>9) {
-			setFBListLike(view.getList(),coreConfig.getBaseToptenUrl());
+			setFBListLike(view.getList(),coreConfig.getBaseToptenUrlForFacebook());
+			refreshButtons();
+			view.setItemCount(0);
 		}
 
 	}
@@ -456,17 +436,16 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 		if (oldChild != null) {
 			e.removeChild(oldChild);
 		}
-		//fblike.clear();
-		//HTMLPanel fbLike = HTMLPanel.wrap(e);
-		String encodedUrl= URL.encode(baseUrl + "#List:listId=" + list.getId());
+
+		// so we have to include the specifics both in the GET query parameters and the hash fragment to support the FB linting. See:
+		// https://developers.facebook.com/tools/debug/og/object?q=http%3A%2F%2Fdev.rugby.net%2Ffb%2Ftopten.html%3FlistId%3D159002%26playerId%3D148002%23List%3AlistId%3D159002%26playerId%3D148002
+		String encodedUrl= URL.encode(baseUrl + "?listId=" + list.getId() + "#List:listId=" + list.getId());
 
 		HTML fb = new HTML("<div class=\"fb-like\" id=\"fbListLike\" data-width=\"450\" data-layout=\"button_count\" data-show-faces=\"true\" data-send=\"true\" data-href=\"" + encodedUrl + "\"></div>");
 
 		e.appendChild(fb.getElement());
 		parse("fbListLike");
-		//navbar.setFBLikeAttribute("data-href", baseUrl +"#List:listId=" + list.getId());
-		//topTenPanel.getElement().setAttribute("id", "topTenPanel");
-		//presenter.parse(topTenPanel);
+
 	}
 
 	/**

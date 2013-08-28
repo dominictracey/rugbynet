@@ -10,7 +10,6 @@ import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.BaseConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
-import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -20,7 +19,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
  * @author home
  *
  */
-public class OfyConfigurationFactory extends BaseConfigurationFactory implements IConfigurationFactory, Serializable {
+public class OfyConfigurationFactory extends BaseConfigurationFactory implements Serializable {
 	
 	/**
 	 * 
@@ -39,7 +38,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 	 * @see net.rugby.foundation.core.server.factory.IConfigurationFactory#get()
 	 */
 	@Override
-	public ICoreConfiguration getFromPersistentDatastore() {
+	public ICoreConfiguration getFromPersistentDatastore(Long id) {
 		Objectify ofy = DataStoreFactory.getOfy();
 		// there should just be one...
 		ICoreConfiguration c = ofy.query(CoreConfiguration.class).get();
@@ -71,6 +70,18 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.put(conf);
 		return conf;
+	}
+
+	@Override
+	protected boolean deleteFromPersistentDatastore(ICoreConfiguration t) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		ofy.delete(t);
+		return true;
+	}
+
+	@Override
+	public ICoreConfiguration create() {
+		return new CoreConfiguration();
 	}
 
 }

@@ -51,6 +51,10 @@
 			    <g:MenuItem ui:field="adminMenuCreateAdmin">Create Admin</g:MenuItem>
 			    <g:MenuItem ui:field="adminMenuSanityCheck">Sanity Check</g:MenuItem>
 			    <g:MenuItem ui:field="adminMenuFlushAllPipelineJobs">Flush All Pipeline Jobs</g:MenuItem>
+			    <g:MenuItem ui:field="adminMenuCreateContent">Create Content</g:MenuItem>
+			    <g:MenuItem ui:field="adminMenuEditContent">Edit Content
+			        <g:MenuBar ui:field="contentList" vertical="true"></g:MenuBar>
+			    </g:MenuItem>
 			</g:MenuBar>
 		</g:MenuItem>
 		

@@ -1,0 +1,28 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+
+    <b:Row>
+        <b:Column
+            offset="2"
+            size="9" >
+
+            <b:Well>
+
+                <g:HTMLPanel>
+
+                    <g:HTML ui:field="content" >
+                    </g:HTML>
+                </g:HTMLPanel>
+
+                <b:Nav alignment="RIGHT" >
+
+                    <b:NavWidget ui:field="buttonBar" >
+                    </b:NavWidget>
+                </b:Nav>
+            </b:Well>
+        </b:Column>
+    </b:Row>
+
+</ui:UiBinder>
