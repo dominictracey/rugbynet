@@ -3,8 +3,6 @@ package net.rugby.foundation.topten.model.shared;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.Position;
 
-import com.google.gwt.http.client.URL;
-
 public interface ITopTenItem {
 
 	public abstract Long getId();

@@ -31,39 +31,20 @@ public interface RugbyAdminServiceAsync {
 	public void fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, AsyncCallback<ICompetition> cb);
 	public void saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams, AsyncCallback<ICompetition> cb);
 	public void fetchTeams(String url, String resultType, AsyncCallback<Map<String, ITeamGroup>> cb);
-	public void saveTeams(Map<String, ITeamGroup> teams, AsyncCallback<Map<String, ITeamGroup>> cb);
 	public void fetchRounds(String url, Map<String, IMatchGroup> matches, AsyncCallback<List<IRound> > cb);
-	public void saveRounds(List<IRound> rounds, AsyncCallback<List<IRound>> cb);
 	public void fetchMatches(String url, Map<String, ITeamGroup> teams, AsyncCallback<Map<String, IMatchGroup>> cb);
-	public void saveMatches(Map<String, IMatchGroup> rounds, AsyncCallback<Map<String, IMatchGroup>> cb);
 	public void  getComps(Filter filter, AsyncCallback<List<ICompetition>> cb);
 	public void saveWorkflowConfig(IWorkflowConfiguration wfc, AsyncCallback<IWorkflowConfiguration> asyncCallback);
 	public void getOrchestrationConfiguration(AsyncCallback<Map<String, IOrchestrationConfiguration>> asyncCallback);
 	public void saveOrchestrationConfiguration(	Map<String, IOrchestrationConfiguration> configs,AsyncCallback<Map<String, IOrchestrationConfiguration>> asyncCallback);
-	/**
-	 * @param compId
-	 * @param asyncCallback
-	 */
-	public void getTeams(Long compId,
-			AsyncCallback<List<ITeamGroup>> asyncCallback);
-	/**
-	 * @param compId
-	 * @param asyncCallback
-	 */
-	public void getRounds(Long compId,
-			AsyncCallback<List<IRound>> asyncCallback);
+
 	/**
 	 * @param roundId
 	 * @param asyncCallback
 	 */
 	public void getMatches(Long roundId,
 			AsyncCallback<List<IMatchGroup>> asyncCallback);
-	/**
-	 * @param matchId
-	 * @param asyncCallback
-	 */
-	public void getResults(Long matchId,
-			AsyncCallback<List<IMatchResult>> asyncCallback);
+
 	/**
 	 * @param teamGroup
 	 * @param asyncCallback

@@ -1,53 +1,45 @@
 package net.rugby.foundation.topten.client.activity;
 
 import java.util.Iterator;
-import java.util.List;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.MetaElement;
-import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import net.rugby.foundation.core.client.Core;
-import net.rugby.foundation.core.client.Identity;
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
-import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.TopTenListPlace;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText.EditTTITextPresenter;
+import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo.EditTTLInfoPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenItemView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView.TopTenListViewPresenter;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
-public class TopTenListActivity extends AbstractActivity implements Presenter, EditTTITextPresenter, TopTenListViewPresenter  { 
+public class TopTenListActivity extends AbstractActivity implements Presenter, EditTTITextPresenter, TopTenListViewPresenter, EditTTLInfoPresenter  { 
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
 	 */
 	private ClientFactory clientFactory;
 	private TopTenListPlace place;
-	private ICoreConfiguration coreConfig;
+	//private ICoreConfiguration coreConfig;
 
 	private TopTenListView<ITopTenItem> view;
 
@@ -64,84 +56,54 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(view.asWidget());
+		view.setClientFactory(clientFactory);
 		view.setPresenter(this);
-		final Identity.Presenter identityPresenter = this;
-		// remember this is appears to be asynchronous but is really cached locally by the Core.
-		Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
+		//final Identity.Presenter identityPresenter = this;
+		clientFactory.RegisterIdentityPresenter(this);
 
+		clientFactory.doSetup(new AsyncCallback<ICoreConfiguration>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Hmm, something is wrong...");
+				// suffer in silence
 			}
 
 			@Override
-			public void onSuccess(final ICoreConfiguration config) {
-				final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
-				// where we keep the sign in/sign out
-				if (i.getParent() == null) {
-					view.setClientFactory(clientFactory);
-					i.setParent(view.getLoginPanel());
-					i.setPresenter(identityPresenter);
-				}
-				Core.getCore().login(new AsyncCallback<LoginInfo>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						//dealt with in the Core
-					}
-
-					@Override
-					public void onSuccess(LoginInfo result) {
-
-						coreConfig = config;
-						view.setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
-						if (place != null) {
-							if (place.getListId() != null) {
-								clientFactory.getRpcService().getTopTenList(place.getListId(), new AsyncCallback<ITopTenList>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										// fail silently
-										//Window.alert("Failed to fetch top ten list.");
-									}
-
-									@Override
-									public void onSuccess(ITopTenList result) {
-										view.setItemCount(0);
-
-										view.setList(result, coreConfig.getBaseToptenUrlForFacebook());
-									}	
-								});
-							} else { // no listId
-								// do we have a comp?
-								if (place.getCompId() == null) {
-									TopTenListPlace newPlace = new TopTenListPlace();
-									newPlace.setCompId(coreConfig.getDefaultCompId());
-									clientFactory.getPlaceController().goTo(newPlace);
-								} else {
-									// just use the comp from place
-									showListForComp(place.getCompId());
-								}
-							}
-						}
-						
-						// set up content list (ok to do it simultaneously for now)
-						clientFactory.getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
-
+			public void onSuccess(final ICoreConfiguration coreConfig) {
+				if (place != null) {
+					if (place.getListId() != null) {
+						clientFactory.getRpcService().getTopTenList(place.getListId(), new AsyncCallback<ITopTenList>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								// fail silent
+								// fail silently
+								//Window.alert("Failed to fetch top ten list.");
 							}
 
 							@Override
-							public void onSuccess(List<IContent> result) {
-								view.setContent(result);
-							}
-							
+							public void onSuccess(final ITopTenList ttl) {
+								view.setItemCount(0);
+								clientFactory.getNavBarView().collapseHero(false);
+								clientFactory.getNavBarView().getButtonBar().clear();
+								clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+								view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());	
+								
+								
+							}	
 						});
+					} else { // no listId
+						// do we have a comp?
+						if (place.getCompId() == null) {
+							TopTenListPlace newPlace = new TopTenListPlace();
+							newPlace.setCompId(coreConfig.getDefaultCompId());
+							clientFactory.getPlaceController().goTo(newPlace);
+						} else {
+							// just use the comp from place
+							showListForComp(place.getCompId());
+						}
 					}
-				});	
+				}
 			}
 		});
+
 	}
 
 	private void showListForComp(Long compId) {
@@ -167,13 +129,12 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	 */
 	@Override
 	public void onLoginComplete(String destination) {
-		refreshButtons();
+		clientFactory.getPlaceController().goTo(place);
 	}
 
 	private void refreshButtons() {
-		//Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "onLoginComplete callback with destination: " + destination);
+
 		LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
-		view.getButtonBar().clear();
 		if (view.getItemViews() != null && view.getList() != null) {
 
 			// next and prev buttons
@@ -211,7 +172,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 					} else /*if (view.getList().getLive().equals(true))*/ {
 						publish.setEnabled(false);
 					}
-					view.getButtonBar().add(publish);
+					clientFactory.getNavBarView().getButtonBar().add(publish);
 					publish.addClickHandler( new ClickHandler() {
 
 						@Override
@@ -224,12 +185,24 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 					});
 					Button delete = new Button("Delete");
 					delete.setType(ButtonType.DANGER);
-					view.getButtonBar().add(delete);
+					clientFactory.getNavBarView().getButtonBar().add(delete);
 					delete.addClickHandler( new ClickHandler() {
 
 						@Override
 						public void onClick(ClickEvent event) {
 							deleteTTL(view);
+						}
+
+					});
+
+					Button edit = new Button("Edit TTL Info");
+					edit.setType(ButtonType.DANGER);
+					clientFactory.getNavBarView().getButtonBar().add(edit);
+					edit.addClickHandler( new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent event) {
+							editTTL(view);
 						}
 
 					});
@@ -260,7 +233,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 			@Override
 			public void onSuccess(ITopTenItem result) {
 
-				v.setItem(result, v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrlForFacebook());
+				v.setItem(result, v.getIndex(), result.getPlayerId(), clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
 				view.getList().getList().set(v.getIndex(), result);  // if we don't do this the references diverge
 
 				setTTIButtons(v); // admin buttons
@@ -283,8 +256,10 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				list.setList(result, coreConfig.getBaseToptenUrlForFacebook());
-				refreshButtons();
+				list.setList(result, clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
+				clientFactory.getNavBarView().getButtonBar().clear();
+				clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+				//refreshButtons();
 			}
 		});	}
 
@@ -302,10 +277,12 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				list.setList(result, coreConfig.getBaseToptenUrlForFacebook());
+				list.setList(result, clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
 			}
 		});
 	}
+
+
 
 	@Override
 	public void saveTTIText(final TopTenItemView v) {
@@ -321,7 +298,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenItem result) {
-				v.setItem(result,v.getIndex(), result.getPlayerId(), coreConfig.getBaseToptenUrlForFacebook());
+				v.setItem(result,v.getIndex(), result.getPlayerId(), clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
 				view.getList().getList().set(v.getIndex(), result);  // if we don't do this the references diverge
 				clientFactory.getEditTTITextDialog().hide();
 			}
@@ -357,9 +334,9 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	@Override
 	public void setTTIButtons(final TopTenItemView v) {
 		LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
-		
+
 		view.setItemCount(view.getItemCount() +1);
-		
+
 		v.getButtonBar().clear();
 		if (login.isTopTenContentContributor()) {
 			//Badge edit = new Badge("Edit");				
@@ -418,12 +395,16 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 		//		else {
 		//			v.getButtonBar().clear();
 		//		}
-		
+
 		// FB like for the whole list once all the items are set
 		if (view.getItemCount()>9) {
-			setFBListLike(view.getList(),coreConfig.getBaseToptenUrlForFacebook());
+			setFBListLike(view.getList(),clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
 			refreshButtons();
 			view.setItemCount(0);
+			Element loadPanel = DOM.getElementById("loadPanel");
+			if (loadPanel != null && loadPanel.hasParentElement()) {
+				loadPanel.removeFromParent();
+			}
 		}
 
 	}
@@ -472,5 +453,34 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	public static native void parse (String domelementid) /*-{
             $wnd.FB.XFBML.parse(document.getElementById('domelementid'));
     }-*/;
+
+	private void editTTL(final TopTenListView<ITopTenItem> list) {
+		clientFactory.getEditTTLInfoDialog().setPresenter(this);
+		clientFactory.getEditTTLInfoDialog().showTTL(list.getList());
+		clientFactory.getEditTTLInfoDialog().center();
+	}
+
+
+
+	@Override
+	public void saveTTLInfo(ITopTenList list) {
+		clientFactory.getRpcService().saveTopTenList(list, new AsyncCallback<ITopTenList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save Top Ten List. See event log for details.");
+			}
+
+			@Override
+			public void onSuccess(ITopTenList result) {
+				clientFactory.getNavBarView().setHeroListInfo(result.getTitle(), result.getContent());
+				clientFactory.getEditTTLInfoDialog().hide();
+			}
+		});		
+	}
+
+	@Override
+	public void cancelEditTTLInfo(ITopTenList ttl) {
+		clientFactory.getEditTTLInfoDialog().hide();
+	}
 
 }

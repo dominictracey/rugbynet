@@ -20,4 +20,5 @@ public interface TopTenListService extends RemoteService {
 	public ITopTenList getLatestForComp(Long compId);
 	public Long getLatestListIdForComp(Long compId);
 	public List<IContent> getContentItems();
+	public ITopTenList saveTopTenList(ITopTenList list);
 }

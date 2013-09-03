@@ -2,11 +2,7 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -21,13 +17,12 @@ import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
-import net.rugby.foundation.admin.client.ui.portal.EditTTIText;
-import net.rugby.foundation.admin.client.ui.portal.EditTTIText.EditTTITextPresenter;
+import net.rugby.foundation.admin.client.ui.portal.EditTTLInfo;
+import net.rugby.foundation.admin.client.ui.portal.EditTTLInfo.EditTTLInfoPresenter;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresenter;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICountry;
-import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -37,7 +32,7 @@ import net.rugby.foundation.model.shared.Position.position;
 public class PortalActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, PortalViewPresenter<IPlayerMatchInfo>,
-PlayerListView.Listener<IPlayerMatchInfo>, EditTTITextPresenter { 
+PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter { 
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -47,7 +42,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTITextPresenter {
 	SelectionModel<IPlayerMatchInfo> selectionModel;
 	int index; // the task line item number
 	private PortalView<IPlayerMatchInfo> view;
-	private EditTTIText ttltext;
+	private EditTTLInfo ttltext;
 
 	public PortalActivity(PortalPlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IPlayerMatchInfo>();
@@ -242,7 +237,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTITextPresenter {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
+						Window.alert("Query failed: " + caught.getLocalizedMessage());
 						
 					}
 
@@ -319,7 +314,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTITextPresenter {
 	@Override
 	public void createTopTenList(TopTenSeedData data) {
 		if (ttltext == null) {
-			ttltext = new EditTTIText();
+			ttltext = new EditTTLInfo();
 		}
 
 		ttltext.setText("Top Ten List Properties");

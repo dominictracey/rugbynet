@@ -30,19 +30,14 @@ public interface RugbyAdminService extends RemoteService {
 	ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams);
 	ICompetition saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams);
 	Map<String, ITeamGroup> fetchTeams(String url, String resultType);
-	Map<String, ITeamGroup> saveTeams(Map<String, ITeamGroup> teams);
 	List<IRound>  fetchRounds(String url, Map<String, IMatchGroup> matches);
-	List<IRound> saveRounds(List<IRound> rounds);
 	Map<String, IMatchGroup> fetchMatches(String url, Map<String, ITeamGroup> teams);
-	Map<String, IMatchGroup> saveMatches(Map<String, IMatchGroup> matches);
 	List<ICompetition> getComps(Filter filter);
 	IWorkflowConfiguration saveWorkflowConfig(IWorkflowConfiguration wfc);
 	Map<String, IOrchestrationConfiguration> getOrchestrationConfiguration();
 	Map<String, IOrchestrationConfiguration> saveOrchestrationConfiguration(	Map<String, IOrchestrationConfiguration> configs);
-	List<ITeamGroup> getTeams(Long compId);
-	List<IRound> getRounds(Long compId);
-	List<IMatchGroup> getMatches(Long roundId);
-	List<IMatchResult> getResults(Long matchId);
+
+	List<IMatchGroup> getMatches(Long roundId);;
 	ITeamGroup saveTeam(ITeamGroup teamGroup);
 	ITeamGroup getTeam(Long teamId);
 	IPlayer getPlayer(Long id);

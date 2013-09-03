@@ -460,6 +460,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		try {
 			item.setSubmitted(!item.isSubmitted());
 			put(item);
+			
+			// refresh the containing list in memcache by deleting the record and forcing a refetch on the next get
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			syncCache.delete(item.getParentId());
+			
 			//			if (!item.isSubmitted() && item.getParent().getLive()) {
 			//				// if we retract an item on a published list, we need to unpublish the list.
 			//				publish(item.getParent());

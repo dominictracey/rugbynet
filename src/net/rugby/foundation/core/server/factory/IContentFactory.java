@@ -6,4 +6,6 @@ import net.rugby.foundation.model.shared.IContent;
 
 public interface IContentFactory extends ICachingFactory<IContent> {
 	List<IContent> getAll(Boolean onlyActive);
+
+	IContent getForDiv(String string);
 }

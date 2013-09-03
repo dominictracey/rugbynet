@@ -38,5 +38,11 @@ public class TestContentFactory extends BaseCachingFactory<IContent>  implements
 		return null;
 	}
 
+	@Override
+	public IContent getForDiv(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

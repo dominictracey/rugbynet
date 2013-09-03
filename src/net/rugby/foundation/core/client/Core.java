@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.core.client.ui.CreateClubhouse;
@@ -73,7 +76,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	
 	// a cache of IClubhouses. key clubhouseId, value IClubhouse.
 	//	Login agnostic
-	private Map<Long,IClubhouse> clubhouseMap = new HashMap<Long,IClubhouse>();
+	private Map<Long,IClubhouse> clubhouseMap = null;
 	
 	// the UI component for creating a new clubhouse
 	//	Login agnostic
@@ -117,7 +120,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void onModuleLoad() {
-		
+		Element element = DOM.getElementById("loadProgress");
+		if (element != null) {
+			element.getStyle().setWidth(60, Unit.PCT);
+		}
 		
 	}
 
@@ -315,7 +321,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			@Override
 			public void onSuccess(final IClubhouse result) {	
 				currentClubhouseId = result.getId();
-				clubhouseMap.put(result.getId(), result);
+				getClubhouseMap().put(result.getId(), result);
 				clubhouseList.add(result);
 				cb.onSuccess(result);
 				
@@ -412,8 +418,8 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void getClubhouse(final Long clubhouseId, final AsyncCallback<IClubhouse> cb) {
-		if (clubhouseMap.containsKey(clubhouseId)) {
-			cb.onSuccess(clubhouseMap.get(clubhouseId));
+		if (getClubhouseMap().containsKey(clubhouseId)) {
+			cb.onSuccess(getClubhouseMap().get(clubhouseId));
 		} else {
 			clientFactory.getRpcService().getClubhouse(clubhouseId, new AsyncCallback<IClubhouse> () {
 				@Override
@@ -423,7 +429,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	
 				@Override
 				public void onSuccess(IClubhouse result) {	
-					clubhouseMap.put(clubhouseId, result);
+					getClubhouseMap().put(clubhouseId, result);
 					cb.onSuccess(result);
 				}
 	
@@ -459,7 +465,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	public IClubhouse getCurrentClubhouse() {
 		assert (isInitialized());
-		return clubhouseMap.get(currentClubhouseId);
+		return getClubhouseMap().get(currentClubhouseId);
 	}
 
 	/* (non-Javadoc)
@@ -606,6 +612,14 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			contentMap = new HashMap<Long,IContent>();
 		}
 		return contentMap;
+	}
+	
+	private Map<Long,IClubhouse> getClubhouseMap() {
+		if (clubhouseMap == null) {
+			clubhouseMap = new HashMap<Long,IClubhouse>();
+		}
+		
+		return clubhouseMap;
 	}
 
 }

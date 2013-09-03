@@ -3,10 +3,6 @@ package net.rugby.foundation.topten.model.shared;
 import java.util.Date;
 import java.util.List;
 
-import net.rugby.foundation.model.shared.IPlayer;
-
-import com.google.gwt.http.client.URL;
-
 public interface ITopTenList {
 
 

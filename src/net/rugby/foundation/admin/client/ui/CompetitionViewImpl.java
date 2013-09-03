@@ -101,29 +101,9 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	}
 
-	//	@UiHandler("load")
-	//	void onLoadClick(ClickEvent e)  {
-	//		listener.loadCompsClicked(base);
-	//	}
-
 	@UiHandler("save")
 	void onSaveClick(ClickEvent e) {
-		if (step == Step.TEAMS) {
-			listener.saveTeamsClicked(teamMap);
-			fetch.setText("Fetch Matches");		
-			status.setText("Step 1a. Fetch Teams");
-			step=Step.MATCHES;
-		} else if (step == Step.MATCHES) {
-			listener.saveMatchesClicked(matchMap);
-			fetch.setText("Fetch Rounds");	
-			status.setText("Step 2a. Fetch Matches");
-			step = Step.ROUNDS;
-		} else if (step == Step.ROUNDS) {
-			listener.saveRoundsClicked(roundMap);
-			fetch.setText("Fetch Comp");	
-			status.setText("Step 3a. Fetch Rounds");
-			step = Step.COMP;
-		} else if (step == Step.COMP) {
+		if (step == Step.COMP) {
 			listener.saveCompetitionClicked(comp, teamMap);
 			status.setText("Done!");
 			step = Step.TEAMS;
@@ -137,24 +117,27 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	void onFetchClick(ClickEvent e) {	
 		if (step == Step.TEAMS) {
 			listener.fetchTeamsClicked(url.getText(), resultType.getItemText(0));
-			save.setText("Save Teams");
-			status.setText("Step 1b. Save Teams");
+			step=Step.MATCHES;
+			fetch.setText("Fetch Matches");
 		} else if (step == Step.MATCHES) {
 			listener.fetchMatchesClicked(teamMap);
-			save.setText("Save Matches");
-			status.setText("Step 2b. Save Matches");
+			step=Step.ROUNDS;
+			fetch.setText("Fetch Rounds");
 		} else if (step == Step.ROUNDS) {
 			listener.fetchRoundsClicked(matchMap);
-			save.setText("Save Rounds");
-			status.setText("Step 3b. Save Rounds");
+			step=Step.COMP;
+			fetch.setText("Fetch Comp");
 		} else if (step == Step.COMP) {
 			listener.fetchCompetitionClicked(roundMap);
 			save.setText("Save Comp");
-			status.setText("Step 4b. Save Comp");
+			save.setVisible(true);
+			fetch.setVisible(false);
+			return;
 		} 
 		save.setEnabled(false);
-		fetch.setVisible(false);
-		save.setVisible(true);
+		save.setVisible(false);
+		fetch.setVisible(true);
+		fetch.setEnabled(false);
 	}
 
 	@UiHandler("createAdmin")
@@ -224,11 +207,11 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 							listener.compClicked(editComp, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
 						}							
 					} else if (depth == 2) {  //teams or rounds clicked
-						if (event.getSelectedItem().getText().equals("teams")) {
-							listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-						}	else {
-							listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-						}							
+//						if (event.getSelectedItem().getText().equals("teams")) {
+//							listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+//						}	else {
+//							//listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+//						}							
 					} else if (depth == 3) { // specific team or round clicked
 						if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
 							editArea.clear();
@@ -278,14 +261,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						Long matchId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
 						listener.editMatchInit(editMatch, editMatchStats, matchId, roundId, compId);
 
-					} else if (depth == 5) { // results?
-						if (event.getSelectedItem().getText().equals("results")) {
-							listener.resultsClicked(
-									Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]),  // compId
-									Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),  // roundId
-									Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));  //matchId
-						}
-					}
+					} 
 				}
 			}
 		});
@@ -305,7 +281,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			}
 
 		}
-		save.setEnabled(true);
 		fetch.setEnabled(true);
 	}
 
@@ -313,8 +288,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public void showRounds(List<IRound>  rds) {
 		roundMap = rds;
 		rounds.removeItems();
-
-		save.setEnabled(true);
 		fetch.setEnabled(true);
 	}
 
@@ -340,7 +313,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 					matches.getChild(matches.getChildCount()-1).getElement().addClassName("gnu");
 				}
 			}		
-			save.setEnabled(true);
 			fetch.setEnabled(true);
 		}
 	}
@@ -360,7 +332,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			addRound(comp.getId(),r.getId(),r.getMatches());
 		}
 		save.setEnabled(true);
-		fetch.setEnabled(true);
 	}
 
 	/* (non-Javadoc)

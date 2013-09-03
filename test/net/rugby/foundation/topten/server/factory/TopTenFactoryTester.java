@@ -658,16 +658,34 @@ public class TopTenFactoryTester {
 		
 		assertTrue(ttl2.getId().equals(last.getId()));
 		
-		// refresh ttl
+		// publish second
+		ttf.publish(ttl2);
+		
+		// refresh ttls
 		ttl = ttf.get(ttl.getId());
+		ttl2 = ttf.get(ttl2.getId());
 		
 		// make sure next and prev are right
 		assertTrue(ttl.getNextId().equals(ttl2.getId()));
-		assertTrue(ttl.getNextPublishedId() == null);
+		assertTrue(ttl.getNextPublishedId().equals(ttl2.getId()));
 		assertTrue(ttl2.getPrevId().equals(ttl.getId()));
+		assertTrue(ttl2.getPrevPublishedId().equals(ttl.getId()));
 		
-		// so this is actually not true. Unpublished ttls don't maintain their published links
-		//assertTrue(ttl2.getPrevPublishedId().equals(ttl.getId()));
+		// create third
+		ITopTenList ttl3 = ttf.create(ttsd);
+		
+		// refresh ttls
+		ttl = ttf.get(ttl.getId());
+		ttl2 = ttf.get(ttl2.getId());
+		
+		assertTrue(ttl2.getNextId().equals(ttl3.getId()));
+		assertTrue(ttl2.getNextPublishedId() == null);
+		assertTrue(ttl2.getPrevId().equals(ttl.getId()));
+		assertTrue(ttl2.getPrevPublishedId().equals(ttl.getId()));
+		assertTrue(ttl3.getPrevId().equals(ttl2.getId()));
+		assertTrue(ttl3.getPrevPublishedId() == null);
+		assertTrue(ttl3.getNextId() == null);
+		assertTrue(ttl2.getNextPublishedId() == null);
 		deleteAll();
 	}
 }

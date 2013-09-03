@@ -1,13 +1,22 @@
 package net.rugby.foundation.topten.server;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+
+import net.rugby.foundation.core.server.factory.ICachingFactory;
+import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -25,16 +34,26 @@ public class MetaTagGenerator extends HttpServlet {
 
 	private ITopTenListFactory ttlf;
 	private IPlayerFactory pf;
+	private ICachingFactory<IContent> ctf;
+
+
+	private IContent details2Content;
+
+
+	private String details2Div;
 
 	@Inject
-	public MetaTagGenerator(ITopTenListFactory ttlf, IPlayerFactory pf, ITeamGroupFactory tf) {
+	public MetaTagGenerator(ITopTenListFactory ttlf, IPlayerFactory pf, ITeamGroupFactory tf, ICachingFactory<IContent> ctf) {
 		this.ttlf = ttlf;
 		this.pf = pf;
+		this.ctf = ctf;
 	}
 
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 
+		parseHTML();
+		
 		// so we can have as parameters:
 		//	1) none
 		//	2) a listId
@@ -137,98 +156,62 @@ public class MetaTagGenerator extends HttpServlet {
 				}
 			}
 			
-			resp.getWriter().print(second);
-			resp.getWriter().print(players);
+			String details2Div = getContent(players);
+			
 			resp.getWriter().print(third);
+			resp.getWriter().print(details2Div);
+			resp.getWriter().print(fifth);
 		} else {
 			resp.sendRedirect(req.getScheme() + "://" + req.getServerName() + "/404.html");
 			return;
 		}
 	}
 
+	private String getContent(String players) {
+		if (details2Content == null) {
+			details2Content = ((IContentFactory)ctf).getForDiv("details2");
+			
+			if (details2Content != null) {
+				details2Div = "<div id=\"details2\">" + details2Content.getBody().replaceFirst("<% players %>", players) + "</div>";
+			}
+		}
+		
+		return details2Div;
+	}
+
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		doPost(req,resp);
 	}
+	
+	private void parseHTML() {
+		if (first.isEmpty()) {
+			FileInputStream inputStream = null;
+		    try {
+		    	inputStream = new FileInputStream("topten.html");
+	
+		        String everything = IOUtils.toString(inputStream);
+		        
+		        String[] chunks = everything.split("(<!-- split -->|<div id=\"split\"></div>)");
+		        first = chunks[0];
+		        //second = chunks[1];
+		        third = chunks[2];
+		        //fourth = chunks[3];
+		        fifth = chunks[4];
+		        
+		        inputStream.close();
+		    } catch (Throwable ex) {
+		    	Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+		    } 
+		}
+	}
 
 	private String defaultTitle = "Rugby Network Weekly Top Ten Perfomances";
 	private String defaultDescription = "Weekly top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Aviva Premiership and Super Rugby.";
-	private String first = "<!doctype html><html>  <head>" +
-			"<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">" +
-			"<script type=\"text/javascript\" language=\"javascript\" src=\"/topten/topten.nocache.js\"></script>" +
-			"<script type=\"text/javascript\" language=\"javascript\" src=\"/core/core.nocache.js\"></script>"  +
-			"<!-- Bootstrap --><link href=\"/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\">";
-	private String second = "<meta property=\"og:type\" content=\"sport\" />" + 
-			"<meta name=\"google-site-verification\" content=\"UlslUtViFtnEFDorsx8irllq-I5bqyXWLxAH9HeVbsI\" />" +
-			"<!-- spiders -->" +
-			"<META HTTP-EQUIV=\"CONTENT-LANGUAGE\" CONTENT=\"EN\">" +
-			"<META NAME=\"revisit-after\" CONTENT=\"7 days\">" +
-			"<META NAME=\"robots\" CONTENT=\"all\">" +
-			"<META NAME=\"Author\" CONTENT=\"Rugby Network\">" +
-			"<META NAME=\"Copyright\" CONTENT=\"Copyright 2013 RUGBY.NET LLC\">" +
-			"<!-- Weekly top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Aviva Premiership and Super Rugby.  -->" +
-			"<!-- Google Analytics -->" +
-			"<script type=\"text/javascript\">" +
-			"  var _gaq = _gaq || [];" +
-			"  _gaq.push(['_setAccount', 'UA-2626751-1']);" +
-			"  _gaq.push(['_setDomainName', 'rugby.net']);" +
-			"  _gaq.push(['_trackPageview']);" +
-			"" +
-			"  (function() {" +
-			"    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;" +
-			"    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';" +
-			"    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);" +
-			"  })();" +
-			"</script>" +
-			"<link href=\"/bootstrap/css/bootstrap-responsive.css\" rel=\"stylesheet\">" +
-			"<link href=\"/stylesheets/push.css\" rel=\"stylesheet\">" +
-			"<link href=\"/stylesheets/openid.css\" rel=\"stylesheet\">" +
-			"</head>" +
-			"<body>" +
-			"<div id=\"wrap\">" +
-			"<div id=\"navbar\"></div>" +
-			"<div class=\"hero-unit\" id=\"hero\">" +
-			"  <h3 id=\"heading\"></h3>" +
-			"  <p id=\"details1\"></p>" +
-			"  <p id=\"details2\">Check back every Monday for Top Ten Performances from global competitions. We have coverage for The Rugby Championship, Aviva Premiership, Six Nations, Super Rugby and Rugby World Cup - with others to follow! ";
-private String third = " Please like us on Facebook and let us know which choices you agree with by liking below!</p>" +
-			"  <div id=\"fbLike\"> </div>" +
-			"</div>" +
-			"<div class=\"span2\"></div>" +
-			"<script async src=\"http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\"></script>" +
-			"<!-- top ten top banner -->" +
-			"<ins class=\"adsbygoogle\"" +
-			"     style=\"display:inline-block;width:728px;height:90px\"" +
-			"     data-ad-client=\"ca-pub-9355939918394201\"" +
-			"     data-ad-slot=\"1278737769\"></ins>" +
-			"<script>" +
-			"(adsbygoogle = window.adsbygoogle || []).push({});" +
-			"</script>" +
-			"<div id=\"app\" style=\"padding-top:20px\"></div>" +
-			"<div id=\"fb-root\"></div>" +
-			"<script>(function(d, s, id) {" +
-			"  var js, fjs = d.getElementsByTagName(s)[0];" +
-			"  if (d.getElementById(id)) return;" +
-			"  js = d.createElement(s); js.id = id;" +
-			"  js.src = \"//connect.facebook.net/en_US/all.js#xfbml=1&appId=499268570161982\";" +
-			"  fjs.parentNode.insertBefore(js, fjs);" +
-			"}(document, 'script', 'facebook-jssdk'));</script>" +
-			"<div id=\"push\"></div></div>" +
-			"	<div id=\"footer\">" +
-			"<div class='navbar'>" +
-			"<div class='navbar-inner'>" +
-			"	<div class='container'>" +
-			"		<ul  id='footerLinks' class='nav'>" +
-			"			<li>" +
-			"				<span class='nav'>&copy; 2011-2013 RUGBY.NET LLC</span>" +
-			"			</li>" +
-			"		</ul>" +
-			"	</div>" +					
-			"</div>" +
-			"</div>" +
-			"	</div>" +
-			"   <iframe src=\"javascript:''\" id=\"__gwt_historyFrame\" tabIndex='-1' style=\"position:absolute;width:0;height:0;border:0\"></iframe>" +
-			"" +
-			"  </body>" +
-			"</html>";
+
+	private String first = "";
+	//private String second = "";
+	private String third = "";
+	//private String fourth = "";
+	private String fifth = "";
 }

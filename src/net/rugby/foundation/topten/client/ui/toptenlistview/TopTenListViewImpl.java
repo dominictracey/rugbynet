@@ -3,16 +3,12 @@ package net.rugby.foundation.topten.client.ui.toptenlistview;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.NavPills;
-import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
@@ -25,8 +21,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -42,7 +36,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 	@UiField Button prevButton;
 	@UiField Button nextButton;
 
-	NavBarViewImpl navbar;
+	//NavBarViewImpl navbar;
 
 	List<TopTenItemView> itemList;
 	private ITopTenList list;
@@ -54,7 +48,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 	private net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView.TopTenListViewPresenter presenter;
 
 
-	//private ClientFactory clientFactory;
+	private ClientFactory clientFactory;
 
 
 	@UiTemplate("TopTenListViewImpl.ui.xml")
@@ -67,8 +61,8 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 	public TopTenListViewImpl()
 	{
 		// add the login bar to the top
-		navbar = new NavBarViewImpl();
-		RootPanel.get("navbar").add(navbar);
+//		navbar = new NavBarViewImpl();
+//		RootPanel.get("navbar").add(navbar);
 
 		initWidget(uiBinder.createAndBindUi(this));
 		prevButton.setIconSize(IconSize.LARGE);
@@ -84,7 +78,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 		list = result;
 		//setVisible(false);
 		if (result != null) {
-			navbar.setHeroListInfo(result.getTitle(),result.getContent());
+			clientFactory.getNavBarView().setHeroListInfo(result.getTitle(),result.getContent());
 
 			if (list.getPrevPublishedId() != null) {
 				prevButton.setEnabled(true);
@@ -115,7 +109,6 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 							itemList.add(itemView);
 							items.add(itemView);
 							presenter.setTTIButtons(itemView);
-							//presenter.parse(itemView);
 						}
 					});
 				}
@@ -125,8 +118,8 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 			//setVisible(true);
 		} else {
 			items.clear();
-			navbar.setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
-			navbar.setDetails("Check back every Monday for top ten performances from competitions.");
+			clientFactory.getNavBarView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
+			//clientFactory.getNavBarView().setDetails("Check back every Monday for top ten performances from competitions.");
 			prevButton.setEnabled(false);
 			nextButton.setEnabled(false);
 		}
@@ -140,31 +133,9 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 	}
 
 
-
-
-
-	@Override
-	public void addLoginPanel(HorizontalPanel acct) {
-		navbar.addLoginPanel(acct);
-
-	}
-
-
-	@Override
-	public NavPills getLoginPanel() {
-		return navbar.getLoginPanel();
-	}
-
-
 	@Override
 	public List<TopTenItemView> getItemViews() {
 		return itemList;
-	}
-
-
-	@Override
-	public NavWidget getButtonBar() {
-		return navbar.getButtonBar();
 	}
 
 	@UiHandler("prevButton")
@@ -199,16 +170,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 
 	@Override
 	public void setClientFactory(ClientFactory clientFactory) {
-		//this.clientFactory = clientFactory;
-		navbar.setClientFactory(clientFactory);
-	}
-
-
-	@Override
-	public void setComps(Map<Long, String> competitionMap,
-			List<Long> compsUnderway) {
-		navbar.setComps(competitionMap, compsUnderway);
-
+		this.clientFactory = clientFactory;
 	}
 	
 	@Override
@@ -222,10 +184,6 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 	}
 
 
-	@Override
-	public void setContent(List<IContent> result) {
-		navbar.setContent(result);
-		
-	}
+
 
 }

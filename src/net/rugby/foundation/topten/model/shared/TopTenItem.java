@@ -8,7 +8,6 @@ import javax.persistence.Transient;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.Position;
 
-import com.google.gwt.http.client.URL;
 import com.googlecode.objectify.annotation.Entity;
 
 @Entity

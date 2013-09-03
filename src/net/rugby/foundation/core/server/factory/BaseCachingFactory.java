@@ -12,8 +12,6 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.inject.TypeLiteral;
-
 import net.rugby.foundation.model.shared.HasId;
 
 
@@ -140,10 +138,10 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 				ByteArrayInputStream bis = new ByteArrayInputStream(value);
 				ObjectInput in = new ObjectInputStream(bis);
 				Object obj = in.readObject();
-//				TypeLiteral<List<T>> typeLiteral = new TypeLiteral<List<T>>() {};
-//				if (typeLiteral.equals(obj.getClass())) {  // can't do 'obj instanceof List<T>' *sadfase*
-					mr = (List<T>)obj;
-//				}
+
+				//				if (typeLiteral.equals(obj.getClass())) {  // can't do 'obj instanceof List<T>' *sadfase*
+				mr = (List<T>)obj;
+
 
 				bis.close();
 				in.close();
@@ -159,28 +157,89 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 	/**
 	 * 
 	 * @param key - memcache key to store (consider using this.getClass() + "descriptor")
-	 * @param list - List<T> to store
+	 * @param list - List<T> to store or null to clear entry
 	 * @return true if successful storing
 	 */
 	protected boolean putList(String key, List<T> list) {
 		try {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(key);
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutput out = new ObjectOutputStream(bos);   
-			out.writeObject(list);
-			byte[] yourBytes = bos.toByteArray(); 
+			if (list != null) {
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutput out = new ObjectOutputStream(bos);   
+				out.writeObject(list);
+				byte[] yourBytes = bos.toByteArray(); 
 
-			out.close();
-			bos.close();
+				out.close();
+				bos.close();
 
-			syncCache.put(key, yourBytes);
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list at " + key + " *** \n" + syncCache.getStatistics());
-
+				syncCache.put(key, yourBytes);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list at " + key + " *** \n" + syncCache.getStatistics());
+			}
 			return true;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return false;
 		}
 	}
+
+	public T getItem(String divKey) {
+		try {
+			byte[] value = null;
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			T mr = null;
+
+			value = (byte[])syncCache.get(divKey);
+			if (value == null) {
+				return null;
+			} else {
+
+				// send back the cached version
+				ByteArrayInputStream bis = new ByteArrayInputStream(value);
+				ObjectInput in = new ObjectInputStream(bis);
+				Object obj = in.readObject();
+
+				//				if (typeLiteral.equals(obj.getClass())) {  // can't do 'obj instanceof T' *sadfase*
+				mr = (T)obj;
+
+
+				bis.close();
+				in.close();
+
+			}
+			return mr;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param divKey - key to store 
+	 * @param content - value to store or null to delete key
+	 * @return false on exception caught
+	 */
+	public boolean putItem(String divKey, T content) {
+		try {
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			syncCache.delete(divKey);
+			if (content != null) {
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutput out = new ObjectOutputStream(bos);   
+				out.writeObject(content);
+				byte[] yourBytes = bos.toByteArray(); 
+
+				out.close();
+				bos.close();
+
+				syncCache.put(divKey, yourBytes);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list at " + divKey + " *** \n" + syncCache.getStatistics());
+			}
+			return true;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return false;
+		}	}
 }

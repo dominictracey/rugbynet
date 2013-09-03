@@ -35,28 +35,15 @@ public interface CompetitionView extends IsWidget {
 		void fetchTeamsClicked(String text, String itemText);
 		void fetchMatchesClicked(Map<String,ITeamGroup> teams);
 		void fetchRoundsClicked(Map<String, IMatchGroup> matches);
-		void saveMatchesClicked(Map<String, IMatchGroup> matchMap);
-		void saveRoundsClicked(List<IRound> roundMap);
-		void saveTeamsClicked(Map<String, ITeamGroup> teamMap);
+
 		void saveCompetitionClicked(ICompetition comp, Map<String,ITeamGroup> teams);
 
-		/**
-		 * @param compID
-		 */
-		void teamsClicked(Long parseLong);
-		/**
-		 * @param compID
-		 */
-		void roundsClicked(Long parseLong);
 		/**
 		 * @param compId
 		 * @param roundId
 		 */
 		void roundClicked(Long parseLong, Long parseLong2);
-		/**
-		 * @param parseLong
-		 */
-		void resultsClicked(Long compId, Long roundId, Long matchID);
+
 		/**
 		 * @param editTeam
 		 * @param parseLong

@@ -20,11 +20,13 @@ public class BPMServletModule extends ServletModule {
 		serve("/core/CoreService").with(CoreServiceImpl.class);
 		serve("/topten/TopTenService").with(TopTenServiceImpl.class);
 		serve("/login/*").with(LoginServlet.class);
+		serve("/_ah/login/*").with(LoginServlet.class);
 		serve("/util/facebook/channel.html").with(FacebookChannelServlet.class);
 		serve("/_ah/start").with(BackEndStartupServlet.class);
 		serve("/fb/core/CoreService").with(CoreServiceImpl.class);
 		serve("/fb/topten/TopTenService").with(TopTenServiceImpl.class);
 		serve("/fb/topten.html").with(MetaTagGenerator.class);
+		serve("/_ah/login_required").with(LoginRequiredServlet.class);
 //		serve("/_ah/pipeline/*").with(PipelineServlet.class); // not @Singleton
 	}
 }

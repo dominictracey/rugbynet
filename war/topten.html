@@ -2,27 +2,38 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <script type="text/javascript" language="javascript" src="topten/topten.nocache.js"></script>
-    <script type="text/javascript" language="javascript" src="core/core.nocache.js"></script>
-    
+	<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <script type="text/javascript" language="javascript" src="/core/core.nocache.js"></script>
+    <script type="text/javascript" language="javascript" src="/topten/topten.nocache.js"></script>   
+    <link href="/stylesheets/push.css" rel="stylesheet">
+	<link href="/stylesheets/openid.css" rel="stylesheet">
     <!-- Bootstrap -->
-<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 
-<!-- Facebook, etc. -->
+
+<!-- split -->
+<!-- Facebook Open Graph -->
 <meta property="og:image" content="http://www.rugby.net/resources/banner_150.jpg" />
 <meta property="og:type" content="sport" />
-<meta name="google-site-verification" content="UlslUtViFtnEFDorsx8irllq-I5bqyXWLxAH9HeVbsI" />
+<meta property="og:url" content="http://www.rugby.net/topten.html" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="Weekly top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Aviva Premiership and Super Rugby. " />
+<meta property="og:title" content="Rugby Network Top Ten Performances"/>
 
 <!-- spiders -->
-<META NAME="keywords" CONTENT="rugby, The Rugby Championship, Rugby World Cup, rugby union, Aviva Premiership, Super Rugby, All Blacks, Wallabies, Springboks, Richie McCaw">
-<META NAME="description" CONTENT="Weekly top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Aviva Premiership and Super Rugby. ">
-<META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="EN">
-<META NAME="revisit-after" CONTENT="7 days">
-<META NAME="robots" CONTENT="all">
-<META NAME="title" CONTENT="Rugby Network">
-<META NAME="Author" CONTENT="Rugby Network">
-<META NAME="Copyright" CONTENT="Copyright 2013 RUGBY.NET LLC">
-<!-- Weekly top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Aviva Premiership and Super Rugby.  -->
+<meta name="keywords" content="rugby, The Rugby Championship, Rugby World Cup, rugby union, Aviva Premiership, Super Rugby, All Blacks, Wallabies, Springboks, Richie McCaw">
+<meta name="description" content="Weekly top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Aviva Premiership and Super Rugby. ">
+<meta name="title" content="Rugby Network">
+<title>Top Ten Performances from Rugby Network</title>
+<!-- split -->
+
+<meta HTTP-EQUIV="content-LANGUAGE" content="EN">
+<meta name="revisit-after" content="7 days">
+<meta name="robots" content="all">
+
+<meta name="Author" content="Rugby Network">
+<meta name="Copyright" content="Copyright 2013 RUGBY.NET LLC">
+<meta name="google-site-verification" content="UlslUtViFtnEFDorsx8irllq-I5bqyXWLxAH9HeVbsI" />
 
 
 <!-- Google Analytics -->
@@ -41,17 +52,23 @@
 
 </script>
 
-<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-<link href="stylesheets/push.css" rel="stylesheet">
-<link href="stylesheets/openid.css" rel="stylesheet">
+
+
 </head>
 <body>
 <div id="wrap">
+<div id="loadPanel" class="modal-backdrop" style="height: 100%; width: 100%;">
+	<div class="progress progress-striped active" style="position: absolute; width: 80%; top: 50%; left: 10%; " >
+		<div id="loadProgress" class="bar" style="width: 20%;"></div>
+	</div>
+</div>
 <div id="navbar"></div>
 <div class="hero-unit" id="hero">
   <h3 id="heading"></h3>
   <p id="details1"></p>
-  <p id="details2">Check back every Monday for Top Ten performances from global competitions. We have coverage for The Rugby Championship, Aviva Premiership, Six Nations, Super Rugby and Rugby World Cup - with others to follow! </p>
+  <div id="split"></div>
+  <div id="details2"></div>
+	<div id="split"></div>
   <div id="fbLike"> </div>
 </div>
 <div class="span2"></div>
@@ -81,10 +98,9 @@
 	<div id="footer">
 		<div class="navbar">
 			<div class="navbar-inner">
-				<div class="container">
+				<div class="container" style="width:960px;">
 					<ul  id="footerLinks" class="nav">
-						<li>
-							<span class="nav">&copy; 2011-2013 RUGBY.NET LLC</span>
+						<li style="padding-top:10px;">&copy; 2011-2013 RUGBY.NET LLC
 						</li>
 					</ul>
 				</div>

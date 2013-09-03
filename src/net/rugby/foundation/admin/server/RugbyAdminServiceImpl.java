@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.codec.digest.DigestUtils;
 
 import net.rugby.foundation.admin.client.RugbyAdminService;
@@ -71,6 +74,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITopTenUser;
+import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
@@ -86,6 +90,9 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.pipeline.Job;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.JobSetting;
@@ -104,7 +111,6 @@ import com.googlecode.objectify.Query;
 @Singleton
 public class RugbyAdminServiceImpl extends RemoteServiceServlet implements RugbyAdminService {
 
-	//private Objectify ofy;
 	private IAppUserFactory auf;
 	private IOrchestrationConfigurationFactory ocf;
 	private ICompetitionFactory cf;
@@ -135,10 +141,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
+		try {
+			queuer = new OrchestrationHelper();
 
-		//		ofy = DataStoreFactory.getOfy();
-		queuer = new OrchestrationHelper();
-
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+		}
 	}
 
 	@Inject
@@ -150,251 +158,354 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
 			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, ICachingFactory<IContent> ctf) {
-		this.auf = auf;
-		this.ocf = ocf;
-		this.cf = cf;
-		this.ef = ef;
-		this.mf = mf;
-		this.mef = mef;
-		this.ref = ref;
-		this.fcff = fcff;
-		this.ccf = ccf;
-		this.tf = tf;
-		this.rf = rf;
-		this.pf = pf;
-		this.tmsf = tmsf;
-		this.pmsf = pmsf;
-		this.countryf = countryf;
-		this.wfcf = wfcf;
-		this.srff = srff;
-		this.mref = mref;
-		this.pmrf = pmrf;
-		this.atf = atf;
-		this.pmif = pmif;
-		this.mrf = mrf;
-		this.pmsff = pmsff;
-		this.mresf = mresf;
-		this.ttlf = ttlf;
-		this.ctf = ctf;
+		try {
+			this.auf = auf;
+			this.ocf = ocf;
+			this.cf = cf;
+			this.ef = ef;
+			this.mf = mf;
+			this.mef = mef;
+			this.ref = ref;
+			this.fcff = fcff;
+			this.ccf = ccf;
+			this.tf = tf;
+			this.rf = rf;
+			this.pf = pf;
+			this.tmsf = tmsf;
+			this.pmsf = pmsf;
+			this.countryf = countryf;
+			this.wfcf = wfcf;
+			this.srff = srff;
+			this.mref = mref;
+			this.pmrf = pmrf;
+			this.atf = atf;
+			this.pmif = pmif;
+			this.mrf = mrf;
+			this.pmsff = pmsff;
+			this.mresf = mresf;
+			this.ttlf = ttlf;
+			this.ctf = ctf;
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+		}
 	}
+
+	private boolean checkAdmin() {
+		try {
+			if (UserServiceFactory.getUserService().isUserAdmin()) {
+				return true;
+			} else {
+				return false;
+			}
+//			IAppUser u = getAppUser();
+//			if (u != null && u.isAdmin()) {
+//				return true;
+//			} else {
+//				String user = "a not logged on user ";
+//				if (u != null) {
+//					user = "The user " + u.getEmailAddress() + " (" + u.getId() + ")";
+//				}
+//				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, user + " is trying to access admin functions");
+//				return false;
+//			}
+		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return false;
+		}
+	}
+
+
+
+//	private IAppUser getAppUser()
+//	{
+//		try {
+////			UserService service =UserServiceFactory.getUserService();
+////			User u = service.getCurrentUser();
+//			
+//			// do they have a session going?
+//			HttpServletRequest request = this.getThreadLocalRequest();
+//			HttpSession session = request.getSession(false);
+//			if (session != null) {
+//				LoginInfo loginInfo = (LoginInfo) session.getAttribute("loginInfo");
+//				if (loginInfo.isLoggedIn()) {
+//					auf.setEmail(loginInfo.getEmailAddress());
+//					return auf.get();
+//				}
+//			}
+//			return null;
+//		} catch (Throwable e) {
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+//			return null;
+//		}
+//	}
 
 	@Override
 	public ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams) {
-		IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
+		try {
+			if (checkAdmin()) {
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
 
-		ICompetition comp = fetcher.getCompetition(url, rounds, teams);
+				ICompetition comp = fetcher.getCompetition(url, rounds, teams);
 
-		// do we have this in our database?
-		List<ICompetition> comps = cf.getAllComps();
-		ICompetition compDB = null;
-		for (ICompetition dBComp : comps) {
-			if (dBComp.getLongName().equals(comp.getLongName())) {
-				cf.setId(comp.getId());
-				compDB = dBComp; //cf.getCompetition();//ofy.query(Competition.class).filter("longName", comp.getLongName()).get();				
+				// do we have this in our database?
+				List<ICompetition> comps = cf.getAllComps();
+				ICompetition compDB = null;
+				for (ICompetition dBComp : comps) {
+					if (dBComp.getLongName().equals(comp.getLongName())) {
+						cf.setId(comp.getId());
+						compDB = dBComp; //cf.getCompetition();//ofy.query(Competition.class).filter("longName", comp.getLongName()).get();				
+					}
+				}
+
+				if (compDB != null) {
+					return compDB;
+				} else {
+					// add the rounds for them
+					ArrayList<Long> rids = new ArrayList<Long>();
+					for (IRound r : rounds) {
+						rids.add(r.getId());
+					}
+					comp.setRoundIds(rids);
+					comp.setRounds(rounds);
+					return comp;
+				}
+			} else {
+				return null;
 			}
-		}
-
-		if (compDB != null) {
-			return compDB;
-		} else {
-			// add the rounds for them
-			ArrayList<Long> rids = new ArrayList<Long>();
-			for (IRound r : rounds) {
-				rids.add(r.getId());
-			}
-			comp.setRoundIds(rids);
-			comp.setRounds(rounds);
-			return comp;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
 	}
 
+
+
 	@Override
 	public ICompetition saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams) {
+		try {
+			if (checkAdmin()) {
+				cf.put(comp);
 
-		cf.put(comp);
+				// there should just be one...
+				ICoreConfiguration c = ccf.get();
 
-		// there should just be one...
-		ICoreConfiguration c = ccf.get();
+				c.addCompetition(comp.getId(), comp.getShortName());
+				if (comp.getUnderway()) {
+					c.addCompUnderway(comp.getId());
+				} else {
+					c.removeCompUnderway(comp.getId());
+				}
+				//c.setDefaultCompId(comp.getId());
+				ccf.put(c);
 
-		c.addCompetition(comp.getId(), comp.getShortName());
-		if (comp.getUnderway()) {
-			c.addCompUnderway(comp.getId());
-		} else {
-			c.removeCompUnderway(comp.getId());
+				//add it to the workflow configuration as well
+				//		IWorkflowConfiguration wfc = wfcf.get();
+				//		boolean found = false;
+				//		for (Long id : wfc.getUnderwayCompetitions()) {
+				//			if (id.equals(comp.getId())) {
+				//				found = true;
+				//				break;
+				//			}
+				//		}
+				//		
+				//		if (!found) {
+				//			wfc.getUnderwayCompetitions().add(comp.getId());
+				//			wfcf.put(wfc);
+				//		}
+
+				// and a blank orchestration config
+				ocf.setId(null);
+				ocf.setCompId(comp.getId());
+				IOrchestrationConfiguration oc = ocf.get();
+
+				// if we didn't find one, make one
+				if (oc == null) {
+					ocf.setCompId(null);
+					oc = ocf.get();
+					assert (oc != null);
+					oc.setCompID(comp.getId());
+					ocf.put(oc);
+				}
+
+				return comp;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-		//c.setDefaultCompId(comp.getId());
-		ccf.put(c);
-
-		//add it to the workflow configuration as well
-		//		IWorkflowConfiguration wfc = wfcf.get();
-		//		boolean found = false;
-		//		for (Long id : wfc.getUnderwayCompetitions()) {
-		//			if (id.equals(comp.getId())) {
-		//				found = true;
-		//				break;
-		//			}
-		//		}
-		//		
-		//		if (!found) {
-		//			wfc.getUnderwayCompetitions().add(comp.getId());
-		//			wfcf.put(wfc);
-		//		}
-
-		// and a blank orchestration config
-		ocf.setId(null);
-		ocf.setCompId(comp.getId());
-		IOrchestrationConfiguration oc = ocf.get();
-
-		// if we didn't find one, make one
-		if (oc == null) {
-			ocf.setCompId(null);
-			oc = ocf.get();
-			assert (oc != null);
-			oc.setCompID(comp.getId());
-			ocf.put(oc);
-		}
-
-		return comp;
 	}
 
 
 	@Override
 	public Map<String, ITeamGroup> fetchTeams(String url, String resultType) {
-		CountryLoader cloader = new CountryLoader();
-		cloader.Run(countryf);
+		try {
+			if (checkAdmin()) {
 
-		IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
+				CountryLoader cloader = new CountryLoader();
+				cloader.Run(countryf);
 
-		Map<String, ITeamGroup> teams = fetcher.getTeams();
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
 
-		// sometimes the points table isn't up yet so we don't get anything back, this is ok.
-		if (teams != null && !teams.isEmpty()) {
-			// do we have this in our database? If so, replace the fetched one with the one that already has an ID
-			for (ITeamGroup foundTeam: teams.values()) {
-				//Query<Group> team = ofy.query(Group.class).filter("displayName", name);
-				ITeamGroup t = tf.find(foundTeam);
-				if (t != null) {
-					teams.put(foundTeam.getDisplayName(), t);
-				}				
+				Map<String, ITeamGroup> teams = fetcher.getTeams();
+
+				// sometimes the points table isn't up yet so we don't get anything back, this is ok.
+				if (teams != null && !teams.isEmpty()) {
+					// do we have this in our database? If so, replace the fetched one with the one that already has an ID
+					for (ITeamGroup foundTeam: teams.values()) {
+						//Query<Group> team = ofy.query(Group.class).filter("displayName", name);
+						ITeamGroup t = tf.find(foundTeam);
+						if (t != null) {
+							teams.put(foundTeam.getDisplayName(), t);
+						}				
+					}
+				}
+
+				return teams;
+			} else {
+				return null;
 			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		return teams;
-
 	}
 
+	//
+	//	@Override
+	//	public Map<String, ITeamGroup> saveTeams(Map<String, ITeamGroup> teams) {
+	//		try {
+	//			if (checkAdmin()) {
+	//		return teams; //deprecated
+	//		//		ofy.put(teams.values());
+	//		//		return teams;
+	//	}
 
-	@Override
-	public Map<String, ITeamGroup> saveTeams(Map<String, ITeamGroup> teams) {
-
-		return teams; //deprecated
-		//		ofy.put(teams.values());
-		//		return teams;
-	}
-
-
-	@Override
-	public List<IRound> saveRounds(List<IRound> rounds) {
-		return rounds; //deprecated
-		//		ofy.put(rounds);
-		//		return rounds;
-	}
+	//
+	//	@Override
+	//	public List<IRound> saveRounds(List<IRound> rounds) {
+	//		return rounds; //deprecated
+	//		//		ofy.put(rounds);
+	//		//		return rounds;
+	//	}
 
 
 	@Override
 	public List<IRound> fetchRounds(String url, Map<String,IMatchGroup> matches) {
-		IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
+		try {
+			if (checkAdmin()) {
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
 
-		List<IRound>  rounds = fetcher.getRounds(url, matches);
+				List<IRound>  rounds = fetcher.getRounds(url, matches);
 
-		// do we have this in our database? If so, replace the fetched one with the one that already has an ID
-		// a round in the DB is considered the same if it contains the same matches
+				// do we have this in our database? If so, replace the fetched one with the one that already has an ID
+				// a round in the DB is considered the same if it contains the same matches
 
-		Map<Integer,IRound> changes = new HashMap<Integer,IRound>();
+				Map<Integer,IRound> changes = new HashMap<Integer,IRound>();
 
-		// have to do two-pass to avoid concurrentChangeException
-		for (IRound r : rounds) {
-			IRound roundDB = rf.find(r);
+				// have to do two-pass to avoid concurrentChangeException
+				for (IRound r : rounds) {
+					IRound roundDB = rf.find(r);
 
-			if (roundDB != null) {
-				changes.put(rounds.indexOf(r), roundDB);
+					if (roundDB != null) {
+						changes.put(rounds.indexOf(r), roundDB);
+					}
+				}
+
+				// now swap in the found round for the in situ one
+				for (Integer index : changes.keySet()) {
+					rounds.remove((int)index);
+					rounds.add(index,changes.get(index));	
+				}
+
+
+				return rounds;
+			} else {
+				return null;
 			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		// now swap in the found round for the in situ one
-		for (Integer index : changes.keySet()) {
-			rounds.remove((int)index);
-			rounds.add(index,changes.get(index));	
-		}
-
-
-		return rounds;
 	}
 
 
 	@Override
 	public Map<String, IMatchGroup> fetchMatches(String url, Map<String,ITeamGroup> teams) {
-		IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff, tf);
+		try {
+			if (checkAdmin()) {
+				IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff, tf);
 
-		Map<String, IMatchGroup> matches = fetcher.getMatches(url, teams);
+				Map<String, IMatchGroup> matches = fetcher.getMatches(url, teams);
 
-		if (matches != null) {
-			for (IMatchGroup m: matches.values()) {
-				IMatchGroup found = mf.find(m);
-				if (found != null) {
-					matches.put(found.getDisplayName(), found);
+				if (matches != null) {
+					for (IMatchGroup m: matches.values()) {
+						IMatchGroup found = mf.find(m);
+						if (found != null) {
+							matches.put(found.getDisplayName(), found);
+						}
+					}
 				}
+
+				return matches;
+			} else {
+				return null;
 			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		return matches;
 	}
 
-
-	@Override
-	public Map<String, IMatchGroup> saveMatches(Map<String, IMatchGroup> matches) {
-		return matches; //deprecated
-		//		ofy.put(matches.values());
-		//		return matches;
-	}
+	//
+	//	@Override
+	//	public Map<String, IMatchGroup> saveMatches(Map<String, IMatchGroup> matches) {
+	//		return matches; //deprecated
+	//		//		ofy.put(matches.values());
+	//		//		return matches;
+	//	}
 
 
 	@Override
 	public List<ICompetition> getComps(Filter filter) {
-		List<ICompetition> compList = new ArrayList<ICompetition>();
-		//		Query<Competition> qc = ofy.query(Competition.class);
-		//		for (Competition c : qc) {
-		//			compList.add(c);
-		//		}
+		try {
+			if (checkAdmin()) {
+				List<ICompetition> compList = new ArrayList<ICompetition>();
 
+				if (filter == null) {
+					filter = Filter.ALL;
+				}
 
-		//		IWorkflowConfiguration wfc = wfcf.get();
-		//		
-		//		for (Long compId : wfc.getUnderwayCompetitions()) {		
-		//			cf.setId(compId);
-		//			compList.add((Competition)cf.getCompetition());
-		//		}
-
-		if (filter == null) {
-			filter = Filter.ALL;
+				if (filter.equals(Filter.ALL)) {
+					compList = cf.getAllComps();
+				} else if (filter.equals(Filter.UNDERWAY)) {
+					compList = cf.getUnderwayComps();
+				}
+				return compList;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		if (filter.equals(Filter.ALL)) {
-			compList = cf.getAllComps();
-		} else if (filter.equals(Filter.UNDERWAY)) {
-			compList = cf.getUnderwayComps();
-		}
-		return compList;
 	}
 
 
 	@Override
 	public IWorkflowConfiguration saveWorkflowConfig(IWorkflowConfiguration wfc) {
-		// there may only be one...
-		//		wfcf.put(wfc);
-		//
-		//		return wfc;
-		return null;
+		try {
+			if (checkAdmin()) {
+				return null;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 
@@ -404,32 +515,24 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public Map<String, IOrchestrationConfiguration> getOrchestrationConfiguration() {
 		Map<String, IOrchestrationConfiguration> newMap = new HashMap<String, IOrchestrationConfiguration>();
+		try {
+			if (checkAdmin()) {
+				List<IOrchestrationConfiguration> list = ocf.getAll();
 
-		List<IOrchestrationConfiguration> list = ocf.getAll();
 
+				for (IOrchestrationConfiguration oc : list) {
+					cf.setId(oc.getCompID());
+					newMap.put(cf.getCompetition().getLongName(), oc);
+				}
 
-		for (IOrchestrationConfiguration oc : list) {
-			cf.setId(oc.getCompID());
-			newMap.put(cf.getCompetition().getLongName(), oc);
+				return newMap;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		//		Query<Competition> qc = ofy.query(Competition.class);
-		//		for (ICompetition c: qc) {
-		//			OrchestrationConfiguration newOc = new OrchestrationConfiguration();
-		//			newOc.setCompID(c.getId());
-		//			newMap.put(c.getLongName(), newOc);
-		//		}
-		//		
-		//		Query<OrchestrationConfiguration> qoc = ofy.query(OrchestrationConfiguration.class);
-		//				
-		//		for (OrchestrationConfiguration oc : qoc) {
-		//			Key<Competition> kc = new Key<Competition>(Competition.class, oc.getCompID());
-		//			ICompetition c = ofy.get(kc);
-		//			if (c != null)
-		//				newMap.put(c.getLongName(),oc);		
-		//		}
-
-		return newMap;
 	}
 
 
@@ -439,51 +542,19 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public Map<String, IOrchestrationConfiguration> saveOrchestrationConfiguration(
 			Map<String, IOrchestrationConfiguration> configs) {
-		// there may only be one set...
-		//		Query<OrchestrationConfiguration> qoc = ofy.query(OrchestrationConfiguration.class);
-		//		if (qoc.count() > 0)
-		//			ofy.delete(qoc);
-		//		
-		//		ofy.put(configs.values());
-
-		for (IOrchestrationConfiguration oc : configs.values()) {
-			ocf.put(oc);
+		try {
+			if (checkAdmin()) {
+				for (IOrchestrationConfiguration oc : configs.values()) {
+					ocf.put(oc);
+				}
+				return configs;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-		return configs;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.RugbyAdminService#getTeams(long)
-	 */
-	@Override
-	public List<ITeamGroup> getTeams(Long compId) {
-		return null; //deprecated
-		//		Query<CompetitionTeam> qct = ofy.query(CompetitionTeam.class).filter("competitionID", compId);
-		//		ArrayList<TeamGroup> tgs = new ArrayList<TeamGroup>();
-		//
-		//		for (ICompetitionTeam ct : qct) {
-		//			Key<TeamGroup> ktg = new Key<TeamGroup>(TeamGroup.class,ct.getTeamID());
-		//			tgs.add(ofy.get(ktg));
-		//		}
-		//
-		//		return tgs;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.RugbyAdminService#getRounds(long)
-	 */
-	@Override
-	public List<IRound> getRounds(Long compId) {
-		return null; //deprecated
-		//		ArrayList<Round> rs = new ArrayList<Round>();
-		//		Key<Competition> kc = new Key<Competition>(Competition.class, compId);
-		//		ICompetition c = ofy.get(kc);
-		//		for (Long rid : c.getRoundIds()) {
-		//			rs.add(0,ofy.get(new Key<Round>(Round.class,rid)));
-		//		}
-		//		return rs;
 	}
 
 
@@ -492,25 +563,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	 */
 	@Override
 	public List<IMatchGroup> getMatches(Long roundId) {
+		try {
+			if (checkAdmin()) {
+				List<IMatchGroup> ms = mf.getMatchesForRound(roundId);
 
-		List<IMatchGroup> ms = mf.getMatchesForRound(roundId);
-
-		return ms;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.RugbyAdminService#getResults(long)
-	 */
-	@Override
-	public List<IMatchResult> getResults(Long matchId) {
-		return null; //deprecated
-		//		ArrayList<MatchResult> mrs = new ArrayList<MatchResult>();
-		//		Query<MatchResult> qmr = ofy.query(MatchResult.class).filter("matchID",matchId);
-		//		for (MatchResult mr : qmr) {
-		//			mrs.add(mr);
-		//		}
-		//		return mrs;
+				return ms;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 
@@ -519,8 +583,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	 */
 	@Override
 	public ITeamGroup saveTeam(ITeamGroup teamGroup) {
-		tf.put(teamGroup);
-		return teamGroup;
+		try {
+			if (checkAdmin()) {
+				tf.put(teamGroup);
+				return teamGroup;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 
@@ -529,9 +602,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	 */
 	@Override
 	public ITeamGroup getTeam(Long teamId) {
-		// to allow editing
-		tf.setId(teamId);
-		return tf.getTeam();
+		try {
+			if (checkAdmin()) {
+				// to allow editing
+				tf.setId(teamId);
+				return tf.getTeam();
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 
 	}
 
@@ -541,26 +623,31 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public Boolean createAdmin() {
 		try {
-			auf.setId(null);
-			IAppUser admin = auf.get();
+			if (checkAdmin()) {
+				auf.setId(null);
+				IAppUser admin = auf.get();
 
-			admin.setActive(true);
-			admin.setAdmin(true);
-			admin.setEmailAddress("dominic.tracey@gmail.com");
-			admin.setNickname("d1");
-			admin.setSuperadmin(true);
-			if (admin instanceof ITopTenUser) {
-				((ITopTenUser)admin).setTopTenContentContributor(true);
-				((ITopTenUser)admin).setTopTenContentEditor(true);
+				admin.setActive(true);
+				admin.setAdmin(true);
+				admin.setEmailAddress("dominic.tracey@gmail.com");
+				admin.setNickname("d1");
+				admin.setSuperadmin(true);
+				if (admin instanceof ITopTenUser) {
+					((ITopTenUser)admin).setTopTenContentContributor(true);
+					((ITopTenUser)admin).setTopTenContentEditor(true);
+				}
+				String pwhash = DigestUtils.md5Hex("asdasd");
+				admin.setPwHash(pwhash);
+				auf.put(admin);
+
+				return true;
+			} else {
+				return null;
 			}
-			String pwhash = DigestUtils.md5Hex("asdasd");
-			admin.setPwHash(pwhash);
-			auf.put(admin);
-		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "CreateAdmin: " + e.getMessage());
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		return true;
 	}
 
 	/* (non-Javadoc)
@@ -568,94 +655,111 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	 */
 	@Override
 	public IWorkflowConfiguration getWorkflowConfiguration() {
-
-		return wfcf.get();
+		try {
+			if (checkAdmin()) {
+				return wfcf.get();
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public List<String> sanityCheck()
 	{
-		List<String> changes = new ArrayList<String>();
+		try {
+			if (checkAdmin()) {
+				List<String> changes = new ArrayList<String>();
 
 
-		//		// does every comp have a CC?
-		//		List<ICompetition> comps = cf.getAllComps();
-		//		for (ICompetition comp: comps) {
-		//			chf.setId(comp.getCompClubhouseId());
-		//			IClubhouse ch = chf.get();
-		//			if (ch == null) {
-		//				chf.setId(null);
-		//				ch = chf.get();
-		//				ch.setOwnerID(-99L);
-		//				ch.setName("Competition Clubhouse for " + comp.getLongName());
-		//				ch.setPublicClubhouse(false);
-		//				ch.setActive(true);
-		//				chf.put(ch);
-		//				comp.setCompClubhouseId(ch.getId());
-		//				cf.put(comp);
-		//				changes.add("Added competition clubhouse for " + comp.getLongName());
-		//			}
-		//		}
+				//		// does every comp have a CC?
+				//		List<ICompetition> comps = cf.getAllComps();
+				//		for (ICompetition comp: comps) {
+				//			chf.setId(comp.getCompClubhouseId());
+				//			IClubhouse ch = chf.get();
+				//			if (ch == null) {
+				//				chf.setId(null);
+				//				ch = chf.get();
+				//				ch.setOwnerID(-99L);
+				//				ch.setName("Competition Clubhouse for " + comp.getLongName());
+				//				ch.setPublicClubhouse(false);
+				//				ch.setActive(true);
+				//				chf.put(ch);
+				//				comp.setCompClubhouseId(ch.getId());
+				//				cf.put(comp);
+				//				changes.add("Added competition clubhouse for " + comp.getLongName());
+				//			}
+				//		}
 
-		// for every entry, if for the first round of the competition, they don't have a picklist,
-		// create one with picks for all the winning teams.
-		List<Long> compIds = wfcf.get().getUnderwayCompetitions();
-		for (Long compId: compIds) {
-			cf.setId(compId);
-			ICompetition comp = cf.getCompetition();
-			IRound r = comp.getPrevRound();
-			if (r != null) {
-				ef.setRoundAndComp(null, comp);
-				List<IEntry> entries = ef.getEntries();
-				for (IEntry e: entries) {
-					IRoundEntry re = e.getRoundEntries().get(r.getId());
-					if (re == null) {  // @REX shouldn't the factory or entity do this?!
-						re = ref.getNew();
+				// for every entry, if for the first round of the competition, they don't have a picklist,
+				// create one with picks for all the winning teams.
+				List<Long> compIds = wfcf.get().getUnderwayCompetitions();
+				for (Long compId: compIds) {
+					cf.setId(compId);
+					ICompetition comp = cf.getCompetition();
+					IRound r = comp.getPrevRound();
+					if (r != null) {
+						ef.setRoundAndComp(null, comp);
+						List<IEntry> entries = ef.getEntries();
+						for (IEntry e: entries) {
+							IRoundEntry re = e.getRoundEntries().get(r.getId());
+							if (re == null) {  // @REX shouldn't the factory or entity do this?!
+								re = ref.getNew();
 
-						// last match of the round is the tiebreaker
-						re.setTieBreakerMatchId(r.getMatches().get(r.getMatches().size()-1).getId()); 
+								// last match of the round is the tiebreaker
+								re.setTieBreakerMatchId(r.getMatches().get(r.getMatches().size()-1).getId()); 
 
-						re.setRoundId(r.getId());
+								re.setRoundId(r.getId());
 
-						e.getRoundEntries().put(r.getId(),re);	
-					}
-					if (re != null) {
-						Map<Long,IMatchEntry> pickMap = re.getMatchPickMap();
+								e.getRoundEntries().put(r.getId(),re);	
+							}
+							if (re != null) {
+								Map<Long,IMatchEntry> pickMap = re.getMatchPickMap();
 
-						if (pickMap == null || pickMap.isEmpty()) {
-							// need to fix
-							e.getRoundEntries().get(r.getId()).setMatchPickMap(new HashMap<Long,IMatchEntry>());
+								if (pickMap == null || pickMap.isEmpty()) {
+									// need to fix
+									e.getRoundEntries().get(r.getId()).setMatchPickMap(new HashMap<Long,IMatchEntry>());
 
-							for (IMatchGroup m: r.getMatches()) {
-								if (!m.getLocked()) {
-									IMatchEntry me = new MatchEntry();
-									me.setMatchId(m.getId());
+									for (IMatchGroup m: r.getMatches()) {
+										if (!m.getLocked()) {
+											IMatchEntry me = new MatchEntry();
+											me.setMatchId(m.getId());
 
-									if (m.getStatus() == Status.FINAL_HOME_WIN) {
-										me.setTeamPicked(m.getHomeTeam());
-										me.setTeamPickedId(m.getHomeTeamId());
-									} else {
-										me.setTeamPicked(m.getVisitingTeam());
-										me.setTeamPickedId(m.getVisitingTeamId());
+											if (m.getStatus() == Status.FINAL_HOME_WIN) {
+												me.setTeamPicked(m.getHomeTeam());
+												me.setTeamPickedId(m.getHomeTeamId());
+											} else {
+												me.setTeamPicked(m.getVisitingTeam());
+												me.setTeamPickedId(m.getVisitingTeamId());
+											}
+
+											me = mef.put(me);
+											e.getRoundEntries().get(r.getId()).getMatchPickMap().put(m.getId(), me);
+
+										} else {
+											changes.add("Couldn't add round 1 pick list to entry " + e.getName() + " -- match " + m.getDisplayName() + " (" + m.getId()+ ") is locked.");
+										}
 									}
 
-									me = mef.put(me);
-									e.getRoundEntries().get(r.getId()).getMatchPickMap().put(m.getId(), me);
-
-								} else {
-									changes.add("Couldn't add round 1 pick list to entry " + e.getName() + " -- match " + m.getDisplayName() + " (" + m.getId()+ ") is locked.");
+									ef.put(e);
+									changes.add("Added round 1 pick list to entry " + e.getName());
 								}
 							}
-
-							ef.put(e);
-							changes.add("Added round 1 pick list to entry " + e.getName());
 						}
 					}
 				}
-			}
-		}
 
-		return changes;
+				return changes;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -664,21 +768,26 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public ICompetition saveCompInfo(ICompetition comp) {
 		try {
-			comp = cf.put(comp);
-			
-			ICoreConfiguration cc = ccf.get();
-			// add or remove from CoreConfiguration map depending on the Underway flag
-			if (comp.getUnderway()) {
-				cc.addCompUnderway(comp.getId());
-			} else {
-				cc.removeCompUnderway(comp.getId());
-			}
-			
-			ccf.put(cc);
+			if (checkAdmin()) {
+				comp = cf.put(comp);
 
-			return comp;
-		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "saveCompInfo: " + e.getMessage());
+
+				ICoreConfiguration cc = ccf.get();
+				// add or remove from CoreConfiguration map depending on the Underway flag
+				if (comp.getUnderway()) {
+					cc.addCompUnderway(comp.getId());
+				} else {
+					cc.removeCompUnderway(comp.getId());
+				}
+
+				ccf.put(cc);
+
+				return comp;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
@@ -689,10 +798,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IMatchGroup saveMatch(IMatchGroup matchGroup) {
 		try {
-			mf.put(matchGroup);
-			return matchGroup;
-		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "saveMatch: " + e.getMessage());
+			if (checkAdmin()) {
+				mf.put(matchGroup);
+				return matchGroup;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
@@ -703,10 +816,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IMatchGroup getMatch(Long matchId) {
 		try {
-			mf.setId(matchId);
-			return mf.getGame();
-		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "saveMatch: " + e.getMessage());
+			if (checkAdmin()) {
+				mf.setId(matchId);
+				return mf.getGame();
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
@@ -717,16 +834,20 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<String> lockMatch(Boolean lock, IMatchGroup match, Long compId, List<String> log) {
 		try {
-			ICompetition comp = getComp(compId);
+			if (checkAdmin()) {
+				ICompetition comp = getComp(compId);
 
-			if (lock)
-				queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.LOCK, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
-			else 
-				queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.UNLOCK, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
+				if (lock)
+					queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.LOCK, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
+				else 
+					queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.UNLOCK, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
 
-			return log;
-		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "lockMatch: " + e.getMessage());
+				return log;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
@@ -734,12 +855,15 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public ICompetition getComp(Long compId) {
 		try {
+			if (checkAdmin()) {
+				cf.setId(compId);
+				return cf.getCompetition();
 
-			cf.setId(compId);
-			return cf.getCompetition();
-
+			} else {
+				return null;
+			}
 		} catch (Throwable ex) {
-			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
@@ -750,223 +874,284 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IMatchGroup fetchMatchScore(IMatchGroup match, Long compId, List<String> log) {
 		try {
-			//ICompetition comp = getComp(compId);
+			if (checkAdmin()) {
+				//ICompetition comp = getComp(compId);
 
-			//queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.FETCH, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
-			IResultFetcher fetcher = srff.getResultFetcher(compId, null, ResultType.MATCHES);
-			IMatchResult result = fetcher.getResult(match);
+				//queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.FETCH, AdminOrchestrationTargets.Targets.MATCH, match, comp, log);
+				IResultFetcher fetcher = srff.getResultFetcher(compId, null, ResultType.MATCHES);
+				IMatchResult result = fetcher.getResult(match);
 
-			return match;
-		} catch (Throwable e) {
-			Logger.getLogger("Admin").log(Level.SEVERE, "fetchScore: " + e.getMessage(), e);
+				return match;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
 
 	@Override
 	public IPlayer getPlayer(Long id) {
-		return pf.getById(id);
+		try {
+			if (checkAdmin()) {
+				return pf.getById(id);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public IPlayer savePlayer(IPlayer player, IAdminTask task) {
-		player = pf.put(player);
-		if (task != null && task.getAction().equals(IAdminTask.Action.EDITPLAYER)) {
-			if (task.getPromise() != null) {
-				PipelineService service = PipelineServiceFactory.newPipelineService();
-				try {
-					service.submitPromisedValue(task.getPromise(), player);
-				} catch (NoSuchObjectException e) {
-					e.printStackTrace();
-				} catch (OrphanedObjectException e) {
-					e.printStackTrace();
-				}
-			}
+		try {
+			if (checkAdmin()) {
+				player = pf.put(player);
+				if (task != null && task.getAction().equals(IAdminTask.Action.EDITPLAYER)) {
+					if (task.getPromise() != null) {
+						PipelineService service = PipelineServiceFactory.newPipelineService();
+						try {
+							service.submitPromisedValue(task.getPromise(), player);
+						} catch (NoSuchObjectException e) {
+							e.printStackTrace();
+						} catch (OrphanedObjectException e) {
+							e.printStackTrace();
+						}
+					}
 
-			atf.complete(task);
+					atf.complete(task);
+				}
+				return player;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-		return player;
 	}
 
 	@Override
 	public List<IPlayerMatchStats> testMatchStats(Long matchId) {
+		try {
+			if (checkAdmin()) {
+				//		PipelineService service = PipelineServiceFactory.newPipelineService();
+				//		mf.setId(matchId);
+				//		IMatchGroup match = mf.getGame();
+				//
+				//		CountryLoader cloader = new CountryLoader();
+				//		cloader.Run(countryf);
+				//
+				//		if (match == null) {
+				//
+				//
+				//
+				//			for (Long id = 9001L; id<9003L; ++id) {
+				//				tf.setId(null);
+				//				ITeamGroup t = tf.getTeam();
+				//				if (id == 9001) {
+				//					t.setAbbr("NZL");
+				//					t.setShortName("All Blacks");
+				//					((IGroup)t).setDisplayName("New Zealand");
+				//					t.setColor("#000000");
+				//				} else if (id == 9002) {
+				//					t.setAbbr("AUS");
+				//					t.setShortName("Wallabies");
+				//					((IGroup)t).setDisplayName("Australia");
+				//					t.setColor("#f0af00");
+				//				}
+				//				((TeamGroup)t).setId(id);
+				//				((IGroup)t).setGroupType(GroupType.TEAM);
+				//
+				//				tf.put(t);
+				//			}
+				//
+				//
+				//			Calendar cal = new GregorianCalendar();
+				//			cal.setTime(new Date());
+				//			mf.setId(null);
+				//			IMatchGroup g = mf.getGame();
+				//			((MatchGroup)g).setId(300L);
+				//			((IGroup)g).setGroupType(GroupType.MATCH);
+				//
+				//			g.setHomeTeamId(9001L);
+				//			g.setVisitingTeamId(9002L);
+				//			g.setLocked(true);
+				//			g.setForeignId(93503L);
+				//			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
+				//			cal.set(2011, 10, 16);
+				//			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
+				//			tf.setId(g.getHomeTeamId());
+				//			g.setHomeTeam(tf.getTeam());
+				//			tf.setId(g.getVisitingTeamId());
+				//			g.setVisitingTeam(tf.getTeam());
+				//			g.setDisplayName();	
+				//
+				//			g.setDate(cal.getTime());
+				//
+				//			mf.put(g);
+				//			match = g;
+				//		}
+				//
+				//		String pipelineId = "";
+				//		try {
+				//
+				//			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(1));
+				//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+				//
+				//			while (true) {
+				//				Thread.sleep(2000);
+				//				JobInfo jobInfo = service.getJobInfo(pipelineId);
+				//				switch (jobInfo.getJobState()) {
+				//				case COMPLETED_SUCCESSFULLY:
+				//					//service.deletePipelineRecords(pipelineId);
+				//					return (List<IPlayerMatchStats>) jobInfo.getOutput();
+				//				case RUNNING:
+				//					break;
+				//				case STOPPED_BY_ERROR:
+				//					throw new RuntimeException("Job stopped " + jobInfo.getError());
+				//				case STOPPED_BY_REQUEST:
+				//					throw new RuntimeException("Job stopped by request.");
+				//				}
+				//			}
+				//		} catch (Exception e) {
+				//			// TODO Auto-generated catch block
+				//			e.printStackTrace();
+				//			return null;
+				//		}
 
-		//		PipelineService service = PipelineServiceFactory.newPipelineService();
-		//		mf.setId(matchId);
-		//		IMatchGroup match = mf.getGame();
-		//
-		//		CountryLoader cloader = new CountryLoader();
-		//		cloader.Run(countryf);
-		//
-		//		if (match == null) {
-		//
-		//
-		//
-		//			for (Long id = 9001L; id<9003L; ++id) {
-		//				tf.setId(null);
-		//				ITeamGroup t = tf.getTeam();
-		//				if (id == 9001) {
-		//					t.setAbbr("NZL");
-		//					t.setShortName("All Blacks");
-		//					((IGroup)t).setDisplayName("New Zealand");
-		//					t.setColor("#000000");
-		//				} else if (id == 9002) {
-		//					t.setAbbr("AUS");
-		//					t.setShortName("Wallabies");
-		//					((IGroup)t).setDisplayName("Australia");
-		//					t.setColor("#f0af00");
-		//				}
-		//				((TeamGroup)t).setId(id);
-		//				((IGroup)t).setGroupType(GroupType.TEAM);
-		//
-		//				tf.put(t);
-		//			}
-		//
-		//
-		//			Calendar cal = new GregorianCalendar();
-		//			cal.setTime(new Date());
-		//			mf.setId(null);
-		//			IMatchGroup g = mf.getGame();
-		//			((MatchGroup)g).setId(300L);
-		//			((IGroup)g).setGroupType(GroupType.MATCH);
-		//
-		//			g.setHomeTeamId(9001L);
-		//			g.setVisitingTeamId(9002L);
-		//			g.setLocked(true);
-		//			g.setForeignId(93503L);
-		//			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
-		//			cal.set(2011, 10, 16);
-		//			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
-		//			tf.setId(g.getHomeTeamId());
-		//			g.setHomeTeam(tf.getTeam());
-		//			tf.setId(g.getVisitingTeamId());
-		//			g.setVisitingTeam(tf.getTeam());
-		//			g.setDisplayName();	
-		//
-		//			g.setDate(cal.getTime());
-		//
-		//			mf.put(g);
-		//			match = g;
-		//		}
-		//
-		//		String pipelineId = "";
-		//		try {
-		//
-		//			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(1));
-		//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
-		//
-		//			while (true) {
-		//				Thread.sleep(2000);
-		//				JobInfo jobInfo = service.getJobInfo(pipelineId);
-		//				switch (jobInfo.getJobState()) {
-		//				case COMPLETED_SUCCESSFULLY:
-		//					//service.deletePipelineRecords(pipelineId);
-		//					return (List<IPlayerMatchStats>) jobInfo.getOutput();
-		//				case RUNNING:
-		//					break;
-		//				case STOPPED_BY_ERROR:
-		//					throw new RuntimeException("Job stopped " + jobInfo.getError());
-		//				case STOPPED_BY_REQUEST:
-		//					throw new RuntimeException("Job stopped by request.");
-		//				}
-		//			}
-		//		} catch (Exception e) {
-		//			// TODO Auto-generated catch block
-		//			e.printStackTrace();
-		//			return null;
-		//		}
-
-		return (List<IPlayerMatchStats>) pmsf.getByMatchId(matchId);
+				return (List<IPlayerMatchStats>) pmsf.getByMatchId(matchId);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId) {
-		IMatchRatingEngineSchema schema = mresf.getDefault();
-		if (schema != null && matchId != null) {
-			return pmif.getForMatch(matchId, schema); 
-		} else {
+		try {
+			if (checkAdmin()) {
+				IMatchRatingEngineSchema schema = mresf.getDefault();
+				if (schema != null && matchId != null) {
+					return pmif.getForMatch(matchId, schema); 
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
 
 	@Override
 	public List<ICountry> fetchCountryList() {
-		List<ICountry> list = new ArrayList<ICountry>();
-		Iterator<Country> it = countryf.getAll();
+		try {
+			if (checkAdmin()) {
+				List<ICountry> list = new ArrayList<ICountry>();
+				Iterator<Country> it = countryf.getAll();
 
-		if (it == null || !it.hasNext()) {
-			CountryLoader cloader = new CountryLoader();
-			cloader.Run(countryf);
-			it = countryf.getAll();
-		}
+				if (it == null || !it.hasNext()) {
+					CountryLoader cloader = new CountryLoader();
+					cloader.Run(countryf);
+					it = countryf.getAll();
+				}
 
-		while (it.hasNext()) {
-			Country c = it.next();
-			list.add(c);
+				while (it.hasNext()) {
+					Country c = it.next();
+					list.add(c);
+				}
+				return list;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-		return list;
 	}
 
 	@Override
 	public List<position> fetchPositionList() {
-		List<position> list = new ArrayList<position>();
+		try {
+			if (checkAdmin()) {
+				List<position> list = new ArrayList<position>();
 
-		for (position p : position.values()) {
-			list.add(p);
+				for (position p : position.values()) {
+					list.add(p);
+				}
+
+				return list;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		return list;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<IPlayerMatchInfo> fetchMatchStats(Long matchId) {
-		Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
-		countryf.put(c);
-
-		PipelineService service = PipelineServiceFactory.newPipelineService();
-		mf.setId(matchId);
-		IMatchGroup match = mf.getGame();
-
-		String pipelineId = "";
 		try {
+			if (checkAdmin()) {
+				Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
+				countryf.put(c);
 
-			// first check if this match already has a pipeline going and kill it if it does
-			if (match.getFetchMatchStatsPipelineId() != null && !match.getFetchMatchStatsPipelineId().isEmpty()) {
-				// delete adminTasks first
-				List<? extends IAdminTask> tasks = atf.getForPipeline(match.getFetchMatchStatsPipelineId());
-				atf.delete((List<IAdminTask>) tasks);
+				PipelineService service = PipelineServiceFactory.newPipelineService();
+				mf.setId(matchId);
+				IMatchGroup match = mf.getGame();
 
-				// now the pipeline records
-				service.deletePipelineRecords(match.getFetchMatchStatsPipelineId(), true, false);
-				match.setFetchMatchStatsPipelineId(null);
+				String pipelineId = "";
 
-			}
+				// first check if this match already has a pipeline going and kill it if it does
+				if (match.getFetchMatchStatsPipelineId() != null && !match.getFetchMatchStatsPipelineId().isEmpty()) {
+					// delete adminTasks first
+					List<? extends IAdminTask> tasks = atf.getForPipeline(match.getFetchMatchStatsPipelineId());
+					atf.delete((List<IAdminTask>) tasks);
 
-			//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-			pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(3));
-			match.setFetchMatchStatsPipelineId(pipelineId);
-			mf.put(match);
+					// now the pipeline records
+					service.deletePipelineRecords(match.getFetchMatchStatsPipelineId(), true, false);
+					match.setFetchMatchStatsPipelineId(null);
 
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
-
-			while (true) {
-				Thread.sleep(2000);
-				JobInfo jobInfo = service.getJobInfo(pipelineId);
-				switch (jobInfo.getJobState()) {
-				case COMPLETED_SUCCESSFULLY:
-					service.deletePipelineRecords(pipelineId);
-					return getPlayerMatchInfo(matchId); // (List<IPlayerMatchStats>) jobInfo.getOutput();
-				case RUNNING:
-					break;
-				case STOPPED_BY_ERROR:
-					throw new RuntimeException("Job stopped " + jobInfo.getError());
-				case STOPPED_BY_REQUEST:
-					throw new RuntimeException("Job stopped by request.");
 				}
+
+				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
+				pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(3));
+				match.setFetchMatchStatsPipelineId(pipelineId);
+				mf.put(match);
+
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+
+				while (true) {
+					Thread.sleep(2000);
+					JobInfo jobInfo = service.getJobInfo(pipelineId);
+					switch (jobInfo.getJobState()) {
+					case COMPLETED_SUCCESSFULLY:
+						service.deletePipelineRecords(pipelineId);
+						return getPlayerMatchInfo(matchId); // (List<IPlayerMatchStats>) jobInfo.getOutput();
+					case RUNNING:
+						break;
+					case STOPPED_BY_ERROR:
+						throw new RuntimeException("Job stopped " + jobInfo.getError());
+					case STOPPED_BY_REQUEST:
+						throw new RuntimeException("Job stopped by request.");
+					}
+				}
+			} else {
+				return null;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 
@@ -974,123 +1159,213 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public IPlayerMatchStats getPlayerMatchStats(Long id) {
-		return pmsf.getById(id);
+		try {
+			if (checkAdmin()) {
+				return pmsf.getById(id);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats stats, IAdminTask task) {
-		pmsf.put(stats);
-		if (task != null  && task.getAction().equals(IAdminTask.Action.EDITPLAYERMATCHSTATS)) {
-			if (task.getPromise() != null) {
-				PipelineService service = PipelineServiceFactory.newPipelineService();
-				try {
-					service.submitPromisedValue(task.getPromise(), stats);
-				} catch (NoSuchObjectException e) {
-					e.printStackTrace();
-				} catch (OrphanedObjectException e) {
-					e.printStackTrace();
+		try {
+			if (checkAdmin()) {
+				pmsf.put(stats);
+				if (task != null  && task.getAction().equals(IAdminTask.Action.EDITPLAYERMATCHSTATS)) {
+					if (task.getPromise() != null) {
+						PipelineService service = PipelineServiceFactory.newPipelineService();
+						try {
+							service.submitPromisedValue(task.getPromise(), stats);
+						} catch (NoSuchObjectException e) {
+							e.printStackTrace();
+						} catch (OrphanedObjectException e) {
+							e.printStackTrace();
+						}
+					}
+					atf.complete(task);
 				}
+				return pmif.getForPlayerMatchStats(stats.getId(),null);
+			} else {
+				return null;
 			}
-			atf.complete(task);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-		return pmif.getForPlayerMatchStats(stats.getId(),null);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<IAdminTask> getAllOpenAdminTasks() {
-		return (List<IAdminTask>) atf.getAllOpen();
+		try {
+			if (checkAdmin()) {
+				return (List<IAdminTask>) atf.getAllOpen();
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<IAdminTask> deleteTasks(List<IAdminTask> selectedItems) {
-		return (List<IAdminTask>) atf.delete(selectedItems);
+		try {
+			if (checkAdmin()) {
+				return (List<IAdminTask>) atf.delete(selectedItems);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public IAdminTask getTask(Long id) {
-		return atf.get(id);
+		try {
+			if (checkAdmin()) {
+				return atf.get(id);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public ICompetition repairComp(ICompetition comp) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Service call equested repair comp " + comp.getLongName());
+		try {
+			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Service call equested repair comp " + comp.getLongName());
 
-		return cf.repair(comp);
+				return cf.repair(comp);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms) {
-		IPlayer player = pf.getById(pms.getPlayerId());
-		mf.setId(pms.getMatchId());
-		IMatchGroup match = mf.getGame();
+		try {
+			if (checkAdmin()) {
+				IPlayer player = pf.getById(pms.getPlayerId());
+				mf.setId(pms.getMatchId());
+				IMatchGroup match = mf.getGame();
 
-		Home_or_Visitor side = Home_or_Visitor.HOME;
-		if (pms.getTeamId().equals(match.getVisitingTeamId())) {
-			side = Home_or_Visitor.VISITOR;
+				Home_or_Visitor side = Home_or_Visitor.HOME;
+				if (pms.getTeamId().equals(match.getVisitingTeamId())) {
+					side = Home_or_Visitor.VISITOR;
+				}
+
+				IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(player, match, side, pms.getSlot(), match.getForeignUrl()+"?view=scorecard");
+				if (!fetcher.process()) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());			
+				}
+
+				return fetcher.getStats();
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(player, match, side, pms.getSlot(), match.getForeignUrl()+"?view=scorecard");
-		if (!fetcher.process()) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());			
-		}
-
-		return fetcher.getStats();
 	}
 
 	@Override
 	public List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId,
 			Long roundId, position posi, Long countryId, Long teamId) {
-		return pmif.query(compId, roundId, posi, countryId, teamId, null);
+		try {
+			if (checkAdmin()) {
+				return pmif.query(compId, roundId, posi, countryId, teamId, null);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public List<IPlayerMatchInfo> reRateMatch(Long matchId) {
-		IMatchRatingEngineSchema mres = mresf.getDefault();
-		assert (mres != null);
-		IMatchRatingEngine mre = mref.get(mres);
-		assert (mre != null);
-		mf.setId(matchId);
-		IMatchGroup m = mf.getGame();
+		try {
+			if (checkAdmin()) {
+				IMatchRatingEngineSchema mres = mresf.getDefault();
+				assert (mres != null);
+				IMatchRatingEngine mre = mref.get(mres);
+				assert (mre != null);
+				mf.setId(matchId);
+				IMatchGroup m = mf.getGame();
 
-		List<IPlayerMatchStats> stats = pmsf.getByMatchId(matchId);
-		List<IPlayerMatchStats> homePlayerStats =  new ArrayList<IPlayerMatchStats>();
-		List<IPlayerMatchStats> visitorPlayerStats =  new ArrayList<IPlayerMatchStats>();
-		for (IPlayerMatchStats s : stats) {
-			if (s.getTeamId().equals(m.getHomeTeamId())) {
-				homePlayerStats.add(s);
+				List<IPlayerMatchStats> stats = pmsf.getByMatchId(matchId);
+				List<IPlayerMatchStats> homePlayerStats =  new ArrayList<IPlayerMatchStats>();
+				List<IPlayerMatchStats> visitorPlayerStats =  new ArrayList<IPlayerMatchStats>();
+				for (IPlayerMatchStats s : stats) {
+					if (s.getTeamId().equals(m.getHomeTeamId())) {
+						homePlayerStats.add(s);
+					} else {
+						visitorPlayerStats.add(s);
+					}
+				}
+
+				mre.setPlayerStats(homePlayerStats, visitorPlayerStats);
+
+				// now the team stats
+				ITeamMatchStats hStats = tmsf.getHomeStats(m);
+				ITeamMatchStats vStats = tmsf.getVisitStats(m);
+
+				mre.setTeamStats(hStats, vStats);		
+
+				mre.generate(mres, m);
+
+				return pmif.getForMatch(matchId, mres);
 			} else {
-				visitorPlayerStats.add(s);
+				return null;
 			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-
-		mre.setPlayerStats(homePlayerStats, visitorPlayerStats);
-
-		// now the team stats
-		ITeamMatchStats hStats = tmsf.getHomeStats(m);
-		ITeamMatchStats vStats = tmsf.getVisitStats(m);
-
-		mre.setTeamStats(hStats, vStats);		
-
-		mre.generate(mres, m);
-
-		return pmif.getForMatch(matchId, mres);
 	}
 
 	@Override
 	public ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId) {
-		mf.setId(matchId);
-		IMatchGroup m = mf.getGame();
+		try {
+			if (checkAdmin()) {
+				mf.setId(matchId);
+				IMatchGroup m = mf.getGame();
 
-		if (m != null) {
-			if (m.getHomeTeamId().equals(teamId)) {
-				return tmsf.getHomeStats(m);
+				if (m != null) {
+					if (m.getHomeTeamId().equals(teamId)) {
+						return tmsf.getHomeStats(m);
+					} else {
+						return tmsf.getVisitStats(m);
+					}
+				} else {
+					return null;  // couldn't find match
+				}
 			} else {
-				return tmsf.getVisitStats(m);
+				return null;
 			}
-		} else {
-			return null;  // couldn't find match
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
 	}
 
@@ -1099,173 +1374,254 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	 */
 	@Override
 	public ITeamMatchStats refetchTeamMatchStats(ITeamMatchStats tms) {
-		tf.setId(tms.getTeamId());
-		ITeamGroup team = tf.getTeam();
-
-
-		Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
-		countryf.put(c);
-
-		PipelineService service = PipelineServiceFactory.newPipelineService();
-		mf.setId(tms.getMatchId());
-		IMatchGroup match = mf.getGame();
-
-		Home_or_Visitor hov = Home_or_Visitor.VISITOR;
-		if (match.getHomeTeamId().equals(team.getId())) {
-			hov = Home_or_Visitor.HOME;
-		}
-
-		String pipelineId = "";
 		try {
+			if (checkAdmin()) {
+				tf.setId(tms.getTeamId());
+				ITeamGroup team = tf.getTeam();
 
-			//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-			pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), team, match, hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
-			while (true) {
-				Thread.sleep(2000);
-				JobInfo jobInfo = service.getJobInfo(pipelineId);
-				switch (jobInfo.getJobState()) {
-				case COMPLETED_SUCCESSFULLY:
-					service.deletePipelineRecords(pipelineId);
-					return getTeamMatchStats(match.getId(),tms.getTeamId()); // (List<IPlayerMatchStats>) jobInfo.getOutput();
-				case RUNNING:
-					break;
-				case STOPPED_BY_ERROR:
-					throw new RuntimeException("Job stopped " + jobInfo.getError());
-				case STOPPED_BY_REQUEST:
-					throw new RuntimeException("Job stopped by request.");
-				case WAITING_TO_RETRY:
-					break;
-				default:
-					break;
+				Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
+				countryf.put(c);
+
+				PipelineService service = PipelineServiceFactory.newPipelineService();
+				mf.setId(tms.getMatchId());
+				IMatchGroup match = mf.getGame();
+
+				Home_or_Visitor hov = Home_or_Visitor.VISITOR;
+				if (match.getHomeTeamId().equals(team.getId())) {
+					hov = Home_or_Visitor.HOME;
 				}
+
+				String pipelineId = "";
+
+				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
+				pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), team, match, hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+
+				while (true) {
+					Thread.sleep(2000);
+					JobInfo jobInfo = service.getJobInfo(pipelineId);
+					switch (jobInfo.getJobState()) {
+					case COMPLETED_SUCCESSFULLY:
+						service.deletePipelineRecords(pipelineId);
+						return getTeamMatchStats(match.getId(),tms.getTeamId()); // (List<IPlayerMatchStats>) jobInfo.getOutput();
+					case RUNNING:
+						break;
+					case STOPPED_BY_ERROR:
+						throw new RuntimeException("Job stopped " + jobInfo.getError());
+					case STOPPED_BY_REQUEST:
+						throw new RuntimeException("Job stopped by request.");
+					case WAITING_TO_RETRY:
+						break;
+					default:
+						break;
+					}
+				}
+			} else {
+				return null;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
 
 	@Override
-	public ITeamMatchStats saveTeamMatchStats(ITeamMatchStats tms,
-			IAdminTask task) {
-		tmsf.put(tms);
-		if (task != null  && task.getAction().equals(IAdminTask.Action.EDITTEAMMATCHSTATS)) {
-			if (task.getPromise() != null) {
-				PipelineService service = PipelineServiceFactory.newPipelineService();
-				try {
-					service.submitPromisedValue(task.getPromise(), tms);
-				} catch (NoSuchObjectException e) {
-					e.printStackTrace();
-				} catch (OrphanedObjectException e) {
-					e.printStackTrace();
+	public ITeamMatchStats saveTeamMatchStats(ITeamMatchStats tms, IAdminTask task) {
+		try {
+			if (checkAdmin()) {
+				tmsf.put(tms);
+				if (task != null  && task.getAction().equals(IAdminTask.Action.EDITTEAMMATCHSTATS)) {
+					if (task.getPromise() != null) {
+						PipelineService service = PipelineServiceFactory.newPipelineService();
+						try {
+							service.submitPromisedValue(task.getPromise(), tms);
+						} catch (NoSuchObjectException e) {
+							e.printStackTrace();
+						} catch (OrphanedObjectException e) {
+							e.printStackTrace();
+						}
+					}
+					atf.complete(task);
 				}
+				return tms;
+			} else {
+				return null;
 			}
-			atf.complete(task);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
-		return tms;
 	}
 
 	@Override
-	public ScrumMatchRatingEngineSchema saveMatchRatingEngineSchema(
-			ScrumMatchRatingEngineSchema schema) {
-		mresf.put(schema);
-		return schema;
+	public ScrumMatchRatingEngineSchema saveMatchRatingEngineSchema(ScrumMatchRatingEngineSchema schema) {
+		try {
+			if (checkAdmin()) {
+				mresf.put(schema);
+				return schema;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public ScrumMatchRatingEngineSchema getMatchRatingEngineSchema(Long schemaId) {
-		IMatchRatingEngineSchema schema = mresf.getById(schemaId);
-		if (schema instanceof ScrumMatchRatingEngineSchema) {
-			return (ScrumMatchRatingEngineSchema) schema;
-		} else {
+		try {
+			if (checkAdmin()) {
+				IMatchRatingEngineSchema schema = mresf.getById(schemaId);
+				if (schema instanceof ScrumMatchRatingEngineSchema) {
+					return (ScrumMatchRatingEngineSchema) schema;
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
 
 	@Override
-	public ScrumMatchRatingEngineSchema saveMatchRatingEngineSchemaAsCopy(
-			ScrumMatchRatingEngineSchema schema) {
-		schema.setId(null);
-		schema.setIsDefault(false);
-		mresf.put(schema);
-		return schema;
+	public ScrumMatchRatingEngineSchema saveMatchRatingEngineSchemaAsCopy(ScrumMatchRatingEngineSchema schema) {
+		try {
+			if (checkAdmin()) {
+				schema.setId(null);
+				schema.setIsDefault(false);
+				mresf.put(schema);
+				return schema;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
-	public Boolean deleteMatchRatingEngineSchema(
-			ScrumMatchRatingEngineSchema20130713 schema) {
-		return mresf.delete(schema);
+	public Boolean deleteMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema) {
+		try {
+			if (checkAdmin()) {
+				return mresf.delete(schema);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
-	public Boolean deleteRatingsForMatchRatingEngineSchema(
-			ScrumMatchRatingEngineSchema20130713 schema) {
-		pmrf.deleteForSchema(schema);
-		return null;
+	public Boolean deleteRatingsForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema) {
+		try {
+			if (checkAdmin()) {
+				pmrf.deleteForSchema(schema);
+				return null;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
-	public ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(
-			ScrumMatchRatingEngineSchema20130713 schema) {
-		IMatchRatingEngineSchema s2 = mresf.setAsDefault(schema);
-		if (s2 instanceof ScrumMatchRatingEngineSchema)
-			return (ScrumMatchRatingEngineSchema) s2;
-		else 
-			return null; // not sure what this would be
+	public ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(ScrumMatchRatingEngineSchema20130713 schema) {
+		try {
+			if (checkAdmin()) {
+				IMatchRatingEngineSchema s2 = mresf.setAsDefault(schema);
+				if (s2 instanceof ScrumMatchRatingEngineSchema)
+					return (ScrumMatchRatingEngineSchema) s2;
+				else 
+					return null; // not sure what this would be
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public List<ScrumMatchRatingEngineSchema> getScrumSchemaList() {
-		return mresf.getScrumList();
+		try {
+			if (checkAdmin()) {
+				return mresf.getScrumList();
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 	@Override
 	public Boolean flushAllPipelineJobs() {
 		try {
-			PipelineService service = PipelineServiceFactory.newPipelineService();
+			if (checkAdmin()) {
+				PipelineService service = PipelineServiceFactory.newPipelineService();
 
-			List<? extends IMatchGroup> list = mf.getMatchesWithPipelines();
-			Iterator<? extends IMatchGroup> it = list.iterator();
-			while (it.hasNext()) {
-				IMatchGroup m = it.next();
-				String id = m.getFetchMatchStatsPipelineId();
-				m.setFetchMatchStatsPipelineId(null);
-				mf.put(m);
-				try {
-					service.deletePipelineRecords(id,true,false);
-				} catch (NoSuchObjectException nsox) {
-					// it's ok, just was a dangling reference in the match record
+				List<? extends IMatchGroup> list = mf.getMatchesWithPipelines();
+				Iterator<? extends IMatchGroup> it = list.iterator();
+				while (it.hasNext()) {
+					IMatchGroup m = it.next();
+					String id = m.getFetchMatchStatsPipelineId();
+					m.setFetchMatchStatsPipelineId(null);
+					mf.put(m);
+					try {
+						service.deletePipelineRecords(id,true,false);
+					} catch (NoSuchObjectException nsox) {
+						// it's ok, just was a dangling reference in the match record
+					}
+
 				}
 
+				return true;
+			} else {
+				return null;
 			}
-
-			return true;
-
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "flushAllPipelineJobs " + ex.getLocalizedMessage());		
-			return false;
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
 	}
 
 	@Override
 	public Boolean deleteComp(Long id) {
 		try {
-			return cf.delete(id);
+			if (checkAdmin()) {
+				return cf.delete(id);
+			} else {
+				return null;
+			}
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "deleteComp " + ex.getLocalizedMessage());		
-			return false;
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
 	}
 
 	@Override
 	public TopTenSeedData createTopTenList(TopTenSeedData tti) {
 		try {
-			ttlf.create(tti);
-			return tti;
+			if (checkAdmin()) {
+				ttlf.create(tti);
+				return tti;
+			} else {
+				return null;
+			}
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "createTopTenList " + ex.getMessage(), ex);		
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
@@ -1273,36 +1629,44 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public Boolean setCompAsDefault(Long compId) {
 		try {
-			ICoreConfiguration cc = ccf.get();
-			cc.setDefaultCompId(compId);
-			cc = ccf.put(cc);
-			if (cc != null && cc.getDefaultCompId() != null) {
-				return cc.getDefaultCompId().equals(compId);
+			if (checkAdmin()) {
+				ICoreConfiguration cc = ccf.get();
+				cc.setDefaultCompId(compId);
+				cc = ccf.put(cc);
+				if (cc != null && cc.getDefaultCompId() != null) {
+					return cc.getDefaultCompId().equals(compId);
+				} else {
+					return false;
+				}
 			} else {
-				return false;
+				return null;
 			}
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "createTopTenList " + ex.getMessage(), ex);		
-			return false;
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
 	}
 
 	@Override
 	public IContent createContent(Long id, String content) {
 		try {
-			IContent c = ctf.create();
-			if (id != null) {
-				c.setId(id);
-				ctf.put(c);
+			if (checkAdmin()) {
+				IContent c = ctf.create();
+				if (id != null) {
+					c.setId(id);
+					ctf.put(c);
+				}
+
+				if (content != null) {
+					c.setBody(content);
+					ctf.put(c);
+				}
+
+				return c;
+
+			} else {
+				return null;
 			}
-			
-			if (content != null) {
-				c.setBody(content);
-				ctf.put(c);
-			}
-			
-			return c;
-			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
@@ -1312,12 +1676,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public List<IContent> getContentList(boolean onlyActive) {
 		try {
-			List<IContent> lc = null;
-			if (ctf instanceof IContentFactory) {
-				lc = ((IContentFactory)ctf).getAll(onlyActive);
+			if (checkAdmin()) {
+				List<IContent> lc = null;
+				if (ctf instanceof IContentFactory) {
+					lc = ((IContentFactory)ctf).getAll(onlyActive);
+				}
+				return lc;
+
+			} else {
+				return null;
 			}
-			return lc;
-			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;

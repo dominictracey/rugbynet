@@ -174,22 +174,22 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private IAppUser getAppUser()
 	{
 		try {
-		// do they have a session going?
-		HttpServletRequest request = this.getThreadLocalRequest();
-		HttpSession session = request.getSession(false);
-		if (session != null) {
-			LoginInfo loginInfo = (LoginInfo) session.getAttribute("loginInfo");
-			if (loginInfo.isLoggedIn()) {
-				auf.setEmail(loginInfo.getEmailAddress());
-				return auf.get();
+			// do they have a session going?
+			HttpServletRequest request = this.getThreadLocalRequest();
+			HttpSession session = request.getSession(false);
+			if (session != null) {
+				LoginInfo loginInfo = (LoginInfo) session.getAttribute("loginInfo");
+				if (loginInfo.isLoggedIn()) {
+					auf.setEmail(loginInfo.getEmailAddress());
+					return auf.get();
+				}
 			}
-		}
 
-		return null;
-	} catch (Throwable e) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
-		return null;
-	}
+			return null;
+		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
 
 	}
 
@@ -232,11 +232,22 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	@Override
 	public List<IContent> getContentItems() {
 		try {
-			
+
 			if (ctf instanceof IContentFactory) {
 				return ((IContentFactory)ctf).getAll(true);
 			}
 			return null;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public ITopTenList saveTopTenList(ITopTenList list) {
+		try {
+			list = ttlf.put(list);
+			return list;
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

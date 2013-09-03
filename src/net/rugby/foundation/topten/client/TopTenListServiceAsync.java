@@ -25,5 +25,7 @@ public interface TopTenListServiceAsync {
 	public void getLatestListIdForComp(Long compId,
 			AsyncCallback<Long> asyncCallback);
 	public void getContentItems(AsyncCallback<List<IContent>> asyncCallback);
+	public void saveTopTenList(ITopTenList list,
+			AsyncCallback<ITopTenList> asyncCallback);
 
 }
