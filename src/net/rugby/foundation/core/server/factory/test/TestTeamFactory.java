@@ -158,6 +158,26 @@ public class TestTeamFactory implements ITeamGroupFactory, Serializable {
 			t.setShortName("Saracens");
 			((IGroup)t).setDisplayName("Saracens");
 			t.setColor("#000000");
+		} else if (id == 9210) {
+			t.setAbbr("WAS");
+			t.setShortName("Wasps");
+			((IGroup)t).setDisplayName("London Wasps");
+			t.setColor("#000000");
+		} else if (id == 9211) {
+			t.setAbbr("HAR");
+			t.setShortName("Quins");
+			((IGroup)t).setDisplayName("Harlequins");
+			t.setColor("#330033");
+		}  else if (id == 9212) {
+			t.setAbbr("LIR");
+			t.setShortName("London Irish");
+			((IGroup)t).setDisplayName("London Irish");
+			t.setColor("#00FF00");
+		}  else if (id == 9213) {
+			t.setAbbr("SAR");
+			t.setShortName("Saracens");
+			((IGroup)t).setDisplayName("Saracens");
+			t.setColor("#000000");
 		}
 		((TeamGroup)t).setId(id);
 		((IGroup)t).setGroupType(GroupType.TEAM);

@@ -46,8 +46,7 @@ public class OrchestrationServlet extends HttpServlet {
 		String action = req.getParameter(AdminOrchestrationActions.MatchActions.getKey());
 		String target = req.getParameter(AdminOrchestrationTargets.Targets.getKey());
 		if (target.equals(AdminOrchestrationTargets.Targets.MATCH.toString())) {
-	        mgf.setId(Long.parseLong(req.getParameter("id")));  
-	        IOrchestration<IMatchGroup> orch = of.get(mgf.getGame(), AdminOrchestrationActions.MatchActions.valueOf(AdminOrchestrationActions.MatchActions.class, action));
+	        IOrchestration<IMatchGroup> orch = of.get(mgf.get(Long.parseLong(req.getParameter("id"))), AdminOrchestrationActions.MatchActions.valueOf(AdminOrchestrationActions.MatchActions.class, action));
 	        if (orch != null) {
 	        	orch.setExtraKey(Long.parseLong(req.getParameter("extraKey")));
 	        	orch.execute();

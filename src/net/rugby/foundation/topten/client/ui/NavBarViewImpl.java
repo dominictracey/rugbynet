@@ -81,7 +81,7 @@ public class NavBarViewImpl extends Composite implements NavBarView, EditContent
 
 		buttonBar = new NavWidget();
 		buttonBar.addStyleName("btn-group");
-		RootPanel.get("hero").add(buttonBar);
+		RootPanel.get("buttons").add(buttonBar);
 	}
 
 

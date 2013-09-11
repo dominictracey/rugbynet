@@ -5,37 +5,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.google.inject.Inject;
+import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
-import net.rugby.foundation.core.server.factory.IMatchResultFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
-import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
-import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.Group.GroupType;
 
-public class TestMatchGroupFactory implements IMatchGroupFactory {
-	private Long id;
-	private ITeamGroupFactory tf;
-	private final IMatchResultFactory mrf;
-	private IRoundFactory rf;
-	
-	@Inject
-	TestMatchGroupFactory(ITeamGroupFactory tf, IMatchResultFactory mrf, IRoundFactory rf) {
-		this.tf = tf;
-		this.mrf = mrf;
-		this.rf = rf;
-	}
+public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMatchGroupFactory {
+
 
 	@Override
-	public IMatchGroup getGame() {
+	public IMatchGroup getFromPersistentDatastore(Long id) {
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(new Date());
 		IMatchGroup g = new MatchGroup();
@@ -184,8 +167,28 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 			g.setVisitingTeamId(9002L);
 			g.setLocked(true);
 			g.setForeignId(93503L);
-			g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
+			//g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard");
 			cal.set(2011, 10, 16);
+			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
+		} else if (id == 400) {  
+			// http://www.espnscrum.com/premiership-2013-14/rugby/match/188689.html
+			// testing out fetching player match stats
+			g.setHomeTeamId(9210L);
+			g.setVisitingTeamId(9211L);
+			g.setLocked(true);
+			g.setForeignId(188689L);
+			//g.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/188689.html?view=scorecard");
+			cal.set(2013, 9, 7);
+			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
+		}  else if (id == 401) {  
+			// http://www.espnscrum.com/premiership-2013-14/rugby/match/188683.html
+			g.setHomeTeamId(9212L);
+			g.setVisitingTeamId(9213L);
+			g.setDisplayName("London Irish v Saracens");
+			g.setLocked(true);
+			g.setForeignId(188683L);
+			//g.setForeignUrl("http://www.espnscrum.com/premiership-2013-14/rugby/match/188683.html?view=scorecard");
+			cal.set(2013, 9, 7);
 			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
 		}
 		//if (g.getHomeTeamId() != 0L) {
@@ -205,36 +208,9 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 		return g;
 	}
 
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-		
-	}
 
 	@Override
-	public IMatchGroup put(IMatchGroup g) {
-//		if (g == null) {
-//			g = new MatchGroup();
-//		}
-//		
-//		if (g.getHomeTeam() == null) {
-//			tf.setId(null);
-//			g.setHomeTeam(tf.getTeam());
-//		} else {
-//			tf.put(g.getHomeTeam());
-//		}
-//		
-//		if (g.getVisitingTeam() == null) {
-//			tf.setId(null);
-//			g.setVisitingTeam(tf.getTeam());
-//		} else {
-//			tf.put(g.getVisitingTeam());
-//		}
-//		
-//		((MatchGroup)g).setHomeTeamId(g.getHomeTeam().getId());
-//		((MatchGroup)g).setVisitingTeamId(g.getVisitingTeam().getId());
-//		
-//		ofy.put(g);
+	public IMatchGroup putToPersistentDatastore(IMatchGroup g) {
 		return g;
 	}
 
@@ -247,39 +223,36 @@ public class TestMatchGroupFactory implements IMatchGroupFactory {
 		return null;
 	}
 
-	@Override
-	public List<IMatchGroup> getMatchesForRound(Long roundId) {
-		// @TODO haven't tested this
-		rf.setId(roundId);
-		IRound r = rf.getRound();
-		if (r != null) {
-			return r.getMatches();
-		} else {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Could not find requested Round " + roundId);
-			return null;
-		}
-	}
+//	@Override
+//	public List<IMatchGroup> getMatchesForRound(Long roundId) {
+//		// @TODO haven't tested this
+//		rf.setId(roundId);
+//		IRound r = rf.getRound();
+//		if (r != null) {
+//			return r.getMatches();
+//		} else {
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Could not find requested Round " + roundId);
+//			return null;
+//		}
+//	}
 
 	@Override
 	public List<? extends IMatchGroup> getMatchesWithPipelines() {
-		
 		return new ArrayList<IMatchGroup>();
 	}
 
+
 	@Override
-	public boolean delete(Long matchId) {
-		// TODO Auto-generated method stub
-		return false;
+	public IMatchGroup create() {
+		return new MatchGroup();
 	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.factory.IMatchGroupFactory#setFactories(net.rugby.foundation.core.server.factory.IRoundFactory, net.rugby.foundation.core.server.factory.ITeamGroupFactory)
-	 */
-//	@Override
-//	public void setFactories(IRoundFactory rf, ITeamGroupFactory tf) {
-//		this.tf = tf;
-//		
-//	}
+
+	@Override
+	protected boolean deleteFromPersistentDatastore(IMatchGroup t) {
+		return true;
+	}
+
 
 
 }

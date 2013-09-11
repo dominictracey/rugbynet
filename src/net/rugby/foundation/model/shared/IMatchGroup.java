@@ -9,12 +9,11 @@ import java.util.Date;
  * @author home
  *
  */
-public interface IMatchGroup {
+public interface IMatchGroup extends IGroup  {
 
 	public enum Status {SCHEDULED, FINAL_HOME_WIN, FINAL_HOME_WIN_OT, FINAL_VISITOR_WIN, FINAL_VISITOR_WIN_OT, FINAL_DRAW, FINAL_DRAW_OT, UNDERWAY_FIRST_HALF, HALFTIME, UNDERWAY_SECOND_HALF, COMPLETE_AWAITING_RESULTS, POSTPONED, RESCHEDULED, CANCELED, UNREPORTED}
 
 	public abstract void setDisplayName();
-	public abstract Long getId();
 	
 	public abstract ITeamGroup getHomeTeam();
 	public abstract void setHomeTeam(ITeamGroup homeTeam);

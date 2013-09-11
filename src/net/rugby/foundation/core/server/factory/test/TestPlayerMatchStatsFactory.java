@@ -37,6 +37,9 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	 */
 	@Override
 	public IPlayerMatchStats getById(Long id) {
+		if (id == null) {
+			return new ScrumPlayerMatchStats();
+		}
 		Long pid = id-10000L;
 		Long teamId = 9002L; //AUS
 		int slot = (int) (pid-9002000);
@@ -44,10 +47,7 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 			teamId = 9001L; //NZL
 			slot += 1000;
 		}
-		
-		mf.setId(100L);
-		
-		return createPMS(pf.getById(pid), mf.getGame(), slot, teamId);
+		return createPMS(pf.get(pid), mf.get(100L), slot, teamId);
 	}
 	
 	/* (non-Javadoc)
@@ -69,12 +69,11 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	@Override
 	public List<IPlayerMatchStats> getByMatchId(Long matchId) {
 		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
-		mf.setId(matchId);
-		IMatchGroup m = mf.getGame();
+		IMatchGroup m = mf.get(matchId);
 		//NZL
 		int slot = 0;
 		for (Long i=9001001L; i<9001023L; ++i) {
-			IPlayerMatchStats pms = createPMS(pf.getById(i), m, slot++, 9001L);
+			IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9001L);
 			pms.setId(i+10000L);
 			list.add(pms);
 		}
@@ -82,7 +81,7 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 		//AUS
 		slot = 0;
 		for (Long i=9002001L; i<9002023L; ++i) {
-			IPlayerMatchStats pms = createPMS(pf.getById(i), m, slot++, 9002L);
+			IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9002L);
 			pms.setId(i+10000L);
 			list.add(pms);
 		}

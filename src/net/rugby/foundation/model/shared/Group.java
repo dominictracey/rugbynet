@@ -2,6 +2,7 @@ package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,35 +20,17 @@ public class Group implements Serializable, IGroup {
   private List<IPlayer> members;
   private GroupType groupType;
   protected String groupInfo;
-  
+  protected Date createdDate;
+  protected Date lastModifiedDate;
 
 
 //if you change here, also change mapping in Browse.java :(
   public enum GroupType { ADHOC, TEAM, POSITION, MATCH, FEATURED, NONE, MY }
   
   public Group() {
-    //new Group(null, GroupType.ADHOC, "", new ArrayList<Key<Player>>() );
 	  members = new ArrayList<IPlayer>();
   }
-
-//  public Group(Long id, GroupType type, String displayName, ArrayList<Key<Player>> m) {
-//	assert m != null;
-//    this.id = id;
-//    this.groupType = type;
-//    this.displayName = displayName;
-//    this.setMembers(m);
-//  }
-  
-  /* (non-Javadoc)
- * @see net.rugby.foundation.model.shared.IGroup#getId()
- */
-@Override
-public Long getId() { return id; }
-  /* (non-Javadoc)
- * @see net.rugby.foundation.model.shared.IGroup#setId(java.lang.Long)
- */
-@Override
-public void setId(Long id) { this.id = id; }
+ 
   
   /* (non-Javadoc)
  * @see net.rugby.foundation.model.shared.IGroup#getGroupType()
@@ -81,11 +64,7 @@ public Iterator<IPlayer> getMembers() {	return members.iterator();	}
  */
 @Override
 public void setMembers(List<IPlayer> members) {	this.members = members;	} 
-//
-//  public void addMember(Key<Player> m)
-//  {
-//	  members.add(m);
-//  }
+
   
   /* (non-Javadoc)
  * @see net.rugby.foundation.model.shared.IGroup#getGroupInfo()
@@ -108,4 +87,17 @@ public String getGroupInfo() {
 		members.add(p);
 		
 	}
+
+
+	@Override
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	@Override
+	public Long getId() {
+		return id;
+	}
+
 }

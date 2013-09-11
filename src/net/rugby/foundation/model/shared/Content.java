@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import com.googlecode.objectify.annotation.Entity;
 
 @Entity
-public class Content implements IContent, Serializable {
+public class Content extends HasInfo implements IHasId, IContent, Serializable {
 	/**
 	 * 
 	 */

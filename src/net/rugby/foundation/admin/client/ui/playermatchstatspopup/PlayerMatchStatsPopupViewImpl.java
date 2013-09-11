@@ -2,7 +2,11 @@ package net.rugby.foundation.admin.client.ui.playermatchstatspopup;
 
 import java.util.List;
 
+import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
+import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
+import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -18,9 +22,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DatePicker;
 
-public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements PlayerMatchStatsPopupView<T>
+public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements PlayerMatchStatsPopupView<T>, PlayerPopupView.Presenter<IPlayer>
 {
 	private static PlayerPopupViewImplUiBinder uiBinder = GWT.create(PlayerPopupViewImplUiBinder.class);
 
@@ -93,7 +96,7 @@ public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements Playe
 
 	@UiHandler("playerAndId")
 	public void onShowPlayerPopUp(ClickEvent event) {
-		presenter.showPlayerPopup(target);
+		presenter.showPlayerPopup((IPlayerMatchStats) target, this);
 	}
 	
 	private PlayerMatchStatsPopupViewPresenter<T> presenter;
@@ -166,5 +169,27 @@ public class PlayerMatchStatsPopupViewImpl<T> extends DialogBox implements Playe
 	@Override
 	public void clear() {
 		clearContents();	
+	}
+
+	@Override
+	public ClientFactory getClientFactory() {
+		return presenter.getClientFactory();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onSaveEditPlayerClicked(IPlayer player) {
+		nameAndId.setText(player.getShortName() + "/" + ((IPlayerMatchStats)target).getId());
+		if (presenter instanceof PlayerPopupView.Presenter<?>) {
+			((PlayerPopupView.Presenter<IPlayer>)presenter).onSaveEditPlayerClicked(player);
+		}
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onCancelEditPlayerClicked() {
+		((PlayerPopupView.Presenter<IPlayer>)presenter).onCancelEditPlayerClicked();
+		
 	}
 }

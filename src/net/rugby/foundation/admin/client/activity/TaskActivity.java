@@ -302,8 +302,12 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 	}
 
 	@Override
-	public void showPlayerPopup(IPlayerMatchStats target) {
-		clientFactory.getPlayerPopupView().setPresenter(this);
+	public void showPlayerPopup(IPlayerMatchStats target, PlayerPopupView.Presenter<IPlayer> presenter) {
+		// note the popup dialog will call back to the presenter (which may not be this activity)
+		if (presenter == null) {
+			presenter = this;
+		}
+		clientFactory.getPlayerPopupView().setPresenter(presenter);
 		clientFactory.getRpcService().getPlayer(target.getPlayerId(), new AsyncCallback<IPlayer>() {
 			@Override
 			public void onFailure(Throwable caught) {

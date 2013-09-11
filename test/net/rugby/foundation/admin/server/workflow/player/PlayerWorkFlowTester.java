@@ -22,7 +22,6 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
-import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -48,7 +47,12 @@ import junit.framework.Assert;
 @RunWith(GuiceJUnitRunner.class)
 @GuiceModules({ AdminTestModule.class, CoreTestModule.class, Game1TestModule.class })
 public class PlayerWorkFlowTester extends PipelineTest {
-	    private final LocalServiceTestHelper helper =
+	    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4489876078241494541L;
+
+		private final LocalServiceTestHelper helper =
 	            new LocalServiceTestHelper(new LocalTaskQueueTestConfig());
 	
 	private transient ICompetitionFactory cf;
@@ -91,7 +95,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		this.pmsf = pmsf;
 		this.mf = mf;
 		this.tf = tf;
-		((TestPlayerFactory)this.pf).setTeamFactory(tf);
+//		((TestPlayerFactory)this.pf).setTeamFactory(tf);
 	}
 	
 	@Test
@@ -322,11 +326,10 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	public void testFetchPlayerMatchStatsRichieMcCaw() {
 
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
-		mf.setId(300L);
-		IMatchGroup match = mf.getGame();
+		IMatchGroup match = mf.get(300L);
 		cf.setId(1L);
 
-		IPlayer p = pf.getById(9001014L);
+		IPlayer p = pf.get(9001014L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 14, url);//, 14505L, 1L);
@@ -369,11 +372,11 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	public void testFetchPlayerMatchStatsDanVickerman() {
 
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
-		mf.setId(300L);
-		IMatchGroup match = mf.getGame();
+
+		IMatchGroup match = mf.get(300L);;
 		//cf.setId(1L);
 
-		IPlayer p = pf.getById(9002011L);
+		IPlayer p = pf.get(9002011L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.VISITOR, 11, url);//, 14505L, 1L);
@@ -416,11 +419,11 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	public void testFetchPlayerMatchStatsJamesSlipper() {
 
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
-		mf.setId(300L);
-		IMatchGroup match = mf.getGame();
+
+		IMatchGroup match = mf.get(300L);;
 		//cf.setId(1L);
 
-		IPlayer p = pf.getById(9002017L);
+		IPlayer p = pf.get(9002017L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.VISITOR, 17, url);//, 14505L, 1L);
@@ -464,11 +467,11 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	public void testFetchPlayerMatchStatsRobSimmons() {
 
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
-		mf.setId(300L);
-		IMatchGroup match = mf.getGame();
+
+		IMatchGroup match = mf.get(300L);;
 		//cf.setId(1L);
 
-		IPlayer p = pf.getById(9002018L);
+		IPlayer p = pf.get(9002018L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.VISITOR, 18, url);//, 14505L, 1L);
@@ -512,11 +515,11 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	public void testFetchPlayerMatchStatsAliWilliams() {
 
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
-		mf.setId(300L);
-		IMatchGroup match = mf.getGame();
+
+		IMatchGroup match = mf.get(300L);;
 		//cf.setId(1L);
 
-		IPlayer p = pf.getById(9001018L);
+		IPlayer p = pf.get(9001018L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 18, url);//, 14505L, 1L);
@@ -560,11 +563,11 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	public void testFetchPlayerMatchStatsPiriWeepu() {
 
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
-		mf.setId(300L);
-		IMatchGroup match = mf.getGame();
+
+		IMatchGroup match = mf.get(300L);;
 		//cf.setId(1L);
 
-		IPlayer p = pf.getById(9001007L);
+		IPlayer p = pf.get(9001007L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 7, url);//, 14505L, 1L);
@@ -609,11 +612,11 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	public void testFetchPlayerMatchStatsSonnyBillWilliams() {
 	
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
-		mf.setId(300L);
-		IMatchGroup match = mf.getGame();
+
+		IMatchGroup match = mf.get(300L);;
 		//cf.setId(1L);
 	
-		IPlayer p = pf.getById(9001021L);
+		IPlayer p = pf.get(9001021L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 21, url);//, 14505L, 1L);

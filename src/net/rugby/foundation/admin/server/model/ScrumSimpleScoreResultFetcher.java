@@ -1,10 +1,5 @@
 package net.rugby.foundation.admin.server.model;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
@@ -267,8 +260,7 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 			return null;
 		} 
 
-		mf.setId(null);
-		IMatchGroup match = mf.getGame();  // get empty match
+		IMatchGroup match = mf.create();  // get empty match
 
 		// see if we have a new date
 		if (line.contains("fixtureTableDate")) {
@@ -321,7 +313,7 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 			}
 			if (found)  {
 				match.setForeignId(Long.parseLong(parts[i]));
-				match.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/" + parts[i] + ".html?view=scorecard" );
+				//match.setForeignUrl("http://www.espnscrum.com/scrum/rugby/current/match/" + parts[i] + ".html?view=scorecard" );
 				
 			}  else {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Couldn't get scrum id from " + line + " (couldn't find match token)");

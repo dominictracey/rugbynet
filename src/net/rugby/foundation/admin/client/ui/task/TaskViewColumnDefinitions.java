@@ -3,7 +3,11 @@ package net.rugby.foundation.admin.client.ui.task;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -88,11 +92,25 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 					return null;
 				}
 			});
-			
+
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// summary
+				// status
 				public Widget render(T c) {
 					String pos = c.getStatus().toString();
+					return new HTML(pos);
+				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			});
+
+			columnDefinitions.add(new ColumnDefinition<T>() {
+				// created
+				public Widget render(T c) {
+					String pos = c.getCreated().toString();
 					return new HTML(pos);
 				}
 
@@ -121,7 +139,38 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 				}
 			});
 
+			columnDefinitions.add(new ColumnDefinition<T>() {
+				// log
+				public Widget render(final T c) {
 
+					Button a =  new Button("Log");
+					if (c.getLog() != null) {
+						a.addClickHandler(new ClickHandler() {
+
+							@Override
+							public void onClick(ClickEvent event) {
+								if (c.getLog() != null) {
+									Window.alert(c.getLog().toString());
+								}
+							}
+
+						});
+					} else {
+						a.setEnabled(false);
+					}
+					return a;
+				}
+
+				public boolean isClickable() {
+					return false;  // it's an a href
+				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			});
 		} 	
 	}
 
@@ -133,9 +182,11 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 		ArrayList<String> headers = new ArrayList<String>();
 		headers.add("<img src='resources/cb.jpg'>");
 		headers.add( "Task");
-		headers.add( "Details");
+		headers.add( "Summary");
 		headers.add( "Status");
-		headers.add( "Pipeline");		
+		headers.add( "Created");
+		headers.add( "Pipeline");
+		headers.add("Details");
 
 
 		return headers;

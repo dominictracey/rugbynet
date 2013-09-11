@@ -1,6 +1,6 @@
 package net.rugby.foundation.model.shared;
 
-public interface IContent extends HasId {
+public interface IContent extends IHasId {
 
 	public abstract String getBody();
 

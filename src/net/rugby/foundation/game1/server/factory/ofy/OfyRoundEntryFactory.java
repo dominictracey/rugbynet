@@ -55,8 +55,8 @@ public class OfyRoundEntryFactory implements IRoundEntryFactory {
 				}
 			}
 			if (re.getTieBreakerMatchId() != null) {
-				mgf.setId(re.getTieBreakerMatchId());
-				re.setTieBreakerMatch(mgf.getGame());
+				
+				re.setTieBreakerMatch(mgf.get(re.getTieBreakerMatchId()));
 			}
 		}
 
@@ -78,8 +78,7 @@ public class OfyRoundEntryFactory implements IRoundEntryFactory {
 			List<Long> killList = new ArrayList<Long>();
 
 			for (IMatchEntry me : re.getMatchPickMap().values()) {
-				mgf.setId(me.getMatchId());
-				IMatchGroup match = mgf.getGame();
+				IMatchGroup match = mgf.get(me.getMatchId());
 				if (match.getLocked()) {
 					if (me.getId() != null)  //@REX means that they are submitting a new pick for a newly locked match?
 						newList.add(me.getId());

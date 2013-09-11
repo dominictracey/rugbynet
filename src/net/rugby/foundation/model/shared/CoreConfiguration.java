@@ -14,7 +14,7 @@ import com.googlecode.objectify.annotation.Entity;
 import net.rugby.foundation.model.shared.Stage.stageType;
 
 @Entity
-public class CoreConfiguration implements ICoreConfiguration, Serializable {
+public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Serializable, IHasId {
 	
 	private static final long serialVersionUID = 1L;
 

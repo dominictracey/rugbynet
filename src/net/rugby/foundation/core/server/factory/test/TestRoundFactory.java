@@ -96,8 +96,7 @@ public class TestRoundFactory implements IRoundFactory {
 		r.setBegin(cal.getTime());
 
 		for (Long gid : r.getMatchIDs()) {
-			gf.setId(gid);
-			IMatchGroup g = gf.getGame();
+			IMatchGroup g = gf.get(gid);
 			r.getMatches().add(g);
 			if (g.getDate().before(r.getBegin())) {
 				r.setBegin(g.getDate());

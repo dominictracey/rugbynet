@@ -37,8 +37,8 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	@Override
 	public IPlayerMatchRating get(Long id) {
 		if (id.equals(2000L)) {
-			mf.setId(300L);
-			return new PlayerMatchRating(723, pf.getById(9001014L), (IGroup)mf.getGame(),
+
+			return new PlayerMatchRating(723, pf.get(9001014L), (IGroup)mf.get(300L),
 					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L)) ;
 		}
 		return null;
@@ -78,8 +78,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	@Override
 	public IPlayerMatchRating get(IPlayerMatchStats pms, IMatchRatingEngineSchema schema) {
 		int rating = getRandomRating();
-		mf.setId(pms.getMatchId());
-		return new PlayerMatchRating(rating, pf.getById(pms.getPlayerId()), (IGroup)mf.getGame(), schema, pms);
+		return new PlayerMatchRating(rating, pf.get(pms.getPlayerId()), (IGroup)mf.get(pms.getMatchId()), schema, pms);
 	}
 
 	private int getRandomRating() {

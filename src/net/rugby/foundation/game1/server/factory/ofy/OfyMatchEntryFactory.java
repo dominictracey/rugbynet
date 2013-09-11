@@ -77,8 +77,7 @@ public class OfyMatchEntryFactory implements IMatchEntryFactory {
 	@Override
 	public IMatchEntry put(IMatchEntry e) {
 		// don't put it if the match is locked
-		mf.setId(e.getMatchId());
-		IMatchGroup m = mf.getGame();
+		IMatchGroup m = mf.get(e.getMatchId());
 		if (m != null) {
 			if (!m.getLocked()) {
 				ofy.put(e);
@@ -111,8 +110,7 @@ public class OfyMatchEntryFactory implements IMatchEntryFactory {
 		
 		if (e != null) {
 			// update the MatchStats
-			mf.setId(e.getMatchId());
-			IMatchGroup m = mf.getGame();
+			IMatchGroup m = mf.get(e.getMatchId());
 			if (m != null) {
 				msf.setMatchId(e.getMatchId());
 				IMatchStats ms = msf.getMatchStatsShard();

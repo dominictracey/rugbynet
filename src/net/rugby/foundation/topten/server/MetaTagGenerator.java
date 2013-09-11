@@ -80,7 +80,7 @@ public class MetaTagGenerator extends HttpServlet {
 
 			if (req.getParameter("playerId") != null && !req.getParameter("playerId").isEmpty()) {
 				playerId = Long.parseLong(req.getParameter("playerId"));
-				p = pf.getById(playerId);
+				p = pf.get(playerId);
 			}
 			
 			if (ttl != null) {
@@ -138,7 +138,7 @@ public class MetaTagGenerator extends HttpServlet {
 			if (tti != null) {
 				resp.getWriter().println("<meta property=\"og:image\" content=\"" + req.getScheme() + "://" + req.getServerName() + "/resources/" + tti.getTeamId() + "/200.png" + "\" />");
 			} else {
-				resp.getWriter().println("<meta property=\"og:image\" content=\"http://www.rugby.net/resources/banner_150.jpg\" />");				
+				resp.getWriter().println("<meta property=\"og:image\" content=\"http://www.rugby.net/resources/logo200.png\" />");				
 			}
 
 

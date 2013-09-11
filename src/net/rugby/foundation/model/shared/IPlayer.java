@@ -2,10 +2,7 @@ package net.rugby.foundation.model.shared;
 
 import java.util.Date;
 
-public interface IPlayer {
-
-	public abstract Long getId();
-	public abstract void setId(Long id);
+public interface IPlayer extends IHasId {
 
 	public abstract Long getScrumId();
 	public abstract void setScrumId(Long scrumId);

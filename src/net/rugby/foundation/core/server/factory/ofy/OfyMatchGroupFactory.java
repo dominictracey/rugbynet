@@ -1,115 +1,34 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.appengine.tools.pipeline.NoSuchObjectException;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
-import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
+import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
-import net.rugby.foundation.core.server.factory.IMatchResultFactory;
-import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
-import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
-import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
-import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
-import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.Round;
 
-public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
+public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Serializable,IMatchGroupFactory {
+	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5536925770981961238L;
-	private Long id;
 
-	private ITeamGroupFactory tf;
-	private IMatchResultFactory mrf;
-	private IRoundFactory rf;
-	protected ITeamMatchStatsFactory tmsf;
-	protected IPlayerMatchStatsFactory pmsf;
-	protected IPlayerMatchRatingFactory pmrf;
-	@Inject
-	OfyMatchGroupFactory(IMatchResultFactory mrf, ITeamGroupFactory tf, IRoundFactory rf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf,
-			IPlayerMatchRatingFactory pmrf) {
-
-		this.tf = tf;
-		this.mrf = mrf;
-		this.rf = rf;
-		this.tmsf = tmsf;
-		this.pmsf = pmsf;
-		this.pmrf = pmrf;
-	}
 
 	@Override
-	public IMatchGroup getGame() {
-		try {
-			byte[] value = null;
-			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			IMatchGroup m = null;
-
-			if (id == null) {
-				return (MatchGroup) put(null);
-			}
-
-			value = (byte[])syncCache.get(id);
-			if (value == null) {
-				setId(id);
-				m = getFromDB();
-
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				ObjectOutput out = new ObjectOutputStream(bos);   
-				out.writeObject(m);
-				byte[] yourBytes = bos.toByteArray(); 
-
-				out.close();
-				bos.close();
-
-				syncCache.put(id, yourBytes);
-			} else {
-
-				// send back the cached version
-				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-				ObjectInput in = new ObjectInputStream(bis);
-				m = (IMatchGroup)in.readObject();
-
-				bis.close();
-				in.close();
-
-			}
-			return m;
-
-		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-			return null;
-		}
-
-	}
-
-
-	protected IMatchGroup getFromDB() {
+	protected IMatchGroup getFromPersistentDatastore(Long id) {
 		MatchGroup g = null;
 		if (id != null) {
 			Objectify ofy = DataStoreFactory.getOfy();
@@ -130,61 +49,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 		return g;
 	}
 
-	@Override
-	public void setId(Long id) {
-		this.id = id;
 
-	}
-
-	@Override
-	public IMatchGroup put(IMatchGroup g) {
-		try {
-			if (g == null) {
-				return new MatchGroup();
-			}
-
-			if (g.getHomeTeam() == null) {
-				tf.setId(null);
-				g.setHomeTeam(tf.getTeam());
-			} else {
-				tf.put(g.getHomeTeam());
-			}
-
-			if (g.getVisitingTeam() == null) {
-				tf.setId(null);
-				g.setVisitingTeam(tf.getTeam());
-			} else {
-				tf.put(g.getVisitingTeam());
-			}
-
-			((MatchGroup)g).setHomeTeamId(g.getHomeTeam().getId());
-			((MatchGroup)g).setVisitingTeamId(g.getVisitingTeam().getId());
-			Objectify ofy = DataStoreFactory.getOfy();
-			ofy.put(g);
-
-			// now update the memcache version
-			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			syncCache.delete(g.getId());
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutput out = new ObjectOutputStream(bos);   
-			out.writeObject(g);
-			byte[] yourBytes = bos.toByteArray(); 
-
-			out.close();
-			bos.close();
-
-			syncCache.put(id, yourBytes);
-			// force top-level reload
-			if (g.getRoundId() != null) {
-				rf.build(g.getRoundId());
-			}
-
-			return g;
-		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-			return null;
-		}
-	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IMatchGroupFactory#find(net.rugby.foundation.model.shared.IMatchGroup)
@@ -214,19 +79,7 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 		return null;
 	}
 
-	@Override
-	public List<IMatchGroup> getMatchesForRound(Long roundId) {
-		//		Objectify ofy = DataStoreFactory.getOfy();
-		//		Round r = ofy.get(new Key<Round>(Round.class,roundId));
-		rf.setId(roundId);
-		IRound r = rf.getRound();  //roundFactory handles memcaching
-		if (r != null) {
-			return r.getMatches();
-		} else {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Could not find requested Round " + roundId);
-			return null;
-		}
-	}
+
 
 	@Override
 	public List<? extends IMatchGroup> getMatchesWithPipelines() {
@@ -237,59 +90,54 @@ public class OfyMatchGroupFactory implements IMatchGroupFactory, Serializable {
 	}
 
 	@Override
-	public boolean delete(Long matchId) {
+	public boolean deleteFromPersistentDatastore(IMatchGroup m) {
 		try {
-			setId(matchId);
-			IMatchGroup m = getGame();
+			Objectify ofy = DataStoreFactory.getOfy();
+			ofy.delete(m);
+			return true;
 
-
-			if (m != null) {
-				// delete any results
-
-				if (m.getSimpleScoreMatchResultId() != null) {
-
-					if (!mrf.delete(m.getSimpleScoreMatchResultId())) {
-						return false;
-					}
-				}
-
-				// delete any teamMatchStats
-				if (!tmsf.deleteForMatch(m)) {
-					return false;
-				}
-
-				// delete any playerMatchStats
-				if (!pmsf.deleteForMatch(m)) {
-					return false;
-				}
-
-				// delete any playerMatchRatings
-				if (!pmrf.deleteForMatch(m)) {
-					return false;
-				}
-
-				// purge any pipeline jobs
-				if (m.getFetchMatchStatsPipelineId() != null) {
-					PipelineService service = PipelineServiceFactory.newPipelineService();
-
-					try {
-						service.deletePipelineRecords(m.getFetchMatchStatsPipelineId(),true,false);
-					} catch (NoSuchObjectException nsox) {
-						// it's ok, just was a dangling reference in the match record
-					}
-				}
-
-				Objectify ofy = DataStoreFactory.getOfy();
-				ofy.delete(m);
-				return true;
-			} else {
-				return true; // ?
-			}
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error deleting match " + matchId + ex.getLocalizedMessage());
+			String id = "null";
+			if (m != null) {
+				id = m.getId().toString();
+			}
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error deleting match " + id + ex.getLocalizedMessage());
 			return false;
 		}
-		
+
+	}
+
+
+
+	@Override
+	public IMatchGroup create() {
+		try {
+		IMatchGroup m =  new MatchGroup();
+		//m.setCreatedDate(new Date());
+		return m;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error creating match " + ex.getLocalizedMessage(), ex);
+			return null;
+		}
+	}
+
+
+
+	@Override
+	protected IMatchGroup putToPersistentDatastore(IMatchGroup m) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			ofy.put(m);
+			return m;
+
+		} catch (Throwable ex) {
+			String id = "null";
+			if (m != null) {
+				id = m.getId().toString();
+			}
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error deleting match " + id + ex.getLocalizedMessage(), ex);
+			return null;
+		}
 	}
 
 

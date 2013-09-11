@@ -5,11 +5,7 @@ import java.util.List;
 
 import net.rugby.foundation.model.shared.Group.GroupType;
 
-public interface IGroup {
-
-	public abstract Long getId();
-
-	public abstract void setId(Long id);
+public interface IGroup extends IHasId {
 
 	public abstract GroupType getGroupType();
 

@@ -62,14 +62,13 @@ public class CompetitionWorkflow extends Workflow {
 			checkMatches(compId);
 		} else if (ev == Events.MatchLocked) {
 			// see if the match needs to be fetched now
-			mf.setId(Long.parseLong(targetKey));
+
 			cf.setId(getCompId());
-			checkResults(mf.getGame(),cf.getCompetition());
+			checkResults(mf.get(Long.parseLong(targetKey)),cf.getCompetition());
 		} else if (ev == Events.ResultFound) {
 			// see if the round can be advanced now
-			mf.setId(Long.parseLong(targetKey));
 			cf.setId(getCompId());
-			checkResults(mf.getGame(),cf.getCompetition());
+			checkResults(mf.get(Long.parseLong(targetKey)),cf.getCompetition());
 			ICompetition c = cf.getCompetition();
 			if (c.getNextRound() != null) {
 				checkRoundComplete(c.getNextRound(), c);	

@@ -50,7 +50,7 @@ public class ScrumMatchRatingEngineBase implements
 		List<IPlayerMatchRating> mrl = new ArrayList<IPlayerMatchRating>();
 		for (IPlayerMatchStats pms : homePlayerStats) {
 			if (pms != null) {
-				IPlayerMatchRating pmr = pmrf.getNew(pf.getById(pms.getPlayerId()), match, 500, schema, pms);
+				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms);
 				pmrf.put(pmr);
 				mrl.add(pmr);
 			}
@@ -58,7 +58,7 @@ public class ScrumMatchRatingEngineBase implements
 		
 		for (IPlayerMatchStats pms : visitPlayerStats) {
 			if (pms != null) {
-				IPlayerMatchRating pmr = pmrf.getNew(pf.getById(pms.getPlayerId()), match, 500, schema, pms);
+				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms);
 				pmrf.put(pmr);
 				mrl.add(pmr);
 			}

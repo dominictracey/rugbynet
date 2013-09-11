@@ -18,10 +18,14 @@
 			width:500px;
 			background-color:lightorange;
 			padding:20px;
+		}
+
+		.fullwidth {
+			width: 100%;
 		}
     </ui:style>
 
-    <g:VerticalPanel>
+    <g:VerticalPanel styleName="{style.fullwidth}">
 
         <g:SimplePanel ui:field="menuBarPanel" >
         </g:SimplePanel>

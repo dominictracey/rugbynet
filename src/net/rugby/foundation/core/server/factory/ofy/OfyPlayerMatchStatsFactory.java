@@ -22,7 +22,6 @@ import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 
@@ -163,7 +162,9 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 
 
 	private String getMatchIdCacheKey(Long matchId) {
-
+		if (matchId == null) {
+			throw new RuntimeException("No matchId provided for getMatchIdCacheKey");
+		}
 		return "PMSIdsForMatch"+matchId.toString();
 	}
 

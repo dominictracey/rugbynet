@@ -109,8 +109,7 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 		if (r != null) {
 			r.setMatches(new ArrayList<IMatchGroup>());
 			for (Long gid : r.getMatchIDs()) {
-				gf.setId(gid);
-				IMatchGroup g = gf.getGame();
+				IMatchGroup g = gf.get(gid);
 				r.getMatches().add(g);
 			}
 		} else {
@@ -232,8 +231,10 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 			boolean ok = true;
 			if (r != null) {
 				for (Long mid : r.getMatchIDs()) {
-					if (ok) 
-						ok = gf.delete(mid);
+					if (ok) {						
+						IMatchGroup m = gf.get(mid);
+						ok = gf.delete(m);
+					}
 				}
 				
 				if (ok) {

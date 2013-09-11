@@ -214,8 +214,6 @@ IMatchRatingEngine  {
 			if (!pms.getTeamId().equals(match.getHomeTeamId())) {
 				pointDifferential *= -1;
 			}
-			
-
 		}
 
 		private void Normalize() {
@@ -389,7 +387,7 @@ IMatchRatingEngine  {
 		}
 
 		for (PlayerStatShares score : pss) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.getById(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats());
+			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats());
 			pmrf.put(pmr);
 			mrl.add(pmr);
 		}

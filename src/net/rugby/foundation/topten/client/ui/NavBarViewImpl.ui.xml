@@ -13,7 +13,7 @@
 	    <g:HTMLPanel width="100%">
 	        
 <b:Navbar>
-    <b:Brand>Rugby Network</b:Brand>
+    <b:Brand>Top Ten Lists</b:Brand>
     <b:Nav>
         <b:NavPills>
     		<b:Dropdown text="Competition" ui:field='compDropdown'>

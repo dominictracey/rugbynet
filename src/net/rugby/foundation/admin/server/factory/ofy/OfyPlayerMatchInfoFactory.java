@@ -61,8 +61,8 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 	public List<IPlayerMatchInfo> getForMatch(Long matchId, IMatchRatingEngineSchema schema) {
 		try {
 			List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
-			mf.setId(matchId);
-			IMatchGroup m = mf.getGame();
+
+			IMatchGroup m = mf.get(matchId);
 
 			if (m != null) {
 				List<? extends IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);

@@ -251,8 +251,7 @@ public class TestRoundEntryFactory implements IRoundEntryFactory {
 		}
 
 		buildMatchEntryList(re);
-		mgf.setId(re.getTieBreakerMatchId());
-		re.setTieBreakerMatch(mgf.getGame());
+		re.setTieBreakerMatch(mgf.get(re.getTieBreakerMatchId()));
 		return re;
 	}
 	

@@ -3,16 +3,12 @@ package net.rugby.foundation.model.shared;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.rugby.foundation.model.shared.Position.position;
 
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Indexed;
 
 @Entity
 public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {

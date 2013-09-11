@@ -13,9 +13,13 @@
     	}
     	.playersViewPlayersFlexTable {
      		margin: 5px 0px 5px 0px;
+			width: 100%;
     	}
+		.fullwidth {
+			width: 100%;
+		}
     </ui:style>
-	<g:VerticalPanel>
+	<g:VerticalPanel addStyleNames="{style.fullwidth}">
 	    
 	 <g:SimplePanel ui:field='menuBarPanel'></g:SimplePanel>
     
@@ -24,7 +28,7 @@
         <g:FlexTable
             addStyleNames="{style.playersViewPlayersFlexTable}"
             
-width="100%"            ui:field="taskTable" />
+           ui:field="taskTable" />
     </g:HTMLPanel>
 </g:VerticalPanel>
 </ui:UiBinder>

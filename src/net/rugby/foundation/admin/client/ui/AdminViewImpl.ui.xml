@@ -5,11 +5,12 @@
 	<ui:style>
 		.panel {
 			background-color: ivory;
+			width: 100%;
 		}
 	</ui:style>
 
 	<g:FlowPanel styleName="{style.panel}">
-		<g:TabPanel ui:field="tabs">
+		<g:TabPanel ui:field="tabs" styleName="{style.panel}">
 		
 		</g:TabPanel>
 	</g:FlowPanel>

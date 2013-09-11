@@ -113,15 +113,14 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 		// hydrate the transient objects from their stored Ids
 		PlayerMatchRating pmr = ofy.get(new Key<PlayerMatchRating>(PlayerMatchRating.class, id));
 		if (pf != null) {
-			pmr.setPlayer(pf.getById(pmr.getPlayerId()));
+			pmr.setPlayer(pf.get(pmr.getPlayerId()));
 		}
 
 		if (pmsf != null) {
 			pmr.setPlayerMatchStats(pmsf.getById(pmr.getPlayerMatchStatsId()));
 			//have to have the PMR to get the match
 			if (mf != null) {
-				mf.setId(pmr.getPlayerMatchStats().getMatchId());
-				pmr.setGroup((IGroup)mf.getGame());
+				pmr.setGroup((IGroup)mf.get(pmr.getPlayerMatchStats().getMatchId()));
 			}
 		}
 		return pmr;
@@ -244,15 +243,14 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 
 		if (qr != null) {
 			if (pf != null) {
-				qr.setPlayer(pf.getById(qr.getPlayerId()));
+				qr.setPlayer(pf.get(qr.getPlayerId()));
 			}
 
 			if (pmsf != null) {
 				//have to have the PMR to get the match
 				if (mf != null && qr instanceof IPlayerMatchRating) {
 					((IPlayerMatchRating)qr).setPlayerMatchStats(pmsf.getById(((IPlayerMatchRating)qr).getPlayerMatchStatsId()));
-					mf.setId(((IPlayerMatchRating)qr).getPlayerMatchStats().getMatchId());
-					qr.setGroup((IGroup)mf.getGame());
+					qr.setGroup((IGroup)mf.get(((IPlayerMatchRating)qr).getPlayerMatchStats().getMatchId()));
 				}
 			}
 

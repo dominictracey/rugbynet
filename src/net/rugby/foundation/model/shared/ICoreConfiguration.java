@@ -12,7 +12,7 @@ import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
  * @author home
  *
  */
-public interface ICoreConfiguration extends HasId {
+public interface ICoreConfiguration extends IHasId {
 	public abstract void addCompetition(Long id, String name);
 	public abstract Map<Long, String> getCompetitionMap();
 	

@@ -12,10 +12,10 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import net.rugby.foundation.model.shared.HasId;
+import net.rugby.foundation.model.shared.IHasId;
 
 
-public abstract class BaseCachingFactory<T extends HasId> implements ICachingFactory<T> {
+public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFactory<T> {
 
 	@Override
 	public T get(Long id) {
@@ -39,7 +39,7 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 					bos.close();
 
 					syncCache.put(id, yourBytes);
-					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** getting object (and putting in memcache)" + mr.getId() + " *** \n" + syncCache.getStatistics());
+					//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** getting object (and putting in memcache)" + mr.getId() + " *** \n" + syncCache.getStatistics());
 
 				}
 			} else {
@@ -48,7 +48,7 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 				ByteArrayInputStream bis = new ByteArrayInputStream(value);
 				ObjectInput in = new ObjectInputStream(bis);
 				Object obj = in.readObject();
-				if (obj instanceof HasId) {  // can't do 'obj instanceof T' *sadfase*
+				if (obj instanceof IHasId) {  // can't do 'obj instanceof T' *sadfase*
 					mr = (T)obj;
 				}
 
@@ -84,7 +84,7 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 			bos.close();
 
 			syncCache.put(t.getId(), yourBytes);
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting config " + t.getId() + " *** \n" + syncCache.getStatistics());
+			//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting object " + t.getId() + " *** \n" + syncCache.getStatistics());
 
 			return t;
 		} catch (Throwable ex) {
@@ -156,7 +156,7 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 
 	/**
 	 * 
-	 * @param key - memcache key to store (consider using this.getClass() + "descriptor")
+	 * @param key - memcache key to store (consider using this.getClass().toString() + "descriptor")
 	 * @param list - List<T> to store or null to clear entry
 	 * @return true if successful storing
 	 */
@@ -174,7 +174,7 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 				bos.close();
 
 				syncCache.put(key, yourBytes);
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list at " + key + " *** \n" + syncCache.getStatistics());
+				//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list at " + key + " *** \n" + syncCache.getStatistics());
 			}
 			return true;
 		} catch (Throwable ex) {
@@ -235,11 +235,13 @@ public abstract class BaseCachingFactory<T extends HasId> implements ICachingFac
 				bos.close();
 
 				syncCache.put(divKey, yourBytes);
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list at " + divKey + " *** \n" + syncCache.getStatistics());
+				//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list at " + divKey + " *** \n" + syncCache.getStatistics());
 			}
 			return true;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return false;
-		}	}
+		}	
+	}
+	
 }

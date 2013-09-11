@@ -467,8 +467,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 						teams.put(visitName,getTeam(visitName));
 					}
 
-					mf.setId(null);
-					IMatchGroup match = mf.getGame();  // get empty one
+					IMatchGroup match = mf.create();  // get empty one
 					match.setHomeTeam(teams.get(homeName));
 					//match.setHomeTeamId(teams.get(homeName).getId());
 					match.setVisitingTeam(teams.get(visitName));

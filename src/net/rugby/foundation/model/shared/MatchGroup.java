@@ -253,6 +253,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public void setForeignId(Long foreignId) {
 		this.foreignId = foreignId;
+		this.foreignUrl = "http://www.espnscrum.com/scrum/rugby/current/match/" + foreignId.toString() + ".html?view=scorecard";
 	}
 
 	@Override

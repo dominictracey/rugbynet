@@ -1,7 +1,10 @@
 package net.rugby.foundation.admin.server.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,6 +15,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.Position;
+import net.rugby.foundation.model.shared.Position.position;
 
 public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	private transient IPlayerMatchStatsFactory pmsf;
@@ -23,6 +27,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	private transient String url;
 	private transient IPlayerMatchStats stats;
 	private transient int time = 0;
+	private transient Map<String, IPlayerMatchStats> playerMap = new HashMap<String, IPlayerMatchStats>();
 	private String errorMessage;
 
 
@@ -38,22 +43,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 
 		setErrorMessage(null);
-		
-		stats = pmsf.getById(null);
-		if (match != null) {
-			stats.setMatchId(match.getId()); // native ID, not scrum's
-			if (hov == Home_or_Visitor.HOME) 
-				stats.setTeamId(match.getHomeTeamId());
-			else
-				stats.setTeamId(match.getVisitingTeamId());	
-		}
 
-		if (player != null) {
-			stats.setPlayerId(player.getId());  // native ID, not scrum's
-			stats.setCountryId(player.getCountryId());
-		}
+		//stats = pmsf.getById(null);
 
-		stats.setSlot(slot);
 
 		Boolean foundStats = false;
 		UrlCacher urlCache = new UrlCacher(url);
@@ -73,6 +65,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 		// get the player stats
 		foundStats = false;
+
+		// whether he is a reserve with his position listed as "R" - in which case we have to figure out who he came on for.
+		boolean findPosition = false;
 
 		while (it.hasNext() && !foundStats) {
 
@@ -96,30 +91,46 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				// there is a weird case (http://www.espnscrum.com/scrum/rugby/current/match/166469.html?view=scorecard) 
 				// where the starter just doesn't show up in the stats. See [12	C Hudson Tonga'uiha].
 				// this not only hoses up that player, but everyone after him.
-				stats = getPlayerStats(it, stats);
-				if (!player.getSurName().equals(stats.getName()) && !player.getShortName().equals(stats.getName())) {
-					// keep looking
-					boolean stillLooking = true;
-					while(stats != null && stillLooking) {
-						stats = getPlayerStats(it,stats);
-						if (stats != null && (player.getSurName().equals(stats.getName()) || player.getShortName().equals(stats.getName()))) {
-							stillLooking = false;
-							break;
-						}
-					}
+				//				IPlayerMatchStats cursor = pmsf.getById(null);
+				//				cursor = getPlayerStats(it, cursor);
+				//				playerMap.put(cursor.getName(),cursor);
+				//				
+				//				if (!player.getSurName().equals(cursor.getName()) && !player.getShortName().equals(cursor.getName())) {
+				//					// keep looking
+				boolean stillLooking = true;
+				while(stillLooking) {
+					IPlayerMatchStats cursor = pmsf.getById(null);
+					cursor = getPlayerStats(it,cursor);
+					if (cursor != null) {
+						playerMap.put(cursor.getName(),cursor);
+						if (cursor != null && (player.getSurName().equals(cursor.getName()) || player.getShortName().equals(cursor.getName()))) {
 
-					// if we didn't find it, assume they didn't get a run on and create an AdminTask if they were a starter
-					if (stillLooking) {
-						stats = noRunOn();
-						if (slot > 14) {
-							return stats;
-						} else {
-							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match data row for " + player.getDisplayName());
-							setErrorMessage("Couldn't get playing time info for player " + player.getDisplayName() + " in slot " + slot + " from the match report at " + url + " : No line in match stats - created empty stats record for your review");		
-							return null;
+							configureStats(cursor);
+							// if we need to find a position for them, we need to get everyone in the playerMap
+							if (!cursor.getPosition().equals(position.RESERVE) && !cursor.getPosition().equals(position.NONE)) {
+								stillLooking = false;
+								break;
+							} else {
+								findPosition = true;
+							}
 						}
+					} else {
+						break; // at the end of the line
 					}
 				}
+
+				// if we didn't find it, assume they didn't get a run on and create an AdminTask if they were a starter
+				if (stillLooking && !findPosition) {
+					stats = noRunOn();
+					if (slot > 14) {
+						return stats;
+					} else {
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match data row for " + player.getDisplayName());
+						setErrorMessage("Couldn't get playing time info for player " + player.getDisplayName() + " in slot " + slot + " from the match report at " + url + " : No line in match stats - created empty stats record for your review");		
+						return null;
+					}
+				}
+
 
 				if (slot < 15) {  // starters
 					try {
@@ -130,11 +141,14 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 					}
 				}
 
+
+
 				pmsf.put(stats);
 				foundStats = true;
-				
 			}
+
 		}
+
 
 		// now get the playing time
 
@@ -164,20 +178,39 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				// now process row-by-row
 				boolean done = false;
 				while (!done) {
-					done = ProcessTimelineRow(it, stats);
+					done = ProcessTimeline(it, stats);
 				}
 				foundTime = true;
 			} 
 		}
-		
+
 		if (!foundTime) {
 			setErrorMessage("Couldn't find timeline tab while getting match stats for " + player.getDisplayName() + " in match " + match.getDisplayName());
 		}
-		
+
 		if (foundStats)
 			return stats;
 		else
 			return null;
+	}
+
+	private void configureStats(IPlayerMatchStats cursor) {
+		stats = cursor;
+		if (match != null) {
+			stats.setMatchId(match.getId()); // native ID, not scrum's
+			if (hov == Home_or_Visitor.HOME) 
+				stats.setTeamId(match.getHomeTeamId());
+			else
+				stats.setTeamId(match.getVisitingTeamId());	
+		}
+
+		if (player != null) {
+			stats.setPlayerId(player.getId());  // native ID, not scrum's
+			stats.setCountryId(player.getCountryId());
+		}
+
+		stats.setSlot(slot);
+
 	}
 
 	private IPlayerMatchStats noRunOn() {
@@ -274,7 +307,16 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		return stats;
 	}
 
-	private boolean ProcessTimelineRow(Iterator<String> it, IPlayerMatchStats pms) {
+	private boolean ProcessTimeline(Iterator<String> it, IPlayerMatchStats pms) {
+		// home team is in left column, visitors in right
+		String us = "liveTblColLeft";
+		String them = "liveTblColRgt";
+		boolean heIsOn = false;
+		if (hov.equals(Home_or_Visitor.VISITOR)) {
+			us = "liveTblColRgt";
+			them = "liveTblColLeft";
+		}
+
 		String line = getNext(it);
 
 		if (line.contains("<tr class=\"liveTblRow"))  {
@@ -310,14 +352,63 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 			// not enough to just test on "contains".  http://www.espnscrum.com/premiership-2012-13/rugby/match/166469.html
 			// Leister is fielding Micky Young and Tom Youngs - gah!
+			//
+			// So we need to cycle through all of the "on" and "off" entries and keep them in a block so if we have a reserve come on who doesn't have
+			// his position set (he is Postition.RESERVE), we can figure out what his position is based on the best matching candidate coming off.
 			try {
-				while (!line.contains(pms.getName()) && !line.contains("</tr>")) {
+				//				while (!line.contains(pms.getName()) && !line.contains("</tr>")) {
+				//					line = getNext(it);
+				//					if (line.contains(pms.getName())) {
+				//						if (line.split("[<|>|-]")[0].trim().equals(pms.getName()) ||line.split("[<|>|-]")[1].trim().equals(pms.getName()) || line.split("[<|>|-]")[2].trim().equals(pms.getName())) {
+				//							if (line.contains("sub")) {
+				//								if (line.split("sub")[1].trim().contains("on")) {
+				//									pms.playerOn(time);
+				//								} else if (line.split("sub")[1].trim().contains("off")) {
+				//									pms.playerOff(time);
+				//								}
+				//							}
+				//						}
+				//					}
+				//				}
+
+
+				// if we have a block, organize them so we know who is coming off.
+				List<String> offList = null;
+
+				boolean findPosition = false;
+				if (pms.getPosition().equals(position.NONE) || pms.getPosition().equals(position.RESERVE)) {
+					findPosition = true;
+					offList = new ArrayList<String>();
+				}
+
+				boolean look = false;
+
+				while (!line.contains("</tr>")) {
 					line = getNext(it);
-					if (line.contains(pms.getName())) {
-						if (line.split("[<|>|-]")[0].trim().equals(pms.getName()) ||line.split("[<|>|-]")[1].trim().equals(pms.getName()) || line.split("[<|>|-]")[2].trim().equals(pms.getName())) {
+
+					if (line.contains(us)) {
+						look = true;
+					} else if (line.contains(them)) {
+						look = false;
+					}
+
+					if (look) {
+						String name = findName(line); 
+
+						if (name != null && findPosition) {
+							if (line.contains("sub")) {
+								if (line.split("sub")[1].trim().contains("off")) {
+									offList.add(name);
+								}
+							}
+						}
+
+						// so if this contains the guy we are looking for, mark them as on or off.
+						if (name != null && name.equals(pms.getName())) {
 							if (line.contains("sub")) {
 								if (line.split("sub")[1].trim().contains("on")) {
 									pms.playerOn(time);
+									heIsOn = true;
 								} else if (line.split("sub")[1].trim().contains("off")) {
 									pms.playerOff(time);
 								}
@@ -325,11 +416,33 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						}
 					}
 				}
+
+				//	Additionally, if they have a position of Reserve or None, figure out who they are replacing
+				// 	so we can update their position accordingly.
+				if (findPosition && heIsOn) {
+					// if there is only one person off, that's the one.
+					if (offList.size() == 1) {
+						if (playerMap.containsKey(offList.get(0))) {
+							pms.setPosition(playerMap.get(offList.get(0)).getPosition());
+						}
+					} else if (offList.size() > 1) {
+						// otherwise, try to pick the right one.
+						position pos = getSwappedPosition(pms, offList);
+						if (pos != null && pos != position.NONE && pos != position.RESERVE) {
+							pms.setPosition(pos);
+						} else {
+							throw new RuntimeException("Could not match the reserve player coming on to anyone coming off so we could determine what his position was.");
+						}
+					} else {
+						throw new RuntimeException("offList not set up properly - must have one or more people coming off as our guy comes on.");
+					}
+				}
+
 			} catch (Exception e) {
 				if (pms != null) {
 					setErrorMessage("Problem getting playing time information for player " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + e.getLocalizedMessage());
 				} 
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Parsing timeline issue: " + e.getMessage());
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Parsing timeline issue: " + e.getMessage(), e);
 
 			}
 
@@ -343,6 +456,154 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 			pms.matchOver(time);
 			return true;
 		}
+	}
+
+	private String findName(String line) {
+		// it can be in a few different places in the strtok
+		String[] split = line.split("<|>| - ");
+		if (split.length > 0 && playerMap.containsKey(split[0].trim())) {
+			return split[0].trim();
+		} else if (split.length > 1 && playerMap.containsKey(split[1].trim())) {
+			return split[1].trim();
+		} if (split.length > 2 && playerMap.containsKey(split[2].trim())) {
+			return split[2].trim();
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param pms - Reserve player we are trying to determine a position for
+	 * @param offList - The players who came off the field as he went on
+	 * @return - The "best fit" position, meaning each slot has a "first choice" (jersey 16 => hooker, jerseys 17,18 => prop, etc). If there wasn't one of them we go through the second choices for that jersey. If we can't find anything we return position.NONE
+	 */
+	private position getSwappedPosition(IPlayerMatchStats pms, List<String> offList) {
+		Iterator<String> it = offList.iterator();
+		boolean matched = false;
+
+		position pos = position.NONE;
+
+		if (pms.getSlot() == 15) { // 15 is jersey 16 since we started at 0
+			// look for a hooker
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.HOOKER)) {
+						pos = position.HOOKER;
+						matched = true;
+					} else if (playerMap.get(candidate).getPosition().equals(position.PROP)) {
+						pos = position.PROP;
+					}
+				}
+			}
+		} else if (pms.getSlot() == 16) {
+			// look for a prop
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.PROP)) {
+						pos = position.PROP;
+						matched = true;
+					}
+				}
+			}
+		} else if (pms.getSlot() == 17) {
+			// look for a prop
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.PROP)) {
+						pos = position.PROP;
+						matched = true;
+					}if (playerMap.get(candidate).getPosition().equals(position.LOCK)) {
+						pos = position.LOCK;
+					}
+				}
+			}
+		} else if (pms.getSlot() == 18) {
+			// look for a lock
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.LOCK)) {
+						pos = position.LOCK;
+						matched = true;
+					} else if (playerMap.get(candidate).getPosition().equals(position.NUMBER8)) {
+						pos = position.NUMBER8;
+					} else if (playerMap.get(candidate).getPosition().equals(position.FLANKER)) {
+						pos = position.FLANKER;
+					}
+				}
+			}
+		} else if (pms.getSlot() == 19) {
+			// look for a backrow
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.FLANKER)) {
+						pos = position.FLANKER;
+						matched = true;
+					} else if (playerMap.get(candidate).getPosition().equals(position.NUMBER8)) {
+						pos = position.NUMBER8;
+					} else if (playerMap.get(candidate).getPosition().equals(position.LOCK)) {
+						pos = position.LOCK;
+					}
+				}
+			}
+		} else if (pms.getSlot() == 20) {
+			// look for a SH
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.SCRUMHALF)) {
+						pos = position.SCRUMHALF;
+						matched = true;
+					} else if (playerMap.get(candidate).getPosition().equals(position.FLYHALF)) {
+						pos = position.FLYHALF;
+					} else if (playerMap.get(candidate).getPosition().equals(position.CENTER)) {
+						pos = position.CENTER;
+					} else if (playerMap.get(candidate).getPosition().equals(position.SCRUMHALF)) {
+						pos = position.SCRUMHALF;
+					}
+				}
+			}
+		}  else if (pms.getSlot() == 21) {
+			// look for a FH
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.FLYHALF)) {
+						pos = position.FLYHALF;
+						matched = true;
+					} else if (playerMap.get(candidate).getPosition().equals(position.CENTER)) {
+						pos = position.CENTER;
+					} else if (playerMap.get(candidate).getPosition().equals(position.WING)) {
+						pos = position.WING;
+					} else if (playerMap.get(candidate).getPosition().equals(position.FULLBACK)) {
+						pos = position.FULLBACK;
+					}
+				}
+			}
+		}  else if (pms.getSlot() == 22) {
+			// look for a Wing or FB
+			while (it.hasNext() && !matched) {
+				String candidate = it.next();
+				if (playerMap.containsKey(candidate)) {
+					if (playerMap.get(candidate).getPosition().equals(position.WING)) {
+						pos = position.WING;
+						matched = true;
+					} else if (playerMap.get(candidate).getPosition().equals(position.FULLBACK)) {
+						pos = position.FULLBACK;
+					} else if (playerMap.get(candidate).getPosition().equals(position.CENTER)) {
+						pos = position.CENTER;
+					} else if (playerMap.get(candidate).getPosition().equals(position.FLYHALF)) {
+						pos = position.FLYHALF;
+					}
+				}
+			}
+		}
+
+		return pos;
 	}
 
 	private void skipPlayer(Iterator<String> it) {
@@ -408,7 +669,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		if (stats == null) {
 			populateStats();
 		}
-		
+
 		return (errorMessage == null);
 	}
 	@Override

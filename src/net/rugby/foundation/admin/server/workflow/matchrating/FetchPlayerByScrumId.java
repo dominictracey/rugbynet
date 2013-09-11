@@ -97,7 +97,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 	 */
 	private Value<IPlayer> getPlayerFromScrum(IPlayerFactory pf, Long scrumPlayerId)  {
 		
-		IPlayer player = pf.getById(null);  //empty
+		IPlayer player = pf.create();  //empty
 
 		String playerURL = "http://www.espnscrum.com/scrum" + "/rugby/player/" + scrumPlayerId + ".html";
 		List<String> errorDetails = new ArrayList<String>();
@@ -123,7 +123,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 					setPlayerNames(line, player, errorDetails);
 				} else if (line.contains("scrumPlayerCountry")) {
 					// added comma to the regex, will this then pick up the first country if they have two listed?
-					ICountry country = cf.getByName(line.split("<|>")[2].trim());
+					ICountry country = cf.getByName(line.split("<|>|\\/")[2].trim());
 					player.setCountry(country);
 					if (country == null) {
 						// not finding a country is non-blocking

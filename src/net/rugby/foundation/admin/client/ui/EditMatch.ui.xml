@@ -13,7 +13,7 @@
 			class. See the GWT docs on UI Binder for more details. -->
 
 				Display Name: <g:TextBox ui:field='displayName'></g:TextBox><br/>
-				Scheduled:  <g:TextBox ui:field='scheduled'></g:TextBox><br/>
+				Scheduled:  <g:TextBox ui:field='scheduled'></g:TextBox> Scrum Id: <g:TextBox ui:field='scrumId'></g:TextBox><br/>
 				Status: <g:ListBox ui:field='status'></g:ListBox>
 				Locked: <g:CheckBox ui:field='locked'></g:CheckBox><br/>
 				Home Score: <g:TextBox ui:field='homeScore'></g:TextBox>

@@ -65,7 +65,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	private ITopTenItem getItem(Long id, ITopTenList parent) {
 		try {
 			ITopTenItem item = ofy.get(TopTenItem.class,id);
-			item.setPlayer(pf.getById(item.getPlayerId()));
+			item.setPlayer(pf.get(item.getPlayerId()));
 			assert(parent.getId()==item.getParentId());
 			//item.setParent(parent);
 			return item;

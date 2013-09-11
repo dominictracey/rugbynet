@@ -283,8 +283,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			int count = 0;
 			while (it.hasNext() && count < 10) {
 				IPlayerMatchRating pmr = it.next();
-				mf.setId(pmr.getPlayerMatchStats().getMatchId());
-				IMatchGroup match = mf.getGame();
+				IMatchGroup match = mf.get(pmr.getPlayerMatchStats().getMatchId());
 				tf.setId(pmr.getPlayerMatchStats().getTeamId());
 				ITeamGroup team = tf.getTeam();
 				//TopTenItem(Long id, Long playerId, IPlayer player, String text,

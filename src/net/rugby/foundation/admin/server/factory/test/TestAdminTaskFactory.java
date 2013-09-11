@@ -46,14 +46,13 @@ public class TestAdminTaskFactory implements IAdminTaskFactory {
 					id, Action.EDITPLAYER, 1L,
 					new Date(), null, Status.OPEN, Priority.BLOCKER,
 					"Could not find country for R McCaw", "Just couldn't get it", null, null,
-					null, null, 9001014L, pf.getById(9001014L) );
+					null, null, 9001014L, pf.get(9001014L) );
 		} else if (id.equals(500001L)) {
-			mgf.setId(300L);
 			retval = new EditPlayerMatchStatsAdminTask(
 					id, Action.EDITPLAYERMATCHSTATS, 1L,
 					new Date(), null, Status.OPEN, Priority.BLOCKER,
 					"Could not get time played for R McCaw in NZL vs AUS", "Just couldn't get it", null, null,
-					null, null, pf.getById(9001014L), mgf.getGame(), null);
+					null, null, pf.get(9001014L), mgf.get(300L), null);
 		}	
 		return retval;
 	}

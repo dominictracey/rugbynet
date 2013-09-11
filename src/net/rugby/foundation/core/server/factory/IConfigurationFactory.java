@@ -11,5 +11,4 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
  */
 public interface IConfigurationFactory extends ICachingFactory<ICoreConfiguration>{
 	public abstract ICoreConfiguration get();
-	//public abstract ICoreConfiguration put(ICoreConfiguration conf);
 }

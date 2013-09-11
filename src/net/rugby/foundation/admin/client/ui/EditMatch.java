@@ -80,6 +80,8 @@ public class EditMatch extends Composite {
 	@UiField
 	TextBox displayName;
 	@UiField
+	TextBox scrumId;
+	@UiField
 	TextBox scheduled;
 	@UiField
 	ListBox status;
@@ -100,6 +102,9 @@ public class EditMatch extends Composite {
 		matchGroup.setDisplayName(displayName.getText());
 		matchGroup.setDate(new Date(scheduled.getText()));
 		matchGroup.setLocked(locked.getValue());
+		if (scrumId.getText() != null && !scrumId.getText().isEmpty() && scrumId.getText().matches("[0-9]*")) {
+			matchGroup.setForeignId(Long.parseLong(scrumId.getText()));
+		}
 		int selected = status.getSelectedIndex();
 		matchGroup.setStatus(Status.valueOf(Status.class, status.getItemText(selected)));
 		listener.saveMatchInfo(matchGroup);
@@ -147,6 +152,11 @@ public class EditMatch extends Composite {
 				selectedIndex = status.getItemCount()-1;
 			}
 		}
+		
+		if (match.getForeignId() != null) {
+			scrumId.setText(match.getForeignId().toString());
+		}
+		
 		status.setSelectedIndex(selectedIndex);
 		locked.setValue(match.getLocked());
 		if (match.getLocked()) {

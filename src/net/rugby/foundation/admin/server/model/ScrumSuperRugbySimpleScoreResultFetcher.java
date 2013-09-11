@@ -144,7 +144,7 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 		 // <a href="/premiership-2011-12/rugby/match/142520.html" class="fixtureTablePreview">London Irish&nbsp;42 - 24&nbsp;Worcester Warriors</a>
 		if (line.split("\"").length > 2) {
 			String foreignUrl = line.split("\"")[1];
-			match.setForeignUrl("http://www.espnscrum.com" + foreignUrl);
+			//match.setForeignUrl("http://www.espnscrum.com" + foreignUrl);
 			// and the matchId
 			if (foreignUrl.split("[/|.]").length > 3) {
 				match.setForeignId(Long.parseLong(foreignUrl.split("[/|.]")[4]));

@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.BasePlayerFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -26,7 +27,7 @@ import net.rugby.foundation.model.shared.Position.position;
  * @author home
  *
  */
-public class TestPlayerFactory implements IPlayerFactory, Serializable {
+public class TestPlayerFactory extends BasePlayerFactory implements IPlayerFactory, Serializable {
 
 	/**
 	 * 
@@ -43,22 +44,18 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	public TestPlayerFactory(ICountryFactory cf, ITeamGroupFactory tf) {
 		this.cf = cf;	
 		this.tf = tf;
-		populate();
+		
 	}
 
-	// @REX take out
-	public void setTeamFactory(ITeamGroupFactory tf) {
-		this.tf = tf;
-	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IPlayerFactory#get()
 	 */
 	@Override
-	public IPlayer getById(Long id) {
+	public IPlayer getFromPersistentDatastore(Long id) {
 		if (id == null) {
-			IPlayer player = new ScrumPlayer();		
-			return player;
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Don't try to get with null. Call create() instead!");
+			return null;
 		} else {
 			if (idMap.containsKey(id)) {
 				return idMap.get(id);
@@ -70,10 +67,10 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	}
 
 	@Override
-	public IPlayer getByScrumId(Long id) {
-		if (id == null) {
-			IPlayer player = new ScrumPlayer();		
-			return player;
+	public IPlayer getFromPersistentDatastoreByScrumId(Long id) {
+		if (id == null) {	
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Don't try to get with null. Call create() instead!");
+			return null;
 		} else {
 			return scrumIdMap.get(id);
 		}
@@ -83,7 +80,7 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	 * @see net.rugby.foundation.core.server.factory.IPlayerFactory#put(net.rugby.foundation.model.shared.IPlayer)
 	 */
 	@Override
-	public IPlayer put(IPlayer player) {
+	public IPlayer putToPersistentDatastore(IPlayer player) {
 		if (player == null) {
 			return null;
 		}
@@ -102,7 +99,7 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	}
 
 
-	private void populate() {
+	public void Populate() {
 		hugoSouthwell();
 		
 		//New Zillund
@@ -152,15 +149,369 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 		lukeBurgess();
 		berrickBarnes();
 		robHorne();
+		
+		// premiership
+		joeMarler();
+		markLambert();
+		joeLaunchbury();
+		jamesCannon();
+		joeCarlisle();
+		robBuchanan();
+		willTaylor();
+		mattStevens();
+		makoVunipola();
+		jimmyStevens();
 	}
 
+	private IPlayer joeMarler() {
+		IPlayer p = create();
+		p.setId(9211001L);
+		p.setScrumId(105504L);
+		p.setDisplayName("Joe Marler");
+		p.setGivenName("Joe");
+		p.setSurName("Marler");
+		p.setShortName("JWG Marler");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L)); 
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 7); 
+		cal.set(Calendar.DAY_OF_MONTH, 7);
+		cal.set(Calendar.YEAR, 1990);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.PROP);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("Harlequins");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+
+
+	private IPlayer markLambert() {
+		IPlayer p = create();
+		p.setId(9211002L);
+		p.setScrumId(78661L);
+		p.setDisplayName("Mark Lambert");
+		p.setGivenName("Mark");
+		p.setSurName("Lambert");
+		p.setShortName("MD Lambert");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 2); 
+		cal.set(Calendar.DAY_OF_MONTH, 19);
+		cal.set(Calendar.YEAR, 1985);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(0);
+		p.setPosition(position.PROP);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("Harlequins");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
+	private IPlayer joeLaunchbury() {
+		IPlayer p = create();
+		p.setId(9211003L);
+		p.setScrumId(132078L);
+		p.setDisplayName("Joe Launchbury");
+		p.setGivenName("Joe");
+		p.setSurName("Launchbury");
+		p.setShortName("JO Launchbury");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 4); 
+		cal.set(Calendar.DAY_OF_MONTH, 12);
+		cal.set(Calendar.YEAR, 1991);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.LOCK);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("London Wasps");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+
+	private IPlayer jamesCannon() {
+		IPlayer p = create();
+		p.setId(9211004L);
+		p.setScrumId(82019L);
+		p.setDisplayName("James Cannon");
+		p.setGivenName("James");
+		p.setSurName("Cannon");
+		p.setShortName("JV Cannon");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 9); 
+		cal.set(Calendar.DAY_OF_MONTH, 24);
+		cal.set(Calendar.YEAR, 1988);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.LOCK);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("London Wasps");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
+	private IPlayer joeCarlisle() {
+		IPlayer p = create();
+		p.setId(9211005L);
+		p.setScrumId(27217L);
+		p.setDisplayName("Joe Carlisle");
+		p.setGivenName("Joe");
+		p.setSurName("Carlisle");
+		p.setShortName("JWR Carlisle");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 12); 
+		cal.set(Calendar.DAY_OF_MONTH, 4);
+		cal.set(Calendar.YEAR, 1987);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.FLYHALF);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("London Wasps");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
+	private IPlayer robBuchanan() {
+		IPlayer p = create();
+		p.setId(9211006L);
+		p.setScrumId(115014L);
+		p.setDisplayName("Rob Buchanan");
+		p.setGivenName("Rob");
+		p.setSurName("Buchanan");
+		p.setShortName("RF Buchanan");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 5); 
+		cal.set(Calendar.DAY_OF_MONTH, 13);
+		cal.set(Calendar.YEAR, 1991);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.HOOKER);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("Harlequins");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
+	private IPlayer willTaylor() {
+		IPlayer p = create();
+		p.setId(9211007L);
+		p.setScrumId(115014L);
+		p.setDisplayName("Will Taylor");
+		p.setGivenName("Will");
+		p.setSurName("Taylor");
+		p.setShortName("RF Taylor");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 3); 
+		cal.set(Calendar.DAY_OF_MONTH, 4);
+		cal.set(Calendar.YEAR, 1991);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.PROP);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("London Wasps");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
+	private IPlayer mattStevens() {
+		IPlayer p = create();
+		p.setId(9211008L);
+		p.setScrumId(188683L);
+		p.setDisplayName("Matt Stevens");
+		p.setGivenName("Matt");
+		p.setSurName("Stevens");
+		p.setShortName("MJH Stevens");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 10); 
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		cal.set(Calendar.YEAR, 1982);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.PROP);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("Saracens");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
+	private IPlayer makoVunipola() {
+		IPlayer p = create();
+		p.setId(9211009L);
+		p.setScrumId(117073L);
+		p.setDisplayName("Mako Vunipola");
+		p.setGivenName("Mako");
+		p.setSurName("Vunipola");
+		p.setShortName("MWIWNA Vunipola");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 1); 
+		cal.set(Calendar.DAY_OF_MONTH, 13);
+		cal.set(Calendar.YEAR, 1991);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.PROP);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("Saracens");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
+	private IPlayer jimmyStevens() {
+		IPlayer p = create();
+		p.setId(9211010L);
+		p.setScrumId(105034L);
+		p.setDisplayName("Jimmy Stevens");
+		p.setGivenName("Jimmy");
+		p.setSurName("Stevens");
+		p.setShortName("JD Stevens");
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5005L));
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.set(Calendar.MONTH, 1); 
+		cal.set(Calendar.DAY_OF_MONTH, 27);
+		cal.set(Calendar.YEAR, 1991);
+		p.setBirthDate(cal.getTime());
+		p.setHeight(188F);
+		p.setWeight(95.7F);
+		p.setNumCaps(12);
+		p.setPosition(position.HOOKER);
+
+		// save it
+		put(p);
+		
+		// team
+		ITeamGroup team = tf.getTeamByName("London Irish");
+		if (team != null) {
+			((IGroup)team).add(p);
+		} else {
+			// didn't call setTeamFactory
+		}
+		
+		return p;		
+	}
+	
 	private IPlayer hugoSouthwell() {
 		
-		IPlayer p = getById(null);
+		IPlayer p = create();
 		p.setId(9207001L);
 		p.setScrumId(14505L);
 		p.setDisplayName("Hugo Southwell");
-		p.setCountry(cf.getById(5012L));  // Scotland?
+		p.setCountryId(5005L);
+		p.setCountry(cf.getById(5012L));
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.set(Calendar.MONTH, 5); 
 		cal.set(Calendar.DAY_OF_MONTH, 14);
@@ -189,7 +540,7 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	// NEW ZEALAND
 	private IPlayer israelDagg() {
 		
-		IPlayer p = getById(null);
+		IPlayer p = create();
 		p.setId(9001001L);
 		p.setScrumId(117316L);
 		p.setDisplayName("Israel Dagg");
@@ -216,7 +567,7 @@ public class TestPlayerFactory implements IPlayerFactory, Serializable {
 	}
 private IPlayer coreyJane() {
 		
-		IPlayer p = getById(null);
+		IPlayer p = create();
 		p.setId(9001002L);
 		p.setScrumId(15235L);
 		p.setDisplayName("Corey Jane");
@@ -243,7 +594,7 @@ private IPlayer coreyJane() {
 	}
 private IPlayer conradSmith() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001003L);
 	p.setScrumId(14650L);
 	p.setDisplayName("Conrad Smith");
@@ -270,7 +621,7 @@ private IPlayer conradSmith() {
 }
 private IPlayer maaNanu() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001004L);
 	p.setScrumId(14237L);
 	p.setDisplayName("Ma'a Nanu");
@@ -297,7 +648,7 @@ private IPlayer maaNanu() {
 }
 private IPlayer richardKahui() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001005L);
 	p.setScrumId(15236L);
 	p.setDisplayName("Richard Kahui");
@@ -324,7 +675,7 @@ private IPlayer richardKahui() {
 }
 private IPlayer aaronCruden() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001006L);
 	p.setScrumId(117315L);
 	p.setDisplayName("Aaron Cruden");
@@ -351,7 +702,7 @@ private IPlayer aaronCruden() {
 }
 private IPlayer piriWeepu() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001007L);
 	p.setScrumId(14680L);
 	p.setDisplayName("Piri Weepu");
@@ -378,7 +729,7 @@ private IPlayer piriWeepu() {
 }
 private IPlayer tonyWoodcock() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001008L);
 	p.setScrumId(14108L);
 	p.setDisplayName("Tony Woodcock");
@@ -405,7 +756,7 @@ private IPlayer tonyWoodcock() {
 }
 private IPlayer kevenMealamu() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001009L);
 	p.setScrumId(14082L);
 	p.setDisplayName("Keven Mealamu");
@@ -432,7 +783,7 @@ private IPlayer kevenMealamu() {
 }
 private IPlayer owenFranks() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001010L);
 	p.setScrumId(98923L);
 	p.setDisplayName("Owen Franks");
@@ -459,7 +810,7 @@ private IPlayer owenFranks() {
 }
 private IPlayer bradThorn() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001011L);
 	p.setScrumId(14241L);
 	p.setDisplayName("Brad Thorn");
@@ -486,7 +837,7 @@ private IPlayer bradThorn() {
 }
 private IPlayer samWhitelock() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001012L);
 	p.setScrumId(117327L);
 	p.setDisplayName("Sam Whitelock");
@@ -513,7 +864,7 @@ private IPlayer samWhitelock() {
 }
 private IPlayer jeromeKaino() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001013L);
 	p.setScrumId(15268L);
 	p.setDisplayName("Jerome Kaino");
@@ -540,7 +891,7 @@ private IPlayer jeromeKaino() {
 }
 private IPlayer richieMcCaw() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001014L);
 	p.setScrumId(13784L);
 	p.setDisplayName("Richie McCaw");
@@ -567,7 +918,7 @@ private IPlayer richieMcCaw() {
 }
 private IPlayer kieranRead() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001015L);
 	p.setScrumId(15623L);
 	p.setDisplayName("Kieran Read");
@@ -594,7 +945,7 @@ private IPlayer kieranRead() {
 }
 private IPlayer andrewHore() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001016L);
 	p.setScrumId(14020L);
 	p.setDisplayName("Andrew Hore");
@@ -621,7 +972,7 @@ private IPlayer andrewHore() {
 }
 private IPlayer benFranks() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001017L);
 	p.setScrumId(117319L);
 	p.setDisplayName("Ben Franks");
@@ -648,7 +999,7 @@ private IPlayer benFranks() {
 }
 private IPlayer aliWilliams() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001018L);
 	p.setScrumId(14094L);
 	p.setDisplayName("Ali Williams");
@@ -678,7 +1029,7 @@ private IPlayer aliWilliams() {
 }
 private IPlayer victorVito() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001019L);
 	p.setScrumId(117326L);
 	p.setDisplayName("Victor Vito");
@@ -705,7 +1056,7 @@ private IPlayer victorVito() {
 }
 private IPlayer andyEllis() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001020L);
 	p.setScrumId(15403L);
 	p.setDisplayName("Andy Ellis");
@@ -732,7 +1083,7 @@ private IPlayer andyEllis() {
 }
 private IPlayer stephenDonald() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001021L);
 	p.setScrumId(15303L);
 	p.setDisplayName("Stephen Donald");
@@ -759,7 +1110,7 @@ private IPlayer stephenDonald() {
 }
 private IPlayer sonnybillWilliams() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9001022L);
 	p.setScrumId(27386L);
 	p.setDisplayName("Sonny Bill Williams");
@@ -789,7 +1140,7 @@ private IPlayer sonnybillWilliams() {
 	// AUSTRALIA
 	private IPlayer adamAshleyCooper() {
 		
-		IPlayer p = getById(null);
+		IPlayer p = create();
 		p.setId(9002001L);  
 		p.setScrumId(117316L);
 		p.setDisplayName("Adam Ashley-Cooper");
@@ -816,7 +1167,7 @@ private IPlayer sonnybillWilliams() {
 	}
 private IPlayer jamesOConnor() {
 		
-		IPlayer p = getById(null);
+		IPlayer p = create();
 		p.setId(9002002L);  
 		p.setScrumId(85497L);
 		p.setDisplayName("James O'Connor");
@@ -843,7 +1194,7 @@ private IPlayer jamesOConnor() {
 	}
 private IPlayer anthonyFaingaa() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002003L);  
 	p.setScrumId(91484L);
 	p.setDisplayName("Anthony Faingaa");
@@ -870,7 +1221,7 @@ private IPlayer anthonyFaingaa() {
   }
 private IPlayer patMcCabe() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002004L);  
 	p.setScrumId(110215L);
 	p.setDisplayName("Pat McCabe");
@@ -897,7 +1248,7 @@ private IPlayer patMcCabe() {
 }
 private IPlayer digbyIoane() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002005L);  
 	p.setScrumId(15641L);
 	p.setDisplayName("Digby Ioane");
@@ -924,7 +1275,7 @@ private IPlayer digbyIoane() {
 }
 private IPlayer quadeCooper() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002006L);  
 	p.setScrumId(85482L);
 	p.setDisplayName("Quade Cooper");
@@ -951,7 +1302,7 @@ private IPlayer quadeCooper() {
 }
 private IPlayer willGenia() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002007L);  
 	p.setScrumId(100275L);
 	p.setDisplayName("Will Genia");
@@ -978,7 +1329,7 @@ private IPlayer willGenia() {
 }
 private IPlayer sekopeKepu() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002008L);  
 	p.setScrumId(16053L);
 	p.setDisplayName("Sekope Kepu");
@@ -1005,7 +1356,7 @@ private IPlayer sekopeKepu() {
 }
 private IPlayer stephenMoore() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002009L);  
 	p.setScrumId(14887L);
 	p.setDisplayName("Stephen Moore");
@@ -1032,7 +1383,7 @@ private IPlayer stephenMoore() {
 }
 private IPlayer benAlexander() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002010L);  
 	p.setScrumId(16050L);
 	p.setDisplayName("Ben Alexander");
@@ -1059,7 +1410,7 @@ private IPlayer benAlexander() {
 }
 private IPlayer danVickerman() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002011L);  
 	p.setScrumId(14010L);
 	p.setDisplayName("Dan Vickerman");
@@ -1086,7 +1437,7 @@ private IPlayer danVickerman() {
 }
 private IPlayer jamesHorwill() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002012L);  
 	p.setScrumId(15676L);
 	p.setDisplayName("James Horwill");
@@ -1113,7 +1464,7 @@ private IPlayer jamesHorwill() {
 }
 private IPlayer rockyElsom() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002013L);  
 	p.setScrumId(14879L);
 	p.setDisplayName("Rocky Elsom");
@@ -1140,7 +1491,7 @@ private IPlayer rockyElsom() {
 }
 private IPlayer davidPocock() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002014L);  
 	p.setScrumId(15603L);
 	p.setDisplayName("David Pocock");
@@ -1167,7 +1518,7 @@ private IPlayer davidPocock() {
 }
 private IPlayer radikeSamo() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002015L);  
 	p.setScrumId(14554L);
 	p.setDisplayName("Radike Samo");
@@ -1194,7 +1545,7 @@ private IPlayer radikeSamo() {
 }
 private IPlayer tatafupolotanau() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002016L);  
 	p.setScrumId(15068L);
 	p.setDisplayName("Tatafu Polota-Nau");
@@ -1221,7 +1572,7 @@ private IPlayer tatafupolotanau() {
 }
 private IPlayer jamesSlipper() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002017L);  
 	p.setScrumId(117323L);
 	p.setDisplayName("James Slipper");
@@ -1248,7 +1599,7 @@ private IPlayer jamesSlipper() {
 }
 private IPlayer robSimmons() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002018L);  
 	p.setScrumId(91481L);
 	p.setDisplayName("Rob Simmons");
@@ -1275,7 +1626,7 @@ private IPlayer robSimmons() {
 }
 private IPlayer benMcCalman() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002019L);  
 	p.setScrumId(110286L);
 	p.setDisplayName("Ben McCalman");
@@ -1302,7 +1653,7 @@ private IPlayer benMcCalman() {
 }
 private IPlayer lukeBurgess() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002020L);  
 	p.setScrumId(16015L);
 	p.setDisplayName("Luke Burgess");
@@ -1329,7 +1680,7 @@ private IPlayer lukeBurgess() {
 }
 private IPlayer berrickBarnes() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002021L);  
 	p.setScrumId(15590L);
 	p.setDisplayName("Berrick Barnes");
@@ -1356,7 +1707,7 @@ private IPlayer berrickBarnes() {
 }
 private IPlayer robHorne() {
 	
-	IPlayer p = getById(null);
+	IPlayer p = create();
 	p.setId(9002022L);  
 	p.setScrumId(117541L);
 	p.setDisplayName("Rob Horne");
@@ -1380,6 +1731,26 @@ private IPlayer robHorne() {
 		((IGroup)team).add(p);
 	}
 	return p;
+}
+
+
+@Override
+public IPlayer create() {
+	return new ScrumPlayer();
+}
+
+
+@Override
+protected boolean deleteFromPersistentDatastore(IPlayer t) {
+	if (idMap.containsKey(t.getId())) {
+		idMap.remove(t.getId());
+	}
+	
+	if (scrumIdMap.containsKey(t.getId())) {
+		scrumIdMap.remove(t.getId());
+	}
+	
+	return true;
 }
 }
 

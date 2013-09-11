@@ -62,8 +62,9 @@ public abstract class Position implements Serializable {
 		FLYHALF ("Fly Half", "FLY"), 
 		CENTER ("Center", "CTR"), 
 		WING ("Wing", "WNG"), 
-		FULLBACK ("Fullback", "FUL"); 
-
+		FULLBACK ("Fullback", "FUL"), 
+		RESERVE ("Reserve", "RES");
+		
 		private String enUsName;
 		private String abbr;
 
@@ -275,6 +276,8 @@ public abstract class Position implements Serializable {
 			return position.FLANKER;
 		} else if (scrumName.equals("N8")) {
 			return position.NUMBER8;
+		}  else if (scrumName.equals("R")) {
+			return position.RESERVE;
 		} else
 			return position.NONE;
 	}

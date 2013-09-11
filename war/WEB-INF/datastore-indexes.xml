@@ -27,5 +27,10 @@
         <property name="slot" direction="asc"/>
     </datastore-index>
 
+    <!--  for searching content -->
+    <datastore-index kind="PlayerRating" ancestor="false" source="manual">
+        <property name="matchId" direction="asc"/>
+        <property name="rating" direction="asc"/>
+    </datastore-index>
     
 </datastore-indexes>

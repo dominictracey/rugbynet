@@ -817,8 +817,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IMatchGroup getMatch(Long matchId) {
 		try {
 			if (checkAdmin()) {
-				mf.setId(matchId);
-				return mf.getGame();
+				return mf.get(matchId);
 			} else {
 				return null;
 			}
@@ -895,7 +894,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IPlayer getPlayer(Long id) {
 		try {
 			if (checkAdmin()) {
-				return pf.getById(id);
+				return pf.get(id);
 			} else {
 				return null;
 			}
@@ -1108,8 +1107,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				countryf.put(c);
 
 				PipelineService service = PipelineServiceFactory.newPipelineService();
-				mf.setId(matchId);
-				IMatchGroup match = mf.getGame();
+
+				IMatchGroup match = mf.get(matchId);
 
 				String pipelineId = "";
 
@@ -1263,9 +1262,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms) {
 		try {
 			if (checkAdmin()) {
-				IPlayer player = pf.getById(pms.getPlayerId());
-				mf.setId(pms.getMatchId());
-				IMatchGroup match = mf.getGame();
+				IPlayer player = pf.get(pms.getPlayerId());
+				
+				IMatchGroup match = mf.get(pms.getMatchId());
 
 				Home_or_Visitor side = Home_or_Visitor.HOME;
 				if (pms.getTeamId().equals(match.getVisitingTeamId())) {
@@ -1292,7 +1291,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			Long roundId, position posi, Long countryId, Long teamId) {
 		try {
 			if (checkAdmin()) {
-				return pmif.query(compId, roundId, posi, countryId, teamId, null);
+				List<IPlayerMatchInfo> raw = pmif.query(compId, roundId, posi, countryId, teamId, null);
+				List<IPlayerMatchInfo> queryRated = null;
+				return queryRated;
 			} else {
 				return null;
 			}
@@ -1310,8 +1311,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				assert (mres != null);
 				IMatchRatingEngine mre = mref.get(mres);
 				assert (mre != null);
-				mf.setId(matchId);
-				IMatchGroup m = mf.getGame();
+
+				IMatchGroup m = mf.get(matchId);
 
 				List<IPlayerMatchStats> stats = pmsf.getByMatchId(matchId);
 				List<IPlayerMatchStats> homePlayerStats =  new ArrayList<IPlayerMatchStats>();
@@ -1348,8 +1349,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId) {
 		try {
 			if (checkAdmin()) {
-				mf.setId(matchId);
-				IMatchGroup m = mf.getGame();
+				IMatchGroup m = mf.get(matchId);
 
 				if (m != null) {
 					if (m.getHomeTeamId().equals(teamId)) {
@@ -1384,8 +1384,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				countryf.put(c);
 
 				PipelineService service = PipelineServiceFactory.newPipelineService();
-				mf.setId(tms.getMatchId());
-				IMatchGroup match = mf.getGame();
+
+				IMatchGroup match = mf.get(tms.getMatchId());
 
 				Home_or_Visitor hov = Home_or_Visitor.VISITOR;
 				if (match.getHomeTeamId().equals(team.getId())) {
