@@ -26,6 +26,37 @@ public class ScrumMatchRatingEngineSchema20130713 extends ScrumMatchRatingEngine
 	protected  Float runsWeight; // .1F;
 	protected  Float metersRunWeight; // .2F;
 	protected  Float cleanBreaksWeight; // .2F;
+	protected  Float defendersBeatenWeight; // .2F;
+	protected  Float offloadsWeight; // .2F;
+	protected  Float turnoversWeight; // -.2F;
+	protected  Float tacklesMadeWeight; // .7F;
+	protected  Float tacklesMissedWeight; // -.1F;
+	protected  Float lineoutsWonOnThrowWeight; // .2F;
+	protected  Float lineoutsStolenOnOppThrowWeight; // .3F;
+	protected  Float penaltiesConcededWeight; // -.1F;
+	protected  Float yellowCardsWeight; // -.2F;
+	protected  Float redCardsWeight; // -.3F;
+
+	// team stats
+	protected  Float scrumShareWeight; // .4F;
+	protected  Float lineoutShareWeight; // .4F;
+	protected  Float ruckShareWeight; // .3F;
+	protected  Float scrumLostWeight; // .4F;
+	protected  Float lineoutLostWeight; // .4F;
+	protected  Float ruckLostWeight; // .3F;
+	protected  Float maulShareWeight; // .3F;
+	protected  Float maulLostWeight; // .3F;
+	protected  Float minutesShareWeight; // .2F;
+	
+	// relevant opposition stats 
+	protected  Float scrumStolenWeight; 
+	protected  Float lineoutStolenWeight; 
+	protected  Float ruckStolenWeight; 
+	protected  Float maulStolenWeight; 
+	
+	protected  Float pointsDifferentialWeight; // .3F;
+	protected  Float win;
+	
 	public void setTriesWeight(Float triesWeight) {
 		this.triesWeight = triesWeight;
 	}
@@ -123,25 +154,7 @@ public class ScrumMatchRatingEngineSchema20130713 extends ScrumMatchRatingEngine
 		this.pointsDifferentialWeight = pointsDifferentialWeight;
 	}
 
-	protected  Float defendersBeatenWeight; // .2F;
-	protected  Float offloadsWeight; // .2F;
-	protected  Float turnoversWeight; // -.2F;
-	protected  Float tacklesMadeWeight; // .7F;
-	protected  Float tacklesMissedWeight; // -.1F;
-	protected  Float lineoutsWonOnThrowWeight; // .2F;
-	protected  Float lineoutsStolenOnOppThrowWeight; // .3F;
-	protected  Float penaltiesConcededWeight; // -.1F;
-	protected  Float yellowCardsWeight; // -.2F;
-	protected  Float redCardsWeight; // -.3F;
 
-	// time-skewed team stats
-	protected  Float scrumShareWeight; // .4F;
-	protected  Float lineoutShareWeight; // .4F;
-	protected  Float ruckShareWeight; // .3F;
-	protected  Float maulShareWeight; // .3F;
-	protected  Float minutesShareWeight; // .2F;
-	
-	protected  Float pointsDifferentialWeight; // .3F;
 	
 	public ScrumMatchRatingEngineSchema20130713() {
 		
@@ -342,6 +355,78 @@ public class ScrumMatchRatingEngineSchema20130713 extends ScrumMatchRatingEngine
 	@Override
 	public Float getPointsDifferentialWeight() {
 		return pointsDifferentialWeight;
+	}
+	@Override
+	public Float getScrumLostWeight() {
+		return scrumLostWeight;
+	}
+	@Override
+	public void setScrumLostWeight(Float scrumLostWeight) {
+		this.scrumLostWeight = scrumLostWeight;
+	}
+	@Override
+	public Float getLineoutLostWeight() {
+		return lineoutLostWeight;
+	}
+	@Override
+	public void setLineoutLostWeight(Float lineoutLostWeight) {
+		this.lineoutLostWeight = lineoutLostWeight;
+	}
+	@Override
+	public Float getRuckLostWeight() {
+		return ruckLostWeight;
+	}
+	@Override
+	public void setRuckLostWeight(Float ruckLostWeight) {
+		this.ruckLostWeight = ruckLostWeight;
+	}
+	@Override
+	public Float getMaulLostWeight() {
+		return maulLostWeight;
+	}
+	@Override
+	public void setMaulLostWeight(Float maulLostWeight) {
+		this.maulLostWeight = maulLostWeight;
+	}
+	@Override
+	public Float getWin() {
+		return win;
+	}
+	@Override
+	public void setWin(Float win) {
+		this.win = win;
+	}
+	@Override
+	public Float getScrumStolenWeight() {
+		return scrumStolenWeight;
+	}
+	@Override
+	public void setScrumStolenWeight(Float scrumStolenWeight) {
+		this.scrumStolenWeight = scrumStolenWeight;
+	}
+	@Override
+	public Float getLineoutStolenWeight() {
+		return lineoutStolenWeight;
+	}
+	@Override
+	public void setLineoutStolenWeight(Float lineoutStolenWeight) {
+		this.lineoutStolenWeight = lineoutStolenWeight;
+	}
+	@Override
+	public Float getRuckStolenWeight() {
+		return ruckStolenWeight;
+	}
+	@Override
+	public void setRuckStolenWeight(Float ruckStolenWeight) {
+		this.ruckStolenWeight = ruckStolenWeight;
+	}
+	@Override
+	public Float getMaulStolenWeight() {
+		return maulStolenWeight;
+	}
+	@Override
+	public void setMaulStolenWeight(Float maulStolenWeight) {
+		this.maulStolenWeight = maulStolenWeight;
 	}
 
 

@@ -198,10 +198,13 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		stats = cursor;
 		if (match != null) {
 			stats.setMatchId(match.getId()); // native ID, not scrum's
-			if (hov == Home_or_Visitor.HOME) 
+			if (hov == Home_or_Visitor.HOME) {
 				stats.setTeamId(match.getHomeTeamId());
-			else
+				stats.setTeamAbbr(match.getHomeTeam().getAbbr());
+			} else {
 				stats.setTeamId(match.getVisitingTeamId());	
+				stats.setTeamAbbr(match.getVisitingTeam().getAbbr());
+			}
 		}
 
 		if (player != null) {
@@ -218,10 +221,13 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		stats.setMatchId(match.getId()); // native ID, not scrum's
 		stats.setPlayerId(player.getId());  // native ID, not scrum's
 		stats.setSlot(slot);
-		if (hov == Home_or_Visitor.HOME) 
+		if (hov == Home_or_Visitor.HOME)  {
 			stats.setTeamId(match.getHomeTeamId());
-		else
-			stats.setTeamId(match.getVisitingTeamId());		
+			stats.setTeamAbbr(match.getHomeTeam().getAbbr());
+		} else {
+			stats.setTeamId(match.getVisitingTeamId());	
+			stats.setTeamAbbr(match.getVisitingTeam().getAbbr());
+		}
 		stats.setName(player.getSurName());
 		stats.setCountryId(player.getCountryId());
 		stats.setTimePlayed(0);

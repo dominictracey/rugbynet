@@ -19,7 +19,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.DataStoreFactory;
@@ -36,14 +36,14 @@ IMatchRatingEngineSchemaFactory {
 	}
 
 	@Override
-	public IMatchRatingEngineSchema getById(Long id) {
+	public IRatingEngineSchema getById(Long id) {
 		try {
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			IMatchRatingEngineSchema m = null;
+			IRatingEngineSchema m = null;
 
 			if (id == null) {
-				return (IMatchRatingEngineSchema) put(null);
+				return (IRatingEngineSchema) put(null);
 			}
 
 			value = (byte[])syncCache.get(id);
@@ -65,7 +65,7 @@ IMatchRatingEngineSchemaFactory {
 				// send back the cached version
 				ByteArrayInputStream bis = new ByteArrayInputStream(value);
 				ObjectInput in = new ObjectInputStream(bis);
-				m = (IMatchRatingEngineSchema)in.readObject();
+				m = (IRatingEngineSchema)in.readObject();
 
 				bis.close();
 				in.close();
@@ -80,16 +80,16 @@ IMatchRatingEngineSchemaFactory {
 
 	}
 
-	private IMatchRatingEngineSchema getByIdFromDB(Long id) {
+	private IRatingEngineSchema getByIdFromDB(Long id) {
 		return ofy.get(new Key<ScrumMatchRatingEngineSchema>(ScrumMatchRatingEngineSchema.class, id));
 	}
 
 	@Override
-	public IMatchRatingEngineSchema getDefault() {
+	public IRatingEngineSchema getDefault() {
 		try {
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			IMatchRatingEngineSchema m = null;
+			IRatingEngineSchema m = null;
 
 			value = (byte[])syncCache.get(memcacheDefaultKey);
 			if (value == null) {
@@ -110,7 +110,7 @@ IMatchRatingEngineSchemaFactory {
 				// send back the cached version
 				ByteArrayInputStream bis = new ByteArrayInputStream(value);
 				ObjectInput in = new ObjectInputStream(bis);
-				m = (IMatchRatingEngineSchema)in.readObject();
+				m = (IRatingEngineSchema)in.readObject();
 
 				bis.close();
 				in.close();
@@ -124,14 +124,14 @@ IMatchRatingEngineSchemaFactory {
 		}
 	}
 
-	private IMatchRatingEngineSchema getDefaultFromDB() {
+	private IRatingEngineSchema getDefaultFromDB() {
 		Query<ScrumMatchRatingEngineSchema> qs = ofy.query(ScrumMatchRatingEngineSchema.class).filter("isDefault",true);
 		assert qs.count() < 2;
 		return qs.get();
 	}
 
 	@Override
-	public IMatchRatingEngineSchema put(IMatchRatingEngineSchema schema) {
+	public IRatingEngineSchema put(IRatingEngineSchema schema) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			// only one per name
@@ -157,11 +157,11 @@ IMatchRatingEngineSchemaFactory {
 				out.close();
 				bos.close();
 
-				syncCache.put(((IMatchRatingEngineSchema)schema).getId(), yourBytes);
+				syncCache.put(((IRatingEngineSchema)schema).getId(), yourBytes);
 
 				//also check if it has it's default flag set
 				if (schema.getIsDefault()) {
-					IMatchRatingEngineSchema currentDefault = getDefault();
+					IRatingEngineSchema currentDefault = getDefault();
 					if (currentDefault != null && !currentDefault.getId().equals(schema.getId())) {
 						// clear default flag in current one
 						currentDefault.setIsDefault(false);
@@ -210,7 +210,7 @@ IMatchRatingEngineSchemaFactory {
 	}
 
 	@Override
-	public Boolean delete(IMatchRatingEngineSchema schema) {
+	public Boolean delete(IRatingEngineSchema schema) {
 		try {
 			boolean isDefault = schema.getIsDefault();
 			ofy.delete(schema);
@@ -229,9 +229,9 @@ IMatchRatingEngineSchemaFactory {
 	}
 
 	@Override
-	public IMatchRatingEngineSchema setAsDefault(IMatchRatingEngineSchema schema) {
+	public IRatingEngineSchema setAsDefault(IRatingEngineSchema schema) {
 
-		IMatchRatingEngineSchema current = getDefault();
+		IRatingEngineSchema current = getDefault();
 
 		if (current != null && current.equals(schema)) {
 			return schema;

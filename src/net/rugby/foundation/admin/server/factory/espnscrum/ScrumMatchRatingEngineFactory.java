@@ -8,7 +8,7 @@ import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
 //import net.rugby.foundation.admin.server.model.ScrumMatchRatingEngineV001;
 import net.rugby.foundation.admin.server.model.ScrumMatchRatingEngineV100;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
@@ -33,7 +33,7 @@ public class ScrumMatchRatingEngineFactory
 	}
 	
 	@Override
-	public IMatchRatingEngine get(IMatchRatingEngineSchema schema) {
+	public IMatchRatingEngine get(IRatingEngineSchema schema) {
 		if (schema instanceof IV1EngineWeightValues) {
 			return new ScrumMatchRatingEngineV100(pf, pmrf, tmsf);
 		} 

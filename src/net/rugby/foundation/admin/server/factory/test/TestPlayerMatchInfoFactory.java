@@ -7,7 +7,7 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
@@ -47,7 +47,7 @@ public class TestPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 
 	@Override
 	public List<IPlayerMatchInfo> getForMatch(Long matchId,
-			IMatchRatingEngineSchema schema) {
+			IRatingEngineSchema schema) {
 		return getForComp(null,null);
 	}
 
@@ -59,7 +59,7 @@ public class TestPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 
 	@Override
 	public IPlayerMatchInfo getForPlayerMatchStats(Long pmsId,
-			IMatchRatingEngineSchema schema) {
+			IRatingEngineSchema schema) {
 		return new PlayerMatchInfo(pmsf.getById(pmsId),pmrf.get(pmsId+1000L));	}
 
 }

@@ -29,10 +29,10 @@
 		<listener-class>net.rugby.foundation.core.server.BPMServletContextListener</listener-class>
 	</listener>
 
-	<servlet>
-		<servlet-name>playersServiceServlet</servlet-name>
-		<servlet-class>net.rugby.foundation.server.PlayersServiceImpl</servlet-class>
-	</servlet>
+<!-- 	<servlet> -->
+<!-- 		<servlet-name>playersServiceServlet</servlet-name> -->
+<!-- 		<servlet-class>net.rugby.foundation.server.PlayersServiceImpl</servlet-class> -->
+<!-- 	</servlet> -->
 
 	<!-- Data API -->
 	<servlet>
@@ -42,10 +42,10 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>playersServiceServlet</servlet-name>
-		<url-pattern>/PlayerListMVP/PlayersService</url-pattern>
-	</servlet-mapping>
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>playersServiceServlet</servlet-name> -->
+<!-- 		<url-pattern>/PlayerListMVP/PlayersService</url-pattern> -->
+<!-- 	</servlet-mapping> -->
 
 	<servlet-mapping>
 		<servlet-name>RemoteApiServlet</servlet-name>
@@ -64,15 +64,15 @@
 	</servlet-mapping>	
 	
 	<!-- appstats -->
-	<servlet>
-	  <servlet-name>appstats</servlet-name>
-	  <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>
-	</servlet>
+<!-- 	<servlet> -->
+<!-- 	  <servlet-name>appstats</servlet-name> -->
+<!-- 	  <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class> -->
+<!-- 	</servlet> -->
 	
-	<servlet-mapping>
-	  <servlet-name>appstats</servlet-name>
-	  <url-pattern>/appstats/*</url-pattern>
-	</servlet-mapping>	
+<!-- 	<servlet-mapping> -->
+<!-- 	  <servlet-name>appstats</servlet-name> -->
+<!-- 	  <url-pattern>/appstats/*</url-pattern> -->
+<!-- 	</servlet-mapping>	 -->
 		
 	<!-- Default page to serve -->
 	<welcome-file-list>

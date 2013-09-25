@@ -33,7 +33,7 @@ import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPo
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.CoreService;

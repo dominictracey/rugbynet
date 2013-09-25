@@ -8,7 +8,7 @@
 	<inherits name="net.rugby.foundation.model.Model" />
 <!-- 	<inherits name="com.google.gwt.logging.Logging"/> -->
 	<inherits name="net.rugby.foundation.core.Core" />
-	<inherits name="net.rugby.foundation.result.Result" />
+<!-- 	<inherits name="net.rugby.foundation.result.Result" /> -->
 	<entry-point class="net.rugby.foundation.topten.client.TopTen"/>
 	<replace-with class="net.rugby.foundation.topten.client.ClientFactoryImpl">
 		<when-type-is class="net.rugby.foundation.topten.client.ClientFactory"/>

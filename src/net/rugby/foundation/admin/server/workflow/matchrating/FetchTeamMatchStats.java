@@ -63,8 +63,11 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 		UrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
 		String line;
-		ITeamMatchStats tms = tmsf.getById(null);
+		ITeamMatchStats tms = tmsf.create();
 		tms.setTeamId(team.getId());
+		tms.setTeamAbbr(team.getAbbr());
+		tms.setIsHome(home_or_visitor == Home_or_Visitor.HOME);
+		
 		tms.setMatchId(match.getId());
 
 		try {

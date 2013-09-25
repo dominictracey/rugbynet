@@ -22,10 +22,12 @@ import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
+import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
+import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
@@ -38,7 +40,7 @@ import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatin
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
@@ -73,9 +75,11 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
+import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -138,6 +142,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IMatchRatingEngineSchemaFactory mresf;
 	private ITopTenListFactory ttlf;
 	private ICachingFactory<IContent> ctf;
+	private IQueryRatingEngineFactory qref;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -157,7 +162,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
 			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
-			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, ICachingFactory<IContent> ctf) {
+			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
+			ICachingFactory<IContent> ctf, IQueryRatingEngineFactory qref) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -185,6 +191,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.mresf = mresf;
 			this.ttlf = ttlf;
 			this.ctf = ctf;
+			this.qref = qref; 
 
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -198,17 +205,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			} else {
 				return false;
 			}
-//			IAppUser u = getAppUser();
-//			if (u != null && u.isAdmin()) {
-//				return true;
-//			} else {
-//				String user = "a not logged on user ";
-//				if (u != null) {
-//					user = "The user " + u.getEmailAddress() + " (" + u.getId() + ")";
-//				}
-//				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, user + " is trying to access admin functions");
-//				return false;
-//			}
+			//			IAppUser u = getAppUser();
+			//			if (u != null && u.isAdmin()) {
+			//				return true;
+			//			} else {
+			//				String user = "a not logged on user ";
+			//				if (u != null) {
+			//					user = "The user " + u.getEmailAddress() + " (" + u.getId() + ")";
+			//				}
+			//				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, user + " is trying to access admin functions");
+			//				return false;
+			//			}
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return false;
@@ -217,28 +224,28 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 
 
-//	private IAppUser getAppUser()
-//	{
-//		try {
-////			UserService service =UserServiceFactory.getUserService();
-////			User u = service.getCurrentUser();
-//			
-//			// do they have a session going?
-//			HttpServletRequest request = this.getThreadLocalRequest();
-//			HttpSession session = request.getSession(false);
-//			if (session != null) {
-//				LoginInfo loginInfo = (LoginInfo) session.getAttribute("loginInfo");
-//				if (loginInfo.isLoggedIn()) {
-//					auf.setEmail(loginInfo.getEmailAddress());
-//					return auf.get();
-//				}
-//			}
-//			return null;
-//		} catch (Throwable e) {
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
-//			return null;
-//		}
-//	}
+	//	private IAppUser getAppUser()
+	//	{
+	//		try {
+	////			UserService service =UserServiceFactory.getUserService();
+	////			User u = service.getCurrentUser();
+	//			
+	//			// do they have a session going?
+	//			HttpServletRequest request = this.getThreadLocalRequest();
+	//			HttpSession session = request.getSession(false);
+	//			if (session != null) {
+	//				LoginInfo loginInfo = (LoginInfo) session.getAttribute("loginInfo");
+	//				if (loginInfo.isLoggedIn()) {
+	//					auf.setEmail(loginInfo.getEmailAddress());
+	//					return auf.get();
+	//				}
+	//			}
+	//			return null;
+	//		} catch (Throwable e) {
+	//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+	//			return null;
+	//		}
+	//	}
 
 	@Override
 	public ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams) {
@@ -1036,7 +1043,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId) {
 		try {
 			if (checkAdmin()) {
-				IMatchRatingEngineSchema schema = mresf.getDefault();
+				IRatingEngineSchema schema = mresf.getDefault();
 				if (schema != null && matchId != null) {
 					return pmif.getForMatch(matchId, schema); 
 				} else {
@@ -1263,7 +1270,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				IPlayer player = pf.get(pms.getPlayerId());
-				
+
 				IMatchGroup match = mf.get(pms.getMatchId());
 
 				Home_or_Visitor side = Home_or_Visitor.HOME;
@@ -1291,9 +1298,39 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			Long roundId, position posi, Long countryId, Long teamId) {
 		try {
 			if (checkAdmin()) {
-				List<IPlayerMatchInfo> raw = pmif.query(compId, roundId, posi, countryId, teamId, null);
-				List<IPlayerMatchInfo> queryRated = null;
-				return queryRated;
+
+				//first the player stats
+				rf.setId(roundId);
+				IRound r = rf.getRound();
+				List<Long> matchIds = r.getMatchIDs();
+				List<IPlayerMatchStats> playerStats = pmsf.query(matchIds, posi, countryId, teamId);
+
+				// and the round stats
+				List<ITeamMatchStats> teamStats = new ArrayList<ITeamMatchStats>();
+				for (IMatchGroup m : r.getMatches()) {
+					ITeamMatchStats h = tmsf.getHomeStats(m);
+					ITeamMatchStats v = tmsf.getVisitStats(m);
+					if (h != null) {
+						teamStats.add(h);
+					}
+
+					if (v != null) {
+						teamStats.add(v);
+					}
+				}
+
+				// now the engine
+				IRatingEngineSchema mres = mresf.getDefault();
+				assert (mres != null);
+				IQueryRatingEngine mre = qref.get(mres);
+				assert (mre != null);
+				//pmif.query(compId, roundId, posi, countryId, teamId, null);
+
+				mre.addPlayerStats(playerStats);
+				mre.addTeamStats(teamStats);
+				mre.generate(mres);
+				List<IPlayerMatchInfo> pmis = pmif.query(compId, roundId, posi, countryId, teamId, null);
+				return pmis;
 			} else {
 				return null;
 			}
@@ -1307,7 +1344,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<IPlayerMatchInfo> reRateMatch(Long matchId) {
 		try {
 			if (checkAdmin()) {
-				IMatchRatingEngineSchema mres = mresf.getDefault();
+				IRatingEngineSchema mres = mresf.getDefault();
 				assert (mres != null);
 				IMatchRatingEngine mre = mref.get(mres);
 				assert (mre != null);
@@ -1473,7 +1510,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ScrumMatchRatingEngineSchema getMatchRatingEngineSchema(Long schemaId) {
 		try {
 			if (checkAdmin()) {
-				IMatchRatingEngineSchema schema = mresf.getById(schemaId);
+				IRatingEngineSchema schema = mresf.getById(schemaId);
 				if (schema instanceof ScrumMatchRatingEngineSchema) {
 					return (ScrumMatchRatingEngineSchema) schema;
 				} else {
@@ -1538,7 +1575,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(ScrumMatchRatingEngineSchema20130713 schema) {
 		try {
 			if (checkAdmin()) {
-				IMatchRatingEngineSchema s2 = mresf.setAsDefault(schema);
+				IRatingEngineSchema s2 = mresf.setAsDefault(schema);
 				if (s2 instanceof ScrumMatchRatingEngineSchema)
 					return (ScrumMatchRatingEngineSchema) s2;
 				else 
@@ -1692,6 +1729,31 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 	}
 
-
+	@Override
+	public ICoreConfiguration getConfiguration() {
+		try {
+			ICoreConfiguration conf = ccf.get();
+			// check that environment is set
+			if (conf.getEnvironment() == null) {
+				HttpServletRequest req = this.getThreadLocalRequest();
+				if (req.getServerName().contains("127.0.0.1")) {
+					conf.setEnvironment(Environment.LOCAL);
+				} else if (req.getServerName().contains("dev")) {
+					conf.setEnvironment(Environment.DEV);
+				} else if (req.getServerName().contains("beta")) {
+					conf.setEnvironment(Environment.BETA);
+				} else if (req.getServerName().contains("www")) {
+					conf.setEnvironment(Environment.PROD);
+				} else {
+					throw new RuntimeException("Could not determine environment for configuration");
+				}
+				conf = ccf.put(conf);
+			}
+			return conf;
+		} catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}		
+	}
 
 }

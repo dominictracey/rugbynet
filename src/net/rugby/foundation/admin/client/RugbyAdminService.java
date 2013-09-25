@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -115,5 +116,6 @@ public interface RugbyAdminService extends RemoteService {
 	
 	IContent createContent(Long id, String content);
 	List<IContent> getContentList(boolean onlyActive);
+	ICoreConfiguration getConfiguration();
 	
 }

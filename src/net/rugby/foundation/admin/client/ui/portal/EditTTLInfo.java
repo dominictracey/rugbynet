@@ -5,6 +5,7 @@ package net.rugby.foundation.admin.client.ui.portal;
 
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
@@ -40,6 +41,7 @@ public class EditTTLInfo extends DialogBox {
 	@UiField Button cancel;
 	@UiField TextArea description;
 	@UiField TextBox title;
+	@UiField DropdownButton playersPerTeam;
 	
 	TopTenSeedData v = null;
 	private EditTTLInfoPresenter listener;
@@ -48,6 +50,8 @@ public class EditTTLInfo extends DialogBox {
 	void onClickSave(ClickEvent e) {
 		v.setTitle(title.getText());
 		v.setDescription(description.getText());
+		int ppt = Integer.parseInt(playersPerTeam.getLastSelectedNavLink().getText());
+		v.setPlayersPerTeam(ppt);
 		listener.saveTTIText(v);
 	}
 	

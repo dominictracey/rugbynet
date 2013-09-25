@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.UrlCacher;
+import net.rugby.foundation.core.server.BPMServletContextListener;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -23,6 +25,7 @@ import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.Job1;
 import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.Value;
+import com.google.inject.Injector;
 
 //@Singleton
 public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchGroup> implements Serializable {
@@ -31,6 +34,8 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 
 	public enum Home_or_Visitor { HOME, VISITOR }
 
+	private static Injector injector = null;
+	private IPlayerFactory pf;
 
 	public GenerateMatchRatings() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -40,13 +45,13 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	protected class NameAndId {
 		String name;
 		Long id;
-		
+
 		NameAndId(Long id, String name) {
 			this.id = id;
 			this.name = name;
 		}
 	}
-	
+
 	/**
 	 * return IPlayer reference
 	 * params String compName
@@ -56,24 +61,21 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	@Override
 	public Value<List<IPlayerMatchRating>> run(IMatchGroup match) {
 
+		if (injector == null) {
+			injector = BPMServletContextListener.getInjectorForNonServlets();
+		}
+
+		this.pf = injector.getInstance(IPlayerFactory.class);
+
 		if (match.getForeignUrl() == null) {
 			// need to get score and find match details url before we do this
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Need to get scores and populate match URL before trying to get match stats for match " + match.getDisplayName());
 			return null;
 		}
-		
+
 		String url = match.getForeignUrl()+"?view=scorecard";
 
-		//		// get the comp from the match
-		//		rf.setId(match.getRoundId());
-		//		IRound r = rf.getRound();
-		//		cf.setId(r.getCompId());
-		//		comp = cf.getCompetition();
-
 		Logger.getLogger("FetchedPlayer").log(Level.INFO,"Starting generate match ratings for url " + url);
-
-		//	    FutureValue<ITeamGroup> homeTeam = futureCall(new FetchTeamFromScrumReport(tf), immediate(Home_or_Visitor.HOME), immediate(url));
-		//	    FutureValue<ITeamGroup> visitTeam = futureCall(new FetchTeamFromScrumReport(tf), immediate(Home_or_Visitor.VISITOR), immediate(url));
 
 		FutureValue<ITeamMatchStats> homeTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getHomeTeam()), immediate(match), immediate(Home_or_Visitor.HOME), immediate(url));
 		FutureValue<ITeamMatchStats> visitorTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getVisitingTeam()), immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(url));
@@ -81,26 +83,42 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		List<NameAndId> homeIds = getIds(Home_or_Visitor.HOME, url);
 		List<NameAndId> visitIds = getIds(Home_or_Visitor.VISITOR, url);
 
-		List<FutureValue<IPlayer>> homePlayers = new ArrayList<FutureValue<IPlayer>>();
-		List<FutureValue<IPlayer>> visitorPlayers = new ArrayList<FutureValue<IPlayer>>();
+		List<Value<IPlayer>> homePlayers = new ArrayList<Value<IPlayer>>();
+		List<Value<IPlayer>> visitorPlayers = new ArrayList<Value<IPlayer>>();
 
 		int count = 0;
 		for (NameAndId info : homeIds) {
-			FutureValue<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
-			homePlayers.add(homePlayer);
+			// first see if we have it in the database
+			IPlayer dbPlayer = pf.getByScrumId(info.id);
+
+			// will return a "blank player" if it can't find it in the DB so check if the returned player has a scrum ID set.
+			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
+				homePlayers.add(immediate(dbPlayer));
+			} else {
+				Value<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
+				homePlayers.add(homePlayer);
+			}
 		}
 
 		count = 0;
 		for (NameAndId info : visitIds) {
-			FutureValue<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
-			visitorPlayers.add(visitPlayer);
+			// first see if we have it in the database
+			IPlayer dbPlayer = pf.getByScrumId(info.id);
+
+			// will return a "blank player" if it can't find it in the DB so check if the returned player has a scrum ID set.
+			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
+				visitorPlayers.add(immediate(dbPlayer));
+			} else {
+				Value<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
+				visitorPlayers.add(visitPlayer);
+			}
 		}	   
 
-		List<FutureValue<IPlayerMatchStats>> homePlayerMatchStats = new ArrayList<FutureValue<IPlayerMatchStats>>();
-		List<FutureValue<IPlayerMatchStats>> visitorPlayerMatchStats = new ArrayList<FutureValue<IPlayerMatchStats>>();
+		List<Value<IPlayerMatchStats>> homePlayerMatchStats = new ArrayList<Value<IPlayerMatchStats>>();
+		List<Value<IPlayerMatchStats>> visitorPlayerMatchStats = new ArrayList<Value<IPlayerMatchStats>>();
 
 		count = 0;
-		for (FutureValue<IPlayer> fp : homePlayers) {
+		for (Value<IPlayer> fp : homePlayers) {
 			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
 			homePlayerMatchStats.add(stats);
 
@@ -109,20 +127,16 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		FutureList<IPlayerMatchStats> hpms = new FutureList<IPlayerMatchStats>(homePlayerMatchStats);
 
 		count = 0;
-		for (FutureValue<IPlayer> fp : visitorPlayers) {
+		for (Value<IPlayer> fp : visitorPlayers) {
 			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(count++), immediate(url));
 			visitorPlayerMatchStats.add(stats);
 
 		}
 		FutureList<IPlayerMatchStats> vpms = new FutureList<IPlayerMatchStats>(visitorPlayerMatchStats);
 
-		//  assert(visitorPlayerMatchStats.size() == MAX_ROSTER);
-
 		// now we can invoke the engine
 		FutureValue<List<IPlayerMatchRating>> ratings = futureCall(new CreateMatchRatings(), immediate(match), hpms, vpms, homeTeamStats, visitorTeamStats);
 
-		
-		
 		return ratings;
 
 	}
@@ -155,24 +169,24 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 
 				//skip down to players
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE,"Skipping down to teams...");
-				
+
 				// there can be a bunch of optional 10-line sections here for tries, cons, pens and drops
 				// easiest to just look for the top of the player section
 				while (it.hasNext() && !line.contains("<tr>")) {
 					line = it.next();
 				}
-				
+
 				if (!it.hasNext()) {
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Couldn't find top of the player section in teams tab when skipping through the summary headers (tries, cons, pens, drops)");
 					return null;
 				}
-				
+
 				// divTeams
 				for (int i=0; i<8; ++i) {
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
 					line = it.next(); 
 				}
-				
+
 				//line = it.next(); // tbody
 
 				// get 15 home starters
@@ -257,7 +271,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	 * sets playerOn to be true/false depending on how they finished the match
 	 */
 	NameAndId getId(Iterator<String> it) {
-		
+
 		String line = it.next();
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST,line);
 
@@ -275,7 +289,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		if (line.split("[/|.]").length > 4) {
 			id = line.split("[/|.]")[4].trim();
 		}
-		
+
 		String name = "unknown";
 		if (line.split("[<|>]").length > 5) {
 			name = line.split("[<|>]")[4];
@@ -310,15 +324,15 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 		}
 
 	}
-	
+
 	public Value<List<IPlayerMatchRating>>  handleFailure(Throwable e) {
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown in generator job for fetching match stats and creating ratings: " + e.getLocalizedMessage());
 		//still didn't find, need human to get this going.
-//		PromisedValue<ITeamGroup> x = newPromise(ITeamGroup.class);
-//		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
-//		atf.put(task);
+		//		PromisedValue<ITeamGroup> x = newPromise(ITeamGroup.class);
+		//		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
+		//		atf.put(task);
 
-//		return x;
+		//		return x;
 		return immediate(null);
 	}
 }

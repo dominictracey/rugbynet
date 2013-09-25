@@ -14,7 +14,7 @@ import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView;
 import net.rugby.foundation.admin.shared.IAdminTask;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;

@@ -8,10 +8,10 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 
-public class MatchRatingEngineSchemaPopupViewFieldDefinitions<T extends IMatchRatingEngineSchema> {
+public class MatchRatingEngineSchemaPopupViewFieldDefinitions<T extends IRatingEngineSchema> {
 	private List<FieldDefinition<T>> fieldDefinitions =
 			new ArrayList<FieldDefinition<T>>();
 
@@ -834,6 +834,213 @@ public class MatchRatingEngineSchemaPopupViewFieldDefinitions<T extends IMatchRa
 			});
 			
 			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// scrum lost
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getScrumLostWeight() != null) {
+						((TextBox)w).setText(c.getScrumLostWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setScrumLostWeight(l);
+					}
+					return p;
+				}
+
+			});
+			
+
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// lineout lost
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getLineoutLostWeight() != null) {
+						((TextBox)w).setText(c.getLineoutLostWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setLineoutLostWeight(l);
+					}
+					return p;
+				}
+
+			});
+			
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// ruck lost
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getRuckLostWeight() != null) {
+						((TextBox)w).setText(c.getRuckLostWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setRuckLostWeight(l);
+					}
+					return p;
+				}
+
+			});
+			
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// scrum stolen
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getScrumStolenWeight() != null) {
+						((TextBox)w).setText(c.getScrumStolenWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setScrumStolenWeight(l);
+					}
+					return p;
+				}
+
+			});
+			
+
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// lineout stolen
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getLineoutStolenWeight() != null) {
+						((TextBox)w).setText(c.getLineoutStolenWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setLineoutStolenWeight(l);
+					}
+					return p;
+				}
+
+			});
+			
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// ruck stolen
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getRuckStolenWeight() != null) {
+						((TextBox)w).setText(c.getRuckStolenWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setRuckStolenWeight(l);
+					}
+					return p;
+				}
+
+			});
+
+			
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
 				// maul share
 
 				@Override
@@ -861,6 +1068,74 @@ public class MatchRatingEngineSchemaPopupViewFieldDefinitions<T extends IMatchRa
 					}
 					if (l != null) {
 						p.setMaulShareWeight(l);
+					}
+					return p;
+				}
+
+			});
+			
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// maul lost
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getMaulLostWeight() != null) {
+						((TextBox)w).setText(c.getMaulLostWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setMaulLostWeight(l);
+					}
+					return p;
+				}
+
+			});
+			
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				// maul stolen
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c != null && c.getMaulStolenWeight() != null) {
+						((TextBox)w).setText(c.getMaulStolenWeight().toString());
+					}
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setMaulStolenWeight(l);
 					}
 					return p;
 				}
@@ -909,7 +1184,9 @@ public class MatchRatingEngineSchemaPopupViewFieldDefinitions<T extends IMatchRa
 				@Override
 				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
 					assert (w instanceof TextBox);
-					((TextBox)w).setText(c.getPointsDifferentialWeight().toString());
+					if (c.getPointsDifferentialWeight() != null) {
+						((TextBox)w).setText(c.getPointsDifferentialWeight().toString());
+					}
 
 					return w;
 				}
@@ -936,6 +1213,40 @@ public class MatchRatingEngineSchemaPopupViewFieldDefinitions<T extends IMatchRa
 
 			});
 			
+			fieldDefinitions.add((FieldDefinition<T>) new FieldDefinition<ScrumMatchRatingEngineSchema20130713>() {
+				//win
+
+				@Override
+				public Widget render(ScrumMatchRatingEngineSchema20130713 c) {
+					assert (w instanceof TextBox);
+					if (c.getWin() != null) {
+						((TextBox)w).setText(c.getWin().toString());
+					}
+
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					assert (w instanceof TextBox);
+					((TextBox)w).setText(null);
+				}
+
+				@Override
+				public ScrumMatchRatingEngineSchema20130713 update(ScrumMatchRatingEngineSchema20130713 p) {
+					Float l = null;
+					try {
+						l = Float.valueOf(((TextBox)w).getText());
+					} catch (NumberFormatException e) {
+						return null;
+					}
+					if (l != null) {
+						p.setWin(l);
+					}
+					return p;
+				}
+
+			});
 		}
 	}
 		

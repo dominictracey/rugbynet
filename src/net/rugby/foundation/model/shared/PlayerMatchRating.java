@@ -3,7 +3,7 @@ package net.rugby.foundation.model.shared;
 import javax.persistence.Transient;
 import java.io.Serializable;
 
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 
 
 
@@ -16,65 +16,81 @@ public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRatin
 	 * 
 	 */
 	private static final long serialVersionUID = -4536867681836433478L;
-	Long playerMatchStatsId;
-	@Transient
-	private IPlayerMatchStats playerMatchStats;
+//	Long playerMatchStatsId;
+//	@Transient
+//	private IPlayerMatchStats playerMatchStats;
+	private String details;
 	
 	public PlayerMatchRating() {
 		super();
 	}
 	
 	public PlayerMatchRating(Integer rating, IPlayer player, IGroup match,
-			IMatchRatingEngineSchema schema, IPlayerMatchStats playerMatchStats) {
+			IRatingEngineSchema schema, IPlayerMatchStats playerMatchStats, String details) {
 		super(rating, player, match, schema);
 		
-		this.playerMatchStats = playerMatchStats;
-		this.playerMatchStatsId = playerMatchStats.getId();
+		super.addMatchStats(playerMatchStats);
+		//super.addplayerMatchStatsId(playerMatchStats.getId();
+		
+		this.setDetails(details);
 	}
 
 	
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.model.shared.IPlayerMatchRating#getPlayerMatchStats()
-	 */
+//	/* (non-Javadoc)
+//	 * @see net.rugby.foundation.model.shared.IPlayerMatchRating#getPlayerMatchStats()
+//	 */
+//	@Override
+//	public IPlayerMatchStats getPlayerMatchStats() {
+//		return super.getPlayerMatchStats();
+//	}
+//	/* (non-Javadoc)
+//	 * @see net.rugby.foundation.model.shared.IPlayerMatchRating#setPlayerMatchStats(java.util.List)
+//	 */
+//	@Override
+//	public void setPlayerMatchStats(IPlayerMatchStats playerMatchStats) {
+//		//this.playerMatchStats = playerMatchStats;
+//		super.setPlayerMatchStats(playerMatchStats);
+//	}
+
 	@Override
 	public IPlayerMatchStats getPlayerMatchStats() {
-		return playerMatchStats;
+		if (super.getMatchStats() != null) {
+			return super.getMatchStats().get(0);
+		} else {
+			return null;
+		}
 	}
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.model.shared.IPlayerMatchRating#setPlayerMatchStats(java.util.List)
-	 */
+
 	@Override
 	public void setPlayerMatchStats(IPlayerMatchStats playerMatchStats) {
-		this.playerMatchStats = playerMatchStats;
+		super.setMatchStats(null);
+		super.setMatchStatIds(null);
+		super.addMatchStats(playerMatchStats);
+	}
+	
+	@Override
+	public String getDetails() {
+		return details;
+	}
+
+	public void setDetails(String details) {
+		this.details = details;
 	}
 
 	@Override
 	public Long getPlayerMatchStatsId() {
-		return playerMatchStatsId;
+		if (super.getMatchStatIds() != null) {
+			return super.getMatchStatIds().get(0);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public void setPlayerMatchStatsId(Long playerMatchStatsId) {
-		this.playerMatchStatsId = playerMatchStatsId;
-	}
-
-	@Override
-	public int compareTo(IPlayerMatchRating o) {
-		if (rating == null) { 
-			return 1;
-		}
-		
-		 if (o.getRating() == null) {
-				return -1;
-		}
-		 
-		if (rating.equals(o.getRating())) {
-			return 0;
-		} else if (rating < o.getRating()) {
-			return 1;
-		} else {
-			return -1;
-		}
+		super.setMatchStats(null);
+		super.setMatchStatIds(null);
+		super.addMatchStatId(playerMatchStatsId);
 	}
 
 	

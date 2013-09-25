@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
@@ -242,11 +242,16 @@ IMatchRatingEngine  {
 			maulShare *= weights.getMaulShareWeight();               
 			minutesShare *= weights.getMinutesShareWeight();  
 			
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST, pms.getName() +" T:"+tries+" TA:"+tryAssists+" Pts:"+points+" K:"+kicks+" R:"+runs+" P:"+passes+" MR:"+metersRun+
-					cleanBreaks+" DB:"+defendersBeaten+" OL:"+offloads+" TO:"+turnovers+" T:"+tacklesMade+" TM:"+tacklesMissed+" LO:"+lineoutsWonOnThrow+
-					" LOStolen:"+lineoutsStolenOnOppThrow+" P:"+penaltiesConceded+" YC:"+yellowCards+" RC: "+redCards+" ScrumShare:"+scrumShare+
-					" LOShare:"+lineoutShare+" RuckShare:"+ruckShare+" MSh:"+ maulShare+" MinShare:"+ minutesShare);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST, pms.getName() + toString());
 			
+		}
+		
+		@Override
+		public String toString() {
+			return " T:"+tries+" TA:"+tryAssists+" Pts:"+points+" K:"+kicks+" R:"+runs+" P:"+passes+" MR:"+metersRun+
+			cleanBreaks+" DB:"+defendersBeaten+" OL:"+offloads+" TO:"+turnovers+" T:"+tacklesMade+" TM:"+tacklesMissed+" LO:"+lineoutsWonOnThrow+
+			" LOStolen:"+lineoutsStolenOnOppThrow+" P:"+penaltiesConceded+" YC:"+yellowCards+" RC: "+redCards+" ScrumShare:"+scrumShare+
+			" LOShare:"+lineoutShare+" RuckShare:"+ruckShare+" MSh:"+ maulShare+" MinShare:"+ minutesShare;
 		}
 
 		private float getBackScore() {
@@ -323,7 +328,7 @@ IMatchRatingEngine  {
 	}
 
 	@Override
-	public List<IPlayerMatchRating> generate(IMatchRatingEngineSchema schema, IMatchGroup match) {
+	public List<IPlayerMatchRating> generate(IRatingEngineSchema schema, IMatchGroup match) {
 
 		// Have to have these weight values available in the schema to work
 		assert (schema instanceof IV1EngineWeightValues);
@@ -351,7 +356,7 @@ IMatchRatingEngine  {
 
 		float totalPlayerScore = 0F;
 
-		ITeamMatchStats combined = tmsf.getById(null); //emtpy one
+		ITeamMatchStats combined = tmsf.create(); //emtpy one
 		combined.add(homeTeamStats);
 		combined.add(visitTeamStats);
 		
@@ -387,7 +392,7 @@ IMatchRatingEngine  {
 		}
 
 		for (PlayerStatShares score : pss) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats());
+			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats(), score.toString());
 			pmrf.put(pmr);
 			mrl.add(pmr);
 		}

@@ -128,6 +128,12 @@ public interface IPlayerMatchStats {
 	public abstract Long getCountryId();
 
 	public abstract void setCountryId(Long countryId);
+
+	String getTeamAbbr();
+
+	void setTeamAbbr(String teamAbbr);
+
+	int isForward();
 	
 
 }

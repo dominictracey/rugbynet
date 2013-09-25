@@ -8,7 +8,7 @@ import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
 import net.rugby.foundation.admin.shared.IAdminTask;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
@@ -47,7 +47,7 @@ public class CreateMatchRatings extends Job5<List<IPlayerMatchRating>, IMatchGro
 		this.mref = injector.getInstance(IMatchRatingEngineFactory.class);
 		this.mresf = injector.getInstance(IMatchRatingEngineSchemaFactory.class);
 		
-		IMatchRatingEngineSchema mres = mresf.getDefault();
+		IRatingEngineSchema mres = mresf.getDefault();
 		assert (mres != null);
 		IMatchRatingEngine mre = mref.get(mres);
 		assert (mre != null);

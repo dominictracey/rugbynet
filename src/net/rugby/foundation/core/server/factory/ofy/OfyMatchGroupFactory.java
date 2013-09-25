@@ -1,7 +1,9 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,7 +88,17 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 		Objectify ofy = DataStoreFactory.getOfy();
 		// @REX should we just check the match - don't we need to also cross-check against comp as well?
 		Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("fetchMatchStatsPipelineId !=", null);
-		return qg.list();
+		List<IMatchGroup> list = new ArrayList<IMatchGroup>();
+		Iterator<MatchGroup> it = qg.list().iterator();
+		while (it.hasNext()) {
+			IMatchGroup g = (IMatchGroup)it.next();
+			tf.setId(g.getHomeTeamId());
+			g.setHomeTeam(tf.getTeam());
+			tf.setId(g.getVisitingTeamId());
+			g.setVisitingTeam(tf.getTeam());
+			list.add(g);
+		}
+		return list;
 	}
 
 	@Override

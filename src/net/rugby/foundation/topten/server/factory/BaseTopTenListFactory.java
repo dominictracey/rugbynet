@@ -8,7 +8,9 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -279,6 +281,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 		// create TTIs
 		if (tti.getPmiList() != null && tti.getPmiList().size() > 0) {
+			// keep track of the number from each team included on the list so we can check specified limit
+			Map<Long,Integer> numFromTeam = new HashMap<Long, Integer>();
 			Iterator<IPlayerMatchRating> it = set.iterator();
 			int count = 0;
 			while (it.hasNext() && count < 10) {
@@ -286,15 +290,24 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				IMatchGroup match = mf.get(pmr.getPlayerMatchStats().getMatchId());
 				tf.setId(pmr.getPlayerMatchStats().getTeamId());
 				ITeamGroup team = tf.getTeam();
-				//TopTenItem(Long id, Long playerId, IPlayer player, String text,
-				//String image, Long contributorId, Long editorId, boolean isSubmitted, 
-				//String matchReportLink, String teamName, ITopTenList parent)
-				ITopTenItem item = new TopTenItem(null, pmr.getPlayerId(), pmr.getPlayer(), "",
-						"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pmr.getPlayerMatchStats().getPosition(), list);
-				put(item);
-				list.getList().add(item);
-				list.getItemIds().add(item.getId());
-				count++;
+				
+				// keep track of players per team
+				if (!numFromTeam.containsKey(team.getId())) {
+					numFromTeam.put(team.getId(), 0);
+				}
+
+				if (numFromTeam.get(team.getId()) < tti.getPlayersPerTeam()) {
+					//TopTenItem(Long id, Long playerId, IPlayer player, String text,
+					//String image, Long contributorId, Long editorId, boolean isSubmitted, 
+					//String matchReportLink, String teamName, ITopTenList parent)
+					ITopTenItem item = new TopTenItem(null, pmr.getPlayerId(), pmr.getPlayer(), "",
+							"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pmr.getPlayerMatchStats().getPosition(), list);
+					put(item);
+					list.getList().add(item);
+					list.getItemIds().add(item.getId());
+					numFromTeam.put(team.getId(), numFromTeam.get(team.getId())+1);
+					count++;
+				}
 			}
 		}
 
@@ -309,7 +322,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 			list.setPrevId(last.getId());
 
- 		}
+		}
 
 		put(list);
 
@@ -433,19 +446,19 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 			syncCache.put(list.getId(), yourBytes);
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list " + list.getId() + " *** \n" + syncCache.getStatistics());
-			
+
 			// refresh latest and last
 			ITopTenList last = getLastCreatedForComp(list.getCompId());
 			if (last != null) {
 				setLastCreatedForComp(get(last.getId()), list.getCompId());
 			}
-	
+
 			ITopTenList latest = getLatestForComp(list.getCompId());
 			if (latest != null) {
 				setLatestPublishedForComp(get(latest.getId()), list.getCompId());
 			}
 
-			
+
 			return list;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -459,11 +472,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		try {
 			item.setSubmitted(!item.isSubmitted());
 			put(item);
-			
+
 			// refresh the containing list in memcache by deleting the record and forcing a refetch on the next get
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(item.getParentId());
-			
+
 			//			if (!item.isSubmitted() && item.getParent().getLive()) {
 			//				// if we retract an item on a published list, we need to unpublish the list.
 			//				publish(item.getParent());

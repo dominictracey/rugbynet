@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.PlayerRating;
 
@@ -24,6 +25,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
@@ -149,93 +151,32 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 				public void onCellPreview(CellPreviewEvent<T> event) {
 					boolean isClick = "click".equals(event.getNativeEvent().getType());
 					if (isClick) {
-						listener.showEditStats(event.getValue());
+						if (event.getColumn() == 0) {
+							listener.showEditTeamStats(event.getValue());
+						} else if (event.getColumn() == 3) {
+							Window.alert(((IPlayerMatchInfo)event.getValue()).getMatchRating().getDetails()); // sigh
+						} else {
+							listener.showEditStats(event.getValue());
+						}
 					}
+//				    if ("mouseover".equals(event.getNativeEvent().getType())) {
+//				        Element cellElement = event.getNativeEvent().getEventTarget().cast();
+//
+//				        cellElement.setTitle(((IPlayerMatchInfo)event.getValue()).getMatchRating().getDetails());
+//				      }
 					
 				}
 				
 			});
-			//			playersTable.removeAllRows();
-			//			this.playerList = PlayerList;
-			//			setHeaders();
-			//			String style = "leaderboardRow-odd";
-			//
-			//			//	      Date begin = new Date();
-			//			for (int i = 1; i < PlayerList.size()+1; ++i) {
-			//				T t = PlayerList.get(i-1);
-			//				for (int j = 0; j < columnDefinitions.size(); ++j) {
-			//					ColumnDefinition<T> columnDefinition = columnDefinitions.get(j);
-			//
-			//					playersTable.setWidget(i, j, columnDefinition.render(t));
-			//					if (j < 4) {
-			//						// first four columns are clickable
-			//						playersTable.getCellFormatter().setStyleName(i, j, "leaderboardCell");
-			//					}
-			//
-			//				}
-			//				playersTable.getRowFormatter().setStyleName(i, style);
-			//				if (style == "leaderboardRow-odd")
-			//					style = "leaderboardRow-even";
-			//				else
-			//					style = "leaderboardRow-odd";
-			//
-			//			}
-			//
-			//			//	      Date end = new Date();
-			//
-			//			//	      Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,begin.toLocaleString() + " end: " + end.toLocaleString());
 		}
 	}
 
-	private void setHeaders() {
-		//		int i = 0;
-		//		for (String s : headers) {
-		//			playersTable.setHTML(0, i++, s);	
-		//		}
-		//
-		//		playersTable.getRowFormatter().addStyleName(0, "leaderboardRow-header");
-
-
-	}
-
-	private boolean shouldFireClickEvent(HTMLTable.Cell cell) {
-		boolean shouldFireClickEvent = false;
-
-		if (cell != null) {
-			ColumnDefinition<T> columnDefinition =
-					columnDefinitions.get(cell.getCellIndex());
-
-			if (columnDefinition != null) {
-				shouldFireClickEvent = columnDefinition.isClickable();
-			}
-		}
-
-		return shouldFireClickEvent;
-	}
-
-	//	private boolean shouldFireSelectEvent(HTMLTable.Cell cell) {
-	//		boolean shouldFireSelectEvent = false;
-	//
-	//		if (cell != null) {
-	//			ColumnDefinition<T> columnDefinition =
-	//					columnDefinitions.get(cell.getCellIndex());
-	//
-	//			if (columnDefinition != null) {
-	//				shouldFireSelectEvent = columnDefinition.isSelectable();
-	//			}
-	//		}
-	//
-	//		return shouldFireSelectEvent;
-	//	}
 
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setListener(Listener<T> listener) {
 		this.listener = listener;
-
-		//		PlayerListViewColumnDefinitions.setListener((Listener<IPlayerMatchInfo>) listener);
-
 	}
 
 	@Override
@@ -266,27 +207,6 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 				list.add(index-1, newPmi);
 			}
 		}
-		//		// find it in the playerList
-		//		boolean found = false;
-		//		int index = 0;
-		//		for (IPlayerMatchInfo pmi : playerList) {
-		//			if (pmi.getPlayerMatchStats().getId().equals(newPmi.getPlayerMatchStats().getId())) {
-		//				found = true;
-		//				break;
-		//			}
-		//			index++;
-		//		}
-		//		
-		//		if (found) {
-		//			assert (index < playerList.size());
-		//			for (int j = 0; j < columnDefinitions.size(); ++j) {
-		//				ColumnDefinition<T> columnDefinition = columnDefinitions.get(j);
-		//
-		//				playersTable.setWidget(index, j, columnDefinition.render(newPmi));
-		//
-		//
-		//			}
-		//		}
 	}
 
 	private boolean AddColumnSorters(int j, Column<T,?> col, List<T> PlayerList) {
@@ -297,15 +217,15 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 			columnSortHandler.setComparator(col,
 					new Comparator<T>() {
 				public int compare(T o1, T o2) {
-					if (o1.getPlayerMatchStats().getSlot().equals(o2.getPlayerMatchStats().getSlot())) {
+					String o1s = o1.getPlayerMatchStats().getTeamAbbr() + " " + o1.getPlayerMatchStats().getSlot();
+					String o2s = o2.getPlayerMatchStats().getTeamAbbr() + " " + o2.getPlayerMatchStats().getSlot();
+					if (o1s.equals(o2s)) {
 						return 0;
 					}
 
-					// Compare the name columns.
-					if (o1 != null) {
-						return (o2 != null) ? o1.getPlayerMatchStats().getSlot().compareTo(o2.getPlayerMatchStats().getSlot()) : 1;
-					}
-					return -1;
+					// Compare the team abbr columns.
+					return (o2 != null) ? o1s.compareTo(o2s) : 1;
+
 				}
 			});
 			playersTable.addColumnSortHandler(columnSortHandler);

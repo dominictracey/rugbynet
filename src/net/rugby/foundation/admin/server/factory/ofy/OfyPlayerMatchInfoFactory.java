@@ -10,7 +10,7 @@ import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
@@ -58,7 +58,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 	}
 
 	@Override
-	public List<IPlayerMatchInfo> getForMatch(Long matchId, IMatchRatingEngineSchema schema) {
+	public List<IPlayerMatchInfo> getForMatch(Long matchId, IRatingEngineSchema schema) {
 		try {
 			List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
 
@@ -82,7 +82,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 	}
 
 	@Override
-	public IPlayerMatchInfo getForPlayerMatchStats(Long pmsId, IMatchRatingEngineSchema schema) {
+	public IPlayerMatchInfo getForPlayerMatchStats(Long pmsId, IRatingEngineSchema schema) {
 		
 		if (schema == null) {
 			schema = sf.getDefault();

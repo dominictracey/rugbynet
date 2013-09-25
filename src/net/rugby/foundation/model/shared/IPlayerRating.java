@@ -1,8 +1,9 @@
 package net.rugby.foundation.model.shared;
 
 import java.util.Date;
+import java.util.List;
 
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 
 public interface IPlayerRating {
 
@@ -26,9 +27,9 @@ public interface IPlayerRating {
 
 	public abstract void setSchemaId(Long schemaId);
 
-	public abstract IMatchRatingEngineSchema getSchema();
+	public abstract IRatingEngineSchema getSchema();
 
-	public abstract void setSchema(IMatchRatingEngineSchema schema);
+	public abstract void setSchema(IRatingEngineSchema schema);
 
 	public abstract void setPlayer(IPlayer player);
 
@@ -41,4 +42,22 @@ public interface IPlayerRating {
 	public abstract Date getGenerated();
 	
 	public abstract void setGenerated(Date generated);
+
+//	void setMatchStats(List<IPlayerMatchStats> list);
+//
+//	List<IPlayerMatchStats> getMatchStats();
+
+	int compareTo(IPlayerMatchRating o);
+
+	void addMatchStats(IPlayerMatchStats playerMatchStats);
+
+	void setMatchStats(List<IPlayerMatchStats> pmsList);
+
+	List<IPlayerMatchStats> getMatchStats();
+
+	void setMatchStatIds(List<Long> playerMatchStatIds);
+
+	List<Long> getMatchStatIds();
+
+	void addMatchStatId(Long playerMatchStatsId);
 }

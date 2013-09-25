@@ -2,15 +2,15 @@ package net.rugby.foundation.admin.server.factory;
 
 import java.util.List;
 
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 
 public interface IMatchRatingEngineSchemaFactory {
-	IMatchRatingEngineSchema getById(Long id);
-	IMatchRatingEngineSchema getDefault();
-	IMatchRatingEngineSchema put (IMatchRatingEngineSchema schema);
-	Boolean delete(IMatchRatingEngineSchema schema);
-	IMatchRatingEngineSchema setAsDefault(IMatchRatingEngineSchema schema);
+	IRatingEngineSchema getById(Long id);
+	IRatingEngineSchema getDefault();
+	IRatingEngineSchema put (IRatingEngineSchema schema);
+	Boolean delete(IRatingEngineSchema schema);
+	IRatingEngineSchema setAsDefault(IRatingEngineSchema schema);
 	
 	// this is awkward downcast
 	List<ScrumMatchRatingEngineSchema> getScrumList();	
