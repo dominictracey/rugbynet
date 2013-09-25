@@ -59,6 +59,9 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	private Long teamId;
 	private position pos;
 	private String name;
+	private String teamAbbr;
+
+
 
 	//@REX should implement to be able to save list of Longs.
 	@Transient
@@ -566,9 +569,27 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 		this.countryId = countryId;
 	}
 
+	@Override
+	public String getTeamAbbr() {
+		return teamAbbr;
+	}
 
+	@Override
+	public void setTeamAbbr(String teamAbbr) {
+		this.teamAbbr = teamAbbr;
+	}
 
-
-
+	@Override
+	public int isForward() {
+		if (	getPosition().equals(position.PROP) ||
+				getPosition().equals(position.HOOKER) ||
+				getPosition().equals(position.LOCK) ||
+				getPosition().equals(position.FLANKER) ||
+				getPosition().equals(position.NUMBER8) ) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 
 }

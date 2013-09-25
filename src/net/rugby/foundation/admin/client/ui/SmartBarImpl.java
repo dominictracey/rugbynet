@@ -9,7 +9,7 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.place.PortalPlace;
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.IContent;
 
@@ -138,7 +138,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 		if (schemas != null) {
 			Iterator<ScrumMatchRatingEngineSchema> it = schemas.iterator();
 			while (it.hasNext()) {
-				final IMatchRatingEngineSchema s = it.next();
+				final IRatingEngineSchema s = it.next();
 				String name = s.getName();
 				if (s.getIsDefault()) {
 					name += " (Default)";

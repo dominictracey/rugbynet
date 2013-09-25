@@ -5,7 +5,7 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.IContent;
 
@@ -45,7 +45,7 @@ public interface SmartBar extends IsWidget {
 		/**
 		 * 
 		 */
-		void editSchema(IMatchRatingEngineSchema schema);
+		void editSchema(IRatingEngineSchema schema);
 	
 		void createSchema();
 	}

@@ -1,8 +1,8 @@
 package net.rugby.foundation.model.shared;
 
-import java.util.List;
+import java.util.Date;
 
-public interface ITeamMatchStats {
+public interface ITeamMatchStats  extends IHasId {
 
 	public abstract Long getId();
 
@@ -137,5 +137,21 @@ public interface ITeamMatchStats {
 	Long getMatchId();
 
 	public abstract void add(ITeamMatchStats stats);
+
+	Boolean getIsHome();
+
+	void setIsHome(Boolean isHome);
+
+	Date getCreated();
+
+	void setCreated(Date created);
+
+	Date getModified();
+
+	void setModified(Date modified);
+
+	String getTeamAbbr();
+
+	void setTeamAbbr(String teamAbbr);
 
 }

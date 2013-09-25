@@ -3,7 +3,7 @@ package net.rugby.foundation.admin.server.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
@@ -19,12 +19,12 @@ public class ScrumMatchRatingEngineBase implements
 	ITeamMatchStats visitTeamStats;
 	List<IPlayerMatchStats> homePlayerStats;
 	List<IPlayerMatchStats> visitPlayerStats;
-	private List<IMatchRatingEngineSchema> supportedSchemas;
+	private List<IRatingEngineSchema> supportedSchemas;
 	protected final IPlayerMatchRatingFactory pmrf;
 	protected final IPlayerFactory pf;
 	
 	public ScrumMatchRatingEngineBase(IPlayerFactory pf, IPlayerMatchRatingFactory pmrf) {
-		supportedSchemas = new ArrayList<IMatchRatingEngineSchema>();
+		supportedSchemas = new ArrayList<IRatingEngineSchema>();
 		supportedSchemas.add(new ScrumMatchRatingEngineSchema20130713());
 		this.pmrf = pmrf;
 		this.pf = pf;
@@ -46,11 +46,11 @@ public class ScrumMatchRatingEngineBase implements
 	}
 
 	@Override
-	public List<IPlayerMatchRating> generate(IMatchRatingEngineSchema schema, IMatchGroup match) {
+	public List<IPlayerMatchRating> generate(IRatingEngineSchema schema, IMatchGroup match) {
 		List<IPlayerMatchRating> mrl = new ArrayList<IPlayerMatchRating>();
 		for (IPlayerMatchStats pms : homePlayerStats) {
 			if (pms != null) {
-				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms);
+				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms, "just made up");
 				pmrf.put(pmr);
 				mrl.add(pmr);
 			}
@@ -58,7 +58,7 @@ public class ScrumMatchRatingEngineBase implements
 		
 		for (IPlayerMatchStats pms : visitPlayerStats) {
 			if (pms != null) {
-				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms);
+				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms, "just made up");
 				pmrf.put(pmr);
 				mrl.add(pmr);
 			}
@@ -68,7 +68,7 @@ public class ScrumMatchRatingEngineBase implements
 	}
 
 	@Override
-	public List<IMatchRatingEngineSchema> getSupportedSchemas() {
+	public List<IRatingEngineSchema> getSupportedSchemas() {
 
 		return supportedSchemas;
 	}

@@ -3,6 +3,8 @@ package net.rugby.foundation.admin.client.ui.playerlistview;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.gwtbootstrap.client.ui.Tooltip;
+import com.github.gwtbootstrap.client.ui.constants.Placement;
 import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.user.cellview.client.Column;
@@ -53,6 +55,7 @@ public class PlayerListViewColumnDefinitions<T> {
 			//			}
 			//	      });
 
+			if (match != null) {
 			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
 				// slot
 				@Override
@@ -83,6 +86,36 @@ public class PlayerListViewColumnDefinitions<T> {
 				}
 
 			});
+			} else {
+				columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
+					// team abbr as link to TeamMatcHStats
+					@Override
+					public Widget render(IPlayerMatchInfo c) {
+						String name = c.getPlayerMatchStats().getTeamAbbr();
+						return new HTML(name);
+					}
+
+					@Override
+					public Column<IPlayerMatchInfo, ?> getColumn() {
+						
+						Column<IPlayerMatchInfo, ?> col =  new TextColumn<IPlayerMatchInfo>() {
+							@Override
+							public String getValue(IPlayerMatchInfo c) {
+								String teamName = "";
+								if (c.getPlayerMatchStats().getTeamAbbr() != null) {
+									teamName = c.getPlayerMatchStats().getTeamAbbr();
+								} 
+								String slot = teamName + c.getPlayerMatchStats().getSlot();
+								return slot;
+							}
+						};
+						col.setSortable(true);
+						return col;
+						
+					}
+
+				});
+			}
 
 			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
 
@@ -140,7 +173,13 @@ public class PlayerListViewColumnDefinitions<T> {
 					if ((PlayerRating)c.getMatchRating() != null && ((PlayerRating)c.getMatchRating()).getRating() != null) {
 						name = ((PlayerRating)c.getMatchRating()).getRating().toString();
 					}
-					return new HTML(name);
+					Widget w = new HTML(name);
+					Tooltip tooltip = new Tooltip();
+				    tooltip.setWidget(w);
+				    tooltip.setText(c.getMatchRating().getDetails());
+				    tooltip.setPlacement(Placement.RIGHT);
+				    tooltip.reconfigure();
+					return w;
 				}     
 
 				public boolean isClickable() {

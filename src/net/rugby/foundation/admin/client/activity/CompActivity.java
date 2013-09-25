@@ -17,7 +17,7 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView.TeamMatchStatsPopupViewPresenter;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -1009,7 +1009,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 
 	@Override
-	public void editSchema(IMatchRatingEngineSchema schema) {
+	public void editSchema(IRatingEngineSchema schema) {
 		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
 		if (schema instanceof ScrumMatchRatingEngineSchema20130713) {
 			clientFactory.getMatchRatingEngineSchemaPopupView().setTarget((ScrumMatchRatingEngineSchema20130713)schema);
@@ -1216,4 +1216,23 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	public void createContent() {
 		clientFactory.createContent();
 	}
+
+
+
+	@Override
+	public void showEditTeamStats(IPlayerMatchInfo pmi) {
+		clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
+		clientFactory.getRpcService().getTeamMatchStats(pmi.getPlayerMatchStats().getMatchId(), pmi.getPlayerMatchStats().getTeamId(), new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch team match stats to edit");
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+
+				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+			}
+		});	}
 }

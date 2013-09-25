@@ -49,7 +49,7 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 		}
 		return createPMS(pf.get(pid), mf.get(100L), slot, teamId);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.test.IPlayerMatchFactory#put(net.rugby.foundation.model.shared.IPlayerMatchStats)
 	 */
@@ -57,7 +57,7 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	public IPlayerMatchStats put(IPlayerMatchStats val) {
 		return val;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.test.IPlayerMatchFactory#delete(net.rugby.foundation.model.shared.IPlayerMatchStats)
 	 */
@@ -70,20 +70,44 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	public List<IPlayerMatchStats> getByMatchId(Long matchId) {
 		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
 		IMatchGroup m = mf.get(matchId);
-		//NZL
-		int slot = 0;
-		for (Long i=9001001L; i<9001023L; ++i) {
-			IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9001L);
-			pms.setId(i+10000L);
-			list.add(pms);
+
+		if (matchId.equals(400L)) {
+			//NZL
+			int slot = 0;
+			for (Long i=9001001L; i<9001023L; ++i) {
+				IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9001L);
+				pms.setId(i+10000L);
+				list.add(pms);
+			}
+
+			//AUS
+			slot = 0;
+			for (Long i=9002001L; i<9002023L; ++i) {
+				IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9002L);
+				pms.setId(i+10000L);
+				list.add(pms);
+			}
 		}
-		
-		//AUS
-		slot = 0;
-		for (Long i=9002001L; i<9002023L; ++i) {
-			IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9002L);
-			pms.setId(i+10000L);
-			list.add(pms);
+
+		else {
+			// create a bunch of random players
+			int slot = 0;
+			for (int i=0; i<23; ++i) {
+				IPlayer p = pf.get(m.getHomeTeamId() + 100000 + random.nextInt(5000));
+				IPlayerMatchStats pms = createPMS(p,m,slot++,m.getHomeTeamId());
+				pms.setPosition(position.getAt(random.nextInt(11))); // we do want NONE?
+				pms.setId(p.getId()+100000);
+				list.add(pms);
+			}
+			
+			slot = 0;
+			for (int i=0; i<23; ++i) {
+				IPlayer p = pf.get(m.getVisitingTeamId() + 100000 + random.nextInt(5000));
+				IPlayerMatchStats pms = createPMS(p,m,slot++,m.getVisitingTeamId());
+				pms.setPosition(position.getAt(random.nextInt(11)));  // we do want NONE?
+				pms.setId(p.getId()+100000);
+				list.add(pms);
+			}
 		}
 		return list;
 	}

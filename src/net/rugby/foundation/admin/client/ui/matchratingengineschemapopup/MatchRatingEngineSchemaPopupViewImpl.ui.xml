@@ -300,7 +300,7 @@ Red Cards:
             <tr>
 
                 <td>
-Scrum share:
+Scrum won:
                 </td>
 
                 <td>
@@ -310,7 +310,7 @@ Scrum share:
                 </td>
 
                 <td>
-Lineout share:
+Lineout won:
                 </td>
 
                 <td>
@@ -320,7 +320,7 @@ Lineout share:
                 </td>
 
                 <td>
-Ruck share:
+Ruck won:
                 </td>
 
                 <td>
@@ -329,11 +329,78 @@ Ruck share:
                     </g:TextBox>
                 </td>
             </tr>
-
             <tr>
 
                 <td>
-Maul share:
+Scrum lost:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="scrumLost" >
+                    </g:TextBox>
+                </td>
+                                <td>
+Lineout lost:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="lineoutLost" >
+                    </g:TextBox>
+                </td>
+                
+                                <td>
+Ruck lost:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="ruckLost" >
+                    </g:TextBox>
+                </td>
+            </tr>
+                        <tr>
+
+                <td>
+Scrum stolen:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="scrumStolen" >
+                    </g:TextBox>
+                </td>
+                                <td>
+Lineout stolen:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="lineoutStolen" >
+                    </g:TextBox>
+                </td>
+                
+                                <td>
+Ruck stolen:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="ruckStolen" >
+                    </g:TextBox>
+                </td>
+            </tr>
+            <tr>
+
+                <td>
+Maul won:
                 </td>
 
                 <td>
@@ -342,6 +409,29 @@ Maul share:
                     </g:TextBox>
                 </td>
 
+                                <td>
+Maul lost:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="maulLost" >
+                    </g:TextBox>
+                </td>
+                
+                 <td>
+Maul stolen:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="maulStolen" >
+                    </g:TextBox>
+                </td>
+            </tr>
+           <tr>                
                 <td>
 Minutes share:
                 </td>
@@ -351,8 +441,8 @@ Minutes share:
                     <g:TextBox ui:field="minutesShareWeight" >
                     </g:TextBox>
                 </td>
-                
-                                <td>
+         
+                 <td>
 Points Differential:
 
                 </td>
@@ -362,8 +452,17 @@ Points Differential:
                     <g:TextBox ui:field="pointsDifferentialWeight" >
                     </g:TextBox>
                 </td>
-                
-            </tr>
+                      <td>
+Win:
+
+                </td>
+
+                <td>
+
+                    <g:TextBox ui:field="win" >
+                    </g:TextBox>
+                </td>           
+	</tr>
 
             <tr>
 

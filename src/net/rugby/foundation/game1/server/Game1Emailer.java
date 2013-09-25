@@ -18,7 +18,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 
 import net.rugby.foundation.model.shared.IAppUser;
-import net.rugby.foundation.server.PlayersServiceImpl;
 
 /**
  * @author home
@@ -41,7 +40,7 @@ public class Game1Emailer {
 	        msg.setSubject(subject);
 	        msg.setText(message);
 	        Transport.send(msg);
-	        Logger.getLogger(PlayersServiceImpl.class.getName()).log(Level.INFO,"Sent mail to " + msg.getRecipients(RecipientType.TO)[0].toString());
+	        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Sent mail to " + msg.getRecipients(RecipientType.TO)[0].toString());
 	
 	    } catch (AddressException e) {
 	    	e.printStackTrace();

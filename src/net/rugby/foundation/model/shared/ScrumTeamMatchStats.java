@@ -1,6 +1,8 @@
 package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import javax.persistence.Id;
 
 import com.googlecode.objectify.annotation.Entity;
@@ -17,7 +19,12 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	private Long 	id;
 	private Long 	matchId;
 	private Long 	teamId;
-	
+	private String 	teamAbbr;
+
+	private Boolean isHome;
+	private Date created;
+	private Date modified;
+
 	private Integer tries;
 	
 	private Integer conversionsAttempted;
@@ -122,6 +129,15 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	@Override
+	public String getTeamAbbr() {
+		return teamAbbr;
+	}
+	@Override
+	public void setTeamAbbr(String teamAbbr) {
+		this.teamAbbr = teamAbbr;
+	}
+	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.ITeamMatchStats#getTries()
 	 */
@@ -550,6 +566,33 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	public void setTeamId(Long teamId) {
 		this.teamId = teamId;
 	}
+	
+	
+	@Override
+	public Boolean getIsHome() {
+		return isHome;
+	}
+	@Override
+	public void setIsHome(Boolean isHome) {
+		this.isHome = isHome;
+	}
+	@Override
+	public Date getCreated() {
+		return created;
+	}
+	@Override
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+	@Override
+	public Date getModified() {
+		return modified;
+	}
+	@Override
+	public void setModified(Date modified) {
+		this.modified = modified;
+	}
+	
 	@Override
 	public void add(ITeamMatchStats s) {
 		tries += s.getTries();                

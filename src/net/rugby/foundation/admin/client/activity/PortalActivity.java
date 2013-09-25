@@ -21,18 +21,23 @@ import net.rugby.foundation.admin.client.ui.portal.EditTTLInfo;
 import net.rugby.foundation.admin.client.ui.portal.EditTTLInfo.EditTTLInfoPresenter;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresenter;
+import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView;
+import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView.TeamMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
 public class PortalActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, PortalViewPresenter<IPlayerMatchInfo>,
-PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter { 
+PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsPopupViewPresenter<ITeamMatchStats> { 
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -64,14 +69,14 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter {
 		panel.setWidget(view.asWidget());
 
 		if (place != null) {
-			clientFactory.getRpcService().getComps(Filter.ALL, new AsyncCallback<List<ICompetition>>() {
+			clientFactory.getRpcService().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					Window.alert("Failed to fetch comps");
 				}
 
 				@Override
-				public void onSuccess(List<ICompetition> result) {
+				public void onSuccess(ICoreConfiguration result) {
 					view.setComps(result);
 
 					clientFactory.getRpcService().fetchPositionList(new AsyncCallback<List<position>>() {
@@ -79,33 +84,33 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter {
 						@Override
 						public void onFailure(Throwable caught) {
 							Window.alert("Failed to fetch position list");
-							
+
 						}
 
 						@Override
 						public void onSuccess(List<position> result) {
 							view.setPositions(result);
-							
+
 							clientFactory.getRpcService().fetchCountryList(new AsyncCallback<List<ICountry>>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
 									Window.alert("Failed to fetch country list");
-									
+
 								}
 
 								@Override
 								public void onSuccess(List<ICountry> result) {
 									view.setCountries(result);
-									
+
 								}
-								
+
 							});
-							
+
 						}
-						
+
 					});
-					
+
 				}
 			});
 
@@ -200,7 +205,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter {
 	@Override
 	public void onCancelEditPlayerMatchStatsClicked() {
 		((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).hide();
-		
+
 	}
 
 	@Override
@@ -230,7 +235,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter {
 	@Override
 	public void onCancelEditPlayerClicked() {
 		((DialogBox)clientFactory.getPlayerPopupView()).hide();
-		
+
 	}
 
 	@Override
@@ -239,20 +244,20 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter {
 		clientFactory.getRpcService().aggregatePlayerMatchRatings(compId, roundId, posi,
 				countryId, teamId, new AsyncCallback<List<IPlayerMatchInfo>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						Window.alert("Query failed: " + caught.getLocalizedMessage());
-						
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Query failed: " + caught.getLocalizedMessage());
 
-					@Override
-					public void onSuccess(List<IPlayerMatchInfo> result) {
-						clientFactory.getPortalView().showAggregatedMatchInfo(result);
-						
-					}
+			}
+
+			@Override
+			public void onSuccess(List<IPlayerMatchInfo> result) {
+				clientFactory.getPortalView().showAggregatedMatchInfo(result);
+
+			}
 		});
 
-		
+
 	}
 
 	@Override
@@ -312,7 +317,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter {
 	@Override
 	public void flushAllPipelineJobs() {
 		clientFactory.flushAllPipelineJobs();
-		
+
 	}
 
 	@Override
@@ -346,19 +351,106 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter {
 				}
 			}
 		});	
-		
+
 	}
 
 	@Override
 	public void cancelTTITextEdit(TopTenSeedData tti) {
 		ttltext.hide();
-		
+
 	}
 
 	@Override
 	public void createContent() {
 		clientFactory.createContent();
 	}
-	
+
+	@Override
+	public void portalViewCompSelected(long compId) {
+		clientFactory.getRpcService().getComp(compId, new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Problem fetching comp: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(ICompetition result) {
+				if (result != null) {
+					view.setComp(result);
+				}
+			}
+		});	
+
+	}
+
+	@Override
+	public void showEditTeamStats(IPlayerMatchInfo pmi) {
+
+		clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
+		clientFactory.getRpcService().getTeamMatchStats(pmi.getPlayerMatchStats().getMatchId(), pmi.getPlayerMatchStats().getTeamId(), new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch team match stats to edit");
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+
+				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+			}
+		});
+	}
+
+	/**
+	 * 
+	 * @param Team
+	 */
+	@Override
+	public void onSaveTeamMatchStatsClicked(ITeamMatchStats tms) {
+		clientFactory.getRpcService().saveTeamMatchStats(tms, null, new AsyncCallback<ITeamMatchStats>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+
+				Window.alert("Team Match Stats not saved: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+				((DialogBox) clientFactory.getTeamMatchStatsPopupView()).hide();
+			}
+		});		}
+
+
+
+	@Override
+	public void onCancelEditTeamMatchStatsClicked() {
+		((DialogBox)clientFactory.getTeamMatchStatsPopupView()).hide();
+
+	}
+
+
+
+	@Override
+	public void onRefetchEditTeamMatchStatsClicked(ITeamMatchStats target) {
+		clientFactory.getRpcService().refetchTeamMatchStats(target, new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch Team Match Stats, see logs for details");
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+			}
+		});
+
+	}
+
+
+
 
 }

@@ -4,7 +4,11 @@ package net.rugby.foundation.test.jenkins;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +31,7 @@ import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.TopTenTestModule;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
@@ -193,7 +198,7 @@ public class TopTenFactoryTester {
 	private ITopTenList createTTL() {
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, 2L, null, null, null);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, 2L, null, null, null,10);
 		return ttf.create(ttsd);
 	}
 
@@ -397,7 +402,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -417,7 +422,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -446,7 +451,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
 		ITopTenList ttl1 = ttf.create(ttsd);
 
 		assertTrue(ttl1 != null);
@@ -520,7 +525,7 @@ public class TopTenFactoryTester {
 		// delete 1
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
 		ITopTenList ttl1 = ttf.create(ttsd);
 		assertTrue(ttl1 != null);
 		assertFalse(ttl1.getLive());
@@ -637,7 +642,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -694,5 +699,42 @@ public class TopTenFactoryTester {
 		assertTrue(ttl3.getNextId() == null);
 		assertTrue(ttl2.getNextPublishedId() == null);
 		deleteAll();
+	}
+	
+	@Test
+	public void teamLimitOf5() {
+		//		  (List<IPlayerMatchInfo> pmiList, String title,
+		//					String description, Long compId, Long roundId, position pos,
+		//					Long countryId, Long teamId)
+		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+		deleteAll();
+
+		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
+
+		int max = 5;
+	
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, 2L, null, null, null,max);
+		ITopTenList ttl = ttf.create(ttsd);
+		
+		assert (ttl != null);
+
+		Iterator<ITopTenItem> it = ttl.getList().iterator();
+		assertTrue(ttl.getList().size() == 10);
+		Map<Long, Integer> counter = new HashMap<Long,Integer>(); 
+		while (it.hasNext()) {
+			ITopTenItem tti = it.next();
+			if (!counter.containsKey(tti.getTeamId())) {
+				counter.put(tti.getTeamId(), 1);
+			} else {
+				counter.put(tti.getTeamId(), counter.get(tti.getTeamId()) + 1);
+				assertTrue(counter.get(tti.getTeamId()) <= max);
+			}
+		}
+
+		ttf.delete(ttl);
+		assertFalse(ms.contains(ttl.getId()));
+
+		deleteAll();
+
 	}
 }

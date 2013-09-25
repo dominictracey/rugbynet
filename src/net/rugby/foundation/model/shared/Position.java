@@ -93,131 +93,131 @@ public abstract class Position implements Serializable {
 			return abbr;
 		}
 
-		public int getNumberRequired(Stage.stageType stage, int round)  { 
-			switch (ordinal()) {
-			case 1: 
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumPropsPoolRoster();
-					else
-						return CoreConfiguration.getNumPropsPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumPropsKnockoutRoster();
-					else
-						return CoreConfiguration.getNumPropsKnockoutRound();							
-				}
-			case 2 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumHookersPoolRoster();
-					else
-						return CoreConfiguration.getNumHookersPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumHookersKnockoutRoster();
-					else
-						return CoreConfiguration.getNumHookersKnockoutRound();							
-				}
-			case 3 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumLocksPoolRoster();
-					else
-						return CoreConfiguration.getNumLocksPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumLocksKnockoutRoster();
-					else
-						return CoreConfiguration.getNumLocksKnockoutRound();							
-				}
-			case 4 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumFlankersPoolRoster();
-					else
-						return CoreConfiguration.getNumFlankersPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumFlankersKnockoutRoster();
-					else
-						return CoreConfiguration.getNumFlankersKnockoutRound();							
-				}
-			case 5 : 
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0) 
-						return CoreConfiguration.getNumNumber8sPoolRoster();
-					else
-						return CoreConfiguration.getNumNumber8sPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumNumber8sKnockoutRoster();
-					else
-						return CoreConfiguration.getNumNumber8sKnockoutRound();							
-				}
-			case 6 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumScrumhalvesPoolRoster();
-					else
-						return CoreConfiguration.getNumScrumhalvesPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumScrumhalvesKnockoutRoster();
-					else
-						return CoreConfiguration.getNumScrumhalvesKnockoutRound();							
-				}
-			case 7 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumFlyhalvesPoolRoster();
-					else
-						return CoreConfiguration.getNumFlyhalvesPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumFlyhalvesKnockoutRoster();
-					else
-						return CoreConfiguration.getNumFlyhalvesKnockoutRound();							
-				}
-			case 8 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumCentersPoolRoster();
-					else
-						return CoreConfiguration.getNumCentersPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumCentersKnockoutRoster();
-					else
-						return CoreConfiguration.getNumCentersKnockoutRound();							
-				}
-			case 9 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumWingsPoolRoster();
-					else
-						return CoreConfiguration.getNumWingsPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumWingsKnockoutRoster();
-					else
-						return CoreConfiguration.getNumWingsKnockoutRound();							
-				}
-			case 10 :
-				if (stage == Stage.stageType.POOL) {
-					if (round == 0)
-						return CoreConfiguration.getNumFullbacksPoolRoster();
-					else
-						return CoreConfiguration.getNumFullbacksPoolRound();
-				} else {
-					if (round == 0)
-						return CoreConfiguration.getNumFullbacksKnockoutRoster();
-					else
-						return CoreConfiguration.getNumFullbacksKnockoutRound();							
-				}
-			}
-			return 0;
-		}
+//		public int getNumberRequired(Stage.stageType stage, int round)  { 
+//			switch (ordinal()) {
+//			case 1: 
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumPropsPoolRoster();
+//					else
+//						return CoreConfiguration.getNumPropsPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumPropsKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumPropsKnockoutRound();							
+//				}
+//			case 2 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumHookersPoolRoster();
+//					else
+//						return CoreConfiguration.getNumHookersPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumHookersKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumHookersKnockoutRound();							
+//				}
+//			case 3 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumLocksPoolRoster();
+//					else
+//						return CoreConfiguration.getNumLocksPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumLocksKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumLocksKnockoutRound();							
+//				}
+//			case 4 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumFlankersPoolRoster();
+//					else
+//						return CoreConfiguration.getNumFlankersPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumFlankersKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumFlankersKnockoutRound();							
+//				}
+//			case 5 : 
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0) 
+//						return CoreConfiguration.getNumNumber8sPoolRoster();
+//					else
+//						return CoreConfiguration.getNumNumber8sPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumNumber8sKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumNumber8sKnockoutRound();							
+//				}
+//			case 6 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumScrumhalvesPoolRoster();
+//					else
+//						return CoreConfiguration.getNumScrumhalvesPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumScrumhalvesKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumScrumhalvesKnockoutRound();							
+//				}
+//			case 7 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumFlyhalvesPoolRoster();
+//					else
+//						return CoreConfiguration.getNumFlyhalvesPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumFlyhalvesKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumFlyhalvesKnockoutRound();							
+//				}
+//			case 8 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumCentersPoolRoster();
+//					else
+//						return CoreConfiguration.getNumCentersPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumCentersKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumCentersKnockoutRound();							
+//				}
+//			case 9 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumWingsPoolRoster();
+//					else
+//						return CoreConfiguration.getNumWingsPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumWingsKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumWingsKnockoutRound();							
+//				}
+//			case 10 :
+//				if (stage == Stage.stageType.POOL) {
+//					if (round == 0)
+//						return CoreConfiguration.getNumFullbacksPoolRoster();
+//					else
+//						return CoreConfiguration.getNumFullbacksPoolRound();
+//				} else {
+//					if (round == 0)
+//						return CoreConfiguration.getNumFullbacksKnockoutRoster();
+//					else
+//						return CoreConfiguration.getNumFullbacksKnockoutRound();							
+//				}
+//			}
+//			return 0;
+//		}
 	}
 
 

@@ -3,7 +3,7 @@ package net.rugby.foundation.admin.client.ui.matchratingengineschemapopup;
 import java.util.List;
 
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 
 import com.google.gwt.core.client.GWT;
@@ -52,12 +52,21 @@ public class MatchRatingEngineSchemaPopupViewImpl extends DialogBox implements M
 	@UiField TextBox yellowCards;
 	@UiField TextBox redCards;
 	
-	@UiField TextBox scrumShareWeight; // .4F;
-	@UiField TextBox lineoutShareWeight; // .4F;
-	@UiField TextBox ruckShareWeight; // .3F;
-	@UiField TextBox maulShareWeight; // .3F;
-	@UiField TextBox minutesShareWeight; // .2F;
-	@UiField TextBox pointsDifferentialWeight; // .2F;
+	@UiField TextBox scrumShareWeight;
+	@UiField TextBox scrumLost;
+	@UiField TextBox scrumStolen;
+	@UiField TextBox lineoutShareWeight;
+	@UiField TextBox lineoutLost;
+	@UiField TextBox lineoutStolen;
+	@UiField TextBox ruckShareWeight;
+	@UiField TextBox ruckLost;
+	@UiField TextBox ruckStolen;
+	@UiField TextBox maulShareWeight;
+	@UiField TextBox maulLost;
+	@UiField TextBox maulStolen;
+	@UiField TextBox minutesShareWeight;
+	@UiField TextBox pointsDifferentialWeight; 
+	@UiField TextBox win;
 	
 	@UiField Button saveButton;
 	@UiField Button saveAsCopyButton;
@@ -96,10 +105,19 @@ public class MatchRatingEngineSchemaPopupViewImpl extends DialogBox implements M
               
 		fieldDefinitions.get(i++).bind(scrumShareWeight);
 		fieldDefinitions.get(i++).bind(lineoutShareWeight);
-		fieldDefinitions.get(i++).bind(ruckShareWeight); //
-		fieldDefinitions.get(i++).bind(maulShareWeight); //
+		fieldDefinitions.get(i++).bind(ruckShareWeight);
+		fieldDefinitions.get(i++).bind(scrumLost);
+		fieldDefinitions.get(i++).bind(lineoutLost);
+		fieldDefinitions.get(i++).bind(ruckLost);
+		fieldDefinitions.get(i++).bind(scrumStolen);
+		fieldDefinitions.get(i++).bind(lineoutStolen);
+		fieldDefinitions.get(i++).bind(ruckStolen);
+		fieldDefinitions.get(i++).bind(maulShareWeight); 
+		fieldDefinitions.get(i++).bind(maulLost);
+		fieldDefinitions.get(i++).bind(maulStolen);
 		fieldDefinitions.get(i++).bind(minutesShareWeight);
 		fieldDefinitions.get(i++).bind(pointsDifferentialWeight);
+		fieldDefinitions.get(i++).bind(win);
 	}
 	
 	private MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713> presenter;

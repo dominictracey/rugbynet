@@ -7,7 +7,7 @@ import java.util.Random;
 
 import com.google.inject.Inject;
 
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
@@ -39,7 +39,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 		if (id.equals(2000L)) {
 
 			return new PlayerMatchRating(723, pf.get(9001014L), (IGroup)mf.get(300L),
-					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L)) ;
+					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L), "helpful tooltip details also") ;
 		}
 		return null;
 	}
@@ -54,7 +54,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 		List<IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
 		
 		Iterator<IPlayerMatchStats> it = pmsl.iterator();
-		IMatchRatingEngineSchema schema = new ScrumMatchRatingEngineSchema20130713();
+		IRatingEngineSchema schema = new ScrumMatchRatingEngineSchema20130713();
 		
 		while (it.hasNext()) {
 			list.add(get(it.next(),schema));
@@ -64,10 +64,10 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	}
 
 	@Override
-	public IPlayerMatchRating getNew(IPlayer playerId, IMatchGroup matchId,
-			Integer rating, IMatchRatingEngineSchema schemaId,
-			IPlayerMatchStats playerMatchStatsId) {
-		return null;
+	public IPlayerMatchRating getNew(IPlayer player, IMatchGroup match,
+			Integer rating, IRatingEngineSchema schema,
+			IPlayerMatchStats playerMatchStats, String details) {
+		return new PlayerMatchRating(rating, player, match, schema, playerMatchStats, details);
 	}
 
 	@Override
@@ -76,9 +76,9 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	}
 
 	@Override
-	public IPlayerMatchRating get(IPlayerMatchStats pms, IMatchRatingEngineSchema schema) {
+	public IPlayerMatchRating get(IPlayerMatchStats pms, IRatingEngineSchema schema) {
 		int rating = getRandomRating();
-		return new PlayerMatchRating(rating, pf.get(pms.getPlayerId()), (IGroup)mf.get(pms.getMatchId()), schema, pms);
+		return new PlayerMatchRating(rating, pf.get(pms.getPlayerId()), (IGroup)mf.get(pms.getMatchId()), schema, pms, "helpful tooltip details");
 	}
 
 	private int getRandomRating() {
@@ -86,7 +86,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	}
 
 	@Override
-	public Boolean deleteForSchema(IMatchRatingEngineSchema schema) {
+	public Boolean deleteForSchema(IRatingEngineSchema schema) {
 		return true;
 	}
 

@@ -19,7 +19,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
-import net.rugby.foundation.admin.shared.IMatchRatingEngineSchema;
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
@@ -135,10 +135,10 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 
 	@Override
 	public IPlayerMatchRating getNew(IPlayer player, IMatchGroup match,
-			Integer rating, IMatchRatingEngineSchema schema,
-			IPlayerMatchStats playerMatchStats) {
+			Integer rating, IRatingEngineSchema schema,
+			IPlayerMatchStats playerMatchStats, String details) {
 		Objectify ofy = DataStoreFactory.getOfy();
-		PlayerMatchRating pmr = new PlayerMatchRating(rating, player, (IGroup)match, schema, playerMatchStats);
+		PlayerMatchRating pmr = new PlayerMatchRating(rating, player, (IGroup)match, schema, playerMatchStats, details);
 		ofy.put(pmr);
 		return pmr;
 	}
@@ -184,7 +184,7 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 	}
 
 	@Override
-	public IPlayerMatchRating get(IPlayerMatchStats pms, IMatchRatingEngineSchema schema) {
+	public IPlayerMatchRating get(IPlayerMatchStats pms, IRatingEngineSchema schema) {
 		try {
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
@@ -235,7 +235,7 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 
 	}
 
-	private IPlayerMatchRating getByPMSFromDB(IPlayerMatchStats pms, IMatchRatingEngineSchema schema) {
+	private IPlayerMatchRating getByPMSFromDB(IPlayerMatchStats pms, IRatingEngineSchema schema) {
 		Objectify ofy = DataStoreFactory.getOfy();
 		// I don't remember why we need both filters?
 		Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("playerMatchStatsId", pms.getId()).filter("schemaId", schema.getId());
@@ -265,7 +265,7 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 	}
 
 	@Override
-	public Boolean deleteForSchema(IMatchRatingEngineSchema schema) {
+	public Boolean deleteForSchema(IRatingEngineSchema schema) {
 		Objectify ofy = DataStoreFactory.getOfy();
 
 		try {

@@ -10,4 +10,6 @@ public interface IPlayerMatchRating extends IPlayerRating {
 
 	void setPlayerMatchStatsId(Long playerMatchStatsId);
 
+	String getDetails();
+
 }

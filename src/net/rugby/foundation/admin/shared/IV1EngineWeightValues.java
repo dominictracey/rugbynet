@@ -50,4 +50,40 @@ public interface IV1EngineWeightValues {
 
 	public abstract Float getPointsDifferentialWeight();
 
+	void setWin(Float win);
+	Float getWin();
+	Float getScrumLostWeight();
+
+	void setScrumLostWeight(Float scrumLostWeight);
+
+	Float getLineoutLostWeight();
+
+	void setLineoutLostWeight(Float lineoutLostWeight);
+
+	Float getRuckLostWeight();
+
+	void setRuckLostWeight(Float ruckLostWeight);
+
+	Float getMaulLostWeight();
+
+	void setMaulLostWeight(Float maulLostWeight);
+
+	Float getScrumStolenWeight();
+
+	void setScrumStolenWeight(Float scrumStolenWeight);
+
+	Float getLineoutStolenWeight();
+
+	void setLineoutStolenWeight(Float lineoutStolenWeight);
+
+	Float getRuckStolenWeight();
+
+	void setRuckStolenWeight(Float ruckStolenWeight);
+
+	Float getMaulStolenWeight();
+
+	void setMaulStolenWeight(Float maulStolenWeight);
+
+
+
 }

@@ -60,8 +60,17 @@ public class TestPlayerFactory extends BasePlayerFactory implements IPlayerFacto
 			if (idMap.containsKey(id)) {
 				return idMap.get(id);
 			} else {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"No player found with Id " + id);
-				return null;
+				
+				// just make one up
+				IPlayer p = create();
+				p.setId(id);
+				p.setGivenName("Player");
+				p.setSurName(id.toString());
+				p.setDisplayName("Player "+ id.toString());
+				put(p);
+				return p;
+//				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"No player found with Id " + id);
+//				return null;
 			}
 		}
 	}

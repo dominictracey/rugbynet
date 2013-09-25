@@ -26,6 +26,7 @@ public interface PlayerListView<T extends IPlayerMatchInfo> extends IsWidget
 		void showEditPlayer(T player);
 		void showEditStats(T player);
 		void showEditRating(T player);
+		void showEditTeamStats(T player);
 
 	}
 
