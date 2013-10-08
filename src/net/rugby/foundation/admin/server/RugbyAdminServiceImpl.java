@@ -58,6 +58,7 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.game1.server.factory.IEntryFactory;
@@ -76,6 +77,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
@@ -143,6 +145,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private ITopTenListFactory ttlf;
 	private ICachingFactory<IContent> ctf;
 	private IQueryRatingEngineFactory qref;
+	private IStandingFactory sf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -163,7 +166,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff, IMatchRatingEngineFactory mref, 
 			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
-			ICachingFactory<IContent> ctf, IQueryRatingEngineFactory qref) {
+			ICachingFactory<IContent> ctf, IQueryRatingEngineFactory qref, IStandingFactory sf) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -192,6 +195,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.ttlf = ttlf;
 			this.ctf = ctf;
 			this.qref = qref; 
+			this.sf = sf;
 
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -1754,6 +1758,39 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}		
+	}
+
+	@Override
+	public List<IStanding> getStandings(Long roundId) {
+		try {
+			if (checkAdmin()) {
+				rf.setId(roundId);
+				return sf.getForRound(rf.getRound());
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public List<IStanding> saveStandings(Long roundId, List<IStanding> standings) {
+		try {
+			if (checkAdmin()) {
+				for (IStanding s: standings) {
+					sf.put(s);
+				}
+				rf.setId(roundId);
+				return sf.getForRound(rf.getRound());
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 }

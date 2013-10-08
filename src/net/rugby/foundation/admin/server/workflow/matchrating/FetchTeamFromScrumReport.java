@@ -11,7 +11,8 @@ import com.google.appengine.tools.pipeline.Job2;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 
-import net.rugby.foundation.admin.server.UrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -36,7 +37,7 @@ public class FetchTeamFromScrumReport extends Job2<ITeamGroup, Home_or_Visitor, 
 		boolean found = false;
 		ITeamGroup team = null;
 
-		UrlCacher urlCache = new UrlCacher(url);
+		IUrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
 		String line;
 		String homeName = null;

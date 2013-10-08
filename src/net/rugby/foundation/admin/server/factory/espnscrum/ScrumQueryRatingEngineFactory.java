@@ -16,6 +16,8 @@ import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 
 public class ScrumQueryRatingEngineFactory
@@ -29,19 +31,23 @@ public class ScrumQueryRatingEngineFactory
 	private final IPlayerMatchRatingFactory pmrf;
 	private ITeamMatchStatsFactory tmsf;
 	private IMatchGroupFactory mgf;
+	private IRoundFactory rf;
+	private IStandingFactory sf;
 
 	@Inject
-	public ScrumQueryRatingEngineFactory(IPlayerFactory pf, IMatchGroupFactory mgf, IPlayerMatchRatingFactory pmrf, ITeamMatchStatsFactory tmsf) {
+	public ScrumQueryRatingEngineFactory(IPlayerFactory pf, IMatchGroupFactory mgf, IPlayerMatchRatingFactory pmrf, ITeamMatchStatsFactory tmsf, IRoundFactory rf, IStandingFactory sf) {
 		this.pf = pf;
 		this.pmrf = pmrf;
 		this.tmsf = tmsf;
 		this.mgf = mgf;
+		this.rf = rf;
+		this.sf = sf;
 	}
 	
 	@Override
 	public IQueryRatingEngine get(IRatingEngineSchema schema) {
 		if (schema instanceof IV1EngineWeightValues) {
-			return new ScrumQueryRatingEngineV100(pf, mgf, pmrf, tmsf);
+			return new ScrumQueryRatingEngineV100(pf, mgf, pmrf, tmsf, rf, sf);
 		} 
 		
 		return null;

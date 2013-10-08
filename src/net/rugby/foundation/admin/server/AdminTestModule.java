@@ -8,17 +8,16 @@ import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumResultFetcherFactory;
-import net.rugby.foundation.admin.server.factory.ofy.OfyMatchRatingEngineSchemaFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.TestUrlCacher;
 import net.rugby.foundation.admin.server.factory.test.TestAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.test.TestMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.test.TestPlayerMatchInfoFactory;
-import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
-import net.rugby.foundation.admin.server.model.ScrumQueryRatingEngineV100;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationFactory;
@@ -29,6 +28,9 @@ import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
 import net.rugby.foundation.admin.server.workflow.TestWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.TestWorkflowFactory;
+import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
+
 import com.google.inject.AbstractModule;
 
 public class AdminTestModule extends AbstractModule {
@@ -48,6 +50,8 @@ public class AdminTestModule extends AbstractModule {
 		bind(IPlayerMatchStatsFetcherFactory.class).to(ScrumPlayerMatchStatsFetcherFactory.class);
 		bind(IMatchRatingEngineSchemaFactory.class).to(TestMatchRatingEngineSchemaFactory.class);
 		bind(IQueryRatingEngineFactory.class).to(ScrumQueryRatingEngineFactory.class);
+		bind(IUrlCacher.class).to(TestUrlCacher.class);
+		bind(IStandingFactory.class).to(TestStandingFactory.class);
 	}
 	
 }

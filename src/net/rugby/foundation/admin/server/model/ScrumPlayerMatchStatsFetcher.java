@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.admin.server.UrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -48,7 +49,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 
 		Boolean foundStats = false;
-		UrlCacher urlCache = new UrlCacher(url);
+		IUrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
 		String line;
 		//List<String> errorList = new ArrayList<String>();

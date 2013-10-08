@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
@@ -106,7 +107,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 
 		try {
 
-			UrlCacher urlCache = new UrlCacher(playerURL);
+			IUrlCacher urlCache = new UrlCacher(playerURL);
 			List<String> lines = urlCache.get();
 			String line;
 			

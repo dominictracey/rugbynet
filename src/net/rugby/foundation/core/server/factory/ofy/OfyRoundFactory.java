@@ -8,6 +8,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,9 +22,11 @@ import com.googlecode.objectify.Query;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.Round;
 
 public class OfyRoundFactory implements IRoundFactory, Serializable {
@@ -34,11 +37,13 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 	private Long id;
 	private IMatchGroupFactory gf;
 	private ICompetitionFactory cf;
+	private IStandingFactory sf;
 
 	@Inject
-	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf) {
+	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf, IStandingFactory sf) {
 		this.gf = gf;
 		this.cf = cf;
+		this.sf = sf;
 	}
 
 	//	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
@@ -236,6 +241,13 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 						ok = gf.delete(m);
 					}
 				}
+				
+				List<IStanding> standings = sf.getForRound(r);
+				for (IStanding s : standings) {
+					sf.delete(s);
+				}
+				
+				// also delete standings
 				
 				if (ok) {
 					Objectify ofy = DataStoreFactory.getOfy();

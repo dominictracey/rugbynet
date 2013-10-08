@@ -10,8 +10,9 @@ import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
-import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
@@ -60,7 +61,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 
 		boolean found = false;
 
-		UrlCacher urlCache = new UrlCacher(url);
+		IUrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
 		String line;
 		ITeamMatchStats tms = tmsf.create();

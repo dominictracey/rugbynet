@@ -127,7 +127,7 @@ public class QueryMatchRatingTester {
 	@Test
 	public void testGenerate1() {
 
-		IQueryRatingEngine qre = qref.get(new ScrumMatchRatingEngineSchema20130713());
+		IQueryRatingEngine qre = qref.get(mresf.getDefault());
 
 		addMatch(100L, qre);
 		addMatch(101L, qre);

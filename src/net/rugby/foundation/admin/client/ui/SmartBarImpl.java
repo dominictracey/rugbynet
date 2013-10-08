@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
+import net.rugby.foundation.admin.client.place.AdminOrchPlace;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.place.PortalPlace;
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
@@ -98,6 +99,12 @@ public class SmartBarImpl extends Composite implements SmartBar {
 				listener.flushAllPipelineJobs();	
 			}
 
+		});
+		orchMenuShow.setCommand(new Command() {
+			@Override
+			public void execute() {
+				listener.goTo(new AdminOrchPlace(""));	
+			}	
 		});
 
 	}

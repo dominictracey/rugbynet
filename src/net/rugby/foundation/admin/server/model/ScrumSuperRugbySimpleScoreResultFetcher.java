@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.admin.server.UrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -38,7 +39,7 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
         try {
 //            URL url = new URL(resultURL);
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-        	UrlCacher urlCache = new UrlCacher(resultURL);
+        	IUrlCacher urlCache = new UrlCacher(resultURL);
         	List<String> lines = urlCache.get();
             String line;
 

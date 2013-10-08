@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.rugby.foundation.admin.server;
+package net.rugby.foundation.admin.server.factory.espnscrum;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -26,13 +26,21 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
  * @author home
  *
  */
-public class UrlCacher {
+public class UrlCacher implements IUrlCacher {
 	private String url;
 
+	public UrlCacher() {
+		
+	}
+	
 	public UrlCacher(String url) {
 		this.url = url;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher#get()
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<String> get() {
 		if (!url.isEmpty()) {
@@ -93,9 +101,21 @@ public class UrlCacher {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher#clear(java.lang.String)
+	 */
+	@Override
 	public void clear(String url) {
 		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 		syncCache.delete(url);
+	}
+	@Override
+	public String getUrl() {
+		return url;
+	}
+	@Override
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }

@@ -13,6 +13,7 @@ import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
@@ -27,7 +28,7 @@ import junit.framework.Assert;
  *
  */
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ AdminMainModule.class, CoreTestModule.class })
+@GuiceModules({ AdminTestModule.class, CoreTestModule.class, Game1TestModule.class})
 public class OrchestrationCompTester {
 	
     private final LocalServiceTestHelper helper =
@@ -81,7 +82,7 @@ public class OrchestrationCompTester {
 	  public void testCompCompleteOrchestration() {
 			
 			cf.setId(3L);
-			IOrchestration<ICompetition> compUpdater = of.get(cf.getCompetition(), AdminOrchestrationActions.CompActions.UPDATENEXTANDPREV);
+			IOrchestration<ICompetition> compUpdater = of.get(cf.getCompetition(), AdminOrchestrationActions.CompActions.COMP_COMPLETE);
 			
 
 			ICompetition c = compUpdater.getTarget();

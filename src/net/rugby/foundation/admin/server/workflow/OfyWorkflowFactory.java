@@ -22,7 +22,6 @@ public class OfyWorkflowFactory implements IWorkflowFactory {
 	private Long id;
 	private Objectify ofy;
 	private ICompetitionFactory cf;
-	private IWorkflowConfigurationFactory wfcf;
 	private ICoreRuleFactory crf;
 	private IMatchGroupFactory mf;
 	
