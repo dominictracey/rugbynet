@@ -209,8 +209,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	private ITeamGroup getTeam(String teamName) {
 		ITeamGroup t = tf.getTeamByName(teamName);
 		if (t == null) {
-			tf.setId(null);
-			t = tf.getTeam();
+			t = tf.create();
 			t.setDisplayName(teamName);
 
 

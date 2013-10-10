@@ -6,12 +6,9 @@ package net.rugby.foundation.admin.client.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.rugby.foundation.model.shared.ICompetition;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 
-import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.TextInputCell;
@@ -20,13 +17,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -41,7 +36,9 @@ public class EditRound extends Composite {
 
 	interface EditRoundUiBinder extends UiBinder<Widget, EditRound> {
 	}
-
+	
+	@UiTemplate("EditRound.ui.xml")
+	
 	public interface RoundPresenter {
 		void saveRound(IRound R, List<IStanding> standings);
 	} 
@@ -49,30 +46,30 @@ public class EditRound extends Composite {
 	public EditRound() {
 		initWidget(uiBinder.createAndBindUi(this));
 		
-//		standingTable.addColumn(new Column<IStanding,String>(new TextCell()){
-//			@Override
-//            public String getValue(IStanding s)
-//            {
-//                return s.getTeam().getDisplayName() == null ? "" : s.getTeam().getDisplayName();
-//            }
-//		}, "Team");
-//		
-//		Column<IStanding,String> myEditableColumn = new Column<IStanding,String>(new TextInputCell()){
-//			@Override
-//            public String getValue(IStanding s)
-//            {
-//                return s.getStanding() == null ? "" : s.getStanding().toString();
-//            }
-//		};
-//		
-//		standingTable.addColumn(myEditableColumn, "Standing");
-//		
-//		myEditableColumn.setFieldUpdater(new FieldUpdater<IStanding, String>() {
-//		    @Override
-//		    public void update(int index, IStanding s, String value) {
-//		        s.setStanding(Integer.parseInt(value));
-//		    }
-//		});
+		standingTable.addColumn(new Column<IStanding,String>(new TextCell()){
+			@Override
+            public String getValue(IStanding s)
+            {
+                return s.getTeam().getDisplayName() == null ? "" : s.getTeam().getDisplayName();
+            }
+		}, "Team");
+		
+		Column<IStanding,String> myEditableColumn = new Column<IStanding,String>(new TextInputCell()){
+			@Override
+            public String getValue(IStanding s)
+            {
+                return s.getStanding() == null ? "" : s.getStanding().toString();
+            }
+		};
+		
+		standingTable.addColumn(myEditableColumn, "Standing");
+		
+		myEditableColumn.setFieldUpdater(new FieldUpdater<IStanding, String>() {
+		    @Override
+		    public void update(int index, IStanding s, String value) {
+		        s.setStanding(Integer.parseInt(value));
+		    }
+		});
 	}
 
 	@UiField

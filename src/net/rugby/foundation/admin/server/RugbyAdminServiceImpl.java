@@ -616,8 +616,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				// to allow editing
-				tf.setId(teamId);
-				return tf.getTeam();
+				return tf.get(teamId);
 			} else {
 				return null;
 			}
@@ -1417,8 +1416,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ITeamMatchStats refetchTeamMatchStats(ITeamMatchStats tms) {
 		try {
 			if (checkAdmin()) {
-				tf.setId(tms.getTeamId());
-				ITeamGroup team = tf.getTeam();
+				ITeamGroup team = tf.get(tms.getTeamId());
 
 
 				Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");

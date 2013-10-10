@@ -46,10 +46,10 @@ public class OfyRoundFactory implements IRoundFactory, Serializable {
 		this.sf = sf;
 	}
 
-	//	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
-	//		this.gf = gf;
-	//		this.cf = cf;
-	//	}
+//		public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
+//			this.gf = gf;
+//			this.cf = cf;
+//		}
 
 	@Override
 	public void setId(Long id) {

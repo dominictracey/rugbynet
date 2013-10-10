@@ -67,8 +67,7 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 				IStanding t = ofy.get(new Key<Standing>(Standing.class,id));
 				rf.setId(t.getRoundId());
 				t.setRound(rf.getRound());
-				tf.setId(t.getTeamId());
-				t.setTeam(tf.getTeam());
+				t.setTeam(tf.get(t.getTeamId()));
 				return t;
 			} else {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Don't try to get with null. Call create() instead!");
@@ -112,8 +111,7 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 		for (Standing s : qs) {
 			rf.setId(s.getRoundId());
 			s.setRound(rf.getRound());
-			tf.setId(s.getTeamId());
-			s.setTeam(tf.getTeam());
+			s.setTeam(tf.get(s.getTeamId()));
 			list.add(s);
 		}
 		return list;

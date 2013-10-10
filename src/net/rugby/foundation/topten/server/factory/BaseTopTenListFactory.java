@@ -288,8 +288,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			while (it.hasNext() && count < 10) {
 				IPlayerMatchRating pmr = it.next();
 				IMatchGroup match = mf.get(pmr.getPlayerMatchStats().getMatchId());
-				tf.setId(pmr.getPlayerMatchStats().getTeamId());
-				ITeamGroup team = tf.getTeam();
+				ITeamGroup team = tf.get(pmr.getPlayerMatchStats().getTeamId());
 				
 				// keep track of players per team
 				if (!numFromTeam.containsKey(team.getId())) {

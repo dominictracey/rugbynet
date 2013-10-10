@@ -35,10 +35,8 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 		if (id != null) {
 			Objectify ofy = DataStoreFactory.getOfy();
 			g = ofy.get(new Key<MatchGroup>(MatchGroup.class,id));
-			tf.setId(g.getHomeTeamId());
-			g.setHomeTeam(tf.getTeam());
-			tf.setId(g.getVisitingTeamId());
-			g.setVisitingTeam(tf.getTeam());
+			g.setHomeTeam(tf.get(g.getHomeTeamId()));
+			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 
 			if (g.getSimpleScoreMatchResultId() != null) {
 				mrf.setId(g.getSimpleScoreMatchResultId());
@@ -70,10 +68,8 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 
 		if (qg.get() instanceof IMatchGroup) {
 			IMatchGroup g = (IMatchGroup)qg.get();
-			tf.setId(g.getHomeTeamId());
-			g.setHomeTeam(tf.getTeam());
-			tf.setId(g.getVisitingTeamId());
-			g.setVisitingTeam(tf.getTeam());
+			g.setHomeTeam(tf.get(g.getHomeTeamId()));
+			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 			if (g.equals(match)) {
 				return g; // will have an id since it came out of the db
 			}
@@ -92,10 +88,8 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 		Iterator<MatchGroup> it = qg.list().iterator();
 		while (it.hasNext()) {
 			IMatchGroup g = (IMatchGroup)it.next();
-			tf.setId(g.getHomeTeamId());
-			g.setHomeTeam(tf.getTeam());
-			tf.setId(g.getVisitingTeamId());
-			g.setVisitingTeam(tf.getTeam());
+			g.setHomeTeam(tf.get(g.getHomeTeamId()));
+			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 			list.add(g);
 		}
 		return list;

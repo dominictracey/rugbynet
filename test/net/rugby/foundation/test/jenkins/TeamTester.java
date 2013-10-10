@@ -65,8 +65,7 @@ public class TeamTester {
 		  assertTrue(t != null);
 		  assertTrue(t.getAbbr().equals("NZL"));
 		  
-		  tf.setId(9001L);
-		  t = tf.getTeam();
+		  t = tf.get(9001L);
 		  assertTrue(t != null);
 		  assertTrue(t.getAbbr().equals("NZL"));
 		  

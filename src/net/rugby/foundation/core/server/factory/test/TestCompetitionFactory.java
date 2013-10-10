@@ -251,8 +251,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 */
 	private void addTeams(ICompetition c) {
 		for (Long tid : c.getTeamIds()) {
-			tf.setId(tid);
-			ITeamGroup g = tf.getTeam();
+			ITeamGroup g = tf.get(tid);
 			c.getTeams().add(g);
 		}		
 	}

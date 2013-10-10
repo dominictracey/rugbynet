@@ -54,7 +54,6 @@ public class AdminMainModule extends AbstractModule {
 		bind(IMatchRatingEngineSchemaFactory.class).to(OfyMatchRatingEngineSchemaFactory.class);
 		bind(IQueryRatingEngineFactory.class).to(ScrumQueryRatingEngineFactory.class);
 		bind(IUrlCacher.class).to(UrlCacher.class);
-		bind(IStandingFactory.class).to(OfyStandingFactory.class);
 	}
 	
 }

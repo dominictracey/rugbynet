@@ -6,18 +6,18 @@ import java.util.Map;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Group.GroupType;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
 
-public class TestTeamFactory implements ITeamGroupFactory, Serializable {
+public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements ITeamGroupFactory, Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4807160728169022839L;
-	private Long id;
 	private Map<Long, ITeamGroup> idMap = new HashMap<Long, ITeamGroup>(); 
 	private Map<String, ITeamGroup> nameMap = new HashMap<String, ITeamGroup>(); 
 	
@@ -25,13 +25,9 @@ public class TestTeamFactory implements ITeamGroupFactory, Serializable {
 	TestTeamFactory() {
 		populate();
 	}
-		@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	@Override
-	public ITeamGroup getTeam() {
+	public ITeamGroup getFromPersistentDatastore(Long id) {
 		if (id == null) {
 			return new TeamGroup();
 		} else {
@@ -40,7 +36,7 @@ public class TestTeamFactory implements ITeamGroupFactory, Serializable {
 
 	}
 	@Override
-	public ITeamGroup put(ITeamGroup team) {
+	public ITeamGroup putToPersistentDatastore(ITeamGroup team) {
 		idMap.put(team.getId(), team);
 		nameMap.put(team.getDisplayName(), team);
 		return team;
@@ -185,6 +181,18 @@ public class TestTeamFactory implements ITeamGroupFactory, Serializable {
 		put(t);
 		
 		return t;
+	}
+
+	@Override
+	public ITeamGroup create() {
+
+		return new TeamGroup();
+	}
+
+	@Override
+	protected boolean deleteFromPersistentDatastore(ITeamGroup t) {
+
+		return true;
 	}
 	
 

@@ -149,8 +149,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 
 			c.setTeams(new ArrayList<ITeamGroup>());
 			for (Long tid : c.getTeamIds()) {
-				tf.setId(tid);
-				ITeamGroup t = tf.getTeam();
+				ITeamGroup t = tf.get(tid);
 				c.getTeams().add(t);
 			}
 		} else {

@@ -51,7 +51,6 @@ public class AdminTestModule extends AbstractModule {
 		bind(IMatchRatingEngineSchemaFactory.class).to(TestMatchRatingEngineSchemaFactory.class);
 		bind(IQueryRatingEngineFactory.class).to(ScrumQueryRatingEngineFactory.class);
 		bind(IUrlCacher.class).to(TestUrlCacher.class);
-		bind(IStandingFactory.class).to(TestStandingFactory.class);
 	}
 	
 }

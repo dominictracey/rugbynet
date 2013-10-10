@@ -16,6 +16,7 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyClubhouseFactory;
@@ -31,6 +32,7 @@ import net.rugby.foundation.core.server.factory.ofy.OfyPlayerFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyStandingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IContent;
@@ -63,6 +65,7 @@ public class CoreMainModule extends AbstractModule {
 		bind(IPlayerMatchRatingFactory.class).to(OfyPlayerMatchRatingFactory.class);
 		bind(PipelineServlet.class).in(Singleton.class);
 		bind(new TypeLiteral<ICachingFactory<IContent>>(){}).to(new TypeLiteral<OfyContentFactory>(){});
+		bind(IStandingFactory.class).to(OfyStandingFactory.class);
 	}
 }
 

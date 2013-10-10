@@ -6,36 +6,33 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
+import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
 
-public class OfyTeamFactory implements ITeamGroupFactory, Serializable {
+public class OfyTeamFactory extends BaseCachingFactory<ITeamGroup> implements ITeamGroupFactory, Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7135535109216170518L;
-	private Long id;
 
 	@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@Override
-	public ITeamGroup getTeam() {
+	public ITeamGroup getFromPersistentDatastore(Long id) {
 		if (id == null) {
-			return new TeamGroup();
+			throw new RuntimeException("Call create to get a new team.");
 		}
 		
 		Objectify ofy = DataStoreFactory.getOfy();
 		ITeamGroup t = (ITeamGroup)ofy.get(new Key<Group>(Group.class,id));
 		return t;
 	}
+	
 	@Override
-	public ITeamGroup put(ITeamGroup team) {
+	public ITeamGroup putToPersistentDatastore(ITeamGroup team) {
 		if (team == null) {
 			team = new TeamGroup();
 			team.setShortName("TDB");
@@ -71,6 +68,18 @@ public class OfyTeamFactory implements ITeamGroupFactory, Serializable {
 			return g; // has Id set (parameter may not)
 		}
 		return null;
+	}
+
+	@Override
+	public ITeamGroup create() {
+		return new TeamGroup();
+	}
+
+	@Override
+	protected boolean deleteFromPersistentDatastore(ITeamGroup t) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		ofy.delete(t);
+		return true;
 	}
 
 }
