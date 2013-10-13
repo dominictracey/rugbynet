@@ -21,13 +21,16 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 	private Map<Long, ITeamGroup> idMap = new HashMap<Long, ITeamGroup>(); 
 	private Map<String, ITeamGroup> nameMap = new HashMap<String, ITeamGroup>(); 
 	
-	@Inject
+	private boolean populated = false;
+	
+	//@Inject
 	TestTeamFactory() {
-		populate();
+
 	}
 
 	@Override
 	public ITeamGroup getFromPersistentDatastore(Long id) {
+		populate();
 		if (id == null) {
 			return new TeamGroup();
 		} else {
@@ -46,6 +49,7 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 	 */
 	@Override
 	public ITeamGroup getTeamByName(String name) {
+		populate();
 		if (name == null) {
 			return new TeamGroup();
 		} else {
@@ -63,12 +67,16 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 	}
 	
 	private void populate() {
-		for (Long l=9001L; l<9007L; l++) {
-			build(l);
-		}
-		
-		for (Long l=9201L; l<9210L; l++) {
-			build(l);
+		if (!populated) {
+			for (Long l=9001L; l<9007L; l++) {
+				build(l);
+			}
+			
+			for (Long l=9201L; l<9210L; l++) {
+				build(l);
+			}
+			
+			populated = true;
 		}
 	}
 	

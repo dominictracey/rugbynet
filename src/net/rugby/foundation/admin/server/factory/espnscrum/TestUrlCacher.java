@@ -42,11 +42,11 @@ public class TestUrlCacher implements IUrlCacher {
 	 */
 	@Override
 	public List<String> get() {
-		if ( url.equals("match1")) {
+		//if ( url.equals("match1")) {
 			return fetchContent();
-		} else {
-			return null;
-		}
+		//} else {
+		//	return null;
+		//}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -63,7 +63,7 @@ public class TestUrlCacher implements IUrlCacher {
 
 					// didn't find - get from werld wyde weeb
 					//URL Url = new URL(url);
-					reader = new BufferedReader(new FileReader("testData\\LeicesterExeter-188725.htm")); //new InputStreamReader(Url.openStream()));
+					reader = new BufferedReader(new FileReader(url)); //"testData\\LeicesterExeter-188725.htm")); //new InputStreamReader(Url.openStream()));
 					String line;
 					page = new ArrayList<String>();
 					while ((line = reader.readLine()) != null) {

@@ -346,6 +346,10 @@ IQueryRatingEngine  {
 			playerName = pms.getName();
 			IMatchGroup m = mf.get(pms.getMatchId());
 			matchName = m.getDisplayName();
+			if (!standingsFactorMap.containsKey(pms.getMatchId())) {
+				getStandingFactorForMatch(pms.getMatchId());
+
+			}
 			if (!pms.getPosition().equals(position.NONE)) {
 				ITeamMatchStats tms = null;
 				ITeamMatchStats otms = null;
@@ -357,42 +361,14 @@ IQueryRatingEngine  {
 					otms = tmsHomeMap.get(m.getId());
 				}
 				PlayerStatShares score = new PlayerStatShares((IV1EngineWeightValues)schema, tms, otms, pms, m, pmsList.size());
+				// scale the rating by the match's standingsFactor
+				score.scaleForStandings(standingsFactorMap.get(score.getPlayerMatchStats().getMatchId()));
 				pss.add(score);
 				totalPlayerScore += score.getPlayerScore();
 			} 
 		}
 
 		for (PlayerStatShares score : pss) {
-			if (!standingsFactorMap.containsKey(score.getPlayerMatchStats().getMatchId())) {
-				
-				rf.setId(mf.get(score.getPlayerMatchStats().getMatchId()).getRoundId());
-				List<IStanding> list = sf.getForRound(rf.getRound());
-				IMatchGroup m = mf.get(score.getPlayerMatchStats().getMatchId());
-				int sTot = 0;
-				int count = 0;
-				boolean found = false;
-				for (IStanding s : list) {
-					if (s.getTeamId().equals(m.getHomeTeamId()) || s.getTeamId().equals(m.getVisitingTeamId())) {
-						sTot += s.getStanding();
-						count ++;
-						if (count == 2) {
-							found = true;
-							break;
-						}
-					}
-				}
-				
-				Float standingsFactor = 1F;
-				if (found) {
-					standingsFactor = 1F / (sTot-2F);
-				}
-				
-				standingsFactorMap.put(score.getPlayerMatchStats().getMatchId(), standingsFactor);
-			}
-			
-			// scale the rating by the match's standingsFactor
-			score.scaleForStandings(standingsFactorMap.get(score.getPlayerMatchStats().getMatchId()));
-			
 			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), null, score.getRating(totalPlayerScore), schema, score.getPlayerMatchStats(), score.toString());
 			pmrf.put(pmr);
 			mrl.add(pmr);
@@ -405,6 +381,33 @@ IQueryRatingEngine  {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Engine threw a rod on player " + playerName + " from match " + matchName, e);
 			return null;
 		}
+	}
+
+	private void getStandingFactorForMatch(Long matchId) {
+		rf.setId(mf.get(matchId).getRoundId());
+		List<IStanding> list = sf.getForRound(rf.getRound());
+		IMatchGroup m = mf.get(matchId);
+		int sTot = 0;
+		int count = 0;
+		boolean found = false;
+		for (IStanding s : list) {
+			if (s.getTeamId().equals(m.getHomeTeamId()) || s.getTeamId().equals(m.getVisitingTeamId())) {
+				sTot += s.getStanding();
+				count ++;
+				if (count == 2) {
+					found = true;
+					break;
+				}
+			}
+		}
+		
+		Float standingsFactor = 1F;
+		if (found) {
+			standingsFactor =  1F / (float)(Math.sqrt(sTot-2F)) + .43F;
+		}
+		
+		standingsFactorMap.put(matchId, standingsFactor);
+		
 	}
 
 	@Override

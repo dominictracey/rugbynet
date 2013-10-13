@@ -31,9 +31,12 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	private transient Map<String, IPlayerMatchStats> playerMap = new HashMap<String, IPlayerMatchStats>();
 	private String errorMessage;
 
+	private IUrlCacher urlCache;
 
-	public ScrumPlayerMatchStatsFetcher(IPlayerMatchStatsFactory pmsf) {
+
+	public ScrumPlayerMatchStatsFetcher(IPlayerMatchStatsFactory pmsf, IUrlCacher urlCache) {
 		this.pmsf = pmsf;
+		this.urlCache = urlCache;
 	}
 
 	private IPlayerMatchStats populateStats()  {
@@ -45,11 +48,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 		setErrorMessage(null);
 
-		//stats = pmsf.getById(null);
-
-
 		Boolean foundStats = false;
-		IUrlCacher urlCache = new UrlCacher(url);
+		urlCache.setUrl(url);
+		
 		List<String> lines = urlCache.get();
 		String line;
 		//List<String> errorList = new ArrayList<String>();

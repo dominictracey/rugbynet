@@ -59,7 +59,7 @@ public class TeamTester {
 	  }
 	  
 	  @Test
-	  public void testGetCountryByName() {
+	  public void testGetTeamByName() {
 		  
 		  ITeamGroup t = tf.getTeamByName("New Zealand");
 		  assertTrue(t != null);
