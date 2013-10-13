@@ -3,11 +3,6 @@ package net.rugby.foundation.test.jenkins;
 
 import static org.junit.Assert.*;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,16 +16,12 @@ import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
-import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.core.server.CoreTestModule;
-import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
-import net.rugby.foundation.model.shared.Country;
-import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -80,6 +71,32 @@ public class PlayerMatchStatsFetcherTester {
 		return "net.rugby.foundation.model.Model";
 	}
 	
+	@Test
+	public void testJohnBarclay() {  // this one should work right off - the test timeline is rightside up. He went to the blood bin for 7 minutes, then
+										// was subbed off at the end of the match.
+		IPlayer p = pf.create();
+		p.setScrumId(15578L);
+		p.setSurName("Barclay");
+		p.setDisplayName("John Barclay");
+		p.setShortName("J Barclay");
+
+		IMatchGroup m = getQuinsScarlets();
+		
+		
+		IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(p, m, Home_or_Visitor.VISITOR, 13, "testData\\191605-QUI-SCA-rightsideup.htm");
+		
+		if (fetcher.process()) {
+		
+			IPlayerMatchStats pms = fetcher.getStats();
+			
+			assertTrue(pms != null);
+			assertTrue(pms.getTimePlayed().equals(62));
+		} else {
+			assertTrue(false); // did not process correctly
+		}
+	}
+
+
 	@Test
 	public void testSamWarburton() {
 		IPlayer p = pf.create();
@@ -263,6 +280,7 @@ public class PlayerMatchStatsFetcherTester {
 		ITeamGroup v = tf.create();
 		v.setId(99L);
 		v.setAbbr("CAR");
+		m.setVisitingTeam(v);
 		ITeamGroup h = tf.create();
 		h.setId(98L);
 		h.setAbbr("EXE");
@@ -277,9 +295,26 @@ public class PlayerMatchStatsFetcherTester {
 		ITeamGroup v = tf.create();
 		v.setId(97L);
 		v.setAbbr("GLA");
+		m.setVisitingTeam(v);
 		ITeamGroup h = tf.create();
 		h.setId(96L);
 		h.setAbbr("TLN");
+		m.setHomeTeam(h);
+		return m;
+	}
+	
+	
+	private IMatchGroup getQuinsScarlets() {
+		IMatchGroup m = mf.create();
+		m.setForeignId(191605L);
+		
+		ITeamGroup v = tf.create();
+		v.setId(95L);
+		v.setAbbr("SCA");
+		m.setVisitingTeam(v);
+		ITeamGroup h = tf.create();
+		h.setId(94L);
+		h.setAbbr("QUI");
 		m.setHomeTeam(h);
 		return m;
 	}
