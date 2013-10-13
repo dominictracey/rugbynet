@@ -23,6 +23,7 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
@@ -145,4 +146,6 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<IContent> asyncCallback);
 	public void getContentList(boolean onlyActive, AsyncCallback<List<IContent>> asyncCallback);
 	public void getConfiguration(AsyncCallback<ICoreConfiguration> asyncCallback);
+	public void getStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
+	public void saveStandings(Long roundId, List<IStanding> standings, AsyncCallback<List<IStanding>> asyncCallback);
 }

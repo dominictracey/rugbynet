@@ -10,6 +10,8 @@ import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditComp;
 import net.rugby.foundation.admin.client.ui.EditMatch;
+import net.rugby.foundation.admin.client.ui.EditRound;
+import net.rugby.foundation.admin.client.ui.EditRound.RoundPresenter;
 import net.rugby.foundation.admin.client.ui.EditTeam;
 import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.matchratingengineschemapopup.MatchRatingEngineSchemaPopupView.MatchRatingEngineSchemaPopupViewPresenter;
@@ -26,6 +28,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
@@ -47,7 +50,7 @@ public class CompActivity extends AbstractActivity implements
 CompetitionView.Presenter, EditTeam.Presenter, EditComp.Presenter, 
 EditMatch.Presenter, PlayerListView.Listener<IPlayerMatchInfo>, PlayerPopupView.Presenter<IPlayer>,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, 
-SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713> {
+SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>, RoundPresenter {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -58,6 +61,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	private SelectionModel<IPlayerMatchInfo> selectionModel;
 	private EditTeam et = null;  //@REX stupid
 	private EditComp ec = null;  //@REX stupid
+	private EditRound er = null; //@REX and yet I continue doing it...
 
 	private List<ICompetition> comps = null;
 	private EditMatch em;
@@ -273,7 +277,37 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	 * @see net.rugby.foundation.admin.client.ui.CompetitionView.Presenter#roundClicked(java.lang.Long, java.lang.Long)
 	 */
 	@Override
-	public void roundClicked(final Long compId, final Long roundId) {
+	public void roundClicked(final EditRound editRound, final Long compId, final Long roundId) {
+		this.er = editRound;
+		er.SetPresenter(this);
+		ICompetition comp = null;
+		IRound round = null;
+		// find the round 
+		for (ICompetition c : comps) {
+			if (c.getId().equals(compId)) {
+				comp = c;
+				break;
+			}
+		}
+		
+		if (comp == null) {
+			Window.alert("Could not find comp matching this round.");
+			return;
+		}
+		
+		for (IRound r : comp.getRounds()) {
+			if (r.getId().equals(roundId)) {
+				round = r;
+				break;
+			}
+		}
+		
+		if (round == null) {
+			Window.alert("Could not find round in the comp.");
+			return;
+		}
+		final IRound fRound = round;
+		
 		clientFactory.getRpcService().getMatches(roundId, new AsyncCallback<List<IMatchGroup>>() {
 
 			@Override
@@ -286,6 +320,20 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			public void onSuccess(List<IMatchGroup> result) {
 
 				view.addRound(compId, roundId, result);
+				clientFactory.getRpcService().getStandings(roundId, new AsyncCallback<List<IStanding>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onSuccess(List<IStanding> result) {
+						er.ShowRound(fRound,result);
+					}
+					
+				});
 
 			}
 		});			
@@ -391,23 +439,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	public void compClicked(final EditComp editComp, long compId) {
 		//final EditComp.Presenter presenter = this;  // there must be a way to do this...
 		ec = editComp;
-		ec.SetPresenter(this);
-		////			clientFactory.getRpcService().getTeam(teamId, new AsyncCallback<ITeamGroup>() {
-		//			Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
-		//
-		//				@Override
-		//				public void onFailure(Throwable caught) {
-		//					
-		//					Window.alert("Couldn't get comp info " + caught.getMessage());
-		//				}
-		//
-		//				@Override
-		//				public void onSuccess(ICompetition result) {
-		//					//ec.SetPresenter(presenter);
-		//					ec.ShowComp(result);
-		//					
-		//				}
-		//			});		
+		ec.SetPresenter(this);	
 
 		for (ICompetition comp : comps) {
 			if (comp.getId().equals(compId)) {
@@ -1235,4 +1267,26 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
 			}
 		});	}
+
+
+
+	// @REX doesn't save Round info, only standings
+	@Override
+	public void saveRound(final IRound r, List<IStanding> ss) {
+		clientFactory.getRpcService().saveStandings(r.getId(), ss, new AsyncCallback<List<IStanding>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles saving standings: " + caught.getLocalizedMessage());
+				
+			}
+
+			@Override
+			public void onSuccess(List<IStanding> result) {
+				er.ShowRound(r,result);		
+			}
+			
+		});
+		
+	}
 }

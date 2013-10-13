@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.admin.server.UrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -30,9 +31,12 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	private transient Map<String, IPlayerMatchStats> playerMap = new HashMap<String, IPlayerMatchStats>();
 	private String errorMessage;
 
+	private IUrlCacher urlCache;
 
-	public ScrumPlayerMatchStatsFetcher(IPlayerMatchStatsFactory pmsf) {
+
+	public ScrumPlayerMatchStatsFetcher(IPlayerMatchStatsFactory pmsf, IUrlCacher urlCache) {
 		this.pmsf = pmsf;
+		this.urlCache = urlCache;
 	}
 
 	private IPlayerMatchStats populateStats()  {
@@ -44,11 +48,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 		setErrorMessage(null);
 
-		//stats = pmsf.getById(null);
-
-
 		Boolean foundStats = false;
-		UrlCacher urlCache = new UrlCacher(url);
+		urlCache.setUrl(url);
+		
 		List<String> lines = urlCache.get();
 		String line;
 		//List<String> errorList = new ArrayList<String>();

@@ -18,11 +18,15 @@ import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -32,24 +36,29 @@ IQueryRatingEngine  {
 	private Map<Long,ITeamMatchStats> tmsHomeMap = new HashMap<Long,ITeamMatchStats>();
 	private Map<Long,ITeamMatchStats> tmsVisitMap = new HashMap<Long,ITeamMatchStats>();
 	private List<IPlayerMatchStats> pmsList = new ArrayList<IPlayerMatchStats>();
-
+	private Map<Long,Float> standingsFactorMap = new HashMap<Long,Float>();
+	
 	private ITeamMatchStatsFactory tmsf;
 	private IMatchGroupFactory mf;
 	private IPlayerFactory pf;
 	private IPlayerMatchRatingFactory pmrf;
 	private ArrayList<IRatingEngineSchema> supportedSchemas;
+	private IStandingFactory sf;
+	private IRoundFactory rf;
 
 	public ScrumQueryRatingEngineV100() {
 
 	}
 
-	public ScrumQueryRatingEngineV100(IPlayerFactory pf, IMatchGroupFactory mf, IPlayerMatchRatingFactory pmrf, ITeamMatchStatsFactory tmsf) {
+	public ScrumQueryRatingEngineV100(IPlayerFactory pf, IMatchGroupFactory mf, IPlayerMatchRatingFactory pmrf, ITeamMatchStatsFactory tmsf, IRoundFactory rf, IStandingFactory sf) {
 		supportedSchemas = new ArrayList<IRatingEngineSchema>();
 		supportedSchemas.add(new ScrumMatchRatingEngineSchema20130713());
 		this.pf = pf;
 		this.pmrf = pmrf;
 		this.tmsf = tmsf;
 		this.mf = mf;
+		this.rf = rf;
+		this.sf = sf;
 	}
 
 
@@ -312,6 +321,11 @@ IQueryRatingEngine  {
 			return Math.round(normalizedSmoothScore * 500 * numPlayers);  // we use numPlayers and not playersOnField here so they average out to 500.
 		}
 
+		public void scaleForStandings(Float matchStandingFactor) {
+			playerScore *= matchStandingFactor;
+			
+		}
+
 	}
 
 	@Override
@@ -332,6 +346,10 @@ IQueryRatingEngine  {
 			playerName = pms.getName();
 			IMatchGroup m = mf.get(pms.getMatchId());
 			matchName = m.getDisplayName();
+			if (!standingsFactorMap.containsKey(pms.getMatchId())) {
+				getStandingFactorForMatch(pms.getMatchId());
+
+			}
 			if (!pms.getPosition().equals(position.NONE)) {
 				ITeamMatchStats tms = null;
 				ITeamMatchStats otms = null;
@@ -343,6 +361,8 @@ IQueryRatingEngine  {
 					otms = tmsHomeMap.get(m.getId());
 				}
 				PlayerStatShares score = new PlayerStatShares((IV1EngineWeightValues)schema, tms, otms, pms, m, pmsList.size());
+				// scale the rating by the match's standingsFactor
+				score.scaleForStandings(standingsFactorMap.get(score.getPlayerMatchStats().getMatchId()));
 				pss.add(score);
 				totalPlayerScore += score.getPlayerScore();
 			} 
@@ -361,6 +381,33 @@ IQueryRatingEngine  {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Engine threw a rod on player " + playerName + " from match " + matchName, e);
 			return null;
 		}
+	}
+
+	private void getStandingFactorForMatch(Long matchId) {
+		rf.setId(mf.get(matchId).getRoundId());
+		List<IStanding> list = sf.getForRound(rf.getRound());
+		IMatchGroup m = mf.get(matchId);
+		int sTot = 0;
+		int count = 0;
+		boolean found = false;
+		for (IStanding s : list) {
+			if (s.getTeamId().equals(m.getHomeTeamId()) || s.getTeamId().equals(m.getVisitingTeamId())) {
+				sTot += s.getStanding();
+				count ++;
+				if (count == 2) {
+					found = true;
+					break;
+				}
+			}
+		}
+		
+		Float standingsFactor = 1F;
+		if (found) {
+			standingsFactor =  1F / (float)(Math.sqrt(sTot-2F)) + .43F;
+		}
+		
+		standingsFactorMap.put(matchId, standingsFactor);
+		
 	}
 
 	@Override

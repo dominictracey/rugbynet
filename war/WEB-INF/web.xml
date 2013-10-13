@@ -63,7 +63,6 @@
 	  <url-pattern>/_ah/pipeline/*</url-pattern>
 	</servlet-mapping>	
 	
-	<!-- appstats -->
 <!-- 	<servlet> -->
 <!-- 	  <servlet-name>appstats</servlet-name> -->
 <!-- 	  <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class> -->

@@ -16,17 +16,19 @@ import net.rugby.foundation.model.shared.IPlayer;
 public class ScrumPlayerMatchStatsFetcherFactory implements IPlayerMatchStatsFetcherFactory {
 
 	private IPlayerMatchStatsFactory pmsf;
+	private IUrlCacher urlCache;
 
 	@Inject
-	public void setFactories(IPlayerMatchStatsFactory pmsf) {
+	public void setFactories(IPlayerMatchStatsFactory pmsf, IUrlCacher urlCache) {
 		this.pmsf = pmsf;
+		this.urlCache = urlCache;
 	}
 	
 	@Override
 	public IPlayerMatchStatsFetcher getResultFetcher(IPlayer player, IMatchGroup match, Home_or_Visitor side, Integer slot, String url) {
 			if (player != null && match != null && side != null && slot != null && url != null) {
 				//Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized compId specified: " + sourceCompID);
-				IPlayerMatchStatsFetcher fetcher = new ScrumPlayerMatchStatsFetcher(pmsf);
+				IPlayerMatchStatsFetcher fetcher = new ScrumPlayerMatchStatsFetcher(pmsf, urlCache);
 				fetcher.setPlayer(player);
 				fetcher.setMatch(match);
 				fetcher.setHov(side);

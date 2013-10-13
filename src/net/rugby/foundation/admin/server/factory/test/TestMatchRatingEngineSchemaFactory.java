@@ -46,6 +46,15 @@ public class TestMatchRatingEngineSchemaFactory implements
 		((ScrumMatchRatingEngineSchema20130713)s).setTryAssistsWeight(.3f);
 		((ScrumMatchRatingEngineSchema20130713)s).setTurnoversWeight(-.3f);
 		((ScrumMatchRatingEngineSchema20130713)s).setYellowCardsWeight(-.3f);
+		((ScrumMatchRatingEngineSchema20130713)s).setScrumLostWeight(-.3f);
+		((ScrumMatchRatingEngineSchema20130713)s).setLineoutLostWeight(-.2f);
+		((ScrumMatchRatingEngineSchema20130713)s).setRuckLostWeight(-.1f);
+		((ScrumMatchRatingEngineSchema20130713)s).setMaulLostWeight(-.1f);
+		((ScrumMatchRatingEngineSchema20130713)s).setScrumStolenWeight(.3f);
+		((ScrumMatchRatingEngineSchema20130713)s).setLineoutStolenWeight(.2f);
+		((ScrumMatchRatingEngineSchema20130713)s).setRuckStolenWeight(.1f);
+		((ScrumMatchRatingEngineSchema20130713)s).setMaulStolenWeight(.1f);
+		((ScrumMatchRatingEngineSchema20130713)s).setWin(3f);
 		
 		return s;
 	}

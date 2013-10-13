@@ -192,13 +192,11 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			g.setStatus(Status.COMPLETE_AWAITING_RESULTS);
 		}
 		//if (g.getHomeTeamId() != 0L) {
-			tf.setId(g.getHomeTeamId());
-			g.setHomeTeam(tf.getTeam());
+			g.setHomeTeam(tf.get(g.getHomeTeamId()));
 		//} 
 		//
 		//if (g.getVisitingTeamId() != 0L) {
-			tf.setId(g.getVisitingTeamId());
-			g.setVisitingTeam(tf.getTeam());
+			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 		//}
 		
 		//if (g.getHomeTeamId() != 0L && g.getVisitingTeamId() != 0L)

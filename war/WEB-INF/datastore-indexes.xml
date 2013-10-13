@@ -33,4 +33,9 @@
         <property name="rating" direction="asc"/>
     </datastore-index>
     
+    <datastore-index kind="Standing" ancestor="false" source="manual">
+        <property name="roundId" direction="asc"/>
+        <property name="standing" direction="asc"/>
+    </datastore-index>
+    
 </datastore-indexes>

@@ -18,8 +18,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.admin.server.UrlCacher;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
+import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -85,7 +86,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		try {
 			//            URL url = new URL(homePage);
 			//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			UrlCacher urlCache = new UrlCacher(homePage);
+			IUrlCacher urlCache = new UrlCacher(homePage);
 			List<String> lines = urlCache.get();
 			String line = "";
 			Iterator<String> it = lines.iterator();
@@ -166,7 +167,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		//first get the teams
 		String tableURL = homePage + "?template=pointstable";
 		try {
-			UrlCacher urlCache = new UrlCacher(tableURL);
+			IUrlCacher urlCache = new UrlCacher(tableURL);
 			List<String> lines = urlCache.get();
 			String line = "";
 			Iterator<String> it = lines.iterator();
@@ -208,8 +209,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	private ITeamGroup getTeam(String teamName) {
 		ITeamGroup t = tf.getTeamByName(teamName);
 		if (t == null) {
-			tf.setId(null);
-			t = tf.getTeam();
+			t = tf.create();
 			t.setDisplayName(teamName);
 
 
@@ -361,7 +361,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 			Long scrumId = 0L;
 
 
-			UrlCacher urlCache = new UrlCacher(tableURL);
+			IUrlCacher urlCache = new UrlCacher(tableURL);
 			List<String> lines = urlCache.get();
 			String line = "";
 			Iterator<String> it = lines.iterator();

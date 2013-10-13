@@ -74,7 +74,9 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 
 			// now update the memcache version
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			syncCache.delete(t.getId());
+			if (syncCache.contains(t.getId())) {
+				syncCache.delete(t.getId());
+			}
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			ObjectOutput out = new ObjectOutputStream(bos);   
 			out.writeObject(t);

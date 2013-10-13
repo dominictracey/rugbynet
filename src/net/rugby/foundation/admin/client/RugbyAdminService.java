@@ -20,6 +20,7 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
@@ -117,5 +118,8 @@ public interface RugbyAdminService extends RemoteService {
 	IContent createContent(Long id, String content);
 	List<IContent> getContentList(boolean onlyActive);
 	ICoreConfiguration getConfiguration();
+	
+	List<IStanding> getStandings(Long roundId);
+	List<IStanding> saveStandings(Long roundId, List<IStanding> standings);
 	
 }

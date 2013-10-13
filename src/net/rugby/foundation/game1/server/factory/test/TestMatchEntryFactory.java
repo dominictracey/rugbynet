@@ -262,8 +262,7 @@ public class TestMatchEntryFactory implements IMatchEntryFactory {
 		
 		
 		Long tid = me.getTeamPickedId();
-		tf.setId(tid);
-		me.setTeamPicked(tf.getTeam());
+		me.setTeamPicked(tf.get(tid));
 		return me;
 	}
 

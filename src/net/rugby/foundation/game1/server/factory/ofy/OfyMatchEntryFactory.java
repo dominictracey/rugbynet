@@ -62,8 +62,7 @@ public class OfyMatchEntryFactory implements IMatchEntryFactory {
 				return null;
 			}
 			Long tid = me.getTeamPickedId();
-			tf.setId(tid);
-			me.setTeamPicked(tf.getTeam());
+			me.setTeamPicked(tf.get(tid));
 			return me;
 		} catch (Throwable e) {
 			Logger.getLogger("OfyMatchEntryFactory").log(Level.SEVERE, "getMatchEntry: " + e.getMessage(), e);

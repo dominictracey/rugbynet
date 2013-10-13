@@ -175,6 +175,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 			private EditComp editComp = null;
 			private EditMatch editMatch = null;
+			private EditRound editRound = null;
 			private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions;
 
 			@Override
@@ -226,7 +227,14 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 							listener.editTeamInit(editTeam, teamId, compId );
 						} else { // round, so show matches
 							// params are compId and roundId
-							listener.roundClicked(Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),
+							editArea.clear();
+							if (editRound == null) {
+								editRound = new EditRound();
+							}
+							editArea.add(editRound);
+							editRound.setVisible(true);
+							
+							listener.roundClicked(editRound, Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),
 									Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
 						}
 					} else if (depth == 4) { // match clicked
@@ -247,6 +255,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 							editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
 							editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
+							
+//							editMatchStats = clientFactory.getPlayerListView();
 
 							jobArea.add(editMatchStats);
 							editMatchStats.asWidget().setVisible(true);

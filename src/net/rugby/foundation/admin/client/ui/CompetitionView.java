@@ -39,10 +39,11 @@ public interface CompetitionView extends IsWidget {
 		void saveCompetitionClicked(ICompetition comp, Map<String,ITeamGroup> teams);
 
 		/**
+		 * @param editRound 
 		 * @param compId
 		 * @param roundId
 		 */
-		void roundClicked(Long parseLong, Long parseLong2);
+		void roundClicked(EditRound editRound, Long parseLong, Long parseLong2);
 
 		/**
 		 * @param editTeam
