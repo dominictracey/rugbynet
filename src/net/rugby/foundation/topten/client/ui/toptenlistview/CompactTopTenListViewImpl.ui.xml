@@ -1,0 +1,30 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    		 xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    		 xmlns:c="urn:import:com.google.gwt.user.cellview.client" >
+
+    <g:HTMLPanel width="100%" ui:field="topTenPanel">
+
+
+
+
+    	<b:Row>
+    	    <b:Column size ="12">
+    	        <b:Row><c:CellTable ui:field="items" width="100%"/></b:Row>
+    	        <b:Row>
+    	            <b:Column size="3" offset="5">
+	    	            <b:Nav alignment="RIGHT">
+	    	                <b:NavWidget>
+	    	                    <b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
+	    	                    <b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
+	    	                </b:NavWidget>
+	    	            </b:Nav>
+    	            </b:Column>
+    	        </b:Row>
+    	    </b:Column>
+		</b:Row>
+		</g:HTMLPanel>
+
+
+</ui:UiBinder>

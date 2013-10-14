@@ -75,7 +75,7 @@ public class FetchBasicScoreMatchResultOrchestration extends OrchestrationCore<I
 						cf.setId(compId);
 						ICompetition comp = cf.getCompetition();
 	
-						IResultFetcher fetcher = rff.getResultFetcher(compId, comp.getNextRound(), IMatchResult.ResultType.SIMPLE_SCORE);
+						IResultFetcher fetcher = rff.getResultFetcher(compId, comp.getNextRound(), IMatchResult.ResultType.MATCHES);
 	
 						IMatchResult mr = fetcher.getResult(target);
 	

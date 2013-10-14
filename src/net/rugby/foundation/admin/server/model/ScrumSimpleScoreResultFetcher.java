@@ -39,10 +39,12 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 	// when we are parsing all the matches out, this is where we keep the date of the matches being read
 	private Date dateCursor;
 	protected IMatchResultFactory mrf;
+	protected IUrlCacher uc;
 	 
-	public ScrumSimpleScoreResultFetcher(IMatchGroupFactory mf, IMatchResultFactory mrf) {
+	public ScrumSimpleScoreResultFetcher(IMatchGroupFactory mf, IMatchResultFactory mrf, IUrlCacher uc) {
 		this.mf = mf;
 		this.mrf = mrf;
+		this.uc = uc;
 	}
 
 	@Override
@@ -57,8 +59,9 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 		try {
 			//URL url = new URL(resultURL);
 			//BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			IUrlCacher urlCache = new UrlCacher(resultURL);
-			List<String> lines = urlCache.get();
+//			IUrlCacher urlCache = new UrlCacher(resultURL);
+			uc.setUrl(resultURL);
+			List<String> lines = uc.get();
 			String line = "";
 			Iterator<String> it = lines.iterator();
 			if (it.hasNext()) {

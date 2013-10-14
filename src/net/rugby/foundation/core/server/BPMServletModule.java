@@ -14,8 +14,8 @@ public class BPMServletModule extends ServletModule {
 //		serve("/game1/orchestration/*").with(net.rugby.foundation.game1.server.OrchestrationServlet.class);
 //		serve("/game1/workflow/").with(net.rugby.foundation.game1.server.WorkflowServlet.class);
 //		serve("/game1/service").with(Game1ServiceImpl.class);
-//		serve("/admin/orchestration/*").with(net.rugby.foundation.admin.server.OrchestrationServlet.class);
-//		serve("/admin/workflow/*").with(net.rugby.foundation.admin.server.WorkflowServlet.class);
+		serve("/admin/orchestration/*").with(net.rugby.foundation.admin.server.OrchestrationServlet.class);
+		serve("/admin/workflow/*").with(net.rugby.foundation.admin.server.WorkflowServlet.class);
 		serve("/admin/rugbyAdminService").with(RugbyAdminServiceImpl.class);
 		serve("/core/CoreService").with(CoreServiceImpl.class);
 		serve("/topten/TopTenService").with(TopTenServiceImpl.class);

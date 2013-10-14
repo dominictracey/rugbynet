@@ -22,8 +22,8 @@ import net.rugby.foundation.model.shared.IMatchGroup.Status;
 
 public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreResultFetcher implements IResultFetcher {
 
-	public ScrumSuperRugbySimpleScoreResultFetcher(IMatchGroupFactory mf, IMatchResultFactory mrf) {
-		super(mf,mrf);
+	public ScrumSuperRugbySimpleScoreResultFetcher(IMatchGroupFactory mf, IMatchResultFactory mrf, IUrlCacher uc) {
+		super(mf,mrf,uc);
 	}
 
 	@Override
@@ -39,8 +39,8 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
         try {
 //            URL url = new URL(resultURL);
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-        	IUrlCacher urlCache = new UrlCacher(resultURL);
-        	List<String> lines = urlCache.get();
+        	uc.setUrl(resultURL);
+        	List<String> lines = uc.get();
             String line;
 
             Iterator<String> it = lines.iterator();

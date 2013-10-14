@@ -51,6 +51,8 @@ public class TestUrlCacher implements IUrlCacher {
 	
 	@SuppressWarnings("unchecked")
 	private List<String> fetchContent() {
+		// first strip off the ? param string if it exists
+		url = url.split("\\?")[0];
 		if (!url.isEmpty()) {
 			BufferedReader reader;
 			try {

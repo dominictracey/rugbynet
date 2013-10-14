@@ -3,6 +3,10 @@
  */
 package net.rugby.foundation.admin.server;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,8 +17,10 @@ import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
@@ -54,11 +60,13 @@ public class OrchestrationMatchTester {
 
 	private IOrchestrationFactory of;
 	private IMatchGroupFactory mgf;
+	private ITeamGroupFactory tf;
 
 	@Inject
-	public void setFactory(IOrchestrationFactory of, IMatchGroupFactory mgf) {
+	public void setFactory(IOrchestrationFactory of, IMatchGroupFactory mgf, ITeamGroupFactory tf) {
 		this.of = of;
 		this.mgf = mgf;
+		this.tf = tf;
 	}
 
 	@Test
@@ -85,9 +93,32 @@ public class OrchestrationMatchTester {
 
 	@Test
 	public void testFetchMatchOrchestration() {
-		IOrchestration<IMatchGroup> matchFetcher = of.get(mgf.get(203L),AdminOrchestrationActions.MatchActions.FETCH);
+		IMatchGroup m = mgf.create();
+		Calendar cal = new GregorianCalendar();
+		ITeamGroup v = tf.create();
+		v.setId(97L);
+		v.setAbbr("TLN");
+		v.setDisplayName("Toulon");
+		m.setVisitingTeam(v);
+		ITeamGroup h = tf.create();
+		h.setId(96L);
+		h.setDisplayName("Cardiff Blues");
+		h.setAbbr("CAR");
+		m.setHomeTeam(h);
+		cal.set(Calendar.HOUR_OF_DAY, 0);  
+		cal.set(Calendar.MINUTE, 0);  
+		cal.set(Calendar.SECOND, 0);  
+		cal.set(Calendar.MILLISECOND, 0); 
+		cal.set(Calendar.DAY_OF_MONTH, 19); 
+		cal.set(Calendar.MONTH, Calendar.OCTOBER);
+		cal.set(Calendar.YEAR, 2013);
+		Date matchDate = cal.getTime();
+		m.setDate(matchDate);
+		m.setLocked(true);
+		
+		IOrchestration<IMatchGroup> matchFetcher = of.get(m,AdminOrchestrationActions.MatchActions.FETCH);
 		matchFetcher.setExtraKey(2L);
-		IMatchGroup m = matchFetcher.getTarget();
+		m = matchFetcher.getTarget();
 		Assert.assertTrue(m.getLocked());
 
 		matchFetcher.execute();

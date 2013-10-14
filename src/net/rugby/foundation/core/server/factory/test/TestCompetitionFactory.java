@@ -127,7 +127,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		addTeams(c);
 		
 		c.setForeignID(999L);
-		c.setForeignURL("http://testonlyplease.com/1001");
+		c.setForeignURL("testData\\191757-round2-results.htm");
 		c.setLongName("European Heineken Cup");
 		c.setShortName("Heineken Cup");
 

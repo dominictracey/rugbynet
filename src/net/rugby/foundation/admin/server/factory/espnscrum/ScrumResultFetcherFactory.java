@@ -22,12 +22,14 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 	private ICompetitionFactory cf;
 	private IMatchGroupFactory mf;
 	private IMatchResultFactory mrf;
+	private IUrlCacher uc;
 
 	@Inject
-	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory mf, IMatchResultFactory mrf) {
+	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory mf, IMatchResultFactory mrf, IUrlCacher uc) {
 		this.cf = cf;
 		this.mf = mf;
 		this.mrf = mrf;
+		this.uc = uc;
 	}
 
 	@Override
@@ -40,16 +42,16 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 
 		if (comp == null) {
 			//Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized compId specified: " + sourceCompID);
-			return new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf);
+			return new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
 		}
 
 		if (resultType == ResultType.SIMPLE_SCORE) {
 
 			IResultFetcher fetcher = null;
 			if (comp != null && !comp.getLongName().contains("Super Rugby")) {
-				fetcher =  new ScrumSimpleScoreResultFetcher(mf,mrf);
+				fetcher =  new ScrumSimpleScoreResultFetcher(mf,mrf, uc);
 			} else {
-				fetcher =  new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf);
+				fetcher =  new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
 			}
 
 			if (comp != null) {
@@ -59,7 +61,7 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 
 			return fetcher;
 		} else if (resultType == ResultType.MATCHES) {
-			IResultFetcher fetcher = new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf);
+			IResultFetcher fetcher = new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
 			if (comp != null) {
 				fetcher.setComp(comp);
 				fetcher.setRound(round);

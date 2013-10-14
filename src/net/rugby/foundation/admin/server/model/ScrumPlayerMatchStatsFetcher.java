@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 	private IUrlCacher urlCache;
 
-
 	public ScrumPlayerMatchStatsFetcher(IPlayerMatchStatsFactory pmsf, IUrlCacher urlCache) {
 		this.pmsf = pmsf;
 		this.urlCache = urlCache;
@@ -44,38 +44,38 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		assert(!url.isEmpty());
 
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
-
 		setErrorMessage(null);
-
 		Boolean foundStats = false;
 		urlCache.setUrl(url);
-		
 		List<String> lines = urlCache.get();
 		String line;
+		
+		// fix the timeline before we get started processing the list
+		// lines is the whole file.
+		List<String> timeline = lines;
+		if(isUpsideDown(timeline)) {
+			timeline = extractTimelineTable(timeline);
+			timeline = flipList(timeline);
+			timeline = processFlippedList(timeline);
+			lines = replaceTimeline(timeline, lines);
+		}	
 		//List<String> errorList = new ArrayList<String>();
-
 		if (lines == null) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Did not read any lines at " + url);
 			setErrorMessage("Couldn't get sufficient info for player in slot " + slot + " from the match report at " + url + " : No lines returned from that url.");
 			return null;
 		}
-
 		int countTabs = 0;
 		boolean foundMatchTab = false;
 		Iterator<String> it = lines.iterator();
-
 		// get the player stats
 		foundStats = false;
-
 		// whether he is a reserve with his position listed as "R" - in which case we have to figure out who he came on for.
 		boolean findPosition = false;
-
 		while (it.hasNext() && !foundStats) {
-
 			line = getNext(it);
 			// first we scan to the match stats tab. Home is next after and visitor is after that
 			if (line.contains("tabbertab")) {
-
 				line = getNext(it);
 				if (line.contains("Match stats"))
 					foundMatchTab = true;
@@ -83,12 +83,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 					countTabs++;
 				}
 			}
-
 			if ((countTabs == 1 && hov == Home_or_Visitor.HOME) || (countTabs == 2 && hov == Home_or_Visitor.VISITOR)) {
 				line = getNext(it);
-
 				skipPlayer(it); // header row
-
 				// there is a weird case (http://www.espnscrum.com/scrum/rugby/current/match/166469.html?view=scorecard) 
 				// where the starter just doesn't show up in the stats. See [12	C Hudson Tonga'uiha].
 				// this not only hoses up that player, but everyone after him.
@@ -105,7 +102,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 					if (cursor != null) {
 						playerMap.put(cursor.getName(),cursor);
 						if (cursor != null && (player.getSurName().equals(cursor.getName()) || player.getShortName().equals(cursor.getName()))) {
-
 							configureStats(cursor);
 							// if we need to find a position for them, we need to get everyone in the playerMap
 							if (!cursor.getPosition().equals(position.RESERVE) && !cursor.getPosition().equals(position.NONE)) {
@@ -119,7 +115,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						break; // at the end of the line
 					}
 				}
-
 				// if we didn't find it, assume they didn't get a run on and create an AdminTask if they were a starter
 				if (stillLooking && !findPosition) {
 					stats = noRunOn();
@@ -131,8 +126,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						return null;
 					}
 				}
-
-
 				if (slot < 15) {  // starters
 					try {
 						stats.playerOn(0);
@@ -141,24 +134,15 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						return stats;
 					}
 				}
-
-
-
 				pmsf.put(stats);
 				foundStats = true;
 			}
-
 		}
-
-
 		// now get the playing time
-
 		countTabs = 0;
 		it = lines.iterator();  //restart
 		boolean foundTime = false;
-
 		while (it.hasNext() && !foundTime) {
-
 			line = getNext(it);
 			// first we scan to the Timeline tab 
 			boolean foundTimelineTab = false;
@@ -168,14 +152,12 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 					foundTimelineTab = true;
 				}
 			}
-
 			if (foundTimelineTab) { // Timeline
-
+				
 				// get past header row
 				while(it.hasNext() && !line.contains("</tr>")) {
 					line = it.next();
 				}
-
 				// now process row-by-row
 				boolean done = false;
 				while (!done) {
@@ -184,17 +166,204 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				foundTime = true;
 			} 
 		}
-
 		if (!foundTime) {
 			setErrorMessage("Couldn't find timeline tab while getting match stats for " + player.getDisplayName() + " in match " + match.getDisplayName());
 		}
-
 		if (foundStats)
 			return stats;
 		else
 			return null;
 	}
+	
+	private List<String> extractTimelineTable(List<String> toProcess) {
+		List<String> subLines = new ArrayList<String>();
+		int start = 0;
+		int end = 0;
+		for (int i = 0; i < toProcess.size(); i++) {
+			String line = toProcess.get(i);
+			if (line.contains("Timeline")) { // start
+				start = i;
+			}
+			if (start > 0 && line.contains("</table>")) {
+				end = i + 1;
+				break;
+			}
+		}
+		for (int b = start; b < end; b++) {
+			subLines.add(toProcess.get(b));
+		}
+		
+		return subLines;
+	}
+			
+	private List<String> processFlippedList(List<String> toProcess) {
+		
+		List<String> processed = new ArrayList<String>();
+		// the correct order of the tds is:
+		// liveTblTextBlk - 0
+		// liveTblColLeft - 1
+		// liveTblTextGrn - 2
+		// liveTblColRgt - 3
+		// we need the last 7 rows to be at the top of the list
+		int tableSize = toProcess.size();
+		String headerRow[] = new String[8];
+		headerRow[0] = "<h2>Timeline</h2>";
+		toProcess.remove(tableSize - 1);
+		headerRow[1] = "<table width=\"455\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">" ;
+		toProcess.remove(tableSize - 2);
+		headerRow[2] = toProcess.get(tableSize - 3);
+		toProcess.remove(tableSize - 3);
+		headerRow[3] = toProcess.get(tableSize - 4);
+		toProcess.remove(tableSize - 4);
+		headerRow[4] = toProcess.get(tableSize - 5);
+		toProcess.remove(tableSize - 5);
+		headerRow[5] = toProcess.get(tableSize - 6);
+		toProcess.remove(tableSize - 6);
+		headerRow[6] = toProcess.get(tableSize - 7);
+		toProcess.remove(tableSize - 7);
+		headerRow[7] = toProcess.get(tableSize - 8);
+		
+		processed.add(headerRow[0]);
+		processed.add(headerRow[1]);
+		processed.add(headerRow[2]);
+		processed.add(headerRow[3]);
+		processed.add(headerRow[4]);
+		processed.add(headerRow[5]);
+		processed.add(headerRow[6]);
+		processed.add(headerRow[7]);
+		Iterator<String> iter = toProcess.iterator();
+		while(iter.hasNext()) {
+			String cur = iter.next();
+			processed.add(cur);
+		}
+		processed.remove(8);
+		processed.add("</table>");
+		processed = processRows(processed);
+		//writeListToFile(processed, "list5");
+		return processed;
+	}
 
+	private List<String> processRows(List<String> toProcess) {
+		List<String> processed = new ArrayList<String>();
+		String whtClass = "<tr class=\"liveTblRowWht\">"; // 0
+		String gryClass = "<tr class=\"liveTblRowGry\">"; // 1
+		
+		int index = 0;
+		int start = 0;
+		int end = 0;
+		for(int i = 0; i < toProcess.size(); i++) {
+			String curLine = toProcess.get(i);
+			if(i > 7) {
+				if(curLine.contains("</tr>")) {
+					start = i + 1;
+					if(index == 0) {
+						curLine = whtClass;
+						index = 1;
+					} else if(index == 1) {
+						curLine = gryClass;
+						index = 0;
+					}
+				} else if(curLine.contains("<tr ")) {
+					curLine = "</tr>";
+					end = i;
+				}
+				List<String> cols = new ArrayList<String>();
+				while(start < end) {
+					String col = toProcess.get(start);
+					cols.add(col);
+					start++;
+				}
+				ListIterator<String> colIter = cols.listIterator(cols.size());
+				while(colIter.hasPrevious()) {
+					processed.add(colIter.previous());
+				}
+			}
+			if(!curLine.contains("<td")) {
+				processed.add(curLine);
+			}
+		}
+		// processed = processColumns(processed);
+//		writeListToFile(processed, "processed8");
+		return processed;
+	}
+		
+	private List<String> replaceTimeline(List<String> timeline, List<String> wholeList) {
+		// find the timeline in the big list and replace it with the flipped list.
+		List<String> modified = new ArrayList<String>();
+		int start = 0;
+		int end = 0;
+		for (int i = 0; i < wholeList.size(); i++) {
+			String line = wholeList.get(i);
+			if (line.contains("Timeline")) { // start
+				start = i;
+			}
+			if (start > 0 && line.contains("</table>")) {
+				end = i + 1;
+				break;
+			}
+		}
+		for(int x = 0; x < wholeList.size(); x++) {
+			if(x >= start && x < end) {
+				wholeList.remove(x);
+			} else {
+				modified.add(wholeList.get(x));
+			}
+		}
+		modified.addAll(start,  timeline);
+//		writeListToFile(modified, "modified5");
+		return modified;
+		
+	}
+	
+	
+	private List<String> flipList(List<String> lines) {
+		ListIterator<String> iter = lines.listIterator(lines.size());
+		List<String> newList = new ArrayList<String>();
+		while(iter.hasPrevious()) {
+			String line = iter.previous();
+			newList.add(line);
+		}
+		return newList;
+	}
+	
+	private boolean isUpsideDown(List<String> eles) {
+		String tdClass = "liveTblTextBlk";
+		Iterator<String> iter = eles.iterator();
+		int timeEle = 0;
+		while (iter.hasNext()) {
+			String line = iter.next();
+			if (line != null && line.length() > -1) {
+				if (line.contains(tdClass)) {
+					timeEle = Integer.parseInt(line.split("<|/|>")[2]);
+					if (timeEle > 0) {
+						return true;
+					} else if (timeEle == 0) {
+						return false;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+//		
+//	private void writeListToFile(List<String> subLines, String filename) {
+//		Iterator<String> iter = subLines.iterator();
+//		PrintWriter writer;
+//		try {
+//			writer = new PrintWriter("C:\\Temp\\" + filename + ".html", "UTF-8");
+//			while(iter.hasNext()) {
+//				writer.println(iter.next());
+//			}
+//			writer.close();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
+//	}
+	
+	
 	private void configureStats(IPlayerMatchStats cursor) {
 		stats = cursor;
 		if (match != null) {
@@ -217,6 +386,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 	}
 
+	
 	private IPlayerMatchStats noRunOn() {
 		stats = pmsf.getById(null);
 		stats.setMatchId(match.getId()); // native ID, not scrum's
@@ -236,6 +406,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		return stats;
 	}
 
+	
 	private IPlayerMatchStats getPlayerStats(Iterator<String> it, IPlayerMatchStats stats) {
 		//now read the player
 		String line = getNext(it);  //<tr>
@@ -465,6 +636,161 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		}
 	}
 
+	private boolean ProcessTimelineOriginal(Iterator<String> it, IPlayerMatchStats pms) {
+		// home team is in left column, visitors in right
+		String us = "liveTblColLeft";
+		String them = "liveTblColRgt";
+		boolean heIsOn = false;
+		if (hov.equals(Home_or_Visitor.VISITOR)) {
+			us = "liveTblColRgt";
+			them = "liveTblColLeft";
+		}
+
+		String line = it.next(); //getNext(it);
+
+		if (line.contains("<tr class=\"liveTblRow")) {
+			// first col is time
+			line = it.next(); //getNext(it);
+
+			// ignore the header row, which has liveTblTextGrn in the first
+			// column
+			if (line.contains("liveTblTextGrn")) {
+				while (it.hasNext() && !line.contains("</tr")) {
+					line = it.next();
+				}
+
+				if (it.hasNext())
+					return false;
+				else {
+					// found end of file??
+					return true;
+				}
+			}
+
+			if (line.split("<|>").length > 2) {
+				try {
+					if (!line.split("<|>")[2].contains("+")) {
+						time = Integer.parseInt(line.split("<|>")[2]);
+					} else {
+						time = Integer.parseInt(line.split("<|>")[2].split("[+]")[0]) + Integer.parseInt(line.split("<|>")[2].split("[+]")[1]);
+					}
+					// writeLineToFile(line);
+				} catch (NumberFormatException e) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Parsing timeline found bad time - thought there was a number on this line: " + line);
+				}
+			}
+
+			// not enough to just test on "contains".
+			// http://www.espnscrum.com/premiership-2012-13/rugby/match/166469.html
+			// Leister is fielding Micky Young and Tom Youngs - gah!
+			//
+			// So we need to cycle through all of the "on" and "off" entries and
+			// keep them in a block so if we have a reserve come on who doesn't
+			// have
+			// his position set (he is Postition.RESERVE), we can figure out
+			// what his position is based on the best matching candidate coming
+			// off.
+			try {
+				// documentation taken from here see below...
+				// ******************************************>
+
+				// if we have a block, organize them so we know who is coming
+				// off.
+				List<String> offList = null;
+
+				boolean findPosition = false;
+				if (pms.getPosition().equals(position.NONE) || pms.getPosition().equals(position.RESERVE)) {
+					findPosition = true;
+					offList = new ArrayList<String>();
+				}
+
+				boolean look = false;
+
+				while (!line.contains("</tr>")) {
+					line = it.next(); //getNext(it); // if the string isn't the end of a row,
+										// get the next string/line.
+
+					if (line.contains(us)) { // if the string contains the name of the home time...
+						look = true;
+					} else if (line.contains(them)) { // if the string contains the name of the away team...
+						look = false;
+					}
+
+					if (look) { // if it's the home team, get their name out of the line.
+						String name = findName(line);
+
+						if (name != null && findPosition) {
+							if (line.contains("sub")) {
+								if (line.split("sub")[1].trim().contains("off")) {
+									offList.add(name);
+								}
+							}
+						}
+
+						// so if this contains the guy we are looking for, mark
+						// them as on or off.
+						if (name != null && name.equals(pms.getName())) {
+							if (line.contains("sub")) {
+								if (line.split("sub")[1].trim().contains("on")) {
+									pms.playerOn(time);
+									heIsOn = true;
+								} else if (line.split("sub")[1].trim()	.contains("off")) {
+									pms.playerOff(time);
+								}
+							}
+						}
+					}
+				}
+
+				// Additionally, if they have a position of Reserve or None,
+				// figure out who they are replacing
+				// so we can update their position accordingly.
+				if (findPosition && heIsOn) {
+					// if there is only one person off, that's the one.
+					if (offList.size() == 1) {
+						if (playerMap.containsKey(offList.get(0))) {
+							pms.setPosition(playerMap.get(offList.get(0)).getPosition());
+						}
+					} else if (offList.size() > 1) {
+						// otherwise, try to pick the right one.
+						position pos = getSwappedPosition(pms, offList);
+						if (pos != null && pos != position.NONE && pos != position.RESERVE) {
+							pms.setPosition(pos);
+						} else {
+							throw new RuntimeException("Could not match the reserve player coming on to anyone coming off so we could determine what his position was.");
+						}
+					} else {
+						throw new RuntimeException("offList not set up properly - must have one or more people coming off as our guy comes on.");
+					}
+				}
+
+			} catch (Exception e) {
+				if (pms != null) {
+					setErrorMessage("Problem getting playing time information for player "
+							+ player.getDisplayName()
+							+ " in match "
+							+ match.getDisplayName()
+							+ " : "
+							+ e.getLocalizedMessage());
+				}
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Parsing timeline issue: " + e.getMessage(), e);
+
+			}
+
+			while (!line.contains("</tr>")) {
+				// line = getNext(it);
+				line = it.next();
+			}
+
+			return false;
+		} else {
+			// we are done
+			pms.matchOver(time);
+			return true;
+		}
+	}
+	
+	
 	private String findName(String line) {
 		// it can be in a few different places in the strtok
 		String[] split = line.split("<|>| - ");
