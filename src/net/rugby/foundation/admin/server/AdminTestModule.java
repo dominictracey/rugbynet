@@ -18,6 +18,8 @@ import net.rugby.foundation.admin.server.factory.espnscrum.TestUrlCacher;
 import net.rugby.foundation.admin.server.factory.test.TestAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.test.TestMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.test.TestPlayerMatchInfoFactory;
+import net.rugby.foundation.admin.server.model.IStandingsFetcher;
+import net.rugby.foundation.admin.server.model.ScrumStandingsFetcher;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationFactory;
@@ -51,6 +53,7 @@ public class AdminTestModule extends AbstractModule {
 		bind(IMatchRatingEngineSchemaFactory.class).to(TestMatchRatingEngineSchemaFactory.class);
 		bind(IQueryRatingEngineFactory.class).to(ScrumQueryRatingEngineFactory.class);
 		bind(IUrlCacher.class).to(TestUrlCacher.class);
+		bind(IStandingsFetcher.class).to(ScrumStandingsFetcher.class);
 	}
 	
 }

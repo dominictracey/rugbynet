@@ -76,6 +76,9 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 				build(l);
 			}
 			
+			for (Long l=9300L; l<9324L; l++) {
+				build(l);
+			}
 			populated = true;
 		}
 	}
@@ -182,7 +185,60 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 			t.setShortName("Saracens");
 			((IGroup)t).setDisplayName("Saracens");
 			t.setColor("#000000");
+			
+			// HEINEKEN CUP 2013-2014
+		} else if (id == 9300) {
+			t.setDisplayName("Leinster");
+		} else if (id == 9301) {
+			t.setDisplayName("Castres");
+		} else if (id == 9302) {
+			t.setDisplayName("Northampton Saints");
+		} else if (id == 9303) {
+			t.setDisplayName("Ospreys");
+		} else if (id == 9304) {
+			t.setDisplayName("Toulon");
+		} else if (id == 9305) {
+			t.setDisplayName("Exeter Chiefs");
+		} else if (id == 9306) {
+			t.setDisplayName("Cardiff Blues");
+		} else if (id == 9307) {
+			t.setDisplayName("Glasgow");
+		} else if (id == 9308) {
+			t.setDisplayName("Toulouse");
+		} else if (id == 9309) {
+			t.setDisplayName("Saracens");
+		} else if (id == 9310) {
+			t.setDisplayName("Connacht");
+		} else if (id == 9311) {
+			t.setDisplayName("Zebre");
+		} else if (id == 9312) {
+			t.setDisplayName("Scarlets");
+		} else if (id == 9313) {
+			t.setDisplayName("Racing Metro");
+		} else if (id == 9314) {
+			t.setDisplayName("Harlequins");
+		} else if (id == 9315) {
+			t.setDisplayName("Clermont Auvergne");
+		} else if (id == 9316) {
+			t.setDisplayName("Montpellier");
+		} else if (id == 9317) {
+			t.setDisplayName("Ulster");
+		} else if (id == 9318) {
+			t.setDisplayName("Leicester Tigers");
+		} else if (id == 9319) {
+			t.setDisplayName("Benetton Treviso");
+		} else if (id == 9310) {
+			t.setDisplayName("Edinburgh");
+		} else if (id == 9321) {
+			t.setDisplayName("Gloucester Rugby");
+		} else if (id == 9322) {
+			t.setDisplayName("Munster");
+		} else if (id == 9323) {
+			t.setDisplayName("Perpignan");
 		}
+		
+		
+		
 		((TeamGroup)t).setId(id);
 		((IGroup)t).setGroupType(GroupType.TEAM);
 		

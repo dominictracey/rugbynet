@@ -87,6 +87,11 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(207L);
 			/** END COMP 2 **/
 		}
+		 // HEINEKEN CUP 2013-14
+		 else  if (roundId == 15L) {
+				r.setAbbr("1");
+				r.setName("Round 1");
+			}
 		
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(new Date());

@@ -68,6 +68,8 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			return getTestComp2();
 		} else if (id == 3L) {
 			return getTestComp3();
+		} else if (id == 4L) {
+			return getTestComp4();
 		}
 		
 		return null;
@@ -143,6 +145,24 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		c.setPrevRoundIndex(-1);
 		c.setNextRoundIndex(0);
 		setBeginAndEnd(c);
+		return c;
+	}
+	
+	/**
+	 * @return
+	 */
+	private ICompetition getTestComp4() {
+		ICompetition c = getEmptyComp();
+		c.getRoundIds().add(15L);
+		addRounds(c);
+		for (Long i=9300L; i<9324L; ++i) {
+			c.getTeamIds().add(i);
+			c.getTeams().add(tf.get(i));
+		}
+		//setNextAndPrevRound(c);
+//		c.setPrevRoundIndex(-1);
+//		c.setNextRoundIndex(0);
+//		setBeginAndEnd(c);
 		return c;
 	}
 	

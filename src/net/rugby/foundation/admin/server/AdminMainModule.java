@@ -20,7 +20,9 @@ import net.rugby.foundation.admin.server.factory.ofy.OfyMatchRatingEngineSchemaF
 import net.rugby.foundation.admin.server.factory.ofy.OfyPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.factory.test.TestAdminTaskFactory;
 import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
+import net.rugby.foundation.admin.server.model.IStandingsFetcher;
 import net.rugby.foundation.admin.server.model.ScrumQueryRatingEngineV100;
+import net.rugby.foundation.admin.server.model.ScrumStandingsFetcher;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OfyOrchestrationConfigurationFactory;
@@ -54,6 +56,8 @@ public class AdminMainModule extends AbstractModule {
 		bind(IMatchRatingEngineSchemaFactory.class).to(OfyMatchRatingEngineSchemaFactory.class);
 		bind(IQueryRatingEngineFactory.class).to(ScrumQueryRatingEngineFactory.class);
 		bind(IUrlCacher.class).to(UrlCacher.class);
+		bind(IStandingsFetcher.class).to(ScrumStandingsFetcher.class);
+
 	}
 	
 }
