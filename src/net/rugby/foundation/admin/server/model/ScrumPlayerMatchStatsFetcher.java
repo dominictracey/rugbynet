@@ -1,15 +1,18 @@
 package net.rugby.foundation.admin.server.model;
 
+//import java.io.FileNotFoundException;
+//import java.io.PrintWriter;
+//import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
-import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -30,9 +33,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	private transient int time = 0;
 	private transient Map<String, IPlayerMatchStats> playerMap = new HashMap<String, IPlayerMatchStats>();
 	private String errorMessage;
+	private List<String> header;
 
 	private IUrlCacher urlCache;
-
 
 	public ScrumPlayerMatchStatsFetcher(IPlayerMatchStatsFactory pmsf, IUrlCacher urlCache) {
 		this.pmsf = pmsf;
@@ -45,38 +48,41 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		assert(!url.isEmpty());
 
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
-
 		setErrorMessage(null);
-
 		Boolean foundStats = false;
 		urlCache.setUrl(url);
-		
 		List<String> lines = urlCache.get();
 		String line;
-		//List<String> errorList = new ArrayList<String>();
+		
+		// fix the timeline before we get started processing the list	
+		List<String> timeline = lines;
+		if(isUpsideDown(timeline)) {
+			timeline = extractTimelineTable(timeline);
+			header = processHeader(timeline);
+			timeline = flipList(timeline);
+			timeline = flipRows(timeline);
+			timeline = addHeader(timeline);
+//			writeListToFile(timeline, "WithHeader");
+			lines = replaceTimeline(timeline, lines);
+//			writeListToFile(lines, "CompleteFile");
+		}	
 
 		if (lines == null) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Did not read any lines at " + url);
 			setErrorMessage("Couldn't get sufficient info for player in slot " + slot + " from the match report at " + url + " : No lines returned from that url.");
 			return null;
 		}
-
 		int countTabs = 0;
 		boolean foundMatchTab = false;
 		Iterator<String> it = lines.iterator();
-
 		// get the player stats
 		foundStats = false;
-
 		// whether he is a reserve with his position listed as "R" - in which case we have to figure out who he came on for.
 		boolean findPosition = false;
-
 		while (it.hasNext() && !foundStats) {
-
 			line = getNext(it);
 			// first we scan to the match stats tab. Home is next after and visitor is after that
 			if (line.contains("tabbertab")) {
-
 				line = getNext(it);
 				if (line.contains("Match stats"))
 					foundMatchTab = true;
@@ -84,12 +90,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 					countTabs++;
 				}
 			}
-
 			if ((countTabs == 1 && hov == Home_or_Visitor.HOME) || (countTabs == 2 && hov == Home_or_Visitor.VISITOR)) {
 				line = getNext(it);
-
 				skipPlayer(it); // header row
-
 				// there is a weird case (http://www.espnscrum.com/scrum/rugby/current/match/166469.html?view=scorecard) 
 				// where the starter just doesn't show up in the stats. See [12	C Hudson Tonga'uiha].
 				// this not only hoses up that player, but everyone after him.
@@ -106,7 +109,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 					if (cursor != null) {
 						playerMap.put(cursor.getName(),cursor);
 						if (cursor != null && (player.getSurName().equals(cursor.getName()) || player.getShortName().equals(cursor.getName()))) {
-
 							configureStats(cursor);
 							// if we need to find a position for them, we need to get everyone in the playerMap
 							if (!cursor.getPosition().equals(position.RESERVE) && !cursor.getPosition().equals(position.NONE)) {
@@ -120,7 +122,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						break; // at the end of the line
 					}
 				}
-
 				// if we didn't find it, assume they didn't get a run on and create an AdminTask if they were a starter
 				if (stillLooking && !findPosition) {
 					stats = noRunOn();
@@ -132,8 +133,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						return null;
 					}
 				}
-
-
 				if (slot < 15) {  // starters
 					try {
 						stats.playerOn(0);
@@ -142,24 +141,15 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						return stats;
 					}
 				}
-
-
-
 				pmsf.put(stats);
 				foundStats = true;
 			}
-
 		}
-
-
 		// now get the playing time
-
 		countTabs = 0;
 		it = lines.iterator();  //restart
 		boolean foundTime = false;
-
 		while (it.hasNext() && !foundTime) {
-
 			line = getNext(it);
 			// first we scan to the Timeline tab 
 			boolean foundTimelineTab = false;
@@ -169,14 +159,11 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 					foundTimelineTab = true;
 				}
 			}
-
 			if (foundTimelineTab) { // Timeline
-
 				// get past header row
 				while(it.hasNext() && !line.contains("</tr>")) {
 					line = it.next();
 				}
-
 				// now process row-by-row
 				boolean done = false;
 				while (!done) {
@@ -185,17 +172,157 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				foundTime = true;
 			} 
 		}
-
 		if (!foundTime) {
 			setErrorMessage("Couldn't find timeline tab while getting match stats for " + player.getDisplayName() + " in match " + match.getDisplayName());
 		}
-
 		if (foundStats)
 			return stats;
 		else
 			return null;
 	}
-
+	
+	private boolean isUpsideDown(List<String> eles) {
+		String tdClass = "liveTblTextBlk";
+		Iterator<String> iter = eles.iterator();
+		int timeEle = 0;
+		while (iter.hasNext()) {
+			String line = iter.next();
+			if (line != null && line.length() > -1) {
+				if (line.contains(tdClass)) {
+					timeEle = Integer.parseInt(line.split("<|/|>")[2]);
+					if (timeEle > 0) {
+						return true;
+					} else if (timeEle == 0) {
+						return false;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	private List<String> extractTimelineTable(List<String> toProcess) {
+		List<String> subLines = new ArrayList<String>();
+		int start = 0;
+		int end = 0;
+		for (int i = 0; i < toProcess.size(); i++) {
+			String line = toProcess.get(i);
+			if (line.contains("Timeline")) { // start
+				start = i;
+			} //start > 0 &&
+			if ( start > 0 && line.contains("</table>")) {
+				end = i + 1;
+				break;
+			}
+		}
+		for (int b = start; b < end; b++) {
+			subLines.add(toProcess.get(b));
+		}
+		return subLines;
+	}
+			
+	private List<String> flipList(List<String> lines) {
+		ListIterator<String> iter = lines.listIterator(lines.size());
+		List<String> newList = new ArrayList<String>();
+		while(iter.hasPrevious()) {
+			String line = iter.previous();
+			newList.add(line);
+		}
+		return newList;
+	}
+	
+	private List<String> flipRows(List<String> toProcess) {
+		List<String> processed = new ArrayList<String>();
+		List<String> flippedRow = new ArrayList<String>();
+		List<String> goodList = new ArrayList<String>();
+		int start = 0;
+		int end = 0;
+		for(int i = 0; i < toProcess.size(); i++) {
+			String curLine = toProcess.get(i);
+			if(curLine.contains("</tr>")) {
+				start = i;
+			}
+			if(curLine.contains("<tr ")) {
+				end = i + 1;
+			} 
+			if(start < end) {
+				processed = toProcess.subList(start, end);
+				
+				ListIterator<String> tdIter = processed.listIterator(processed.size());
+				while(tdIter.hasPrevious()) {
+					flippedRow.add(tdIter.previous());
+				}
+//				writeListToFile(flippedRow, "flipedRows" + i);
+				goodList.addAll(flippedRow);
+				flippedRow.clear();
+			}
+		}
+//		writeListToFile(goodList, "goodList");
+		return goodList;
+	}
+		
+	private List<String> processHeader(List<String> toProcess) {
+		List<String> processed = new ArrayList<String>();
+		for(int i = 0; i < 8; i++) {
+			processed.add(toProcess.get(i));
+		}
+		return processed;
+	}
+	
+	private List<String> addHeader(List<String> toProcess) {
+		List<String> newList = new ArrayList<String>();
+		newList.addAll(header);
+		newList.addAll(toProcess);
+		return newList;
+	}
+	
+	private List<String> replaceTimeline(List<String> timeline, List<String> wholeList) {
+		// find the timeline in the big list and replace it with the flipped list.
+		List<String> modified = new ArrayList<String>();
+		int start = 0;
+		int end = 0;
+		for (int i = 0; i < wholeList.size(); i++) {
+			String line = wholeList.get(i);
+			if (line.contains("Timeline")) { // start
+				start = i + 1;
+			}
+			if (start > 0 && line.contains("</table>")) {
+				end = i;
+				break;
+			}
+		}
+		for(int x = 0; x < wholeList.size(); x++) {
+			if(x >= start && x < end) {
+				wholeList.remove(x);
+			} else {
+				modified.add(wholeList.get(x));
+			}
+		}
+		
+		modified.addAll(start -1,  timeline);
+		
+		return modified;
+		
+	}
+			
+//	private void writeListToFile(List<String> subLines, String filename) {
+//		if(subLines != null && subLines.size() > 0) {
+//			Iterator<String> iter = subLines.iterator();
+//			PrintWriter writer;
+//			try {
+//				writer = new PrintWriter("C:\\users\\seanm\\Development\\JAVA_SRC\\TEMP_FILES\\" + filename + ".html", "UTF-8");
+//				while(iter.hasNext()) {
+//					writer.println(iter.next());
+//				}
+//				writer.close();
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			} catch (UnsupportedEncodingException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+		
 	private void configureStats(IPlayerMatchStats cursor) {
 		stats = cursor;
 		if (match != null) {
@@ -217,7 +344,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		stats.setSlot(slot);
 
 	}
-
+	
 	private IPlayerMatchStats noRunOn() {
 		stats = pmsf.getById(null);
 		stats.setMatchId(match.getId()); // native ID, not scrum's
@@ -236,7 +363,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		pmsf.put(stats);
 		return stats;
 	}
-
+	
 	private IPlayerMatchStats getPlayerStats(Iterator<String> it, IPlayerMatchStats stats) {
 		//now read the player
 		String line = getNext(it);  //<tr>
@@ -465,7 +592,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 			return true;
 		}
 	}
-
+		
 	private String findName(String line) {
 		// it can be in a few different places in the strtok
 		String[] split = line.split("<|>| - ");
@@ -478,10 +605,10 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		}
 		return null;
 	}
-
+	
+	
 	/**
-	 * 
-	 * @param pms - Reserve player we are trying to determine a position for
+     * @param pms - Reserve player we are trying to determine a position for
 	 * @param offList - The players who came off the field as he went on
 	 * @return - The "best fit" position, meaning each slot has a "first choice" (jersey 16 => hooker, jerseys 17,18 => prop, etc). If there wasn't one of them we go through the second choices for that jersey. If we can't find anything we return position.NONE
 	 */
@@ -613,7 +740,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 		return pos;
 	}
-
 	private void skipPlayer(Iterator<String> it) {
 		String line = getNext(it);
 		assert(line.contains("<tr class=\"liveTblRow"));
@@ -622,7 +748,6 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		}
 		assert(line.contains("</tr>"));
 	}
-
 	private String getNext(Iterator<String> it) {
 		String line = it.next();  //<tr>
 		while (line.isEmpty() && it.hasNext()) line = it.next();
@@ -684,16 +809,13 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	public void set(IPlayerMatchStats stats) {
 		this.stats = stats;
 	}
-
 	@Override
 	public String getErrorMessage() {
 		return errorMessage;
 	}
-
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
-
 	@Override
 	public IPlayerMatchStats getStats() {
 		return stats;
