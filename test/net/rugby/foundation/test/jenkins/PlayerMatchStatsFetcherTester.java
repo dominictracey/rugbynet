@@ -235,7 +235,7 @@ public class PlayerMatchStatsFetcherTester {
 			IPlayerMatchStats pms = fetcher.getStats();
 			
 			assertTrue(pms != null);
-			assertTrue(pms.getTimePlayed().equals(59));
+			assertTrue(pms.getTimePlayed().equals(60));
 		} else {
 			assertTrue(false); // did not process correctly
 		}
