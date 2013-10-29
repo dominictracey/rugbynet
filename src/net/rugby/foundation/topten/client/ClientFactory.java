@@ -51,7 +51,7 @@ public interface ClientFactory {
 
 	List<IContent> getContentList();
 
-	LoginInfo getLoginInfo();
+	LoginInfo getLoginInfo();
 
-;
+	TopTenListView<ITopTenItem> getSimpleView();
 }

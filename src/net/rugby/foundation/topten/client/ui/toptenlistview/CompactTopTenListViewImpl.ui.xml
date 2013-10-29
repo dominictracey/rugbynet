@@ -11,7 +11,14 @@
 
     	<b:Row>
     	    <b:Column size ="12">
-    	        <b:Row><c:CellTable ui:field="items" width="100%"/></b:Row>
+    	        <b:Row>
+    	            <b:Column size="9" offset="2">
+    	             	<c:CellTable ui:field="items" width="100%"/>
+    	             </b:Column>
+    	        </b:Row>
+    	        <b:Row>
+    	            
+    	        </b:Row>
     	        <b:Row>
     	            <b:Column size="3" offset="5">
 	    	            <b:Nav alignment="RIGHT">

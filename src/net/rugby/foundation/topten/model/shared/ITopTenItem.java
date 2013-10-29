@@ -64,4 +64,7 @@ public interface ITopTenItem {
 
 	void setPosition(Position.position position);
 
+	public abstract void setOrdinal(int ordinal);
+	public abstract int getOrdinal();
+
 }

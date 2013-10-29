@@ -149,13 +149,13 @@ public class NavBarViewImpl extends Composite implements NavBarView, EditContent
 		details1.setInnerHTML(details11);
 	}
 
-	//	/* (non-Javadoc)
-	//	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setDetails(java.lang.String)
-	//	 */
-	//	@Override
-	//	public void setDetails(String details11) {
-	//		details2.setInnerHTML(details11);
-	//	}
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.topten.client.ui.NavBarView#setDetails(java.lang.String)
+		 */
+		@Override
+		public void setDetails(String details11) {
+			details2.setInnerHTML(details11);
+		}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setFBLikeAttribute(java.lang.String, java.lang.String)
@@ -180,69 +180,69 @@ public class NavBarViewImpl extends Composite implements NavBarView, EditContent
 	@Override
 	public void setContent(List<IContent> list, boolean isEditor) {
 		this.isEditor = isEditor;
-		Iterator<IContent> it = list.iterator();
-		if (it != null) {
-			contentDropdown.clear();
-			while (it.hasNext()) {
-				final IContent content = it.next();
-				if (content.isShowInMenu()) {
-					NavLink nl = new NavLink(content.getTitle());
-					nl.addClickHandler( new ClickHandler() {
+		if (list != null) {
+			Iterator<IContent> it = list.iterator();
+			if (it != null) {
+				contentDropdown.clear();
+				while (it.hasNext()) {
+					final IContent content = it.next();
+					if (content.isShowInMenu()) {
+						NavLink nl = new NavLink(content.getTitle());
+						nl.addClickHandler( new ClickHandler() {
 
-						@Override
-						public void onClick(ClickEvent event) {
-							ContentPlace newPlace = new ContentPlace(content.getId());
-							assert (clientFactory != null);
-							clientFactory.getPlaceController().goTo(newPlace);
-						}
-					});
+							@Override
+							public void onClick(ClickEvent event) {
+								ContentPlace newPlace = new ContentPlace(content.getId());
+								assert (clientFactory != null);
+								clientFactory.getPlaceController().goTo(newPlace);
+							}
+						});
 
-					contentDropdown.add(nl);
-					//					if (content.isShowInFooter()) {
-					//						NavLink a = new NavLink(content.getTitle());
-					//						a.addClickHandler( new ClickHandler() {
+						contentDropdown.add(nl);
+						//					if (content.isShowInFooter()) {
+						//						NavLink a = new NavLink(content.getTitle());
+						//						a.addClickHandler( new ClickHandler() {
+						//
+						//							@Override
+						//							public void onClick(ClickEvent event) {
+						//								ContentPlace newPlace = new ContentPlace(content.getId());
+						//								assert (clientFactory != null);
+						//								clientFactory.getPlaceController().goTo(newPlace);
+						//							}
+						//						});
+						//						footerLinks.appendChild(a.getElement());
+						//					}
+					} else if (!content.getDiv().isEmpty()) {
+						setDivContent(content);
+					}
+					//					if (isEditor) {
+					//						Element div = DOM.getElementById(content.getDiv());
+					//						String id = DOM.createUniqueId();
+					//						HTMLPanel panel = new HTMLPanel("<div id=\"" + id + "><span>" + c + "</span></div>");
+					////						if (panel..hasChildNodes()) {
+					////							panel.removeChild(div.getFirstChild());
+					////						}
+					//						
+					//						panel.add(new HTML(c));
+					//						Button edit = new Button("Edit");
+					//						panel.add(edit);
+					//						div.
+					//						edit.addClickHandler(new ClickHandler() {
 					//
 					//							@Override
 					//							public void onClick(ClickEvent event) {
-					//								ContentPlace newPlace = new ContentPlace(content.getId());
-					//								assert (clientFactory != null);
-					//								clientFactory.getPlaceController().goTo(newPlace);
+					//								EditContent ec = clientFactory.getEditContentDialog();
+					//								ec.setContent(content, contentPresenter);
+					//								ec.center();
 					//							}
+					//							
 					//						});
-					//						footerLinks.appendChild(a.getElement());
-					//					}
-				} else if (!content.getDiv().isEmpty()) {
-					setDivContent(content);
+					//					} else {
+
+					//}
 				}
-				//					if (isEditor) {
-				//						Element div = DOM.getElementById(content.getDiv());
-				//						String id = DOM.createUniqueId();
-				//						HTMLPanel panel = new HTMLPanel("<div id=\"" + id + "><span>" + c + "</span></div>");
-				////						if (panel..hasChildNodes()) {
-				////							panel.removeChild(div.getFirstChild());
-				////						}
-				//						
-				//						panel.add(new HTML(c));
-				//						Button edit = new Button("Edit");
-				//						panel.add(edit);
-				//						div.
-				//						edit.addClickHandler(new ClickHandler() {
-				//
-				//							@Override
-				//							public void onClick(ClickEvent event) {
-				//								EditContent ec = clientFactory.getEditContentDialog();
-				//								ec.setContent(content, contentPresenter);
-				//								ec.center();
-				//							}
-				//							
-				//						});
-				//					} else {
-
-				//}
-			}
-		}	
-
-
+			}	
+		}
 	}
 
 	private void setDivContent(final IContent content) {

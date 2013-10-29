@@ -55,6 +55,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
+		final TopTenListViewPresenter This = this;
 		panel.setWidget(view.asWidget());
 		view.setClientFactory(clientFactory);
 		view.setPresenter(this);
@@ -69,6 +70,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(final ICoreConfiguration coreConfig) {
+				
 				if (place != null) {
 					if (place.getListId() != null) {
 						clientFactory.getRpcService().getTopTenList(place.getListId(), new AsyncCallback<ITopTenList>() {
@@ -80,11 +82,30 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 							@Override
 							public void onSuccess(final ITopTenList ttl) {
-								view.setItemCount(0);
-								clientFactory.getNavBarView().collapseHero(false);
-								clientFactory.getNavBarView().getButtonBar().clear();
-								clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
-								view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());	
+								// are we simple list or feature?
+								boolean simple = true;
+								Iterator<ITopTenItem> it = ttl.getList().iterator();
+								while (it.hasNext())  {
+									if (it.next().getText() != null && !it.next().getText().isEmpty()) {
+										simple = false; 
+										break;
+									}
+								}
+								
+								if (!simple) {
+									view.setItemCount(0);
+									clientFactory.getNavBarView().collapseHero(false);
+									clientFactory.getNavBarView().getButtonBar().clear();
+									clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+									view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+								} else {
+									view = clientFactory.getSimpleView();
+									view.setPresenter(This);
+									clientFactory.getNavBarView().collapseHero(false);
+									clientFactory.getNavBarView().getButtonBar().clear();
+									clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+									view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+								}
 								
 								
 							}	

@@ -10,6 +10,7 @@ import net.rugby.foundation.topten.client.ui.NavBarView;
 import net.rugby.foundation.topten.client.ui.NavBarViewImpl;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
+import net.rugby.foundation.topten.client.ui.toptenlistview.CompactTopTenListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
@@ -35,6 +36,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 
 	private static PlaceController placeController = null;
 	private static  TopTenListView<ITopTenItem> listView = null;
+	private static  TopTenListView<ITopTenItem> simpleView = null;
 	private static ContentView contentView = null;
 	private static EditContent editContent = null;
 	private static TopTenListServiceAsync rpcService = null;
@@ -62,7 +64,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	@Override
 	public TopTenListView<ITopTenItem> getListView() {
 		if (listView == null) {
-			listView = new TopTenListViewImpl();
+			//listView = new TopTenListViewImpl();
+			listView = new CompactTopTenListViewImpl();
 		}
 		return listView;
 	}
@@ -222,6 +225,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	@Override
 	public LoginInfo getLoginInfo() {
 		return loginInfo;
+	}
+	@Override
+	public TopTenListView<ITopTenItem> getSimpleView() {
+		if (simpleView == null) {
+			simpleView = new CompactTopTenListViewImpl();
+		}
+		return simpleView;
 	}
 
 

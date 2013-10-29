@@ -1,7 +1,5 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.rugby.foundation.topten.client.ClientFactory;
@@ -11,19 +9,24 @@ import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.cell.client.ImageCell;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
-
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 public class CompactTopTenListViewImpl extends Composite implements TopTenListView<ITopTenItem>
 {
@@ -69,6 +72,50 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		nextButton.setIconSize(IconSize.LARGE);
 		nextButton.setIcon(IconType.FORWARD);
 
+
+		
+		ImageCell imageCell = new ImageCell() {
+		    @Override
+		    public void render(com.google.gwt.cell.client.Cell.Context context, String value, SafeHtmlBuilder sb) {
+		        super.render(context, value, sb);
+		        String imagePath = "/resources/" + ((ITopTenItem)context.getKey()).getTeamId() + "/200.png";
+		        sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '40px' width = '40px' />");
+
+		    }
+		};
+		
+		items.addColumn(new Column<ITopTenItem,String>(imageCell){
+			@Override
+            public String getValue(ITopTenItem s)
+            { //
+                return "";
+            }
+		});
+		
+		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			@Override
+            public String getValue(ITopTenItem s)
+            {
+                return s.getOrdinal() == 0 ? "" : Integer.toString(s.getOrdinal());
+            }
+		});
+		
+		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			@Override
+            public String getValue(ITopTenItem s)
+            {
+                return s.getPlayer().getDisplayName() == null ? "" : "<h3>"+s.getPlayer().getDisplayName()+"</h3>";
+            }
+		});
+		
+		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			@Override
+            public String getValue(ITopTenItem s)
+            {
+                return s.getPosition() == null ? "" : s.getPosition().getName();
+            }
+		});
+
 	}
 
 
@@ -113,7 +160,10 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 //				}
 //			}
 
-
+			Element loadPanel = DOM.getElementById("loadPanel");
+			if (loadPanel != null && loadPanel.hasParentElement()) {
+				loadPanel.removeFromParent();
+			}
 			//setVisible(true);
 		} else {
 			items.setVisible(false);

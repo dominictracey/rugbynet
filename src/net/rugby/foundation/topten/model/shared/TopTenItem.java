@@ -32,6 +32,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected Long parentId;
 	protected Long teamId;
 	protected Position.position position;
+	protected int ordinal;
 	
 	public TopTenItem() {
 		
@@ -221,6 +222,17 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setPosition(Position.position position) {
 		this.position = position;
+	}
+
+	@Override
+	public void setOrdinal(int ordinal) {
+		this.ordinal = ordinal;
+		
+	}
+
+	@Override
+	public int getOrdinal() {
+		return ordinal;
 	}
 
 }

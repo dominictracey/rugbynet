@@ -48,8 +48,9 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 			if (list != null && list.getItemIds() != null) {
 				//hydrate items
 				Iterator<Long> it = list.getItemIds().iterator();
+				int ordinal = 1;
 				while (it.hasNext()) {
-					list.getList().add(getItem(it.next(), list));
+					list.getList().add(getItem(it.next(), list, ordinal++));
 				}
 			}
 
@@ -62,10 +63,11 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	}
 
 
-	private ITopTenItem getItem(Long id, ITopTenList parent) {
+	private ITopTenItem getItem(Long id, ITopTenList parent, int ordinal) {
 		try {
 			ITopTenItem item = ofy.get(TopTenItem.class,id);
 			item.setPlayer(pf.get(item.getPlayerId()));
+			item.setOrdinal(ordinal);
 			assert(parent.getId()==item.getParentId());
 			//item.setParent(parent);
 			return item;
