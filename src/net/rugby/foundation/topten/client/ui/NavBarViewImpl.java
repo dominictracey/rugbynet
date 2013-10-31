@@ -318,4 +318,21 @@ public class NavBarViewImpl extends Composite implements NavBarView, EditContent
 		clientFactory.getEditContentDialog().hide();
 
 	}
+
+
+	@Override
+	public void setHeroTextBig(Boolean big) {
+		if (!big) {
+			details1.removeClassName("lead");
+			details2.removeClassName("lead");
+			details1.addClassName("compactContent");
+			details2.addClassName("compactContent");
+		} else {
+			details1.addClassName("lead");
+			details2.addClassName("lead");
+			details1.removeClassName("compactContent");
+			details2.removeClassName("compactContent");
+		}
+		
+	}
 }

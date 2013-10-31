@@ -41,6 +41,11 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 		// use same players for now
 		List<ITopTenItem> items = getItems(list);
 
+		int i = 1;
+		for (ITopTenItem item : items) {
+			item.setOrdinal(i++);
+		}
+		
 		if (id.equals(1000L)) {
 			list.setCreated(new Date());
 			list.setPublished(new Date());

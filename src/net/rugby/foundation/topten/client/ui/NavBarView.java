@@ -34,5 +34,7 @@ public interface NavBarView {
 	void setContent(List<IContent> list, boolean isEditor);
 
 	void setDetails(String details11);
+	
+	void setHeroTextBig(Boolean big);
 
 }

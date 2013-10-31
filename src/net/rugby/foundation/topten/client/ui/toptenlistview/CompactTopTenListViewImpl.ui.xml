@@ -3,7 +3,11 @@
 			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
     		 xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     		 xmlns:c="urn:import:com.google.gwt.user.cellview.client" >
-
+	<ui:style>
+		.buttons {
+			margin: 20px 20px;
+		}
+	</ui:style>
     <g:HTMLPanel width="100%" ui:field="topTenPanel">
 
 
@@ -20,13 +24,15 @@
     	            
     	        </b:Row>
     	        <b:Row>
-    	            <b:Column size="3" offset="5">
+    	            <b:Column size="4" offset="4">
 	    	            <b:Nav alignment="RIGHT">
-	    	                <b:NavWidget>
+	    	                <b:NavWidget  styleName="{style.buttons}">
 	    	                    <b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
 	    	                    <b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
+	    	                    
 	    	                </b:NavWidget>
 	    	            </b:Nav>
+
     	            </b:Column>
     	        </b:Row>
     	    </b:Column>

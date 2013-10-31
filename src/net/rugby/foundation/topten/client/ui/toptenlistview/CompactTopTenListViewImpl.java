@@ -9,13 +9,12 @@ import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.ImageCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -63,8 +62,8 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	public CompactTopTenListViewImpl()
 	{
 		// add the login bar to the top
-//		navbar = new NavBarViewImpl();
-//		RootPanel.get("navbar").add(navbar);
+		//		navbar = new NavBarViewImpl();
+		//		RootPanel.get("navbar").add(navbar);
 
 		initWidget(uiBinder.createAndBindUi(this));
 		prevButton.setIconSize(IconSize.LARGE);
@@ -73,48 +72,93 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		nextButton.setIcon(IconType.FORWARD);
 
 
-		
-		ImageCell imageCell = new ImageCell() {
-		    @Override
-		    public void render(com.google.gwt.cell.client.Cell.Context context, String value, SafeHtmlBuilder sb) {
-		        super.render(context, value, sb);
-		        String imagePath = "/resources/" + ((ITopTenItem)context.getKey()).getTeamId() + "/200.png";
-		        sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '40px' width = '40px' />");
+		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				return s.getPosition() == null ? "" : Integer.toString(s.getOrdinal());
+			}
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return "bubble";
 
-		    }
-		};
+			}
+		});
+
+		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				return s.getPlayer() == null ? "" : s.getPlayer().getDisplayName();
+			}
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return "lead text-center";
+
+			}
+		});
 		
+		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				return s.getPosition() == null ? "" : "(" + s.getPosition().getName() + ")";
+			}
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return "lead text-center";
+
+			}
+		});
+
+		ImageCell imageCell = new ImageCell() {
+			@Override
+			public void render(Context context, String value, SafeHtmlBuilder sb) {
+				if (((ITopTenItem)context.getKey()).getTeamId() != null) {
+					String imagePath = "/resources/" + ((ITopTenItem)context.getKey()).getTeamId() + "/200.png";
+					sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '40px' width = '40px' title=\"" + ((ITopTenItem)context.getKey()).getTeamName()  + "\"/>");
+				}
+
+			}
+		};
+
 		items.addColumn(new Column<ITopTenItem,String>(imageCell){
 			@Override
-            public String getValue(ITopTenItem s)
-            { //
-                return "";
-            }
-		});
-		
-		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			public String getValue(ITopTenItem s)
+			{ //
+				return "";
+			}
 			@Override
-            public String getValue(ITopTenItem s)
-            {
-                return s.getOrdinal() == 0 ? "" : Integer.toString(s.getOrdinal());
-            }
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return "pull-right";
+			}
 		});
-		
-		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
-			@Override
-            public String getValue(ITopTenItem s)
-            {
-                return s.getPlayer().getDisplayName() == null ? "" : "<h3>"+s.getPlayer().getDisplayName()+"</h3>";
-            }
-		});
-		
-		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
-			@Override
-            public String getValue(ITopTenItem s)
-            {
-                return s.getPosition() == null ? "" : s.getPosition().getName();
-            }
-		});
+
+		//		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+		//			@Override
+		//            public String getValue(ITopTenItem s)
+		//            {
+		//                return s.getPlayer().getDisplayName() == null ? "" : s.getPlayer().getDisplayName();
+		//            }
+		//			@Override
+		//			public String getCellStyleNames(Context context, ITopTenItem value) {
+		//				return "lead";
+		//				
+		//			}
+		//		});
+
+		//		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+		//			@Override
+		//            public String getValue(ITopTenItem s)
+		//            {
+		//                return s.getPosition() == null ? "" : "(" + s.getPosition().getName() + ")";
+		//            }
+		//			@Override
+		//			public String getCellStyleNames(Context context, ITopTenItem value) {
+		//				return "lead";
+		//				
+		//			}
+		//		});
 
 	}
 
@@ -125,7 +169,9 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		//setVisible(false);
 		if (result != null) {
 			clientFactory.getNavBarView().setHeroListInfo(result.getTitle(),result.getContent());
-
+			clientFactory.getNavBarView().setDetails("");
+			clientFactory.getNavBarView().setHeroTextBig(false);
+			
 			if (list.getPrevPublishedId() != null) {
 				prevButton.setEnabled(true);
 			} else {
@@ -138,27 +184,27 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 				nextButton.setEnabled(false);
 			}
 			items.setRowData(result.getList());
-//			Iterator<ITopTenItem> it = result.getList().iterator();
-//			int count = 0;
-//			if (it != null) {
-//				itemList = new ArrayList<TopTenItemView>();
-//
-//				while (it.hasNext()) {
-//					final ITopTenItem item = it.next();
-//
-//					final int fCount = count++;
-//					Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
-//						@Override
-//						public void execute() {
-//
-//							TopTenItemView itemView = new TopTenItemView(item, fCount, result.getId(), item.getPlayerId(), baseUrl);
-//							itemList.add(itemView);
-//							items.add(itemView);
-//							presenter.setTTIButtons(itemView);
-//						}
-//					});
-//				}
-//			}
+			//			Iterator<ITopTenItem> it = result.getList().iterator();
+			//			int count = 0;
+			//			if (it != null) {
+			//				itemList = new ArrayList<TopTenItemView>();
+			//
+			//				while (it.hasNext()) {
+			//					final ITopTenItem item = it.next();
+			//
+			//					final int fCount = count++;
+			//					Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
+			//						@Override
+			//						public void execute() {
+			//
+			//							TopTenItemView itemView = new TopTenItemView(item, fCount, result.getId(), item.getPlayerId(), baseUrl);
+			//							itemList.add(itemView);
+			//							items.add(itemView);
+			//							presenter.setTTIButtons(itemView);
+			//						}
+			//					});
+			//				}
+			//			}
 
 			Element loadPanel = DOM.getElementById("loadPanel");
 			if (loadPanel != null && loadPanel.hasParentElement()) {
@@ -221,7 +267,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	public void setClientFactory(ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
 	}
-	
+
 	@Override
 	public int getItemCount() {
 		return itemCount;

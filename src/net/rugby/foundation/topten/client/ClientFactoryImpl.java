@@ -230,6 +230,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	public TopTenListView<ITopTenItem> getSimpleView() {
 		if (simpleView == null) {
 			simpleView = new CompactTopTenListViewImpl();
+			simpleView.setClientFactory(this);
 		}
 		return simpleView;
 	}
