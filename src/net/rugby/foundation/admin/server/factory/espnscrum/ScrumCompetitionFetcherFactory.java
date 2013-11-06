@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFacto
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
+import net.rugby.foundation.admin.server.model.ScrumInternationalCompetitionFetcher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -38,6 +39,10 @@ public class ScrumCompetitionFetcherFactory implements IForeignCompetitionFetche
 		
 		if (fetcherType == CompetitionFetcherType.ESPNSCRUM_BASIC) {
 			ScrumCompetitionFetcher scf =  new ScrumCompetitionFetcher(rf,mf,rff, tf);
+			scf.setURL(url);
+			return scf;
+		} else if (fetcherType == CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS) {
+			ScrumInternationalCompetitionFetcher scf =  new ScrumInternationalCompetitionFetcher(rf,mf,rff, tf);
 			scf.setURL(url);
 			return scf;
 		} else {

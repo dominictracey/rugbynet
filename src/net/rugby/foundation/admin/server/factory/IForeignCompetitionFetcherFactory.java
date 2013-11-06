@@ -5,7 +5,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 
 public interface IForeignCompetitionFetcherFactory {
-	enum CompetitionFetcherType {ESPNSCRUM_BASIC, ESPNSCRUM_EXTENDED}
+	enum CompetitionFetcherType {ESPNSCRUM_BASIC, ESPNSCRUM_EXTENDED, ESPNSCRUM_INTERNATIONALS}
 	public IForeignCompetitionFetcher getForeignCompetitionFetcher(String url, CompetitionFetcherType fetcherType);
 	/**
 	 * @param rf
