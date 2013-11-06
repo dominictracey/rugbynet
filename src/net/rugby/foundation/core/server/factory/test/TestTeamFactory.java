@@ -227,7 +227,7 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 			t.setDisplayName("Leicester Tigers");
 		} else if (id == 9319) {
 			t.setDisplayName("Benetton Treviso");
-		} else if (id == 9310) {
+		} else if (id == 9320) {
 			t.setDisplayName("Edinburgh");
 		} else if (id == 9321) {
 			t.setDisplayName("Gloucester Rugby");

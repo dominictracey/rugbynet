@@ -34,104 +34,104 @@ import com.google.inject.Inject;
 @GuiceModules({ Game1TestModule.class, AdminTestModule.class, CoreTestModule.class })
 public class StandingsFetcherTester {
 
-    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
+	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 
-    private IUrlCacher uc;
-    private IMatchGroupFactory mf;
+	private IUrlCacher uc;
+	private IMatchGroupFactory mf;
 
-    private ITeamGroupFactory tf;
+	private ITeamGroupFactory tf;
 
-    private IStandingsFetcher sFetcher;
+	private IStandingsFetcher sFetcher;
 
-    private ICompetitionFactory cf;
+	private ICompetitionFactory cf;
 
-    @Before
-    public void setUp() {
-        helper.setUp();
-    }
+	@Before
+	public void setUp() {
+		helper.setUp();
+	}
 
-    @After
-    public void tearDown() {
-        helper.tearDown();
-    }
+	@After
+	public void tearDown() {
+		helper.tearDown();
+	}
 
-    @Inject
-    public void setFactory(IUrlCacher uc, IPlayerFactory pf, IMatchGroupFactory mf, ITeamGroupFactory tf, ICompetitionFactory cf, IStandingsFetcher sFetcher, IStandingFactory sf) {
-        this.uc = uc;
-        this.mf = mf;
-        this.tf = tf;
-        this.sFetcher = sFetcher;
-        this.cf = cf;
-    }
+	@Inject
+	public void setFactory(IUrlCacher uc, IPlayerFactory pf, IMatchGroupFactory mf, ITeamGroupFactory tf, ICompetitionFactory cf, IStandingsFetcher sFetcher, IStandingFactory sf) {
+		this.uc = uc;
+		this.mf = mf;
+		this.tf = tf;
+		this.sFetcher = sFetcher;
+		this.cf = cf;
+	}
 
-    /**
-     * Must refer to a valid module that sources this class.
-     */
-    public String getModuleName() { // (2)
-        return "net.rugby.foundation.model.Model";
-    }
+	/**
+	 * Must refer to a valid module that sources this class.
+	 */
+	 public String getModuleName() { // (2)
+		 return "net.rugby.foundation.model.Model";
+	 }
 
-    @Test
-    public void testHeinekenCupRoundOne() {
+	 @Test
+	 public void testHeinekenCupRoundOne() {
 
-        cf.setId(4L);
-        ICompetition c = cf.getCompetition();
+		 cf.setId(4L);
+		 ICompetition c = cf.getCompetition();
 
-        sFetcher.setComp(c);
-        sFetcher.setRound(c.getRounds().get(0));
-        sFetcher.setUrl("testData\\191757-heineken-standings-round-1.htm");
-        sFetcher.setUc(uc);
+		 sFetcher.setComp(c);
+		 sFetcher.setRound(c.getRounds().get(0));
+		 sFetcher.setUrl("testData\\191757-heineken-standings-round-1.htm");
+		 sFetcher.setUc(uc);
 
-        Iterator<ITeamGroup> it = c.getTeams().iterator();
-        int count = 0;
-        while (it.hasNext()) {
-            ITeamGroup team = it.next();
-            // You'll notice that this test is skipping team w/id of 9320. There's no team name in the data store 
-            // for that id.
-            if (team.getId() != 9320L) {
-                IStanding s = sFetcher.getStandingForTeam(team);
+		 Iterator<ITeamGroup> it = c.getTeams().iterator();
+		 int count = 0;
+		 while (it.hasNext()) {
+			 ITeamGroup team = it.next();
+			 // You'll notice that this test is skipping team w/id of 9320. There's no team name in the data store 
+			 // for that id.
+			 // if (team.getId() != 9320L) {
+			 IStanding s = sFetcher.getStandingForTeam(team);
 
-                if (s != null) {
-                    if (s.getTeam().getDisplayName().equals("Scarlets")) {
-                        assertTrue(s.getStanding().equals(1));
-                        count++;
-                    } else if (s.getTeam().getDisplayName().equals("Munster")) {
-                        assertTrue(s.getStanding().equals(3));
-                        count++;
-                    } else if (s.getTeam().getDisplayName().equals("Toulon")) {
-                        assertTrue(s.getStanding().equals(1));
-                        count++;
-                    } else if (s.getTeam().getDisplayName().equals("Clermont Auvergne")) {
-                        assertTrue(s.getStanding().equals(4));
-                        count++;
-                    } else if (s.getTeam().getDisplayName().equals("Gloucester Rugby")) {
-                        assertTrue(s.getStanding().equals(2));
-                        count++;
-                    } else if (s.getTeam().getDisplayName().equals("Leinster")) {
-                        assertTrue(s.getStanding().equals(1));
-                        count++;
-                    }
-                } else {
-                    assertTrue(false); // did not process correctly
-                }
-            }
-        }
-        assertTrue(count == 6);
-    }
+			 if (s != null) {
+				 if (s.getTeam().getDisplayName().equals("Scarlets")) {
+					 assertTrue(s.getStanding().equals(1));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Munster")) {
+					 assertTrue(s.getStanding().equals(3));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Toulon")) {
+					 assertTrue(s.getStanding().equals(1));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Clermont Auvergne")) {
+					 assertTrue(s.getStanding().equals(4));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Gloucester Rugby")) {
+					 assertTrue(s.getStanding().equals(2));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Leinster")) {
+					 assertTrue(s.getStanding().equals(1));
+					 count++;
+				 }
+			 } else {
+				 assertTrue(false); // did not process correctly
+			 }
+			 // }
+		 }
+		 assertTrue(count == 6);
+	 }
 
-   
-    private IMatchGroup getQuinsScarlets() {
-        IMatchGroup m = mf.create();
-        m.setForeignId(191605L);
 
-        ITeamGroup v = tf.create();
-        v.setId(95L);
-        v.setAbbr("SCA");
-        m.setVisitingTeam(v);
-        ITeamGroup h = tf.create();
-        h.setId(94L);
-        h.setAbbr("QUI");
-        m.setHomeTeam(h);
-        return m;
-    }
+	 private IMatchGroup getQuinsScarlets() {
+		 IMatchGroup m = mf.create();
+		 m.setForeignId(191605L);
+
+		 ITeamGroup v = tf.create();
+		 v.setId(95L);
+		 v.setAbbr("SCA");
+		 m.setVisitingTeam(v);
+		 ITeamGroup h = tf.create();
+		 h.setId(94L);
+		 h.setAbbr("QUI");
+		 m.setHomeTeam(h);
+		 return m;
+	 }
 }
