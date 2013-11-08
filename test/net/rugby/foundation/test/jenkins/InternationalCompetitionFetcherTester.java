@@ -3,10 +3,14 @@ package net.rugby.foundation.test.jenkins;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
+import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
+import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
-import net.rugby.foundation.admin.server.model.IStandingsFetcher;
+import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
@@ -16,6 +20,7 @@ import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.test.GuiceJUnitRunner;
@@ -41,9 +46,11 @@ public class InternationalCompetitionFetcherTester {
 
 	private ITeamGroupFactory tf;
 
-	private IStandingsFetcher sFetcher;
+	private IForeignCompetitionFetcher cFetcher;
 
 	private ICompetitionFactory cf;
+
+	private IForeignCompetitionFetcherFactory cff;
 
 	@Before
 	public void setUp() {
@@ -56,11 +63,11 @@ public class InternationalCompetitionFetcherTester {
 	}
 
 	@Inject
-	public void setFactory(IUrlCacher uc, IPlayerFactory pf, IMatchGroupFactory mf, ITeamGroupFactory tf, ICompetitionFactory cf, IStandingsFetcher sFetcher, IStandingFactory sf) {
+	public void setFactory(IUrlCacher uc, IPlayerFactory pf, IMatchGroupFactory mf, ITeamGroupFactory tf, ICompetitionFactory cf, IForeignCompetitionFetcherFactory cff, IStandingFactory sf) {
 		this.uc = uc;
 		this.mf = mf;
 		this.tf = tf;
-		this.sFetcher = sFetcher;
+		this.cff = cff;
 		this.cf = cf;
 	}
 
@@ -74,49 +81,39 @@ public class InternationalCompetitionFetcherTester {
 	 @Test
 	 public void testHeinekenCupRoundOne() {
 
-		 cf.setId(4L);
-		 ICompetition c = cf.getCompetition();
+		 String url  = "testData\\191757-heineken";
+		 cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
 
-		 sFetcher.setComp(c);
-		 sFetcher.setRound(c.getRounds().get(0));
-		 sFetcher.setUrl("testData\\191757-heineken-standings-round-1.htm");
-		 sFetcher.setUc(uc);
+		 Map<String, ITeamGroup> teams  = cFetcher.getTeams();
+		 Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
 
+		 List<IRound> rounds = cFetcher.getRounds(url, matches);
+		 
+		 ICompetition c = cFetcher.getCompetition(url, rounds, (List<ITeamGroup>)teams.values());
+		 
 		 Iterator<ITeamGroup> it = c.getTeams().iterator();
-		 int count = 0;
-		 while (it.hasNext()) {
-			 ITeamGroup team = it.next();
-			 // You'll notice that this test is skipping team w/id of 9320. There's no team name in the data store 
-			 // for that id.
-			 // if (team.getId() != 9320L) {
-			 IStanding s = sFetcher.getStandingForTeam(team);
 
-			 if (s != null) {
-				 if (s.getTeam().getDisplayName().equals("Scarlets")) {
-					 assertTrue(s.getStanding().equals(1));
-					 count++;
-				 } else if (s.getTeam().getDisplayName().equals("Munster")) {
-					 assertTrue(s.getStanding().equals(3));
-					 count++;
-				 } else if (s.getTeam().getDisplayName().equals("Toulon")) {
-					 assertTrue(s.getStanding().equals(1));
-					 count++;
-				 } else if (s.getTeam().getDisplayName().equals("Clermont Auvergne")) {
-					 assertTrue(s.getStanding().equals(4));
-					 count++;
-				 } else if (s.getTeam().getDisplayName().equals("Gloucester Rugby")) {
-					 assertTrue(s.getStanding().equals(2));
-					 count++;
-				 } else if (s.getTeam().getDisplayName().equals("Leinster")) {
-					 assertTrue(s.getStanding().equals(1));
-					 count++;
-				 }
-			 } else {
-				 assertTrue(false); // did not process correctly
-			 }
-			 // }
-		 }
-		 assertTrue(count == 6);
+		 // check teams
+		 
+		 // check num of teams
+		 
+		 // check num rounds
+		 
+		 // check start and end of the first and last round
+		 
+		 // check name of round
+		 
+		 // check a match's date 
+		 
+		 // check match in first round
+		 
+		 // check match in third round
+		 
+		 // check match with New Zealand (two words)
+		 
+		 // check match on Sunday
+		 
+		 // check match on Friday
 	 }
 
 
