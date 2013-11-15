@@ -1289,4 +1289,25 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 		});
 		
 	}
+
+
+
+	@Override
+	public void fetchRoundStandings(final IRound round) {
+		clientFactory.getRpcService().FetchRoundStandings(round.getId(), new AsyncCallback<List<IStanding>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
+				
+			}
+
+			@Override
+			public void onSuccess(List<IStanding> result) {
+				er.ShowRound(round,result);		
+			}
+			
+		});
+		
+	}
 }

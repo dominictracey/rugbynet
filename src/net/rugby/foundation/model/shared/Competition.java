@@ -38,6 +38,7 @@ public class Competition implements Serializable, ICompetition {
 	List<Long> teamIDs = new ArrayList<Long>();
 	@Transient 
 	List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
+	private CompetitionType compType;
 	
 	public Long getCompClubhouse() {
 		return compClubhouse;
@@ -346,6 +347,16 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setLastSaved(Date lastSaved) {
 		this.lastSaved = lastSaved;	
+	}
+
+	@Override
+	public CompetitionType getCompType() {
+		return compType;
+	}
+
+	@Override
+	public void setCompType(CompetitionType t) {
+		this.compType = t;
 	}
 
 

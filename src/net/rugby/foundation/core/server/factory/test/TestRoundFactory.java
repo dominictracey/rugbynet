@@ -45,12 +45,14 @@ public class TestRoundFactory implements IRoundFactory {
 			r.setOrdinal(1);
 			r.addMatchID(100L);
 			r.addMatchID(101L);
+			r.setCompId(1L);
 		} else if (roundId == 3L) {
 			r.setAbbr("2");
 			r.setName("Round 2");
 			r.setOrdinal(2);
 			r.addMatchID(102L);
 			r.addMatchID(103L);
+			r.setCompId(1L);
 		} else if (roundId == 4L) {
 			r.setAbbr("3");			
 			r.setName("Round 3");
@@ -58,12 +60,14 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(104L);
 			r.addMatchID(105L);
 			r.addMatchID(106L);
+			r.setCompId(1L);
 		} else  if (roundId == 5L) {
 			r.setAbbr("F");
 			r.setName("Finals");
 			r.setOrdinal(4);
 			r.addMatchID(107L);
 			r.addMatchID(108L);
+			r.setCompId(1L);
 			/** BEGIN COMP 2 **/
 		} else if (roundId == 12L) {
 			r.setAbbr("1");
@@ -72,6 +76,7 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(200L);
 			r.addMatchID(201L);
 			r.addMatchID(202L);
+			r.setCompId(2L);
 		} else if (roundId == 13L) {
 			r.setAbbr("2");			
 			r.setName("Round 2");
@@ -79,18 +84,21 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(203L);
 			r.addMatchID(204L);
 			r.addMatchID(205L);
+			r.setCompId(2L);
 		} else  if (roundId == 14L) {
 			r.setAbbr("3");
 			r.setName("Round 3");
 			r.setOrdinal(3);
 			r.addMatchID(206L);
 			r.addMatchID(207L);
+			r.setCompId(2L);
 			/** END COMP 2 **/
 		}
 		 // HEINEKEN CUP 2013-14
 		 else  if (roundId == 15L) {
 				r.setAbbr("1");
 				r.setName("Round 1");
+				r.setCompId(4L);
 			}
 		
 		Calendar cal = new GregorianCalendar();

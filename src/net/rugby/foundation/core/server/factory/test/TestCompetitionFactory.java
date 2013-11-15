@@ -20,6 +20,7 @@ import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 import com.google.inject.Inject;
 
@@ -163,6 +164,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 //		c.setPrevRoundIndex(-1);
 //		c.setNextRoundIndex(0);
 //		setBeginAndEnd(c);
+		c.setCompType(CompetitionType.HEINEKEN_CUP);
 		return c;
 	}
 	

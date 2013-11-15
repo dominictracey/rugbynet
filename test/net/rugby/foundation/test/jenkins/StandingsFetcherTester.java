@@ -5,17 +5,15 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
+import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.model.IStandingsFetcher;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
-import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
-import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
-import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.test.GuiceJUnitRunner;
@@ -37,13 +35,12 @@ public class StandingsFetcherTester {
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 
 	private IUrlCacher uc;
-	private IMatchGroupFactory mf;
-
-	private ITeamGroupFactory tf;
 
 	private IStandingsFetcher sFetcher;
 
 	private ICompetitionFactory cf;
+
+	private IStandingsFetcherFactory sFetcherFactory;
 
 	@Before
 	public void setUp() {
@@ -56,11 +53,9 @@ public class StandingsFetcherTester {
 	}
 
 	@Inject
-	public void setFactory(IUrlCacher uc, IPlayerFactory pf, IMatchGroupFactory mf, ITeamGroupFactory tf, ICompetitionFactory cf, IStandingsFetcher sFetcher, IStandingFactory sf) {
+	public void setFactory(IUrlCacher uc, IPlayerFactory pf, ICompetitionFactory cf, IStandingsFetcherFactory sFetcherFactory, IStandingFactory sf) {
 		this.uc = uc;
-		this.mf = mf;
-		this.tf = tf;
-		this.sFetcher = sFetcher;
+		this.sFetcherFactory = sFetcherFactory;
 		this.cf = cf;
 	}
 
@@ -77,6 +72,10 @@ public class StandingsFetcherTester {
 		 cf.setId(4L);
 		 ICompetition c = cf.getCompetition();
 
+		 sFetcher = sFetcherFactory.getFetcher(c.getRounds().get(0));
+			
+		 assertTrue(sFetcher != null);
+		 
 		 sFetcher.setComp(c);
 		 sFetcher.setRound(c.getRounds().get(0));
 		 sFetcher.setUrl("testData\\191757-heineken-standings-round-1.htm");
@@ -86,9 +85,7 @@ public class StandingsFetcherTester {
 		 int count = 0;
 		 while (it.hasNext()) {
 			 ITeamGroup team = it.next();
-			 // You'll notice that this test is skipping team w/id of 9320. There's no team name in the data store 
-			 // for that id.
-			 // if (team.getId() != 9320L) {
+
 			 IStanding s = sFetcher.getStandingForTeam(team);
 
 			 if (s != null) {
@@ -114,24 +111,8 @@ public class StandingsFetcherTester {
 			 } else {
 				 assertTrue(false); // did not process correctly
 			 }
-			 // }
 		 }
 		 assertTrue(count == 6);
 	 }
 
-
-	 private IMatchGroup getQuinsScarlets() {
-		 IMatchGroup m = mf.create();
-		 m.setForeignId(191605L);
-
-		 ITeamGroup v = tf.create();
-		 v.setId(95L);
-		 v.setAbbr("SCA");
-		 m.setVisitingTeam(v);
-		 ITeamGroup h = tf.create();
-		 h.setId(94L);
-		 h.setAbbr("QUI");
-		 m.setHomeTeam(h);
-		 return m;
-	 }
 }

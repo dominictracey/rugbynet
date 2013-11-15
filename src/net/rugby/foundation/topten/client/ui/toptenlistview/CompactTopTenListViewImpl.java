@@ -76,7 +76,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-				return s.getPosition() == null ? "" : Integer.toString(s.getOrdinal());
+				return s.getOrdinal() < 0 ? "" : Integer.toString(s.getOrdinal());
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {

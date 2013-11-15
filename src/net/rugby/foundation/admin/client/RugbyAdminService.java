@@ -121,5 +121,5 @@ public interface RugbyAdminService extends RemoteService {
 	
 	List<IStanding> getStandings(Long roundId);
 	List<IStanding> saveStandings(Long roundId, List<IStanding> standings);
-	
+	List<IStanding> FetchRoundStandings(Long roundId);
 }

@@ -12,9 +12,14 @@ import java.util.List;
  */
 public interface ICompetition {
 
+	enum CompetitionType {HEINEKEN_CUP, AVIVA_PREMIERSHIP, SUPER_RUGBY}
+
 	public abstract Long getId();
 	public abstract void setId(Long id);
 
+	public abstract CompetitionType getCompType();
+	public abstract void setCompType(CompetitionType t);
+	
 	public abstract String getLongName();
 	public abstract void setLongName(String longName);
 

@@ -8,18 +8,20 @@ import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.StandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.TestUrlCacher;
 import net.rugby.foundation.admin.server.factory.test.TestAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.test.TestMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.test.TestPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.server.model.IStandingsFetcher;
-import net.rugby.foundation.admin.server.model.ScrumStandingsFetcher;
+import net.rugby.foundation.admin.server.model.ScrumHeinekenStandingsFetcher;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationFactory;
@@ -53,7 +55,7 @@ public class AdminTestModule extends AbstractModule {
 		bind(IMatchRatingEngineSchemaFactory.class).to(TestMatchRatingEngineSchemaFactory.class);
 		bind(IQueryRatingEngineFactory.class).to(ScrumQueryRatingEngineFactory.class);
 		bind(IUrlCacher.class).to(TestUrlCacher.class);
-		bind(IStandingsFetcher.class).to(ScrumStandingsFetcher.class);
+		bind(IStandingsFetcherFactory.class).to(StandingsFetcherFactory.class);
 	}
 	
 }

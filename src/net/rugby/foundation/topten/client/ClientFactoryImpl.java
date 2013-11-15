@@ -64,8 +64,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	@Override
 	public TopTenListView<ITopTenItem> getListView() {
 		if (listView == null) {
-			//listView = new TopTenListViewImpl();
-			listView = new CompactTopTenListViewImpl();
+			listView = new TopTenListViewImpl();
 		}
 		return listView;
 	}
