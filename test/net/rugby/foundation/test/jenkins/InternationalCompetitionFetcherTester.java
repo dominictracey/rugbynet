@@ -2,6 +2,7 @@ package net.rugby.foundation.test.jenkins;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,15 @@ public class InternationalCompetitionFetcherTester {
 		this.cff = cff;
 		this.cf = cf;
 	}
+	
+//	@Inject
+//    public void setFactory(IUrlCacher uc, IPlayerFactory pf, IMatchGroupFactory mf, ITeamGroupFactory tf, ICompetitionFactory cf, ICompetitionFetcherFactory cff, IStandingFactory sf) {
+//        this.uc = uc;
+//        this.mf = mf;
+//        this.tf = tf;
+//        this.cff = cff;
+//        this.cf = cf;
+//    }
 
 	/**
 	 * Must refer to a valid module that sources this class.
@@ -78,43 +88,119 @@ public class InternationalCompetitionFetcherTester {
 		 return "net.rugby.foundation.model.Model";
 	 }
 
+//	 @Test
+//	 public void testAutumnInternationals() {
+//
+//		 String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
+//		 cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+//
+//		 Map<String, ITeamGroup> teams  = cFetcher.getTeams();
+//		 Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
+//
+//		 List<IRound> rounds = cFetcher.getRounds(url, matches);
+//		 
+//		 ICompetition c = cFetcher.getCompetition(url, rounds, (List<ITeamGroup>)teams.values());
+//		 
+//		 Iterator<ITeamGroup> it = c.getTeams().iterator();
+//
+//		 // check teams
+//		 
+//		 // check num of teams
+//		 
+//		 // check num rounds
+//		 
+//		 // check start and end of the first and last round
+//		 
+//		 // check name of round
+//		 
+//		 // check a match's date 
+//		 
+//		 // check match in first round
+//		 
+//		 // check match in third round
+//		 
+//		 // check match with New Zealand (two words)
+//		 
+//		 // check match on Sunday
+//		 
+//		 // check match on Friday
+//	 }
+	 
 	 @Test
-	 public void testHeinekenCupRoundOne() {
-
-		 String url  = "testData\\191757-heineken";
-		 cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
-
-		 Map<String, ITeamGroup> teams  = cFetcher.getTeams();
-		 Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
-
-		 List<IRound> rounds = cFetcher.getRounds(url, matches);
-		 
-		 ICompetition c = cFetcher.getCompetition(url, rounds, (List<ITeamGroup>)teams.values());
-		 
-		 Iterator<ITeamGroup> it = c.getTeams().iterator();
-
-		 // check teams
-		 
-		 // check num of teams
-		 
-		 // check num rounds
-		 
-		 // check start and end of the first and last round
-		 
-		 // check name of round
-		 
-		 // check a match's date 
-		 
-		 // check match in first round
-		 
-		 // check match in third round
-		 
-		 // check match with New Zealand (two words)
-		 
-		 // check match on Sunday
-		 
-		 // check match on Friday
+	 public void testGetMatches() {
+	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+         cFetcher.setURL(url);
+         Map<String, ITeamGroup> teams = cFetcher.getTeams();
+         Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
+         
+         assertTrue(matches != null);
+         assertTrue(matches.size() > 0);
 	 }
+	 
+	 @Test
+	 public void testGetRounds() {
+//       public List<IRound> getRounds(String url, Map<String, IMatchGroup> matches);
+	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+         cFetcher.setURL(url);
+         Map<String, ITeamGroup> teams = cFetcher.getTeams();
+         Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
+         assertTrue(teams != null);
+         assertTrue(matches != null);
+         
+         List<IRound> rounds = cFetcher.getRounds(url,  matches);
+         assertTrue(rounds != null);
+         assertTrue(rounds.size() > 0);
+	 }
+	 
+	 @Test
+	 public void testSetUrl() {
+//       public void setURL(String url);
+	 }
+	 
+	 @Test
+	 public void testGetTeams() {
+	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+
+         Map<String, ITeamGroup> teams  = cFetcher.getTeams();
+         
+         assertTrue(teams!= null);
+         assertTrue(teams.values().size() > 0);
+	 }
+	 
+	 @Test
+	 public void testGetCompetition() {
+//	 public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams);
+	     
+	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+
+         Map<String, ITeamGroup> teams = cFetcher.getTeams();
+         Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
+         assertTrue(teams != null);
+         assertTrue(matches != null);
+         
+         List<IRound> rounds = cFetcher.getRounds(url,  matches);
+         assertTrue(rounds != null);
+         assertTrue(rounds.size() > 0);
+         
+         List<ITeamGroup> teamVals = new ArrayList<ITeamGroup>();
+         for(ITeamGroup t : teams.values()) {
+             teamVals.add(t);
+         }
+         
+         ICompetition comp = cFetcher.getCompetition(url, rounds, teamVals);
+         assertTrue(comp != null);
+         
+         assertTrue(comp.getLongName() != null);
+         
+	 }
+
+
+
+
 
 
 	 private IMatchGroup getQuinsScarlets() {

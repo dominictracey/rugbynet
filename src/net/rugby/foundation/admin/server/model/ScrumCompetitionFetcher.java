@@ -192,12 +192,9 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 					line = it.next();  // team line
 					String teamName = line.split("<|>")[2];
 					ITeamGroup t = getTeam(teamName);
-
-
 					teamMap.put(teamName, t);
 				}
 			}
-
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage());
 			return null;
@@ -211,8 +208,6 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		if (t == null) {
 			t = tf.create();
 			t.setDisplayName(teamName);
-
-
 			// one name or two?
 			if (teamName.split(" ").length > 1) {
 				t.setAbbr(teamName.split(" ")[1]);

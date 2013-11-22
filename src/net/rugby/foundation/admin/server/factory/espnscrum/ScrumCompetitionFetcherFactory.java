@@ -20,13 +20,15 @@ public class ScrumCompetitionFetcherFactory implements IForeignCompetitionFetche
 	private IMatchGroupFactory mf;
 	private IResultFetcherFactory rff;
 	private ITeamGroupFactory tf;
+    private IUrlCacher uc;
 
 	@Inject
-	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf) {
+	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf, IUrlCacher uc) {
 		this.rf  = rf;
 		this.mf = mf;
 		this.rff = rff;
 		this.tf = tf;
+		this.uc = uc;
 	}
 
 	/* (non-Javadoc)
@@ -42,7 +44,7 @@ public class ScrumCompetitionFetcherFactory implements IForeignCompetitionFetche
 			scf.setURL(url);
 			return scf;
 		} else if (fetcherType == CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS) {
-			ScrumInternationalCompetitionFetcher scf =  new ScrumInternationalCompetitionFetcher(rf,mf,rff, tf);
+			ScrumInternationalCompetitionFetcher scf =  new ScrumInternationalCompetitionFetcher(rf,mf,rff, tf, uc);
 			scf.setURL(url);
 			return scf;
 		} else {
