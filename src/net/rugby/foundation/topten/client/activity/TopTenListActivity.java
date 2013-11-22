@@ -57,6 +57,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		final TopTenListViewPresenter This = this;
 		panel.setWidget(view.asWidget());
+		final AcceptsOneWidget Panel = panel;
 		view.setClientFactory(clientFactory);
 		view.setPresenter(this);
 		//final Identity.Presenter identityPresenter = this;
@@ -82,31 +83,37 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 							@Override
 							public void onSuccess(final ITopTenList ttl) {
-								// are we simple list or feature?
-								boolean simple = true;
-								Iterator<ITopTenItem> it = ttl.getList().iterator();
-								while (it.hasNext())  {
-									if (it.next().getText() != null && !it.next().getText().isEmpty()) {
-										simple = false; 
-										break;
+								if (ttl != null) {
+									// are we simple list or feature?
+									boolean simple = true;
+									Iterator<ITopTenItem> it = ttl.getList().iterator();
+									while (it.hasNext())  {
+										ITopTenItem i = it.next();
+										if (i.getText() != null && !i.getText().isEmpty()) {
+											simple = false; 
+											break;
+										}
 									}
-								}
-								
-								if (!simple) {
-									view.setItemCount(0);
-									clientFactory.getNavBarView().collapseHero(false);
-									clientFactory.getNavBarView().getButtonBar().clear();
-									clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
-									view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+									
+									if (!simple) {
+										view.setItemCount(0);
+										clientFactory.getNavBarView().collapseHero(false);
+										clientFactory.getNavBarView().getButtonBar().clear();
+										clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+										view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+									} else {
+										view = clientFactory.getSimpleView();
+										view.setPresenter(This);
+										view.setClientFactory(clientFactory);
+										Panel.setWidget(view.asWidget());
+										clientFactory.getNavBarView().collapseHero(false);
+										clientFactory.getNavBarView().getButtonBar().clear();
+										clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+										view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+									}
 								} else {
-									view = clientFactory.getSimpleView();
-									view.setPresenter(This);
-									clientFactory.getNavBarView().collapseHero(false);
-									clientFactory.getNavBarView().getButtonBar().clear();
-									clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
-									view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+									Window.alert("Failed to fetch top ten list.");
 								}
-								
 								
 							}	
 						});
@@ -137,9 +144,17 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(Long result) {
-				TopTenListPlace newPlace = new TopTenListPlace();
-				newPlace.setListId(result);
-				clientFactory.getPlaceController().goTo(newPlace);
+				
+				if (result != null) {
+					TopTenListPlace newPlace = new TopTenListPlace();
+					newPlace.setListId(result);
+					clientFactory.getPlaceController().goTo(newPlace);
+				} else { // otherwise just kill load panel
+					Element loadPanel = DOM.getElementById("loadPanel");
+					if (loadPanel != null && loadPanel.hasParentElement()) {
+						loadPanel.removeFromParent();
+					}
+				}
 			}	
 		});
 	}

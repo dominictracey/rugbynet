@@ -41,6 +41,8 @@ public class EditRound extends Composite {
 	
 	public interface RoundPresenter {
 		void saveRound(IRound R, List<IStanding> standings);
+
+		void fetchRoundStandings(IRound round);
 	} 
 	
 	public EditRound() {
@@ -75,6 +77,8 @@ public class EditRound extends Composite {
 	@UiField
 	Button save;
 	@UiField
+	Button fetch;
+	@UiField
 	TextBox name;
 	@UiField
 	TextBox abbr;
@@ -98,13 +102,21 @@ public class EditRound extends Composite {
 		listener.saveRound(round, ss);
 	}
 	
+	@UiHandler("fetch")
+	void onClickFetch(ClickEvent e) {
+		listener.fetchRoundStandings(round);
+	}
 	
 	public void ShowRound(IRound round, List<IStanding> standings) {
 		this.round = round;
 		this.standings = standings;
 		name.setText(round.getName());
 		abbr.setText(round.getAbbr());
-		standingTable.setRowData(0, standings);
+		if (standings != null) {
+			standingTable.setRowCount(standings.size());
+			standingTable.setVisibleRange(0, standings.size());
+			standingTable.setRowData(0, standings);
+		}
 	}
 
 	public void SetPresenter(RoundPresenter p) {

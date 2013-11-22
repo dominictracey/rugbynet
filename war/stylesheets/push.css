@@ -55,7 +55,7 @@ code {
 	padding: 25px 25px;*/
 	text-align: center;
 	color: #fefefe;
-	font-size: 1.5em;
+	font-size: 1.3em;
 	font-weight: bold;
 	text-shadow:  0 -1px 0 rgba(0,0,0,0.25);
 	vertical-align: middle;
@@ -79,7 +79,8 @@ code {
 	color:  #fff;
 	width: 1em;
 	height: 1em;
-	background-color:  #777;
+	background-color:  #999;
+	box-shadow: 5px 5px 3px #888888;
 }
 
 .hero-unit p.compactContent  {

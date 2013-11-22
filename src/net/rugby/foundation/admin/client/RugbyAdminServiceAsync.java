@@ -148,4 +148,5 @@ public interface RugbyAdminServiceAsync {
 	public void getConfiguration(AsyncCallback<ICoreConfiguration> asyncCallback);
 	public void getStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
 	public void saveStandings(Long roundId, List<IStanding> standings, AsyncCallback<List<IStanding>> asyncCallback);
+	public void FetchRoundStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
 }

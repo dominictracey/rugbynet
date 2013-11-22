@@ -4,6 +4,8 @@
 package net.rugby.foundation.admin.client.ui;
 
 import net.rugby.foundation.model.shared.ICompetition;
+
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -12,6 +14,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -55,6 +58,8 @@ public class EditComp extends Composite {
 	@UiField
 	CheckBox underway;
 	@UiField
+	ListBox compType;
+	@UiField
 	Button setAsDefault;
 	
 	ICompetition comp = null;
@@ -67,6 +72,9 @@ public class EditComp extends Composite {
 		comp.setAbbr(abbr.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
+//		if (!compType.isItemSelected(-1)) {
+			comp.setCompType(ICompetition.CompetitionType.values()[compType.getSelectedIndex()]);
+//		}
 		listener.saveCompInfo(comp);
 	}
 	
@@ -98,6 +106,13 @@ public class EditComp extends Composite {
 		ccid.setText(comp.getCompClubhouseId().toString());
 		abbr.setText(comp.getAbbr());
 		underway.setValue(comp.getUnderway());
+		compType.clear();
+		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {
+			compType.addItem(ICompetition.CompetitionType.values()[i].toString());
+			if (comp.getCompType() == ICompetition.CompetitionType.values()[i]) {
+				compType.setSelectedIndex(i);
+			}
+		}
 	}
 
 	public void SetPresenter(Presenter p) {
