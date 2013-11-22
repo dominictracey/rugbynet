@@ -95,6 +95,8 @@ public class ScrumInternationalCompetitionFetcher implements IForeignCompetition
            //  IUrlCacher urlCache = new UrlCacher(tableURL);
             urlCacher.setUrl(tableURL);
             List<String> lines = urlCacher.get();
+            
+            
 
             String line = "";
 
