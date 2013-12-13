@@ -84,14 +84,19 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 							@Override
 							public void onSuccess(final ITopTenList ttl) {
 								if (ttl != null) {
+									LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
 									// are we simple list or feature?
 									boolean simple = true;
-									Iterator<ITopTenItem> it = ttl.getList().iterator();
-									while (it.hasNext())  {
-										ITopTenItem i = it.next();
-										if (i.getText() != null && !i.getText().isEmpty()) {
-											simple = false; 
-											break;
+									if (login.isTopTenContentContributor() || login.isTopTenContentEditor()) {
+										simple = false;
+									} else {
+	 									Iterator<ITopTenItem> it = ttl.getList().iterator();
+										while (it.hasNext())  {
+											ITopTenItem i = it.next();
+											if (i.getText() != null && !i.getText().isEmpty()) {
+												simple = false; 
+												break;
+											}
 										}
 									}
 									
@@ -122,6 +127,9 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 						if (place.getCompId() == null) {
 							TopTenListPlace newPlace = new TopTenListPlace();
 							newPlace.setCompId(coreConfig.getDefaultCompId());
+							if (coreConfig.getDefaultCompId() == null) {
+								throw new RuntimeException("No default configuration defined for site.");
+							}
 							clientFactory.getPlaceController().goTo(newPlace);
 						} else {
 							// just use the comp from place

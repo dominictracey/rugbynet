@@ -18,6 +18,7 @@ import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.TestUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -42,7 +43,8 @@ public class ScrumInternationalCompetitionFetcher implements IForeignCompetition
     private IMatchGroupFactory matchFactory;
     private IResultFetcherFactory resultFetcherFactory;
     private ITeamGroupFactory teamGroupFactory;
-    private IUrlCacher urlCacher;;
+    private IUrlCacher urlCacher;
+	private ICompetitionFactory cf;;
 
     public ScrumInternationalCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf, IUrlCacher uc) {
         this.roundFactory = rf;
@@ -56,32 +58,27 @@ public class ScrumInternationalCompetitionFetcher implements IForeignCompetition
     public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams) {
         ICompetition comp = new Competition();
 
-        roundFactory.setId(null);
-        IRound round = roundFactory.getRound();
-        round.setAbbr("1");
-        round.setBegin(new Date());
-        roundFactory.put(round);
-
-        comp.getRoundIds().add(round.getId());
-        comp.getRounds().add(round);
-
-        IMatchGroup match = matchFactory.create();
-
-        ITeamGroup home = teamGroupFactory.getTeamByName("New Zealand");
-        ITeamGroup visitor = teamGroupFactory.getTeamByName("England");
-        if (home != null) {
-            match.setHomeTeam(home);
-            match.setVisitingTeam(visitor);
-            match.setHomeTeamId(home.getId());
-            match.setVisitingTeamId(visitor.getId());
+        for (IRound r : rounds) {
+        	comp.getRounds().add(r);
+//        	comp.getRoundIds().add(r.getId());
         }
+        
+        for (ITeamGroup t : teams) {
+        	comp.getTeams().add(t);
+//        	comp.getTeamIds().add(t.getId());
+        }
+        
+        comp.setBegin(rounds.get(0).getBegin());
+        comp.setEnd(rounds.get(rounds.size()-1).getEnd());
+        
+        comp.setLastSaved(new Date());
+        comp.setUnderway(false);
+        comp.setNextRoundIndex(0);
+        comp.setPrevRoundIndex(-1);
         
         comp.setForeignID(194567L);
         comp.setForeignURL("http://www.espnscrum.com/scrum/rugby/page/194567.html");
         comp.setLongName("New Competition");
-
-        round.getMatches().add(match);
-        round.getMatchIDs().add(match.getId());
 
         return comp;
     }
@@ -89,8 +86,7 @@ public class ScrumInternationalCompetitionFetcher implements IForeignCompetition
     @Override
     public Map<String, ITeamGroup> getTeams() {
         // first get the teams
-        // String tableURL = homePage + "?template=pointstable";
-        String tableURL = "testData\\194567-AUT-INTLS-Fixtures.htm";
+        String tableURL = homePage; 
         try {
            //  IUrlCacher urlCache = new UrlCacher(tableURL);
             urlCacher.setUrl(tableURL);

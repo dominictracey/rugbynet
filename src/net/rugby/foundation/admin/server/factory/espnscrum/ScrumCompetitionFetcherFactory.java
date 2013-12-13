@@ -13,6 +13,7 @@ import net.rugby.foundation.admin.server.model.ScrumInternationalCompetitionFetc
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 public class ScrumCompetitionFetcherFactory implements IForeignCompetitionFetcherFactory {
 
@@ -35,22 +36,20 @@ public class ScrumCompetitionFetcherFactory implements IForeignCompetitionFetche
 	 * @see net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory#getForeignCompetitionFetcher(java.lang.String, net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType)
 	 */
 	@Override
-	public IForeignCompetitionFetcher getForeignCompetitionFetcher(String url, CompetitionFetcherType fetcherType) {
+	public IForeignCompetitionFetcher getForeignCompetitionFetcher(String url, CompetitionType fetcherType) {
 		
 		assert(rf!=null);
 		
-		if (fetcherType == CompetitionFetcherType.ESPNSCRUM_BASIC) {
-			ScrumCompetitionFetcher scf =  new ScrumCompetitionFetcher(rf,mf,rff, tf);
+		if (fetcherType == CompetitionType.AUTUMN_INTERNATIONALS) {
+			IForeignCompetitionFetcher scf =  new ScrumInternationalCompetitionFetcher(rf,mf,rff, tf, uc);
 			scf.setURL(url);
 			return scf;
-		} else if (fetcherType == CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS) {
-			ScrumInternationalCompetitionFetcher scf =  new ScrumInternationalCompetitionFetcher(rf,mf,rff, tf, uc);
+		} else  {
+			IForeignCompetitionFetcher scf =  new ScrumCompetitionFetcher(rf,mf,rff, tf);
 			scf.setURL(url);
 			return scf;
-		} else {
-			Logger.getLogger("CompetitionFetcherFactory").log(Level.SEVERE, "Unrecognized fetcherType requested " + fetcherType.toString());
-			return null;
-		}
+		} 
+
 	}
 
 

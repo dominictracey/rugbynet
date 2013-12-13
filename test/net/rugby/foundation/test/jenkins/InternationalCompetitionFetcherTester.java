@@ -9,7 +9,6 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
-import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.core.server.CoreTestModule;
@@ -20,6 +19,7 @@ import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
@@ -129,7 +129,7 @@ public class InternationalCompetitionFetcherTester {
 	 @Test
 	 public void testGetMatches() {
 	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
-         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionType.AUTUMN_INTERNATIONALS );
          cFetcher.setURL(url);
          Map<String, ITeamGroup> teams = cFetcher.getTeams();
          Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
@@ -142,7 +142,7 @@ public class InternationalCompetitionFetcherTester {
 	 public void testGetRounds() {
 //       public List<IRound> getRounds(String url, Map<String, IMatchGroup> matches);
 	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
-         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionType.AUTUMN_INTERNATIONALS );
          cFetcher.setURL(url);
          Map<String, ITeamGroup> teams = cFetcher.getTeams();
          Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);
@@ -162,7 +162,7 @@ public class InternationalCompetitionFetcherTester {
 	 @Test
 	 public void testGetTeams() {
 	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
-         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionType.AUTUMN_INTERNATIONALS );
 
          Map<String, ITeamGroup> teams  = cFetcher.getTeams();
          
@@ -175,7 +175,7 @@ public class InternationalCompetitionFetcherTester {
 //	 public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams);
 	     
 	     String url  = "testData\\194567-AUT-INTLS-Fixtures.htm";
-         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_INTERNATIONALS );
+         cFetcher = cff.getForeignCompetitionFetcher(url, CompetitionType.AUTUMN_INTERNATIONALS );
 
          Map<String, ITeamGroup> teams = cFetcher.getTeams();
          Map<String, IMatchGroup> matches = cFetcher.getMatches(url, teams);

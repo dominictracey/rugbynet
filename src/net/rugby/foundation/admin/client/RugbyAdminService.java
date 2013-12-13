@@ -15,6 +15,7 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -22,17 +23,19 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.Position.position;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("rugbyAdminService")
 public interface RugbyAdminService extends RemoteService {
-	ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams);
+	ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, CompetitionType compType);
 	ICompetition saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams);
-	Map<String, ITeamGroup> fetchTeams(String url, String resultType);
-	List<IRound>  fetchRounds(String url, Map<String, IMatchGroup> matches);
-	Map<String, IMatchGroup> fetchMatches(String url, Map<String, ITeamGroup> teams);
+	Map<String, ITeamGroup> fetchTeams(String url, CompetitionType compType);
+	List<IRound>  fetchRounds(String url, Map<String, IMatchGroup> matches, CompetitionType compType);
+	Map<String, IMatchGroup> fetchMatches(String url, Map<String, ITeamGroup> teams, CompetitionType compType);
 	List<ICompetition> getComps(Filter filter);
 	IWorkflowConfiguration saveWorkflowConfig(IWorkflowConfiguration wfc);
 	Map<String, IOrchestrationConfiguration> getOrchestrationConfiguration();
@@ -96,7 +99,7 @@ public interface RugbyAdminService extends RemoteService {
 	IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms);
 	List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId, Long roundId, position posi, Long countryId, Long teamId);
 	List<IPlayerMatchInfo> reRateMatch(Long matchId);
-
+	IMatchGroup SaveScore(Long matchId, int hS, int vS, Status status);
 	ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId);
 	ITeamMatchStats refetchTeamMatchStats(ITeamMatchStats target);
 	ITeamMatchStats saveTeamMatchStats(ITeamMatchStats tms, IAdminTask target);

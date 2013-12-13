@@ -31,7 +31,7 @@ public class TopTen implements EntryPoint {
 	private SimplePanel appWidget = new SimplePanel();
 	private Place defaultPlace = new TopTenListPlace("List:");
 	private ClientFactory clientFactory = null;
-	final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
+	//final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
 
 	@SuppressWarnings("deprecation")
 	public void onModuleLoad() {

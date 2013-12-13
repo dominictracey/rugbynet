@@ -39,8 +39,7 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 
 			if (g.getSimpleScoreMatchResultId() != null) {
-				mrf.setId(g.getSimpleScoreMatchResultId());
-				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());  // @REX need to sort this out before other types of results are added
+				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(g.getSimpleScoreMatchResultId()));  // @REX need to sort this out before other types of results are added
 			}
 		} else { // create new
 			// @REX cast

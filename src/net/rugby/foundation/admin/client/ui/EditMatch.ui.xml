@@ -17,7 +17,8 @@
 				Status: <g:ListBox ui:field='status'></g:ListBox>
 				Locked: <g:CheckBox ui:field='locked'></g:CheckBox><br/>
 				Home Score: <g:TextBox ui:field='homeScore'></g:TextBox>
-				Visitor Score: <g:TextBox ui:field='visitorScore'></g:TextBox><br/><br/>
+				Visitor Score: <g:TextBox ui:field='visitorScore'></g:TextBox>
+				<g:Button styleName="{style.important}" ui:field="saveScore">Save Score</g:Button><br/><br/>
 				Match Stats Pipeline: <g:Anchor ui:field='pipelineLink'></g:Anchor><br/>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 		<g:Button styleName="{style.important}" ui:field="lock">Lock</g:Button>

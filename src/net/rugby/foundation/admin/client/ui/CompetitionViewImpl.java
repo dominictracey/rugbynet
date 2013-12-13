@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnD
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
@@ -93,7 +94,15 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
 		url.setText("http://www.espnscrum.com/premiership-2012-13/rugby/series/166258.html");
-		resultType.addItem("basicMatchResult");
+		
+		resultType.clear();
+		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {
+			resultType.addItem(ICompetition.CompetitionType.values()[i].toString());
+//			if (comp.getCompType() == ICompetition.CompetitionType.values()[i]) {
+//				resultType.setSelectedIndex(i);
+//			}
+		}
+		
 		save.setVisible(false);
 		fetch.setText("Fetch teams");
 		step = Step.TEAMS;
@@ -115,20 +124,21 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	@UiHandler("fetch")
 	void onFetchClick(ClickEvent e) {	
+		CompetitionType compType = CompetitionType.values()[resultType.getSelectedIndex()];
 		if (step == Step.TEAMS) {
-			listener.fetchTeamsClicked(url.getText(), resultType.getItemText(0));
+			listener.fetchTeamsClicked(url.getText(), compType);
 			step=Step.MATCHES;
 			fetch.setText("Fetch Matches");
 		} else if (step == Step.MATCHES) {
-			listener.fetchMatchesClicked(teamMap);
+			listener.fetchMatchesClicked(teamMap, compType);
 			step=Step.ROUNDS;
 			fetch.setText("Fetch Rounds");
 		} else if (step == Step.ROUNDS) {
-			listener.fetchRoundsClicked(matchMap);
+			listener.fetchRoundsClicked(matchMap, compType);
 			step=Step.COMP;
 			fetch.setText("Fetch Comp");
 		} else if (step == Step.COMP) {
-			listener.fetchCompetitionClicked(roundMap);
+			listener.fetchCompetitionClicked(roundMap, compType);
 			save.setText("Save Comp");
 			save.setVisible(true);
 			fetch.setVisible(false);

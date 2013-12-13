@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -16,23 +17,15 @@ import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
  * @author home
  *
  */
-public class TestMatchResultFactory implements IMatchResultFactory {
+public class TestMatchResultFactory extends BaseCachingFactory<IMatchResult> implements IMatchResultFactory {
 	private Long id;
 	
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.IMatchResultFactory#setId(java.lang.Long)
-	 */
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-
-	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.IMatchResultFactory#get()
 	 */
 	@Override
-	public IMatchResult get() {
+	public IMatchResult getFromPersistentDatastore(Long id) {
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(new Date());
 
@@ -101,15 +94,21 @@ public class TestMatchResultFactory implements IMatchResultFactory {
 	 * @see net.rugby.foundation.core.server.IMatchResultFactory#put(net.rugby.foundation.model.shared.IMatchResult)
 	 */
 	@Override
-	public IMatchResult put(IMatchResult g) {
+	public IMatchResult putToPersistentDatastore(IMatchResult g) {
 
 		return g;
 	}
 
 	@Override
-	public boolean delete(Long id) {
-		// TODO Auto-generated method stub
-		return false;
+	public IMatchResult create() {
+		return new SimpleScoreMatchResult();
 	}
+
+	@Override
+	protected boolean deleteFromPersistentDatastore(IMatchResult t) {
+		return true;
+	}
+
+
 
 }

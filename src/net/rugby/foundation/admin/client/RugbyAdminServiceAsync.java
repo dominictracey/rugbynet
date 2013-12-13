@@ -18,6 +18,7 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
@@ -26,15 +27,16 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.Position.position;
 
 
 public interface RugbyAdminServiceAsync {
-	public void fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, AsyncCallback<ICompetition> cb);
+	public void fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, CompetitionType compType, AsyncCallback<ICompetition> cb);
 	public void saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams, AsyncCallback<ICompetition> cb);
-	public void fetchTeams(String url, String resultType, AsyncCallback<Map<String, ITeamGroup>> cb);
-	public void fetchRounds(String url, Map<String, IMatchGroup> matches, AsyncCallback<List<IRound> > cb);
-	public void fetchMatches(String url, Map<String, ITeamGroup> teams, AsyncCallback<Map<String, IMatchGroup>> cb);
+	public void fetchTeams(String url, CompetitionType compType, AsyncCallback<Map<String, ITeamGroup>> cb);
+	public void fetchRounds(String url, Map<String, IMatchGroup> matches, CompetitionType compType, AsyncCallback<List<IRound> > cb);
+	public void fetchMatches(String url, Map<String, ITeamGroup> teams, CompetitionType compType, AsyncCallback<Map<String, IMatchGroup>> cb);
 	public void  getComps(Filter filter, AsyncCallback<List<ICompetition>> cb);
 	public void saveWorkflowConfig(IWorkflowConfiguration wfc, AsyncCallback<IWorkflowConfiguration> asyncCallback);
 	public void getOrchestrationConfiguration(AsyncCallback<Map<String, IOrchestrationConfiguration>> asyncCallback);
@@ -149,4 +151,5 @@ public interface RugbyAdminServiceAsync {
 	public void getStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
 	public void saveStandings(Long roundId, List<IStanding> standings, AsyncCallback<List<IStanding>> asyncCallback);
 	public void FetchRoundStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
+	public void SaveScore(Long matchId, int hS, int vS, Status status, AsyncCallback<IMatchGroup> asyncCallback);
 }

@@ -1,6 +1,7 @@
 package net.rugby.foundation.admin.server;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -9,15 +10,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.codec.digest.DigestUtils;
 
 import net.rugby.foundation.admin.client.RugbyAdminService;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
-import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory.CompetitionFetcherType;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
@@ -32,7 +30,6 @@ import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.model.IStandingsFetcher;
-import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
@@ -72,18 +69,16 @@ import net.rugby.foundation.game1.shared.IMatchEntry;
 import net.rugby.foundation.game1.shared.IRoundEntry;
 import net.rugby.foundation.game1.shared.MatchEntry;
 import net.rugby.foundation.model.shared.Country;
-import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITopTenUser;
-import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
@@ -95,27 +90,18 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
-import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.appengine.tools.pipeline.Job;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
-import com.google.appengine.tools.pipeline.impl.model.JobInstanceRecord;
-import com.google.appengine.tools.pipeline.impl.model.JobRecord;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
 
 @Singleton
 public class RugbyAdminServiceImpl extends RemoteServiceServlet implements RugbyAdminService {
@@ -260,10 +246,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	//	}
 
 	@Override
-	public ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams) {
+	public ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
-				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
 
 				ICompetition comp = fetcher.getCompetition(url, rounds, teams);
 
@@ -359,14 +345,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 
 	@Override
-	public Map<String, ITeamGroup> fetchTeams(String url, String resultType) {
+	public Map<String, ITeamGroup> fetchTeams(String url, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
 
 				CountryLoader cloader = new CountryLoader();
 				cloader.Run(countryf);
 
-				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
 
 				Map<String, ITeamGroup> teams = fetcher.getTeams();
 
@@ -412,10 +398,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 
 	@Override
-	public List<IRound> fetchRounds(String url, Map<String,IMatchGroup> matches) {
+	public List<IRound> fetchRounds(String url, Map<String,IMatchGroup> matches, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
-				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, CompetitionFetcherType.ESPNSCRUM_BASIC);
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
 
 				List<IRound>  rounds = fetcher.getRounds(url, matches);
 
@@ -452,11 +438,11 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 
 	@Override
-	public Map<String, IMatchGroup> fetchMatches(String url, Map<String,ITeamGroup> teams) {
+	public Map<String, IMatchGroup> fetchMatches(String url, Map<String,ITeamGroup> teams, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
-				IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff, tf);
-
+				//				IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff, tf);
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
 				Map<String, IMatchGroup> matches = fetcher.getMatches(url, teams);
 
 				if (matches != null) {
@@ -787,8 +773,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ICompetition saveCompInfo(ICompetition comp) {
 		try {
 			if (checkAdmin()) {
-				comp = cf.put(comp);
 
+				comp = cf.put(comp);
 
 				ICoreConfiguration cc = ccf.get();
 				// add or remove from CoreConfiguration map depending on the Underway flag
@@ -1829,7 +1815,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					}
 				}
 			}
-				
+
 			return null;
 
 		} catch (Throwable ex) {
@@ -1837,5 +1823,36 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;
 		}
 	}
+
+	@Override
+	public IMatchGroup SaveScore(Long matchId, int hS, int vS, Status status) {
+		try {
+			if (checkAdmin()) {
+
+				ISimpleScoreMatchResult mr = (ISimpleScoreMatchResult) mrf.create();
+				mr.setHomeScore(hS);
+				mr.setVisitScore(vS);
+				((IMatchResult)mr).setStatus(status);
+				((IMatchResult)mr).setMatchID(matchId);
+				((IMatchResult)mr).setSource(UserServiceFactory.getUserService().getCurrentUser().getEmail());
+				((IMatchResult)mr).setType(ResultType.SIMPLE_SCORE);
+				((IMatchResult)mr).setRecordedDate(new Date());
+				mrf.put((IMatchResult) mr);
+				
+				// link the result to the match
+				IMatchGroup m = mf.get(matchId);
+				m.setSimpleScoreMatchResult(mr);
+				m.setSimpleScoreMatchResultId(((IMatchResult)mr).getId());
+				mf.put(m);
+				
+				return m;
+			}
+
+			return null;
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}	}
 
 }

@@ -9,12 +9,7 @@ import net.rugby.foundation.model.shared.IMatchResult;
  * @author home
  *
  */
-public interface IMatchResultFactory {
-	void setId(Long id);
+public interface IMatchResultFactory extends ICachingFactory<IMatchResult> {
+
 	
-	IMatchResult get();
-
-	IMatchResult put(IMatchResult g);
-
-	boolean delete(Long id);
 }

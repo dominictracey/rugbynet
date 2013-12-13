@@ -16,6 +16,7 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.MatchGroup;
 
@@ -102,7 +103,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 
 				if (m.getSimpleScoreMatchResultId() != null) {
 
-					if (!mrf.delete(m.getSimpleScoreMatchResultId())) {
+					if (!mrf.delete((IMatchResult)m.getSimpleScoreMatchResult())) {
 						return false;
 					}
 				}

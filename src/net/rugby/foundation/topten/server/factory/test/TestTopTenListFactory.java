@@ -67,7 +67,7 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 			list.setLive(true);
 			list.setTitle("Rugby Championship Round 2 Top Ten");
 			list.setContent("What an exciting week of rugby. Lots of great performances to choose from!");
-			list.setList(items);
+			list.setList(getListOfItemsForSimpleList(list));
 			list.setPrevId(1000L);
 			list.setPrevPublishedId(1000L);
 			list.setNextId(1002L);
@@ -158,6 +158,23 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 			items.add(new TopTenItem(r.nextLong(), 9002004L, pf.get(9002004L), "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", null, 1L, 1L, true, "http://google.com", "Australia", 9002L,  position.CENTER, list));
 			items.add(new TopTenItem(r.nextLong(), 9001001L, pf.get(9001001L), "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", null, 1L, 1L, true, "http://google.com","New Zealand", 9001L,  position.CENTER, list));
 		}
+		return items;
+	}
+	
+	private List<ITopTenItem> getListOfItemsForSimpleList(TopTenList list) {
+		List<ITopTenItem> items = new ArrayList<ITopTenItem>();
+		items.add(new TopTenItem(1000000L, 9002002L, pf.get(9002002L), "", null, 1L, 1L, true, "http://google.com", "Australia", 9002L, position.CENTER, list));
+		items.add(new TopTenItem(1000001L, 9001014L, pf.get(9001014L), "", null, 1L, 1L, true, "http://google.com", "New Zealand", 9001L,  position.PROP, list));
+		items.add(new TopTenItem(1000002L, 9002012L, pf.get(9002012L), "", null, 1L, 1L, true, "http://google.com", "Australia", 9002L,  position.LOCK, list));
+		items.add(new TopTenItem(1000003L, 9001002L, pf.get(9001002L), "", null, 1L, 1L, true, "http://google.com", "New Zealand", 9001L,  position.CENTER, list));
+		items.add(new TopTenItem(1000004L, 9002017L, pf.get(9002017L), "", null, 1L, 1L, true, "http://google.com", "Australia", 9002L,  position.WING, list));
+		items.add(new TopTenItem(1000005L, 9001009L, pf.get(9001009L), "", null, 1L, 1L, true, "http://google.com", "New Zealand", 9001L,  position.FLANKER, list));
+		items.add(new TopTenItem(1000006L, 9002006L, pf.get(9002006L), "", null, 1L, 1L, true, "http://google.com", "Australia", 9002L,  position.FLANKER, list));
+		items.add(new TopTenItem(1000007L, 9001019L, pf.get(9001019L), "", null, 1L, 1L, true, "http://google.com", "New Zealand", 9001L,  position.CENTER, list));
+		items.add(new TopTenItem(1000008L, 9002004L, pf.get(9002004L), "", null, 1L, 1L, true, "http://google.com", "Australia", 9002L,  position.HOOKER, list));
+		items.add(new TopTenItem(1000009L, 9001001L, pf.get(9001001L), "", null, 1L, 1L, true, "http://google.com", "New Zealand", 9001L,  position.SCRUMHALF, list));
+
+		
 		return items;
 	}
 

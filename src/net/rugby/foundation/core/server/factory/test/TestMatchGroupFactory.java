@@ -31,36 +31,32 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			g.setVisitingTeamId(9002L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -12);
-			mrf.setId(8001L);
 			g.setSimpleScoreMatchResultId(8001L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8001L));
 			g.setStatus(Status.FINAL_HOME_WIN);
 		} else if (id == 101) {
 			g.setHomeTeamId(9003L);
 			g.setVisitingTeamId(9004L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -11);
-			mrf.setId(8002L);
 			g.setSimpleScoreMatchResultId(8002L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8002L));
 			g.setStatus(Status.FINAL_VISITOR_WIN);
 		} else if (id == 102) {
 			g.setHomeTeamId(9001L);
 			g.setVisitingTeamId(9004L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -4);
-			mrf.setId(8003L);
 			g.setSimpleScoreMatchResultId(8003L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8003L));
 			g.setStatus(Status.FINAL_DRAW_OT);
 		} else if (id == 103) {
 			g.setHomeTeamId(9005L);
 			g.setVisitingTeamId(9006L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -3);
-			mrf.setId(8004L);
 			g.setSimpleScoreMatchResultId(8004L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8004L));
 			g.setStatus(Status.FINAL_HOME_WIN);
 		} else if (id == 104) {
 			g.setHomeTeamId(9002L);
@@ -98,27 +94,24 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			g.setVisitingTeamId(9202L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -7);
-			mrf.setId(8201L);
 			g.setSimpleScoreMatchResultId(8201L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8201L));
 			g.setStatus(Status.FINAL_HOME_WIN);
 		} else if (id == 201) {
 			g.setHomeTeamId(9203L);
 			g.setVisitingTeamId(9204L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -8);
-			mrf.setId(8202L);
 			g.setSimpleScoreMatchResultId(8202L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8202L));
 			g.setStatus(Status.FINAL_VISITOR_WIN);
 		} else if (id == 202) {
 			g.setHomeTeamId(9205L);
 			g.setVisitingTeamId(9206L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -8);
-			mrf.setId(8203L);
 			g.setSimpleScoreMatchResultId(8203L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8203L));
 			g.setStatus(Status.FINAL_VISITOR_WIN);
 		} else if (id == 203) {
 			g.setHomeTeamId(9207L);

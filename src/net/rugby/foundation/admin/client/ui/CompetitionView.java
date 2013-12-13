@@ -7,6 +7,7 @@ import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
@@ -31,10 +32,10 @@ public interface CompetitionView extends IsWidget {
 	void showStatus(String message);
 	
 	public interface Presenter {
-		void fetchCompetitionClicked(List<IRound> roundMap);
-		void fetchTeamsClicked(String text, String itemText);
-		void fetchMatchesClicked(Map<String,ITeamGroup> teams);
-		void fetchRoundsClicked(Map<String, IMatchGroup> matches);
+		void fetchCompetitionClicked(List<IRound> roundMap, CompetitionType compType);
+		void fetchTeamsClicked(String text, CompetitionType compType);
+		void fetchMatchesClicked(Map<String,ITeamGroup> teams, CompetitionType compType);
+		void fetchRoundsClicked(Map<String, IMatchGroup> matches, CompetitionType compType);
 
 		void saveCompetitionClicked(ICompetition comp, Map<String,ITeamGroup> teams);
 

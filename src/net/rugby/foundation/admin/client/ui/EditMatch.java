@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -56,6 +57,8 @@ public class EditMatch extends Composite {
 
 		void showVisitingTeamMatchStats(IMatchGroup matchGroup);
 
+		void saveScore(Long matchId, int hS, int vS, Status status);
+
 
 	} 
 	
@@ -91,6 +94,8 @@ public class EditMatch extends Composite {
 	TextBox homeScore;
 	@UiField
 	TextBox visitorScore;
+	@UiField
+	Button saveScore;
 	@UiField
 	Anchor pipelineLink;
 	
@@ -146,6 +151,7 @@ public class EditMatch extends Composite {
 		displayName.setText(match.getDisplayName());
 		scheduled.setText(match.getDate().toString());
 		int selectedIndex = 0;
+		status.clear();
 		for (Status s : Status.values()) {
 			status.addItem(s.toString());
 			if (match.getStatus().equals(s)) {
@@ -180,6 +186,18 @@ public class EditMatch extends Composite {
 
 	public void SetPresenter(Presenter p) {
 		listener = p;
+	}
+	
+	@UiHandler("saveScore")
+	void onClickSaveScore(ClickEvent e) {
+		try {
+			int hS = Integer.parseInt(homeScore.getText());
+			int vS = Integer.parseInt(visitorScore.getText());
+			listener.saveScore(matchGroup.getId(), hS, vS, Status.values()[status.getSelectedIndex()]);
+		} catch (Throwable ex) {
+			Window.alert("Score must be a valid number");
+		}
+		
 	}
 
 }

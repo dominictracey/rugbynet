@@ -11,7 +11,7 @@ import net.rugby.foundation.model.shared.IMatchGroup.Status;
  * @author home
  *
  */
-public interface IMatchResult {
+public interface IMatchResult extends IHasId {
 
 	enum ResultType {SIMPLE_SCORE, MATCHES}
 

@@ -23,6 +23,8 @@ public class TestConfigurationFactory extends BaseConfigurationFactory {
 		ICoreConfiguration c = new CoreConfiguration();
 		c.addCompetition(1L, "Rugby.net Championships");
 		c.addCompetition(2L, "Heineken Cup");
+		c.addCompUnderway(1L);
+		c.addCompUnderway(2L);
 		c.setDefaultCompId(1L);
 		c.setEnvironment(Environment.LOCAL);
 		return c;

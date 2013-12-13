@@ -245,5 +245,4 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 			return false;
 		}	
 	}
-	
 }

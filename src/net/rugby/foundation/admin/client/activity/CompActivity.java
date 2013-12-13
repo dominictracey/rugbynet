@@ -23,8 +23,11 @@ import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -158,10 +161,10 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	}
 
 	@Override
-	public void fetchCompetitionClicked(List<IRound> rounds) {
+	public void fetchCompetitionClicked(List<IRound> rounds, CompetitionType compType) {
 
 
-		clientFactory.getRpcService().fetchCompetition(url, rounds, teams, new AsyncCallback<ICompetition>() {
+		clientFactory.getRpcService().fetchCompetition(url, rounds, teams, compType, new AsyncCallback<ICompetition>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -198,9 +201,9 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	}
 
 	@Override
-	public void fetchTeamsClicked(String url, String resultType) {
+	public void fetchTeamsClicked(String url, CompetitionType compType) {
 		this.url = url;
-		clientFactory.getRpcService().fetchTeams(url, resultType, new AsyncCallback<Map<String, ITeamGroup>>() {
+		clientFactory.getRpcService().fetchTeams(url, compType, new AsyncCallback<Map<String, ITeamGroup>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -222,8 +225,8 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	}
 
 	@Override
-	public void fetchMatchesClicked(Map<String,ITeamGroup> teams) {
-		clientFactory.getRpcService().fetchMatches(url, teams, new AsyncCallback<Map<String,IMatchGroup>>() {
+	public void fetchMatchesClicked(Map<String,ITeamGroup> teams, CompetitionType compType) {
+		clientFactory.getRpcService().fetchMatches(url, teams, compType, new AsyncCallback<Map<String,IMatchGroup>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -239,8 +242,8 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	}
 
 	@Override
-	public void fetchRoundsClicked(Map<String,IMatchGroup> matches) {
-		clientFactory.getRpcService().fetchRounds(url, matches, new AsyncCallback<List<IRound> >() {
+	public void fetchRoundsClicked(Map<String,IMatchGroup> matches, CompetitionType compType) {
+		clientFactory.getRpcService().fetchRounds(url, matches, compType, new AsyncCallback<List<IRound> >() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1309,5 +1312,26 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			
 		});
 		
+	}
+
+
+
+	@Override
+	public void saveScore(Long matchId, int hS, int vS, Status status) {
+		clientFactory.getRpcService().SaveScore(matchId, hS, vS, status, new AsyncCallback<IMatchGroup>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
+				
+			}
+
+			@Override
+			public void onSuccess(IMatchGroup result) {
+				Window.alert("Score saved");	
+				em.ShowMatch(result);
+			}
+			
+		});		
 	}
 }
