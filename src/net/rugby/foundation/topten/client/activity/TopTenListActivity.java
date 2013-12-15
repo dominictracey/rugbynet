@@ -103,7 +103,9 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 									if (!simple) {
 										view.setItemCount(0);
 										clientFactory.getNavBarView().collapseHero(false);
-										clientFactory.getNavBarView().getButtonBar().clear();
+										if ( clientFactory.getLoginInfo().isTopTenContentEditor()) {
+											clientFactory.getNavBarView().getButtonBar().clear();
+										}
 										clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
 										view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
 									} else {
@@ -112,7 +114,8 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 										view.setClientFactory(clientFactory);
 										Panel.setWidget(view.asWidget());
 										clientFactory.getNavBarView().collapseHero(false);
-										clientFactory.getNavBarView().getButtonBar().clear();
+										if (clientFactory.getLoginInfo().isTopTenContentEditor())
+											clientFactory.getNavBarView().getButtonBar().clear();
 										clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
 										view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
 									}

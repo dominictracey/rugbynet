@@ -79,9 +79,7 @@ public class NavBarViewImpl extends Composite implements NavBarView, EditContent
 		footerLinks = DOM.getElementById("footerLinks");
 		hero = DOM.getElementById("hero");
 
-		buttonBar = new NavWidget();
-		buttonBar.addStyleName("btn-group");
-		RootPanel.get("buttons").add(buttonBar);
+
 	}
 
 
@@ -170,6 +168,11 @@ public class NavBarViewImpl extends Composite implements NavBarView, EditContent
 	 */
 	@Override
 	public NavWidget getButtonBar() {
+		if (buttonBar == null) {
+			buttonBar = new NavWidget();
+			//buttonBar.addStyleName("btn-group");
+			RootPanel.get("buttons").add(buttonBar);
+		}
 		return buttonBar;
 	}
 

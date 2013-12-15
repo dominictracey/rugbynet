@@ -191,7 +191,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 								@Override
 								public void onSuccess(List<IContent> contentList) {
 									ClientFactoryImpl.contentList = contentList;
-									getNavBarView().getButtonBar().clear();
+									//getNavBarView().getButtonBar().clear();
 									getNavBarView().setContent(contentList, loginInfo.isTopTenContentEditor());	
 									cb.onSuccess(coreConfig);
 								}
