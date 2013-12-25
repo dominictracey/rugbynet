@@ -2,13 +2,8 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<!-- 	<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> -->
-<!-- 	<link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet"> -->
     <script type="text/javascript" language="javascript" src="/topten/topten.nocache.js"></script>   
-    <link href="/stylesheets/push.css" rel="stylesheet">
-	<link href="/stylesheets/openid.css" rel="stylesheet">
-    <!-- Bootstrap -->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- split -->
 <!-- Facebook Open Graph -->
@@ -52,19 +47,13 @@
 </script>
 
 
+    <link href="/stylesheets/master.css" rel="stylesheet">
 
 </head>
 <body>
 <div id="wrap">
-<div id="loadPanel" class="modal-backdrop" style="height: 100%; width: 100%;">
-	<div class="progress progress-striped active" style="position: absolute; width: 80%; top: 50%; left: 10%; " >
-		<div id="loadProgress" class="bar" style="width: 20%;"></div>
-	</div>
-</div>
-<div id="navbar"></div>
-<div style="float: left;"><img src="/resources/logo200.png" align="left" style="margin: 0px 10px 3px 0px;"/></div>
-<div class="hero-unit" id="hero" >
-
+<div id="banner">
+	<div id="header"></div>
   <h3 id="heading"></h3>
   <p id="details1"></p>
 
@@ -74,18 +63,18 @@
   <div id="fbLike"> </div>
   <div id="buttons"> </div>
 </div>
-<div class="span2"></div>
+<div id="app"></div>
+<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+<div class="adBack" align="center">
 <script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <!-- top ten top banner -->
 <ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:90px"
+     style="display:inline-block;width:728px;height:90px;"
      data-ad-client="ca-pub-9355939918394201"
      data-ad-slot="1278737769"></ins>
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-<div id="app" style="padding-top:20px"></div>
-<div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
@@ -93,17 +82,17 @@
   js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=499268570161982";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
-
-
+</div>
+<div id="fb-root"></div>
 
 	<div id="push"></div>
 	</div>
 	<div id="footer">
 		<div class="navbar">
-			<div class="navbar-inner">
+			<div class="navbar-inner" style="background-image: -webkit-linear-gradient(top,#05213c,#03172b)">
 				<div class="container" style="width:960px;">
-					<ul  id="footerLinks" class="nav">
-						<li style="padding-top:10px;">&copy; 2011-2013 RUGBY.NET LLC
+					<ul  id="footerLinks" class="nav" style="width:100%">
+						<li class="footerItem">&copy; 2011-2014 RUGBY.NET LLC
 						</li>
 					</ul>
 				</div>
@@ -112,7 +101,7 @@
 		</div>
 	</div>
 
-	<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+	
 
   </body>
 </html>

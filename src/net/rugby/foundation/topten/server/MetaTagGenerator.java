@@ -206,8 +206,8 @@ public class MetaTagGenerator extends HttpServlet {
 		}
 	}
 
-	private String defaultTitle = "Rugby Network Weekly Top Ten Perfomances";
-	private String defaultDescription = "Weekly top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Aviva Premiership and Super Rugby.";
+	private String defaultTitle = "The Rugby Net's Top Ten Perfomances";
+	private String defaultDescription = "Top ten lists of the best performances in the Rugby World Cup, The Rugby Championship, Six Nations, Heineken Cup, Aviva Premiership and Super Rugby.";
 
 	private String first = "";
 	//private String second = "";

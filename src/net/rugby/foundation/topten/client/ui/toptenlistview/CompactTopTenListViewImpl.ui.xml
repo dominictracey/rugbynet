@@ -7,16 +7,33 @@
 		.buttons {
 			margin: 20px 20px;
 		}
+		.header {
+			background-color: #001123;
+			color: #fff;
+			font-size: 14px;
+			padding: 10px;
+			font-weight: bold;
+		}
+		.shadow {
+			box-shadow: 0px 2px 2px 2px #dddddd;
+		}
 	</ui:style>
-    <g:HTMLPanel width="100%" ui:field="topTenPanel">
+    <g:HTMLPanel width="100%" ui:field="topTenPanel" styleName="{style.shadow}">
 
 
 
 
     	<b:Row>
     	    <b:Column size ="12">
-    	        <b:Row>
-    	            <b:Column size="9" offset="2">
+    	        <b:Row ui:field="contentPanel">
+    	            <b:Column size="6" >
+    	                <g:VerticalPanel ui:field="contentArea">
+    	                	<b:Heading ui:field="title" size="3"></b:Heading>
+    	                	<g:HTML ui:field="details1"></g:HTML>
+    	                </g:VerticalPanel>
+    	            </b:Column>
+    	            <b:Column size="6">
+    	                <g:Label styleName="{style.header}">Top Ten:</g:Label>
     	             	<c:CellTable ui:field="items" width="100%"/>
     	             </b:Column>
     	        </b:Row>
@@ -25,15 +42,15 @@
     	        </b:Row>
     	        <b:Row>
     	            <b:Column size="4" offset="4">
-	    	            <b:Nav alignment="RIGHT">
+	    	            <b:Nav alignment="LEFT">
 	    	                <b:NavWidget  styleName="{style.buttons}">
-	    	                    <b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
-	    	                    <b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
-	    	                    
+	    	                    <b:Button size="LARGE" type="PRIMARY" ui:field="prevButton">Prev</b:Button>
+	    	                    <b:Button size="LARGE" type="PRIMARY" ui:field="nextButton">Next</b:Button>
 	    	                </b:NavWidget>
 	    	            </b:Nav>
 
     	            </b:Column>
+    	            <b:Column size="4"></b:Column>
     	        </b:Row>
     	    </b:Column>
 		</b:Row>

@@ -69,7 +69,8 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 		prevButton.setIcon(IconType.BACKWARD);
 		nextButton.setIconSize(IconSize.LARGE);
 		nextButton.setIcon(IconType.FORWARD);
-
+		nextButton.setVisible(false);
+		prevButton.setVisible(false);
 	}
 
 
@@ -78,18 +79,18 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 		list = result;
 		//setVisible(false);
 		if (result != null) {
-			clientFactory.getNavBarView().setHeroListInfo(result.getTitle(),result.getContent());
+			clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent());
 
 			if (list.getPrevPublishedId() != null) {
-				prevButton.setEnabled(true);
+				prevButton.setVisible(true);
 			} else {
-				prevButton.setEnabled(false);
+				prevButton.setVisible(false);
 			}
 
 			if (list.getNextPublishedId() != null) {
-				nextButton.setEnabled(true);
+				nextButton.setVisible(true);
 			} else {
-				nextButton.setEnabled(false);
+				nextButton.setVisible(false);
 			}
 			items.clear();
 			Iterator<ITopTenItem> it = result.getList().iterator();
@@ -118,10 +119,10 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 			//setVisible(true);
 		} else {
 			items.clear();
-			clientFactory.getNavBarView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
+			clientFactory.getHeaderView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
 			//clientFactory.getNavBarView().setDetails("Check back every Monday for top ten performances from competitions.");
-			prevButton.setEnabled(false);
-			nextButton.setEnabled(false);
+			prevButton.setVisible(false);
+			nextButton.setVisible(false);
 		}
 
 
@@ -157,14 +158,14 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 
 	@Override
 	public void hasNext(boolean has) {
-		nextButton.setEnabled(has);
+		nextButton.setVisible(has);
 
 	}
 
 
 	@Override
 	public void hasPrev(boolean has) {
-		prevButton.setEnabled(has);	
+		prevButton.setVisible(has);	
 	}
 
 

@@ -17,6 +17,7 @@ import com.github.gwtbootstrap.client.ui.NavPills;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -205,8 +206,10 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				signOutLink = new Button("sign out");
 				signOutLink.setIcon(IconType.UNLOCK);
 				signOutLink.addClickHandler(signOutHandler);
+				signOutLink.addStyleDependentName("IdentityButton");
 				editProfileLink = new Button(clientFactory.getLoginInfo().getNickname());
 				editProfileLink.addClickHandler(editProfileHandler);
+				editProfileLink.addStyleDependentName("IdentityButton");
 				editProfileLink.setIcon(IconType.COG);
 				accountManagement.add(editProfileLink);			  		
 				accountManagement.add(signOutLink);
@@ -221,10 +224,12 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		}
 		else {
 			signInLink = new Button("sign in");
-			signInLink.setIcon(IconType.LOCK);
+			signInLink.setIcon(IconType.KEY);
 			signInLink.addClickHandler(signInHandler);
+			signInLink.addStyleDependentName("IdentityButton");
 			signUpLink = new Button("sign up");
-			signUpLink.setIcon(IconType.PLUS_SIGN);
+			signUpLink.addStyleDependentName("IdentityButton");
+			signUpLink.setIcon(IconType.LOCK);
 			signUpLink.addClickHandler(signUpHandler);
 
 			accountManagement.add(signInLink);

@@ -79,7 +79,7 @@ public class ContentActivity extends AbstractActivity implements EditContentPres
 				final IContent content = result;
 				LoginInfo login = clientFactory.getLoginInfo();
 				view.getButtonBar().clear();
-				clientFactory.getNavBarView().collapseHero(true);
+				clientFactory.getHeaderView().collapseHero(true);
 				Element loadPanel = DOM.getElementById("loadPanel");
 				if (loadPanel != null && loadPanel.hasParentElement()) {
 					loadPanel.removeFromParent();

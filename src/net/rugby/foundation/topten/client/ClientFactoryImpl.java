@@ -6,8 +6,8 @@ import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.topten.client.ui.NavBarView;
-import net.rugby.foundation.topten.client.ui.NavBarViewImpl;
+import net.rugby.foundation.topten.client.ui.HeaderView;
+import net.rugby.foundation.topten.client.ui.HeaderViewImpl;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
 import net.rugby.foundation.topten.client.ui.toptenlistview.CompactTopTenListViewImpl;
@@ -41,7 +41,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	private static EditContent editContent = null;
 	private static TopTenListServiceAsync rpcService = null;
 	private static EditTTIText editTTIText = null;
-	private static NavBarView navBarView = null;
+	private static HeaderView headerView = null;
 	private static EditTTLInfo editTTLInfo = null;
 	private static Presenter identityPresenter = null;
 	private static LoginInfo loginInfo = null;
@@ -107,13 +107,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		return Location.getPath().contains("fb");
 	}
 	@Override
-	public NavBarView getNavBarView() {
-		if (navBarView == null) {
-			navBarView = new NavBarViewImpl();
-			RootPanel.get("navbar").add((NavBarViewImpl)navBarView);
-			navBarView.setClientFactory(this);
+	public HeaderView getHeaderView() {
+		if (headerView == null) {
+			headerView = new HeaderViewImpl();
+			RootPanel.get("header").add((HeaderViewImpl)headerView);
+			headerView.setClientFactory(this);
 		}
-		return navBarView; 
+		return headerView; 
 	}
 	@Override
 	public EditTTLInfo getEditTTLInfoDialog() {
@@ -161,7 +161,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 					final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
 					// where we keep the sign in/sign out
 					if (i.getParent() == null) {
-						i.setParent(getNavBarView().getLoginPanel());
+						i.setParent(getHeaderView().getLoginPanel());
 						i.setPresenter(iPresenter);
 					}
 					Core.getCore().login(new AsyncCallback<LoginInfo>() {
@@ -176,7 +176,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 
 							loginInfo = result;
 							coreConfig = config;
-							getNavBarView().setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
+							getHeaderView().setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
 
 							// set up content 
 							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
@@ -192,7 +192,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 								public void onSuccess(List<IContent> contentList) {
 									ClientFactoryImpl.contentList = contentList;
 									//getNavBarView().getButtonBar().clear();
-									getNavBarView().setContent(contentList, loginInfo.isTopTenContentEditor());	
+									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
 									cb.onSuccess(coreConfig);
 								}
 

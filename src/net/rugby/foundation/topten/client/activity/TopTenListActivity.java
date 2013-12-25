@@ -89,34 +89,36 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 									boolean simple = true;
 									if (login.isTopTenContentContributor() || login.isTopTenContentEditor()) {
 										simple = false;
-									} else {
-	 									Iterator<ITopTenItem> it = ttl.getList().iterator();
-										while (it.hasNext())  {
-											ITopTenItem i = it.next();
-											if (i.getText() != null && !i.getText().isEmpty()) {
-												simple = false; 
-												break;
-											}
-										}
-									}
+									} 
+									
+//									else {
+//	 									Iterator<ITopTenItem> it = ttl.getList().iterator();
+//										while (it.hasNext())  {
+//											ITopTenItem i = it.next();
+//											if (i.getText() != null && !i.getText().isEmpty()) {
+//												simple = false; 
+//												break;
+//											}
+//										}
+//									}
 									
 									if (!simple) {
 										view.setItemCount(0);
-										clientFactory.getNavBarView().collapseHero(false);
+										clientFactory.getHeaderView().collapseHero(false);
 										if ( clientFactory.getLoginInfo().isTopTenContentEditor()) {
-											clientFactory.getNavBarView().getButtonBar().clear();
+											clientFactory.getHeaderView().getButtonBar().clear();
 										}
-										clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+										clientFactory.getHeaderView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
 										view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
 									} else {
 										view = clientFactory.getSimpleView();
 										view.setPresenter(This);
 										view.setClientFactory(clientFactory);
 										Panel.setWidget(view.asWidget());
-										clientFactory.getNavBarView().collapseHero(false);
+										clientFactory.getHeaderView().collapseHero(false);
 										if (clientFactory.getLoginInfo().isTopTenContentEditor())
-											clientFactory.getNavBarView().getButtonBar().clear();
-										clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+											clientFactory.getHeaderView().getButtonBar().clear();
+										clientFactory.getHeaderView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
 										view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
 									}
 								} else {
@@ -219,7 +221,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 					} else /*if (view.getList().getLive().equals(true))*/ {
 						publish.setEnabled(false);
 					}
-					clientFactory.getNavBarView().getButtonBar().add(publish);
+					clientFactory.getHeaderView().getButtonBar().add(publish);
 					publish.addClickHandler( new ClickHandler() {
 
 						@Override
@@ -232,7 +234,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 					});
 					Button delete = new Button("Delete");
 					delete.setType(ButtonType.DANGER);
-					clientFactory.getNavBarView().getButtonBar().add(delete);
+					clientFactory.getHeaderView().getButtonBar().add(delete);
 					delete.addClickHandler( new ClickHandler() {
 
 						@Override
@@ -244,7 +246,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 					Button edit = new Button("Edit TTL Info");
 					edit.setType(ButtonType.DANGER);
-					clientFactory.getNavBarView().getButtonBar().add(edit);
+					clientFactory.getHeaderView().getButtonBar().add(edit);
 					edit.addClickHandler( new ClickHandler() {
 
 						@Override
@@ -304,8 +306,8 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 			@Override
 			public void onSuccess(ITopTenList result) {
 				list.setList(result, clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
-				clientFactory.getNavBarView().getButtonBar().clear();
-				clientFactory.getNavBarView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
+				clientFactory.getHeaderView().getButtonBar().clear();
+				clientFactory.getHeaderView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
 				//refreshButtons();
 			}
 		});	}
@@ -519,7 +521,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				clientFactory.getNavBarView().setHeroListInfo(result.getTitle(), result.getContent());
+				clientFactory.getHeaderView().setHeroListInfo(result.getTitle(), result.getContent());
 				clientFactory.getEditTTLInfoDialog().hide();
 			}
 		});		

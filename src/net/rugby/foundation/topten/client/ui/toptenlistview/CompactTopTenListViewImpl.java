@@ -7,6 +7,7 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.Cell.Context;
@@ -23,7 +24,9 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
@@ -36,6 +39,10 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 
 	@UiField CellTable<ITopTenItem> items;
+	@UiField Heading title;
+	@UiField HTML details1;
+	@UiField com.github.gwtbootstrap.client.ui.Row contentPanel;
+	@UiField VerticalPanel contentArea;
 	@UiField Button prevButton;
 	@UiField Button nextButton;
 
@@ -67,20 +74,24 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 		initWidget(uiBinder.createAndBindUi(this));
 		prevButton.setIconSize(IconSize.LARGE);
-		prevButton.setIcon(IconType.BACKWARD);
+		prevButton.setIcon(IconType.CHEVRON_LEFT);
 		nextButton.setIconSize(IconSize.LARGE);
-		nextButton.setIcon(IconType.FORWARD);
-
-
+		nextButton.setIcon(IconType.CHEVRON_RIGHT);
+		prevButton.setVisible(false);
+		nextButton.setVisible(false);
+		contentPanel.addStyleName("contentPanel");
+		contentArea.addStyleName("contentArea");
+		
+		
 		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-				return s.getOrdinal() < 0 ? "" : Integer.toString(s.getOrdinal());
+				return s.getOrdinal() < 0 ? "" : Integer.toString(s.getOrdinal()) + ".";
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return "bubble";
+				return "compactTTL";
 
 			}
 		});
@@ -93,7 +104,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return "lead text-center";
+				return "lead text-center compactTTL";
 
 			}
 		});
@@ -106,7 +117,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return "lead text-center";
+				return "text-center compactTTL position";
 
 			}
 		});
@@ -130,7 +141,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return "pull-right";
+				return "compactTTL";
 			}
 		});
 
@@ -168,21 +179,24 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		list = result;
 		//setVisible(false);
 		if (result != null) {
-			clientFactory.getNavBarView().setHeroListInfo(result.getTitle(),result.getContent());
-			clientFactory.getNavBarView().setDetails("");
-			clientFactory.getNavBarView().setHeroTextBig(false);
+			clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent());
+			clientFactory.getHeaderView().setDetails("");
+			clientFactory.getHeaderView().setHeroTextBig(false);
 			
 			if (list.getPrevPublishedId() != null) {
-				prevButton.setEnabled(true);
+				prevButton.setVisible(true);
 			} else {
-				prevButton.setEnabled(false);
+				prevButton.setVisible(false);
 			}
 
 			if (list.getNextPublishedId() != null) {
-				nextButton.setEnabled(true);
+				nextButton.setVisible(true);
 			} else {
-				nextButton.setEnabled(false);
+				nextButton.setVisible(false);
 			}
+			
+			title.setText(result.getTitle());
+			details1.setHTML(result.getContent());
 			items.setRowData(result.getList());
 			//			Iterator<ITopTenItem> it = result.getList().iterator();
 			//			int count = 0;
@@ -206,17 +220,17 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			//				}
 			//			}
 
-			Element loadPanel = DOM.getElementById("loadPanel");
-			if (loadPanel != null && loadPanel.hasParentElement()) {
-				loadPanel.removeFromParent();
-			}
+//			Element loadPanel = DOM.getElementById("loadPanel");
+//			if (loadPanel != null && loadPanel.hasParentElement()) {
+//				loadPanel.removeFromParent();
+//			}
 			//setVisible(true);
 		} else {
 			items.setVisible(false);
-			clientFactory.getNavBarView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
+			clientFactory.getHeaderView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
 			//clientFactory.getNavBarView().setDetails("Check back every Monday for top ten performances from competitions.");
-			prevButton.setEnabled(false);
-			nextButton.setEnabled(false);
+			prevButton.setVisible(false);
+			nextButton.setVisible(false);
 		}
 
 
@@ -253,13 +267,15 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	@Override
 	public void hasNext(boolean has) {
 		nextButton.setEnabled(has);
-
+		nextButton.setVisible(has);
 	}
 
 
 	@Override
 	public void hasPrev(boolean has) {
 		prevButton.setEnabled(has);	
+		prevButton.setVisible(has);
+
 	}
 
 

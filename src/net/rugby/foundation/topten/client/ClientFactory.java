@@ -11,7 +11,7 @@ import net.rugby.foundation.topten.client.ui.content.EditContent;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
-import net.rugby.foundation.topten.client.ui.NavBarView;
+import net.rugby.foundation.topten.client.ui.HeaderView;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
 import com.google.gwt.event.shared.EventBus;
@@ -42,7 +42,7 @@ public interface ClientFactory {
 	EditTTLInfo getEditTTLInfoDialog();
 
 	boolean isDualParamString();
-	NavBarView getNavBarView();
+	HeaderView getHeaderView();
 	
 	void RegisterIdentityPresenter(Presenter identityPresenter);
 	void doSetup(AsyncCallback<ICoreConfiguration> cb);

@@ -39,7 +39,7 @@ public class OfyContentFactory extends BaseCachingFactory<IContent> implements I
 			dropAllList();
 			
 			// store in memcache by div if it is of that sort
-			if (!t.getDiv().isEmpty()) {
+			if (t!= null && t.getDiv() != null && !t.getDiv().isEmpty()) {
 				String divKey = this.getClass().getCanonicalName() + t.getDiv();
 				super.putItem(divKey, t);
 			}

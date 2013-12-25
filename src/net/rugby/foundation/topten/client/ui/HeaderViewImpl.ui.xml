@@ -1,0 +1,65 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+
+    <ui:style>
+		/* Add CSS here. See the GWT docs on UI Binder for more details */
+		.nobtn {
+			border: none;
+			background: none;
+			box-shadow: none;
+		}
+    </ui:style>
+
+    <g:HTMLPanel width="100%" >
+
+        <b:Navbar>
+           <b:Nav alignment="RIGHT" >
+
+                <g:HTML styleName="btn {style.nobtn}" >
+
+                    <div
+                        class="fb-like"
+                        data-href="https://www.facebook.com/therugbynet"
+                        data-layout="button_count"
+                        data-send="true"
+                        data-show-faces="false"
+                        data-width="0" >
+                    </div>
+                </g:HTML>
+            </b:Nav>
+
+            <b:Nav alignment="RIGHT" >
+
+                <b:NavPills ui:field="loginPanel" />
+            </b:Nav>
+        </b:Navbar>
+
+        <b:Navbar>
+
+            <b:Nav alignment="RIGHT" >
+
+                <b:Brand>
+Top Ten Lists
+                </b:Brand>
+
+                <b:NavPills>
+
+                    <b:Dropdown
+                        text="Competition"
+                        ui:field="compDropdown" >
+                    </b:Dropdown>
+
+                    <b:Dropdown
+                        text="About Us"
+                        ui:field="contentDropdown" >
+                    </b:Dropdown>
+                </b:NavPills>
+            </b:Nav>
+
+
+        </b:Navbar>
+    </g:HTMLPanel>
+
+</ui:UiBinder>
