@@ -13,8 +13,8 @@ import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerMatchInfo;
-import net.rugby.foundation.model.shared.Position.position;
 
 public class TestPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 
@@ -52,8 +52,7 @@ public class TestPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 	}
 
 	@Override
-	public List<IPlayerMatchInfo> query(Long compId, Long roundId,
-			position posi, Long countryId, Long teamId, Long schemaId) {
+	public List<IPlayerMatchInfo> query(IRatingQuery rq, Long schemaId) {
 		return getForComp(null,null);
 	}
 

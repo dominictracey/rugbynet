@@ -22,6 +22,7 @@ import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
@@ -33,6 +34,7 @@ import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
@@ -53,6 +55,7 @@ public class QueryMatchRatingTester {
 	private IQueryRatingEngineFactory qref;
 	private IMatchGroupFactory mf;
 	private IMatchRatingEngineSchemaFactory mresf;
+	private IRatingQueryFactory rqf;
 
 
 	@Before
@@ -67,7 +70,7 @@ public class QueryMatchRatingTester {
 
 	@Inject
 	public void setFactory(ITeamGroupFactory tf, IPlayerFactory pf, IMatchGroupFactory mf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, 
-			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory mresf) {
+			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory mresf, IRatingQueryFactory rqf) {
 		this.tf = tf;
 		this.pf = pf;
 		this.mf = mf;
@@ -75,6 +78,7 @@ public class QueryMatchRatingTester {
 		this.pmsf = pmsf;
 		this.qref = qref;
 		this.mresf = mresf;
+		this.rqf = rqf;
 	}
 	/**
 	 * Must refer to a valid module that sources this class.
@@ -107,32 +111,36 @@ public class QueryMatchRatingTester {
 	@Test
 	public void testPopulate() {
 		IQueryRatingEngine qre = qref.get(new ScrumMatchRatingEngineSchema20130713());
-
-		addMatch(100L, qre);
-		addMatch(101L, qre);
-		addMatch(102L, qre);
-		
+//
+//		addMatch(100L, qre);
+//		addMatch(101L, qre);
+//		addMatch(102L, qre);
+		IRatingQuery rq = rqf.get(700L);
+		assertTrue (rq != null);
+		qre.setQuery(rq);
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
 	}
 	
-	private void addMatch(Long mid, IQueryRatingEngine qre) {
-		qre.addPlayerStats(pmsf.getByMatchId(mid));
-		IMatchGroup m = mf.get(mid);
-		List<ITeamMatchStats> list = new ArrayList<ITeamMatchStats>();
-		list.add(tmsf.getHomeStats(m));
-		list.add(tmsf.getVisitStats(m));
-		qre.addTeamStats(list);
-	}
+//	private void addMatch(Long mid, IQueryRatingEngine qre) {
+//		qre.addPlayerStats(pmsf.getByMatchId(mid));
+//		IMatchGroup m = mf.get(mid);
+//		List<ITeamMatchStats> list = new ArrayList<ITeamMatchStats>();
+//		list.add(tmsf.getHomeStats(m));
+//		list.add(tmsf.getVisitStats(m));
+//		qre.addTeamStats(list);
+//	}
 	
 	@Test
 	public void testGenerate1() {
 
 		IQueryRatingEngine qre = qref.get(mresf.getDefault());
 
-		addMatch(100L, qre);
-		addMatch(101L, qre);
-		addMatch(102L, qre);
+//		addMatch(100L, qre);
+//		addMatch(101L, qre);
+//		addMatch(102L, qre);
+		IRatingQuery rq = rqf.get(700L);
 		
+		qre.setQuery(rq);
 		qre.generate(mresf.getDefault());
 		
 		StatisticalSummary ss = qre.getStatisticalSummary();

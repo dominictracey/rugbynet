@@ -21,6 +21,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.PlayerMatchInfo;
 import net.rugby.foundation.model.shared.Position.position;
@@ -99,8 +100,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 
 
 	@Override
-	public List<IPlayerMatchInfo> query(Long compId, Long roundId,
-			position posi, Long countryId, Long teamId, Long schemaId) {
+	public List<IPlayerMatchInfo> query(IRatingQuery query, Long schemaId) {
 		try {
 			List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
 
@@ -112,17 +112,17 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 			
 			// so first we need a list of matches
 			ICompetition comp = null;
-			if (compId != null) {
-				cf.setId(compId);
+			if (query.getCompIds().get(0) != null) {
+				cf.setId(query.getCompIds().get(0));
 				comp = cf.getCompetition();
 			} else {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "compID can't be null in call to query");
 				return null; 
 			}
 
-			if (roundId != null) {
+			if (query.getRoundIds().get(0) != null) {
 				for (IRound r : comp.getRounds()) {
-					if (r.getId().equals(roundId)) {
+					if (r.getId().equals(query.getRoundIds().get(0))) {
 						matches = r.getMatchIDs();
 						break;
 					}
@@ -135,7 +135,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 			}
 			
 			// now matches has all the matches
-			List<IPlayerMatchStats> statsList = pmsf.query(matches, posi, countryId, teamId);
+			List<IPlayerMatchStats> statsList = pmsf.query(query);
 			
 			for (IPlayerMatchStats stats : statsList) {
 				IPlayerMatchRating pmr = null;

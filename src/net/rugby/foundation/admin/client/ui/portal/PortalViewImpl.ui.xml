@@ -45,7 +45,7 @@ Round:
 
                 <br />
 
-                <g:ListBox ui:field="round" />
+                <g:ListBox ui:field="round"/>
             </g:HTMLPanel>
 
             <g:HTMLPanel>
@@ -53,7 +53,7 @@ Position:
 
                 <br />
 
-                <g:ListBox ui:field="pos" />
+                <g:ListBox ui:field="pos" multipleSelect="true"/>
             </g:HTMLPanel>
 
             <g:HTMLPanel>
@@ -61,7 +61,7 @@ Country:
 
                 <br />
 
-                <g:ListBox ui:field="country" />
+                <g:ListBox ui:field="country" multipleSelect="true"/>
             </g:HTMLPanel>
 
             <g:HTMLPanel>
@@ -69,9 +69,11 @@ Team:
 
                 <br />
 
-                <g:ListBox ui:field="team" />
+                <g:ListBox ui:field="team" multipleSelect="true"/>
             </g:HTMLPanel>
             <g:Button ui:field="query">Query</g:Button>
+            <g:Button ui:field="clear">Clear</g:Button>
+            <g:Button ui:field="delete">Delete</g:Button>
             <g:Button ui:field="topTen">Create Top Ten List</g:Button>
         </g:HorizontalPanel>
 

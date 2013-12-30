@@ -15,10 +15,11 @@ public class TopTenSeedData implements Serializable {
 	protected String title;
 	protected String description;
 	protected Long compId;
-	protected Long roundId;
-	protected position pos;
-	protected Long countryId;
-	protected Long teamId;
+	protected Long ratingQueryId;
+//	protected Long roundId;
+//	protected position pos;
+//	protected Long countryId;
+//	protected Long teamId;
 	protected int playersPerTeam = 10;
 	
 	public TopTenSeedData() {
@@ -26,17 +27,13 @@ public class TopTenSeedData implements Serializable {
 	}
 	
 	public TopTenSeedData(List<IPlayerMatchInfo> pmiList, String title,
-			String description, Long compId, Long roundId, position pos,
-			Long countryId, Long teamId, int playersPerTeam) {
+			String description, Long compId, Long ratingQueryId, int playersPerTeam) {
 		super();
 		this.pmiList = pmiList;
 		this.title = title;
 		this.description = description;
 		this.compId = compId;
-		this.roundId = roundId;
-		this.pos = pos;
-		this.countryId = countryId;
-		this.teamId = teamId;
+		this.ratingQueryId = ratingQueryId;
 		this.playersPerTeam = playersPerTeam;
 	}
 	public List<IPlayerMatchInfo> getPmiList() {
@@ -63,30 +60,30 @@ public class TopTenSeedData implements Serializable {
 	public void setCompId(Long compId) {
 		this.compId = compId;
 	}
-	public Long getRoundId() {
-		return roundId;
-	}
-	public void setRoundId(Long roundId) {
-		this.roundId = roundId;
-	}
-	public position getPos() {
-		return pos;
-	}
-	public void setPos(position pos) {
-		this.pos = pos;
-	}
-	public Long getCountryId() {
-		return countryId;
-	}
-	public void setCountryId(Long countryId) {
-		this.countryId = countryId;
-	}
-	public Long getTeamId() {
-		return teamId;
-	}
-	public void setTeamId(Long teamId) {
-		this.teamId = teamId;
-	}
+//	public Long getRoundId() {
+//		return roundId;
+//	}
+//	public void setRoundId(Long roundId) {
+//		this.roundId = roundId;
+//	}
+//	public position getPos() {
+//		return pos;
+//	}
+//	public void setPos(position pos) {
+//		this.pos = pos;
+//	}
+//	public Long getCountryId() {
+//		return countryId;
+//	}
+//	public void setCountryId(Long countryId) {
+//		this.countryId = countryId;
+//	}
+//	public Long getTeamId() {
+//		return teamId;
+//	}
+//	public void setTeamId(Long teamId) {
+//		this.teamId = teamId;
+//	}
 
 	public int getPlayersPerTeam() {
 		return playersPerTeam;
@@ -94,5 +91,13 @@ public class TopTenSeedData implements Serializable {
 
 	public void setPlayersPerTeam(int playersPerTeam) {
 		this.playersPerTeam = playersPerTeam;
+	}
+
+	public Long getRatingQueryId() {
+		return ratingQueryId;
+	}
+
+	public void setRatingQueryId(Long ratingQueryId) {
+		this.ratingQueryId = ratingQueryId;
 	}
 }

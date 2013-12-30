@@ -1,6 +1,10 @@
 package net.rugby.foundation.core.server.factory;
 
+import java.util.List;
+
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 public interface ITeamMatchStatsFactory   extends ICachingFactory<ITeamMatchStats> {
@@ -11,4 +15,5 @@ public interface ITeamMatchStatsFactory   extends ICachingFactory<ITeamMatchStat
 
 	public abstract boolean deleteForMatch(IMatchGroup m);
 
+	public abstract List<ITeamMatchStats> query(IRatingQuery rq);
 }

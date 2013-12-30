@@ -31,6 +31,7 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerMatchRating;
 import net.rugby.foundation.model.shared.PlayerRating;
 
@@ -136,9 +137,9 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 	@Override
 	public IPlayerMatchRating getNew(IPlayer player, IMatchGroup match,
 			Integer rating, IRatingEngineSchema schema,
-			IPlayerMatchStats playerMatchStats, String details) {
+			IPlayerMatchStats playerMatchStats, String details, IRatingQuery query) {
 		Objectify ofy = DataStoreFactory.getOfy();
-		PlayerMatchRating pmr = new PlayerMatchRating(rating, player, (IGroup)match, schema, playerMatchStats, details);
+		PlayerMatchRating pmr = new PlayerMatchRating(rating, player, (IGroup)match, schema, playerMatchStats, details, query);
 		ofy.put(pmr);
 		return pmr;
 	}
@@ -298,4 +299,23 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 		}
 		return true;
 	}
+
+	@Override
+	public boolean deleteForQuery(IRatingQuery rq) {
+		try {
+			if (rq != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+	
+				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("queryId", rq.getId());
+				ofy.delete(qpmr);
+
+				
+			} else {
+				return false; // null match
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;	}
 }

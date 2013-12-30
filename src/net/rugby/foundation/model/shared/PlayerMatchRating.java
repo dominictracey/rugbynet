@@ -1,6 +1,5 @@
 package net.rugby.foundation.model.shared;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
 
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
@@ -26,8 +25,8 @@ public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRatin
 	}
 	
 	public PlayerMatchRating(Integer rating, IPlayer player, IGroup match,
-			IRatingEngineSchema schema, IPlayerMatchStats playerMatchStats, String details) {
-		super(rating, player, match, schema);
+			IRatingEngineSchema schema, IPlayerMatchStats playerMatchStats, String details, IRatingQuery query) {
+		super(rating, player, match, schema, query);
 		
 		super.addMatchStats(playerMatchStats);
 		//super.addplayerMatchStatsId(playerMatchStats.getId();

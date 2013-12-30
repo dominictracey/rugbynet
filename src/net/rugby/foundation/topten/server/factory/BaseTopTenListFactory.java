@@ -457,6 +457,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				setLatestPublishedForComp(get(latest.getId()), list.getCompId());
 			}
 
+			// sanity check
+			scan(list.getCompId());
 
 			return list;
 		} catch (Throwable ex) {
@@ -585,6 +587,37 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}
+	}
+	
+	@Override
+	public boolean scan(Long compId) {
+		
+		boolean retval = true;
+		// start at the purported last created and work backwards to confirm veracity of linkages
+		ITopTenList lastCreated = getLastCreatedForComp(compId);
+		ITopTenList cursor = lastCreated;
+		while (cursor != null) {
+			Long prevId = cursor.getPrevId();
+			ITopTenList prev = get(prevId);
+			if (prev.getNextId() != cursor.getId()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Scan of TTL for comp " + compId + " discovered bad nextId for TTL " + prev.getId() + ". The TTL who points to it with it's prevId is TTL " + cursor.getId() + " but the nextId for this TTL is " + prev.getNextId() + ".");
+				retval = false;
+			}
+			cursor = prev;
+		}
+		
+		// now the same with the published list
+		cursor = getLatestForComp(compId);
+		while (cursor != null) {
+			Long prevId = cursor.getPrevPublishedId();
+			ITopTenList prev = get(prevId);
+			if (prev.getNextPublishedId() != cursor.getId()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Scan of TTL for comp " + compId + " discovered bad nextPublishedId for TTL " + prev.getId() + ". The TTL who points to it with it's prevPublishedId is TTL " + cursor.getId() + " but the nexPublishedtId for this TTL is " + prev.getNextPublishedId() + ".");
+				retval = false;
+			}
+			cursor = prev;
+		}
+		return retval;
 	}
 
 }

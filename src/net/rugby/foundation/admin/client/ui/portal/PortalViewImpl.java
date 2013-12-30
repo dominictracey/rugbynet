@@ -3,6 +3,7 @@
  */
 package net.rugby.foundation.admin.client.ui.portal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.rugby.foundation.admin.client.ClientFactory;
@@ -17,8 +18,10 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.Position;
 import net.rugby.foundation.model.shared.Position.position;
 
 import com.google.gwt.core.client.GWT;
@@ -28,6 +31,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
@@ -57,6 +61,8 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
     @UiField ListBox team;
 
     @UiField Button query;
+    @UiField Button clear;
+    @UiField Button delete;
     @UiField Button topTen;
     @UiField SimplePanel jobArea;
     
@@ -69,15 +75,15 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 
 	//private List<ICompetition> comps;
 
-	private Long teamId;
+	private List<Long> teamIds;
 
-	private Long countryId;
+	private List<Long> countryIds;
 
-	private position posi;
+	private List<position> posis;
 
-	private Long roundId;
+	private List<Long> roundIds;
 
-	private Long compId;
+	private List<Long> compIds;
 
 	private ICompetition currentComp;
 
@@ -86,6 +92,10 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	private ICoreConfiguration config;
 
 	private int playersPerTeam = 10;
+	
+	private IRatingQuery rq;
+
+	private boolean isSetup = false;
 	
 	public PortalViewImpl()
 	{
@@ -148,19 +158,44 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	@Override
 	public void setComp(ICompetition c) {
 		currentComp = c;
-		compId = c.getId();
+		if (compIds == null) {
+			compIds = new ArrayList<Long>();
+		}
+		compIds.add(c.getId());
+		// select any comps in the current query
+		if (rq != null) {
+			for (int i=0; i<comp.getItemCount(); i++) {
+				if (rq.getCompIds().contains(c.getId())) {
+					comp.setSelectedIndex(i);
+				}
+			}
+		}
+		
 		round.clear();
 		round.addItem("All","-1");
 		for (IRound r : c.getRounds()) {
 			round.addItem(r.getName(),r.getId().toString());
+			// select any items in the current query
+			if (rq != null) {
+				if (rq.getRoundIds().contains(r.getId())) {
+					round.setItemSelected(round.getItemCount()-1, true);
+				}
+			}
 		}
 		
 		team.clear();
 		team.addItem("All","-1");
 		for (ITeamGroup t : c.getTeams()) {
 			team.addItem(t.getDisplayName(), t.getId().toString());
+			// select any items in the current query
+			if (rq != null) {
+				if (rq.getTeamIds().contains(t.getId())) {
+					team.setItemSelected(team.getItemCount()-1, true);
+				}
+			}
 		}
 	}
+	
 	@Override
 	public void setPositions(List<position> result) {
 		for (position posi: result) {
@@ -175,6 +210,8 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 			country.addItem(c.getName(), c.getId().toString());
 		}
 		
+		// this is the last thing
+		isSetup = true;
 	}
 	
 	@UiHandler("query")
@@ -182,34 +219,43 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 
 		populateVals();
 		
-		listener.submitPortalQuery(compId, roundId, posi, countryId, teamId);
+		listener.submitPortalQuery(compIds, roundIds, posis, countryIds, teamIds);
 	}
 	
 	
 	private void populateVals() {
+		compIds = new ArrayList<Long>();
+		compIds.add(Long.parseLong(comp.getValue(comp.getSelectedIndex())));
 		
-		roundId = null;
-		if (round.getSelectedIndex() > -1) {
-			if (!round.getValue(round.getSelectedIndex()).equals("-1")) {
-				roundId = currentComp.getRounds().get(round.getSelectedIndex()-1).getId();
-				currentRound = currentComp.getRounds().get(round.getSelectedIndex()-1);
-			}
-		}
+		roundIds = new ArrayList<Long>();
+	    for (int i = 0; i < round.getItemCount(); i++) {
+	        if (round.isItemSelected(i)) {
+	        	if (!round.getValue(i).equals("-1")) {
+					roundIds.add(currentComp.getRounds().get(i-1).getId());
+	        	}
+	        }
+	    }
 		
-		posi = position.NONE;
-		if (pos.getSelectedIndex() > -1) {
-			posi = position.getAt(pos.getSelectedIndex());
-		}		
+		posis = new ArrayList<position>();
+	    for (int i = 0; i < pos.getItemCount(); i++) {
+	        if (pos.isItemSelected(i)) {
+	        	posis.add(position.getAt(i));
+	        }
+	    }	
 		
-		countryId = null;
-		if (country.getSelectedIndex() > -1) {
-			countryId = Long.parseLong(country.getValue(country.getSelectedIndex()));
-		}
+		countryIds = new ArrayList<Long>();
+	    for (int i = 0; i < country.getItemCount(); i++) {
+	        if (country.isItemSelected(i)) {
+	        	countryIds.add(Long.parseLong(country.getValue(i)));
+	        }
+	    }	
 		
-		teamId = null;
-		if (team.getSelectedIndex() > -1) {
-			teamId = Long.parseLong(team.getValue(team.getSelectedIndex()));
-		}
+		teamIds = new ArrayList<Long>();
+	    for (int i = 0; i < team.getItemCount(); i++) {
+	        if (team.isItemSelected(i)) {
+	        	teamIds.add(Long.parseLong(team.getValue(i)));
+	        }
+	    }	
 		
 	}
 
@@ -219,7 +265,12 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 
 		populateVals();
 		
-		TopTenSeedData data = new TopTenSeedData((List<IPlayerMatchInfo>)PortalList, "", "", compId, roundId, posi, countryId, teamId, playersPerTeam);
+		Long rqId = null;
+		if (rq != null) {
+			rqId = rq.getId();
+		}
+		
+		TopTenSeedData data = new TopTenSeedData((List<IPlayerMatchInfo>)PortalList, "", "", compIds.get(0), rqId, playersPerTeam);
 
 		listener.createTopTenList(data);
 
@@ -258,5 +309,70 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 		this.currentRound = currentRound;
 	}
 
+
+	@Override
+	public void setRatingQuery(IRatingQuery rq) {
+		this.rq = rq;
+
+		if (rq != null) {
+			// select the comp
+			listener.portalViewCompSelected(rq.getCompIds().get(0));
+			
+			// this will call setComp, where we can select the comp(s), round(s) and teams.
+			
+			// we can do the positions and countries though
+			for (int i=0; i<position.values().length; i++) {
+				if (rq.getPositions().contains(position.values()[i])) {
+					if (pos.getItemCount() >= i-1) {
+						pos.setItemSelected(i, true);
+					}
+				}
+			}
+			
+			for (int i=0; i<country.getItemCount(); i++) {
+				if (rq.getCountryIds().contains(Long.parseLong(country.getValue(i)))) {
+					country.setItemSelected(i, true);
+				}
+			}
+		} else {
+			Window.alert("The query you are accessing no longer exists or is invalid.");
+		}
+		
+	}
+
+
+	@Override
+	public boolean isSetup() {
+		return isSetup ;
+	}
+
+	@UiHandler("clear")
+	void onClearClick(ClickEvent e) {
+		clear();
+	}
+	
+	@UiHandler("delete")
+	void onDeleteClick(ClickEvent e) {
+		listener.deleteQuery(rq);
+	}
+	
+	@Override
+	public boolean clear() {
+		clientFactory.getPlayerListView().clear();
+		
+		comp.setSelectedIndex(-1);
+		round.clear();
+		team.clear();
+		for (int i=0; i<country.getItemCount(); i++) {
+			country.setItemSelected(i, false);
+		}
+		
+		for (int i=0; i<pos.getItemCount(); i++) {
+			pos.setItemSelected(i, false);
+		}
+		
+		return true;
+	}
+	
 }
 

@@ -15,6 +15,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStatTimeLog;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -150,5 +151,9 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	@Override
 	public boolean deleteForMatch(IMatchGroup m) {
 		return true;
+	}
+	@Override
+	public List<IPlayerMatchStats> query(IRatingQuery rq) {
+		return getByMatchId(100L);
 	}
 }

@@ -198,7 +198,7 @@ public class TopTenFactoryTester {
 	private ITopTenList createTTL() {
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, 2L, null, null, null,10);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, 2L, 10);
 		return ttf.create(ttsd);
 	}
 
@@ -402,7 +402,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -422,7 +422,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -451,7 +451,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, 10);
 		ITopTenList ttl1 = ttf.create(ttsd);
 
 		assertTrue(ttl1 != null);
@@ -525,7 +525,7 @@ public class TopTenFactoryTester {
 		// delete 1
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, 10);
 		ITopTenList ttl1 = ttf.create(ttsd);
 		assertTrue(ttl1 != null);
 		assertFalse(ttl1.getLive());
@@ -642,7 +642,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, null, null, null,10);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, 12L, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -713,7 +713,7 @@ public class TopTenFactoryTester {
 
 		int max = 5;
 	
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, 2L, null, null, null,max);
+		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, 2L, max);
 		ITopTenList ttl = ttf.create(ttsd);
 		
 		assert (ttl != null);

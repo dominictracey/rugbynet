@@ -1,6 +1,8 @@
 package net.rugby.foundation.core.server.factory;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,16 +10,20 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumTeamMatchStats;
 
 public abstract class BaseTeamMatchStatsFactory extends BaseCachingFactory<ITeamMatchStats> implements ITeamMatchStatsFactory {
 	
 	protected IMatchGroupFactory mf;
+	private IRoundFactory rf;
 
 	@Inject
-	protected void setFactories(IMatchGroupFactory mf) {
+	protected void setFactories(IMatchGroupFactory mf, IRoundFactory rf) {
 		this.mf = mf;
+		this.rf = rf;
 	}
 	
 	private final String prefix = this.getClass().toString();
@@ -71,5 +77,35 @@ public abstract class BaseTeamMatchStatsFactory extends BaseCachingFactory<ITeam
 		ITeamMatchStats tms = new ScrumTeamMatchStats();
 		tms.setCreated(new Date());
 		return tms;
+	}
+	
+
+	@Override
+	public List<ITeamMatchStats> query(IRatingQuery rq) {
+		try {
+			// @REX case of just specifying the comp and not the rounds (want all rounds)
+			List<ITeamMatchStats> tmss = new ArrayList<ITeamMatchStats>();
+			for (Long rid : rq.getRoundIds()) {
+				rf.setId(rid);
+				IRound r = rf.getRound();
+				for (IMatchGroup m : r.getMatches()) {
+					ITeamMatchStats h = getHomeStats(m);
+					if (h != null) {
+						tmss.add(h);
+					}
+					
+					ITeamMatchStats v = getVisitStats(m);
+					if (v != null) {
+						tmss.add(v);
+					}
+				}
+			}
+			
+			return tmss;
+			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in query: " + ex.getLocalizedMessage());
+			return null;
+		}
 	}
 }

@@ -2,6 +2,7 @@ package net.rugby.foundation.admin.client.ui.portal;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.IsWidget;
 
 import net.rugby.foundation.admin.client.ClientFactory;
@@ -10,6 +11,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -18,11 +20,14 @@ public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
 		
 		ClientFactory getClientFactory();
 
-		void submitPortalQuery(Long compId, Long roundId, position posi,
-				Long countryId, Long teamId);
+		void submitPortalQuery(List<Long> compId, List<Long> roundId, List<position> posi,
+				List<Long> countryId, List<Long> teamId);
+		
 		void createTopTenList(TopTenSeedData data);
 
 		void portalViewCompSelected(long parseLong);
+
+		void deleteQuery(IRatingQuery query);
 
 	} 
 
@@ -49,6 +54,10 @@ public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
 
 	public abstract void setComp(ICompetition result);
 	
-	
+	public abstract void setRatingQuery(IRatingQuery rq);
+
+	public abstract boolean isSetup();
+
+	boolean clear();
 
 }

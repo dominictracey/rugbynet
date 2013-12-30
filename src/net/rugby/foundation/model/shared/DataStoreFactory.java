@@ -74,6 +74,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(TopTenList.class);
 			ObjectifyService.register(TopTenItem.class);
 			ObjectifyService.register(Standing.class);
+			ObjectifyService.register(RatingQuery.class);
 			
 		}
 		

@@ -35,6 +35,7 @@ public interface PlayerListView<T extends IPlayerMatchInfo> extends IsWidget
 
 	void updatePlayerMatchStats(T newPmi);
 	void setPlayers(List<T> PlayerList, IMatchGroup match);
+	void clear();
 
 
 }

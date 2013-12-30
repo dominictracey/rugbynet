@@ -13,11 +13,13 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerMatchRating;
 
 public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
@@ -25,13 +27,15 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	private IPlayerMatchStatsFactory pmsf;
 	private IMatchGroupFactory mf;
 	private IPlayerFactory pf;
+	IRatingQueryFactory rqf;
 	private Random random = new Random();
 	
 	@Inject
-	TestPlayerMatchRatingFactory(IPlayerMatchStatsFactory pmsf, IMatchGroupFactory mgf, IPlayerFactory pf ) {
+	TestPlayerMatchRatingFactory(IPlayerMatchStatsFactory pmsf, IMatchGroupFactory mgf, IPlayerFactory pf, IRatingQueryFactory rqf ) {
 		this.pmsf = pmsf;
 		this.mf = mgf;
 		this.pf = pf;
+		this.rqf = rqf;
 	}
 	
 	@Override
@@ -39,7 +43,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 		if (id.equals(2000L)) {
 
 			return new PlayerMatchRating(723, pf.get(9001014L), (IGroup)mf.get(300L),
-					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L), "helpful tooltip details also") ;
+					new ScrumMatchRatingEngineSchema20130713(), pmsf.getById(1000L), "helpful tooltip details also", rqf.get(700L)) ;
 		}
 		return null;
 	}
@@ -66,8 +70,8 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	@Override
 	public IPlayerMatchRating getNew(IPlayer player, IMatchGroup match,
 			Integer rating, IRatingEngineSchema schema,
-			IPlayerMatchStats playerMatchStats, String details) {
-		return new PlayerMatchRating(rating, player, match, schema, playerMatchStats, details);
+			IPlayerMatchStats playerMatchStats, String details, IRatingQuery query) {
+		return new PlayerMatchRating(rating, player, match, schema, playerMatchStats, details, null);
 	}
 
 	@Override
@@ -78,7 +82,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	@Override
 	public IPlayerMatchRating get(IPlayerMatchStats pms, IRatingEngineSchema schema) {
 		int rating = getRandomRating();
-		return new PlayerMatchRating(rating, pf.get(pms.getPlayerId()), (IGroup)mf.get(pms.getMatchId()), schema, pms, "helpful tooltip details");
+		return new PlayerMatchRating(rating, pf.get(pms.getPlayerId()), (IGroup)mf.get(pms.getMatchId()), schema, pms, "helpful tooltip details", rqf.get(700L));
 	}
 
 	private int getRandomRating() {
@@ -92,6 +96,12 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 
 	@Override
 	public boolean deleteForMatch(IMatchGroup m) {
+		return true;
+	}
+
+	@Override
+	public boolean deleteForQuery(IRatingQuery rq) {
+		// TODO Auto-generated method stub
 		return true;
 	}
 

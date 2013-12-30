@@ -14,10 +14,12 @@ import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRatingQuery;
 
 @Singleton
 public class OrchestrationServlet extends HttpServlet {
@@ -27,13 +29,14 @@ public class OrchestrationServlet extends HttpServlet {
 	private IOrchestrationFactory of;
 	private ICompetitionFactory cf;
 	private IMatchGroupFactory mgf;
+	private IRatingQueryFactory rqf;
 
 	@Inject
-	public OrchestrationServlet(IOrchestrationFactory of, ICompetitionFactory cf, IMatchGroupFactory mgf, IRoundFactory rf, ITeamGroupFactory tf) {
+	public OrchestrationServlet(IOrchestrationFactory of, ICompetitionFactory cf, IMatchGroupFactory mgf, IRoundFactory rf, ITeamGroupFactory tf, IRatingQueryFactory rqf) {
 		this.of = of;
 		this.cf = cf;
 		this.mgf = mgf;
-		//mgf.setFactories(rf, tf);
+		this.rqf = rqf;
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -54,6 +57,12 @@ public class OrchestrationServlet extends HttpServlet {
 		} else if (target.equals(AdminOrchestrationTargets.Targets.COMP.toString())) {
 	        cf.setId(Long.parseLong(req.getParameter("id")));
 	        IOrchestration<ICompetition> orch = of.get(cf.getCompetition(), AdminOrchestrationActions.CompActions.valueOf(AdminOrchestrationActions.CompActions.class, action));
+	        if (orch != null) {
+	        	orch.execute();
+	        }
+		}  else if (target.equals(AdminOrchestrationTargets.Targets.RATING.toString())) {
+	        IRatingQuery rq = rqf.get(Long.parseLong(req.getParameter("id")));
+	        IOrchestration<IRatingQuery> orch = of.get(rq, AdminOrchestrationActions.RatingActions.valueOf(AdminOrchestrationActions.RatingActions.class, action));
 	        if (orch != null) {
 	        	orch.execute();
 	        }

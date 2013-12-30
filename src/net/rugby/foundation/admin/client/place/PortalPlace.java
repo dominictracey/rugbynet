@@ -20,7 +20,7 @@ public class PortalPlace extends Place {
   
 	private String token;
 	private String seps = "&|=";
-	private String taskId;
+	private String queryId;
 	private Map<String,String> map;
 	
 	
@@ -30,8 +30,8 @@ public class PortalPlace extends Place {
 		String[] tok = token.split(seps);
 		
 		if (tok.length > 1) {
-			assert (tok[0].equals("taskId"));
-			taskId = URL.decode(tok[1]);	
+			assert (tok[0].equals("queryId"));
+			queryId = URL.decode(tok[1]);	
 			
 		}
 
@@ -56,8 +56,8 @@ public class PortalPlace extends Place {
 	
 	public String getToken() {
 		token = "";
-		token += "taskId=";
-		token += taskId;
+		token += "queryId=";
+		token += queryId;
 		for (String key : map.keySet()) {
 			token += "&" + key + "=" + map.get(key);
 		}
@@ -65,7 +65,7 @@ public class PortalPlace extends Place {
 		return token;
 	}
 	
-	public String getTaskId() { return taskId; }
+	public String getqueryId() { return queryId; }
 
 	/**
 	 * PlaceTokenizer knows how to serialize the Place's state to a URL token.

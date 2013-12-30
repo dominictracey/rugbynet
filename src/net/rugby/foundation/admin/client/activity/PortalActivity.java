@@ -31,8 +31,11 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.RatingQuery;
 
 public class PortalActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
@@ -68,6 +71,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 		view.setPresenter(this);
 		panel.setWidget(view.asWidget());
 
+		
 		if (place != null) {
 			clientFactory.getRpcService().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 				@Override
@@ -103,6 +107,42 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 								public void onSuccess(List<ICountry> result) {
 									view.setCountries(result);
 
+									// now see if we have a query to display
+									if (place != null && place.getqueryId() != null) {
+										clientFactory.getRpcService().getRatingQuery(Long.parseLong(place.getqueryId()), new  AsyncCallback<IRatingQuery>() {
+
+											@Override
+											public void onFailure(Throwable caught) {
+												Window.alert("Problem finding the query with id " + place.getqueryId());
+												
+											}
+
+											@Override
+											public void onSuccess(IRatingQuery result) {
+												view.setRatingQuery(result);
+												if (result.getStatus() == Status.COMPLETE) {
+													clientFactory.getRpcService().getRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerMatchInfo>>() {
+
+														@Override
+														public void onFailure(Throwable caught) {
+															Window.alert("Problem finding the query results with id " + place.getqueryId());
+														}
+
+														@Override
+														public void onSuccess(List<IPlayerMatchInfo> result) {
+															view.showAggregatedMatchInfo(result);
+														}
+														
+													});
+												} else if (result.getStatus() == Status.ERROR) {
+													Window.alert("The query has terminated without delivering results. Check the server log for details.");
+												} else if (result.getStatus() == Status.RUNNING || result.getStatus() == Status.NEW) {
+													// keep checking
+													goTo(new PortalPlace("queryId=" + place.getqueryId()));
+												}
+											}	
+										});
+									}
 								}
 
 							});
@@ -115,6 +155,8 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 			});
 
 		}
+		
+	
 	}
 
 
@@ -238,27 +280,6 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 
 	}
 
-	@Override
-	public void submitPortalQuery(Long compId, Long roundId, position posi,
-			Long countryId, Long teamId) {
-		clientFactory.getRpcService().aggregatePlayerMatchRatings(compId, roundId, posi,
-				countryId, teamId, new AsyncCallback<List<IPlayerMatchInfo>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Query failed: " + caught.getLocalizedMessage());
-
-			}
-
-			@Override
-			public void onSuccess(List<IPlayerMatchInfo> result) {
-				clientFactory.getPortalView().showAggregatedMatchInfo(result);
-
-			}
-		});
-
-
-	}
 
 	@Override
 	public boolean onItemSelected(IPlayerMatchInfo c) {
@@ -327,7 +348,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 		}
 
 		ttltext.setText("Top Ten List Properties");
-		data.setTitle("Top Ten Performances for " + view.getCurrentComp().getShortName() + " - " + view.getCurrentRound().getName());
+		data.setTitle("Top Ten Performances for ");
 		ttltext.setPresenter(this);
 		ttltext.showTTI(data);
 	}
@@ -450,7 +471,47 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 
 	}
 
+	@Override
+	public void submitPortalQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId) {
 
+		clientFactory.getRpcService().createRatingQuery(compId, roundId, posi, countryId, teamId, new AsyncCallback<IRatingQuery>() {
 
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Query failed: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(IRatingQuery result) {
+				//clientFactory.getPortalView().setRatingQuery(result);	
+				goTo(new PortalPlace("queryId=" + result.getId().toString()));
+			}
+		});
+
+	}
+
+	@Override
+	public void deleteQuery(IRatingQuery query) {
+		clientFactory.getRpcService().deleteRatingQuery(query, new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Delete query failed: " + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				//clientFactory.getPortalView().setRatingQuery(result);	
+				if (result) {
+					Window.alert("Query deleted successfully");
+				} else {
+					Window.alert("Query not deleted successfully");
+				}
+				view.clear();
+				goTo(new PortalPlace(""));
+			}
+		});
+		
+	}
 
 }

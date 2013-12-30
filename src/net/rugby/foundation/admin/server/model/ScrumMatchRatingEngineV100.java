@@ -392,7 +392,7 @@ IMatchRatingEngine  {
 		}
 
 		for (PlayerStatShares score : pss) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats(), score.toString());
+			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats(), score.toString(), null);
 			pmrf.put(pmr);
 			mrl.add(pmr);
 		}

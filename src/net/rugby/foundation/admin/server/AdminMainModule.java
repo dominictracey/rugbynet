@@ -35,7 +35,9 @@ import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
 import net.rugby.foundation.admin.server.workflow.OfyWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.OfyWorkflowFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyStandingFactory;
 import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
 
@@ -59,7 +61,7 @@ public class AdminMainModule extends AbstractModule {
 		bind(IQueryRatingEngineFactory.class).to(ScrumQueryRatingEngineFactory.class);
 		bind(IUrlCacher.class).to(UrlCacher.class);
 		bind(IStandingsFetcherFactory.class).to(StandingsFetcherFactory.class);
-
+		bind(IRatingQueryFactory.class).to(OfyRatingQueryFactory.class);
 	}
 	
 }

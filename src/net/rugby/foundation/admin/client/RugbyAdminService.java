@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -15,7 +16,6 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -97,7 +97,7 @@ public interface RugbyAdminService extends RemoteService {
 	IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
 	ICompetition repairComp(ICompetition comp);
 	IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms);
-	List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId, Long roundId, position posi, Long countryId, Long teamId);
+	IRatingQuery createRatingQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId);
 	List<IPlayerMatchInfo> reRateMatch(Long matchId);
 	IMatchGroup SaveScore(Long matchId, int hS, int vS, Status status);
 	ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId);
@@ -124,4 +124,7 @@ public interface RugbyAdminService extends RemoteService {
 	List<IStanding> getStandings(Long roundId);
 	List<IStanding> saveStandings(Long roundId, List<IStanding> standings);
 	List<IStanding> FetchRoundStandings(Long roundId);
+	IRatingQuery getRatingQuery(long parseLong);
+	List<IPlayerMatchInfo> getRatingQueryResults(long parseLong);
+	Boolean deleteRatingQuery(IRatingQuery query);
 }

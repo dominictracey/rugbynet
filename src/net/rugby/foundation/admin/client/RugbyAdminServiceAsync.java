@@ -6,7 +6,7 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -19,7 +19,6 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
-import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -113,9 +112,9 @@ public interface RugbyAdminServiceAsync {
 	public void fetchMatchScore(IMatchGroup matchGroup, Long currentCompId,
 			List<String> log, AsyncCallback<IMatchGroup> asyncCallback);
 	public void refetchPlayerMatchStats(IPlayerMatchStats pms, AsyncCallback<IPlayerMatchStats> asyncCallback);
-	public void aggregatePlayerMatchRatings(Long compId, Long roundId,
-			position posi, Long countryId, Long teamId,
-			AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+	public void createRatingQuery(List<Long> compId,
+			List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId,
+			AsyncCallback<IRatingQuery> asyncCallback);
 	public void reRateMatch(Long id, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
 	public void  getTeamMatchStats(Long matchId, Long teamId, AsyncCallback<ITeamMatchStats> asyncCallback);
 	public void refetchTeamMatchStats(ITeamMatchStats target,
@@ -152,4 +151,10 @@ public interface RugbyAdminServiceAsync {
 	public void saveStandings(Long roundId, List<IStanding> standings, AsyncCallback<List<IStanding>> asyncCallback);
 	public void FetchRoundStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
 	public void SaveScore(Long matchId, int hS, int vS, Status status, AsyncCallback<IMatchGroup> asyncCallback);
+	public void getRatingQuery(long parseLong,
+			AsyncCallback<IRatingQuery> asyncCallback);
+	public void getRatingQueryResults(long parseLong,
+			AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+	public void deleteRatingQuery(IRatingQuery query,
+			AsyncCallback<Boolean> asyncCallback);
 }

@@ -5,14 +5,18 @@ package net.rugby.foundation.admin.server.orchestration;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
+import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.admin.shared.IOrchestrationActions;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.game1.server.BPM.OrchestrationCreateLeaderboard;
@@ -40,6 +44,7 @@ import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 
 /**
@@ -64,20 +69,19 @@ public class OrchestrationFactory implements
 	private IClubhouseLeagueMapFactory chlmf;
 	private IRoundEntryFactory ref;
 	private IMatchEntryFactory mef;
-	private IRoundFactory rf;
-	private ITeamGroupFactory tf;
+	private IMatchRatingEngineSchemaFactory mresf;
+	private IQueryRatingEngineFactory qref;
+	private IRatingQueryFactory rqf;
 
 	//@REX this is probably horrendously inefficient
 	@Inject
 	public void setFactories(ICompetitionFactory cf, IRoundFactory rf, ITeamGroupFactory tf, IMatchGroupFactory mf, IOrchestrationConfigurationFactory ocf,
 			IResultFetcherFactory rff, IMatchResultFactory mrf, ILeagueFactory lf, 
 			ILeaderboardFactory lbf, IEntryFactory ef, IAppUserFactory auf, IClubhouseMembershipFactory chmf, ILeaderboardRowFactory lbrf,
-			IClubhouseLeagueMapFactory chlmf, IMatchEntryFactory mef, IRoundEntryFactory ref) {
+			IClubhouseLeagueMapFactory chlmf, IMatchEntryFactory mef, IRoundEntryFactory ref, IMatchRatingEngineSchemaFactory mresf, IQueryRatingEngineFactory qref,
+			IRatingQueryFactory rqf) {
 		this.cf = cf;
 		this.mf = mf;
-		this.rf = rf;
-		//this.rf.setFactories(cf, mf);
-		this.tf = tf;
 		//this.mf.setFactories(rf, tf);
 		this.ocf = ocf;
 		this.rff = rff;
@@ -91,6 +95,9 @@ public class OrchestrationFactory implements
 		this.chlmf = chlmf;
 		this.ref = ref;
 		this.mef = mef;
+		this.mresf = mresf;
+		this.qref = qref;
+		this.rqf = rqf;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.factory.IOrchestrationFactory#get(net.rugby.foundation.model.shared.IMatchGroup, net.rugby.foundation.admin.server.factory.IOrchestrationActions)
@@ -222,6 +229,16 @@ public class OrchestrationFactory implements
 	public IOrchestration<IRoundEntry> get(IRoundEntry target, RoundEntryActions action) {
 		if (action.equals(Game1OrchestrationActions.RoundEntryActions.DELETEMATCHENTRY)) {
 			IOrchestration<IRoundEntry> o = new OrchestrationDeleteMatchEntryFromRoundEntry(ref);
+			o.setTarget(target);
+			return o;
+		}
+		return null;
+	}
+	@Override
+	public IOrchestration<IRatingQuery> get(IRatingQuery target,
+			RatingActions action) {
+		if (action.equals(AdminOrchestrationActions.RatingActions.GENERATE)) {
+			IOrchestration<IRatingQuery> o = new GenerateRatingsOrchestration(ocf, mresf, qref, rqf);
 			o.setTarget(target);
 			return o;
 		}

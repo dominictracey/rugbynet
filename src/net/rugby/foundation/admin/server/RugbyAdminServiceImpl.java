@@ -39,6 +39,7 @@ import net.rugby.foundation.admin.server.workflow.matchrating.FetchTeamMatchStat
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
@@ -57,6 +58,7 @@ import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -76,6 +78,7 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITopTenUser;
@@ -92,6 +95,10 @@ import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.JobSetting;
@@ -137,6 +144,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IStandingFactory sf;
 	private IStandingsFetcherFactory sff;
 	private IUrlCacher uc;
+	private IRatingQueryFactory rqf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -158,7 +166,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IPlayerMatchRatingFactory pmrf, IAdminTaskFactory atf, IPlayerMatchInfoFactory pmif, IMatchResultFactory mrf, 
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
 			ICachingFactory<IContent> ctf, IQueryRatingEngineFactory qref, IStandingFactory sf, IStandingsFetcherFactory sff,
-			IUrlCacher uc) {
+			IUrlCacher uc, IRatingQueryFactory rqf) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -190,6 +198,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.sf = sf;
 			this.sff = sff;
 			this.uc = uc;
+			this.rqf = rqf;
 
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -1291,43 +1300,31 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public List<IPlayerMatchInfo> aggregatePlayerMatchRatings(Long compId,
-			Long roundId, position posi, Long countryId, Long teamId) {
+	public IRatingQuery createRatingQuery(List<Long> compIds,
+			List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds) {
 		try {
 			if (checkAdmin()) {
+				
+				// put the query in the database
+				IRatingQuery rq = rqf.create();
+				rq.getCompIds().addAll(compIds);
+				rq.getRoundIds().addAll(roundIds);
+				rq.getPositions().addAll(posis);
+				rq.getCountryIds().addAll(countryIds);
+				rq.getTeamIds().addAll(teamIds);
+				rq = rqf.put(rq);
+				
+				// now trigger the backend processing task
+				Queue queue = QueueFactory.getDefaultQueue();
+			    TaskOptions to = Builder.withUrl("/admin/orchestration/IRatingQuery").
+			    		param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
+			    		param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+			    		param("id",rq.getId().toString()).
+			    		param("extraKey", "0L");
+			    		
+			    queue.add(to);	
 
-				//first the player stats
-				rf.setId(roundId);
-				IRound r = rf.getRound();
-				List<Long> matchIds = r.getMatchIDs();
-				List<IPlayerMatchStats> playerStats = pmsf.query(matchIds, posi, countryId, teamId);
-
-				// and the round stats
-				List<ITeamMatchStats> teamStats = new ArrayList<ITeamMatchStats>();
-				for (IMatchGroup m : r.getMatches()) {
-					ITeamMatchStats h = tmsf.getHomeStats(m);
-					ITeamMatchStats v = tmsf.getVisitStats(m);
-					if (h != null) {
-						teamStats.add(h);
-					}
-
-					if (v != null) {
-						teamStats.add(v);
-					}
-				}
-
-				// now the engine
-				IRatingEngineSchema mres = mresf.getDefault();
-				assert (mres != null);
-				IQueryRatingEngine mre = qref.get(mres);
-				assert (mre != null);
-				//pmif.query(compId, roundId, posi, countryId, teamId, null);
-
-				mre.addPlayerStats(playerStats);
-				mre.addTeamStats(teamStats);
-				mre.generate(mres);
-				List<IPlayerMatchInfo> pmis = pmif.query(compId, roundId, posi, countryId, teamId, null);
-				return pmis;
+				return rq;
 			} else {
 				return null;
 			}
@@ -1853,6 +1850,53 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
-		}	}
+		}		
+	}
+
+	@Override
+	public IRatingQuery getRatingQuery(long rqId) {
+		try {
+			if (checkAdmin()) {
+				return rqf.get(rqId);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}	
+	}
+
+	@Override
+	public List<IPlayerMatchInfo> getRatingQueryResults(long rqId) {
+		try {
+			if (checkAdmin()) {
+				IRatingQuery rq = rqf.get(rqId);
+				if (rq.getStatus() == IRatingQuery.Status.COMPLETE) {
+					return pmif.query(rq, null);
+				}
+				return null;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}	
+	}
+
+	@Override
+	public Boolean deleteRatingQuery(IRatingQuery query) {
+		try {
+			if (checkAdmin()) {
+				return rqf.delete(query);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
 
 }

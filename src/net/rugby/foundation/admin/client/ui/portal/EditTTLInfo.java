@@ -50,8 +50,12 @@ public class EditTTLInfo extends DialogBox {
 	void onClickSave(ClickEvent e) {
 		v.setTitle(title.getText());
 		v.setDescription(description.getText());
-		int ppt = Integer.parseInt(playersPerTeam.getLastSelectedNavLink().getText());
-		v.setPlayersPerTeam(ppt);
+		if (playersPerTeam.getLastSelectedNavLink() != null) {
+			int ppt = Integer.parseInt(playersPerTeam.getLastSelectedNavLink().getText());
+			v.setPlayersPerTeam(ppt);
+		} else {
+			v.setPlayersPerTeam(10);
+		}
 		listener.saveTTIText(v);
 	}
 	

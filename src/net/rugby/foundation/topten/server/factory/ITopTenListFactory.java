@@ -31,4 +31,10 @@ public interface ITopTenListFactory {
 	
 	void setLastCreatedForComp(ITopTenList ttl, Long compId);
 	void setLatestPublishedForComp(ITopTenList ttl, Long compId);
+	
+	/**
+	 * @param compId of set of lists to check over
+	 * @return returns true if no errors are logged. Check log if false returned.
+	 */
+	public boolean scan(Long compId);
 }

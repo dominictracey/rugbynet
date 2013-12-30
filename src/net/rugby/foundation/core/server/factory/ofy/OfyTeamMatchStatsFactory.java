@@ -1,16 +1,24 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.BaseTeamMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumTeamMatchStats;
 
@@ -19,7 +27,14 @@ public class OfyTeamMatchStatsFactory extends BaseTeamMatchStatsFactory implemen
 	 * 
 	 */
 	private static final long serialVersionUID = 9132591058693886799L;
+	private IRoundFactory rf;
 
+	@Inject
+	public OfyTeamMatchStatsFactory(IRoundFactory rf, IMatchGroupFactory mf) {
+		this.rf = rf;
+		this.mf = mf;
+	}
+	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory#get()
 	 */
@@ -95,4 +110,5 @@ public class OfyTeamMatchStatsFactory extends BaseTeamMatchStatsFactory implemen
 			return null;
 		}
 	}
+
 }

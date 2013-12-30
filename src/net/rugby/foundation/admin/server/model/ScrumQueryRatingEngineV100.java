@@ -18,6 +18,8 @@ import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
@@ -25,40 +27,45 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
-import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
-public class ScrumQueryRatingEngineV100 implements
-IQueryRatingEngine  {
+public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 	private Map<Long,ITeamMatchStats> tmsHomeMap = new HashMap<Long,ITeamMatchStats>();
 	private Map<Long,ITeamMatchStats> tmsVisitMap = new HashMap<Long,ITeamMatchStats>();
 	private List<IPlayerMatchStats> pmsList = new ArrayList<IPlayerMatchStats>();
 	private Map<Long,Float> standingsFactorMap = new HashMap<Long,Float>();
 	
-	private ITeamMatchStatsFactory tmsf;
 	private IMatchGroupFactory mf;
 	private IPlayerFactory pf;
 	private IPlayerMatchRatingFactory pmrf;
 	private ArrayList<IRatingEngineSchema> supportedSchemas;
 	private IStandingFactory sf;
 	private IRoundFactory rf;
+	private IPlayerMatchStatsFactory pmsf;
+	private ITeamMatchStatsFactory tmsf;
+	private IRatingQueryFactory rqf;
 
 	public ScrumQueryRatingEngineV100() {
 
 	}
 
-	public ScrumQueryRatingEngineV100(IPlayerFactory pf, IMatchGroupFactory mf, IPlayerMatchRatingFactory pmrf, ITeamMatchStatsFactory tmsf, IRoundFactory rf, IStandingFactory sf) {
+	public ScrumQueryRatingEngineV100(IPlayerFactory pf, IMatchGroupFactory mf, IPlayerMatchRatingFactory pmrf, IRoundFactory rf, IStandingFactory sf, 
+			IPlayerMatchStatsFactory pmsf, ITeamMatchStatsFactory tmsf, IRatingQueryFactory rqf) {
 		supportedSchemas = new ArrayList<IRatingEngineSchema>();
 		supportedSchemas.add(new ScrumMatchRatingEngineSchema20130713());
 		this.pf = pf;
 		this.pmrf = pmrf;
-		this.tmsf = tmsf;
 		this.mf = mf;
 		this.rf = rf;
 		this.sf = sf;
+		this.pmsf = pmsf;
+		this.tmsf = tmsf;
+		this.rqf = rqf;
 	}
 
 
@@ -69,6 +76,7 @@ IQueryRatingEngine  {
 	//private final int playersOnField = 30;
 
 	private List<IPlayerRating> mrl;
+	private IRatingQuery query;
 
 	protected class PlayerStatShares {
 
@@ -282,7 +290,7 @@ IQueryRatingEngine  {
 
 		private float getBackScore() {
 			backScore =  (tries + tryAssists + points + kicks + passes + runs + metersRun + cleanBreaks + 
-					defendersBeaten + offloads + turnovers + tacklesMade + tacklesMissed + (.3f * ruckShare) + (.3f * ruckLost) *penaltiesConceded +
+					defendersBeaten + offloads + turnovers + tacklesMade + tacklesMissed + (.3f * ruckShare) + (.3f * ruckLost) + penaltiesConceded +
 					yellowCards + redCards + minutesShare + pointDifferential + win); 
 			return backScore;
 		}
@@ -369,16 +377,23 @@ IQueryRatingEngine  {
 		}
 
 		for (PlayerStatShares score : pss) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), null, score.getRating(totalPlayerScore), schema, score.getPlayerMatchStats(), score.toString());
+			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), null, score.getRating(totalPlayerScore), schema, score.getPlayerMatchStats(), score.toString(), query);
 			pmrf.put(pmr);
 			mrl.add(pmr);
 		}
 
 		sendReport();
-
+		
+		// mark query complete
+		query.setStatus(Status.COMPLETE);
+		rqf.put(query);
+		
 		return mrl;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Engine threw a rod on player " + playerName + " from match " + matchName, e);
+			// mark query errored
+			query.setStatus(Status.ERROR);
+			rqf.put(query);
 			return null;
 		}
 	}
@@ -410,7 +425,7 @@ IQueryRatingEngine  {
 		
 	}
 
-	@Override
+	//@Override
 	public void addTeamStats(List<ITeamMatchStats> teamStats) {
 		for (ITeamMatchStats ts : teamStats) {
 			if (ts.getIsHome() == null) {
@@ -428,7 +443,7 @@ IQueryRatingEngine  {
 
 	}
 
-	@Override
+	//@Override
 	public void addPlayerStats(List<IPlayerMatchStats> playerStats) {
 		for (IPlayerMatchStats pms : playerStats) {
 			if (pms.getPosition() != position.NONE) {
@@ -454,7 +469,12 @@ IQueryRatingEngine  {
 
 	@Override
 	public String toString() {
-		return "[ " + this.getClass().getCanonicalName() + " PMS count: " + pmsList.size() + "TMS count: " + (tmsHomeMap.size() + tmsVisitMap.size()) + " ]";
+		String retval = "[ " + this.getClass().getCanonicalName() + " PMS count: " + pmsList.size() + "TMS count: " + (tmsHomeMap.size() + tmsVisitMap.size()) + " ]";
+		
+		if (query != null) {
+			retval += "Query is: " + query.toString();
+		}
+		return retval;
 	}
 
 	private void sendReport() {
@@ -463,6 +483,8 @@ IQueryRatingEngine  {
 		emailer.setSubject("Rating Engine Report");
 
 		String body = " PlayerMatchStats count: " + pmsList.size() + " TMS count: " + (tmsHomeMap.size() + tmsVisitMap.size()) + "\n";
+		body += query.toString() + "\n";
+		body += "http://www.rugby.net/Admin.html#PortalPlace::queryId=" + query.getId().toString() + "\n";
 		body += sep + "Overall" + sep + "\n" + sep + sep + "\n";
 
 		StatisticalSummary ss = new SummaryStatistics();
@@ -522,5 +544,13 @@ IQueryRatingEngine  {
 		}
 		emailer.setMessage(body);
 		emailer.send();
+	}
+
+	@Override
+	public boolean setQuery(IRatingQuery q) {
+		this.query = q;
+		addPlayerStats(pmsf.query(q));
+		addTeamStats(tmsf.query(q));
+		return true;
 	}
 }

@@ -14,14 +14,19 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.RatingQuery;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 
@@ -42,11 +47,12 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 	 * 
 	 */
 	private static final long serialVersionUID = -175156134974074733L;
-	//private Objectify ofy;
+	private IRoundFactory rf;
 
 
-	public OfyPlayerMatchStatsFactory() {
-		//this.ofy = DataStoreFactory.getOfy();
+	@Inject
+	public OfyPlayerMatchStatsFactory(IRoundFactory rf) {
+		this.rf = rf;
 	}
 
 	/* (non-Javadoc)
@@ -122,7 +128,7 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 			if (pms == null) {
 				return new ScrumPlayerMatchStats();
 			}
-			
+
 			Objectify ofy = DataStoreFactory.getOfy();
 
 			// only one per player per match
@@ -313,13 +319,13 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 		try {
 			if (m != null) {
 				Objectify ofy = DataStoreFactory.getOfy();
-	
+
 				List<IPlayerMatchStats> c = getByMatchId(m.getId());
-	
+
 				if (c != null) {
 					ofy.delete(c);
 				}
-				
+
 			} else {
 				return false; // null match
 			}
@@ -328,5 +334,45 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public List<IPlayerMatchStats> query(IRatingQuery rq) {
+		Objectify ofy = DataStoreFactory.getOfy();
+
+		// @REX case of just specifying the comp and not the rounds (want all rounds)
+		List<Long> matchIds = new ArrayList<Long>();
+		for (Long rid : rq.getRoundIds()) {
+			rf.setId(rid);
+			IRound r = rf.getRound();
+			for (Long mid : r.getMatchIDs()) {
+				matchIds.add(mid);
+			}
+		}
+		
+		Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId in",matchIds);
+
+		if (rq.getPositions() != null && !rq.getPositions().isEmpty()) {
+			qpms = qpms.filter("pos in",rq.getPositions());
+		}
+
+
+		if (rq.getCountryIds() != null && !rq.getCountryIds().isEmpty() && !rq.getCountryIds().contains(5000L)) {
+			qpms = qpms.filter("countryId in", rq.getCountryIds());
+		}
+
+
+		if (rq.getTeamIds() != null && !rq.getTeamIds().isEmpty() && !rq.getTeamIds().contains(-1L)) {
+			qpms = qpms.filter("teamId in", rq.getTeamIds());
+		}
+
+
+		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
+
+		for (ScrumPlayerMatchStats spms : qpms) {
+			list.add(spms);
+		}
+
+		return list;
 	}
 }

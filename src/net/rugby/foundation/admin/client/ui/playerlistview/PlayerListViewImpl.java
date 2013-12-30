@@ -281,4 +281,11 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 		return true;
 	}
 
+
+
+	@Override
+	public void clear() {
+		dataProvider.setList(new ArrayList<T>());
+	}
+
 }

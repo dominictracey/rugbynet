@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.Position.position;
 
 public interface IPlayerMatchStatsFactory {
@@ -20,5 +21,7 @@ public interface IPlayerMatchStatsFactory {
 			position posi, Long countryId, Long teamId);
 
 	public abstract boolean deleteForMatch(IMatchGroup m);
+
+	public abstract List<IPlayerMatchStats> query(IRatingQuery rq);
 
 }
