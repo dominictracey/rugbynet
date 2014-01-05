@@ -140,6 +140,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 		config = result;
 		comp.clear();
 		comp.addItem("All","-1");
+		
 		for (Long id: result.getCompetitionMap().keySet()) {
 			comp.addItem(result.getCompetitionMap().get(id), id.toString());
 		}
@@ -148,6 +149,20 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 
 			@Override
 			public void onChange(ChangeEvent event) {
+				rq = null;
+				compIds = null;
+				roundIds = null;
+				teamIds = null;
+				round.clear();
+				team.clear();
+				for (int i=0; i<pos.getItemCount(); i++) {
+					pos.setItemSelected(i, false);
+				}
+				
+				for (int i=0; i<country.getItemCount(); i++) {
+					country.setItemSelected(i, false);
+				}
+				
 				listener.portalViewCompSelected(Long.parseLong(comp.getValue((comp.getSelectedIndex()))));			
 			}
 			
@@ -163,13 +178,13 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 		}
 		compIds.add(c.getId());
 		// select any comps in the current query
-		if (rq != null) {
+
 			for (int i=0; i<comp.getItemCount(); i++) {
-				if (rq.getCompIds().contains(c.getId())) {
+				if (comp.getValue(i).equals(c.getId().toString())) {
 					comp.setSelectedIndex(i);
 				}
 			}
-		}
+		
 		
 		round.clear();
 		round.addItem("All","-1");
@@ -194,6 +209,8 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 				}
 			}
 		}
+		
+		
 	}
 	
 	@Override
@@ -326,12 +343,18 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 					if (pos.getItemCount() >= i-1) {
 						pos.setItemSelected(i, true);
 					}
+				} else {
+					if (pos.getItemCount() >= i-1) {
+						pos.setItemSelected(i, false);
+					}
 				}
 			}
 			
 			for (int i=0; i<country.getItemCount(); i++) {
 				if (rq.getCountryIds().contains(Long.parseLong(country.getValue(i)))) {
 					country.setItemSelected(i, true);
+				} else {
+					country.setItemSelected(i, false);
 				}
 			}
 		} else {

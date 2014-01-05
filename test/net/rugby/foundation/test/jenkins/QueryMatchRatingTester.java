@@ -14,8 +14,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.appengine.tools.development.testing.LocalTaskQueueTestConfig;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.CoreTestModule;
@@ -31,7 +36,10 @@ import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
+import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -47,10 +55,12 @@ public class QueryMatchRatingTester {
 	private IPlayerFactory pf;
 	private ITeamMatchStatsFactory tmsf;
 	
-	private final LocalServiceTestHelper helper =
-			new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
+//	private final LocalServiceTestHelper helper =
+//			new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 
-
+	private final LocalServiceTestHelper queueHelper =
+			new LocalServiceTestHelper(new LocalTaskQueueTestConfig());
+	
 	private boolean populated = false;
 	private IQueryRatingEngineFactory qref;
 	private IMatchGroupFactory mf;
@@ -60,12 +70,14 @@ public class QueryMatchRatingTester {
 
 	@Before
 	public void setUp() {
-		helper.setUp();
+//		helper.setUp();
+		queueHelper.setUp();
 	}
 
 	@After
 	public void tearDown() {
-		helper.tearDown();
+//		helper.tearDown();
+		queueHelper.tearDown();
 	}
 
 	@Inject
@@ -149,4 +161,24 @@ public class QueryMatchRatingTester {
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
 	}
 
+	@Test
+	public void testOrchestrationQueue() {
+		// put the query in the database
+		IRatingQuery rq = rqf.create();
+		rq.getCompIds().add(1L);
+		rq.getRoundIds().add(2L);
+
+		rq = rqf.put(rq);
+		
+		// now trigger the backend processing task
+		Queue queue = QueueFactory.getDefaultQueue();
+	    TaskOptions to = Builder.withUrl("/admin/orchestration/IRatingQuery").
+	    		param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
+	    		param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+	    		param("id",rq.getId().toString()).
+	    		param("extraKey", "0L");
+	    		
+	    queue.add(to);	
+	    
+	}
 }

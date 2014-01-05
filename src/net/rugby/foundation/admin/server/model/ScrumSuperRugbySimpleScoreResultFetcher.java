@@ -44,6 +44,19 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
             String line;
 
             Iterator<String> it = lines.iterator();
+            
+			// it seems like some matches don't get played on the days when they are originally scheduled so we should
+			// start looking when we find a date two days before the match's scheduled date. This allows us to catch
+			// a match scheduled for Friday being played on Sunday.
+			Calendar cal = new GregorianCalendar();
+			cal.setTime(match.getDate());
+			cal.set(Calendar.HOUR_OF_DAY, 0);  
+			cal.set(Calendar.MINUTE, 0);  
+			cal.set(Calendar.SECOND, 0);  
+			cal.set(Calendar.MILLISECOND, 0); 
+			cal.add(Calendar.DAY_OF_MONTH, 3);
+			Date matchDate = cal.getTime();
+			
             while (it.hasNext() && !found) {
             	
             	line = it.next();
@@ -56,19 +69,11 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 	            		dateRead = dateFormatter.parse(date);
 	            		if (dateRead != null) {
 	            			// push the day we found back a day so we can compare (don't take time of day into account in comparison)
-	            			Calendar cal = new GregorianCalendar();
-	            			cal.setTime(match.getDate());
-	            			cal.set(Calendar.HOUR_OF_DAY, 0);  
-	            			cal.set(Calendar.MINUTE, 0);  
-	            			cal.set(Calendar.SECOND, 0);  
-	            			cal.set(Calendar.MILLISECOND, 0); 
-	            			Date matchDate = cal.getTime();
-	            			if (dateRead.equals(matchDate)) {
+
+	            			if (dateRead.before(matchDate)) {
 	            				foundDate = true;
 	            				break;
-	            			} //else if (dateRead.after(matchDate)) { // we haven't found it and are looking at later dates so it's not posted yet
-	            				//break;
-	            			//}
+	            			}
 	            		}
             		}
             	}

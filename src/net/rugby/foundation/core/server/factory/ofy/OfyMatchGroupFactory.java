@@ -140,7 +140,7 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			if (m != null) {
 				id = m.getId().toString();
 			}
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error deleting match " + id + ex.getLocalizedMessage(), ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error saving match " + id + ex.getLocalizedMessage(), ex);
 			return null;
 		}
 	}
