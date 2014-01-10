@@ -30,7 +30,10 @@ import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
 import net.rugby.foundation.admin.server.workflow.TestWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.TestWorkflowFactory;
+import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.test.TestPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.test.TestRatingQueryFactory;
 import com.google.inject.AbstractModule;
 
@@ -54,6 +57,8 @@ public class AdminTestModule extends AbstractModule {
 		bind(IUrlCacher.class).to(TestUrlCacher.class);
 		bind(IStandingsFetcherFactory.class).to(StandingsFetcherFactory.class);
 		bind(IRatingQueryFactory.class).to(TestRatingQueryFactory.class);
+		bind(IPlayerRatingFactory.class).to(TestPlayerRatingFactory.class);
+
 	}
 	
 }

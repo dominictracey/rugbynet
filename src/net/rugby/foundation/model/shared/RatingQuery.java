@@ -164,4 +164,12 @@ public class RatingQuery implements IRatingQuery, Serializable {
 		return "[RatingQuery " + sCompIds + " :: " + sRoundIds + " :: " + sCountryIds + " :: " +  sTeamIds + " :: " + sPositions + " ]";
 	}
 
+	@Override
+	public boolean isTimeSeries() {
+		if (roundIds != null && roundIds.size() > 1)
+			return true;
+		else
+			return false;
+	}
+
 }

@@ -41,6 +41,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -78,6 +79,8 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	protected List<IRound> rounds = new ArrayList<IRound>();
 	private PlayerListView<IPlayerMatchInfo> plv;
 	private AdminCompPlace place;
+	private boolean waiting = false; // used to see if matchStats fetching is complete
+	private boolean ready = false;
 
 	public CompActivity(AdminCompPlace place, ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
@@ -292,25 +295,25 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 				break;
 			}
 		}
-		
+
 		if (comp == null) {
 			Window.alert("Could not find comp matching this round.");
 			return;
 		}
-		
+
 		for (IRound r : comp.getRounds()) {
 			if (r.getId().equals(roundId)) {
 				round = r;
 				break;
 			}
 		}
-		
+
 		if (round == null) {
 			Window.alert("Could not find round in the comp.");
 			return;
 		}
 		final IRound fRound = round;
-		
+
 		clientFactory.getRpcService().getMatches(roundId, new AsyncCallback<List<IMatchGroup>>() {
 
 			@Override
@@ -328,14 +331,14 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 					@Override
 					public void onFailure(Throwable caught) {
 						// TODO Auto-generated method stub
-						
+
 					}
 
 					@Override
 					public void onSuccess(List<IStanding> result) {
 						er.ShowRound(fRound,result);
 					}
-					
+
 				});
 
 			}
@@ -635,7 +638,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	public void fetchMatchStats(final IMatchGroup matchGroup) {
 		final EditMatch.Presenter presenter = this;  // there must be a way to do this...
 
-		clientFactory.getRpcService().fetchMatchStats(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
+		clientFactory.getRpcService().fetchMatchStats(matchGroup.getId(), new AsyncCallback<String>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -643,27 +646,73 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			}
 
 			@Override
-			public void onSuccess(final List<IPlayerMatchInfo> result) {
-				clientFactory.getRpcService().getMatch(matchGroup.getId(), new AsyncCallback<IMatchGroup>() {
+			public void onSuccess(final String result) {
+				em.setPipelineId(result);
+				waiting = true;
+				ready = true;
+
+				Timer t = new Timer() {
+					@Override
+					public void run() {
+						checkPipelineStatus(result);
+					}
+				};
+				
+				t.schedule(5000);
+
+			}
+
+			private void checkPipelineStatus(final String id) {
+				clientFactory.getRpcService().checkPipelineStatus(id, matchGroup.getId(), new AsyncCallback<String>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Window.alert("Failed getting updated Match (for pipeline Id): " + caught.getMessage());
-
+						waiting = false;
+						Window.alert("Problem checking pipeline status for " + id);					
 					}
 
 					@Override
-					public void onSuccess(IMatchGroup match) {
-						em.SetPresenter(presenter);
-						em.ShowMatch(match);
-						view.getPlayerListView().setPlayers(result, matchGroup);
+					public void onSuccess(String result) {
+						clientFactory.getRpcService().getPlayerMatchInfo(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								Window.alert("Failed getting updated Match (for pipeline Id): " + caught.getMessage());
+
+							}
+
+							@Override
+							public void onSuccess(List<IPlayerMatchInfo> playerInfo) {
+								//em.SetPresenter(presenter);
+								//em.ShowMatch(matchGroup);	
+								//em.setPipelineId(id);
+								view.getPlayerListView().setPlayers(playerInfo, matchGroup);
+							}
+
+						});
+						
+						// do we have to check again?
+						if (result.equals("COMPLETED")) {
+							em.setPipelineId(null);
+							
+						} else {
+							// call ourselves recursively until we finish
+							Timer t = new Timer() {
+								@Override
+								public void run() {
+									checkPipelineStatus(id);
+								}
+							};
+							
+							t.schedule(5000);
+						}
 
 					}
 
 				});
 
 			}
-		});	
+		});
 	}
 
 	/* (non-Javadoc)
@@ -1281,16 +1330,16 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Troubles saving standings: " + caught.getLocalizedMessage());
-				
+
 			}
 
 			@Override
 			public void onSuccess(List<IStanding> result) {
 				er.ShowRound(r,result);		
 			}
-			
+
 		});
-		
+
 	}
 
 
@@ -1302,16 +1351,16 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
-				
+
 			}
 
 			@Override
 			public void onSuccess(List<IStanding> result) {
 				er.ShowRound(round,result);		
 			}
-			
+
 		});
-		
+
 	}
 
 
@@ -1323,7 +1372,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
-				
+
 			}
 
 			@Override
@@ -1331,7 +1380,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 				Window.alert("Score saved");	
 				em.ShowMatch(result);
 			}
-			
+
 		});		
 	}
 }

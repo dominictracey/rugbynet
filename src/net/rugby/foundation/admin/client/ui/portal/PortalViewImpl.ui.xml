@@ -1,7 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:d="urn:import:com.google.gwt.user.datepicker.client" >
+    xmlns:d="urn:import:com.google.gwt.user.datepicker.client" 
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui">
 
     <ui:style>
 		/* Add CSS here. See the GWT docs on UI Binder for more details */
@@ -33,18 +34,13 @@
         <g:HorizontalPanel>
 
             <g:HTMLPanel>
-Competition:
-
-                <br />
-
+				<g:Label ui:field="compLabel">Competition:</g:Label>
                 <g:ListBox ui:field="comp" />
+                 <g:ListBox ui:field="compAndRound" multipleSelect="true"/>
             </g:HTMLPanel>
 
             <g:HTMLPanel>
-Round:
-
-                <br />
-
+				<g:Label ui:field="roundLabel">Round:</g:Label>
                 <g:ListBox ui:field="round"/>
             </g:HTMLPanel>
 
@@ -71,6 +67,7 @@ Team:
 
                 <g:ListBox ui:field="team" multipleSelect="true"/>
             </g:HTMLPanel>
+            <b:Button ui:field="timeSeries" icon="TIME" toggle="true">Time Series</b:Button>
             <g:Button ui:field="query">Query</g:Button>
             <g:Button ui:field="clear">Clear</g:Button>
             <g:Button ui:field="delete">Delete</g:Button>

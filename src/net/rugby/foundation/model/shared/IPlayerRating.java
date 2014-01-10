@@ -3,9 +3,11 @@ package net.rugby.foundation.model.shared;
 import java.util.Date;
 import java.util.List;
 
+import com.github.gwtbootstrap.client.ui.base.HasId;
+
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 
-public interface IPlayerRating {
+public interface IPlayerRating extends IHasId {
 
 	public abstract Long getId();
 
@@ -43,10 +45,6 @@ public interface IPlayerRating {
 	
 	public abstract void setGenerated(Date generated);
 
-//	void setMatchStats(List<IPlayerMatchStats> list);
-//
-//	List<IPlayerMatchStats> getMatchStats();
-
 	int compareTo(IPlayerMatchRating o);
 
 	void addMatchStats(IPlayerMatchStats playerMatchStats);
@@ -60,4 +58,16 @@ public interface IPlayerRating {
 	List<Long> getMatchStatIds();
 
 	void addMatchStatId(Long playerMatchStatsId);
+	
+	Long getQueryId();
+
+	void setQueryId(long queryId);
+
+	String getDetails();
+
+	void setDetails(String details);
+
+	public abstract void setRawScore(float f);
+
+	public abstract float getRawScore();
 }

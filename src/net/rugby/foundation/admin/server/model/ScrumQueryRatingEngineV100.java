@@ -15,6 +15,7 @@ import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
@@ -23,39 +24,44 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
 public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
-	private Map<Long,ITeamMatchStats> tmsHomeMap = new HashMap<Long,ITeamMatchStats>();
-	private Map<Long,ITeamMatchStats> tmsVisitMap = new HashMap<Long,ITeamMatchStats>();
-	private List<IPlayerMatchStats> pmsList = new ArrayList<IPlayerMatchStats>();
-	private Map<Long,Float> standingsFactorMap = new HashMap<Long,Float>();
-	
-	private IMatchGroupFactory mf;
-	private IPlayerFactory pf;
-	private IPlayerMatchRatingFactory pmrf;
-	private ArrayList<IRatingEngineSchema> supportedSchemas;
-	private IStandingFactory sf;
-	private IRoundFactory rf;
-	private IPlayerMatchStatsFactory pmsf;
-	private ITeamMatchStatsFactory tmsf;
-	private IRatingQueryFactory rqf;
+	protected Map<Long,ITeamMatchStats> tmsHomeMap = new HashMap<Long,ITeamMatchStats>();
+	protected Map<Long,ITeamMatchStats> tmsVisitMap = new HashMap<Long,ITeamMatchStats>();
+	protected List<IPlayerMatchStats> pmsList = new ArrayList<IPlayerMatchStats>();
+	protected Map<Long,Float> standingsFactorMap = new HashMap<Long,Float>();
+	protected Map<Long,Float> matchCompWeights = new HashMap<Long,Float>(); // maps a matchId to a competition weightingFactor
+
+	protected IMatchGroupFactory mf;
+	protected IPlayerFactory pf;
+	protected IPlayerMatchRatingFactory pmrf;
+	protected ArrayList<IRatingEngineSchema> supportedSchemas;
+	protected IStandingFactory sf;
+	protected IRoundFactory rf;
+	protected IPlayerMatchStatsFactory pmsf;
+	protected ITeamMatchStatsFactory tmsf;
+	protected IRatingQueryFactory rqf;
+	private ICompetitionFactory cf;
 
 	public ScrumQueryRatingEngineV100() {
 
 	}
 
 	public ScrumQueryRatingEngineV100(IPlayerFactory pf, IMatchGroupFactory mf, IPlayerMatchRatingFactory pmrf, IRoundFactory rf, IStandingFactory sf, 
-			IPlayerMatchStatsFactory pmsf, ITeamMatchStatsFactory tmsf, IRatingQueryFactory rqf) {
+			IPlayerMatchStatsFactory pmsf, ITeamMatchStatsFactory tmsf, IRatingQueryFactory rqf,
+			ICompetitionFactory cf) {
 		supportedSchemas = new ArrayList<IRatingEngineSchema>();
 		supportedSchemas.add(new ScrumMatchRatingEngineSchema20130713());
 		this.pf = pf;
@@ -66,6 +72,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		this.pmsf = pmsf;
 		this.tmsf = tmsf;
 		this.rqf = rqf;
+		this.cf = cf;
 	}
 
 
@@ -75,60 +82,62 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	//
 	//private final int playersOnField = 30;
 
-	private List<IPlayerRating> mrl;
-	private IRatingQuery query;
+	public List<IPlayerRating> mrl;
+	public IRatingQuery query;
 
-	protected class PlayerStatShares {
+	protected class PlayerStatShares implements IPlayerStatShares {
 
-		private IPlayerMatchStats pms;
+		protected IPlayerMatchStats pms;
 
-		private float tries;
-		private float tryAssists;
-		private float points;
-		private float kicks;
-		private float passes;
-		private float runs;
-		private float metersRun;
-		private float cleanBreaks;
-		private float defendersBeaten;
-		private float offloads;
-		private float turnovers;
-		private float tacklesMade;
-		private float tacklesMissed;
-		private float lineoutsWonOnThrow;
-		private float lineoutsStolenOnOppThrow;
-		private float penaltiesConceded;
-		private float yellowCards;
-		private float redCards;
+		protected float tries;
+		protected float tryAssists;
+		protected float points;
+		protected float kicks;
+		protected float passes;
+		protected float runs;
+		protected float metersRun;
+		protected float cleanBreaks;
+		protected float defendersBeaten;
+		protected float offloads;
+		protected float turnovers;
+		protected float tacklesMade;
+		protected float tacklesMissed;
+		protected float lineoutsWonOnThrow;
+		protected float lineoutsStolenOnOppThrow;
+		protected float penaltiesConceded;
+		protected float yellowCards;
+		protected float redCards;
 
 		// time-skewed team stats
-		private float scrumShare;
-		private float lineoutShare;
-		private float ruckShare;
-		private float maulShare;
-		private float scrumLost;
-		private float lineoutLost;
-		private float ruckLost;
-		private float maulLost;
-		private float scrumStolen;
-		private float lineoutStolen;
-		private float ruckStolen;
-		private float maulStolen;
-		private float minutesShare;
-		private float win;
+		protected float scrumShare;
+		protected float lineoutShare;
+		protected float ruckShare;
+		protected float maulShare;
+		protected float scrumLost;
+		protected float lineoutLost;
+		protected float ruckLost;
+		protected float maulLost;
+		protected float scrumStolen;
+		protected float lineoutStolen;
+		protected float ruckStolen;
+		protected float maulStolen;
+		protected float minutesShare;
+		protected float win;
 
-		private float pointDifferential;
+		protected float pointDifferential;
 
-		private float backScore;
-		private float forwardScore;
+		protected float backScore;
+		protected float forwardScore;
 
-		private int numPlayers;
+		protected int numPlayers;
 
-		private float playerScore = 0F;
+		protected float playerScore = 0F;
 
-		private IV1EngineWeightValues weights;
+		protected IV1EngineWeightValues weights;
 
-		public PlayerStatShares(IV1EngineWeightValues weights, ITeamMatchStats tms, ITeamMatchStats otms, /*ITeamMatchStats combined,*/ IPlayerMatchStats pms, IMatchGroup match, /*int totalTryAssists, int totalLineoutsStolen, int totalMinutes,*/ int numPlayers) {
+		protected IMatchGroup match;
+
+		public PlayerStatShares(IV1EngineWeightValues weights, ITeamMatchStats tms, ITeamMatchStats otms, IPlayerMatchStats pms, IMatchGroup match, int numPlayers) {
 
 			assert(tms.getTeamId().equals(pms.getTeamId()));
 
@@ -175,7 +184,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			pms = adjustStatsByPosition(pms);
 
 			this.numPlayers = numPlayers;
-
+			this.match = match;
+			
 			CalculatePointDifferential(match);
 
 			Normalize();
@@ -265,7 +275,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			lineoutLost *= weights.getLineoutLostWeight();            
 			ruckLost *= weights.getRuckLostWeight();               
 			maulLost *= weights.getMaulLostWeight();     
-			
+
 			scrumStolen *= weights.getScrumStolenWeight();              
 			lineoutStolen *= weights.getLineoutStolenWeight();            
 			ruckStolen *= weights.getRuckStolenWeight();               
@@ -278,9 +288,12 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		}
 
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.admin.server.model.IPlayerStatShares#toString()
+		 */
 		@Override
 		public String toString() {
-			return " T:"+tries+" TA:"+tryAssists+" Pts:"+points+" K:"+kicks+" R:"+runs+" P:"+passes+" MR:"+metersRun+
+			return " T:"+tries+" TA:"+tryAssists+" Pts:"+points+" K:"+kicks+" R:"+runs+" P:"+passes+" MR:"+metersRun+" CB:"+
 					cleanBreaks+" DB:"+defendersBeaten+" OL:"+offloads+" TO:"+turnovers+" T:"+tacklesMade+" TM:"+tacklesMissed+"\n LO:"+lineoutsWonOnThrow+
 					" LOStolen:"+lineoutsStolenOnOppThrow+"\n P:"+penaltiesConceded+" YC:"+yellowCards+" RC: "+redCards+"\n ScrumShare:"+scrumShare+
 					" LOShare:"+lineoutShare+" RuckShare:"+ruckShare+" MSh:"+ maulShare+"\n ScrumLost:"+scrumLost+
@@ -312,6 +325,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.admin.server.model.IPlayerStatShares#getPlayerScore()
+		 */
+		@Override
 		public float getPlayerScore() {
 			if (playerScore  == 0F) {
 				playerScore = getBackScore() + (isForward() * getForwardScore()); //)/(1+isForward());
@@ -320,75 +337,81 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			return playerScore;
 		}
 
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.admin.server.model.IPlayerStatShares#getPlayerMatchStats()
+		 */
+		@Override
 		public IPlayerMatchStats getPlayerMatchStats() {
 			return pms;
 		}
 
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.admin.server.model.IPlayerStatShares#getRating(float)
+		 */
+		@Override
 		public Integer getRating(float totalScores) {
 			Float normalizedSmoothScore = (float) (playerScore/totalScores);
 			return Math.round(normalizedSmoothScore * 500 * numPlayers);  // we use numPlayers and not playersOnField here so they average out to 500.
 		}
 
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.admin.server.model.IPlayerStatShares#scaleForStandings(java.lang.Float)
+		 */
+		@Override
 		public void scaleForStandings(Float matchStandingFactor) {
 			playerScore *= matchStandingFactor;
-			
+
+		}
+
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.admin.server.model.IPlayerStatShares#scaleForCompWeight(java.lang.Float)
+		 */
+		@Override
+		public void scaleForCompWeight(Float compWeightFactor) {
+			playerScore *= compWeightFactor;
 		}
 
 	}
 
-	@Override
-	public List<IPlayerRating> generate(IRatingEngineSchema schema) {
-
+	protected List<IPlayerStatShares> populate(IRatingEngineSchema schema, List<IPlayerStatShares> pss) {
 		String playerName = "nobody yet";
 		String matchName = "no match yet";
 		try {
-		// Have to have these weight values available in the schema to work
-		assert (schema instanceof IV1EngineWeightValues);
+			// Have to have these weight values available in the schema to work
+			assert (schema instanceof IV1EngineWeightValues);
 
-		List<PlayerStatShares> pss = new ArrayList<PlayerStatShares>();
-		mrl = new ArrayList<IPlayerRating>();
 
-		float totalPlayerScore = 0F;
+			float totalPlayerScore = 0F;
 
-		for (IPlayerMatchStats pms : pmsList) {
-			playerName = pms.getName();
-			IMatchGroup m = mf.get(pms.getMatchId());
-			matchName = m.getDisplayName();
-			if (!standingsFactorMap.containsKey(pms.getMatchId())) {
-				getStandingFactorForMatch(pms.getMatchId());
-
-			}
-			if (!pms.getPosition().equals(position.NONE)) {
-				ITeamMatchStats tms = null;
-				ITeamMatchStats otms = null;
-				if (pms.getTeamId().equals(m.getHomeTeamId())) {
-					tms = tmsHomeMap.get(m.getId());
-					otms =  tmsVisitMap.get(m.getId());
-				} else {
-					tms = tmsVisitMap.get(m.getId());
-					otms = tmsHomeMap.get(m.getId());
+			for (IPlayerMatchStats pms : pmsList) {
+				playerName = pms.getName();
+				IMatchGroup m = mf.get(pms.getMatchId());
+				matchName = m.getDisplayName();
+				if (!standingsFactorMap.containsKey(pms.getMatchId())) {
+					getStandingFactorForMatch(m);
 				}
-				PlayerStatShares score = new PlayerStatShares((IV1EngineWeightValues)schema, tms, otms, pms, m, pmsList.size());
-				// scale the rating by the match's standingsFactor
-				score.scaleForStandings(standingsFactorMap.get(score.getPlayerMatchStats().getMatchId()));
-				pss.add(score);
-				totalPlayerScore += score.getPlayerScore();
-			} 
-		}
-
-		for (PlayerStatShares score : pss) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), null, score.getRating(totalPlayerScore), schema, score.getPlayerMatchStats(), score.toString(), query);
-			pmrf.put(pmr);
-			mrl.add(pmr);
-		}
-
-		sendReport();
-		
-		// mark query complete
-		query.setStatus(Status.COMPLETE);
-		rqf.put(query);
-		
-		return mrl;
+				if (!matchCompWeights.containsKey(pms.getMatchId())) {
+					getCompWeightingFactorForMatch(m);
+				}
+				if (!pms.getPosition().equals(position.NONE)) {
+					ITeamMatchStats tms = null;
+					ITeamMatchStats otms = null;
+					if (pms.getTeamId().equals(m.getHomeTeamId())) {
+						tms = tmsHomeMap.get(m.getId());
+						otms =  tmsVisitMap.get(m.getId());
+					} else {
+						tms = tmsVisitMap.get(m.getId());
+						otms = tmsHomeMap.get(m.getId());
+					}
+					IPlayerStatShares score = getNewStatShares((IV1EngineWeightValues)schema, tms, otms, pms, m);
+					// scale the rating by the match's standingsFactor
+					score.scaleForStandings(standingsFactorMap.get(score.getPlayerMatchStats().getMatchId()));
+					score.scaleForCompWeight(matchCompWeights.get(score.getPlayerMatchStats().getMatchId()));
+					pss.add(score);
+					totalPlayerScore += score.getPlayerScore();
+				} 
+			}
+			return pss;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Engine threw a rod on player " + playerName + " from match " + matchName, e);
 			// mark query errored
@@ -398,10 +421,43 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		}
 	}
 
-	private void getStandingFactorForMatch(Long matchId) {
-		rf.setId(mf.get(matchId).getRoundId());
-		List<IStanding> list = sf.getForRound(rf.getRound());
-		IMatchGroup m = mf.get(matchId);
+	protected IPlayerStatShares getNewStatShares(IV1EngineWeightValues schema, ITeamMatchStats tms, ITeamMatchStats otms, IPlayerMatchStats pms, IMatchGroup m) {
+		return new PlayerStatShares(schema, tms, otms, pms, m, pmsList.size());
+	}
+
+	@Override
+	public List<IPlayerRating> generate(IRatingEngineSchema schema) {
+
+		List<IPlayerStatShares> pss = new ArrayList<IPlayerStatShares>();
+		mrl = new ArrayList<IPlayerRating>();
+		
+		float totalPlayerScore = 0;
+		pss = populate(schema, pss);
+		for (IPlayerStatShares score : pss) {
+			totalPlayerScore += score.getPlayerScore();
+		}
+		
+		for (IPlayerStatShares score : pss) {
+			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), null, score.getRating(totalPlayerScore), schema, score.getPlayerMatchStats(), score.toString(), query);
+			pmrf.put(pmr);
+			mrl.add(pmr);
+		}
+
+		sendReport();
+
+		// mark query complete
+		query.setStatus(Status.COMPLETE);
+		rqf.put(query);
+
+		return mrl;
+
+	}
+
+	protected void getStandingFactorForMatch(IMatchGroup m) {
+		rf.setId(m.getRoundId());
+		IRound r = rf.getRound();
+		List<IStanding> list = sf.getForRound(r);
+
 		int sTot = 0;
 		int count = 0;
 		boolean found = false;
@@ -415,14 +471,31 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				}
 			}
 		}
-		
+
 		Float standingsFactor = 1F;
 		if (found) {
 			standingsFactor =  1F / (float)(Math.sqrt(sTot-2F)) + .43F;
 		}
-		
-		standingsFactorMap.put(matchId, standingsFactor);
-		
+
+		standingsFactorMap.put(m.getId(), standingsFactor);
+
+
+	}
+	
+	protected void getCompWeightingFactorForMatch(IMatchGroup m) {
+		// and the comp weightingFactor
+		if (!matchCompWeights.containsKey(m.getId())) {
+
+			rf.setId(m.getRoundId());
+			IRound r = rf.getRound();
+			cf.setId(r.getCompId());
+			ICompetition c = cf.getCompetition();
+			if (c.getWeightingFactor() != null) {
+				matchCompWeights.put(m.getId(), c.getWeightingFactor());
+			} else {
+				matchCompWeights.put(m.getId(), 1F); // default to 1.0
+			}
+		}
 	}
 
 	//@Override
@@ -470,14 +543,14 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	@Override
 	public String toString() {
 		String retval = "[ " + this.getClass().getCanonicalName() + " PMS count: " + pmsList.size() + "TMS count: " + (tmsHomeMap.size() + tmsVisitMap.size()) + " ]";
-		
+
 		if (query != null) {
 			retval += "Query is: " + query.toString();
 		}
 		return retval;
 	}
 
-	private void sendReport() {
+	protected void sendReport() {
 		AdminEmailer emailer = new AdminEmailer();
 		String sep = " =================== ";
 		emailer.setSubject("Rating Engine Report");

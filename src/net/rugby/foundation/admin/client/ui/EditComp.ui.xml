@@ -17,6 +17,7 @@
 				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
 				CompClubhouse Id: <g:TextBox ui:field='ccid'></g:TextBox><br/>
 				Underway: <g:CheckBox ui:field="underway"/><br/>
+				Weighting: <g:TextBox ui:field="weightingFactor"></g:TextBox><br/>
 				Type: <g:ListBox ui:field="compType"></g:ListBox>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 		<g:Button styleName="{style.important}" ui:field="repair">Repair</g:Button>

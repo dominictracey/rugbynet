@@ -98,7 +98,7 @@ public interface RugbyAdminServiceAsync {
 	public void getPlayerMatchInfo(Long matchId, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
 	public void fetchCountryList(AsyncCallback<List<ICountry>> asyncCallback);
 	public void fetchPositionList(AsyncCallback<List<position>> asyncCallback);
-	public void fetchMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+	public void fetchMatchStats(Long matchId, AsyncCallback<String> asyncCallback);
 	
 	public void getAllOpenAdminTasks(AsyncCallback<List<IAdminTask>> asyncCallback);
 	public void deleteTasks(List<IAdminTask> selectedItems,
@@ -157,4 +157,6 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
 	public void deleteRatingQuery(IRatingQuery query,
 			AsyncCallback<Boolean> asyncCallback);
+	public void checkPipelineStatus(String id, Long matchId,
+			AsyncCallback<String> asyncCallback);
 }

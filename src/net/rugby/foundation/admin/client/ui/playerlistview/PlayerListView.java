@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * its container widget.
  *
  */
-public interface PlayerListView<T extends IPlayerMatchInfo> extends IsWidget
+public interface PlayerListView<T> extends IsWidget
 {
 
 	void setListener(Listener<T> listener);

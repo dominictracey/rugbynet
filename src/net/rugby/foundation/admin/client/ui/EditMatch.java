@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -61,7 +62,7 @@ public class EditMatch extends Composite {
 
 
 	} 
-	
+
 	public EditMatch() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -98,10 +99,10 @@ public class EditMatch extends Composite {
 	Button saveScore;
 	@UiField
 	Anchor pipelineLink;
-	
+
 	IMatchGroup matchGroup = null;
 	private Presenter listener;
-	
+
 	@UiHandler("save")
 	void onClickSave(ClickEvent e) {
 		matchGroup.setDisplayName(displayName.getText());
@@ -114,17 +115,17 @@ public class EditMatch extends Composite {
 		matchGroup.setStatus(Status.valueOf(Status.class, status.getItemText(selected)));
 		listener.saveMatchInfo(matchGroup);
 	}
-	
+
 	@UiHandler("lock")
 	void onClickLock(ClickEvent e) {
 		listener.lockMatch(!matchGroup.getLocked(), matchGroup);
 	}
-	
+
 	@UiHandler("fetchScore")
 	void onClickFetchScore(ClickEvent e) {
 		listener.fetchScore(matchGroup);
 	}
-	
+
 	@UiHandler("regenerateRatings") 
 	void onClickReRate(ClickEvent e) {
 		listener.reRateMatch(matchGroup);
@@ -134,20 +135,20 @@ public class EditMatch extends Composite {
 	void onClickFetchMatchStats(ClickEvent e) {
 		listener.fetchMatchStats(matchGroup);
 	}
-	
+
 	@UiHandler("showHomeTeamMatchStats")
 	void onClickShowHomeTeamMatchStats(ClickEvent e) {
 		listener.showHomeTeamMatchStats(matchGroup);
 	}
-	
+
 	@UiHandler("showVisitingTeamMatchStats")
 	void onClickShowVisitingTeamMatchStats(ClickEvent e) {
 		listener.showVisitingTeamMatchStats(matchGroup);
 	}
-	
+
 	public void ShowMatch(IMatchGroup match) {
 		matchGroup = match;
-		
+
 		displayName.setText(match.getDisplayName());
 		scheduled.setText(match.getDate().toString());
 		int selectedIndex = 0;
@@ -158,11 +159,11 @@ public class EditMatch extends Composite {
 				selectedIndex = status.getItemCount()-1;
 			}
 		}
-		
+
 		if (match.getForeignId() != null) {
 			scrumId.setText(match.getForeignId().toString());
 		}
-		
+
 		status.setSelectedIndex(selectedIndex);
 		locked.setValue(match.getLocked());
 		if (match.getLocked()) {
@@ -170,7 +171,7 @@ public class EditMatch extends Composite {
 		} else {
 			lock.setText("Lock");
 		}
-		
+
 		if (match.getSimpleScoreMatchResult() != null) {
 			homeScore.setText(Integer.toString(match.getSimpleScoreMatchResult().getHomeScore()));
 			visitorScore.setText(Integer.toString(match.getSimpleScoreMatchResult().getVisitScore()));
@@ -178,7 +179,7 @@ public class EditMatch extends Composite {
 			homeScore.setText("");
 			visitorScore.setText("");
 		}
-		
+
 		pipelineLink.setHref("/_ah/pipeline/status.html?root=" + match.getFetchMatchStatsPipelineId());
 		pipelineLink.setTarget("top");
 		pipelineLink.setText("Fetch Match Stats Pipeline Status");
@@ -187,7 +188,7 @@ public class EditMatch extends Composite {
 	public void SetPresenter(Presenter p) {
 		listener = p;
 	}
-	
+
 	@UiHandler("saveScore")
 	void onClickSaveScore(ClickEvent e) {
 		try {
@@ -197,7 +198,18 @@ public class EditMatch extends Composite {
 		} catch (Throwable ex) {
 			Window.alert("Score must be a valid number");
 		}
-		
+
+	}
+
+	public void setPipelineId(String result) {
+
+		pipelineLink.setHref("/_ah/pipeline/status.html?root=" + result);
+		pipelineLink.setTarget("top");
+		String val = "Fetch Match Stats Pipeline Status";
+		if (result != null) {
+			val += " (running)";
+		}
+		pipelineLink.setText(val);
 	}
 
 }

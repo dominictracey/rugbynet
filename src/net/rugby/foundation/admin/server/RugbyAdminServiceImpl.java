@@ -1113,7 +1113,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<IPlayerMatchInfo> fetchMatchStats(Long matchId) {
+	public String fetchMatchStats(Long matchId) {
 		try {
 			if (checkAdmin()) {
 				Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
@@ -1144,21 +1144,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
-				while (true) {
-					Thread.sleep(2000);
-					JobInfo jobInfo = service.getJobInfo(pipelineId);
-					switch (jobInfo.getJobState()) {
-					case COMPLETED_SUCCESSFULLY:
-						service.deletePipelineRecords(pipelineId);
-						return getPlayerMatchInfo(matchId); // (List<IPlayerMatchStats>) jobInfo.getOutput();
-					case RUNNING:
-						break;
-					case STOPPED_BY_ERROR:
-						throw new RuntimeException("Job stopped " + jobInfo.getError());
-					case STOPPED_BY_REQUEST:
-						throw new RuntimeException("Job stopped by request.");
-					}
-				}
+				//				while (true) {
+				//					Thread.sleep(2000);
+
+				//				}
+
+				return pipelineId;
 			} else {
 				return null;
 			}
@@ -1304,7 +1295,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds) {
 		try {
 			if (checkAdmin()) {
-				
+
 				// put the query in the database
 				IRatingQuery rq = rqf.create();
 				rq.getCompIds().addAll(compIds);
@@ -1313,16 +1304,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				rq.getCountryIds().addAll(countryIds);
 				rq.getTeamIds().addAll(teamIds);
 				rq = rqf.put(rq);
-				
+
 				// now trigger the backend processing task
 				Queue queue = QueueFactory.getDefaultQueue();
-			    TaskOptions to = Builder.withUrl("/admin/orchestration/IRatingQuery").
-			    		param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
-			    		param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
-			    		param("id",rq.getId().toString()).
-			    		param("extraKey", "0L");
-			    		
-			    queue.add(to);	
+				TaskOptions to = Builder.withUrl("/admin/orchestration/IRatingQuery").
+						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
+						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+						param("id",rq.getId().toString()).
+						param("extraKey", "0L");
+
+				queue.add(to);	
 
 				return rq;
 			} else {
@@ -1835,13 +1826,13 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				((IMatchResult)mr).setType(ResultType.SIMPLE_SCORE);
 				((IMatchResult)mr).setRecordedDate(new Date());
 				mrf.put((IMatchResult) mr);
-				
+
 				// link the result to the match
 				IMatchGroup m = mf.get(matchId);
 				m.setSimpleScoreMatchResult(mr);
 				m.setSimpleScoreMatchResultId(((IMatchResult)mr).getId());
 				mf.put(m);
-				
+
 				return m;
 			}
 
@@ -1896,6 +1887,38 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
+		}
+	}
+
+	@Override
+	public String checkPipelineStatus(String id, Long matchId) {
+		try {
+			if (checkAdmin()) {
+				PipelineService service = PipelineServiceFactory.newPipelineService();
+
+				JobInfo jobInfo = service.getJobInfo(id);
+				switch (jobInfo.getJobState()) {
+				case COMPLETED_SUCCESSFULLY:
+					service.deletePipelineRecords(id);
+					IMatchGroup m = mf.get(matchId);
+					m.setFetchMatchStatsPipelineId(null);
+					mf.put(m);
+					return "COMPLETED"; // (List<IPlayerMatchStats>) jobInfo.getOutput();
+				case RUNNING:
+					break;
+				case STOPPED_BY_ERROR:
+					throw new RuntimeException("Job stopped " + jobInfo.getError());
+				case STOPPED_BY_REQUEST:
+					throw new RuntimeException("Job stopped by request.");
+				default:
+					return "RUNNING";
+				}
+				return "WOT?";
+			}
+			return null;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return "COMPLETED";
 		}
 	}
 

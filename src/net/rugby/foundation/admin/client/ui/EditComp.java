@@ -58,6 +58,8 @@ public class EditComp extends Composite {
 	@UiField
 	CheckBox underway;
 	@UiField
+	TextBox weightingFactor;
+	@UiField
 	ListBox compType;
 	@UiField
 	Button setAsDefault;
@@ -72,6 +74,7 @@ public class EditComp extends Composite {
 		comp.setAbbr(abbr.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
+		comp.setWeightingFactor(Float.parseFloat(weightingFactor.getText()));
 //		if (!compType.isItemSelected(-1)) {
 			comp.setCompType(ICompetition.CompetitionType.values()[compType.getSelectedIndex()]);
 //		}
@@ -106,6 +109,7 @@ public class EditComp extends Composite {
 		ccid.setText(comp.getCompClubhouseId().toString());
 		abbr.setText(comp.getAbbr());
 		underway.setValue(comp.getUnderway());
+		weightingFactor.setValue(comp.getWeightingFactor().toString());
 		compType.clear();
 		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {
 			compType.addItem(ICompetition.CompetitionType.values()[i].toString());

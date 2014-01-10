@@ -86,7 +86,7 @@ public interface RugbyAdminService extends RemoteService {
 	List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId);
 	List<ICountry> fetchCountryList();
 	List<position> fetchPositionList();
-	List<IPlayerMatchInfo> fetchMatchStats(Long matchId);
+	String fetchMatchStats(Long matchId);
 	
 	List<IAdminTask> getAllOpenAdminTasks();
 	List<IAdminTask> deleteTasks(List<IAdminTask> selectedItems);
@@ -127,4 +127,5 @@ public interface RugbyAdminService extends RemoteService {
 	IRatingQuery getRatingQuery(long parseLong);
 	List<IPlayerMatchInfo> getRatingQueryResults(long parseLong);
 	Boolean deleteRatingQuery(IRatingQuery query);
+	String checkPipelineStatus(String id, Long matchId);
 }

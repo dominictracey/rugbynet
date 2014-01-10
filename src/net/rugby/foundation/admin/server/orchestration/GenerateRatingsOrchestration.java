@@ -51,13 +51,13 @@ public class GenerateRatingsOrchestration extends OrchestrationCore<IRatingQuery
 			target.setStatus(Status.RUNNING);
 			rqf.put(target);
 			
-			ocf.setCompId(compId);
-			IOrchestrationConfiguration conf = ocf.get();
+//			ocf.setCompId(compId);
+//			IOrchestrationConfiguration conf = ocf.get();
 //			if (conf.getRatingActions().get(RatingActions.GENERATE.getValue())) {
 				// get the engine
 				IRatingEngineSchema mres = mresf.getDefault();
 				assert (mres != null);
-				IQueryRatingEngine mre = qref.get(mres);
+				IQueryRatingEngine mre = qref.get(mres, target);
 				assert (mre != null);
 				//pmif.query(compId, roundId, posi, countryId, teamId, null);
 				mre.setQuery(target);

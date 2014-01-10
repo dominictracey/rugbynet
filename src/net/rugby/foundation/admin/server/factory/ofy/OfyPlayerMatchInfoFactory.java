@@ -133,7 +133,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 					matches.addAll(r.getMatchIDs());
 				}
 			}
-			
+//			
 			// now matches has all the matches
 			List<IPlayerMatchStats> statsList = pmsf.query(query);
 			

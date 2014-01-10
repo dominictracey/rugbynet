@@ -89,6 +89,15 @@ public interface ICompetition {
 	
 	void setLastSaved(Date lastSaved);
 
+	/**
+	 * 
+	 * @return the weightingFactor allows us to compare across competitions. 1F is the 
+	 * Aviva Premiership and other comps vary from this. So NZL vs AUS might be 2F and
+	 * USA Superleague might be .3F...
+	 */
+	public abstract Float getWeightingFactor();
+	public abstract void setWeightingFactor(Float weightingFactor);
+	
 	// don't put getNextRound and getPrevRound in here, see note at bottom of Competition.java
 	//public abstract void setNextAndPrevRound();
 	

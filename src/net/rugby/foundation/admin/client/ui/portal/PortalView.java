@@ -29,6 +29,10 @@ public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
 
 		void deleteQuery(IRatingQuery query);
 
+		void portalViewCompPopulate(Long id);
+		
+		void setTimeSeries(boolean isTrue);
+
 	} 
 
 
@@ -52,7 +56,7 @@ public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
 
 	IRound getCurrentRound();
 
-	public abstract void setComp(ICompetition result);
+	public abstract void setComp(ICompetition result, boolean populate);
 	
 	public abstract void setRatingQuery(IRatingQuery rq);
 

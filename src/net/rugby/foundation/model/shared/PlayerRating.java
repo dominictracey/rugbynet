@@ -25,7 +25,7 @@ public class PlayerRating implements IPlayerRating, Serializable {
 	}
 
 	public PlayerRating(Integer rating, IPlayer player, IGroup group,
-			IRatingEngineSchema schema, IRatingQuery query) {
+			IRatingEngineSchema schema, IRatingQuery query, String details) {
 		super();
 		this.rating = rating;
 		this.player = player;
@@ -41,6 +41,7 @@ public class PlayerRating implements IPlayerRating, Serializable {
 		this.schema = schema;
 		this.schemaId = schema.getId();
 		this.queryId = query.getId();
+		this.details = details;
 	}
 
 	@Id
@@ -60,9 +61,10 @@ public class PlayerRating implements IPlayerRating, Serializable {
 	protected List<Long> playerMatchStatIds;
 	@Transient
 	private List<IPlayerMatchStats> playerMatchStats;
-	//private IPlayerMatchStats playerMatchStats;
-	
+		
 	protected Long queryId;
+	protected String details;
+	protected Float rawScore;
 	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IPlayerRating#getId()
@@ -255,11 +257,34 @@ public class PlayerRating implements IPlayerRating, Serializable {
 
 	}
 
+	@Override
 	public Long getQueryId() {
 		return queryId;
 	}
 
+	@Override
 	public void setQueryId(long queryId) {
 		this.queryId = queryId;
+	}
+	
+	@Override
+	public String getDetails() {
+		return details;
+	}
+
+	@Override
+	public void setDetails(String details) {
+		this.details = details;
+	}
+
+	@Override
+	public void setRawScore(float rawScore) {
+		this.rawScore = rawScore;
+		
+	}
+
+	@Override
+	public float getRawScore() {
+		return rawScore;
 	}
 }

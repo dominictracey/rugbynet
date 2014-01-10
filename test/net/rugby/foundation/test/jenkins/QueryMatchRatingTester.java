@@ -55,8 +55,8 @@ public class QueryMatchRatingTester {
 	private IPlayerFactory pf;
 	private ITeamMatchStatsFactory tmsf;
 	
-//	private final LocalServiceTestHelper helper =
-//			new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
+	private final LocalServiceTestHelper helper =
+			new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 
 	private final LocalServiceTestHelper queueHelper =
 			new LocalServiceTestHelper(new LocalTaskQueueTestConfig());
@@ -70,13 +70,13 @@ public class QueryMatchRatingTester {
 
 	@Before
 	public void setUp() {
-//		helper.setUp();
+		helper.setUp();
 		queueHelper.setUp();
 	}
 
 	@After
 	public void tearDown() {
-//		helper.tearDown();
+		helper.tearDown();
 		queueHelper.tearDown();
 	}
 
@@ -143,13 +143,10 @@ public class QueryMatchRatingTester {
 //	}
 	
 	@Test
-	public void testGenerate1() {
+	public void testGenerate700() {
 
 		IQueryRatingEngine qre = qref.get(mresf.getDefault());
 
-//		addMatch(100L, qre);
-//		addMatch(101L, qre);
-//		addMatch(102L, qre);
 		IRatingQuery rq = rqf.get(700L);
 		
 		qre.setQuery(rq);
@@ -162,23 +159,39 @@ public class QueryMatchRatingTester {
 	}
 
 	@Test
-	public void testOrchestrationQueue() {
-		// put the query in the database
-		IRatingQuery rq = rqf.create();
-		rq.getCompIds().add(1L);
-		rq.getRoundIds().add(2L);
+	public void testGenerate704() {
 
-		rq = rqf.put(rq);
+		IQueryRatingEngine qre = qref.get(mresf.getDefault());
+
+		IRatingQuery rq = rqf.get(704L);
 		
-		// now trigger the backend processing task
-		Queue queue = QueueFactory.getDefaultQueue();
-	    TaskOptions to = Builder.withUrl("/admin/orchestration/IRatingQuery").
-	    		param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
-	    		param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
-	    		param("id",rq.getId().toString()).
-	    		param("extraKey", "0L");
-	    		
-	    queue.add(to);	
-	    
+		qre.setQuery(rq);
+		qre.generate(mresf.getDefault());
+		
+		StatisticalSummary ss = qre.getStatisticalSummary();
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
 	}
+	
+//	@Test
+//	public void testOrchestrationQueue() {
+//		// put the query in the database
+//		IRatingQuery rq = rqf.create();
+//		rq.getCompIds().add(1L);
+//		rq.getRoundIds().add(2L);
+//
+//		rq = rqf.put(rq);
+//		
+//		// now trigger the backend processing task
+//		Queue queue = QueueFactory.getDefaultQueue();
+//	    TaskOptions to = Builder.withUrl("/admin/orchestration/IRatingQuery").
+//	    		param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
+//	    		param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+//	    		param("id",rq.getId().toString()).
+//	    		param("extraKey", "0L");
+//	    		
+//	    queue.add(to);	
+//	    
+//	}
 }

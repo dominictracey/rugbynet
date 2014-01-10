@@ -118,4 +118,5 @@ public class RatingQueryTester {
 		assertTrue(rq.getRoundIds().contains(2L));
 		
 	}
+	
 }

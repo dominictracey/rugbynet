@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Id;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import com.googlecode.objectify.annotation.Entity;
 
 

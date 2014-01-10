@@ -23,13 +23,14 @@ import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 import com.google.appengine.tools.pipeline.FutureList;
 import com.google.appengine.tools.pipeline.FutureValue;
+import com.google.appengine.tools.pipeline.ImmediateValue;
 import com.google.appengine.tools.pipeline.Job1;
 import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchGroup> implements Serializable {
+public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
@@ -54,13 +55,13 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 	}
 
 	/**
-	 * return IPlayer reference
+	 * return generator jobId
 	 * params String compName
 	 * 			Long scrumId
 	 * 			Long adminID
 	 */		
 	@Override
-	public Value<List<IPlayerMatchRating>> run(IMatchGroup match) {
+	public Value<String> run(IMatchGroup match) {
 
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();
@@ -125,7 +126,7 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 
 		}
 
-		FutureList<IPlayerMatchStats> hpms = new FutureList<IPlayerMatchStats>(homePlayerMatchStats);
+		//FutureList<IPlayerMatchStats> hpms = new FutureList<IPlayerMatchStats>(homePlayerMatchStats);
 
 		count = 0;
 		for (Value<IPlayer> fp : visitorPlayers) {
@@ -133,12 +134,12 @@ public class GenerateMatchRatings extends Job1<List<IPlayerMatchRating>, IMatchG
 			visitorPlayerMatchStats.add(stats);
 
 		}
-		FutureList<IPlayerMatchStats> vpms = new FutureList<IPlayerMatchStats>(visitorPlayerMatchStats);
+		//FutureList<IPlayerMatchStats> vpms = new FutureList<IPlayerMatchStats>(visitorPlayerMatchStats);
 
 		// now we can invoke the engine
-		FutureValue<List<IPlayerMatchRating>> ratings = futureCall(new CreateMatchRatings(), immediate(match), hpms, vpms, homeTeamStats, visitorTeamStats);
-
-		return ratings;
+		//FutureValue<List<IPlayerMatchRating>> ratings = futureCall(new CreateMatchRatings(), immediate(match), hpms, vpms, homeTeamStats, visitorTeamStats);
+		Value<String> retVal = new ImmediateValue<String>(this.getPipelineKey().toString());
+		return retVal;
 
 	}
 

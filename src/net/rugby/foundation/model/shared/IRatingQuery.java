@@ -31,5 +31,7 @@ public interface IRatingQuery extends IHasId {
 
 	Status getStatus();
 
-	void setStatus(Status status);;
+	void setStatus(Status status);
+	
+	boolean isTimeSeries();
 }

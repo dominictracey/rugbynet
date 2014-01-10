@@ -26,6 +26,7 @@ public class Competition implements Serializable, ICompetition {
 	private String foreignURL;
 	private Long compClubhouse;
 	private Date lastSaved;
+	private Float weightingFactor;
 	
 	private int nextRoundIndex;
 	private int prevRoundIndex;
@@ -357,6 +358,16 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setCompType(CompetitionType t) {
 		this.compType = t;
+	}
+
+	@Override
+	public Float getWeightingFactor() {
+		return weightingFactor;
+	}
+
+	@Override
+	public void setWeightingFactor(Float weightingFactor) {
+		this.weightingFactor = weightingFactor;
 	}
 
 

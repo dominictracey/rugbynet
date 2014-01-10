@@ -33,5 +33,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-testing.jar" sourcepath="C:/Program Files/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.7.2.1/appengine-java-sdk-1.7.2.1/src/user/appengine-api-1.0-sdk-1.7.2.1-src.zip"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/aopalliance.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/joda-time-2.3.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

@@ -52,6 +52,8 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 	private PortalView<IPlayerMatchInfo> view;
 	private EditTTLInfo ttltext;
 
+	protected boolean isTimeSeries= false;
+
 	public PortalActivity(PortalPlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IPlayerMatchInfo>();
 
@@ -71,7 +73,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 		view.setPresenter(this);
 		panel.setWidget(view.asWidget());
 
-		
+
 		if (place != null) {
 			clientFactory.getRpcService().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 				@Override
@@ -108,13 +110,13 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 									view.setCountries(result);
 
 									// now see if we have a query to display
-									if (place != null && place.getqueryId() != null) {
+									if (place != null && place.getqueryId() != null && !place.getqueryId().equals("null")) {
 										clientFactory.getRpcService().getRatingQuery(Long.parseLong(place.getqueryId()), new  AsyncCallback<IRatingQuery>() {
 
 											@Override
 											public void onFailure(Throwable caught) {
 												Window.alert("Problem finding the query with id " + place.getqueryId());
-												
+
 											}
 
 											@Override
@@ -132,7 +134,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 														public void onSuccess(List<IPlayerMatchInfo> result) {
 															view.showAggregatedMatchInfo(result);
 														}
-														
+
 													});
 												} else if (result.getStatus() == Status.ERROR) {
 													Window.alert("The query has terminated without delivering results. Check the server log for details.");
@@ -155,8 +157,8 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 			});
 
 		}
-		
-	
+
+
 	}
 
 
@@ -398,7 +400,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 			@Override
 			public void onSuccess(ICompetition result) {
 				if (result != null) {
-					view.setComp(result);
+					view.setComp(result, false);
 				}
 			}
 		});	
@@ -472,21 +474,23 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 	}
 
 	@Override
-	public void submitPortalQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId) {
+	public void submitPortalQuery(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds) {
 
-		clientFactory.getRpcService().createRatingQuery(compId, roundId, posi, countryId, teamId, new AsyncCallback<IRatingQuery>() {
+		//if (!isTimeSeries) {
+			clientFactory.getRpcService().createRatingQuery(compIds, roundIds, posis, countryIds, teamIds, new AsyncCallback<IRatingQuery>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Query failed: " + caught.getLocalizedMessage());
-			}
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Query failed: " + caught.getLocalizedMessage());
+				}
 
-			@Override
-			public void onSuccess(IRatingQuery result) {
-				//clientFactory.getPortalView().setRatingQuery(result);	
-				goTo(new PortalPlace("queryId=" + result.getId().toString()));
-			}
-		});
+				@Override
+				public void onSuccess(IRatingQuery result) {
+					//clientFactory.getPortalView().setRatingQuery(result);	
+					goTo(new PortalPlace("queryId=" + result.getId().toString()));
+				}
+			});
+		//}
 
 	}
 
@@ -511,7 +515,30 @@ PlayerListView.Listener<IPlayerMatchInfo>, EditTTLInfoPresenter, TeamMatchStatsP
 				goTo(new PortalPlace(""));
 			}
 		});
-		
+
+	}
+
+	@Override
+	public void portalViewCompPopulate(Long id) {
+		clientFactory.getRpcService().getComp(id, new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Problem fetching comp: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(ICompetition result) {
+				if (result != null) {
+					view.setComp(result, true);
+				}
+			}
+		});			
+	}
+
+	@Override
+	public void setTimeSeries(boolean isTrue) {
+		isTimeSeries = isTrue;		
 	}
 
 }

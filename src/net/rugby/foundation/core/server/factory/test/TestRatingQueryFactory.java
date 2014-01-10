@@ -48,6 +48,9 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 					rq.getRoundIds().add(2L);
 					rq.getTeamIds().add(1L);
 					rq.getTeamIds().add(2L);
+				} else if (id == 704L) { // time series - round 1 and round 2
+					rq.getRoundIds().add(2L);
+					rq.getRoundIds().add(3L);
 				}
 			}
 			return rq;
