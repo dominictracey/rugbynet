@@ -5,18 +5,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.persistence.Transient;
-
 import com.google.appengine.tools.pipeline.Job2;
-import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
-import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
 public class FetchTeamFromScrumReport extends Job2<ITeamGroup, Home_or_Visitor, String> {

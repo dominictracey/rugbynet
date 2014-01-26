@@ -3,8 +3,6 @@ package net.rugby.foundation.test.jenkins;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,10 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalTaskQueueTestConfig;
@@ -36,14 +30,10 @@ import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
-import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
-import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
+import net.rugby.foundation.admin.server.model.ScrumTimeSeriesRatingEngineV100;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
-import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
-import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRatingQuery;
-import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 
@@ -77,7 +67,7 @@ public class QueryMatchRatingTester {
 	@After
 	public void tearDown() {
 		helper.tearDown();
-		queueHelper.tearDown();
+//		queueHelper.tearDown();
 	}
 
 	@Inject
@@ -161,14 +151,20 @@ public class QueryMatchRatingTester {
 	@Test
 	public void testGenerate704() {
 
-		IQueryRatingEngine qre = qref.get(mresf.getDefault());
-
 		IRatingQuery rq = rqf.get(704L);
+		IQueryRatingEngine qre = qref.get(mresf.getDefault(), rq);
+		
+		assertTrue(rq.isTimeSeries());
+		assertTrue(qre.getClass().equals(ScrumTimeSeriesRatingEngineV100.class));
 		
 		qre.setQuery(rq);
 		qre.generate(mresf.getDefault());
 		
 		StatisticalSummary ss = qre.getStatisticalSummary();
+		
+		assertTrue(ss.getMean()>499 && ss.getMean()<501);
+		rq = rqf.get(704L);
+		assertTrue(rq.getStatus() == Status.COMPLETE);
 		
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());

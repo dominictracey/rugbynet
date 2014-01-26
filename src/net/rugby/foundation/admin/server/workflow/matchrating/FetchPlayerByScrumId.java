@@ -25,6 +25,7 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
+import com.google.appengine.api.datastore.Key;
 import com.google.inject.Injector;
 
 public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, String, Long, Long> {

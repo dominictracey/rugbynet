@@ -2,8 +2,6 @@ package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
 
-import javax.persistence.Id;
-
 import com.googlecode.objectify.annotation.Entity;
 
 @Entity

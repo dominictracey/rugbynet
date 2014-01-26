@@ -20,11 +20,6 @@ import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.factory.ofy.OfyAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfyMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfyPlayerMatchInfoFactory;
-import net.rugby.foundation.admin.server.factory.test.TestAdminTaskFactory;
-import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
-import net.rugby.foundation.admin.server.model.IStandingsFetcher;
-import net.rugby.foundation.admin.server.model.ScrumQueryRatingEngineV100;
-import net.rugby.foundation.admin.server.model.ScrumHeinekenStandingsFetcher;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OfyOrchestrationConfigurationFactory;
@@ -37,12 +32,8 @@ import net.rugby.foundation.admin.server.workflow.OfyWorkflowConfigurationFactor
 import net.rugby.foundation.admin.server.workflow.OfyWorkflowFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
-import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRatingQueryFactory;
-import net.rugby.foundation.core.server.factory.ofy.OfyStandingFactory;
-import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
-
 import com.google.inject.AbstractModule;
 
 public class AdminMainModule extends AbstractModule {

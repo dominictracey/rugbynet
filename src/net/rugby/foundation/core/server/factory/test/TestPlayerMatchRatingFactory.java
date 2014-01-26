@@ -71,7 +71,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	public IPlayerMatchRating getNew(IPlayer player, IMatchGroup match,
 			Integer rating, IRatingEngineSchema schema,
 			IPlayerMatchStats playerMatchStats, String details, IRatingQuery query) {
-		return new PlayerMatchRating(rating, player, match, schema, playerMatchStats, details, null);
+		return new PlayerMatchRating(rating, player, match, schema, playerMatchStats, details, query);
 	}
 
 	@Override

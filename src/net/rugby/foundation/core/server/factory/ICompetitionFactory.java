@@ -34,4 +34,6 @@ public interface ICompetitionFactory {
 //	Date getLastUpdate(Long compId);
 
 	boolean delete(Long compId);
+	
+	ICompetition getGlobalComp();
 }

@@ -1,6 +1,5 @@
 package net.rugby.foundation.game1.client.place;
 
-import net.rugby.foundation.core.client.Identity;
 import net.rugby.foundation.core.shared.IdentityTypes;
 import net.rugby.foundation.core.shared.IdentityTypes.Actions;
 import net.rugby.foundation.core.shared.IdentityTypes.Keys;

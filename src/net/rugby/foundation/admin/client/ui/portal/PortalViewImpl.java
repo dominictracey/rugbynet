@@ -10,18 +10,15 @@ import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.Listener;
-import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
-import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
-import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
-import net.rugby.foundation.model.shared.Position;
 import net.rugby.foundation.model.shared.Position.position;
 
 import com.google.gwt.core.client.GWT;
@@ -71,7 +68,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	@UiField Button topTen;
 	@UiField SimplePanel jobArea;
 
-	private List<IPlayerMatchInfo> PortalList;
+	private List<IPlayerRating> portalList;
 	private PortalViewPresenter<T> listener;
 
 	private ClientFactory clientFactory;
@@ -101,6 +98,8 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	private IRatingQuery rq;
 
 	private boolean isSetup = false;
+
+	private List<IPlayerRating> ratingList;
 
 	public PortalViewImpl()
 	{
@@ -336,8 +335,13 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 		if (rq != null) {
 			rqId = rq.getId();
 		}
+		
+		Long compId = null;
+		if (compIds != null && compIds.size() > 0) {
+			compId = compIds.get(0);
+		}
 
-		TopTenSeedData data = new TopTenSeedData((List<IPlayerMatchInfo>)PortalList, "", "", compIds.get(0), rqId, playersPerTeam);
+		TopTenSeedData data = new TopTenSeedData((List<IPlayerRating>)portalList, "", "", compId, roundIds, rqId, playersPerTeam);
 
 		listener.createTopTenList(data);
 
@@ -346,16 +350,31 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	@Override
 	public void showAggregatedMatchInfo(List<IPlayerMatchInfo> matchInfo) {
 		clientFactory.getPlayerListView().setPlayers(matchInfo, null);
-		PortalList = matchInfo;
+		portalList = new ArrayList<IPlayerRating>();
+		for (IPlayerMatchInfo pmi : matchInfo) {
+			portalList.add(pmi.getMatchRating());
+		}
 		jobArea.clear();
 		jobArea.add(clientFactory.getPlayerListView());
 		if (listener instanceof PlayerListView.Listener<?>) {
 			clientFactory.getPlayerListView().setListener((Listener<IPlayerMatchInfo>) listener);
 		}
 		clientFactory.getPlayerListView().asWidget().setVisible(true);
-
 	}
 
+	@Override
+	public void showTimeWeightedMatchInfo(List<IPlayerRating> result) {
+		portalList = result;
+		timeSeries.addStyleName("active");
+		clientFactory.getRatingListView().setPlayers(result, null);
+		ratingList = result;
+		jobArea.clear();
+		jobArea.add(clientFactory.getRatingListView());
+		if (listener instanceof PlayerListView.Listener<?>) {
+			clientFactory.getRatingListView().setListener((Listener<IPlayerRating>) listener);
+		}
+		clientFactory.getPlayerListView().asWidget().setVisible(true);	}
+	
 	@Override
 	public ICompetition getCurrentComp() {
 		return currentComp;

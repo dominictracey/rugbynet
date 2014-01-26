@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface ICompetition {
 
-	public enum CompetitionType {HEINEKEN_CUP, AVIVA_PREMIERSHIP, SUPER_RUGBY, AUTUMN_INTERNATIONALS}
+	public enum CompetitionType {HEINEKEN_CUP, AVIVA_PREMIERSHIP, SUPER_RUGBY, AUTUMN_INTERNATIONALS, GLOBAL}
 
 	public abstract Long getId();
 	public abstract void setId(Long id);

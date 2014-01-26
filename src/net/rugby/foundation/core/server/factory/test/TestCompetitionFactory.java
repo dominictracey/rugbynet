@@ -43,7 +43,8 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	private ITeamGroupFactory tf;
 	private IClubhouseFactory chf;
 	private IMatchGroupFactory mf;
-	
+	private ICompetition globalComp;
+
 	@Inject
 	TestCompetitionFactory(IRoundFactory rf, ICoreRuleFactory crf, ITeamGroupFactory tf, IClubhouseFactory chf, ICompetitionFactory cf, IMatchGroupFactory mf) {
 		this.rf = rf;
@@ -54,7 +55,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		this.tf = tf;
 		this.chf = chf;
 	}
-	
+
 	@Override
 	public void setId(Long id) {
 		this.id = id;
@@ -71,11 +72,13 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			return getTestComp3();
 		} else if (id == 4L) {
 			return getTestComp4();
+		} else if (id == 100000L) {
+			return getGlobalComp();
 		}
-		
+
 		return null;
 	}
-	
+
 	/*
 	 * Comp1 should trigger rules:
 	 * 	RuleMatchStaleNeedsAttention
@@ -88,19 +91,19 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		c.getRoundIds().add(3L);
 		c.getRoundIds().add(4L);
 		c.getRoundIds().add(5L);
-		
+
 		addRounds(c);
 
 		setNextAndPrevRound(c);
 		setBeginAndEnd(c);
-		
+
 		c.setCompClubhouseId(70L);
-		
+
 		for (Long l = 9001L; l < 9007L; ++l)
 			c.getTeamIds().add(l);
-		
+
 		addTeams(c);
-		
+
 		return c;
 
 	}
@@ -114,19 +117,19 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		c.getRoundIds().add(12L);
 		c.getRoundIds().add(13L);
 		c.getRoundIds().add(14L);
-		
+
 		addRounds(c);
 
 		setNextAndPrevRound(c);
 		setBeginAndEnd(c);
-		
+
 		c.setCompClubhouseId(75L);
-		
+
 		for (Long l = 9201L; l < 9209L; ++l)
 			c.getTeamIds().add(l);
-		
+
 		addTeams(c);
-		
+
 		c.setForeignID(999L);
 		c.setForeignURL("testData\\191757-round2-results.htm");
 		c.setLongName("European Heineken Cup");
@@ -148,7 +151,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		setBeginAndEnd(c);
 		return c;
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -161,16 +164,16 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			c.getTeams().add(tf.get(i));
 		}
 		//setNextAndPrevRound(c);
-//		c.setPrevRoundIndex(-1);
-//		c.setNextRoundIndex(0);
-//		setBeginAndEnd(c);
+		//		c.setPrevRoundIndex(-1);
+		//		c.setNextRoundIndex(0);
+		//		setBeginAndEnd(c);
 		c.setCompType(CompetitionType.HEINEKEN_CUP);
 		return c;
 	}
-	
+
 	@Override
 	public ICompetition put(ICompetition c) {	
-		
+
 		if (c.getCompClubhouseId() == null) {
 			chf.setId(null);
 			IClubhouse clubhouse = null;
@@ -181,15 +184,15 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			clubhouse.setOwnerID(-99L);  //-99L is system owned
 			clubhouse.setPublicClubhouse(false);
 			// no join link
-			
+
 			clubhouse = chf.put(clubhouse);
 
 			c.setCompClubhouseId(clubhouse.getId());
 		}	
-		
+
 		return c;
 	}
-	
+
 
 
 	/*
@@ -210,9 +213,9 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			}
 		}
 	}
-	
 
-	
+
+
 	private void setBeginAndEnd(ICompetition c) {
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(new Date());
@@ -225,7 +228,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			if (r.getBegin().before(r.getBegin())) {
 				c.setBegin(r.getBegin());
 			}
-			
+
 			if (r.getEnd().after(c.getEnd())) {
 				c.setEnd(r.getEnd());
 			}
@@ -235,7 +238,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	private ICompetition getEmptyComp() {
 		Competition c = new Competition();
 		c.setAbbr("Rugby.net");
-		
+
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(new Date());
 		cal.add(Calendar.DATE, -12);
@@ -243,20 +246,20 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		cal.add(Calendar.DATE, 23);
 		c.setEnd(cal.getTime());
 
-		
+
 		c.setForeignID(999L);
 		c.setForeignURL("http://testonlyplease.com/999");
-		
+
 		c.setId(id);
 		c.setLongName("Rugby.net Championship Cup");
 		c.setShortName("Rugby.net Championship");
 		c.setUnderway(true);
-		
+
 		c.setRounds(new ArrayList<IRound>());
-		
+
 		return c;
 	}
-	
+
 	/**
 	 * @param c
 	 */
@@ -277,7 +280,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			c.getTeams().add(g);
 		}		
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getUnderwayComps()
 	 */
@@ -287,10 +290,10 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 
 		setId(1L);
 		list.add(getCompetition());
-		
+
 		setId(2L);
 		list.add(getCompetition());
-		
+
 		return list;
 	}
 
@@ -303,10 +306,10 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 
 		setId(1L);
 		list.add(getCompetition());
-		
+
 		setId(2L);
 		list.add(getCompetition());
-		
+
 		return list;
 	}
 
@@ -316,7 +319,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	@Override
 	public void build(Long compId) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -331,11 +334,18 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		return false;
 	}
 
-//	/* (non-Javadoc)
-//	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getLastUpdate(java.lang.Long)
-//	 */
-//	@Override
-//	public Date getLastUpdate(Long compId) {
-//		return new Date();  // I guess don't cache in test?
-//	}
+	@Override
+	public ICompetition getGlobalComp() {
+		if (globalComp == null) {
+			globalComp = new Competition();
+			globalComp.setLongName("All Global Competitions");
+			globalComp.setCompType(CompetitionType.GLOBAL);
+			globalComp.setAbbr("Global");
+			globalComp.setUnderway(true);
+			globalComp.setId(10000L);
+		}
+		return globalComp;
+	}
+
+
 }

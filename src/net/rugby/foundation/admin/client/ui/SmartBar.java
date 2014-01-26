@@ -3,7 +3,6 @@ package net.rugby.foundation.admin.client.ui;
 import java.util.List;
 import java.util.Map;
 
-import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;

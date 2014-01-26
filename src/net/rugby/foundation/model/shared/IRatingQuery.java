@@ -2,7 +2,6 @@ package net.rugby.foundation.model.shared;
 
 import java.util.List;
 
-import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.Position.position;
 
 public interface IRatingQuery extends IHasId {

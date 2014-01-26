@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.inject.Inject;
@@ -19,11 +18,11 @@ import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
-
+import net.rugby.foundation.admin.server.AdminTestModule;
 //import com.google.gwt.i18n.shared.DateTimeFormat;
 //import com.google.gwt.junit.client.GWTTestCase;
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ CoreTestModule.class })
+@GuiceModules({ Game1TestModule.class, CoreTestModule.class, AdminTestModule.class })
 public class TeamTester {
 	  private ITeamGroupFactory tf;
 

@@ -1,11 +1,9 @@
 package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
-import net.rugby.foundation.game1.server.Game1ServiceImpl;
 import net.rugby.foundation.topten.server.MetaTagGenerator;
 import net.rugby.foundation.topten.server.TopTenServiceImpl;
 
-import com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet;
 import com.google.inject.servlet.ServletModule;
 
 public class BPMServletModule extends ServletModule {

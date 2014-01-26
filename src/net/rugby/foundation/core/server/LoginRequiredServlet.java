@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,8 +14,6 @@ import javax.servlet.http.HttpSession;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.LoginInfo;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;

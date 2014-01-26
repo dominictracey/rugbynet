@@ -51,54 +51,8 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 	public PlayerListViewImpl()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		//playersTable.getRowFormatter().addStyleName(0, "groupListHeader");
 		playersTable.addStyleName("groupList");
-		//playersTable.getCellFormatter().addStyleName(0, 1, "groupListNumericColumn");
-
 	}
-
-
-
-	//	@UiHandler("playersTable")
-	//	void onTableClicked(TableCellElement event) {
-	//		if (listener != null) {
-	////			Element cell = playersTable.getCellParent(event);
-	//
-	//			if (cell != null) {
-	//				if (cell.getRowIndex() == 0) { // we have a check box up and click the select all
-	//					if (cell.getCellIndex() == 0) {
-	//						if (columnDefinitions.get(0).isSelectable()) {
-	//							// select them all
-	//							for (int i = 1; i < playerList.size()+1; ++i) {
-	//								((CheckBox)playersTable.getWidget(i, 0).asWidget()).setValue(true);
-	//								listener.onItemSelected(playerList.get(i-1));
-	//							}	   			  
-	//						}  
-	//					}
-	//				} else { 					
-	//					if (shouldFireClickEvent(cell)) {
-	//						T info = playerList.get(cell.getRowIndex()-1);
-	//						if (cell.getCellIndex() == 1) {
-	//							listener.showEditPlayer(info);
-	//						} else if (cell.getCellIndex() == 2) {
-	//							listener.showEditStats(info);
-	//						} else if (cell.getCellIndex() == 3) {
-	//							listener.showEditRating(info);
-	//						} 					
-	//					}
-	//
-	////					if (shouldFireSelectEvent(cell)) { // only do it if we have a checkbox up
-	////						listener.onItemSelected(player);
-	////						if (listener != null) {
-	////							//important sanity check because we are clicking on the table and not the checkbox. And we can miss.
-	////							int x = cell.getRowIndex();
-	////							((CheckBox)playersTable.getWidget(x,0).asWidget()).setValue(listener.onItemSelected(player));
-	////						}
-	////					}
-	//				}
-	//			}
-	//		}
-	//	}
 
 
 	@Override
@@ -144,14 +98,7 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 							listener.showEditStats(event.getValue());
 						}
 					}
-//				    if ("mouseover".equals(event.getNativeEvent().getType())) {
-//				        Element cellElement = event.getNativeEvent().getEventTarget().cast();
-//
-//				        cellElement.setTitle(((IPlayerMatchInfo)event.getValue()).getMatchRating().getDetails());
-//				      }
-					
 				}
-				
 			});
 		}
 	}

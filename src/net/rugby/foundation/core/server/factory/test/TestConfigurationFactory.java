@@ -4,7 +4,6 @@
 package net.rugby.foundation.core.server.factory.test;
 
 import net.rugby.foundation.core.server.factory.BaseConfigurationFactory;
-import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.ICoreConfiguration;

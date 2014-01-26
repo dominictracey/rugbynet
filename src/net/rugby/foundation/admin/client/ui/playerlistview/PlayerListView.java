@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
+import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.RatingListener;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IPlayerRating;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -15,6 +17,11 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface PlayerListView<T> extends IsWidget
 {
+
+	public interface RatingListener<T> {
+		void showEditStats(IPlayerRating player, int index);
+		void showEditPlayerFromTS(IPlayerRating player);
+	}
 
 	void setListener(Listener<T> listener);
 	void setColumnDefinitions(List<ColumnDefinition<T>> columnDefinitions);

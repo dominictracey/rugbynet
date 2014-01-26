@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
@@ -26,7 +27,6 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.RatingQuery;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 
@@ -373,6 +373,6 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 			list.add(spms);
 		}
 
-		return list;
+		return Lists.reverse(list);
 	}
 }

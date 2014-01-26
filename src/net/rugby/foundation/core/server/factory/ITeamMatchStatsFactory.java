@@ -3,7 +3,6 @@ package net.rugby.foundation.core.server.factory;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 

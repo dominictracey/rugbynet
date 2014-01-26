@@ -18,7 +18,6 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.ofy.OfyContentFactory;
 import net.rugby.foundation.core.server.factory.test.TestAppUserFactory;
 import net.rugby.foundation.core.server.factory.test.TestClubhouseFactory;
 import net.rugby.foundation.core.server.factory.test.TestClubhouseMembershipFactory;
@@ -38,7 +37,6 @@ import net.rugby.foundation.core.server.factory.test.TestTeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IContent;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 
 public class CoreTestModule extends AbstractModule {

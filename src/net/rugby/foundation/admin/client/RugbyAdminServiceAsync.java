@@ -21,6 +21,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
@@ -159,4 +160,6 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<Boolean> asyncCallback);
 	public void checkPipelineStatus(String id, Long matchId,
 			AsyncCallback<String> asyncCallback);
+	public void getTimeSeriesRatingQueryResults(long parseLong,
+			AsyncCallback<List<IPlayerRating>> asyncCallback);
 }

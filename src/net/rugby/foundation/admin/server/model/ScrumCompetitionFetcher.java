@@ -1,9 +1,4 @@
 package net.rugby.foundation.admin.server.model;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,7 +25,6 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.TeamGroup;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 
 

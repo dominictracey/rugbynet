@@ -3,16 +3,11 @@ package net.rugby.foundation.test.jenkins;
 
 import static org.junit.Assert.*;
 
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.inject.Inject;
@@ -25,11 +20,11 @@ import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
-
+import net.rugby.foundation.admin.server.AdminTestModule;
 //import com.google.gwt.i18n.shared.DateTimeFormat;
 //import com.google.gwt.junit.client.GWTTestCase;
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, CoreTestModule.class })
+@GuiceModules({ Game1TestModule.class, CoreTestModule.class, AdminTestModule.class })
 public class PlayerTester {
 	private ITeamGroupFactory tf;
 

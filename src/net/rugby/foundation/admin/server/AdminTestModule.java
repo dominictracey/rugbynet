@@ -32,7 +32,6 @@ import net.rugby.foundation.admin.server.workflow.TestWorkflowConfigurationFacto
 import net.rugby.foundation.admin.server.workflow.TestWorkflowFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
-import net.rugby.foundation.core.server.factory.ofy.OfyPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.test.TestRatingQueryFactory;
 import com.google.inject.AbstractModule;

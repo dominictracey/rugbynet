@@ -10,6 +10,8 @@ import com.google.inject.Inject;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -27,8 +29,8 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 	private Random r = new Random();
 
 	@Inject
-	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf) {
-		super(mf,tf);
+	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf) {
+		super(mf,tf, rf, pmsf);
 		this.pf = pf;
 		this.cf = cf;
 	}

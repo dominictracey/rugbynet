@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.inject.Inject;
 import com.googlecode.objectify.Query;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -17,6 +19,13 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerRating;
 
 public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> implements IPlayerRatingFactory {
+	
+	private IPlayerFactory pf;
+
+	@Inject
+	public OfyPlayerRatingFactory(IPlayerFactory pf) {
+		this.pf = pf;
+	}
 	
 	@Override
 	public IPlayerRating create() {
@@ -35,6 +44,9 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			Objectify ofy = DataStoreFactory.getOfy();
 			if (id != null) {
 				IPlayerRating rq = ofy.get(new Key<PlayerRating>(PlayerRating.class,id));
+				if (rq != null && rq.getPlayerId() != null) {
+					rq.setPlayer(pf.get(rq.getPlayerId()));
+				}
 				return rq;
 			} else {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Don't try to get with null. Call create() instead!");
@@ -83,6 +95,11 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			Query<PlayerRating> prq = ofy.query(PlayerRating.class).filter("queryId", query.getId());
 			List<IPlayerRating> list = new ArrayList<IPlayerRating>();
 			list.addAll(prq.list());
+			for (IPlayerRating r : list) {
+				if (r.getPlayerId() != null) {
+					r.setPlayer(pf.get(r.getPlayerId()));
+				}
+			}
 			return list;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);

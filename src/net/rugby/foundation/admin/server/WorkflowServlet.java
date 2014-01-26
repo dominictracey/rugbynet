@@ -10,13 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.rugby.foundation.admin.server.workflow.AdminWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
-import net.rugby.foundation.admin.server.workflow.MatchResultFetchWF;
 import net.rugby.foundation.admin.shared.CompetitionWorkflow;
 
-import com.google.appengine.tools.pipeline.JobInfo;
-import com.google.appengine.tools.pipeline.NoSuchObjectException;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

@@ -34,6 +34,8 @@ import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.PlayerRating;
+import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.model.shared.Position.position;
 
 public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
@@ -594,6 +596,13 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 					if (((IPlayerMatchRating)r).getPlayerMatchStats().getPosition().equals(position.getAt(i))) {
 						((SummaryStatistics)ss).addValue(r.getRating());
 					}
+				} else if (r instanceof PlayerRating) {
+					for (RatingComponent rc : r.getRatingComponents()) {
+						IPlayerMatchStats pms = pmsf.getById(rc.getPlayerMatchStatsId());
+						if (pms.getPosition().equals(position.getAt(i))) {
+							((SummaryStatistics)ss).addValue(rc.getTimeWeighted());
+						}
+					}
 				}
 			}
 			body += ss.toString();
@@ -610,6 +619,13 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				if (r instanceof IPlayerMatchRating) {
 					if (((IPlayerMatchRating)r).getPlayerMatchStats().getMatchId().equals(id)) {
 						((SummaryStatistics)ss).addValue(r.getRating());
+					}
+				}  else if (r instanceof PlayerRating) {
+					for (RatingComponent rc : r.getRatingComponents()) {
+						IPlayerMatchStats pms = pmsf.getById(rc.getPlayerMatchStatsId());
+						if (pms.getMatchId().equals(id)) {
+							((SummaryStatistics)ss).addValue(rc.getTimeWeighted());
+						}
 					}
 				}	
 			}

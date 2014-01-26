@@ -109,7 +109,11 @@ public class EditComp extends Composite {
 		ccid.setText(comp.getCompClubhouseId().toString());
 		abbr.setText(comp.getAbbr());
 		underway.setValue(comp.getUnderway());
-		weightingFactor.setValue(comp.getWeightingFactor().toString());
+		if (comp.getWeightingFactor() != null) {
+			weightingFactor.setValue(comp.getWeightingFactor().toString());
+		} else {
+			weightingFactor.setValue("1.0");
+		}
 		compType.clear();
 		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {
 			compType.addItem(ICompetition.CompetitionType.values()[i].toString());

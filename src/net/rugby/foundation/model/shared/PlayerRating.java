@@ -1,19 +1,20 @@
 package net.rugby.foundation.model.shared;
 
+import javax.persistence.Embedded;
 import javax.persistence.Id;
+import javax.persistence.Transient;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Transient;
 
 import com.googlecode.objectify.annotation.Entity;
 
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 
 @Entity
-public class PlayerRating implements IPlayerRating, Serializable {
+public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPlayerRating> {
 
 	/**
 	 * 
@@ -40,8 +41,134 @@ public class PlayerRating implements IPlayerRating, Serializable {
 		}
 		this.schema = schema;
 		this.schemaId = schema.getId();
-		this.queryId = query.getId();
+		if (query != null) {
+			this.queryId = query.getId();
+		}
+		
 		this.details = details;
+	}
+	
+	@Entity
+	public static class RatingComponent implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3979300783273508712L;
+		
+
+		public RatingComponent() {
+			
+		}
+		
+		public RatingComponent(String details, int computedScore, int timeWeighted, float backScore, float forwardScore, float rawScore, Long playerMatchStatsId, String matchLabel) {
+			this.computedScore = computedScore;
+			this.timeWeighted = timeWeighted;
+			this.backScore = backScore;
+			this.forwardScore = forwardScore;
+			this.rawScore = rawScore;
+			this.setPlayerMatchStatsId(playerMatchStatsId);
+			this.setDetails(details);
+			this.setMatchLabel(matchLabel);
+		}
+		
+		@Id
+		protected Long id;
+		
+		protected int computedScore;
+		protected int timeWeighted;
+		protected float backScore;
+		protected float forwardScore;
+		protected float rawScore; 
+		private Long playerMatchStatsId;
+		private String details;
+
+		private String matchLabel;
+	
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+
+		/***
+		 * 
+		 * @return the normalized (0-1000) score for this match's stats for this player without any time bias.
+		 */
+		public int getComputedScore() {
+			return computedScore;
+		}
+		public void setComputedScore(int computedScore) {
+			this.computedScore = computedScore;
+		}
+		/***
+		 * 
+		 * @return the normalized (0-1000) score for this match's stats for this player with time bias.
+		 */
+		public int getTimeWeighted() {
+			return timeWeighted;
+		}
+		public void setTimeWeighted(int timeWeighted) {
+			this.timeWeighted = timeWeighted;
+		}
+		
+		/***
+		 * 
+		 * @return The back component of the player's rating. Is a sum of the stat component and schema weight products.
+		 */
+		public float getBackScore() {
+			return backScore;
+		}
+		public void setBackScore(float backScore) {
+			this.backScore = backScore;
+		}
+		/***
+		 * 
+		 * @return The forward component of the player's rating. Is a sum of the stat component and schema weight products.
+		 */
+		public float getForwardScore() {
+			return forwardScore;
+		}
+		public void setForwardScore(float forwardScore) {
+			this.forwardScore = forwardScore;
+		}
+		/***
+		 * 
+		 * @return For forwards, this is the sum of the forwardScore and backScore. Backs get just their backScore.
+		 */
+		public float getRawScore() {
+			return rawScore;
+		}
+		public void setRawScore(float rawScore) {
+			this.rawScore = rawScore;
+		}
+		public Long getPlayerMatchStatsId() {
+			return playerMatchStatsId;
+		}
+		public void setPlayerMatchStatsId(Long playerMatchStatsId) {
+			this.playerMatchStatsId = playerMatchStatsId;
+		}
+		/***
+		 * 
+		 * @return a text representation suitable for display to admins
+		 */
+		public String getDetails() {
+			return details;
+		}
+		public void setDetails(String details) {
+			this.details = details;
+		}
+
+		public String getMatchLabel() {
+			return matchLabel;
+		}
+		
+		public void setMatchLabel(String label) {
+			matchLabel = label;
+		}
+		
+		
 	}
 
 	@Id
@@ -50,13 +177,13 @@ public class PlayerRating implements IPlayerRating, Serializable {
 	protected Long groupId;
 	protected Date generated;
 	@Transient
-	protected transient IGroup group;
+	protected IGroup group;
 	protected Long schemaId;
 	@Transient
-	protected transient IRatingEngineSchema schema;
+	protected IRatingEngineSchema schema;
 	protected Long playerId;
 	@Transient
-	protected transient IPlayer player;
+	protected IPlayer player;
 
 	protected List<Long> playerMatchStatIds;
 	@Transient
@@ -65,6 +192,9 @@ public class PlayerRating implements IPlayerRating, Serializable {
 	protected Long queryId;
 	protected String details;
 	protected Float rawScore;
+	
+	@Embedded
+	protected List<RatingComponent> ratingComponents;
 	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IPlayerRating#getId()
@@ -190,7 +320,11 @@ public class PlayerRating implements IPlayerRating, Serializable {
 
 	@Override
 	public String toString() {
-		return "[PlayerRating:: player: " + playerId + " rating: " + rating + "]";
+		String name = "-o-";
+		if (player != null)  {
+			name = player.getDisplayName();
+		}
+		return "[PlayerRating:: player: " + name + " (" + playerId + ") rating: " + rating + "]";
 	}
 
 	/* (non-Javadoc)
@@ -222,6 +356,26 @@ public class PlayerRating implements IPlayerRating, Serializable {
 			return -1;
 		}
 	}
+	
+	@Override
+	public int compareTo(IPlayerRating o) {
+		if (rating == null) { 
+			return 1;
+		}
+
+		if (o.getRating() == null) {
+			return -1;
+		}
+
+		if (rating.equals(o.getRating())) {
+			return 0;
+		} else if (rating < o.getRating()) {
+			return 1;
+		} else {
+			return -1;
+		}
+	}
+	
 	@Override
 	public List<Long> getMatchStatIds() {
 		return playerMatchStatIds;
@@ -287,4 +441,20 @@ public class PlayerRating implements IPlayerRating, Serializable {
 	public float getRawScore() {
 		return rawScore;
 	}
+
+	@Override
+	public List<RatingComponent> getRatingComponents() {
+		if (ratingComponents == null) {
+			ratingComponents = new ArrayList<RatingComponent>();
+		}
+		return ratingComponents;
+	}
+
+	@Override
+	public void addRatingComponent(RatingComponent rc) {
+		getRatingComponents().add(rc);
+		
+	}
+
+
 }

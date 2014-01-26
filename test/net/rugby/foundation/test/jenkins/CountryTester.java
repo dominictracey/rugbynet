@@ -3,6 +3,7 @@ package net.rugby.foundation.test.jenkins;
 
 import static org.junit.Assert.*;
 
+
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestCo
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.inject.Inject;
 
+import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
@@ -26,7 +28,7 @@ import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, CoreTestModule.class })
+@GuiceModules({ Game1TestModule.class, CoreTestModule.class, AdminTestModule.class })
 public class CountryTester {
 	private ICountryFactory cf;
 

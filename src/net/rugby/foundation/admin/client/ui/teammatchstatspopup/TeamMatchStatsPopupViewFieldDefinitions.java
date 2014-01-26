@@ -5,15 +5,12 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.ClientFactory.GetPositionListCallback;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
-import net.rugby.foundation.model.shared.Position.position;
 
 public class TeamMatchStatsPopupViewFieldDefinitions<T> {
 	private static List<FieldDefinition<ITeamMatchStats>> fieldDefinitions =

@@ -18,12 +18,8 @@ import com.google.inject.Inject;
 import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
-import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IRatingQuery;
-import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
 

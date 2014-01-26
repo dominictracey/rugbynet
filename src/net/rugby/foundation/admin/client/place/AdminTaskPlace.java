@@ -1,10 +1,5 @@
 package net.rugby.foundation.admin.client.place;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import net.rugby.foundation.admin.shared.IAdminTask;
-
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;

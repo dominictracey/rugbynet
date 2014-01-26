@@ -19,11 +19,17 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
@@ -37,10 +43,14 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 	private String lastCreatedMemcacheKey = "TTL-lastCreated-";
 	private String latestPublishedMemcacheKey = "TTL-latestPublished-";
+	private IRoundFactory rf;
+	private IPlayerMatchStatsFactory pmsf;
 
-	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf) {
+	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf) {
 		this.mf = mf;
 		this.tf = tf;
+		this.rf = rf;
+		this.pmsf = pmsf;
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -254,7 +264,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	@Override
 	public ITopTenList create(TopTenSeedData tti) {
 		ITopTenList list = new TopTenList();
-		list.setCompId(tti.getCompId());
+		// a times series TTL won't have a compId set, so we need to get one
+		list.setCompId(getCompId(tti));
 		list.setContent(tti.getDescription());
 		list.setCreated(new Date());
 		list.setEditorId(null);
@@ -268,10 +279,10 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 		// first prune the PMI list down to the actual Top Ten
 		// put the PMRs in a SortedSet
-		TreeSet<IPlayerMatchRating> set = new TreeSet<IPlayerMatchRating>();
-		for (IPlayerMatchInfo pmi : tti.getPmiList()) {
-			if (pmi.getMatchRating() != null && pmi.getMatchRating().getRating() != null) {
-				set.add(pmi.getMatchRating());
+		TreeSet<IPlayerRating> set = new TreeSet<IPlayerRating>();
+		for (IPlayerRating pmi : tti.getPmiList()) {
+			if (pmi != null && pmi.getRating() != null) {
+				set.add((PlayerRating)pmi);
 			}
 		}
 
@@ -283,12 +294,13 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		if (tti.getPmiList() != null && tti.getPmiList().size() > 0) {
 			// keep track of the number from each team included on the list so we can check specified limit
 			Map<Long,Integer> numFromTeam = new HashMap<Long, Integer>();
-			Iterator<IPlayerMatchRating> it = set.iterator();
+			Iterator<IPlayerRating> it = set.iterator();
 			int count = 0;
 			while (it.hasNext() && count < 10) {
-				IPlayerMatchRating pmr = it.next();
-				IMatchGroup match = mf.get(pmr.getPlayerMatchStats().getMatchId());
-				ITeamGroup team = tf.get(pmr.getPlayerMatchStats().getTeamId());
+				IPlayerRating pmr = it.next();
+				IPlayerMatchStats pms = pmsf.getById(pmr.getMatchStatIds().get(0));
+				IMatchGroup match = mf.get(pms.getMatchId());
+				ITeamGroup team = tf.get(pms.getTeamId());
 				
 				// keep track of players per team
 				if (!numFromTeam.containsKey(team.getId())) {
@@ -300,7 +312,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					//String image, Long contributorId, Long editorId, boolean isSubmitted, 
 					//String matchReportLink, String teamName, ITopTenList parent)
 					ITopTenItem item = new TopTenItem(null, pmr.getPlayerId(), pmr.getPlayer(), "",
-							"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pmr.getPlayerMatchStats().getPosition(), list);
+							"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pms.getPosition(), list);
 					put(item);
 					list.getList().add(item);
 					list.getItemIds().add(item.getId());
@@ -328,6 +340,29 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		setLastCreatedForComp(list,list.getCompId());
 
 		return list;
+	}
+
+	private Long getCompId(TopTenSeedData tti) {
+		if (tti.getCompId() != null && !tti.getCompId().equals(-1L)) {
+			return tti.getCompId();
+		} else {
+			// time series
+			Long compId = null;
+			for (Long rid : tti.getRoundIds()) {
+				rf.setId(rid);
+				IRound r = rf.getRound();
+				// for now, all the selected rounds need to have the same compId
+				if (compId == null) {
+					compId = r.getCompId();
+				} else {
+					if (!r.getCompId().equals(compId)) {
+						throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
+					}
+				}
+			}
+			return compId;
+		}
+
 	}
 
 	@Override

@@ -5,7 +5,6 @@ package net.rugby.foundation.core.client;
 
 import java.util.List;
 
-import net.rugby.foundation.model.shared.Content;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;

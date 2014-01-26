@@ -18,6 +18,8 @@ import net.rugby.foundation.admin.client.ui.matchratingengineschemapopup.MatchRa
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
+import net.rugby.foundation.admin.client.ui.playerlistview.RatingListViewColumnDefinitions;
+import net.rugby.foundation.admin.client.ui.playerlistview.RatingListViewImpl;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupViewImpl;
@@ -33,17 +35,15 @@ import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPo
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.client.Core;
-import net.rugby.foundation.core.client.CoreService;
-import net.rugby.foundation.core.client.CoreServiceAsync;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -78,6 +78,9 @@ public class ClientFactoryImpl implements ClientFactory {
 	
 	private PlayerListView<IPlayerMatchInfo> playerListView = null;
 	private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions =  null; 
+	private PlayerListView<IPlayerRating> ratingListView = null;
+	private List<ColumnDefinition<IPlayerRating>> ratingListViewColumnDefinitions =  null;
+	
 	private EditContent editContent = null;
 	
 	@Override
@@ -219,7 +222,6 @@ public class ClientFactoryImpl implements ClientFactory {
 		if (playerListView == null) {
 			playerListView = new PlayerListViewImpl<IPlayerMatchInfo>();
 
-			//editMatchStats = new PlayerListViewImpl<IPlayerMatchInfo>();
 			  if (playerListViewColumnDefinitions == null) {
 				PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerMatchInfo>();
 			    playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
@@ -229,6 +231,22 @@ public class ClientFactoryImpl implements ClientFactory {
 			  playerListView.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
 		}
 		return playerListView;
+	}
+	
+	@Override
+	public PlayerListView<IPlayerRating> getRatingListView() {
+		if (ratingListView == null) {
+			ratingListView = new RatingListViewImpl<IPlayerRating>();
+
+			  if (ratingListViewColumnDefinitions == null) {
+				RatingListViewColumnDefinitions<?> plvcd =  new RatingListViewColumnDefinitions<IPlayerRating>();
+			    ratingListViewColumnDefinitions = plvcd.getColumnDefinitions();
+			  }
+
+			  ratingListView.setColumnDefinitions(ratingListViewColumnDefinitions);
+			  ratingListView.setColumnHeaders(RatingListViewColumnDefinitions.getHeaders());
+		}
+		return ratingListView;
 	}
 
 	@Override
@@ -378,4 +396,6 @@ public class ClientFactoryImpl implements ClientFactory {
 			}
 
 		});	}
+
+
 }

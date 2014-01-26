@@ -13,19 +13,6 @@ package net.rugby.foundation.admin.server.workflow.player;
 //License for the specific language governing permissions and limitations under
 //the License.
 
-//import com.google.appengine.api.taskqueue.dev.LocalTaskQueueCallback;
-import com.google.appengine.api.urlfetch.URLFetchServicePb;
-import com.google.appengine.api.urlfetch.URLFetchServicePb.URLFetchRequest;
-import com.google.appengine.tools.pipeline.impl.PipelineManager;
-import com.google.appengine.tools.pipeline.impl.servlets.TaskHandler;
-import com.google.appengine.tools.pipeline.impl.tasks.Task;
-import com.google.appengine.tools.pipeline.impl.util.StringUtils;
-
-import java.net.URLDecoder;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Logger;
-
 /**
 * A {@code LocalTaskQueueCallback} for use in tests that make use of the
 * Pipeline framework.

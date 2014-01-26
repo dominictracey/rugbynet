@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.model.IMatchRatingEngine;
-import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -16,7 +15,6 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 import com.google.appengine.tools.pipeline.Job5;
-import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 

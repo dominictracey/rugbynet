@@ -30,7 +30,6 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
-import net.rugby.foundation.model.shared.PlayerMatchRating;
 
 public class OfyAdminTaskFactory implements IAdminTaskFactory {
 	

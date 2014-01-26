@@ -9,7 +9,7 @@ import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import com.googlecode.objectify.annotation.Subclass;
 
 @Subclass
-public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRating, Serializable, Comparable<IPlayerMatchRating>{
+public class PlayerMatchRating extends PlayerRating implements IPlayerMatchRating, Serializable {
 	
 	/**
 	 * 

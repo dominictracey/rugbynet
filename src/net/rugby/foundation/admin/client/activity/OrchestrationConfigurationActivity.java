@@ -3,7 +3,6 @@ package net.rugby.foundation.admin.client.activity;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminOrchPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.OrchestrationConfigurationView;

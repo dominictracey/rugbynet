@@ -13,6 +13,8 @@ import com.googlecode.objectify.Query;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -30,8 +32,8 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	Objectify ofy;
 
 	@Inject
-	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf) {
-		super(mf,tf);
+	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf) {
+		super(mf,tf, rf, pmsf);
 		this.pf = pf;
 		this.cf = cf;
 

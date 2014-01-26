@@ -2,7 +2,6 @@ package net.rugby.foundation.topten.client.ui.toptenlistview;
 
 import java.util.List;
 
-import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;

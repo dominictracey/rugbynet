@@ -13,7 +13,6 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchStatTimeLog;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
@@ -154,6 +153,14 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	}
 	@Override
 	public List<IPlayerMatchStats> query(IRatingQuery rq) {
+		if (rq.getId().equals(704L)) {
+			List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
+			list.addAll(getByMatchId(100L));
+			list.addAll(getByMatchId(101L));
+			list.addAll(getByMatchId(102L));
+			list.addAll(getByMatchId(103L));
+			return list;
+		}
 		return getByMatchId(100L);
 	}
 }

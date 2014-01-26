@@ -20,9 +20,9 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
-
+import net.rugby.foundation.admin.server.AdminTestModule;
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, CoreTestModule.class })
+@GuiceModules({ Game1TestModule.class, CoreTestModule.class, AdminTestModule.class })
 public class TeamMatchStatsTester {
 
 	private final LocalServiceTestHelper helper =

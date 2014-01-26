@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.github.gwtbootstrap.client.ui.Tooltip;
 import com.github.gwtbootstrap.client.ui.constants.Placement;
-import com.google.gwt.cell.client.Cell.Context;
-import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HTML;
@@ -17,10 +15,8 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.Listen
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.PlayerRating;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
 
-public class PlayerListViewColumnDefinitions<T> {
+public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 
 	private static List<ColumnDefinition<IPlayerMatchInfo>> columnDefinitions =
 			new ArrayList<ColumnDefinition<IPlayerMatchInfo>>();
@@ -30,30 +26,6 @@ public class PlayerListViewColumnDefinitions<T> {
 
 	public PlayerListViewColumnDefinitions() {
 		if (columnDefinitions.isEmpty()) {
-			//	      columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-			//	        public Widget render(IPlayerMatchInfo c) {
-			//	          CheckBox checkBox = new CheckBox();
-			//	          if (listener != null)
-			//	        	  checkBox.setValue(listener.isSelected(c));
-			//	          return checkBox;
-			//	        }
-			//	
-			//	        public boolean isSelectable() {
-			//	          return true;
-			//	        }
-			//
-			//			@Override
-			//			public Column<IPlayerMatchInfo, ?> getColumn() {
-			//				{
-			//					return new Column<IPlayerMatchInfo,?>() {
-			//					      @Override
-			//					      public String getValue(IPlayerMatchInfo t) {
-			//					        return "undefined";
-			//					      }
-			//					    };
-			//				}
-			//			}
-			//	      });
 
 			if (match != null) {
 			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {

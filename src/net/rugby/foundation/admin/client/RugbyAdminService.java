@@ -19,6 +19,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
@@ -126,6 +127,7 @@ public interface RugbyAdminService extends RemoteService {
 	List<IStanding> FetchRoundStandings(Long roundId);
 	IRatingQuery getRatingQuery(long parseLong);
 	List<IPlayerMatchInfo> getRatingQueryResults(long parseLong);
+	List<IPlayerRating> getTimeSeriesRatingQueryResults(long parseLong);
 	Boolean deleteRatingQuery(IRatingQuery query);
 	String checkPipelineStatus(String id, Long matchId);
 }

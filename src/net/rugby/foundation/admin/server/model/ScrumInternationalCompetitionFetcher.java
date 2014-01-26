@@ -16,8 +16,6 @@ import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
-import net.rugby.foundation.admin.server.factory.espnscrum.TestUrlCacher;
-import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -29,7 +27,6 @@ import net.rugby.foundation.model.shared.IRound;
 //import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 
 public class ScrumInternationalCompetitionFetcher implements IForeignCompetitionFetcher {
 

@@ -6,7 +6,6 @@ package net.rugby.foundation.core.client;
 import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import net.rugby.foundation.model.shared.Content;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;

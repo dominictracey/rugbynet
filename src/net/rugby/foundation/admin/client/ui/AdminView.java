@@ -33,5 +33,5 @@ public interface AdminView extends IsWidget {
 
 	TaskView<IAdminTask> getTaskView();
 	
-	PortalView getPortalView();
+	PortalView<?> getPortalView();
 }

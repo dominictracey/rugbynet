@@ -4,8 +4,6 @@ package net.rugby.foundation.topten.client;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.core.client.Core;
-import net.rugby.foundation.core.client.Identity;
 import net.rugby.foundation.topten.client.mvp.AppActivityMapper;
 import net.rugby.foundation.topten.client.mvp.AppPlaceHistoryMapper;
 import net.rugby.foundation.topten.client.place.TopTenListPlace;

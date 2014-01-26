@@ -1,8 +1,6 @@
 package net.rugby.foundation.admin.client.ui;
 
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.place.AdminCompPlace;
-import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresenter;
 import net.rugby.foundation.admin.client.ui.task.TaskView;

@@ -23,6 +23,7 @@ import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
@@ -36,6 +37,10 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
+
+
+
+
 @Singleton
 public class OfyCompetitionFactory implements ICompetitionFactory, Serializable {
 	/**
@@ -48,6 +53,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	private IClubhouseFactory chf;
 	private IConfigurationFactory ccf;
 	private boolean saving = false;
+	private ICompetition globalComp;
 
 
 	@Inject
@@ -61,7 +67,7 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 	@Override
 	public void setId(Long id) {
 		this.id = id;
-
+		
 	}
 
 	@Override
@@ -371,21 +377,23 @@ public class OfyCompetitionFactory implements ICompetitionFactory, Serializable 
 		}
 	}
 
-	//	/* (non-Javadoc)
-	//	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#getLastUpdate(java.lang.Long)
-	//	 */
-	//	@Override
-	//	public Date getLastUpdate(Long compId) {
-	//		setId(compId);
-	//		ICompetition c = getCompetition();
-	//		if (c != null) {
-	//			if (c.getLastSaved() == null) {
-	//				c.setLastSaved(new Date());
-	//				put(c);
-	//			}
-	//			return c.getLastSaved();
-	//		}
-	//		return null;
-	//	}
+	@Override
+	public ICompetition getGlobalComp() {
+		if (globalComp == null) {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Competition> cq = ofy.query(Competition.class).filter("CompetitionType", CompetitionType.GLOBAL);
+			if (cq.count() > 0) {
+				globalComp = cq.get();
+			} else {
+				globalComp = new Competition();
+				globalComp.setLongName("All Global Competitions");
+				globalComp.setCompType(CompetitionType.GLOBAL);
+				globalComp.setAbbr("Global");
+				globalComp.setUnderway(true);
+				ofy.put(globalComp);
+			}
+		}
+		return globalComp;
+	}
 
 }

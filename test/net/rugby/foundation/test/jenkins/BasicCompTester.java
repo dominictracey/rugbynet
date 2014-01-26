@@ -34,7 +34,7 @@ import junit.framework.Assert;
  *
  */
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, CoreTestModule.class })
+@GuiceModules({ Game1TestModule.class, AdminTestModule.class, CoreTestModule.class })
 public class BasicCompTester {
 	private final LocalServiceTestHelper helper =
 			new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());

@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -39,10 +40,12 @@ public class ScrumQueryRatingEngineFactory
 	private IRatingQueryFactory rqf;
 	private ICompetitionFactory cf;
 	private IPlayerRatingFactory prf;
+	private IMatchResultFactory mrf;
 
 	@Inject
 	public ScrumQueryRatingEngineFactory(IPlayerFactory pf, IMatchGroupFactory mgf, IPlayerMatchRatingFactory pmrf, ITeamMatchStatsFactory tmsf, 
-			IRoundFactory rf, IStandingFactory sf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, ICompetitionFactory cf, IPlayerRatingFactory prf) {
+			IRoundFactory rf, IStandingFactory sf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, ICompetitionFactory cf, 
+			IPlayerRatingFactory prf, IMatchResultFactory mrf) {
 		this.pf = pf;
 		this.pmrf = pmrf;
 		this.tmsf = tmsf;
@@ -53,6 +56,7 @@ public class ScrumQueryRatingEngineFactory
 		this.rqf = rqf;
 		this.cf = cf;
 		this.prf = prf;
+		this.mrf = mrf;
 	}
 	
 	@Override
@@ -61,7 +65,7 @@ public class ScrumQueryRatingEngineFactory
 			if (rq.getRoundIds().size() == 1) {
 				return new ScrumQueryRatingEngineV100(pf, mgf, pmrf, rf, sf, pmsf, tmsf, rqf, cf);
 			} else {
-				return new ScrumTimeSeriesRatingEngineV100(pf, mgf, pmrf, rf, sf, pmsf, tmsf, rqf, cf, prf);
+				return new ScrumTimeSeriesRatingEngineV100(pf, mgf, pmrf, rf, sf, pmsf, tmsf, rqf, cf, prf, mrf);
 			}
 		} 
 		

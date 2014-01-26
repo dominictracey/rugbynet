@@ -3,31 +3,27 @@ package net.rugby.foundation.admin.shared;
 import java.io.Serializable;
 import java.util.List;
 
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
-import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.IPlayerRating;
 
 public class TopTenSeedData implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6761184923411466077L;
-	protected List<IPlayerMatchInfo> pmiList;
+	protected List<IPlayerRating> pmiList;
 	protected String title;
 	protected String description;
 	protected Long compId;
 	protected Long ratingQueryId;
-//	protected Long roundId;
-//	protected position pos;
-//	protected Long countryId;
-//	protected Long teamId;
 	protected int playersPerTeam = 10;
+	protected List<Long> roundIds;
 	
 	public TopTenSeedData() {
 		
 	}
 	
-	public TopTenSeedData(List<IPlayerMatchInfo> pmiList, String title,
-			String description, Long compId, Long ratingQueryId, int playersPerTeam) {
+	public TopTenSeedData(List<IPlayerRating> pmiList, String title,
+			String description, Long compId, List<Long> roundIds, Long ratingQueryId, int playersPerTeam) {
 		super();
 		this.pmiList = pmiList;
 		this.title = title;
@@ -35,11 +31,12 @@ public class TopTenSeedData implements Serializable {
 		this.compId = compId;
 		this.ratingQueryId = ratingQueryId;
 		this.playersPerTeam = playersPerTeam;
+		this.roundIds = roundIds;
 	}
-	public List<IPlayerMatchInfo> getPmiList() {
+	public List<IPlayerRating> getPmiList() {
 		return pmiList;
 	}
-	public void setPmiList(List<IPlayerMatchInfo> pmiList) {
+	public void setPmiList(List<IPlayerRating> pmiList) {
 		this.pmiList = pmiList;
 	}
 	public String getTitle() {
@@ -60,30 +57,6 @@ public class TopTenSeedData implements Serializable {
 	public void setCompId(Long compId) {
 		this.compId = compId;
 	}
-//	public Long getRoundId() {
-//		return roundId;
-//	}
-//	public void setRoundId(Long roundId) {
-//		this.roundId = roundId;
-//	}
-//	public position getPos() {
-//		return pos;
-//	}
-//	public void setPos(position pos) {
-//		this.pos = pos;
-//	}
-//	public Long getCountryId() {
-//		return countryId;
-//	}
-//	public void setCountryId(Long countryId) {
-//		this.countryId = countryId;
-//	}
-//	public Long getTeamId() {
-//		return teamId;
-//	}
-//	public void setTeamId(Long teamId) {
-//		this.teamId = teamId;
-//	}
 
 	public int getPlayersPerTeam() {
 		return playersPerTeam;
@@ -99,5 +72,13 @@ public class TopTenSeedData implements Serializable {
 
 	public void setRatingQueryId(Long ratingQueryId) {
 		this.ratingQueryId = ratingQueryId;
+	}
+
+	public List<Long> getRoundIds() {
+		return roundIds;
+	}
+
+	public void setRoundIds(List<Long> roundIds) {
+		this.roundIds = roundIds;
 	}
 }
