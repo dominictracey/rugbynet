@@ -157,6 +157,8 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 												}
 											}	
 										});
+									} else {
+										view.showAggregatedMatchInfo(null);
 									}
 								}
 

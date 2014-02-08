@@ -7,8 +7,8 @@ public interface IPlayerMatchInfo {
 
 	public abstract void setPlayerMatchStats(IPlayerMatchStats playerMatchStats);
 
-	public abstract IPlayerMatchRating getMatchRating();
+	public abstract IPlayerRating getMatchRating();
 
-	public abstract void setMatchRating(IPlayerMatchRating matchRating);
+	public abstract void setMatchRating(IPlayerRating matchRating);
 
 }

@@ -12,6 +12,7 @@ import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -21,10 +22,12 @@ import net.rugby.foundation.model.shared.PlayerRating;
 public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> implements IPlayerRatingFactory {
 	
 	private IPlayerFactory pf;
+	private IPlayerMatchStatsFactory pmsf;
 
 	@Inject
-	public OfyPlayerRatingFactory(IPlayerFactory pf) {
+	public OfyPlayerRatingFactory(IPlayerFactory pf, IPlayerMatchStatsFactory pmsf) {
 		this.pf = pf;
+		this.pmsf = pmsf;
 	}
 	
 	@Override
@@ -46,6 +49,9 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 				IPlayerRating rq = ofy.get(new Key<PlayerRating>(PlayerRating.class,id));
 				if (rq != null && rq.getPlayerId() != null) {
 					rq.setPlayer(pf.get(rq.getPlayerId()));
+				}
+				for (Long pmsid : rq.getMatchStatIds()) {
+					rq.addMatchStats(pmsf.getById(pmsid));
 				}
 				return rq;
 			} else {
@@ -98,6 +104,9 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			for (IPlayerRating r : list) {
 				if (r.getPlayerId() != null) {
 					r.setPlayer(pf.get(r.getPlayerId()));
+				}
+				for (Long pmsid : r.getMatchStatIds()) {
+					r.addMatchStats(pmsf.getById(pmsid));
 				}
 			}
 			return list;

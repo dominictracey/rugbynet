@@ -440,7 +440,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		}
 		
 		for (IPlayerStatShares score : pss) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), null, score.getRating(totalPlayerScore), schema, score.getPlayerMatchStats(), score.toString(), query);
+			IPlayerRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), null, score.getRating(totalPlayerScore), schema, score.getPlayerMatchStats(), score.toString(), query);
 			pmrf.put(pmr);
 			mrl.add(pmr);
 		}
@@ -599,7 +599,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				} else if (r instanceof PlayerRating) {
 					for (RatingComponent rc : r.getRatingComponents()) {
 						IPlayerMatchStats pms = pmsf.getById(rc.getPlayerMatchStatsId());
-						if (pms.getPosition().equals(position.getAt(i))) {
+						if (pms != null && pms.getPosition().equals(position.getAt(i))) {
 							((SummaryStatistics)ss).addValue(rc.getTimeWeighted());
 						}
 					}
@@ -623,7 +623,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				}  else if (r instanceof PlayerRating) {
 					for (RatingComponent rc : r.getRatingComponents()) {
 						IPlayerMatchStats pms = pmsf.getById(rc.getPlayerMatchStatsId());
-						if (pms.getMatchId().equals(id)) {
+						if (pms != null && pms.getMatchId() != null && pms.getMatchId().equals(id)) {
 							((SummaryStatistics)ss).addValue(rc.getTimeWeighted());
 						}
 					}

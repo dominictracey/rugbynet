@@ -205,9 +205,8 @@ public class TopTenFactoryTester {
 	private ITopTenList createTTL() {
 //		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, null, 2L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
 		return ttf.create(ttsd);
 	}
 
@@ -411,7 +410,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -430,9 +429,9 @@ public class TopTenFactoryTester {
 	public void publishInNewComp() {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
+		//List<IPlayerRating> 700L = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -460,9 +459,8 @@ public class TopTenFactoryTester {
 	public void publishTwoDeleteOneInNewComp() {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
 		ITopTenList ttl1 = ttf.create(ttsd);
 
 		assertTrue(ttl1 != null);
@@ -537,7 +535,7 @@ public class TopTenFactoryTester {
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
 		ITopTenList ttl1 = ttf.create(ttsd);
 		assertTrue(ttl1 != null);
 		assertFalse(ttl1.getLive());
@@ -653,9 +651,8 @@ public class TopTenFactoryTester {
 	public void publishOneCreateOne() {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -724,11 +721,10 @@ public class TopTenFactoryTester {
 
 //		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
 		int max = 5;
 	
-		TopTenSeedData ttsd = new TopTenSeedData(pmiList, title, desc, 1L, null, 2L, max);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, max);
 		ITopTenList ttl = ttf.create(ttsd);
 		
 		assert (ttl != null);

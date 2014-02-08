@@ -98,9 +98,9 @@ public class RatingListViewImpl<T extends IPlayerRating> extends Composite imple
 							Window.alert(((IPlayerRating)event.getValue()).getDetails());
 						}
 					} else if (event.getNativeEvent().getType().equals("mouseover")) {
-						if (((IPlayerRating)event.getValue()).getRatingComponents().size() > event.getColumn()-2) {
+						if (((IPlayerRating)event.getValue()).getRatingComponents().size() > event.getColumn()-2  && event.getColumn() < ((IPlayerRating)event.getValue()).getRatingComponents().size()) {
 							playersTable.getRowElement(event.getIndex()).getCells().getItem(event.getColumn()).setTitle(((IPlayerRating)event.getValue()).getRatingComponents().get(event.getColumn()-2).getDetails());
-						} else if (((IPlayerRating)event.getValue()).getDetails() != null) {
+						} else if (((IPlayerRating)event.getValue()).getDetails() != null && event.getColumn() == 1 ) {
 							playersTable.getRowElement(event.getIndex()).getCells().getItem(event.getColumn()).setTitle(((IPlayerRating)event.getValue()).getDetails());
 						}
 					}
@@ -199,7 +199,9 @@ public class RatingListViewImpl<T extends IPlayerRating> extends Composite imple
 
 	@Override
 	public void clear() {
-		dataProvider.setList(new ArrayList<T>());
+		if (dataProvider != null) {
+			dataProvider.setList(new ArrayList<T>());
+		}
 	}
 
 }

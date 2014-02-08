@@ -217,7 +217,9 @@ public class PlayerListViewImpl<T extends IPlayerMatchInfo> extends Composite im
 
 	@Override
 	public void clear() {
-		dataProvider.setList(new ArrayList<T>());
+		if (dataProvider != null) {
+			dataProvider.setList(new ArrayList<T>());
+		}
 	}
 
 }

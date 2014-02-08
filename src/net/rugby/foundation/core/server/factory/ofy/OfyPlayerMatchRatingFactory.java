@@ -145,12 +145,12 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 	}
 
 	@Override
-	public IPlayerMatchRating put(IPlayerMatchRating pmr) {
+	public IPlayerRating put(IPlayerRating pmr) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			// only one per match
-			if (pmr != null && pmr.getPlayerMatchStats() != null) {
-				IPlayerMatchRating existing = get(pmr.getPlayerMatchStats(), pmr.getSchema());
+			if (pmr != null && pmr.getMatchStats() != null) {
+				IPlayerRating existing = get(pmr.getMatchStats().get(0), pmr.getSchema());
 				if (existing != null) {
 					ofy.delete(existing);
 				}
@@ -174,7 +174,7 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 				syncCache.put(((IPlayerRating)pmr).getId(), yourBytes);
 
 				//also put it in by PMS id+schema id
-				syncCache.put(memCachePrefix + pmr.getPlayerMatchStats().getId().toString() + pmr.getSchemaId(), yourBytes);
+				syncCache.put(memCachePrefix + pmr.getMatchStats().get(0).getId().toString() + pmr.getSchemaId(), yourBytes);
 			}
 
 		} catch (Throwable ex) {
@@ -185,11 +185,11 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 	}
 
 	@Override
-	public IPlayerMatchRating get(IPlayerMatchStats pms, IRatingEngineSchema schema) {
+	public IPlayerRating get(IPlayerMatchStats pms, IRatingEngineSchema schema) {
 		try {
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			IPlayerMatchRating p = null;
+			IPlayerRating p = null;
 
 			if (pms == null) {
 				return (IPlayerMatchRating) put(null);
@@ -236,10 +236,10 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 
 	}
 
-	private IPlayerMatchRating getByPMSFromDB(IPlayerMatchStats pms, IRatingEngineSchema schema) {
+	private IPlayerRating getByPMSFromDB(IPlayerMatchStats pms, IRatingEngineSchema schema) {
 		Objectify ofy = DataStoreFactory.getOfy();
 		// I don't remember why we need both filters?
-		Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("playerMatchStatsId", pms.getId()).filter("schemaId", schema.getId());
+		Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("playerId", pms.getPlayerId()).filter("schemaId", schema.getId());
 		IPlayerRating qr = qpmr.get();
 
 		if (qr != null) {
@@ -249,17 +249,18 @@ public class OfyPlayerMatchRatingFactory implements IPlayerMatchRatingFactory, S
 
 			if (pmsf != null) {
 				//have to have the PMR to get the match
-				if (mf != null && qr instanceof IPlayerMatchRating) {
-					((IPlayerMatchRating)qr).setPlayerMatchStats(pmsf.getById(((IPlayerMatchRating)qr).getPlayerMatchStatsId()));
-					qr.setGroup((IGroup)mf.get(((IPlayerMatchRating)qr).getPlayerMatchStats().getMatchId()));
+				if (mf != null) { // && qr instanceof IPlayerMatchRating) {
+					//((IPlayerMatchRating)qr).setPlayerMatchStats(pmsf.getById(((IPlayerMatchRating)qr).getPlayerMatchStatsId()));
+					qr.addMatchStats(pms);
+					qr.setGroup((IGroup)mf.get(qr.getMatchStats().get(0).getMatchId()));
 				}
 			}
 
-			if (qr instanceof IPlayerMatchRating) {
-				return (IPlayerMatchRating)qr;
-			} else {
-				return null;
-			}
+//			if (qr instanceof IPlayerMatchRating) {
+				return qr;
+//			} else {
+//				return null;
+//			}
 		} else {
 			return null;
 		}

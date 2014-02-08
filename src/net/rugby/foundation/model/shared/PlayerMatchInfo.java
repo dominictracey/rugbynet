@@ -19,7 +19,7 @@ public class PlayerMatchInfo implements Serializable, IPlayerMatchInfo {
 	private Long id;
 	
 	private IPlayerMatchStats playerMatchStats; // this is bad when we don't mark it transient
-	private IPlayerMatchRating matchRating;
+	private IPlayerRating matchRating;
 	
 	public PlayerMatchInfo() {
 		
@@ -27,10 +27,10 @@ public class PlayerMatchInfo implements Serializable, IPlayerMatchInfo {
 	}
 	
 	public PlayerMatchInfo(IPlayerMatchStats playerMatchStats,
-			IPlayerMatchRating matchRating) {
+			IPlayerRating pmr) {
 		super();
 		this.playerMatchStats = playerMatchStats;
-		this.matchRating = matchRating;
+		this.matchRating = pmr;
 	}
 	
 	/* (non-Javadoc)
@@ -51,14 +51,14 @@ public class PlayerMatchInfo implements Serializable, IPlayerMatchInfo {
 	 * @see net.rugby.foundation.admin.shared.IPlayerMatchInfo#getMatchRating()
 	 */
 	@Override
-	public IPlayerMatchRating getMatchRating() {
+	public IPlayerRating getMatchRating() {
 		return matchRating;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.shared.IPlayerMatchInfo#setMatchRating(net.rugby.foundation.model.shared.IMatchRating)
 	 */
 	@Override
-	public void setMatchRating(IPlayerMatchRating matchRating) {
+	public void setMatchRating(IPlayerRating matchRating) {
 		this.matchRating = matchRating;
 	}
 

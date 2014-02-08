@@ -341,7 +341,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 			compId = compIds.get(0);
 		}
 
-		TopTenSeedData data = new TopTenSeedData((List<IPlayerRating>)portalList, "", "", compId, roundIds, rqId, playersPerTeam);
+		TopTenSeedData data = new TopTenSeedData(rq.getId(), "", "", compId, roundIds, rqId, playersPerTeam);
 
 		listener.createTopTenList(data);
 
@@ -349,10 +349,15 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 
 	@Override
 	public void showAggregatedMatchInfo(List<IPlayerMatchInfo> matchInfo) {
+
 		clientFactory.getPlayerListView().setPlayers(matchInfo, null);
 		portalList = new ArrayList<IPlayerRating>();
-		for (IPlayerMatchInfo pmi : matchInfo) {
-			portalList.add(pmi.getMatchRating());
+		if (matchInfo != null) {
+			for (IPlayerMatchInfo pmi : matchInfo) {
+				portalList.add(pmi.getMatchRating());
+			}
+		} else {
+			portalList = null;
 		}
 		jobArea.clear();
 		jobArea.add(clientFactory.getPlayerListView());
@@ -360,6 +365,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 			clientFactory.getPlayerListView().setListener((Listener<IPlayerMatchInfo>) listener);
 		}
 		clientFactory.getPlayerListView().asWidget().setVisible(true);
+
 	}
 
 	@Override
@@ -463,6 +469,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	@Override
 	public boolean clear() {
 		clientFactory.getPlayerListView().clear();
+		clientFactory.getRatingListView().clear();
 
 		comp.setSelectedIndex(-1);
 		round.clear();

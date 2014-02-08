@@ -19,6 +19,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerMatchRating;
 
@@ -75,7 +76,7 @@ public class TestPlayerMatchRatingFactory implements IPlayerMatchRatingFactory {
 	}
 
 	@Override
-	public IPlayerMatchRating put(IPlayerMatchRating pmr) {
+	public IPlayerRating put(IPlayerRating pmr) {
 		return pmr;
 	}
 

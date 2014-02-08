@@ -18,6 +18,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.PlayerMatchInfo;
@@ -65,7 +66,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 				List<? extends IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
 				for (IPlayerMatchStats pms : pmsl) {
 					if (pms instanceof ScrumPlayerMatchStats) {
-						IPlayerMatchRating pmr = pmrf.get(pms,schema);
+						IPlayerRating pmr = pmrf.get(pms,schema);
 						list.add(new PlayerMatchInfo(pms,pmr));
 					}
 				}
@@ -86,7 +87,7 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 		}
 		
 		IPlayerMatchStats pms = pmsf.getById(pmsId);
-		IPlayerMatchRating pmr = null;
+		IPlayerRating pmr = null;
 		if (pms instanceof ScrumPlayerMatchStats) {
 			pmr = pmrf.get(pms,schema);
 		}
@@ -134,12 +135,12 @@ public class OfyPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 			List<IPlayerMatchStats> statsList = pmsf.query(query);
 			
 			for (IPlayerMatchStats stats : statsList) {
-				IPlayerMatchRating pmr = null;
+				IPlayerRating pmr = null;
 				if (stats instanceof ScrumPlayerMatchStats) {
 					pmr = pmrf.get(stats,sf.getById(schemaId));
 				}
 				
-				list.add(new PlayerMatchInfo(stats,pmr));
+				list.add(new PlayerMatchInfo(stats,(IPlayerMatchRating) pmr));
 			}
 			
 			return list;

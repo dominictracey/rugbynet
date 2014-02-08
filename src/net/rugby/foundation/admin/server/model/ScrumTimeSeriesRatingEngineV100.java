@@ -201,7 +201,8 @@ public class ScrumTimeSeriesRatingEngineV100 extends ScrumQueryRatingEngineV100 
 				
 				// if they don't have any score, don't include them in the query results.
 				if (pr.getRawScore() > 0f) {
-					prf.put(pr);
+					// I don't think we need this one here to generate the PlayerRating.Id?
+					//prf.put(pr);
 					mrl.add(pr);
 					totalscore += pr.getRawScore();
 				} else {

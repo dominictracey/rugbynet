@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 
 import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 
@@ -80,6 +81,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		protected float forwardScore;
 		protected float rawScore; 
 		private Long playerMatchStatsId;
+		@Unindexed
 		private String details;
 
 		private String matchLabel;
@@ -157,6 +159,10 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 			return details;
 		}
 		public void setDetails(String details) {
+			// truncate so we don't have GAE throwing exceptions and turning our String into Text and stuff
+			if (details.length() > 500) {
+				details = details.substring(0, 499);
+			}
 			this.details = details;
 		}
 
@@ -190,6 +196,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	private List<IPlayerMatchStats> playerMatchStats;
 		
 	protected Long queryId;
+	@Unindexed
 	protected String details;
 	protected Float rawScore;
 	
@@ -336,6 +343,12 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 			this.playerMatchStats = new ArrayList<IPlayerMatchStats>();
 		}
 		this.playerMatchStats.add(pms);
+		if (this.playerMatchStatIds == null) {
+			this.playerMatchStatIds = new ArrayList<Long>();
+		}
+		if (pms != null && pms.getId() != null && !playerMatchStatIds.contains(pms.getId())) {
+			this.playerMatchStatIds.add(pms.getId());
+		}
 	}
 
 	@Override
@@ -428,6 +441,10 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 
 	@Override
 	public void setDetails(String details) {
+		// truncate so we don't have GAE throwing exceptions and turning our String into Text and stuff
+		if (details.length() > 500) {
+			details = details.substring(0, 499);
+		}
 		this.details = details;
 	}
 

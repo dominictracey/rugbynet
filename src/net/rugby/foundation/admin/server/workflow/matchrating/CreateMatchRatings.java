@@ -12,13 +12,14 @@ import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
-public class CreateMatchRatings extends Job5<List<IPlayerMatchRating>, IMatchGroup, List<IPlayerMatchStats>, List<IPlayerMatchStats>, ITeamMatchStats, ITeamMatchStats> {
+public class CreateMatchRatings extends Job5<List<IPlayerRating>, IMatchGroup, List<IPlayerMatchStats>, List<IPlayerMatchStats>, ITeamMatchStats, ITeamMatchStats> {
 
 	/**
 	 * 
@@ -36,7 +37,7 @@ public class CreateMatchRatings extends Job5<List<IPlayerMatchRating>, IMatchGro
 	
 	
 	
-	public Value<List<IPlayerMatchRating>> run(IMatchGroup match, List<IPlayerMatchStats> homePlayerStats, List<IPlayerMatchStats> visitorPlayerStats,
+	public Value<List<IPlayerRating>> run(IMatchGroup match, List<IPlayerMatchStats> homePlayerStats, List<IPlayerMatchStats> visitorPlayerStats,
 			ITeamMatchStats hStats,	ITeamMatchStats vStats ) {
 		
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);

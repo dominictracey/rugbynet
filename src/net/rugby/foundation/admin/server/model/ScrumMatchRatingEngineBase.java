@@ -10,6 +10,7 @@ import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 public class ScrumMatchRatingEngineBase implements
@@ -46,11 +47,11 @@ public class ScrumMatchRatingEngineBase implements
 	}
 
 	@Override
-	public List<IPlayerMatchRating> generate(IRatingEngineSchema schema, IMatchGroup match) {
-		List<IPlayerMatchRating> mrl = new ArrayList<IPlayerMatchRating>();
+	public List<IPlayerRating> generate(IRatingEngineSchema schema, IMatchGroup match) {
+		List<IPlayerRating> mrl = new ArrayList<IPlayerRating>();
 		for (IPlayerMatchStats pms : homePlayerStats) {
 			if (pms != null) {
-				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms, "just made up", null);
+				IPlayerRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms, "just made up", null);
 				pmrf.put(pmr);
 				mrl.add(pmr);
 			}
@@ -58,7 +59,7 @@ public class ScrumMatchRatingEngineBase implements
 		
 		for (IPlayerMatchStats pms : visitPlayerStats) {
 			if (pms != null) {
-				IPlayerMatchRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms, "just made up", null);
+				IPlayerRating pmr = pmrf.getNew(pf.get(pms.getPlayerId()), match, 500, schema, pms, "just made up", null);
 				pmrf.put(pmr);
 				mrl.add(pmr);
 			}

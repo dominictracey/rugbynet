@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -328,13 +329,13 @@ IMatchRatingEngine  {
 	}
 
 	@Override
-	public List<IPlayerMatchRating> generate(IRatingEngineSchema schema, IMatchGroup match) {
+	public List<IPlayerRating> generate(IRatingEngineSchema schema, IMatchGroup match) {
 
 		// Have to have these weight values available in the schema to work
 		assert (schema instanceof IV1EngineWeightValues);
 		
 		List<PlayerStatShares> pss = new ArrayList<PlayerStatShares>();
-		List<IPlayerMatchRating> mrl = new ArrayList<IPlayerMatchRating>();
+		List<IPlayerRating> mrl = new ArrayList<IPlayerRating>();
 
 		// these three we have to total across all the players because they aren't available in the TeamMatchStats
 		// like, say, tries or tackles.
@@ -392,7 +393,7 @@ IMatchRatingEngine  {
 		}
 
 		for (PlayerStatShares score : pss) {
-			IPlayerMatchRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats(), score.toString(), null);
+			IPlayerRating pmr = pmrf.getNew(pf.get(score.getPlayerMatchStats().getPlayerId()), match, score.getRating(totalLogarithmSmoothedScores), schema, score.getPlayerMatchStats(), score.toString(), null);
 			pmrf.put(pmr);
 			mrl.add(pmr);
 		}

@@ -14,6 +14,8 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
@@ -32,8 +34,8 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	Objectify ofy;
 
 	@Inject
-	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf) {
-		super(mf,tf, rf, pmsf);
+	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf) {
+		super(mf,tf, rf, pmsf, rqf, prf);
 		this.pf = pf;
 		this.cf = cf;
 
@@ -128,7 +130,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 					return get(q.get().getId());
 				} else {
 					// something really wrong!
-					return null;
+					throw new RuntimeException("Corrupt TopTen database, there are multiple latest top ten lists for the comp " + compId);
 				}
 			}
 		} catch (Throwable e) {
@@ -154,7 +156,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 					setLastCreatedForComp(get(q.get().getId()),compId);
 					return get(q.get().getId());
 				} else {
-					return null;
+					throw new RuntimeException("Corrupt TopTen database, there are multiple Last Created top ten lists for the comp " + compId);
 				}
 			}
 		} catch (Throwable e) {

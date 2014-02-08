@@ -138,7 +138,7 @@ public class MetaTagGenerator extends HttpServlet {
 			if (tti != null) {
 				resp.getWriter().println("<meta property=\"og:image\" content=\"" + req.getScheme() + "://" + req.getServerName() + "/resources/" + tti.getTeamId() + "/200.png" + "\" />");
 			} else {
-				resp.getWriter().println("<meta property=\"og:image\" content=\"http://www.rugby.net/resources/logo200.png\" />");				
+				resp.getWriter().println("<meta property=\"og:image\" content=\"http://www.rugby.net/resources/logo200_crop.png\" />");				
 			}
 
 

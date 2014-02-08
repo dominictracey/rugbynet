@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerMatchInfo;
 
@@ -36,7 +37,7 @@ public class TestPlayerMatchInfoFactory implements IPlayerMatchInfoFactory {
 	public List<IPlayerMatchInfo> getForComp(Long playerId, Long compId) {
 		List<IPlayerMatchInfo> list = new ArrayList<IPlayerMatchInfo>();
 		List<IPlayerMatchStats> pmsl = pmsf.getByMatchId(100L);
-		List<? extends IPlayerMatchRating> pmrl = pmrf.getForMatch(100L);
+		List<? extends IPlayerRating> pmrl = pmrf.getForMatch(100L);
 		Iterator<IPlayerMatchStats> it = pmsl.iterator();
 		int count = 0;
 		while (it.hasNext()) {
