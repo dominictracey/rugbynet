@@ -8,8 +8,7 @@ import net.rugby.foundation.admin.client.ui.task.TaskView.TaskViewPresenter;
 import net.rugby.foundation.admin.client.ui.task.TaskViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.task.TaskViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
-
+import net.rugby.foundation.model.shared.IPlayerRating;
 import org.cobogw.gwt.user.client.CSS;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -31,7 +30,7 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 	private TaskViewImpl<IAdminTask> taskv;
 	TabPanel tabs;
 	private ClientFactory clientFactory;
-	private PortalView<IPlayerMatchInfo> pv;
+	private PortalView<IPlayerRating> pv;
 
 	public AdminViewImpl() {
 
@@ -73,7 +72,7 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 			taskv.setPresenter((TaskViewPresenter<IAdminTask>)listener);
 		}
 		if (listener instanceof PortalViewPresenter<?>) {
-			pv.setPresenter((PortalViewPresenter<IPlayerMatchInfo>)listener);
+			pv.setPresenter((PortalViewPresenter<IPlayerRating>)listener);
 		}
 	}
 
@@ -152,7 +151,7 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 	}
 
 	@Override
-	public PortalView<IPlayerMatchInfo> getPortalView() {
+	public PortalView<IPlayerRating> getPortalView() {
 		return pv;
 	}
 

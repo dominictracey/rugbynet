@@ -14,7 +14,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.ITeamGroup;
@@ -75,7 +75,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	ICompetition comp = null;
 	Map<String, ICompetition> compMap = null;
 	EditTeam editTeam = null;
-	PlayerListView<IPlayerMatchInfo> editMatchStats = null;
+	PlayerListView<IPlayerRating> editMatchStats = null;
 
 	private Step step;
 
@@ -182,7 +182,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			private EditComp editComp = null;
 			private EditMatch editMatch = null;
 			private EditRound editRound = null;
-			private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions;
+			private List<ColumnDefinition<IPlayerRating>> playerListViewColumnDefinitions;
 
 			@Override
 			public void onSelection(SelectionEvent<TreeItem> event) {
@@ -253,9 +253,9 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						editMatch.setVisible(true);
 
 						if (editMatchStats == null) {
-							editMatchStats = new PlayerListViewImpl<IPlayerMatchInfo>();
+							editMatchStats = new PlayerListViewImpl<IPlayerRating>();
 							if (playerListViewColumnDefinitions == null) {
-								PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerMatchInfo>();
+								PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerRating>();
 								playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
 							}
 
@@ -524,7 +524,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	}
 
 	@Override
-	public PlayerListView<IPlayerMatchInfo> getPlayerListView() {
+	public PlayerListView<IPlayerRating> getPlayerListView() {
 		return editMatchStats;
 	}
 

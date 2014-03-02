@@ -13,41 +13,40 @@ import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.Listener;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
-import net.rugby.foundation.model.shared.PlayerRating;
+import net.rugby.foundation.model.shared.IPlayerRating;
 
-public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
+public class PlayerListViewColumnDefinitions<T extends IPlayerRating> {
 
-	private static List<ColumnDefinition<IPlayerMatchInfo>> columnDefinitions =
-			new ArrayList<ColumnDefinition<IPlayerMatchInfo>>();
+	private static List<ColumnDefinition<IPlayerRating>> columnDefinitions =
+			new ArrayList<ColumnDefinition<IPlayerRating>>();
 
-	private static PlayerListView.Listener<IPlayerMatchInfo> listener;
+	private static PlayerListView.Listener<IPlayerRating> listener;
 	private static IMatchGroup match;
 
 	public PlayerListViewColumnDefinitions() {
 		if (columnDefinitions.isEmpty()) {
 
 			if (match != null) {
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
 				// slot
 				@Override
-				public Widget render(IPlayerMatchInfo c) {
-					String name = c.getPlayerMatchStats().getName();
+				public Widget render(IPlayerRating c) {
+					String name = c.getMatchStats().get(0).getName();
 					return new HTML(name);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
+				public Column<IPlayerRating, ?> getColumn() {
 					
-					Column<IPlayerMatchInfo, ?> col =  new TextColumn<IPlayerMatchInfo>() {
+					Column<IPlayerRating, ?> col =  new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
+						public String getValue(IPlayerRating c) {
 							String slot = "";
 							if (match != null) {
-								if (c.getPlayerMatchStats().getTeamId().equals(match.getHomeTeamId()))
-									slot = "H" + c.getPlayerMatchStats().getSlot().toString();
+								if (c.getMatchStats().get(0).getTeamId().equals(match.getHomeTeamId()))
+									slot = "H" + c.getMatchStats().get(0).getSlot().toString();
 								else 
-									slot = "V" + c.getPlayerMatchStats().getSlot().toString();
+									slot = "V" + c.getMatchStats().get(0).getSlot().toString();
 							}
 							return slot;
 						}
@@ -59,25 +58,25 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 
 			});
 			} else {
-				columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
+				columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
 					// team abbr as link to TeamMatcHStats
 					@Override
-					public Widget render(IPlayerMatchInfo c) {
-						String name = c.getPlayerMatchStats().getTeamAbbr();
+					public Widget render(IPlayerRating c) {
+						String name = c.getMatchStats().get(0).getTeamAbbr();
 						return new HTML(name);
 					}
 
 					@Override
-					public Column<IPlayerMatchInfo, ?> getColumn() {
+					public Column<IPlayerRating, ?> getColumn() {
 						
-						Column<IPlayerMatchInfo, ?> col =  new TextColumn<IPlayerMatchInfo>() {
+						Column<IPlayerRating, ?> col =  new TextColumn<IPlayerRating>() {
 							@Override
-							public String getValue(IPlayerMatchInfo c) {
+							public String getValue(IPlayerRating c) {
 								String teamName = "";
-								if (c.getPlayerMatchStats().getTeamAbbr() != null) {
-									teamName = c.getPlayerMatchStats().getTeamAbbr();
+								if (c.getMatchStats().get(0).getTeamAbbr() != null) {
+									teamName = c.getMatchStats().get(0).getTeamAbbr();
 								} 
-								String slot = teamName + c.getPlayerMatchStats().getSlot();
+								String slot = teamName + c.getMatchStats().get(0).getSlot();
 								return slot;
 							}
 						};
@@ -89,10 +88,10 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 				});
 			}
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
 
-				public Widget render(IPlayerMatchInfo c) {
-					String name = c.getPlayerMatchStats().getName();
+				public Widget render(IPlayerRating c) {
+					String name = c.getMatchStats().get(0).getName();
 					return new HTML(name);
 				}
 
@@ -103,11 +102,11 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 
 		        
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					Column<IPlayerMatchInfo, ?> col = new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					Column<IPlayerRating, ?> col = new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String name = c.getPlayerMatchStats().getName();
+						public String getValue(IPlayerRating c) {
+							String name = c.getMatchStats().get(0).getName();
 							return name;
 						}
 					};
@@ -116,9 +115,9 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String name = c.getPlayerMatchStats().getId().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String name = c.getMatchStats().get(0).getId().toString();
 					return new HTML(name);
 				}
 
@@ -127,28 +126,28 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String name = c.getPlayerMatchStats().getId().toString();
+						public String getValue(IPlayerRating c) {
+							String name = c.getMatchStats().get(0).getId().toString();
 							return name;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
 
-				public Widget render(IPlayerMatchInfo c) {
+				public Widget render(IPlayerRating c) {
 					String name = "-";
-					if ((PlayerRating)c.getMatchRating() != null && ((PlayerRating)c.getMatchRating()).getRating() != null) {
-						name = ((PlayerRating)c.getMatchRating()).getRating().toString();
+					if (c.getRating() != null && c.getRating() != null) {
+						name = c.getRating().toString();
 					}
 					Widget w = new HTML(name);
 					Tooltip tooltip = new Tooltip();
 				    tooltip.setWidget(w);
-				    tooltip.setText(c.getMatchRating().getDetails());
+				    tooltip.setText(c.getDetails());
 				    tooltip.setPlacement(Placement.RIGHT);
 				    tooltip.reconfigure();
 					return w;
@@ -159,13 +158,13 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					Column<IPlayerMatchInfo, ?> col = new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					Column<IPlayerRating, ?> col = new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
+						public String getValue(IPlayerRating c) {
 							String name = "--";
-							if ((PlayerRating)c.getMatchRating() != null && ((PlayerRating)c.getMatchRating()).getRating() != null) {
-								name = ((PlayerRating)c.getMatchRating()).getRating().toString();
+							if (c.getRating() != null && c.getRating() != null) {
+								name = c.getRating().toString();
 							}
 							return name;
 						}
@@ -176,234 +175,215 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 			});
 
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String pos = c.getPlayerMatchStats().getPosition().name();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String pos = c.getMatchStats().get(0).getPosition().name();
 					return new HTML(pos);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							return c.getPlayerMatchStats().getPosition().name();
+						public String getValue(IPlayerRating c) {
+							return c.getMatchStats().get(0).getPosition().name();
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getTries().toString()  + "/" + c.getPlayerMatchStats().getTryAssists().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getTries().toString()  + "/" + c.getMatchStats().get(0).getTryAssists().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getTries().toString()  + "/" + c.getPlayerMatchStats().getTryAssists().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getTries().toString()  + "/" + c.getMatchStats().get(0).getTryAssists().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getPoints().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getPoints().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getPoints().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getPoints().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getKicks().toString() + "/" + c.getPlayerMatchStats().getPasses().toString() + "/" +  c.getPlayerMatchStats().getRuns().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getKicks().toString() + "/" + c.getMatchStats().get(0).getPasses().toString() + "/" +  c.getMatchStats().get(0).getRuns().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getKicks().toString() + "/" + c.getPlayerMatchStats().getPasses().toString() + "/" +  c.getPlayerMatchStats().getRuns().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getKicks().toString() + "/" + c.getMatchStats().get(0).getPasses().toString() + "/" +  c.getMatchStats().get(0).getRuns().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getMetersRun().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getMetersRun().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getMetersRun().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getMetersRun().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getCleanBreaks().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getCleanBreaks().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getCleanBreaks().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getCleanBreaks().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getDefendersBeaten().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getDefendersBeaten().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getDefendersBeaten().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getDefendersBeaten().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getOffloads().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getOffloads().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getOffloads().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getOffloads().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getTurnovers().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getTurnovers().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getTurnovers().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getTurnovers().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getTacklesMade().toString() +"/" + c.getPlayerMatchStats().getTacklesMissed().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getTacklesMade().toString() +"/" + c.getMatchStats().get(0).getTacklesMissed().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getTacklesMade().toString() +"/" + c.getPlayerMatchStats().getTacklesMissed().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getTacklesMade().toString() +"/" + c.getMatchStats().get(0).getTacklesMissed().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getLineoutsWonOnThrow().toString() +"/" + c.getPlayerMatchStats().getLineoutsStolenOnOppThrow().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getLineoutsWonOnThrow().toString() +"/" + c.getMatchStats().get(0).getLineoutsStolenOnOppThrow().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getLineoutsWonOnThrow().toString() +"/" + c.getPlayerMatchStats().getLineoutsStolenOnOppThrow().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getLineoutsWonOnThrow().toString() +"/" + c.getMatchStats().get(0).getLineoutsStolenOnOppThrow().toString();
 							return str;
 						}
 					};
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getPenaltiesConceded().toString();
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getPenaltiesConceded().toString();
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getPenaltiesConceded().toString();
-
-							return str;
-						}
-					};
-				}
-			});
-
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
-					String str = c.getPlayerMatchStats().getYellowCards().toString() +"/" + c.getPlayerMatchStats().getRedCards().toString();
-					return new HTML(str);
-				}
-
-				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
-						@Override
-						public String getValue(IPlayerMatchInfo c) {
-							String str = c.getPlayerMatchStats().getYellowCards().toString() +"/" + c.getPlayerMatchStats().getRedCards().toString();
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getPenaltiesConceded().toString();
 
 							return str;
 						}
@@ -411,23 +391,42 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 				}
 			});
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerMatchInfo>() {
-				public Widget render(IPlayerMatchInfo c) {
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
+					String str = c.getMatchStats().get(0).getYellowCards().toString() +"/" + c.getMatchStats().get(0).getRedCards().toString();
+					return new HTML(str);
+				}
+
+				@Override
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
+						@Override
+						public String getValue(IPlayerRating c) {
+							String str = c.getMatchStats().get(0).getYellowCards().toString() +"/" + c.getMatchStats().get(0).getRedCards().toString();
+
+							return str;
+						}
+					};
+				}
+			});
+
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+				public Widget render(IPlayerRating c) {
 					String str = "--";
-					if (c.getPlayerMatchStats().getTimePlayed() != null) {
-						str = c.getPlayerMatchStats().getTimePlayed().toString();
+					if (c.getMatchStats().get(0).getTimePlayed() != null) {
+						str = c.getMatchStats().get(0).getTimePlayed().toString();
 					}
 					return new HTML(str);
 				}
 
 				@Override
-				public Column<IPlayerMatchInfo, ?> getColumn() {
-					return new TextColumn<IPlayerMatchInfo>() {
+				public Column<IPlayerRating, ?> getColumn() {
+					return new TextColumn<IPlayerRating>() {
 						@Override
-						public String getValue(IPlayerMatchInfo c) {
+						public String getValue(IPlayerRating c) {
 							String str = "--";
-							if (c.getPlayerMatchStats().getTimePlayed() != null) {
-								str = c.getPlayerMatchStats().getTimePlayed().toString();
+							if (c.getMatchStats().get(0).getTimePlayed() != null) {
+								str = c.getMatchStats().get(0).getTimePlayed().toString();
 							}
 							return str;
 						}
@@ -437,15 +436,15 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerMatchInfo> {
 		} 	
 	}
 
-	public List<ColumnDefinition<IPlayerMatchInfo>> getColumnDefinitions() {
+	public List<ColumnDefinition<IPlayerRating>> getColumnDefinitions() {
 		return columnDefinitions;
 	}
 
-	public static PlayerListView.Listener<IPlayerMatchInfo> getListener() {
+	public static PlayerListView.Listener<IPlayerRating> getListener() {
 		return listener;
 	}
 
-	public static void setListener(Listener<IPlayerMatchInfo> listener2) {
+	public static void setListener(Listener<IPlayerRating> listener2) {
 		listener = listener2;
 	}
 

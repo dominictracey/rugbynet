@@ -4,11 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.inject.Inject;
+
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerRating;
@@ -18,10 +25,19 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 	private Map<Long,IPlayerRating> idMap = new HashMap<Long,IPlayerRating>();
 	private Map<Long,List<IPlayerRating>> queryMap = new HashMap<Long,List<IPlayerRating>>();
 	
+	private Random random = new Random();
+	private IPlayerMatchStatsFactory pmsf;
+	
+	@Inject
+	public TestPlayerRatingFactory(IPlayerMatchStatsFactory pmsf) {
+		this.pmsf = pmsf;
+	}
+	
 	@Override
 	public IPlayerRating create() {
 		try {
 			IPlayerRating pr = new PlayerRating();
+			pr.setRating(getRandomRating());
 			return pr;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -119,6 +135,55 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 		
 	}
 
-	
+	private int getRandomRating() {
+		return random.nextInt(1000);
+	}
+
+	@Override
+	public boolean deleteForMatch(IMatchGroup m) {
+		try {
+			if (m != null) {
+
+				
+			} else {
+				return false; // null match
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;	
+	}
+
+	@Override
+	public List<IPlayerRating> getForMatch(Long matchId, IRatingEngineSchema schema) {
+		// get the PMSs from their factory
+		List<IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
+		// create wrapper PlayerRating objects for them
+		List<IPlayerRating> list = new ArrayList<IPlayerRating>();
+		for (IPlayerMatchStats pms : pmsl) {
+			IPlayerRating pr = create();
+			pr.addMatchStats(pms);
+			pr.setPlayerId(pms.getPlayerId());
+			list.add(pr);
+		}
+		return list;
+	}
+
+	@Override
+	public Boolean deleteForSchema(IRatingEngineSchema rq) {
+		try {
+			if (rq != null) {
+
+				
+			} else {
+				return false; // null match
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;	
+	}
 
 }

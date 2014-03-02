@@ -23,7 +23,9 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	protected List<Long> countryIds;
 	protected List<position> positions;
 	protected Status status;
-
+	protected boolean scaleTime = true;
+	protected boolean scaleComp = true;
+	protected boolean scaleStanding = true;
 
 	public RatingQuery() {
 		compIds = new ArrayList<Long>();
@@ -170,6 +172,30 @@ public class RatingQuery implements IRatingQuery, Serializable {
 			return true;
 		else
 			return false;
+	}
+	@Override
+	public Boolean getScaleTime() {
+		return scaleTime;
+	}
+	@Override
+	public void setScaleTime(Boolean scaleTime) {
+		this.scaleTime = scaleTime;
+	}
+	@Override
+	public boolean getScaleComp() {
+		return scaleComp;
+	}
+	@Override
+	public void setScaleComp(boolean scaleComp) {
+		this.scaleComp = scaleComp;
+	}
+	@Override
+	public boolean getScaleStanding() {
+		return scaleStanding;
+	}
+	@Override
+	public void setScaleStanding(boolean scaleStanding) {
+		this.scaleStanding = scaleStanding;
 	}
 
 }

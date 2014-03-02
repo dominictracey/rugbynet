@@ -17,7 +17,6 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRound;
@@ -84,7 +83,7 @@ public interface RugbyAdminService extends RemoteService {
 	
 	List<IPlayerMatchStats> testMatchStats(Long matchId);
 	
-	List<IPlayerMatchInfo> getPlayerMatchInfo(Long matchId);
+	List<IPlayerRating> getPlayerMatchInfo(Long matchId);
 	List<ICountry> fetchCountryList();
 	List<position> fetchPositionList();
 	String fetchMatchStats(Long matchId);
@@ -95,11 +94,11 @@ public interface RugbyAdminService extends RemoteService {
 	
 	IPlayerMatchStats getPlayerMatchStats(Long id);
 	
-	IPlayerMatchInfo savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
+	IPlayerRating savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
 	ICompetition repairComp(ICompetition comp);
 	IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms);
-	IRatingQuery createRatingQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId);
-	List<IPlayerMatchInfo> reRateMatch(Long matchId);
+	IRatingQuery createRatingQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding);
+//	List<IPlayerMatchInfo> reRateMatch(Long matchId);
 	IMatchGroup SaveScore(Long matchId, int hS, int vS, Status status);
 	ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId);
 	ITeamMatchStats refetchTeamMatchStats(ITeamMatchStats target);
@@ -126,8 +125,8 @@ public interface RugbyAdminService extends RemoteService {
 	List<IStanding> saveStandings(Long roundId, List<IStanding> standings);
 	List<IStanding> FetchRoundStandings(Long roundId);
 	IRatingQuery getRatingQuery(long parseLong);
-	List<IPlayerMatchInfo> getRatingQueryResults(long parseLong);
-	List<IPlayerRating> getTimeSeriesRatingQueryResults(long parseLong);
+	List<IPlayerRating> getRatingQueryResults(long parseLong);
+	//List<IPlayerRating> getTimeSeriesRatingQueryResults(long parseLong);
 	Boolean deleteRatingQuery(IRatingQuery query);
 	String checkPipelineStatus(String id, Long matchId);
 }

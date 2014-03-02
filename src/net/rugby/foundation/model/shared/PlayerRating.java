@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Unindexed;
 
@@ -61,30 +60,46 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 			
 		}
 		
-		public RatingComponent(String details, int computedScore, int timeWeighted, float backScore, float forwardScore, float rawScore, Long playerMatchStatsId, String matchLabel) {
-			this.computedScore = computedScore;
-			this.timeWeighted = timeWeighted;
+		public RatingComponent(String statsDetails, float backScore, float forwardScore, 
+				float rawScore, Long playerMatchStatsId, String matchLabel, Integer scaledRating, Integer unscaledRating) {
 			this.backScore = backScore;
 			this.forwardScore = forwardScore;
 			this.rawScore = rawScore;
 			this.setPlayerMatchStatsId(playerMatchStatsId);
-			this.setDetails(details);
+			this.setStatsDetails(statsDetails);
 			this.setMatchLabel(matchLabel);
+			this.scaledRating = scaledRating;
+			this.unscaledRating = unscaledRating;
 		}
 		
+		public void addRatingsDetails(String details) {
+			details = ratingDetails + details;
+			// truncate so we don't have GAE throwing exceptions and turning our String into Text and stuff
+			if (details.length() > 500) {
+				details = details.substring(0, 499);
+			}
+			this.ratingDetails = details;
+			
+		}
+
 		@Id
 		protected Long id;
-		
-		protected int computedScore;
-		protected int timeWeighted;
+
 		protected float backScore;
 		protected float forwardScore;
 		protected float rawScore; 
+		
 		private Long playerMatchStatsId;
 		@Unindexed
-		private String details;
+		protected String ratingDetails;
+		@Unindexed
+		protected String statsDetails;
+		@Unindexed
+		protected String matchLabel;
 
-		private String matchLabel;
+		protected float scaledRating;
+		protected float unscaledRating;
+
 	
 		public Long getId() {
 			return id;
@@ -94,26 +109,26 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 			this.id = id;
 		}
 
-		/***
-		 * 
-		 * @return the normalized (0-1000) score for this match's stats for this player without any time bias.
-		 */
-		public int getComputedScore() {
-			return computedScore;
-		}
-		public void setComputedScore(int computedScore) {
-			this.computedScore = computedScore;
-		}
-		/***
-		 * 
-		 * @return the normalized (0-1000) score for this match's stats for this player with time bias.
-		 */
-		public int getTimeWeighted() {
-			return timeWeighted;
-		}
-		public void setTimeWeighted(int timeWeighted) {
-			this.timeWeighted = timeWeighted;
-		}
+//		/***
+//		 * 
+//		 * @return the normalized (0-1000) score for this match's stats for this player without any time bias.
+//		 */
+//		public int getComputedScore() {
+//			return computedScore;
+//		}
+//		public void setComputedScore(int computedScore) {
+//			this.computedScore = computedScore;
+//		}
+//		/***
+//		 * 
+//		 * @return the normalized (0-1000) score for this match's stats for this player with time bias.
+//		 */
+//		public int getTimeWeighted() {
+//			return timeWeighted;
+//		}
+//		public void setTimeWeighted(int timeWeighted) {
+//			this.timeWeighted = timeWeighted;
+//		}
 		
 		/***
 		 * 
@@ -151,19 +166,13 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		public void setPlayerMatchStatsId(Long playerMatchStatsId) {
 			this.playerMatchStatsId = playerMatchStatsId;
 		}
-		/***
-		 * 
-		 * @return a text representation suitable for display to admins
-		 */
-		public String getDetails() {
-			return details;
-		}
-		public void setDetails(String details) {
+
+		public void setStatsDetails(String details) {
 			// truncate so we don't have GAE throwing exceptions and turning our String into Text and stuff
 			if (details.length() > 500) {
 				details = details.substring(0, 499);
 			}
-			this.details = details;
+			this.statsDetails = details;
 		}
 
 		public String getMatchLabel() {
@@ -172,6 +181,30 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		
 		public void setMatchLabel(String label) {
 			matchLabel = label;
+		}
+
+		public float getScaledRating() {
+			return scaledRating;
+		}
+
+		public void setScaledRating(float scaledRating) {
+			this.scaledRating = scaledRating;
+		}
+
+		public float getUnscaledRating() {
+			return unscaledRating;
+		}
+
+		public void setUnscaledRating(float unscaledRating) {
+			this.unscaledRating = unscaledRating;
+		}
+
+		public String getRatingDetails() {
+			return ratingDetails;
+		}
+
+		public String getStatsDetails() {
+			return statsDetails;
 		}
 		
 		
@@ -313,6 +346,9 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	@Override
 	public void setSchema(IRatingEngineSchema schema) {
 		this.schema = schema;
+		if (schema != null) {
+			this.schemaId = schema.getId();
+		}
 	}
 
 	@Override
@@ -351,24 +387,24 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		}
 	}
 
-	@Override
-	public int compareTo(IPlayerMatchRating o) {
-		if (rating == null) { 
-			return 1;
-		}
-
-		if (o.getRating() == null) {
-			return -1;
-		}
-
-		if (rating.equals(o.getRating())) {
-			return 0;
-		} else if (rating < o.getRating()) {
-			return 1;
-		} else {
-			return -1;
-		}
-	}
+//	@Override
+//	public int compareTo(IPlayerMatchRating o) {
+//		if (rating == null) { 
+//			return 1;
+//		}
+//
+//		if (o.getRating() == null) {
+//			return -1;
+//		}
+//
+//		if (rating.equals(o.getRating())) {
+//			return 0;
+//		} else if (rating < o.getRating()) {
+//			return 1;
+//		} else {
+//			return -1;
+//		}
+//	}
 	
 	@Override
 	public int compareTo(IPlayerRating o) {

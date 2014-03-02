@@ -93,7 +93,7 @@ public class RatingListViewColumnDefinitions<T extends IPlayerRating> {
 					public Widget render(IPlayerRating c) {
 						String str = "--";
 						if (c.getRatingComponents() != null && c.getRatingComponents().size() >= j && c.getRatingComponents().get(j) != null) {
-							str = c.getRatingComponents().get(j).getComputedScore() + " (" + c.getRatingComponents().get(j).getTimeWeighted() + ")" ;
+							str = c.getRatingComponents().get(j).getScaledRating() + " (" + c.getRatingComponents().get(j).getUnscaledRating() + ")" ;
 						}
 						return new HTML(str);
 					}
@@ -105,7 +105,7 @@ public class RatingListViewColumnDefinitions<T extends IPlayerRating> {
 							public String getValue(IPlayerRating c) {
 								String str = "--";
 								if (c.getRatingComponents() != null && c.getRatingComponents().size() > j && c.getRatingComponents().get(j) != null) {
-									str = c.getRatingComponents().get(j).getTimeWeighted() + " (" + c.getRatingComponents().get(j).getComputedScore() + ") " + c.getRatingComponents().get(j).getMatchLabel() ;
+									str = c.getRatingComponents().get(j).getScaledRating() + " (" + c.getRatingComponents().get(j).getUnscaledRating() + ") " + c.getRatingComponents().get(j).getMatchLabel() ;
 								}
 								return str;
 							}

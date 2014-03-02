@@ -33,4 +33,16 @@ public interface IRatingQuery extends IHasId {
 	void setStatus(Status status);
 	
 	boolean isTimeSeries();
+
+	Boolean getScaleTime();
+
+	void setScaleTime(Boolean scaleTime);
+
+	boolean getScaleComp();
+
+	void setScaleComp(boolean scaleComp);
+
+	boolean getScaleStanding();
+
+	void setScaleStanding(boolean scaleStanding);
 }

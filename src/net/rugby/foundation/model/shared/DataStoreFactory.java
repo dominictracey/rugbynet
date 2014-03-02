@@ -60,8 +60,6 @@ public class DataStoreFactory {
 			ObjectifyService.register(ScrumPlayerMatchStatTimeLog.class);
 			ObjectifyService.register(ScrumTeamMatchStats.class);
 			ObjectifyService.register(PlayerRating.class);
-			ObjectifyService.register(PlayerMatchRating.class);
-			ObjectifyService.register(PlayerMatchInfo.class);
 			
 			// these should be split off into another DAO manager thingie
 			ObjectifyService.register(AdminTask.class);

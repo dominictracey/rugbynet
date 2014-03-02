@@ -18,7 +18,6 @@ import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
@@ -66,10 +65,10 @@ public interface ClientFactory extends EditContentPresenter {
 
 	SmartBar getMenuBar();
 
-	PlayerListView<IPlayerMatchInfo> getPlayerListView();
+	PlayerListView<IPlayerRating> getPlayerListView();
 	PlayerListView<IPlayerRating> getRatingListView();
 
-	PortalView<IPlayerMatchInfo> getPortalView();
+	PortalView<IPlayerRating> getPortalView();
 	
 	TeamMatchStatsPopupView<ITeamMatchStats> getTeamMatchStatsPopupView();
 	

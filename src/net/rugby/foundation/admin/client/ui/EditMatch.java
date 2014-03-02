@@ -51,8 +51,6 @@ public class EditMatch extends Composite {
 		 */
 		void fetchMatchStats(IMatchGroup matchGroup);
 
-		void reRateMatch(IMatchGroup matchGroup);
-
 		void showHomeTeamMatchStats(IMatchGroup matchGroup);
 
 		void showVisitingTeamMatchStats(IMatchGroup matchGroup);
@@ -74,8 +72,6 @@ public class EditMatch extends Composite {
 	Button fetchScore;
 	@UiField
 	Button fetchMatchStats;
-	@UiField 
-	Button regenerateRatings;
 	@UiField
 	Button showHomeTeamMatchStats;
 	@UiField
@@ -123,11 +119,6 @@ public class EditMatch extends Composite {
 	@UiHandler("fetchScore")
 	void onClickFetchScore(ClickEvent e) {
 		listener.fetchScore(matchGroup);
-	}
-
-	@UiHandler("regenerateRatings") 
-	void onClickReRate(ClickEvent e) {
-		listener.reRateMatch(matchGroup);
 	}
 
 	@UiHandler("fetchMatchStats")

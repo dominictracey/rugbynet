@@ -2,10 +2,8 @@ package net.rugby.foundation.admin.server.workflow.matchrating;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,12 +14,9 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-import com.google.appengine.tools.pipeline.FutureList;
 import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.ImmediateValue;
 import com.google.appengine.tools.pipeline.Job1;
@@ -324,16 +319,5 @@ public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements S
 			return new NameAndId(Long.parseLong(id),name);
 		}
 
-	}
-
-	public Value<List<IPlayerMatchRating>>  handleFailure(Throwable e) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown in generator job for fetching match stats and creating ratings: " + e.getLocalizedMessage());
-		//still didn't find, need human to get this going.
-		//		PromisedValue<ITeamGroup> x = newPromise(ITeamGroup.class);
-		//		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
-		//		atf.put(task);
-
-		//		return x;
-		return immediate(null);
 	}
 }

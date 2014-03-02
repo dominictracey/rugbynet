@@ -44,7 +44,7 @@ public interface IPlayerRating extends IHasId {
 	
 	public abstract void setGenerated(Date generated);
 
-	int compareTo(IPlayerMatchRating o);
+//	int compareTo(IPlayerMatchRating o);
 
 	void addMatchStats(IPlayerMatchStats playerMatchStats);
 

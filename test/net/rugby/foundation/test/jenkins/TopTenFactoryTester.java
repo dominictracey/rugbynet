@@ -22,7 +22,6 @@ import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestCo
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
-import net.rugby.foundation.admin.server.factory.IPlayerMatchInfoFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
@@ -30,7 +29,6 @@ import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
@@ -46,7 +44,6 @@ import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 public class TopTenFactoryTester {
 
 	private ITopTenListFactory ttf;
-	private IPlayerMatchInfoFactory pmif;
 	String title = "Test TTL";
 	String desc = "Desc";
 
@@ -57,9 +54,8 @@ public class TopTenFactoryTester {
 	private IRatingQueryFactory rqf;
 
 	@Inject
-	public void setFactory(ITopTenListFactory ttf, IPlayerMatchInfoFactory pmif, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf) {
+	public void setFactory(ITopTenListFactory ttf, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf) {
 		this.ttf = ttf;
-		this.pmif = pmif;
 		this.pf = pf;
 		this.prf = prf;
 		this.rqf = rqf;

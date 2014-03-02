@@ -23,8 +23,8 @@ import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 public class TaskActivity extends AbstractActivity implements  
@@ -274,14 +274,14 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 
 	@Override
 	public void onSavePlayerMatchStatsClicked(IPlayerMatchStats pms) {
-		clientFactory.getRpcService().savePlayerMatchStats(pms, target, new AsyncCallback<IPlayerMatchInfo>() {
+		clientFactory.getRpcService().savePlayerMatchStats(pms, target, new AsyncCallback<IPlayerRating>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed to save player match stats");
 			}
 
 			@Override
-			public void onSuccess(IPlayerMatchInfo result) {
+			public void onSuccess(IPlayerRating result) {
 				((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).hide();
 				updateTask();
 			}

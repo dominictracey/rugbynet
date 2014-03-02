@@ -10,7 +10,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
-import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
+import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -19,11 +19,11 @@ import net.rugby.foundation.model.shared.RatingQuery;
 
 public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> implements IRatingQueryFactory {
 
-	private IPlayerMatchRatingFactory pmrf;
+	private IPlayerRatingFactory prf;
 
 	@Inject 
-	public OfyRatingQueryFactory(IPlayerMatchRatingFactory pmrf) {
-		this.pmrf = pmrf;
+	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf) {
+		this.prf = pmrf;
 	}
 	
 	@Override
@@ -77,7 +77,7 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 			ofy.delete(rq);
 			
 			// also delete all the PMRs associated with this query
-			pmrf.deleteForQuery(rq);
+			prf.deleteForQuery(rq);
 			return true;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);

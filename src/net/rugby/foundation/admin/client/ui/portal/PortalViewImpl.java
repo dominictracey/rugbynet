@@ -14,13 +14,13 @@ import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Position.position;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -40,7 +40,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author home
  *
  */
-public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implements PortalView<T> {
+public class PortalViewImpl<T extends IPlayerRating> extends Composite implements PortalView<T> {
 
 
 
@@ -66,6 +66,11 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	@UiField Button clear;
 	@UiField Button delete;
 	@UiField Button topTen;
+	
+	@UiField CheckBox scaleTime;
+	@UiField CheckBox scaleComp;
+	@UiField CheckBox scaleStanding;
+
 	@UiField SimplePanel jobArea;
 
 	private List<IPlayerRating> portalList;
@@ -105,6 +110,9 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		compAndRound.setVisible(false);
+		scaleComp.setValue(true);
+		scaleTime.setValue(true);
+		scaleStanding.setValue(true);
 	}
 
 
@@ -272,7 +280,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 
 		populateVals();
 
-		listener.submitPortalQuery(compIds, roundIds, posis, countryIds, teamIds);
+		listener.submitPortalQuery(compIds, roundIds, posis, countryIds, teamIds, scaleTime.getValue(), scaleComp.getValue(), scaleStanding.getValue());
 	}
 
 
@@ -348,13 +356,13 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 	}
 
 	@Override
-	public void showAggregatedMatchInfo(List<IPlayerMatchInfo> matchInfo) {
+	public void showAggregatedMatchInfo(List<IPlayerRating> matchInfo) {
 
 		clientFactory.getPlayerListView().setPlayers(matchInfo, null);
 		portalList = new ArrayList<IPlayerRating>();
 		if (matchInfo != null) {
-			for (IPlayerMatchInfo pmi : matchInfo) {
-				portalList.add(pmi.getMatchRating());
+			for (IPlayerRating pmi : matchInfo) {
+				portalList.add(pmi);
 			}
 		} else {
 			portalList = null;
@@ -362,7 +370,7 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 		jobArea.clear();
 		jobArea.add(clientFactory.getPlayerListView());
 		if (listener instanceof PlayerListView.Listener<?>) {
-			clientFactory.getPlayerListView().setListener((Listener<IPlayerMatchInfo>) listener);
+			clientFactory.getPlayerListView().setListener((Listener<IPlayerRating>) listener);
 		}
 		clientFactory.getPlayerListView().asWidget().setVisible(true);
 
@@ -444,6 +452,12 @@ public class PortalViewImpl<T extends IPlayerMatchInfo> extends Composite implem
 					country.setItemSelected(i, false);
 				}
 			}
+			
+			// and the scaling flags
+			scaleTime.setValue(rq.getScaleTime());
+			scaleComp.setValue(rq.getScaleComp());
+			scaleStanding.setValue(rq.getScaleStanding());
+			
 		} else {
 			Window.alert("The query you are accessing no longer exists or is invalid.");
 		}

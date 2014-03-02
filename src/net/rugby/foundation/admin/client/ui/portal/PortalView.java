@@ -9,19 +9,18 @@ import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Position.position;
 
-public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
+public interface PortalView<T extends IPlayerRating> extends IsWidget {
 	public interface PortalViewPresenter<T> {
 		
 		ClientFactory getClientFactory();
 
 		void submitPortalQuery(List<Long> compId, List<Long> roundId, List<position> posi,
-				List<Long> countryId, List<Long> teamId);
+				List<Long> countryId, List<Long> teamId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding);
 		
 		void createTopTenList(TopTenSeedData data);
 
@@ -50,7 +49,7 @@ public interface PortalView<T extends IPlayerMatchInfo> extends IsWidget {
 
 	public abstract void setCountries(List<ICountry> result);
 
-	public abstract void showAggregatedMatchInfo(List<IPlayerMatchInfo> matchInfo);
+	public abstract void showAggregatedMatchInfo(List<IPlayerRating> matchInfo);
 
 	ICompetition getCurrentComp();
 

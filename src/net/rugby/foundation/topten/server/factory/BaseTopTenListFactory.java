@@ -26,8 +26,6 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
-import net.rugby.foundation.model.shared.IPlayerMatchRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -323,6 +321,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Map<Long,Integer> numFromTeam = new HashMap<Long, Integer>();
 			Iterator<IPlayerRating> it = set.iterator();
 			int count = 0;
+			list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
 			while (it.hasNext() && count < 10) {
 				IPlayerRating pmr = it.next();
 				IPlayerMatchStats pms = pmsf.getById(pmr.getMatchStatIds().get(0));
@@ -340,6 +339,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					//String matchReportLink, String teamName, ITopTenList parent)
 					ITopTenItem item = new TopTenItem(null, pmr.getPlayerId(), pmr.getPlayer(), "",
 							"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pms.getPosition(), list);
+					list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
 					put(item);
 					list.getList().add(item);
 					list.getItemIds().add(item.getId());

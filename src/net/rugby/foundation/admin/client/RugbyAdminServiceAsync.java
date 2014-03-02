@@ -20,7 +20,6 @@ import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
@@ -96,7 +95,7 @@ public interface RugbyAdminServiceAsync {
 	public void setCompAsDefault(Long compId, AsyncCallback<Boolean> asyncCallback);
 	public void testMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchStats>> asyncCallback);
 	
-	public void getPlayerMatchInfo(Long matchId, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+	public void getPlayerMatchInfo(Long matchId, AsyncCallback<List<IPlayerRating>> asyncCallback);
 	public void fetchCountryList(AsyncCallback<List<ICountry>> asyncCallback);
 	public void fetchPositionList(AsyncCallback<List<position>> asyncCallback);
 	public void fetchMatchStats(Long matchId, AsyncCallback<String> asyncCallback);
@@ -107,7 +106,7 @@ public interface RugbyAdminServiceAsync {
 	public void getTask(Long id, AsyncCallback<IAdminTask> asyncCallback);
 	public void getPlayerMatchStats(Long id, AsyncCallback<IPlayerMatchStats> asyncCallback);
 	public void savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target,
-			AsyncCallback<IPlayerMatchInfo> asyncCallback);
+			AsyncCallback<IPlayerRating> asyncCallback);
 	public void repairComp(ICompetition comp,
 			AsyncCallback<ICompetition> asyncCallback);
 	public void fetchMatchScore(IMatchGroup matchGroup, Long currentCompId,
@@ -115,8 +114,7 @@ public interface RugbyAdminServiceAsync {
 	public void refetchPlayerMatchStats(IPlayerMatchStats pms, AsyncCallback<IPlayerMatchStats> asyncCallback);
 	public void createRatingQuery(List<Long> compId,
 			List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId,
-			AsyncCallback<IRatingQuery> asyncCallback);
-	public void reRateMatch(Long id, AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, AsyncCallback<IRatingQuery> asyncCallback);
 	public void  getTeamMatchStats(Long matchId, Long teamId, AsyncCallback<ITeamMatchStats> asyncCallback);
 	public void refetchTeamMatchStats(ITeamMatchStats target,
 			AsyncCallback<ITeamMatchStats> asyncCallback);
@@ -155,11 +153,9 @@ public interface RugbyAdminServiceAsync {
 	public void getRatingQuery(long parseLong,
 			AsyncCallback<IRatingQuery> asyncCallback);
 	public void getRatingQueryResults(long parseLong,
-			AsyncCallback<List<IPlayerMatchInfo>> asyncCallback);
+			AsyncCallback<List<IPlayerRating>> asyncCallback);
 	public void deleteRatingQuery(IRatingQuery query,
 			AsyncCallback<Boolean> asyncCallback);
 	public void checkPipelineStatus(String id, Long matchId,
 			AsyncCallback<String> asyncCallback);
-	public void getTimeSeriesRatingQueryResults(long parseLong,
-			AsyncCallback<List<IPlayerRating>> asyncCallback);
 }

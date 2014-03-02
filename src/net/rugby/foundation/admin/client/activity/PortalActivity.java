@@ -25,7 +25,6 @@ import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -36,23 +35,23 @@ import net.rugby.foundation.model.shared.Position.position;
 
 public class PortalActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
-PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, PortalViewPresenter<IPlayerMatchInfo>,
-PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayerRating>, EditTTLInfoPresenter, TeamMatchStatsPopupViewPresenter<ITeamMatchStats> { 
+PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, PortalViewPresenter<IPlayerRating>,
+PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRating>, EditTTLInfoPresenter, TeamMatchStatsPopupViewPresenter<ITeamMatchStats> { 
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
 	 */
 	private ClientFactory clientFactory;
 	private PortalPlace place;
-	SelectionModel<IPlayerMatchInfo> selectionModel;
+	SelectionModel<IPlayerRating> selectionModel;
 	int index; // the task line item number
-	private PortalView<IPlayerMatchInfo> view;
+	private PortalView<IPlayerRating> view;
 	private EditTTLInfo ttltext;
 
 	protected boolean isTimeSeries= false;
 
 	public PortalActivity(PortalPlace place, ClientFactory clientFactory) {
-		selectionModel = new SelectionModel<IPlayerMatchInfo>();
+		selectionModel = new SelectionModel<IPlayerRating>();
 
 		this.clientFactory = clientFactory;
 		view = clientFactory.getPortalView();
@@ -120,35 +119,40 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 											public void onSuccess(IRatingQuery result) {
 												view.setRatingQuery(result);
 												if (result.getStatus() == Status.COMPLETE) {
-													if (!result.isTimeSeries()) {
-														clientFactory.getRpcService().getRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerMatchInfo>>() {
-	
+													final boolean isTimeSeries = result.isTimeSeries();
+													//if (!result.isTimeSeries()) {
+														clientFactory.getRpcService().getRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
+
 															@Override
 															public void onFailure(Throwable caught) {
 																Window.alert("Problem finding the query results with id " + place.getqueryId());
 															}
-	
-															@Override
-															public void onSuccess(List<IPlayerMatchInfo> result) {
-																view.showAggregatedMatchInfo(result);
-															}
-	
-														});
-													} else {
-														clientFactory.getRpcService().getTimeSeriesRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
-															
-															@Override
-															public void onFailure(Throwable caught) {
-																Window.alert("Problem finding the query results with id " + place.getqueryId());
-															}
-	
+
 															@Override
 															public void onSuccess(List<IPlayerRating> result) {
-																view.showTimeWeightedMatchInfo(result);
+																if (isTimeSeries)
+																	view.showTimeWeightedMatchInfo(result);
+																else
+																	view.showAggregatedMatchInfo(result);
 															}
-	
+
 														});
-													}
+													//} 
+//													else {
+//														clientFactory.getRpcService().getTimeSeriesRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
+//
+//															@Override
+//															public void onFailure(Throwable caught) {
+//																Window.alert("Problem finding the query results with id " + place.getqueryId());
+//															}
+//
+//															@Override
+//															public void onSuccess(List<IPlayerRating> result) {
+//																view.showTimeWeightedMatchInfo(result);
+//															}
+//
+//														});
+//													}
 												} else if (result.getStatus() == Status.ERROR) {
 													Window.alert("The query has terminated without delivering results. Check the server log for details.");
 												} else if (result.getStatus() == Status.RUNNING || result.getStatus() == Status.NEW) {
@@ -243,7 +247,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 	public void onSavePlayerMatchStatsClicked(final IPlayerMatchStats pms) {
 		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
-		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerMatchInfo>() {
+		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerRating>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -252,7 +256,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 			}
 
 			@Override
-			public void onSuccess(IPlayerMatchInfo result) {
+			public void onSuccess(IPlayerRating result) {
 
 				clientFactory.getPlayerListView().updatePlayerMatchStats(result);
 				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
@@ -299,7 +303,7 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 
 
 	@Override
-	public boolean onItemSelected(IPlayerMatchInfo c) {
+	public boolean onItemSelected(IPlayerRating c) {
 		if (selectionModel.isSelected(c)) {
 			selectionModel.removeSelection(c);
 		}
@@ -312,21 +316,21 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 	}
 
 	@Override
-	public boolean isSelected(IPlayerMatchInfo c) {
+	public boolean isSelected(IPlayerRating c) {
 		return selectionModel.isSelected(c);
 	}
 
 	@Override
-	public void showEditPlayer(IPlayerMatchInfo player) {
-		showEditPlayer(player.getPlayerMatchStats().getPlayerId());
+	public void showEditPlayer(IPlayerRating player) {
+		showEditPlayer(player.getPlayerId());
 	}
-	
+
 
 	@Override
 	public void showEditPlayerFromTS(IPlayerRating player) {
 		showEditPlayer(player.getPlayerId());
 	}
-	
+
 	private void showEditPlayer(Long playerId) {
 		clientFactory.getPlayerPopupView().setPresenter(this);
 
@@ -347,33 +351,39 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 	}
 
 	@Override
-	public void showEditStats(IPlayerMatchInfo info) {
+	public void showEditStats(IPlayerRating info) {
+
 		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
-		clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getPlayerMatchStats());
+		clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getMatchStats().get(index));
 		((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
+
 	}
 
 	@Override
-	public void showEditStats(IPlayerRating player, int index) {
-		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
+	public void showEditStats(IPlayerRating info, int index) {
+		if (info != null && info.getMatchStats() != null && info.getMatchStats().size() > index) {
+			clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
-		clientFactory.getRpcService().getPlayerMatchStats(player.getMatchStatIds().get(index), new AsyncCallback<IPlayerMatchStats>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Problem creating top ten list: " + caught.getMessage());
-			}
+			clientFactory.getRpcService().getPlayerMatchStats(info.getMatchStatIds().get(index), new AsyncCallback<IPlayerMatchStats>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Problem creating top ten list: " + caught.getMessage());
+				}
 
-			@Override
-			public void onSuccess(IPlayerMatchStats result) {
-				clientFactory.getPlayerMatchStatsPopupView().setTarget(result);
-				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
-			}
-		});
+				@Override
+				public void onSuccess(IPlayerMatchStats result) {
+					clientFactory.getPlayerMatchStatsPopupView().setTarget(result);
+					((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
+				}
+			});
+		} else {
+			Window.alert("Invalid attempt to edit stats");
+		}
 	}
-	
+
 	@Override
-	public void showEditRating(IPlayerMatchInfo player) {
+	public void showEditRating(IPlayerRating player) {
 		// TODO Auto-generated method stub
 
 	}
@@ -433,12 +443,12 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 	public void portalViewCompSelected(long compId) {
 		if (compId > 0) {
 			clientFactory.getRpcService().getComp(compId, new AsyncCallback<ICompetition>() {
-	
+
 				@Override
 				public void onFailure(Throwable caught) {
 					Window.alert("Problem fetching comp: " + caught.getMessage());
 				}
-	
+
 				@Override
 				public void onSuccess(ICompetition result) {
 					if (result != null) {
@@ -450,22 +460,30 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 	}
 
 	@Override
-	public void showEditTeamStats(IPlayerMatchInfo pmi) {
+	public void showEditTeamStats(IPlayerRating pr) {
 
-		clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
-		clientFactory.getRpcService().getTeamMatchStats(pmi.getPlayerMatchStats().getMatchId(), pmi.getPlayerMatchStats().getTeamId(), new AsyncCallback<ITeamMatchStats>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Failed to fetch team match stats to edit");
-			}
-
-			@Override
-			public void onSuccess(ITeamMatchStats result) {
-
-				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
-				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
-			}
-		});
+		// assumption is that this is only for the case where there is rating over 1 match
+		assert(pr != null);
+		assert(pr.getMatchStatIds() != null);
+		assert(pr.getMatchStatIds().size() == 1);
+		if (pr != null && pr.getMatchStatIds() != null && pr.getMatchStatIds().size() == 1) {
+			clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
+			clientFactory.getRpcService().getTeamMatchStats(pr.getMatchStats().get(0).getMatchId(), pr.getMatchStats().get(0).getTeamId(), new AsyncCallback<ITeamMatchStats>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Failed to fetch team match stats to edit");
+				}
+	
+				@Override
+				public void onSuccess(ITeamMatchStats result) {
+	
+					clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+					((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+				}
+			});
+		} else {
+			Window.alert("Invalid attempt to edit team match stats");
+		}
 	}
 
 	/**
@@ -516,22 +534,24 @@ PlayerListView.Listener<IPlayerMatchInfo>, PlayerListView.RatingListener<IPlayer
 	}
 
 	@Override
-	public void submitPortalQuery(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds) {
+	public void submitPortalQuery(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds,
+										Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding) {
 
 		//if (!isTimeSeries) {
-			clientFactory.getRpcService().createRatingQuery(compIds, roundIds, posis, countryIds, teamIds, new AsyncCallback<IRatingQuery>() {
+		clientFactory.getRpcService().createRatingQuery(compIds, roundIds, posis, countryIds, teamIds, 
+															scaleTime, scaleComp, scaleStanding, new AsyncCallback<IRatingQuery>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					Window.alert("Query failed: " + caught.getLocalizedMessage());
-				}
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Query failed: " + caught.getLocalizedMessage());
+			}
 
-				@Override
-				public void onSuccess(IRatingQuery result) {
-					//clientFactory.getPortalView().setRatingQuery(result);	
-					goTo(new PortalPlace("queryId=" + result.getId().toString()));
-				}
-			});
+			@Override
+			public void onSuccess(IRatingQuery result) {
+				//clientFactory.getPortalView().setRatingQuery(result);	
+				goTo(new PortalPlace("queryId=" + result.getId().toString()));
+			}
+		});
 		//}
 
 	}

@@ -177,6 +177,8 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		list = result;
 		//setVisible(false);
 		if (result != null) {
+			recordAnalyticsHit(baseUrl + "#listId=" + result.getId(), result.getTitle());
+
 			clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent());
 			clientFactory.getHeaderView().setDetails("");
 			clientFactory.getHeaderView().setHeroTextBig(false);
@@ -293,6 +295,10 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	}
 
 
+	// per http://stackoverflow.com/questions/2457794/integrating-google-analytics-into-gwt-application
+	public static native void recordAnalyticsHit(String url, String title) /*-{
+    $wnd.ga('send', 'pageview', {'page': url,'title': title});
+	}-*/;
 
 
 }

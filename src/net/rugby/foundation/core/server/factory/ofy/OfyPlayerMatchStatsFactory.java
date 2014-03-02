@@ -159,6 +159,9 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 				syncCache.delete(mKey);
 			}
 
+			// @REX @TODO updating a PMS should invalidate a query result set (List<IPlayerMatchRating>) that uses it
+			// so we should call rqf.deleteFor(pms), which in turn deletes the IRatingQuery and all its generated PMRs.
+			
 			return pms;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put" + ex.getMessage(), ex);

@@ -41,7 +41,6 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
@@ -65,7 +64,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	private static final CompetitionView compView = new CompetitionViewImpl();
 	private static OrchestrationConfigurationView orchView = null;
 	private static TaskView<IAdminTask> taskView = null;
-	private static PortalView<IPlayerMatchInfo> portalView = null;
+	private static PortalView<IPlayerRating> portalView = null;
 	private static final RugbyAdminServiceAsync rpcService = GWT.create(RugbyAdminService.class);
 	private PlayerPopupView<IPlayer> playerPopupView;
 	private List<FieldDefinition<IPlayer>> playerPopupViewFieldDefinitions;
@@ -76,8 +75,8 @@ public class ClientFactoryImpl implements ClientFactory {
 	private MatchRatingEngineSchemaPopupView<ScrumMatchRatingEngineSchema20130713> matchRatingEngineSchemaPopupView;
 	private MatchRatingEngineSchemaPopupViewFieldDefinitions<ScrumMatchRatingEngineSchema20130713> matchRatingEngineSchemaPopupViewFieldDefinitions;
 	
-	private PlayerListView<IPlayerMatchInfo> playerListView = null;
-	private List<ColumnDefinition<IPlayerMatchInfo>> playerListViewColumnDefinitions =  null; 
+	private PlayerListView<IPlayerRating> playerListView = null;
+	private List<ColumnDefinition<IPlayerRating>> playerListViewColumnDefinitions =  null; 
 	private PlayerListView<IPlayerRating> ratingListView = null;
 	private List<ColumnDefinition<IPlayerRating>> ratingListViewColumnDefinitions =  null;
 	
@@ -218,12 +217,12 @@ public class ClientFactoryImpl implements ClientFactory {
 	}
 
 	@Override
-	public PlayerListView<IPlayerMatchInfo> getPlayerListView() {
+	public PlayerListView<IPlayerRating> getPlayerListView() {
 		if (playerListView == null) {
-			playerListView = new PlayerListViewImpl<IPlayerMatchInfo>();
+			playerListView = new PlayerListViewImpl<IPlayerRating>();
 
 			  if (playerListViewColumnDefinitions == null) {
-				PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerMatchInfo>();
+				PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerRating>();
 			    playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
 			  }
 
@@ -250,9 +249,9 @@ public class ClientFactoryImpl implements ClientFactory {
 	}
 
 	@Override
-	public PortalView<IPlayerMatchInfo> getPortalView() {
+	public PortalView<IPlayerRating> getPortalView() {
 		if (portalView == null) {
-			portalView = new PortalViewImpl<IPlayerMatchInfo>();
+			portalView = new PortalViewImpl<IPlayerRating>();
 			portalView.setClientFactory(this);
 		}
 		return portalView;

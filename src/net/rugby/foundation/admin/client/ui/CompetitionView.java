@@ -10,7 +10,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
@@ -68,7 +68,7 @@ public interface CompetitionView extends IsWidget {
 		 * @param editMatchStats 
 		 * @param matchId
 		 */
-		void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerMatchInfo> editMatchStats, long matchId, long roundId, long compId);
+		void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerRating> editMatchStats, long matchId, long roundId, long compId);
 
 	}
 
@@ -103,7 +103,7 @@ public interface CompetitionView extends IsWidget {
 	 */
 	void addRound(Long compId, Long roundId, List<IMatchGroup> result);
 	void setClientFactory(ClientFactory clientFactory);
-	PlayerListView<IPlayerMatchInfo> getPlayerListView();
+	PlayerListView<IPlayerRating> getPlayerListView();
 	boolean isAllSetup();
 	void setInitialized(boolean b);
 	void showWait(boolean show);

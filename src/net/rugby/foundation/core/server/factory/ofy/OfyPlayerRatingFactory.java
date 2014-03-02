@@ -10,11 +10,14 @@ import com.googlecode.objectify.Query;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
+import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerRating;
@@ -70,6 +73,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			if (rq != null) {
 				Objectify ofy = DataStoreFactory.getOfy();
 				ofy.put(rq);
+				
 				return rq;
 			} else {
 				return null;
@@ -127,15 +131,69 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 
 				
 			} else {
-				return false; // null match
+				return false; // null query
 			}
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in deleteForQuery: " + ex.getLocalizedMessage());
 			return false;
 		}
 		return true;	
 		
 	}
+
+	@Override
+	public boolean deleteForMatch(IMatchGroup m) {
+		try {
+			if (m != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+	
+				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("groupId", m.getId());
+				ofy.delete(qpmr);
+
+				
+			} else {
+				return false; // null match
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in deleteForMatch: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public List<IPlayerRating> getForMatch(Long matchId, IRatingEngineSchema schema) {
+		// get the PMSs from their factory
+		List<IPlayerMatchStats> pmsl = pmsf.getByMatchId(matchId);
+		// create wrapper PlayerRating objects for them
+		List<IPlayerRating> list = new ArrayList<IPlayerRating>();
+		for (IPlayerMatchStats pms : pmsl) {
+			IPlayerRating pr = create();
+			pr.addMatchStats(pms);
+			pr.setPlayerId(pms.getPlayerId());
+			list.add(pr);
+		}
+		return list;
+	}
+
+	@Override
+	public Boolean deleteForSchema(IRatingEngineSchema schema) {
+		try {
+			if (schema != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+	
+				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("schemaId", schema.getId());
+				ofy.delete(qpmr);
+
+				
+			} else {
+				return false; // null query
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in deleteForSchema: " + ex.getLocalizedMessage());
+			return false;
+		}
+		return true;	}
 
 	
 

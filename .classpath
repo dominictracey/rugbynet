@@ -35,5 +35,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-servlet-4.0-beta2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-pipeline.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-15.0.jar"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/v2"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

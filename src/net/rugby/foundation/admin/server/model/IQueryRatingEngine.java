@@ -11,11 +11,11 @@ import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 
 public interface IQueryRatingEngine {
-//	void addTeamStats(List<ITeamMatchStats> teamStats);
-//	void addPlayerStats(List<IPlayerMatchStats> playerStats);
 	boolean setQuery(IRatingQuery q);
-	List<IPlayerRating> generate(IRatingEngineSchema schema);
 	List<IRatingEngineSchema> getSupportedSchemas();
 	StatisticalSummary getStatisticalSummary(); 
 	String toString();
+	List<IPlayerRating> generate(IRatingEngineSchema schema,
+			boolean scaleStandings, boolean scaleCompetition,
+			boolean scaleMatchAge);
 }

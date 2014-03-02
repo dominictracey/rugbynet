@@ -5,8 +5,9 @@ import java.util.Comparator;
 import java.util.List;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -98,8 +99,9 @@ public class RatingListViewImpl<T extends IPlayerRating> extends Composite imple
 							Window.alert(((IPlayerRating)event.getValue()).getDetails());
 						}
 					} else if (event.getNativeEvent().getType().equals("mouseover")) {
-						if (((IPlayerRating)event.getValue()).getRatingComponents().size() > event.getColumn()-2  && event.getColumn() < ((IPlayerRating)event.getValue()).getRatingComponents().size()) {
-							playersTable.getRowElement(event.getIndex()).getCells().getItem(event.getColumn()).setTitle(((IPlayerRating)event.getValue()).getRatingComponents().get(event.getColumn()-2).getDetails());
+						if (event.getColumn() > 1 && ((IPlayerRating)event.getValue()).getRatingComponents().size() > event.getColumn()-2) {
+							RatingComponent rc = ((IPlayerRating)event.getValue()).getRatingComponents().get(event.getColumn()-2);
+							playersTable.getRowElement(event.getIndex()).getCells().getItem(event.getColumn()).setTitle(rc.getStatsDetails()+"\n"+rc.getRatingDetails());
 						} else if (((IPlayerRating)event.getValue()).getDetails() != null && event.getColumn() == 1 ) {
 							playersTable.getRowElement(event.getIndex()).getCells().getItem(event.getColumn()).setTitle(((IPlayerRating)event.getValue()).getDetails());
 						}

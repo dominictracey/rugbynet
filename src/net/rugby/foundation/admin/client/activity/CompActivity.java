@@ -28,7 +28,7 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchInfo;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
@@ -51,7 +51,7 @@ import com.google.gwt.user.client.ui.DialogBox;
  */
 public class CompActivity extends AbstractActivity implements  
 CompetitionView.Presenter, EditTeam.Presenter, EditComp.Presenter, 
-EditMatch.Presenter, PlayerListView.Listener<IPlayerMatchInfo>, PlayerPopupView.Presenter<IPlayer>,
+EditMatch.Presenter, PlayerListView.Listener<IPlayerRating>, PlayerPopupView.Presenter<IPlayer>,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, 
 SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>, RoundPresenter {
 	/**
@@ -61,7 +61,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	private ClientFactory clientFactory;
 	CompetitionView view = null;
 	private String url;
-	private SelectionModel<IPlayerMatchInfo> selectionModel;
+	private SelectionModel<IPlayerRating> selectionModel;
 	private EditTeam et = null;  //@REX stupid
 	private EditComp ec = null;  //@REX stupid
 	private EditRound er = null; //@REX and yet I continue doing it...
@@ -76,7 +76,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	// temp storage for building up new comp
 	private List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
 	protected List<IRound> rounds = new ArrayList<IRound>();
-	private PlayerListView<IPlayerMatchInfo> plv;
+	private PlayerListView<IPlayerRating> plv;
 	private AdminCompPlace place;
 	private boolean waiting = false; // used to see if matchStats fetching is complete
 	private boolean ready = false;
@@ -84,7 +84,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	public CompActivity(AdminCompPlace place, ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
 		view = clientFactory.getCompView();
-		selectionModel = new SelectionModel<IPlayerMatchInfo>();
+		selectionModel = new SelectionModel<IPlayerRating>();
 		this.place = place;
 	}
 
@@ -485,11 +485,11 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	 * @see net.rugby.foundation.admin.client.ui.CompetitionView.Presenter#editMatchInit(net.rugby.foundation.admin.client.ui.EditMatch, long)
 	 */
 	@Override
-	public void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerMatchInfo> editMatchInfo, final long matchId, long roundId, long compId) {
+	public void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerRating> editMatchInfo, final long matchId, long roundId, long compId) {
 		final EditMatch.Presenter presenter = this;  // there must be a way to do this...
 		em = editMatch;
 
-		final PlayerListView.Listener<IPlayerMatchInfo> presenter2 = this;  // there must be a way to do this...
+		final PlayerListView.Listener<IPlayerRating> presenter2 = this;  // there must be a way to do this...
 		plv = editMatchInfo;
 
 		setCurrentRoundId(roundId);
@@ -507,7 +507,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 				em.SetPresenter(presenter);
 				em.ShowMatch(result);
 				final IMatchGroup match = result;
-				clientFactory.getRpcService().getPlayerMatchInfo(matchId, new AsyncCallback<List<IPlayerMatchInfo>>() {
+				clientFactory.getRpcService().getPlayerMatchInfo(matchId, new AsyncCallback<List<IPlayerRating>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -516,7 +516,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 					}
 
 					@Override
-					public void onSuccess(List<IPlayerMatchInfo> result) {
+					public void onSuccess(List<IPlayerRating> result) {
 						plv.setListener(presenter2);
 						plv.setPlayers(result, match);
 					}
@@ -672,7 +672,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 					@Override
 					public void onSuccess(String result) {
-						clientFactory.getRpcService().getPlayerMatchInfo(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
+						clientFactory.getRpcService().getPlayerMatchInfo(matchGroup.getId(), new AsyncCallback<List<IPlayerRating>>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -681,7 +681,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 							}
 
 							@Override
-							public void onSuccess(List<IPlayerMatchInfo> playerInfo) {
+							public void onSuccess(List<IPlayerRating> playerInfo) {
 								//em.SetPresenter(presenter);
 								//em.ShowMatch(matchGroup);	
 								//em.setPipelineId(id);
@@ -714,28 +714,9 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 		});
 	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.admin.client.ui.EditMatch.Presenter#reRateMatch(net.rugby.foundation.model.shared.IMatchGroup)
-	 */
-	@Override
-	public void reRateMatch(final IMatchGroup matchGroup) {
-		clientFactory.getRpcService().reRateMatch(matchGroup.getId(), new AsyncCallback<List<IPlayerMatchInfo>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Failed re-rating match: " + caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(List<IPlayerMatchInfo> result) {
-				view.getPlayerListView().setPlayers(result, matchGroup);
-			}
-		});	
-	}
-
 
 	@Override
-	public boolean onItemSelected(IPlayerMatchInfo c) {
+	public boolean onItemSelected(IPlayerRating c) {
 		if (selectionModel.isSelected(c)) {
 			selectionModel.removeSelection(c);
 		}
@@ -748,41 +729,49 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	}
 
 	@Override
-	public boolean isSelected(IPlayerMatchInfo c) {
+	public boolean isSelected(IPlayerRating c) {
 		return selectionModel.isSelected(c);
 	}
 
 	@Override
-	public void showEditPlayer(IPlayerMatchInfo player) {
-		clientFactory.getPlayerPopupView().setPresenter(this);
-		clientFactory.getRpcService().getPlayer(player.getPlayerMatchStats().getPlayerId(), new AsyncCallback<IPlayer>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-
-				Window.alert("Player info not fetched for editing: " + caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(IPlayer result) {
-
-				clientFactory.getPlayerPopupView().setPlayer(result);
-				((DialogBox) clientFactory.getPlayerPopupView()).center();
-			}
-		});	
+	public void showEditPlayer(IPlayerRating player) {
+		if (ensureSingleMatch(player)) {
+			clientFactory.getPlayerPopupView().setPresenter(this);
+			clientFactory.getRpcService().getPlayer(player.getMatchStats().get(0).getPlayerId(), new AsyncCallback<IPlayer>() {
+	
+				@Override
+				public void onFailure(Throwable caught) {
+	
+					Window.alert("Player info not fetched for editing: " + caught.getMessage());
+				}
+	
+				@Override
+				public void onSuccess(IPlayer result) {
+	
+					clientFactory.getPlayerPopupView().setPlayer(result);
+					((DialogBox) clientFactory.getPlayerPopupView()).center();
+				}
+			});	
+		} else {
+			Window.alert("Invalid attempt to edit player");
+		}
 
 
 	}
 
 	@Override
-	public void showEditStats(IPlayerMatchInfo info) {
-		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
-		clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getPlayerMatchStats());
-		((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
+	public void showEditStats(IPlayerRating info) {
+		if (ensureSingleMatch(info)) {
+			clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
+			clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getMatchStats().get(0));
+			((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
+		} else {
+			Window.alert("Invalid attempt to edit player match stats.");
+		}
 	}
 
 	@Override
-	public void showEditRating(IPlayerMatchInfo player) {
+	public void showEditRating(IPlayerRating player) {
 		// TODO Auto-generated method stub
 
 	}
@@ -825,7 +814,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	public void onSavePlayerMatchStatsClicked(final IPlayerMatchStats pms) {
 		clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
 
-		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerMatchInfo>() {
+		clientFactory.getRpcService().savePlayerMatchStats(pms, null, new AsyncCallback<IPlayerRating>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -834,7 +823,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			}
 
 			@Override
-			public void onSuccess(IPlayerMatchInfo result) {
+			public void onSuccess(IPlayerRating result) {
 
 				view.getPlayerListView().updatePlayerMatchStats(result);
 				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
@@ -1303,21 +1292,35 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 
 	@Override
-	public void showEditTeamStats(IPlayerMatchInfo pmi) {
-		clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
-		clientFactory.getRpcService().getTeamMatchStats(pmi.getPlayerMatchStats().getMatchId(), pmi.getPlayerMatchStats().getTeamId(), new AsyncCallback<ITeamMatchStats>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Failed to fetch team match stats to edit");
-			}
+	public void showEditTeamStats(IPlayerRating pmr) {
+		if (ensureSingleMatch(pmr)) {
+			clientFactory.getTeamMatchStatsPopupView().setPresenter(this);
+			clientFactory.getRpcService().getTeamMatchStats(pmr.getMatchStats().get(0).getMatchId(), pmr.getMatchStats().get(0).getTeamId(), new AsyncCallback<ITeamMatchStats>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Failed to fetch team match stats to edit");
+				}
+	
+				@Override
+				public void onSuccess(ITeamMatchStats result) {
+	
+					clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+					((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+				}
+			});	
+		} else {
+			Window.alert("Invalid attempt to edit team match stats");
+		}
+	}
 
-			@Override
-			public void onSuccess(ITeamMatchStats result) {
 
-				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
-				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
-			}
-		});	}
+
+	private boolean ensureSingleMatch(IPlayerRating pmr) {
+		if (pmr == null || pmr.getMatchStats() == null || pmr.getMatchStats().size() != 1) 
+			return false;
+		else
+			return true;
+	}
 
 
 

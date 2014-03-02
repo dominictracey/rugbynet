@@ -10,7 +10,6 @@ import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 import com.google.inject.Inject;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
-import net.rugby.foundation.core.server.factory.IPlayerMatchRatingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -31,18 +30,18 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 	protected IRoundFactory rf;
 	protected ITeamMatchStatsFactory tmsf;
 	protected IPlayerMatchStatsFactory pmsf;
-	protected IPlayerMatchRatingFactory pmrf;
+	protected IPlayerRatingFactory prf;
 	
 	@Inject
 	protected void setFactories(IMatchResultFactory mrf, ITeamGroupFactory tf, IRoundFactory rf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf,
-			IPlayerMatchRatingFactory pmrf) {
+			IPlayerRatingFactory pmrf) {
 
 		this.tf = tf;
 		this.mrf = mrf;
 		this.rf = rf;
 		this.tmsf = tmsf;
 		this.pmsf = pmsf;
-		this.pmrf = pmrf;
+		this.prf = prf;
 	}
 
 	@Override
@@ -119,7 +118,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 				}
 
 				// delete any playerMatchRatings
-				if (!pmrf.deleteForMatch(m)) {
+				if (!prf.deleteForMatch(m)) {
 					return false;
 				}
 

@@ -30,7 +30,6 @@ import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
-import net.rugby.foundation.admin.server.model.ScrumTimeSeriesRatingEngineV100;
 import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
@@ -140,7 +139,7 @@ public class QueryMatchRatingTester {
 		IRatingQuery rq = rqf.get(700L);
 		
 		qre.setQuery(rq);
-		qre.generate(mresf.getDefault());
+		qre.generate(mresf.getDefault(), true,true,true);
 		
 		StatisticalSummary ss = qre.getStatisticalSummary();
 		
@@ -155,10 +154,9 @@ public class QueryMatchRatingTester {
 		IQueryRatingEngine qre = qref.get(mresf.getDefault(), rq);
 		
 		assertTrue(rq.isTimeSeries());
-		assertTrue(qre.getClass().equals(ScrumTimeSeriesRatingEngineV100.class));
 		
 		qre.setQuery(rq);
-		qre.generate(mresf.getDefault());
+		qre.generate(mresf.getDefault(),true,true,true);
 		
 		StatisticalSummary ss = qre.getStatisticalSummary();
 		
