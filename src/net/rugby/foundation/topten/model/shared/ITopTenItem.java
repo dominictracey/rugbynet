@@ -67,4 +67,12 @@ public interface ITopTenItem {
 	public abstract void setOrdinal(int ordinal);
 	public abstract int getOrdinal();
 
+	void setRating(int rating);
+
+	int getRating();
+
+	void setPlayerRatingId(Long playerRatingId);
+
+	Long getPlayerRatingId();
+
 }

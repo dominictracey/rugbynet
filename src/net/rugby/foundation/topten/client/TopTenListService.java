@@ -3,6 +3,7 @@ package net.rugby.foundation.topten.client;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -21,4 +22,5 @@ public interface TopTenListService extends RemoteService {
 	public Long getLatestListIdForComp(Long compId);
 	public List<IContent> getContentItems();
 	public ITopTenList saveTopTenList(ITopTenList list);
+	public IPlayerRating getPlayerRating(Long playerRatingId);
 }

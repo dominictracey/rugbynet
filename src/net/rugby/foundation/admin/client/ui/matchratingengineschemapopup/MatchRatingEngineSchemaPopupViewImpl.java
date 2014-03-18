@@ -3,7 +3,7 @@ package net.rugby.foundation.admin.client.ui.matchratingengineschemapopup;
 import java.util.List;
 
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

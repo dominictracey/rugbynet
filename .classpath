@@ -21,20 +21,21 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.apache.commons.io.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-bootstrap-2.0.4.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/joda-time-2.3.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-testing.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/json-20090211.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JRE7"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/aopalliance.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/javax.inject.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-4.0-beta2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-assistedinject-4.0-beta2.jar"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Users/home/.eclipse/org.eclipse.platform_4.2.0_1709980481/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/validation-api-1.0.0.GA-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/home/.eclipse/org.eclipse.platform_4.2.0_1709980481/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/validation-api-1.0.0.GA.jar" sourcepath="C:/Users/home/.eclipse/org.eclipse.platform_4.2.0_1709980481/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/validation-api-1.0.0.GA-sources.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT (1)"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-servlet-4.0-beta2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-pipeline.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-15.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Google/appengine-java-sdk-1.8.9/lib/testing/appengine-testing.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Google/appengine-java-sdk-1.8.9/lib/impl/appengine-api-labs.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Google/appengine-java-sdk-1.8.9/lib/impl/appengine-api-stubs.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/v2"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

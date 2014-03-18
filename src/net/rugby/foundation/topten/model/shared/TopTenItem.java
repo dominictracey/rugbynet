@@ -33,6 +33,8 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected Long teamId;
 	protected Position.position position;
 	protected int ordinal;
+	protected Long playerRatingId;
+	protected int rating;
 	
 	public TopTenItem() {
 		
@@ -40,7 +42,8 @@ public class TopTenItem implements Serializable, ITopTenItem
 	
 	public TopTenItem(Long id, Long playerId, IPlayer player, String text,
 			String image, Long contributorId, Long editorId, boolean isSubmitted, 
-			String matchReportLink, String teamName, Long teamId, Position.position position, ITopTenList list) {
+			String matchReportLink, String teamName, Long teamId, Position.position position, 
+			ITopTenList list, Long playerRatingId, int rating) {
 		super();
 		this.id = id;
 		this.playerId = playerId;
@@ -57,6 +60,8 @@ public class TopTenItem implements Serializable, ITopTenItem
 		//this.parent = list;
 		this.parentId = list.getId();
 		this.position = position;
+		this.playerRatingId = playerRatingId;
+		this.rating = rating;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.ITopTenItem#getId()
@@ -233,6 +238,22 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public int getOrdinal() {
 		return ordinal;
+	}
+	@Override
+	public Long getPlayerRatingId() {
+		return playerRatingId;
+	}
+	@Override
+	public void setPlayerRatingId(Long playerRatingId) {
+		this.playerRatingId = playerRatingId;
+	}
+	@Override
+	public int getRating() {
+		return rating;
+	}
+	@Override
+	public void setRating(int rating) {
+		this.rating = rating;
 	}
 
 }

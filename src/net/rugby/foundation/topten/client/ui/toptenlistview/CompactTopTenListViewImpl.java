@@ -1,6 +1,8 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -26,6 +28,8 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 public class CompactTopTenListViewImpl extends Composite implements TopTenListView<ITopTenItem>
@@ -111,7 +115,50 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-				return s.getPosition() == null ? "" : "(" + s.getPosition().getName() + ")";
+				
+				return s.getRating() == 0 ? "" : "(" + Integer.toString(s.getRating()) + ")";
+			}
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return "text-right compactTTL position";
+
+			}
+		});
+
+		ImageCell ratingDetailsCell = new ImageCell() {
+			@Override
+			public void render(Context context, String value, SafeHtmlBuilder sb) {
+				if (((ITopTenItem)context.getKey()).getRating() != 0) {
+					String imagePath = "/resources/info35.png";
+					sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '30px' width = '30px' title=\"click for details\"/>");
+				}
+			}
+			
+			public Set<String> getConsumedEvents() {
+	            HashSet<String> events = new HashSet<String>();
+	            events.add("click");
+	            return events;
+	        }
+		};
+		
+		items.addColumn(new Column<ITopTenItem,String>(ratingDetailsCell) {
+			@Override
+			public String getValue(ITopTenItem s)
+			{ //
+				return "";
+			}
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return "compactTTL";
+			}
+
+		});
+		
+		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				return s.getPosition() == null ? "" : s.getPosition().getName();
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
@@ -143,32 +190,18 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 		});
 
-		//		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
-		//			@Override
-		//            public String getValue(ITopTenItem s)
-		//            {
-		//                return s.getPlayer().getDisplayName() == null ? "" : s.getPlayer().getDisplayName();
-		//            }
-		//			@Override
-		//			public String getCellStyleNames(Context context, ITopTenItem value) {
-		//				return "lead";
-		//				
-		//			}
-		//		});
+		items.addCellPreviewHandler( new Handler<ITopTenItem>() {
 
-		//		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
-		//			@Override
-		//            public String getValue(ITopTenItem s)
-		//            {
-		//                return s.getPosition() == null ? "" : "(" + s.getPosition().getName() + ")";
-		//            }
-		//			@Override
-		//			public String getCellStyleNames(Context context, ITopTenItem value) {
-		//				return "lead";
-		//				
-		//			}
-		//		});
-
+			@Override
+			public void onCellPreview(CellPreviewEvent<ITopTenItem> event) {
+				boolean isClick = "click".equals(event.getNativeEvent().getType());
+				if (isClick) {
+					if (event.getColumn() == 3) {
+						presenter.showRatingDetails(event.getValue());
+					}
+				}
+			}
+		});
 	}
 
 
@@ -296,8 +329,10 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 
 	// per http://stackoverflow.com/questions/2457794/integrating-google-analytics-into-gwt-application
+	// ??       $wnd.ganew.push(['_trackPageview(' + title + ')']);
 	public static native void recordAnalyticsHit(String url, String title) /*-{
-    $wnd.ga('send', 'pageview', {'page': url,'title': title});
+ 
+    $wnd.ganew('send', 'pageview', {'page': url,'title': title});
 	}-*/;
 
 

@@ -277,3 +277,25 @@ a.btn-IdentityButton:hover {
 .navbar .transparentMenuBG .dropdown-menu:after {
 	border-bottom: none;
 }
+
+.popupCaption {
+	width: 100%;
+	padding: 4px;
+	font-weight: bold;
+	font-size: 2em;
+}
+
+.popupCloseButton {
+	float:right;
+}
+
+.popupPlayerInfo {
+	font-size: 1.5em;
+	font-weight: bold;
+	padding: 10px;
+}
+
+.popupContent {
+	width: 400px;
+	padding: 12px;
+}

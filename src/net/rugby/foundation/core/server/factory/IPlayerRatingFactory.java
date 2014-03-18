@@ -5,8 +5,8 @@ package net.rugby.foundation.core.server.factory;
 
 import java.util.List;
 
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IPlayerRating;
 

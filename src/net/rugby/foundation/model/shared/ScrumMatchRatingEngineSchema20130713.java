@@ -1,6 +1,8 @@
-package net.rugby.foundation.admin.shared;
+package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
+
+import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 
 import com.googlecode.objectify.annotation.Subclass;
 

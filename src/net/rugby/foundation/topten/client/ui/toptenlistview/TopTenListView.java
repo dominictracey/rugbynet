@@ -21,6 +21,7 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 		void showPrev();
 		void setTTIButtons(TopTenItemView itemView);
 		void parse(Widget widget);
+		void showRatingDetails(ITopTenItem value);
 	}
 	void setPresenter(TopTenListViewPresenter presenter); 
 	void setList(ITopTenList result, String baseUrl);

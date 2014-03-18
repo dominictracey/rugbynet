@@ -1,13 +1,17 @@
 package net.rugby.foundation.topten.client;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.ui.HeaderView;
 import net.rugby.foundation.topten.client.ui.HeaderViewImpl;
+import net.rugby.foundation.topten.client.ui.RatingPopupView;
+import net.rugby.foundation.topten.client.ui.RatingPopupViewImpl;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
 import net.rugby.foundation.topten.client.ui.toptenlistview.CompactTopTenListViewImpl;
@@ -47,7 +51,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	private static LoginInfo loginInfo = null;
 	private static ICoreConfiguration coreConfig = null;
 	private static List<IContent> contentList = null;
-
+	private static RatingPopupViewImpl<IPlayerRating> ratingPopup = null;
+	
 	@Override
 	public EventBus getEventBus() {
 		return eventBus;
@@ -232,6 +237,28 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 			simpleView.setClientFactory(this);
 		}
 		return simpleView;
+	}
+	@Override
+	public RatingPopupViewImpl<IPlayerRating> getRatingPopup() {
+		if (ratingPopup == null) {
+			ratingPopup = new RatingPopupViewImpl<IPlayerRating>();
+			
+			Iterator<IContent> it = getContentList().iterator();
+			IContent content = null;
+			boolean found = false;
+			while (it.hasNext()) {
+				content = it.next();
+				if (content.getTitle().equals("rating popup details")) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (found) {
+				ratingPopup.setContent(content.getBody());
+			}
+ 		}
+		return ratingPopup;
 	}
 
 

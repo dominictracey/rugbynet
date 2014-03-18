@@ -128,8 +128,8 @@ public class MetaTagGenerator extends HttpServlet {
 				resp.getWriter().println("<meta name=\"description\" content=\"" + pattern + "\" />");
 				resp.getWriter().println("<meta property=\"og:description\" content=\"" + pattern + "\" />");
 			} else if (ttl != null) {
-				resp.getWriter().println("<meta name=\"description\" content=\"" + ttl.getContent() + "\" />");
-				resp.getWriter().println("<meta property=\"og:description\" content=\"" + ttl.getContent() + "\" />");
+				resp.getWriter().println("<meta name=\"description\" content=\"" + ttl.getContent().replaceAll("\\<[^>]*>","") + "\" />");
+				resp.getWriter().println("<meta property=\"og:description\" content=\"" + ttl.getContent().replaceAll("\\<[^>]*>","") + "\" />");
 			} else {
 				resp.getWriter().println("<meta name=\"description\" content=\"" + defaultDescription + "\" />");
 				resp.getWriter().println("<meta property=\"og:description\" content=\"" + defaultDescription + "\" />");

@@ -2,8 +2,8 @@ package net.rugby.foundation.admin.server.factory;
 
 import java.util.List;
 
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 public interface IMatchRatingEngineSchemaFactory {
 	IRatingEngineSchema getById(Long id);

@@ -10,10 +10,12 @@ import javax.servlet.http.HttpSession;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
+import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.topten.client.TopTenListService;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -30,6 +32,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private IAppUserFactory auf;
 	private ITopTenListFactory ttlf;
 	private ICachingFactory<IContent> ctf;
+	private IPlayerRatingFactory prf;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -38,11 +41,12 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Inject
-	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf) {
+	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
 			this.ctf = ctf;
+			this.prf = prf;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 		}
@@ -248,6 +252,17 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		try {
 			list = ttlf.put(list);
 			return list;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IPlayerRating getPlayerRating(Long playerRatingId) {
+		try {
+			IPlayerRating pr = prf.get(playerRatingId);
+			return pr;
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

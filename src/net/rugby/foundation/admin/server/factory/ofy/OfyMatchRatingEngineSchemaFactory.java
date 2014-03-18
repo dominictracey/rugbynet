@@ -19,10 +19,10 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
 public class OfyMatchRatingEngineSchemaFactory implements
 IMatchRatingEngineSchemaFactory {

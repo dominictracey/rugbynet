@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -27,5 +28,7 @@ public interface TopTenListServiceAsync {
 	public void getContentItems(AsyncCallback<List<IContent>> asyncCallback);
 	public void saveTopTenList(ITopTenList list,
 			AsyncCallback<ITopTenList> asyncCallback);
+	public void getPlayerRating(Long playerRatingId,
+			AsyncCallback<IPlayerRating> asyncCallback);
 
 }

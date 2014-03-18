@@ -11,7 +11,6 @@ import java.util.List;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Unindexed;
 
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 
 @Entity
 public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPlayerRating> {

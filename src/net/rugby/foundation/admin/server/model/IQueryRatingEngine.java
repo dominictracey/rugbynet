@@ -6,8 +6,8 @@ import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 
 
 
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 
 public interface IQueryRatingEngine {

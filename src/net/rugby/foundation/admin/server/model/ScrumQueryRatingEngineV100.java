@@ -15,9 +15,7 @@ import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
 import net.rugby.foundation.admin.server.AdminEmailer;
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
@@ -33,7 +31,9 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IRound;
@@ -958,6 +958,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			IMatchGroup m = mf.get(pms.getMatchId());
 			rf.setId(m.getRoundId());
 			IRound r = rf.getRound();
+			cf.setId(r.getCompId());
+			ICompetition c = cf.getCompetition();
 			int hScore = 0;
 			int vScore = 0;
 			if (m.getSimpleScoreMatchResultId() != null) {
@@ -967,7 +969,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 					vScore = ((SimpleScoreMatchResult)mr).getVisitScore();
 				}
 			}
-			matchLabelMap.put(pms.getMatchId(), m.getHomeTeam().getAbbr() + " " + hScore + " - " + m.getVisitingTeam().getAbbr() + " " + vScore + " R(" + r.getAbbr() + ")");
+			matchLabelMap.put(pms.getMatchId(), m.getHomeTeam().getAbbr() + " " + hScore + " - " + m.getVisitingTeam().getAbbr() + " " + vScore + " (" + c.getAbbr() + "-R" + r.getAbbr() + ")");
 		}
 
 		return matchLabelMap.get(pms.getMatchId());

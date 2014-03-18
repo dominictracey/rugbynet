@@ -1,4 +1,4 @@
-package net.rugby.foundation.admin.shared;
+package net.rugby.foundation.model.shared;
 
 import java.util.Date;
 

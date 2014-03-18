@@ -3,7 +3,6 @@ package net.rugby.foundation.model.shared;
 import java.util.Date;
 import java.util.List;
 
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 
 public interface IPlayerRating extends IHasId {

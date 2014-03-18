@@ -338,7 +338,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					//String image, Long contributorId, Long editorId, boolean isSubmitted, 
 					//String matchReportLink, String teamName, ITopTenList parent)
 					ITopTenItem item = new TopTenItem(null, pmr.getPlayerId(), pmr.getPlayer(), "",
-							"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pms.getPosition(), list);
+							"", null, null, false, match.getForeignUrl(), team.getDisplayName(), team.getId(), pms.getPosition(), list,
+							pmr.getId(), pmr.getRating());
 					list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
 					put(item);
 					list.getList().add(item);

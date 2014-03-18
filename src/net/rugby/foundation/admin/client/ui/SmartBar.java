@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;

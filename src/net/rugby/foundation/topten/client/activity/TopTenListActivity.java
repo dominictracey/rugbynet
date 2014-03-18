@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.TopTenListPlace;
@@ -530,6 +531,24 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	@Override
 	public void cancelEditTTLInfo(ITopTenList ttl) {
 		clientFactory.getEditTTLInfoDialog().hide();
+	}
+
+	@Override
+	public void showRatingDetails(ITopTenItem value) {
+		clientFactory.getRpcService().getPlayerRating(value.getPlayerRatingId(), new AsyncCallback<IPlayerRating>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save Top Ten List. See event log for details.");
+			}
+
+			@Override
+			public void onSuccess(IPlayerRating result) {
+				clientFactory.getRatingPopup().setRating(result);
+				clientFactory.getRatingPopup().center();
+			}
+		});	
+		
+		
 	}
 
 }

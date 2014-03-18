@@ -4,8 +4,12 @@
 package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.AdminMainModule;
+import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.game1.server.Game1MainModule;
+import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.topten.server.TopTenMainModule;
+import net.rugby.foundation.topten.server.TopTenTestModule;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;

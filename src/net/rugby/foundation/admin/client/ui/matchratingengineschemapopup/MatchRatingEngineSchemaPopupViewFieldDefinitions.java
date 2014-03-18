@@ -8,8 +8,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
-import net.rugby.foundation.admin.shared.IRatingEngineSchema;
-import net.rugby.foundation.admin.shared.ScrumMatchRatingEngineSchema20130713;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
 public class MatchRatingEngineSchemaPopupViewFieldDefinitions<T extends IRatingEngineSchema> {
 	private List<FieldDefinition<T>> fieldDefinitions =
