@@ -100,6 +100,12 @@ public class TestRoundFactory implements IRoundFactory {
 				r.setName("Round 1");
 				r.setCompId(4L);
 			}
+		 // SUPER RUGBY 2014
+		 else  if (roundId == 16L) {
+				r.setAbbr("1");
+				r.setName("Round 1");
+				r.setCompId(5L);
+			}
 		
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(new Date());

@@ -72,6 +72,8 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			return getTestComp3();
 		} else if (id == 4L) {
 			return getTestComp4();
+		} else if (id == 5L){
+			return getTestComp5();
 		} else if (id == 100000L) {
 			return getGlobalComp();
 		}
@@ -168,6 +170,26 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		//		c.setNextRoundIndex(0);
 		//		setBeginAndEnd(c);
 		c.setCompType(CompetitionType.HEINEKEN_CUP);
+		return c;
+	}
+	
+	/**
+	 * @return
+	 */
+	//SUPER RUGBY
+	private ICompetition getTestComp5() {
+		ICompetition c = getEmptyComp();
+		c.getRoundIds().add(16L);
+		addRounds(c);
+		for (Long i=9400L; i<9415L; ++i) {
+			c.getTeamIds().add(i);
+			c.getTeams().add(tf.get(i));
+		}
+		//setNextAndPrevRound(c);
+		//		c.setPrevRoundIndex(-1);
+		//		c.setNextRoundIndex(0);
+		//		setBeginAndEnd(c);
+		c.setCompType(CompetitionType.SUPER_RUGBY);
 		return c;
 	}
 

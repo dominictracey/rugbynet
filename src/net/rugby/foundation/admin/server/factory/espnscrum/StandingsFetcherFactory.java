@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IStandingsFetcher;
 import net.rugby.foundation.admin.server.model.ScrumHeinekenStandingsFetcher;
+import net.rugby.foundation.admin.server.model.ScrumSuperRugbyStandingsFetcher;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -31,6 +32,8 @@ public class StandingsFetcherFactory implements IStandingsFetcherFactory {
 		
 		if (c != null && c.getCompType() == ICompetition.CompetitionType.HEINEKEN_CUP) {
 			return new ScrumHeinekenStandingsFetcher(sf);
+		} else if (c != null && c.getCompType() == ICompetition.CompetitionType.SUPER_RUGBY) {
+			return new ScrumSuperRugbyStandingsFetcher(sf);
 		}
 		return null;
 	}

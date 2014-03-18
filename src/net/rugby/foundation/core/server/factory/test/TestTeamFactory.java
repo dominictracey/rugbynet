@@ -77,6 +77,10 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 			for (Long l=9300L; l<9324L; l++) {
 				build(l);
 			}
+			
+			for (Long l=9400L; l<9416; l++)  {
+				build(l);
+			}
 			populated = true;
 		}
 	}
@@ -234,8 +238,38 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 		} else if (id == 9323) {
 			t.setDisplayName("Perpignan");
 		}
-		
-		
+		//SUPER RUGBY
+		  else if (id == 9400) {
+			t.setDisplayName("Blues");
+		} else if (id == 9401) {
+			t.setDisplayName("Brumbies");
+		} else if (id == 9402) {
+			t.setDisplayName("Bulls");
+		} else if (id == 9403) {
+			t.setDisplayName("Cheetahs");
+		} else if (id == 9404) {
+			t.setDisplayName("Chiefs");
+		} else if (id == 9405) {
+			t.setDisplayName("Crusaders");
+		} else if (id == 9406) {
+			t.setDisplayName("Force");
+		} else if (id == 9407) {
+			t.setDisplayName("Highlanders");
+		} else if (id == 9408) {
+			t.setDisplayName("Hurricanes");
+		} else if (id == 9409) {
+			t.setDisplayName("Lions");
+		} else if (id == 9410) {
+			t.setDisplayName("Rebels");
+		} else if (id == 9411) {
+			t.setDisplayName("Reds");
+		} else if (id == 9412) {
+			t.setDisplayName("Sharks");
+		} else if (id == 9413) {
+			t.setDisplayName("Stormers");
+		} else if (id == 9414) {
+			t.setDisplayName("Waratahs");
+		}
 		
 		((TeamGroup)t).setId(id);
 		((IGroup)t).setGroupType(GroupType.TEAM);

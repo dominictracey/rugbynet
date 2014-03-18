@@ -78,7 +78,7 @@ public class StandingsFetcherTester {
 		 
 		 sFetcher.setComp(c);
 		 sFetcher.setRound(c.getRounds().get(0));
-		 sFetcher.setUrl("testData\\191757-heineken-standings-round-1.htm");
+		 sFetcher.setUrl("testData/191757-heineken-standings-round-1.htm");
 		 sFetcher.setUc(uc);
 
 		 Iterator<ITeamGroup> it = c.getTeams().iterator();
@@ -114,5 +114,54 @@ public class StandingsFetcherTester {
 		 }
 		 assertTrue(count == 6);
 	 }
+	 @Test
+	 public void testSuperRugby() {
 
+		 cf.setId(5L);
+		 ICompetition c = cf.getCompetition();
+		 assertTrue(c != null);
+		 assertTrue(c.getTeams().size() == 15);
+
+		 sFetcher = sFetcherFactory.getFetcher(c.getRounds().get(0));
+		
+		 assertTrue(sFetcher != null);
+	 
+		 sFetcher.setComp(c);
+		 sFetcher.setRound(c.getRounds().get(0));
+		 sFetcher.setUrl("testData/SuperRugbyTable.html");
+		 sFetcher.setUc(uc);
+
+		 Iterator<ITeamGroup> it = c.getTeams().iterator();
+		 int count = 0;
+		 while (it.hasNext()) {
+			 ITeamGroup team = it.next();
+
+ 			 IStanding s = sFetcher.getStandingForTeam(team);
+
+			 if (s != null) {
+				 if (s.getTeam().getDisplayName().equals("Sharks")) {
+					 assertTrue(s.getStanding().equals(1));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Chiefs")) {
+					 assertTrue(s.getStanding().equals(3));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Hurricanes")) {
+					 assertTrue(s.getStanding().equals(15));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Reds")) {
+					 assertTrue(s.getStanding().equals(6));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Lions")) {
+					 assertTrue(s.getStanding().equals(7));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Force")) {
+					 assertTrue(s.getStanding().equals(10));
+					 count++;
+				 }
+			 } else {
+				 assertTrue(false); // did not process correctly
+			 }
+		 }
+		 assertTrue(count == 6);
+	 }
 }
