@@ -260,7 +260,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			maulStolen = (float) (otms.getMauls() - otms.getMaulsWon());
 
 			pms = adjustStatsByPosition(pms);
-
+			pms = adjustStatsByTimePlayed(pms);
+			
 			//this.numStats = numStats;
 			this.match = match;
 
@@ -268,6 +269,26 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 			Normalize();
 			scalingFactorMap.put(NO_SCALE_KEY, 1f);
+		}
+
+		private IPlayerMatchStats adjustStatsByTimePlayed(IPlayerMatchStats pms) {
+			float timeScale = pms.getTimePlayed()/80f;
+			
+			scrumShare *= timeScale;
+			lineoutShare *= timeScale;
+			ruckShare *= timeScale;
+			maulShare *= timeScale;		
+			scrumLost *= timeScale;
+			lineoutLost *= timeScale;
+			ruckLost *= timeScale;
+			maulLost *= timeScale;
+
+			// Opposition team stats - if the opposition loses something on their "put", we add it to our win
+			scrumStolen *= timeScale;
+			lineoutStolen *= timeScale;
+			ruckStolen *= timeScale;
+			maulStolen *= timeScale;
+			return pms;
 		}
 
 		private IPlayerMatchStats adjustStatsByPosition(IPlayerMatchStats pms2) {
@@ -684,11 +705,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			pr.setDetails(playerScoreMap.get(p).get(0).getPlayerMatchStats().getName() + "\nMatch\tScore\tUnscaled\tScaled\tMatch Aged\tStandings\tCompetition\n-----------------------------------------------------------\n");
 
 			float scores = 0f;
-//			Float divisor = 0f;
 			for (IPlayerStatShares s : playerScoreMap.get(p)) {
-//				scores += s.getPlayerScore();  // back score [+ forward score]
-//				divisor += timescale;
-//				pr.setDetails(pr.getDetails() + getMatchLabel(s.getPlayerMatchStats()) + "** score: " + s.getPlayerScore() + " timeScale " + timescale + "\n");
 				scores += s.getScaledScore();
 				pr.addMatchStatId(s.getPlayerMatchStats().getId());
 				pr.addMatchStats(s.getPlayerMatchStats());	
@@ -697,61 +714,11 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			}
 
 			pr.setRating(Math.round((scores/totalScaledScore)*500*numStats)); //TotalScaled));
-//			// watch divide by 0!
-//			if (!divisor.equals(0f)) {
-//				pr.setRawScore(scores/(divisor+1));
-//				pr.setDetails(pr.getDetails() + "*****\n** Contributing Scores Sum: " + scores + "\n** Cumulative TimeScale" + divisor + " (+1)\n** Aggregate Raw Score: " + pr.getRawScore() + "\n");
-//
-//			} else {
-//				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE, "Setting raw score to 0 for: " + ((PlayerRating)pr).getMatchStats().get(0).getName() + " time scaling sum is 0 ");
-//				pr.setRawScore(0f);
-//			}
 
-			// if they don't have any score, don't include them in the query results.
-//			if (pr.getRawScore() > 0f) {
-				// I don't think we need this one here to generate the PlayerRating.Id?
+			prf.put(pr);
+			mrl.add(pr);
 
-				prf.put(pr);
-				mrl.add(pr);
-//				totalscore += pr.getRawScore();
-//			} else {
-//				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE, "Dropping player score for: " + ((PlayerRating)pr).getMatchStats().get(0).getName() + " because raw score is 0 ");
-//
-//			}
 		}
-
-//		for (IPlayerRating r : mrl) {
-//			Float normalizedSmoothScore = (float) (r.getRawScore()/totalscore);
-//			r.setRating(Math.round(normalizedSmoothScore * 500 * mrl.size()));
-//			r.setDetails(r.getDetails() + "*****\n** Final normalizedSmoothScore (rawscore/totalRawScore): " + normalizedSmoothScore + "\n** Player Rating:" + r.getRating() + "\n");
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Setting Rating for: " + ((PlayerRating)r).getMatchStats().get(0).getName() + " :  normScore=" + normalizedSmoothScore + " rawScore=" + r.getRawScore() + " rating=" + Math.round(normalizedSmoothScore * 500 * mrl.size()));
-//			// go back and calculate the component ratings as well. For Tom.
-//			for (IPlayerStatShares s : playerScoreMap.get(r.getPlayerId())) {
-//				r.addRatingComponent(((TimeSeriesPlayerStatShares)s).getRatingComponent(scaleTotalMap));
-//				//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Adding Rating Component for: " + ((PlayerRating)r).getMatchStats().get(0).getName() + " :  " + s.toString());
-//			}
-//			prf.put(r);
-//		}
-
-
-		//		for (IPlayerStatShares score : pss) {
-		//			IPlayerRating pmr = prf.create();
-		//			pmr.setDetails(score.toString());
-		//			pmr.setGenerated(DateTime.now().toDate());
-		//			pmr.setGroup(score.getMatch());
-		//			pmr.setGroupId(score.getMatch().getId());
-		//			pmr.addMatchStats(score.getPlayerMatchStats());
-		//			pmr.setPlayerId(score.getPlayerMatchStats().getPlayerId());
-		//			if (query != null) {
-		//				pmr.setQueryId(query.getId());
-		//			}
-		//			pmr.setRating(score.getScaledRating(totalScaledScore));
-		//			pmr.setRawScore(score.getUnscaledScore());
-		//			pmr.setSchema(schema);
-		//			prf.put(pmr);
-		//			mrl.add(pmr);
-		//		}
-
 		sendReport();
 
 		// mark query complete
@@ -941,6 +908,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			body += ss.toString();
 		}
 		emailer.setMessage(body);
+		emailer.setSubject(query.toString());
 		emailer.send();
 	}
 

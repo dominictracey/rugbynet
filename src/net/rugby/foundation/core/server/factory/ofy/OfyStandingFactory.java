@@ -6,6 +6,7 @@ package net.rugby.foundation.core.server.factory.ofy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -56,6 +57,20 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 				return null;
 			}
 			Objectify ofy = DataStoreFactory.getOfy();
+			
+			// make sure we only have one per team per round - delete any pre-existing records before saving this one
+			Query<Standing> qs = ofy.query(Standing.class).filter("roundId", standing.getRoundId()).filter("teamId", standing.getTeamId());
+			if (qs.count() > 0) {
+				Iterator<Standing> it = qs.iterator();
+				while (it.hasNext()) {
+					Standing s = it.next();
+					if (s.getId() != standing.getId()) {
+						deleteFromPersistentDatastore(s);
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Deleted duplicate standing object for team " + standing.getTeam().getDisplayName() + " in round " + standing.getRound().getName());						
+					}
+				}
+			}
+			
 			ofy.put(standing);
 			return standing;
 		} catch (Throwable ex) {

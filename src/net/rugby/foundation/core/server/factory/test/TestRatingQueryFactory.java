@@ -30,6 +30,9 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 			return null;
 		} else {
 			IRatingQuery rq = new RatingQuery();
+			rq.setScaleComp(false);
+			rq.setScaleStanding(false);
+			rq.setScaleTime(false);
 			if (id >= 700L && id <= 704L) {
 				rq.setId(id);
 				if (id == 700L) { // round 1

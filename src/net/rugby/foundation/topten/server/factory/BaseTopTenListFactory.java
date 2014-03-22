@@ -475,6 +475,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			ITopTenList last = getLastCreatedForComp(list.getCompId());
 			if (last != null) {
 				setLastCreatedForComp(last, list.getCompId());
+			} else {
+				setLastCreatedForComp(list, list.getCompId());
 			}
 
 			ITopTenList latest = getLatestForComp(list.getCompId());

@@ -657,6 +657,7 @@ public class TopTenFactoryTester {
 		
 		// publish it
 		ttf.publish(ttl);
+		ttl = ttf.get(ttl.getId());
 		assertTrue(ttl.getLive());
 
 		// should be last and latest now

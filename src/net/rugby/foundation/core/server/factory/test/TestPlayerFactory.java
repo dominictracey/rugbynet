@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +41,8 @@ public class TestPlayerFactory extends BasePlayerFactory implements IPlayerFacto
 	private Long count = 1000000L;
 	private ITeamGroupFactory tf;
 
+	private Random random = new Random();
+	
 	@Inject
 	public TestPlayerFactory(ICountryFactory cf, ITeamGroupFactory tf) {
 		this.cf = cf;	
@@ -67,6 +70,8 @@ public class TestPlayerFactory extends BasePlayerFactory implements IPlayerFacto
 				p.setGivenName("Player");
 				p.setSurName(id.toString());
 				p.setDisplayName("Player "+ id.toString());
+				int rnd = random.nextInt(11);
+				p.setPosition(position.getAt(rnd+1));  //.NONE is 0 so add 1
 				put(p);
 				return p;
 //				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"No player found with Id " + id);
