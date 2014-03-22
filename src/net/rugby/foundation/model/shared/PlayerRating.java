@@ -416,7 +416,8 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		}
 
 		if (rating.equals(o.getRating())) {
-			return 0;
+			// same rating so let the guy who has played less matches be higher
+			return ratingComponents.size() >= o.getRatingComponents().size() ? 1 : -1;
 		} else if (rating < o.getRating()) {
 			return 1;
 		} else {

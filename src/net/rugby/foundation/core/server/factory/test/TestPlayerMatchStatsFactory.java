@@ -160,6 +160,13 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 			list.addAll(getByMatchId(102L));
 			list.addAll(getByMatchId(103L));
 			return list;
+		} else if (rq.getPositions() != null && rq.getPositions().size() > 0) {
+			// if they want a position, just set everyone to be that position
+			List<IPlayerMatchStats> list = getByMatchId(100L);
+			for (IPlayerMatchStats pms : list) {
+				pms.setPosition(rq.getPositions().get(0));
+			}
+			list.addAll(list);
 		}
 		return getByMatchId(100L);
 	}
