@@ -2,6 +2,7 @@
 .gwt/
 .metadata/
 .settings/
+.classpath
 doc/
 gwt-unitCache/
 target/
@@ -14,6 +15,8 @@ war/PlayerListMVP/
 war/result/
 war/WEB-INF/classes/
 war/WEB-INF/deploy/
+war/WEB-INF/lib/
+war/WEB-INF/appengine-generated/local_db.bin
 war/topten/
 www-test/
 extras
