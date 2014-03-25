@@ -140,6 +140,18 @@ Short Name:
                         <g:TextBox ui:field="shortName" >
                         </g:TextBox>
                     </td>
+                </tr>
+                 <tr>
+
+                    <td>
+Twitter:
+                    </td>
+
+                    <td>
+
+                        <g:TextBox ui:field="twitter" >
+                        </g:TextBox>
+                    </td>
                 </tr>    
                                 <tr>
 

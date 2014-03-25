@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -27,10 +28,12 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 	
 	private Random random = new Random();
 	private IPlayerMatchStatsFactory pmsf;
+	private IPlayerFactory pf;
 	
 	@Inject
-	public TestPlayerRatingFactory(IPlayerMatchStatsFactory pmsf) {
+	public TestPlayerRatingFactory(IPlayerMatchStatsFactory pmsf, IPlayerFactory pf) {
 		this.pmsf = pmsf;
+		this.pf = pf;
 	}
 	
 	@Override
@@ -109,9 +112,10 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 	@Override
 	public List<IPlayerRating> query(IRatingQuery query) {
 		try {
-			List<IPlayerRating> list = new ArrayList<IPlayerRating>();
+			//List<IPlayerRating> list = new ArrayList<IPlayerRating>();
 
-			return list;
+			//return list;
+			return getForMatch(100L, null);
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
@@ -165,6 +169,8 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 			IPlayerRating pr = create();
 			pr.addMatchStats(pms);
 			pr.setPlayerId(pms.getPlayerId());
+			pr.setPlayer(pf.get(pms.getPlayerId()));
+			pr.setRating(getRandomRating());
 			list.add(pr);
 		}
 		return list;

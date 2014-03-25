@@ -42,6 +42,8 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	private String givenName;
 	private String surName;
 	private String shortName;
+	
+	private String twitterHandle;
 
 	@Override
 	public Long getId() {
@@ -180,6 +182,14 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	@Override
 	public String getForeignUrl() {
 		return "http://www.espnscrum.com/scrum/rugby/player/" + scrumId.toString() + ".html";
+	}
+	@Override
+	public String getTwitterHandle() {
+		return twitterHandle;
+	}
+	@Override
+	public void setTwitterHandle(String twitterHandle) {
+		this.twitterHandle = twitterHandle;
 	}
 
 }

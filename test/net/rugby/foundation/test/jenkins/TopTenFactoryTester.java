@@ -36,6 +36,8 @@ import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.TopTenTestModule;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
+import net.rugby.foundation.topten.server.utilities.SocialMediaDirector;
 
 //import com.google.gwt.i18n.shared.DateTimeFormat;
 //import com.google.gwt.junit.client.GWTTestCase;
@@ -743,6 +745,35 @@ public class TopTenFactoryTester {
 		assertFalse(ms.contains(ttl.getId()));
 
 		deleteAll();
+
+	}
+	@Test
+	public void generateEmail() {
+		//		  (List<IPlayerMatchInfo> pmiList, String title,
+		//					String description, Long compId, Long roundId, position pos,
+		//					Long countryId, Long teamId)
+		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+
+		ITopTenList ttl = createTTL(); 
+
+		assert (ttl != null);
+		for (ITopTenItem i: ttl.getList()){
+			assertTrue(i.getPlayer().getTwitterHandle() != null);
+		}
+		ISocialMediaDirector smd = new SocialMediaDirector();
+
+		smd.PromoteTopTenList(ttl);
+//		assertTrue(ms.contains(ttl.getId()));
+//		assertTrue(ttl.getNextId() == null);
+//		assertTrue(ttl.getNextPublishedId() == null);
+//		assertTrue(ttl.getPrevPublishedId() == null);
+//
+//		ITopTenList prev = ttf.get(ttl.getPrevId());
+//
+//		assertTrue(prev.getNextId().equals(ttl.getId()));
+
+		deleteAll();
+
 
 	}
 }

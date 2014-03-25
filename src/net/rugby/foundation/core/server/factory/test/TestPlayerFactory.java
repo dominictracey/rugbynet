@@ -70,6 +70,7 @@ public class TestPlayerFactory extends BasePlayerFactory implements IPlayerFacto
 				p.setGivenName("Player");
 				p.setSurName(id.toString());
 				p.setDisplayName("Player "+ id.toString());
+				p.setTwitterHandle("@"+ id.toString());
 				int rnd = random.nextInt(11);
 				p.setPosition(position.getAt(rnd+1));  //.NONE is 0 so add 1
 				put(p);

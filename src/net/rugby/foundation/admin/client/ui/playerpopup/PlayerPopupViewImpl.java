@@ -43,7 +43,8 @@ public class PlayerPopupViewImpl<T> extends DialogBox implements PlayerPopupView
 	@UiField TextBox surName;
 	@UiField TextBox shortName;
 	@UiField Anchor scrumLink;
-
+	@UiField TextBox twitter;
+	
 	@UiField Button saveButton;
 	@UiField Button cancelButton;
 
@@ -65,6 +66,7 @@ public class PlayerPopupViewImpl<T> extends DialogBox implements PlayerPopupView
 		fieldDefinitions.get(11).bind(surName); 
 		fieldDefinitions.get(12).bind(shortName); 
 		fieldDefinitions.get(13).bind(scrumLink);
+		fieldDefinitions.get(14).bind(twitter);
 	}
 
 	private Presenter<T> presenter;

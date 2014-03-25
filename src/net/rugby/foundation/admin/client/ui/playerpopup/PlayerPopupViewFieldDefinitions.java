@@ -603,6 +603,36 @@ public class PlayerPopupViewFieldDefinitions<T> {
 		}
 		
       });
+		fieldDefinitions.add(new FieldDefinition<IPlayer>() {
+    		//twitter
+	        private TextBox w;
+	        
+	        @Override
+	        public void bind (Widget in)
+	        {
+	        	w = (TextBox) in;
+	        }
+	        
+	        @Override
+			public Widget render(IPlayer c) {
+	        	w.setText(c.getTwitterHandle());
+	        		
+	        	return w;
+	        }
+
+			@Override
+			public void clear() {
+				w.setText(null);
+			}
+			
+			@Override
+			public IPlayer update(IPlayer p) {
+				p.setTwitterHandle(w.getText());
+
+				return p;
+			}
+			
+	      });
     	}
     }
 

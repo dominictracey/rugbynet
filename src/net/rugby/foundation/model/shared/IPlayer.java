@@ -66,6 +66,8 @@ public interface IPlayer extends IHasId {
 	 */
 	public abstract void setShortName(String shortName);
 	public abstract String getForeignUrl();
+	public abstract String getTwitterHandle();
+	public abstract void setTwitterHandle(String twitterHandle);
 	
 	
 }
