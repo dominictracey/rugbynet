@@ -3,6 +3,8 @@
 .metadata/
 .settings/
 .classpath
+.externalToolBuilders/
+bin/
 doc/
 gwt-unitCache/
 target/
@@ -20,5 +22,3 @@ war/WEB-INF/appengine-generated/
 war/topten/
 www-test/
 extras
-.DS_Store
-.gitignore~

@@ -30,6 +30,7 @@ public class SocialMediaDirector implements ISocialMediaDirector {
 		AdminEmailer emailer = new AdminEmailer();
 		emailer.setMessage(body);
 		emailer.setSubject(ttl.getTitle());
+		emailer.send();
 		return true;
 	}
 

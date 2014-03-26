@@ -14,8 +14,10 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * @author home
@@ -31,6 +33,11 @@ public class AdminEmailer {
     public void send() {
 	    try {
 	        Message msg = new MimeMessage(session);
+	        MimeMultipart mpart = new MimeMultipart();
+	        MimeBodyPart bp = new MimeBodyPart();
+	        bp.setText(message, "UTF_8", "text/html");
+	        // add message body
+	        mpart.addBodyPart(bp);
 //	        msg.setFrom(new InternetAddress("info@rugby.net", "The Rugby Net"));
 //	        msg.addRecipient(Message.RecipientType.TO,
 //	                         new InternetAddress("info@rugby.net", "The Rugby Net"));
@@ -44,7 +51,7 @@ public class AdminEmailer {
 	        msg.addRecipient(Message.RecipientType.TO,
 	        		new InternetAddress("info@rugby.net", "The Rugby Net"));
 	        msg.setSubject(subject);
-	        msg.setText(message);
+	        msg.setContent(mpart);
 	        
 	        
 	        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Sent mail to " + msg.getRecipients(RecipientType.TO)[0].toString());

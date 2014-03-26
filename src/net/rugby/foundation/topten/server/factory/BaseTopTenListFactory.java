@@ -37,6 +37,8 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
 import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
+import net.rugby.foundation.topten.server.utilities.SocialMediaDirector;
 
 public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
@@ -354,7 +356,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		put(list);
 
 		setLastCreatedForComp(list,list.getCompId());
+		ISocialMediaDirector smd = new SocialMediaDirector();
 
+		smd.PromoteTopTenList(list);
 		return list;
 	}
 
