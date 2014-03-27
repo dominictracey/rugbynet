@@ -754,15 +754,20 @@ public class TopTenFactoryTester {
 		//					Long countryId, Long teamId)
 		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 
-		ITopTenList ttl = createTTL(); 
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
+		ITopTenList ttl = ttf.create(ttsd);
 
 		assert (ttl != null);
+		int j = 1;
 		for (ITopTenItem i: ttl.getList()){
 			assertTrue(i.getPlayer().getTwitterHandle() != null);
+			if (j++ > 5) {
+				i.getPlayer().setTwitterHandle(null);
+			}
 		}
 		ISocialMediaDirector smd = new SocialMediaDirector();
 
-		smd.PromoteTopTenList(ttl);
+		smd.PromoteTopTenList(ttl, ttsd);
 //		assertTrue(ms.contains(ttl.getId()));
 //		assertTrue(ttl.getNextId() == null);
 //		assertTrue(ttl.getNextPublishedId() == null);

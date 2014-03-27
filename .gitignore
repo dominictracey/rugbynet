@@ -22,3 +22,5 @@ war/WEB-INF/appengine-generated/
 war/topten/
 www-test/
 extras
+.gitignore~
+**/.DS_Store

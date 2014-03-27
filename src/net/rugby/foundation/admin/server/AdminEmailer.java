@@ -35,7 +35,7 @@ public class AdminEmailer {
 	        Message msg = new MimeMessage(session);
 	        MimeMultipart mpart = new MimeMultipart();
 	        MimeBodyPart bp = new MimeBodyPart();
-	        bp.setText(message, "UTF_8", "text/html");
+	        bp.setContent(message, "text/html");
 	        // add message body
 	        mpart.addBodyPart(bp);
 //	        msg.setFrom(new InternetAddress("info@rugby.net", "The Rugby Net"));
@@ -52,7 +52,7 @@ public class AdminEmailer {
 	        		new InternetAddress("info@rugby.net", "The Rugby Net"));
 	        msg.setSubject(subject);
 	        msg.setContent(mpart);
-	        
+	        msg.saveChanges();
 	        
 	        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Sent mail to " + msg.getRecipients(RecipientType.TO)[0].toString());
 	        

@@ -358,7 +358,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		setLastCreatedForComp(list,list.getCompId());
 		ISocialMediaDirector smd = new SocialMediaDirector();
 
-		smd.PromoteTopTenList(list);
+		smd.PromoteTopTenList(list, tti);
 		return list;
 	}
 

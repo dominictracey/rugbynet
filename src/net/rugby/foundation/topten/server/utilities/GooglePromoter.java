@@ -6,10 +6,10 @@ public class GooglePromoter implements IPromotionHandler {
 
 	@Override
 	public String process(ITopTenList ttl) {
-		String retval = "******** GOOGLE **********\n";
+		String retval = "<p>******** GOOGLE **********</p>\n";
 		{
 			String URL = "http://www.rugby.net/fb/topten.html?listId="+ttl.getId() + "\"";
-			retval += "<a href=\"https://www.google.com/webmasters/tools/submit-url?urlnt=" + URL +">Add to Google</a>\n";;
+			retval += "<p><a href=\"https://www.google.com/webmasters/tools/submit-url?urlnt=" + URL +">Add to Google</a></p>\n";;
 		}
 	
 		return retval;
