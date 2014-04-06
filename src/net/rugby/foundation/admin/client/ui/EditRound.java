@@ -43,6 +43,8 @@ public class EditRound extends Composite {
 		void saveRound(IRound R, List<IStanding> standings);
 
 		void fetchRoundStandings(IRound round);
+		
+		void addMatch(IRound round);
 	} 
 	
 	public EditRound() {
@@ -79,6 +81,8 @@ public class EditRound extends Composite {
 	@UiField
 	Button fetch;
 	@UiField
+	Button addMatch;
+	@UiField
 	TextBox name;
 	@UiField
 	TextBox abbr;
@@ -105,6 +109,11 @@ public class EditRound extends Composite {
 	@UiHandler("fetch")
 	void onClickFetch(ClickEvent e) {
 		listener.fetchRoundStandings(round);
+	}
+	
+	@UiHandler("addMatch")
+	void onClickAddMatch(ClickEvent e) {
+		listener.addMatch(round);
 	}
 	
 	public void ShowRound(IRound round, List<IStanding> standings) {

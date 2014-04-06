@@ -1385,4 +1385,29 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 		});		
 	}
+
+
+
+	@Override
+	public void addMatch(IRound round) {
+		clientFactory.getRpcService().AddMatchToRound(round, new AsyncCallback<IMatchGroup>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
+
+			}
+
+			@Override
+			public void onSuccess(IMatchGroup result) {
+				if (result != null)
+				{
+					Window.alert("Match	Added");	
+					em.ShowMatch(result);
+				} else {
+					Window.alert("Match not added. See server log for details");
+				}
+			}
+
+		});		}
 }

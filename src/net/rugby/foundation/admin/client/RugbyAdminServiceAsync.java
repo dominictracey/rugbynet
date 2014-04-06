@@ -158,4 +158,6 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<Boolean> asyncCallback);
 	public void checkPipelineStatus(String id, Long matchId,
 			AsyncCallback<String> asyncCallback);
+	public void AddMatchToRound(IRound round,
+			AsyncCallback<IMatchGroup> asyncCallback);
 }

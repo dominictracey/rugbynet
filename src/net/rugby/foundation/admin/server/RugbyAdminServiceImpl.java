@@ -90,6 +90,7 @@ import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.joda.time.DateTime;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
@@ -1886,6 +1887,39 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return "COMPLETED";
+		}
+	}
+
+	@Override
+	public IMatchGroup AddMatchToRound(IRound round) {
+		try {
+			if (checkAdmin()) {
+				rf.setId(round.getId());
+				IRound r = rf.getRound();
+				IMatchGroup mg = mf.create();
+				mg.setDate(DateTime.now().toDate());
+				mg.setDisplayName("Change me");
+				ITeamGroup t = tf.getTeamByName("TBD");
+				if (t == null)
+				{
+					t = tf.getTeamByName("TBC");
+					if (t == null)
+					{
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find team TBD to create new empty match. Giving up.");
+						return null;
+					}
+				}
+				mg.setHomeTeam(t);
+				mg.setVisitingTeam(t);
+				mf.put(mg);
+				r.addMatch(mg);
+				rf.put(r);
+				return mg;
+			}
+			return null;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
 		}
 	}
 

@@ -27,7 +27,7 @@
 				</g:ScrollPanel>	
 		<g:Button styleName="{style.important}" ui:field="fetch">Fetch</g:Button>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
-
+		<g:Button styleName="{style.important}" ui:field="addMatch">Add Match</g:Button>
 	</g:HTMLPanel>
 	
 
