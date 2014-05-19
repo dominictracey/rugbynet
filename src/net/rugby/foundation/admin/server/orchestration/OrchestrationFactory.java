@@ -5,6 +5,7 @@ package net.rugby.foundation.admin.server.orchestration;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
@@ -16,6 +17,7 @@ import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
+import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -53,7 +55,7 @@ import net.rugby.foundation.model.shared.IRound;
  */
 
 public class OrchestrationFactory implements
-		IOrchestrationFactory {
+IOrchestrationFactory {
 
 	private ICompetitionFactory cf;
 	private IMatchGroupFactory mf;
@@ -72,32 +74,40 @@ public class OrchestrationFactory implements
 	private IMatchRatingEngineSchemaFactory mresf;
 	private IQueryRatingEngineFactory qref;
 	private IRatingQueryFactory rqf;
+	private IAdminTaskFactory atf;
+	private IPlayerRatingFactory prf;
 
 	//@REX this is probably horrendously inefficient
 	@Inject
 	public void setFactories(ICompetitionFactory cf, IRoundFactory rf, ITeamGroupFactory tf, IMatchGroupFactory mf, IOrchestrationConfigurationFactory ocf,
-			IResultFetcherFactory rff, IMatchResultFactory mrf, ILeagueFactory lf, 
-			ILeaderboardFactory lbf, IEntryFactory ef, IAppUserFactory auf, IClubhouseMembershipFactory chmf, ILeaderboardRowFactory lbrf,
-			IClubhouseLeagueMapFactory chlmf, IMatchEntryFactory mef, IRoundEntryFactory ref, IMatchRatingEngineSchemaFactory mresf, IQueryRatingEngineFactory qref,
-			IRatingQueryFactory rqf) {
+			IResultFetcherFactory rff, IMatchResultFactory mrf, 
+			//			ILeagueFactory lf, 
+			//			ILeaderboardFactory lbf, IEntryFactory ef, 
+			IAppUserFactory auf, 
+			//			IClubhouseMembershipFactory chmf, ILeaderboardRowFactory lbrf,
+			//			IClubhouseLeagueMapFactory chlmf, IMatchEntryFactory mef, IRoundEntryFactory ref, 
+			IMatchRatingEngineSchemaFactory mresf, IQueryRatingEngineFactory qref,
+			IRatingQueryFactory rqf, IAdminTaskFactory atf, IPlayerRatingFactory prf) {
 		this.cf = cf;
 		this.mf = mf;
 		//this.mf.setFactories(rf, tf);
 		this.ocf = ocf;
 		this.rff = rff;
 		this.mrf = mrf;
-		this.lf = lf;
-		this.lbf = lbf;
-		this.ef = ef;
+		//		this.lf = lf;
+		//		this.lbf = lbf;
+		//		this.ef = ef;
 		this.auf = auf;
-		this.chmf = chmf;
-		this.lbrf = lbrf;
-		this.chlmf = chlmf;
-		this.ref = ref;
-		this.mef = mef;
+		//		this.chmf = chmf;
+		//		this.lbrf = lbrf;
+		//		this.chlmf = chlmf;
+		//		this.ref = ref;
+		//		this.mef = mef;
 		this.mresf = mresf;
 		this.qref = qref;
 		this.rqf = rqf;
+		this.atf = atf;
+		this.prf = prf;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.factory.IOrchestrationFactory#get(net.rugby.foundation.model.shared.IMatchGroup, net.rugby.foundation.admin.server.factory.IOrchestrationActions)
@@ -125,10 +135,14 @@ public class OrchestrationFactory implements
 			IOrchestration<IMatchGroup> o = new MatchStaleMarkUnreportedOrchestration(mf, ocf);
 			o.setTarget(target);
 			return o;
-		}
-		
+		} else if (action.equals(AdminOrchestrationActions.MatchActions.FETCHSTATS)) {
+			IOrchestration<IMatchGroup> o = new FetchMatchStatsOrchestration(mf, ocf, atf);	
+			o.setTarget(target);
+			return o;
+		}	
 		return null;
-	}
+
+	} 
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.factory.IOrchestrationFactory#get(net.rugby.foundation.model.shared.ICompetition, net.rugby.foundation.admin.server.factory.IOrchestrationActions)
@@ -141,11 +155,11 @@ public class OrchestrationFactory implements
 			o.setTarget(target);
 			return o;
 		} else if (action.equals(AdminOrchestrationActions.CompActions.COMP_COMPLETE)) {
-//			IOrchestration<ICompetition> o = new CompetitionCompleteOrchestration(cf, wfcf, ocf);
-//			o.setTarget(target);
-//			return o;
+			//			IOrchestration<ICompetition> o = new CompetitionCompleteOrchestration(cf, wfcf, ocf);
+			//			o.setTarget(target);
+			//			return o;
 		}		
-		
+
 		return null;
 	}
 
@@ -241,7 +255,11 @@ public class OrchestrationFactory implements
 			IOrchestration<IRatingQuery> o = new GenerateRatingsOrchestration(ocf, mresf, qref, rqf);
 			o.setTarget(target);
 			return o;
-		}
+		} else if (action.equals(AdminOrchestrationActions.RatingActions.CLEANUP)) {
+			IOrchestration<IRatingQuery> o = new AdminCleanupOrchestration(ocf, rqf, prf, mf);
+			o.setTarget(target);
+			return o;
+		} 
 		return null;
 	}
 

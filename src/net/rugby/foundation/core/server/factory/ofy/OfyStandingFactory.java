@@ -156,7 +156,7 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 		s.setRoundId(r.getId());
 		s.setTeam(t);
 		s.setTeamId(t.getId());
-		s.setStanding(1);
+		s.setStanding(2);
 		return s;
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.datastore.QueryResultIterable;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Query;
 import com.googlecode.objectify.Key;
@@ -146,6 +147,21 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 			curr = cid;
 		}
 		return true;
+	}
+
+	@Override
+	public void deleteAll() {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			QueryResultIterable<Key<RatingQuery>> keys = ofy.query(RatingQuery.class).fetchKeys();
+			ofy.delete(keys);
+
+			// note the PMRs are left orphaned
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+		}	
+		
 	}
 
 

@@ -522,5 +522,11 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 		listener.setTimeSeries(timeSeriesOn);
 	}
 
+
+	@Override
+	public List<IPlayerRating> getCurrentList() {
+		return portalList;
+	}
+
 }
 

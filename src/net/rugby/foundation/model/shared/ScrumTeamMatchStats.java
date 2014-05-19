@@ -6,7 +6,10 @@ import java.util.Date;
 import javax.persistence.Id;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Indexed;
+import com.googlecode.objectify.annotation.Unindexed;
 
+@Unindexed
 @Entity
 public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 
@@ -17,12 +20,16 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 
 	@Id
 	private Long 	id;
+	@Indexed
 	private Long 	matchId;
+	@Indexed
 	private Long 	teamId;
 	private String 	teamAbbr;
-
+	@Indexed
 	private Boolean isHome;
+	@Indexed
 	private Date created;
+	@Indexed
 	private Date modified;
 
 	private Integer tries;

@@ -187,10 +187,12 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			if (nextPub != null) {
 				nextPub.setPrevPublishedId(list.getPrevPublishedId());
 				put(nextPub);
-			} else {
-				// this was the latest published, reset the special memcache object
-				setLatestPublishedForComp(prevPub,list.getCompId());
-			}
+			} 
+			
+//			else {
+//				// this was the latest published, reset the special memcache object
+//				setLatestPublishedForComp(prevPub,list.getCompId());
+//			}
 			list.setPrevPublishedId(null);
 			put(list);
 		} else { //publishing
@@ -261,13 +263,32 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					put(list);
 				} 
 			}
-			// is this now the latest published?
-			if (list.getNextPublishedId() == null) {
-				// this is the latest published, reset the special memcache object
-				setLatestPublishedForComp(list,list.getCompId());
-			}
+//			// is this now the latest published?
+//			if (list.getNextPublishedId() == null) {
+//				// this is the latest published, reset the special memcache object
+//				setLatestPublishedForComp(list,list.getCompId());
+//			}
+//			
+//			// is this now the last created?
+//			if (list.getNextId() == null) {
+//				// this is the latest published, reset the special memcache object
+//				setLastCreatedForComp(list,list.getCompId());
+//			}
+			
+			// dump the memcached versions of last and latest and let them reconstitute
+			clearMemCacheLastAndLatest(list.getCompId());
+			
+			ISocialMediaDirector smd = new SocialMediaDirector();
+
+			smd.PromoteTopTenList(list);
 		}
 		return list;
+	}
+
+	private void clearMemCacheLastAndLatest(Long compId) {
+		setLastCreatedForComp(null,compId);
+		setLatestPublishedForComp(null,compId);
+		
 	}
 
 	@Override
@@ -356,9 +377,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		put(list);
 
 		setLastCreatedForComp(list,list.getCompId());
-		ISocialMediaDirector smd = new SocialMediaDirector();
 
-		smd.PromoteTopTenList(list, tti);
 		return list;
 	}
 
@@ -439,7 +458,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	public ITopTenItem put(ITopTenItem item) {
 		// Allow subclasses to put it in persistent data stores, then put in memcache
 		try {
-			item = putToPersistentDatastore(item);
+			if (item != null) {
+				item = putToPersistentDatastore(item);
+			}
 			
 			return item;
 		} catch (Throwable ex) {
@@ -476,18 +497,21 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list " + list.getId() + " *** \n" + syncCache.getStatistics());
 
 			// refresh latest and last
-			ITopTenList last = getLastCreatedForComp(list.getCompId());
-			if (last != null) {
-				setLastCreatedForComp(last, list.getCompId());
-			} else {
-				setLastCreatedForComp(list, list.getCompId());
-			}
-
-			ITopTenList latest = getLatestForComp(list.getCompId());
-			if (latest != null) {
-				setLatestPublishedForComp(latest, list.getCompId());
-			}
-
+//			ITopTenList last = getLastCreatedForComp(list.getCompId());
+//			if (last != null) {
+//				setLastCreatedForComp(last, list.getCompId());
+//			} else {
+//				setLastCreatedForComp(list, list.getCompId());
+//			}
+//
+//			ITopTenList latest = getLatestForComp(list.getCompId());
+//			if (latest != null) {
+//				setLatestPublishedForComp(latest, list.getCompId());
+//			}
+			
+			setLastCreatedForComp(null, list.getCompId());
+			setLatestPublishedForComp(null, list.getCompId());
+			
 			// sanity check
 			scan(list.getCompId());
 

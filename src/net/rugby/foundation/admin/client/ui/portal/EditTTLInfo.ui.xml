@@ -27,6 +27,8 @@
    			    <b:NavLink>10</b:NavLink>		    
 			</b:DropdownButton>
 			<b:HelpBlock>This is the maximum number of players that will appear in the list from any given team. If a team has more than this number in the top ten of the queried list, only the first N will make the list and players from other teams will be moved up in the order they appear. The default is 10: no limit.</b:HelpBlock>
+	        <b:ControlLabel>Twitter Handles</b:ControlLabel>
+	        <g:HTMLPanel ui:field="twitterHandles"/>
 	        <b:Nav>
 	        	<b:NavWidget ui:field='buttonBar'>
 	        	    <b:Button ui:field="save" type="PRIMARY">Save</b:Button>

@@ -6,14 +6,11 @@
 
 
 	<b:Well>
-		<!-- Add GWT widgets here. Enter < and hit Ctrl-Space to auto-complete 
-			widget names. The ui:field attribute binds an element to a field in the owner 
-			class. See the GWT docs on UI Binder for more details. -->
 		<b:Form type="VERTICAL">
 		    <b:ControlLabel>Title</b:ControlLabel>
-			<b:TextBox ui:field='title'></b:TextBox>
-			<b:ControlLabel>Description</b:ControlLabel>
-			<b:TextArea ui:field='description'></b:TextArea>
+			<b:TextBox ui:field='title' width="75%"></b:TextBox>
+			<b:ControlLabel >Description</b:ControlLabel>
+			<b:TextArea ui:field='description' width="100%"></b:TextArea>
 
 	        <b:Nav>
 	        	<b:NavWidget ui:field='buttonBar'>

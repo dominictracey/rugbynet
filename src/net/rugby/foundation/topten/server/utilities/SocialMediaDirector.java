@@ -21,10 +21,10 @@ public class SocialMediaDirector implements ISocialMediaDirector {
 	}
 	
 	@Override
-	public boolean PromoteTopTenList(ITopTenList ttl, TopTenSeedData tti) {
+	public boolean PromoteTopTenList(ITopTenList ttl) {
 		String body = "<html>";
 		body += "<body>\n";
-		body += "<p><a href=\"http://www.rugby.net/Admin.html#PortalPlace:queryId="+ tti.getQueryId()+ "\"" + ">Query URL</a>\n" + "</p>\n";
+		body += "<p><a href=\"http://www.rugby.net/Admin.html#PortalPlace:queryId="+ ttl.getQueryId()+ "\"" + ">Query URL</a>\n" + "</p>\n";
 		body += "<p><a href=\"http://www.rugby.net/#List:listId="+ ttl.getId()+ "\"" + ">" + ttl.getTitle() + "</a>\n" + "</p>\n";
 		for (IPromotionHandler i: promoters){
 			body += i.process(ttl);

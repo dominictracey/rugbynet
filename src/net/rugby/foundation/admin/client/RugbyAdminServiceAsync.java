@@ -141,7 +141,7 @@ public interface RugbyAdminServiceAsync {
 	
 	public void flushAllPipelineJobs(AsyncCallback<Boolean> asyncCallback);
 	public void deleteComp(Long id, AsyncCallback<Boolean> asyncCallback);
-	public void createTopTenList(TopTenSeedData tti, AsyncCallback<TopTenSeedData> asyncCallback);
+	public void createTopTenList(TopTenSeedData tti, Map<IPlayer, String> twitterMap, AsyncCallback<TopTenSeedData> asyncCallback);
 	public void createContent(Long id, String content,
 			AsyncCallback<IContent> asyncCallback);
 	public void getContentList(boolean onlyActive, AsyncCallback<List<IContent>> asyncCallback);
@@ -160,4 +160,5 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<String> asyncCallback);
 	public void AddMatchToRound(IRound round,
 			AsyncCallback<IMatchGroup> asyncCallback);
+	public void cleanUp(AsyncCallback<String> asyncCallback);
 }

@@ -3,7 +3,11 @@
  */
 package net.rugby.foundation.admin.server.orchestration;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.appengine.api.taskqueue.TaskOptions;
+
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
@@ -11,6 +15,7 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
+import net.rugby.foundation.model.shared.RatingQuery;
 
 /**
  * @author home
@@ -46,6 +51,11 @@ public class GenerateRatingsOrchestration extends OrchestrationCore<IRatingQuery
 	 */
 	@Override
 	public void execute() {
+		if (target != null) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ((RatingQuery)target).toString());
+		} else {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Attempt to invoke Generate Rating Orchestration with null RatingQuery provided");
+		}
 		if (target != null) {
 			target.setStatus(Status.RUNNING);
 			rqf.put(target);

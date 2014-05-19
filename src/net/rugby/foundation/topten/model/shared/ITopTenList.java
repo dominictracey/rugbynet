@@ -18,6 +18,8 @@ public interface ITopTenList {
 	public abstract void setList(List<ITopTenItem> list);
 	Long getId();
 	void setId(Long id);
+	Long getQueryId();
+	void setQueryId(Long id);
 	String getTitle();
 	void setTitle(String id);
 	Date getCreated();

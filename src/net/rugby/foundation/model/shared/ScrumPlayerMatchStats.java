@@ -9,7 +9,10 @@ import javax.persistence.Transient;
 import net.rugby.foundation.model.shared.Position.position;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Indexed;
+import com.googlecode.objectify.annotation.Unindexed;
 
+@Unindexed
 @Entity
 public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 
@@ -51,12 +54,17 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	private Integer penaltiesConceded;
 	private Integer yellowCards;
 	private Integer redCards;
-	//@Indexed
+	@Indexed
 	private Integer slot;
+	@Indexed
 	private Long playerId;
+	@Indexed
 	private Long countryId;
+	@Indexed
 	private Long matchId;
+	@Indexed
 	private Long teamId;
+	@Indexed
 	private position pos;
 	private String name;
 	private String teamAbbr;

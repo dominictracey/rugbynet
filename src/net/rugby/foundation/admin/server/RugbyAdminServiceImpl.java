@@ -1,5 +1,6 @@
 package net.rugby.foundation.admin.server;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import net.rugby.foundation.admin.server.workflow.matchrating.FetchTeamMatchStat
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
@@ -92,10 +94,11 @@ import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.DateTime;
 
+import com.google.appengine.api.modules.ModulesService;
+import com.google.appengine.api.modules.ModulesServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.JobSetting;
@@ -103,9 +106,15 @@ import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
+
+import com.google.appengine.tools.cloudstorage.RetriesExhaustedException;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import static com.google.appengine.api.taskqueue.TaskOptions.Builder.*;
+
 
 @Singleton
 public class RugbyAdminServiceImpl extends RemoteServiceServlet implements RugbyAdminService {
@@ -1107,40 +1116,60 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public String fetchMatchStats(Long matchId) {
 		try {
 			if (checkAdmin()) {
-				Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
-				countryf.put(c);
+//				Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
+//				countryf.put(c);
+//
+//				PipelineService service = PipelineServiceFactory.newPipelineService();
+//
+//				IMatchGroup match = mf.get(matchId);
+//
+//				String pipelineId = "";
+//
+//				// first check if this match already has a pipeline going and kill it if it does
+//				if (match.getFetchMatchStatsPipelineId() != null && !match.getFetchMatchStatsPipelineId().isEmpty()) {
+//					// delete adminTasks first
+//					List<? extends IAdminTask> tasks = atf.getForPipeline(match.getFetchMatchStatsPipelineId());
+//					atf.delete((List<IAdminTask>) tasks);
+//
+//					// now the pipeline records
+//					service.deletePipelineRecords(match.getFetchMatchStatsPipelineId(), true, false);
+//					match.setFetchMatchStatsPipelineId(null);
+//
+//				}
+//
+//				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
+//				try {
+//					pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(3));
+//				} catch (RetriesExhaustedException ree) {
+//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Bad stuff", ree);
+//				}
+//				match.setFetchMatchStatsPipelineId(pipelineId);
+//				mf.put(match);
+//
+//				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+//
+//				//				while (true) {
+//				//					Thread.sleep(2000);
+//
+//				//				}
+//
+//				return pipelineId;
+				
+				String url2 = ccf.get().getEngineUrl() +
+                        "/orchestration/IMatchGroup";
 
-				PipelineService service = PipelineServiceFactory.newPipelineService();
+				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
+						param(AdminOrchestrationActions.MatchActions.getKey(), MatchActions.FETCHSTATS.toString()).
+						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.MATCH.toString()).
+						param("id",matchId.toString()).
+						param("extraKey", "0"));
 
-				IMatchGroup match = mf.get(matchId);
-
-				String pipelineId = "";
-
-				// first check if this match already has a pipeline going and kill it if it does
-				if (match.getFetchMatchStatsPipelineId() != null && !match.getFetchMatchStatsPipelineId().isEmpty()) {
-					// delete adminTasks first
-					List<? extends IAdminTask> tasks = atf.getForPipeline(match.getFetchMatchStatsPipelineId());
-					atf.delete((List<IAdminTask>) tasks);
-
-					// now the pipeline records
-					service.deletePipelineRecords(match.getFetchMatchStatsPipelineId(), true, false);
-					match.setFetchMatchStatsPipelineId(null);
-
-				}
-
-				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-				pipelineId = service.startNewPipeline(new GenerateMatchRatings(), match, new JobSetting.MaxAttempts(3));
-				match.setFetchMatchStatsPipelineId(pipelineId);
-				mf.put(match);
-
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
-
-				//				while (true) {
-				//					Thread.sleep(2000);
-
-				//				}
-
-				return pipelineId;
+				// give the orchestration 15 seconds to start the pipeline and look for the pipeline id
+				Thread.sleep(15000);
+				IMatchGroup m = mf.get(matchId);
+				
+				return m.getFetchMatchStatsPipelineId();
+				
 			} else {
 				return null;
 			}
@@ -1314,14 +1343,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				rq = rqf.put(rq);
 
 				// now trigger the backend processing task
-				Queue queue = QueueFactory.getDefaultQueue();
-				TaskOptions to = Builder.withUrl("/admin/orchestration/IRatingQuery").
+				//Queue queue = QueueFactory.getDefaultQueue();
+				//String url = "/admin/orchestration/IRatingQuery";
+				
+				String url2 = ccf.get().getEngineUrl() +
+                        "/orchestration/IRatingQuery";
+
+				//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Starting Rating Query " + rq.getId());
+				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
 						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
 						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
 						param("id",rq.getId().toString()).
-						param("extraKey", "0L");
-
-				queue.add(to);	
+						param("extraKey", "0L"));
 
 				return rq;
 			} else {
@@ -1600,10 +1633,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public TopTenSeedData createTopTenList(TopTenSeedData tti) {
+	public TopTenSeedData createTopTenList(TopTenSeedData tti, Map<IPlayer, String> twitterMap) {
 		try {
 			if (checkAdmin()) {
 				ttlf.create(tti);
+				
+				// save twitter handles for players
+				for (IPlayer p: twitterMap.keySet()) {
+					p.setTwitterHandle(twitterMap.get(p));
+					pf.put(p);
+				}
+				
 				return tti;
 			} else {
 				return null;
@@ -1862,6 +1902,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public String checkPipelineStatus(String id, Long matchId) {
 		try {
 			if (checkAdmin()) {
+				if (id == null) return "WOT?";
 				PipelineService service = PipelineServiceFactory.newPipelineService();
 
 				JobInfo jobInfo = service.getJobInfo(id);
@@ -1920,6 +1961,32 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
+		}
+	}
+
+	@Override
+	public String cleanUp() {
+		try {
+			if (checkAdmin()) {
+				String url2 = ccf.get().getEngineUrl() +
+                        "/orchestration/IRatingQuery";
+
+				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
+						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.CLEANUP.toString()).
+						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+						param("id","0").
+						param("extraKey", "0"));
+				
+//				rqf.deleteAll();
+//				prf.deleteAll();
+//				flushAllPipelineJobs();
+				
+			} 
+			return "Cleanup underway!";
+		} catch (Throwable ex) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+				return null;
+			
 		}
 	}
 

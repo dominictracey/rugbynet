@@ -2,13 +2,20 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
+import com.github.gwtbootstrap.client.ui.Container;
+import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HTMLPanel;
+
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.PortalPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
@@ -49,6 +56,8 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	private EditTTLInfo ttltext;
 
 	protected boolean isTimeSeries= false;
+	private MenuItemDelegate menuItemDelegate;
+	
 
 	public PortalActivity(PortalPlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IPlayerRating>();
@@ -122,6 +131,8 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 													final boolean isTimeSeries = result.isTimeSeries();
 													//if (!result.isTimeSeries()) {
 														clientFactory.getRpcService().getRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
+
+															private List<IPlayerRating> currentList;
 
 															@Override
 															public void onFailure(Throwable caught) {
@@ -402,6 +413,16 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 
 		ttltext.setText("Top Ten List Properties");
 		data.setTitle("Top Ten Performances for ");
+		
+		ttltext.removePlayers();
+		
+		for (int i=0; i<10; ++i)
+		{
+			if (view.getCurrentList() != null && view.getCurrentList().size() > i) {
+				IPlayer p = view.getCurrentList().get(i).getPlayer();
+				ttltext.addTwitterPlayer(p);				
+			}
+		}
 		ttltext.setPresenter(this);
 		ttltext.showTTI(data);
 	}
@@ -409,7 +430,7 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	@Override
 	public void saveTTIText(final TopTenSeedData tti) {
 		ttltext.hide();
-		clientFactory.getRpcService().createTopTenList(tti, new AsyncCallback<TopTenSeedData>() {
+		clientFactory.getRpcService().createTopTenList(tti, ttltext.getTwitterDictionary(), new AsyncCallback<TopTenSeedData>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -420,6 +441,7 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 			public void onSuccess(TopTenSeedData result) {
 				if (result != null) {
 					Window.alert("Top ten list created: " + result.getTitle());
+					
 				} else {
 					Window.alert("Problem creating top ten list for " + tti.getTitle());
 				}
@@ -604,6 +626,18 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	}
 
 
-
+	@Override
+	public void cleanUp() {
+		getMenuItemDelegate().cleanUp();
+		
+	}
+	
+	private MenuItemDelegate getMenuItemDelegate() {
+		if (menuItemDelegate == null) {
+			menuItemDelegate = new MenuItemDelegate(clientFactory);
+		}
+		
+		return menuItemDelegate;
+	}
 
 }

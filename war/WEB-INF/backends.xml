@@ -1,8 +1,0 @@
-<backends>
-	<backend name="bpm">
-		<options>
-			<dynamic>true</dynamic>
-			<public>true</public>
-		</options>
-	</backend>
-</backends>

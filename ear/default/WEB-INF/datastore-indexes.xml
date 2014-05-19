@@ -1,0 +1,46 @@
+<!-- Indices written at Thu, 8 Sep 2011 04:45:30 UTC -->
+
+<datastore-indexes autoGenerate="true">
+
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="Player" ancestor="false" source="auto">
+        <property name="teamID" direction="asc"/>
+        <property name="overallRating" direction="desc"/>
+    </datastore-index>
+
+    <!-- Used 2 times in query history -->
+    <datastore-index kind="Player" ancestor="false" source="auto">
+        <property name="position" direction="asc"/>
+        <property name="overallRating" direction="desc"/>
+    </datastore-index>
+
+    <!-- for flushing pipelines -->
+    <datastore-index kind="Group" ancestor="false" source="manual">
+        <property name="^i" direction="asc"/>
+        <property name="fetchMatchStatsPipelineId" direction="asc"/>
+    </datastore-index>
+    
+    <!-- for deleting comps -->
+    <datastore-index kind="ScrumPlayerMatchStats" ancestor="false" source="manual">
+        <property name="matchId" direction="asc"/>
+        <property name="teamId" direction="asc"/>
+        <property name="slot" direction="asc"/>
+    </datastore-index>
+
+    <!--  for searching content -->
+    <datastore-index kind="PlayerRating" ancestor="false" source="manual">
+        <property name="matchId" direction="asc"/>
+        <property name="rating" direction="asc"/>
+    </datastore-index>
+    
+    <datastore-index kind="PlayerRating" ancestor="false" source="manual">
+        <property name="queryId" direction="asc"/>
+        <property name="rating" direction="desc"/>
+    </datastore-index>
+    
+    <datastore-index kind="Standing" ancestor="false" source="manual">
+        <property name="roundId" direction="asc"/>
+        <property name="standing" direction="asc"/>
+    </datastore-index>
+    
+</datastore-indexes>

@@ -19,7 +19,7 @@ public class AdminOrchestrationActions {
 		FETCH ("Fetch"),
 		MATCH_STALE_NEEDS_ATTENTION ("Stale, needs attention"), 
 		MATCH_STALE_MARK_UNREPORTED ("Stale, mark unreported"), 
-		UNLOCK ("Unlock");
+		UNLOCK ("Unlock"), FETCHSTATS ("Fetch Stats");
 		
 		private String value;
 		private final static String actionKey = "Action";
@@ -78,7 +78,8 @@ public class AdminOrchestrationActions {
 	
 	public enum RatingActions implements IOrchestrationActions<IRatingQuery> { 
 		
-		GENERATE ("Generate Ratings");
+		GENERATE ("Generate Ratings"),
+		CLEANUP ("Clean Up");
 		
 		private String value;
 		private final static String actionKey = "Action";

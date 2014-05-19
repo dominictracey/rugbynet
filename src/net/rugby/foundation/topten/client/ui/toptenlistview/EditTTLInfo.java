@@ -63,6 +63,7 @@ public class EditTTLInfo extends DialogBox {
 		this.list = list;
 		title.setText(list.getTitle());
 		description.setText(list.getContent());
+		this.setWidth("800px");
 		show();
 	}
 

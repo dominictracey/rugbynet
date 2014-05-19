@@ -192,4 +192,10 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 		return true;	
 	}
 
+	@Override
+	public void deleteAll() {
+		return;
+		
+	}
+
 }

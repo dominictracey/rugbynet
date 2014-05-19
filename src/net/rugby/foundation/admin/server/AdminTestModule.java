@@ -30,6 +30,7 @@ import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.test.TestRatingQueryFactory;
+
 import com.google.inject.AbstractModule;
 
 public class AdminTestModule extends AbstractModule {

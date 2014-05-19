@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 
 @Entity
 public class TopTenList  implements Serializable, ITopTenList {
@@ -26,16 +27,20 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected Date published;
 	protected Date expiration;
 	protected Boolean live;
+	@Unindexed
 	protected String summary;
 	protected Long editorId;
+	@Unindexed
 	protected String pipeLineId;
 	protected String title;
+	@Unindexed
 	protected String content;
 	protected Long nextId;
 	protected Long nextPublishedId;
 	protected Long prevId;
 	protected Long prevPublishedId;
 	protected Long compId;
+	protected Long queryId;
 	
 	public class TopTenListSummary implements ITopTenListSummary {
 		protected Long id;
@@ -223,6 +228,14 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setItemIds(List<Long> itemIds) {
 		this.itemIds = itemIds;
+	}
+	@Override
+	public Long getQueryId() {
+		return queryId;
+	}
+	@Override
+	public void setQueryId(Long id) {
+		this.queryId = id;
 	}
 
 }

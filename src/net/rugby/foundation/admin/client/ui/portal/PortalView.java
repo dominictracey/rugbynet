@@ -65,4 +65,6 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 
 	public abstract void showTimeWeightedMatchInfo(List<IPlayerRating> result);
 
+	public abstract List<IPlayerRating> getCurrentList();
+
 }

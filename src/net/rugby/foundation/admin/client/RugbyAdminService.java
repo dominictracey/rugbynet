@@ -115,7 +115,7 @@ public interface RugbyAdminService extends RemoteService {
 	Boolean flushAllPipelineJobs();
 	
 	// top ten list
-	TopTenSeedData createTopTenList(TopTenSeedData tti);
+	TopTenSeedData createTopTenList(TopTenSeedData tti, Map<IPlayer, String> twitterMap);
 	
 	IContent createContent(Long id, String content);
 	List<IContent> getContentList(boolean onlyActive);
@@ -130,4 +130,5 @@ public interface RugbyAdminService extends RemoteService {
 	Boolean deleteRatingQuery(IRatingQuery query);
 	String checkPipelineStatus(String id, Long matchId);
 	IMatchGroup AddMatchToRound(IRound round);
+	String cleanUp();
 }

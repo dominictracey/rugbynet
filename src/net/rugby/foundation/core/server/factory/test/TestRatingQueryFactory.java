@@ -33,7 +33,7 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 			rq.setScaleComp(false);
 			rq.setScaleStanding(false);
 			rq.setScaleTime(false);
-			if (id >= 700L && id <= 704L) {
+			if (id >= 700L && id <= 705L) {
 				rq.setId(id);
 				if (id == 700L) { // round 1
 					rq.getCompIds().add(1L);
@@ -54,6 +54,12 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 				} else if (id == 704L) { // time series - round 1 and round 2
 					rq.getRoundIds().add(2L);
 					rq.getRoundIds().add(3L);
+				} else if (id == 705L) { // time series - round 1 and round 2 - unscaled
+					rq.getRoundIds().add(2L);
+					rq.getRoundIds().add(3L);
+					rq.setScaleComp(true);
+					rq.setScaleStanding(true);
+					rq.setScaleTime(true);
 				}
 			}
 			return rq;
@@ -100,6 +106,12 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void deleteAll() {
+		return;
+		
 	}
 
 }

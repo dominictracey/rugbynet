@@ -48,12 +48,17 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	protected Map<Long,ITeamMatchStats> tmsHomeMap = new HashMap<Long,ITeamMatchStats>();
 	protected Map<Long,ITeamMatchStats> tmsVisitMap = new HashMap<Long,ITeamMatchStats>();
 	protected List<IPlayerMatchStats> pmsList = new ArrayList<IPlayerMatchStats>();
+	// Key: matchId; Value: scaling factor (0-1) based on the round standings for the home and visiting teams in the match
 	protected Map<Long,Float> standingsFactorMap = new HashMap<Long,Float>();
 	protected Map<Long,Float> matchCompWeights = new HashMap<Long,Float>(); // maps a matchId to a competition weightingFactor
+	// Key: playerId; Value: List of PlayerStatShares for that player in the current query context
 	Map<Long, List<IPlayerStatShares>> playerScoreMap = new HashMap<Long, List<IPlayerStatShares>>();
+	// Key: matchId; Value: match label
 	protected final Map<Long, String> matchLabelMap = new HashMap<Long, String>();
+	// Key: matchId; Value: scaling factor for that match based on how long ago it occurred
 	protected final Map<Long, Float> matchTimeScaleMap = new HashMap<Long, Float>();
-	protected final int maxAge = 100;
+	// Given the current linear aging of match results, the number of days before a match becomes worthless (i.e. scaling of 0)
+	protected final int maxAge = 365;
 
 	protected IMatchGroupFactory mf;
 	protected IPlayerFactory pf;
@@ -67,6 +72,38 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	protected ICompetitionFactory cf;
 	protected IMatchResultFactory mrf;
 
+	public List<IPlayerRating> mrl;
+	public IRatingQuery query;
+
+	// the sum of all of the stats*schemaValues
+	protected float totalRawScore;
+//	private float totalUnscaledScore;
+	// the sum of all the stats*schemaValues*scalingFactor
+	private float totalScaledScore;
+
+	// these are the green items in column D of the simulator
+	// flat number of PlayerMatchStats (D7)
+	protected int numStats = 0;
+	// sum of the standing scaling factors used for the PMSs. 
+	private float numStatsStandingsScaled;
+	// sum of the comp scaling factors used for the PMSs. (D13)
+	private float numStatsCompScaled;
+	// sum of the time scaling factors used for the PMSs. (D10)
+	private float numStatsTimeScaled;
+	// sum of the all scaling factors used for the PMSs. (D32)
+	private float numStatsTotalScaled;
+	// and we keep them in here to make an attempt at scalability
+	protected Map<String,Float> scaleTotalNumMap = new HashMap<String,Float>();
+
+	//this is the totals in (yellow) column F of the simulator
+	protected Map<String, Float> scaleTotalMap = new HashMap<String,Float>();
+
+	protected final String COMP_SCALE_KEY="Competition";
+	protected final String AGE_SCALE_KEY="MatchAge";
+	protected final String STANDINGS_SCALE_KEY="Standings";
+	protected final String NO_SCALE_KEY="Unscaled";
+	protected final String ALL_SCALE_KEY="ActualScaled";
+	
 	public ScrumQueryRatingEngineV100() {
 
 	}
@@ -94,36 +131,6 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	}
 
 
-	// this is odd... it's different than the number of people who get on the field during the game (numPlayers below)
-	// need to think more about what this means. 
-	// The danger we want to avoid is a team that uses subs "diluting" its players' rankings.
-	//
-	//private final int playersOnField = 30;
-
-	public List<IPlayerRating> mrl;
-	public IRatingQuery query;
-
-	protected float totalRawScore;
-	private float totalUnscaledScore;
-	private float totalScaledScore;
-
-	// these are the green items in column D of the simulator
-	protected int numStats = 0;
-	private float numStatsStandingsScaled;
-	private float numStatsCompScaled;
-	private float numStatsTimeScaled;
-	private float numStatsTotalScaled;
-	// and we keep them in here to make an attempt at scalability
-	protected Map<String,Float> scaleTotalNumMap = new HashMap<String,Float>();
-
-	//this is the totals in column F of the simulator
-	protected Map<String, Float> scaleTotalMap = new HashMap<String,Float>();
-
-	protected final String COMP_SCALE_KEY="Competition";
-	protected final String AGE_SCALE_KEY="MatchAge";
-	protected final String STANDINGS_SCALE_KEY="Standings";
-	protected final String NO_SCALE_KEY="Unscaled";
-	protected final String ALL_SCALE_KEY="ActualScaled";
 
 
 
@@ -664,7 +671,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	}
 
 	protected void accumulateScores(IPlayerStatShares pss) {
-		totalUnscaledScore += pss.getUnscaledScore();	
+		//totalUnscaledScore += pss.getUnscaledScore();	
 		totalScaledScore += pss.getScaledScore();
 	}
 
@@ -713,7 +720,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				pr.setDetails(pr.getDetails()+s.getSummaryRow(scaleTotalNumMap, scaleTotalMap));
 			}
 
-			pr.setRating(Math.round((scores/totalScaledScore)*500*numStats)); //TotalScaled));
+			pr.setRating(Math.round((scores/totalScaledScore)*500*playerScoreMap.keySet().size())); //numStats)); //TotalScaled));
 
 			prf.put(pr);
 			mrl.add(pr);
@@ -828,13 +835,13 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 	protected void sendReport() {
 		AdminEmailer emailer = new AdminEmailer();
-		String sep = " =================== ";
+		String sep = " ================== ";
 		emailer.setSubject("Rating Engine Report");
 
-		String body = " PlayerMatchStats count: " + pmsList.size() + " TMS count: " + (tmsHomeMap.size() + tmsVisitMap.size()) + "\n";
-		body += query.toString() + "\n";
-		body += "http://www.rugby.net/Admin.html#PortalPlace::queryId=" + query.getId().toString() + "\n";
-		body += sep + "Overall" + sep + "\n" + sep + sep + "\n";
+		String body = "<p> PlayerMatchStats count: " + pmsList.size() + " TMS count: " + (tmsHomeMap.size() + tmsVisitMap.size()) + "</p><p>";
+		body += query.toString() + "</p><p>";
+		body += "http://www.rugby.net/Admin.html#PortalPlace::queryId=" + query.getId().toString() + "</p><p>";
+		body += "<hr> Overall" + "</p><pre>";
 
 		StatisticalSummary ss = new SummaryStatistics();
 		for (IPlayerRating r : mrl) {
@@ -880,7 +887,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 					}
 				}
 			}
-			body += ss.toString();
+			if (ss.getN() > 0)
+				body += ss.toString();
 		}
 
 		body += sep + "Matches" + sep + "\n" + sep + sep + "\n";
@@ -905,9 +913,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 					}
 				}	
 			}
-			body += ss.toString();
+			if (ss.getN() > 0)
+				body += ss.toString();
 		}
-		emailer.setMessage(body);
+		emailer.setMessage(body + "</pre>");
 		emailer.setSubject(query.toString());
 		emailer.send();
 	}

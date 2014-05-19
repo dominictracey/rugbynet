@@ -14,7 +14,9 @@
             
         <g:HTML ui:field='image'></g:HTML></div><h3><g:HTML ui:field='name'></g:HTML></h3> 
             
-        <g:HTML ui:field='text'></g:HTML></div>
+        <g:HTML ui:field='text'></g:HTML>
+        
+        </div>
         <g:HTMLPanel ui:field='fblike'></g:HTMLPanel>
     </b:Well>
 

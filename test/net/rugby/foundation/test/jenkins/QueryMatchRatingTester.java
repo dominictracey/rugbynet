@@ -217,6 +217,28 @@ public class QueryMatchRatingTester {
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
 	}
 	
+	@Test
+	public void testGenerate705() {
+
+		IRatingQuery rq = rqf.get(705L);
+		IQueryRatingEngine qre = qref.get(mresf.getDefault(), rq);
+		
+		assertTrue(rq.isTimeSeries());
+		
+		qre.setQuery(rq);
+		qre.generate(mresf.getDefault(),true,true,true);
+		
+		StatisticalSummary ss = qre.getStatisticalSummary();
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+		
+		assertTrue(ss.getMean()>498 && ss.getMean()<502);
+		rq = rqf.get(705L);
+		assertTrue(rq.getStatus() == Status.COMPLETE);
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
+	}
+	
 //	@Test
 //	public void testOrchestrationQueue() {
 //		// put the query in the database

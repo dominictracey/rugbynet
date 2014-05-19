@@ -2,7 +2,10 @@ package net.rugby.foundation.topten.server.factory.test;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.google.inject.Inject;
@@ -30,6 +33,8 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 	protected ICompetitionFactory cf;
 	private Random r = new Random();
 
+	private Map<Long,List<ITopTenList>> listMap = new HashMap<Long,List<ITopTenList>>();
+	
 	@Inject
 	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf) {
 		super(mf,tf, rf, pmsf, rqf, prf);
@@ -212,11 +217,33 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 						nextId = ttl.getNextPublishedId();
 					}
 				}
-				if (ttl != null && ttl.getLive())
+				if (ttl != null && ttl.getLive()) {
+					setLatestPublishedForComp(ttl,compId);
 					return ttl;
-				else 
+				} else 
 					return null;
-			}
+			} else if (compId.equals(2L)) {
+				List<ITopTenList> set = null;
+				if (!listMap.containsKey(compId)) {
+					throw new RuntimeException("something is fucked up");
+				} else {
+					set = listMap.get(compId);
+				}
+				int index = set.size()-1;
+				ITopTenList cursor =  set.get(index); // last created should be last in list
+				//scan back to find the last published one.
+				while (cursor != null && !cursor.getLive() && index>0) {
+					index--;
+					cursor = set.get(index);
+					if (cursor.getLive())
+						return cursor;
+				}
+				
+				if (index==0 && !cursor.getLive())
+					return null; // didn't find
+				else
+					return cursor;
+			} 
 			else return null;
 		}
 	}
@@ -238,8 +265,15 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 				}
 				setLastCreatedForComp(ttl,compId);
 				return ttl;
-			}
-			else {
+			} else if (compId.equals(2L)) {
+				List<ITopTenList> set = null;
+				if (!listMap.containsKey(compId)) {
+					return null;  // no lists created yet
+				} else {
+					set = listMap.get(compId);
+				}
+				return set.get(set.size()-1); // last created should be last in list
+			} else {
 				return null;
 			}
 		}
@@ -249,8 +283,21 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 
 	@Override
 	protected void deleteFromPersistentDatastore(ITopTenList list) {
-		//no-op
-
+		if (list == null || list.getId() == null) {
+			return; // we already don't have it.
+		}
+		
+		if (list.getCompId().equals(2L)) {
+			// first confirm we have a list for this comp
+			List<ITopTenList> set = null;
+			if (!listMap.containsKey(list.getCompId())) {
+				throw new RuntimeException("something is fucked up");
+			} else {
+				set = listMap.get(list.getCompId());
+			}
+			
+			set.remove(list);
+		}
 	}
 
 
@@ -268,6 +315,34 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 		if (list.getId() == null) {
 			list.setId(r.nextLong());
 		}
+		
+		// first confirm we have a list for this comp
+		List<ITopTenList> set = null;
+		if (!listMap.containsKey(list.getCompId())) {
+			set = new ArrayList<ITopTenList>();
+			listMap.put(list.getCompId(), set);
+		} else {
+			set = listMap.get(list.getCompId());
+		}
+		
+		// now check if the list already has this list and delete it so we can re-add it.
+		boolean found = false;
+		Iterator<ITopTenList> it = set.iterator();
+		
+		ITopTenList cursor = null;
+		while (it.hasNext() && !found) {
+			cursor = it.next();
+			if (cursor.getId().equals(list.getId())) {
+				found = true;
+				break;
+			}
+		}
+		
+		if (found)
+			set.set(set.indexOf(cursor), list);
+		else
+			set.add(list);
+		
 		return list;
 	}
 

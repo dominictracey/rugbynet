@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.datastore.QueryResultIterable;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Query;
 import com.googlecode.objectify.Key;
@@ -21,9 +22,10 @@ import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerRating;
+import net.rugby.foundation.model.shared.RatingQuery;
 
 public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> implements IPlayerRatingFactory {
-	
+
 	private IPlayerFactory pf;
 	private IPlayerMatchStatsFactory pmsf;
 
@@ -32,7 +34,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		this.pf = pf;
 		this.pmsf = pmsf;
 	}
-	
+
 	@Override
 	public IPlayerRating create() {
 		try {
@@ -73,7 +75,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			if (rq != null) {
 				Objectify ofy = DataStoreFactory.getOfy();
 				ofy.put(rq);
-				
+
 				return rq;
 			} else {
 				return null;
@@ -89,7 +91,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			ofy.delete(rq);
-			
+
 			return true;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -102,7 +104,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			// confirm list is in ascending order
-			Query<PlayerRating> prq = ofy.query(PlayerRating.class).filter("queryId", query.getId());
+			Query<PlayerRating> prq = ofy.query(PlayerRating.class).filter("queryId", query.getId()).order("-rating").limit(30);
 			List<IPlayerRating> list = new ArrayList<IPlayerRating>();
 			list.addAll(prq.list());
 			for (IPlayerRating r : list) {
@@ -125,11 +127,11 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		try {
 			if (rq != null) {
 				Objectify ofy = DataStoreFactory.getOfy();
-	
+
 				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("queryId", rq.getId());
 				ofy.delete(qpmr);
 
-				
+
 			} else {
 				return false; // null query
 			}
@@ -138,7 +140,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			return false;
 		}
 		return true;	
-		
+
 	}
 
 	@Override
@@ -146,11 +148,11 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		try {
 			if (m != null) {
 				Objectify ofy = DataStoreFactory.getOfy();
-	
+
 				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("groupId", m.getId());
 				ofy.delete(qpmr);
 
-				
+
 			} else {
 				return false; // null match
 			}
@@ -181,11 +183,11 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		try {
 			if (schema != null) {
 				Objectify ofy = DataStoreFactory.getOfy();
-	
+
 				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("schemaId", schema.getId());
 				ofy.delete(qpmr);
 
-				
+
 			} else {
 				return false; // null query
 			}
@@ -195,6 +197,21 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		}
 		return true;	}
 
-	
+
+	@Override
+	public void deleteAll() {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			QueryResultIterable<Key<PlayerRating>> keys = ofy.query(PlayerRating.class).fetchKeys();
+			ofy.delete(keys);
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+		}	
+
+	}
+
+
+
 
 }

@@ -81,6 +81,8 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	private boolean waiting = false; // used to see if matchStats fetching is complete
 	private boolean ready = false;
 
+	private MenuItemDelegate menuItemDelegate = null;
+	
 	public CompActivity(AdminCompPlace place, ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
 		view = clientFactory.getCompView();
@@ -1410,4 +1412,21 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			}
 
 		});		}
+
+
+
+	@Override
+	public void cleanUp() {
+		getMenuItemDelegate().cleanUp();
+		
+	}
+	
+	private MenuItemDelegate getMenuItemDelegate() {
+		if (menuItemDelegate == null) {
+			menuItemDelegate = new MenuItemDelegate(clientFactory);
+		}
+		
+		return menuItemDelegate;
+	}
+	
 }

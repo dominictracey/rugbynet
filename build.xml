@@ -1,0 +1,51 @@
+<project>
+  <property name="engine.dir" location="ear/engine/WEB-INF" />
+  <property name="default.dir" location="ear/default/WEB-INF" />
+  <property name="sdk.dir" location="C:/Program Files/Google/appengine-java-sdk-1.9.2" />
+
+  <import file="${sdk.dir}/config/user/ant-macros.xml" />
+  <target name="copyclasses"
+      description="Copies the classes out of default to engine war.">
+    <copy
+        todir="${engine.dir}/classes"
+        flatten="false">
+      <fileset dir="${default.dir}/classes">
+        <include name="**/*.class" />
+      </fileset>
+    </copy>
+  </target>
+    <target name="copylibs"
+      description="Copies the classes out of default to engine war.">
+    <copy
+        todir="${engine.dir}/lib"
+        flatten="false">
+      <fileset dir="${default.dir}/lib">
+        <include name="**/*.jar" />
+      </fileset>
+    </copy>
+  </target>
+   <target name="runengine" 
+      description="Starts the development server.">
+    <dev_appserver war="ear/engine" port="8888" >
+      <options>
+        <arg value="--jvm_flag=-Xdebug"/>
+        <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9999"/>
+        <arg value="--datastore_path=C:/Users/home/code/RugbyBase/ear/default/WEB-INF/appengine-generated/local_db.bin"/>
+      </options>
+    </dev_appserver>
+  </target>
+     <target name="runfrontend" 
+      description="Starts the development server.">
+    <dev_appserver war="ear/default" port="7777" >
+      <options>
+        <arg value="--jvm_flag=-Xdebug"/>
+        <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9999"/>
+        <arg value="--datastore_path=C:/Users/home/code/RugbyBase/ear/default/WEB-INF/appengine-generated/local_db.bin"/>
+      </options>
+    </dev_appserver>
+  </target>
+    <target name="updateEngine" 
+      description="Uploads the application to App Engine.">
+    <appcfg action="update" war="ear/engine" />
+  </target>
+</project>

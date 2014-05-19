@@ -8,7 +8,7 @@ public class FacebookPromoter implements IPromotionHandler {
 	public String process(ITopTenList ttl) {
 		String retval = "<p>******** FACEBOOK ********</p>\n";
 		{
-			String URL = "http://www.rugby.net/fb/topten.html?listId="+ttl.getId() + "\"";
+			String URL = "http://www.rugby.net/fb/topten.html?listId="+ttl.getId() + "#listId="+ttl.getId();
 			retval += "<p><a href=\"http://www.facebook.com/sharer.php?src=sp&u="+ URL +">Share on FB</a></p>\n";
 
 		}

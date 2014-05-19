@@ -138,6 +138,12 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	private final static String FB_BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/fb/topten.html";
 	private final static String FB_PROD_BASE_TOPTEN_URL = "http://www.rugby.net/fb/topten.html";
 	
+	// engine 
+	private final static String LOCAL_ENGINE_URL = "/admin";
+	private final static String DEV_ENGINE_URL = "/engine";
+	private final static String BETA_ENGINE_URL = "/engine";
+	private final static String PROD_ENGINE_URL = "/engine";
+	
 	private final static String FACEBOOK_APPID = "499268570161982";
 //	private final static String FACEBOOK_APPSECRET = "c3550da86a7233c5398129a2b1317495";
 	
@@ -625,6 +631,22 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 			throw (new RuntimeException("Environment not set"));
 		}
 	}
+	
+	@Override
+	public String getEngineUrl() {
+		if (environment == Environment.PROD) {
+			return PROD_ENGINE_URL;
+		} else if (environment == Environment.BETA){
+			return BETA_ENGINE_URL;
+		} else if (environment == Environment.DEV){
+			return DEV_ENGINE_URL;
+		} else if (environment == Environment.LOCAL){
+			return LOCAL_ENGINE_URL;
+		} else {
+			throw (new RuntimeException("Environment not set"));
+		}
+	}
+
 	
 	@Override
 	public String getFacebookAppid() {

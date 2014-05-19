@@ -50,6 +50,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@UiField MenuBar schemaList;
 	@UiField MenuItem adminMenuFlushAllPipelineJobs;
 	@UiField MenuItem adminMenuCreateContent;
+	@UiField MenuItem adminMenuCleanup;
 	@UiField MenuBar contentList;
 
 	private SchemaPresenter schemaListener;
@@ -97,6 +98,14 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			@Override
 			public void execute() {
 				listener.flushAllPipelineJobs();	
+			}
+
+		});
+		adminMenuCleanup.setCommand(new Command() {
+
+			@Override
+			public void execute() {
+				listener.cleanUp();	
 			}
 
 		});
