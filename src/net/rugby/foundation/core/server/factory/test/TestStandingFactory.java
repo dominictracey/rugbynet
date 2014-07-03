@@ -66,8 +66,7 @@ public class TestStandingFactory extends BaseCachingFactory<IStanding> implement
 				t.setId(id);
 				t.setRoundId(id/10000L);
 				t.setTeamId(id-t.getRoundId()*10000L);
-				rf.setId(t.getRoundId());
-				t.setRound(rf.getRound());
+				t.setRound(rf.get(t.getRoundId()));
 				t.setTeam(tf.get(t.getTeamId()));
 				long l = t.getTeamId();
 				int i = (int) l-9000;

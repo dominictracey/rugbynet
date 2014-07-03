@@ -109,7 +109,7 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 		}	
 	}
 
-	private void deleteFromMemcache(T t) {
+	protected void deleteFromMemcache(T t) {
 		try {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(t.getId());

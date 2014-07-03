@@ -27,6 +27,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	
 	// default compId
 	private Long defaultCompId;
+	private Long globalCompId;
 	
 	// environments
 	public enum Environment { LOCAL, DEV, BETA, PROD }
@@ -541,6 +542,14 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	@Override
 	public void setDefaultCompId(Long defaultCompId) {
 		this.defaultCompId = defaultCompId; 
+	}
+	@Override
+	public Long getGlobalCompId() {
+		return globalCompId;
+	}
+	@Override
+	public void setGlobalCompId(Long globalCompId) {
+		this.globalCompId = globalCompId;
 	}
 
 	@Override

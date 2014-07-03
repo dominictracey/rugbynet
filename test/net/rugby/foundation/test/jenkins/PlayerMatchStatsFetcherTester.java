@@ -241,6 +241,29 @@ public class PlayerMatchStatsFetcherTester {
 		}
 	}
 	
+	@Test
+	public void testRichieMcCaw() { // left, then came back
+		IPlayer p = pf.create();
+		p.setScrumId(13784L);
+		p.setSurName("McCaw");
+		p.setDisplayName("Richie McCaw");
+		p.setShortName("RH McCaw");  
+
+		IMatchGroup m = getnzleng();
+		
+		
+		IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(p, m, Home_or_Visitor.HOME, 9, "testData\\Rugby Union - ESPN Scrum - New Zealand v England at Hamilton.htm");
+		
+		if (fetcher.process()) {
+		
+			IPlayerMatchStats pms = fetcher.getStats();
+			
+			assertTrue(pms != null);
+			assertTrue(pms.getTimePlayed().equals(82));
+		} else {
+			assertTrue(false); // did not process correctly
+		}
+	}
 	
 	@Test
 	public void testDanniRossouw() { // So he is in a funny position so the parser should complain!
@@ -315,6 +338,21 @@ public class PlayerMatchStatsFetcherTester {
 		ITeamGroup h = tf.create();
 		h.setId(94L);
 		h.setAbbr("QUI");
+		m.setHomeTeam(h);
+		return m;
+	}
+	
+	private IMatchGroup getnzleng() {
+		IMatchGroup m = mf.create();
+		m.setForeignId(207953L);
+		
+		ITeamGroup v = tf.create();
+		v.setId(98L);
+		v.setAbbr("ENG");
+		m.setVisitingTeam(v);
+		ITeamGroup h = tf.create();
+		h.setId(99L);
+		h.setAbbr("NZL");
 		m.setHomeTeam(h);
 		return m;
 	}

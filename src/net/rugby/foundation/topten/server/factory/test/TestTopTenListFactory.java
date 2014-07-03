@@ -11,6 +11,7 @@ import java.util.Random;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -36,8 +37,8 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 	private Map<Long,List<ITopTenList>> listMap = new HashMap<Long,List<ITopTenList>>();
 	
 	@Inject
-	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf) {
-		super(mf,tf, rf, pmsf, rqf, prf);
+	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf);
 		this.pf = pf;
 		this.cf = cf;
 	}

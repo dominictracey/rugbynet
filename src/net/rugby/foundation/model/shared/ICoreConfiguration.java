@@ -42,4 +42,6 @@ public interface ICoreConfiguration extends IHasId {
 	void removeCompUnderway(Long compId);
 	String getBaseToptenUrlForFacebook();
 	String getEngineUrl();
+	public abstract Long getGlobalCompId();
+	public abstract void setGlobalCompId(Long globalCompId);
 }

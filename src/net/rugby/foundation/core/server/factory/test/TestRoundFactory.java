@@ -6,30 +6,26 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Round;
 
-public class TestRoundFactory implements IRoundFactory {
-	private Long roundId;
+public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRoundFactory {
+
 	private IMatchGroupFactory gf;
-	//private ICompetitionFactory cf;
+
 	
 	@Inject
 	TestRoundFactory(IMatchGroupFactory gf) {
 		this.gf = gf;
 	}
-	
-	@Override
-	public void setId(Long id) {
-		this.roundId = id;
 
-	}
 
 	@Override
-	public IRound getRound() {
+	public IRound getFromPersistentDatastore(Long roundId) {
 		Round r = new Round();
 		r.setId(roundId);
 		r.setMatches(new ArrayList<IMatchGroup>());
@@ -39,21 +35,21 @@ public class TestRoundFactory implements IRoundFactory {
 		}
 		
 		// Begin COMP 1
-		if (roundId == 2L) {
+		if (roundId == 6L) {
 			r.setAbbr("1");
 			r.setName("Round 1");
 			r.setOrdinal(1);
 			r.addMatchID(100L);
 			r.addMatchID(101L);
 			r.setCompId(1L);
-		} else if (roundId == 3L) {
+		} else if (roundId == 7L) {
 			r.setAbbr("2");
 			r.setName("Round 2");
 			r.setOrdinal(2);
 			r.addMatchID(102L);
 			r.addMatchID(103L);
 			r.setCompId(1L);
-		} else if (roundId == 4L) {
+		} else if (roundId == 8L) {
 			r.setAbbr("3");			
 			r.setName("Round 3");
 			r.setOrdinal(3);
@@ -61,7 +57,7 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(105L);
 			r.addMatchID(106L);
 			r.setCompId(1L);
-		} else  if (roundId == 5L) {
+		} else  if (roundId == 9L) {
 			r.setAbbr("F");
 			r.setName("Finals");
 			r.setOrdinal(4);
@@ -129,10 +125,6 @@ public class TestRoundFactory implements IRoundFactory {
 		return r;
 	}
 
-	@Override
-	public IRound put(IRound r) {
-		return r;
-	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IRoundFactory#find(net.rugby.foundation.model.shared.IRound)
@@ -147,25 +139,29 @@ public class TestRoundFactory implements IRoundFactory {
 	 * @see net.rugby.foundation.core.server.factory.IRoundFactory#build(java.lang.Long)
 	 */
 	@Override
-	public void build(Long roundId) {
+	public void invalidate(Long roundId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public boolean delete(Long roundId) {
+	public boolean deleteFromPersistentDatastore(IRound r) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.factory.IRoundFactory#setFactories(net.rugby.foundation.core.server.factory.ICompetitionFactory, net.rugby.foundation.core.server.factory.IMatchGroupFactory)
-	 */
-//	@Override
-//	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory mf) {
-//		this.cf = cf;
-////		this.mf = mf;
-//		this.gf = mf;
-//	}
+
+	@Override
+	public IRound create() {
+		return new Round();
+	}
+
+
+	@Override
+	protected IRound putToPersistentDatastore(IRound t) {
+		// TODO Auto-generated method stub
+		return t;
+	}
+
 
 }

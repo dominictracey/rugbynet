@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
@@ -51,15 +52,17 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	private IPlayerMatchStatsFactory pmsf;
 	private IRatingQueryFactory rqf;
 	private IPlayerRatingFactory prf;
+	private IConfigurationFactory ccf;
 
 	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
-			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf) {
+			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf) {
 		this.mf = mf;
 		this.tf = tf;
 		this.rf = rf;
 		this.pmsf = pmsf;
 		this.rqf = rqf;
 		this.prf = prf;
+		this.ccf = ccf;
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -388,14 +391,14 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			// time series
 			Long compId = null;
 			for (Long rid : tti.getRoundIds()) {
-				rf.setId(rid);
-				IRound r = rf.getRound();
+				IRound r = rf.get(rid);
 				// for now, all the selected rounds need to have the same compId
 				if (compId == null) {
 					compId = r.getCompId();
 				} else {
 					if (!r.getCompId().equals(compId)) {
-						throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
+						//throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
+						return ccf.get().getGlobalCompId();
 					}
 				}
 			}

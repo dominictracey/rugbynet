@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 
 /**
@@ -48,12 +49,25 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		}
 		
 		for (Long compId : c.getCompsUnderway()) {
-			cf.setId(compId);
-			ICompetition comp = cf.getCompetition();
+			ICompetition comp = cf.get(compId);
 			c.addCompetition(compId, comp.getLongName());
 		}
 		
 
+		// confirm we have a global comp
+		if (c.getGlobalCompId() == null) {
+			ICompetition gc = cf.create();
+			gc.setAbbr("GLOBAL");
+			gc.setCompType(CompetitionType.GLOBAL);
+			gc.setLongName("Global Ratings");
+			gc.setShortName("Global");
+			gc.setUnderway(true);
+			cf.put(gc);
+			c.setGlobalCompId(gc.getId());
+			c.addCompUnderway(gc.getId());
+			c.addCompetition(gc.getId(), gc.getShortName());
+			put(c);
+		}
 		
 		return c;
 	}

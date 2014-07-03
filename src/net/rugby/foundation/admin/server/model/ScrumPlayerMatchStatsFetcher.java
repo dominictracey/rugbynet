@@ -182,14 +182,34 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	}
 	
 	private boolean isUpsideDown(List<String> eles) {
-		String tdClass = "liveTblTextBlk";
 		Iterator<String> iter = eles.iterator();
+		String line = iter.next();
+		// first get here:
+	   //   <div class="tabbertab">
+	   //    <h2>Timeline</h2>
+		while (iter.hasNext()) {
+			if (line.contains("tabbertab"))
+			{
+				line = iter.next();
+				if (line.contains("Timeline"))
+				{
+					break;
+				}
+			}
+			line = iter.next();
+		}
+		
+		String tdClass = "liveTblTextBlk";
 		int timeEle = 0;
 		while (iter.hasNext()) {
-			String line = iter.next();
+			line = iter.next();
 			if (line != null && line.length() > -1) {
 				if (line.contains(tdClass)) {
-					timeEle = Integer.parseInt(line.split("<|/|>")[2]);
+					if (!line.split("<|>")[2].contains("+")) {
+						timeEle = Integer.parseInt(line.split("<|>")[2]);
+					} else {
+						timeEle = Integer.parseInt(line.split("<|>")[2].split("[+]")[0]) + Integer.parseInt(line.split("<|>")[2].split("[+]")[1]);
+					}
 					if (timeEle > 0) {
 						return true;
 					} else if (timeEle == 0) {

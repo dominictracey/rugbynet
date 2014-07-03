@@ -106,8 +106,7 @@ public class OrchestrationCreateLeaderboard extends OrchestrationCore<IClubhouse
 				lb.setCompId(target.getCompId());
 
 				if (comp == null) {
-					cf.setId(target.getCompId());
-					comp = cf.getCompetition();
+					comp = cf.get(target.getCompId());
 				}
 
 				lb.setComp(comp);
@@ -199,8 +198,7 @@ public class OrchestrationCreateLeaderboard extends OrchestrationCore<IClubhouse
 	private void checkCompClubhouseLeague() {
 		try {
 			if (comp == null) {
-				cf.setId(target.getCompId());
-				comp = cf.getCompetition();
+				comp = cf.get(target.getCompId());
 			}
 
 			// if this is the comp clubhouse, make sure that our membership is current

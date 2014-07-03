@@ -63,8 +63,7 @@ public class OrchestrationCompTester {
 	  @Test
 	  public void testUpdateNextAndPrevOrchestration() {
 						
-			cf.setId(1L);
-			IOrchestration<ICompetition> compUpdater = of.get(cf.getCompetition(), AdminOrchestrationActions.CompActions.UPDATENEXTANDPREV);
+			IOrchestration<ICompetition> compUpdater = of.get(cf.get(1L), AdminOrchestrationActions.CompActions.UPDATENEXTANDPREV);
 			
 			ICompetition c = compUpdater.getTarget();
 			Assert.assertTrue(c.getNextRound().getId() == 4L);
@@ -80,9 +79,7 @@ public class OrchestrationCompTester {
 	  
 	  @Test
 	  public void testCompCompleteOrchestration() {
-			
-			cf.setId(3L);
-			IOrchestration<ICompetition> compUpdater = of.get(cf.getCompetition(), AdminOrchestrationActions.CompActions.COMP_COMPLETE);
+			IOrchestration<ICompetition> compUpdater = of.get(cf.get(3L), AdminOrchestrationActions.CompActions.COMP_COMPLETE);
 			
 
 			ICompetition c = compUpdater.getTarget();

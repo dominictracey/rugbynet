@@ -86,8 +86,7 @@ public abstract class BaseTeamMatchStatsFactory extends BaseCachingFactory<ITeam
 			// @REX case of just specifying the comp and not the rounds (want all rounds)
 			List<ITeamMatchStats> tmss = new ArrayList<ITeamMatchStats>();
 			for (Long rid : rq.getRoundIds()) {
-				rf.setId(rid);
-				IRound r = rf.getRound();
+				IRound r = rf.get(rid);
 				for (IMatchGroup m : r.getMatches()) {
 					ITeamMatchStats h = getHomeStats(m);
 					if (h != null) {

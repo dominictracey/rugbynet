@@ -70,7 +70,7 @@ public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements S
 			return null;
 		}
 
-		String url = match.getForeignUrl()+"?view=scorecard";
+		String url = match.getForeignUrl(); //+"?view=scorecard";
 
 		Logger.getLogger("FetchedPlayer").log(Level.INFO,"Starting generate match ratings for url " + url);
 

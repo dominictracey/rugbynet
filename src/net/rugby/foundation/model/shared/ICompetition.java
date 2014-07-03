@@ -10,7 +10,7 @@ import java.util.List;
  * @author home
  *
  */
-public interface ICompetition {
+public interface ICompetition extends IHasId {
 
 	public enum CompetitionType {HEINEKEN_CUP, AVIVA_PREMIERSHIP, SUPER_RUGBY, AUTUMN_INTERNATIONALS, GLOBAL}
 

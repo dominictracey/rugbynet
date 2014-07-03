@@ -737,8 +737,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	}
 
 	protected void getStandingFactorForMatch(IMatchGroup m) {
-		rf.setId(m.getRoundId());
-		IRound r = rf.getRound();
+		IRound r = rf.get(m.getRoundId());
 		List<IStanding> list = sf.getForRound(r);
 
 		int sTot = 0;
@@ -769,10 +768,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		// and the comp weightingFactor
 		if (!matchCompWeights.containsKey(m.getId())) {
 
-			rf.setId(m.getRoundId());
-			IRound r = rf.getRound();
-			cf.setId(r.getCompId());
-			ICompetition c = cf.getCompetition();
+			IRound r = rf.get(m.getRoundId());
+			ICompetition c = cf.get(r.getCompId());
 			if (c.getWeightingFactor() != null) {
 				matchCompWeights.put(m.getId(), c.getWeightingFactor());
 			} else {
@@ -933,10 +930,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	protected String getMatchLabel(IPlayerMatchStats pms) {
 		if (!matchLabelMap.containsKey(pms.getMatchId())) {
 			IMatchGroup m = mf.get(pms.getMatchId());
-			rf.setId(m.getRoundId());
-			IRound r = rf.getRound();
-			cf.setId(r.getCompId());
-			ICompetition c = cf.getCompetition();
+			IRound r = rf.get(m.getRoundId());
+			ICompetition c = cf.get(r.getCompId());
 			int hScore = 0;
 			int vScore = 0;
 			if (m.getSimpleScoreMatchResultId() != null) {

@@ -189,8 +189,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	@Test
 	public void testExistingPlayer() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
+		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 14505L, 1L);
@@ -233,8 +232,8 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	@Test
 	public void testFetchNeilBest() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
+
+		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Neil Best", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 15048L, 1L);
@@ -277,8 +276,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 	@Test
 	public void testProblemPlayer() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
+		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 92047L, 1L);
@@ -327,7 +325,6 @@ public class PlayerWorkFlowTester extends PipelineTest {
 
 		String url = "http://www.espnscrum.com/scrum/rugby/current/match/93503.html?view=scorecard";
 		IMatchGroup match = mf.get(300L);
-		cf.setId(1L);
 
 		IPlayer p = pf.get(9001014L);
 		

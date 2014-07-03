@@ -26,8 +26,7 @@ public class StandingsFetcherFactory implements IStandingsFetcherFactory {
 	public IStandingsFetcher getFetcher(IRound r) {
 		ICompetition c = null;
 		if (r.getCompId() != null) {
-			cf.setId(r.getCompId());
-			c = cf.getCompetition();
+			c = cf.get(r.getCompId());
 		}
 		
 		if (c != null && c.getCompType() == ICompetition.CompetitionType.HEINEKEN_CUP) {

@@ -67,8 +67,7 @@ public class StandingTester {
 	@Test
 	public void testGetStandingsByRound() {
 
-		rf.setId(2L);
-		IRound r = rf.getRound();
+		IRound r = rf.get(2L);
 		List<IStanding> list = sf.getForRound(r);
 		
 		assertTrue(list.get(0).getRoundId().equals(2L));

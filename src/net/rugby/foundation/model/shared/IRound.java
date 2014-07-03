@@ -10,7 +10,7 @@ import java.util.Date;
  * @author home
  *
  */
-public interface IRound {
+public interface IRound extends IHasId {
 
 	public abstract Long getId();
 

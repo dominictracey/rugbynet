@@ -267,8 +267,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				ICompetition compDB = null;
 				for (ICompetition dBComp : comps) {
 					if (dBComp.getLongName().equals(comp.getLongName())) {
-						cf.setId(comp.getId());
-						compDB = dBComp; //cf.getCompetition();//ofy.query(Competition.class).filter("longName", comp.getLongName()).get();				
+						compDB = dBComp;			
 					}
 				}
 
@@ -535,8 +534,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 
 				for (IOrchestrationConfiguration oc : list) {
-					cf.setId(oc.getCompID());
-					newMap.put(cf.getCompetition().getLongName(), oc);
+					newMap.put(cf.get(oc.getCompID()).getLongName(), oc);
 				}
 
 				return newMap;
@@ -711,8 +709,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				// create one with picks for all the winning teams.
 				List<Long> compIds = wfcf.get().getUnderwayCompetitions();
 				for (Long compId: compIds) {
-					cf.setId(compId);
-					ICompetition comp = cf.getCompetition();
+					ICompetition comp = cf.get(compId);
 					IRound r = comp.getPrevRound();
 					if (r != null) {
 						ef.setRoundAndComp(null, comp);
@@ -868,9 +865,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ICompetition getComp(Long compId) {
 		try {
 			if (checkAdmin()) {
-				cf.setId(compId);
-				return cf.getCompetition();
-
+				return cf.get(compId);
 			} else {
 				return null;
 			}
@@ -1332,8 +1327,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				
 				// check that we have all the comps for the rounds specified, in multi-comp queries this info is missing
 				for (Long rid : rq.getRoundIds()) {
-					rf.setId(rid);
-					IRound r = rf.getRound();
+					IRound r = rf.get(rid);
 					if (r != null) {
 						if (!rq.getCompIds().contains(r.getCompId())) {
 							rq.getCompIds().add(r.getCompId());
@@ -1622,7 +1616,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public Boolean deleteComp(Long id) {
 		try {
 			if (checkAdmin()) {
-				return cf.delete(id);
+				ICompetition c = cf.get(id);
+				if (c != null) {
+					return cf.delete(c);
+				} else {
+					return false;
+				}
 			} else {
 				return null;
 			}
@@ -1751,8 +1750,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<IStanding> getStandings(Long roundId) {
 		try {
 			if (checkAdmin()) {
-				rf.setId(roundId);
-				return sf.getForRound(rf.getRound());
+				return sf.getForRound(rf.get(roundId));
 			} else {
 				return null;
 			}
@@ -1769,8 +1767,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				for (IStanding s: standings) {
 					sf.put(s);
 				}
-				rf.setId(roundId);
-				return sf.getForRound(rf.getRound());
+				return sf.getForRound(rf.get(roundId));
 			} else {
 				return null;
 			}
@@ -1785,14 +1782,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				if (roundId != null) {
-					rf.setId(roundId);
-					IRound r = rf.getRound();
+					IRound r = rf.get(roundId);
 					if (r != null) {
 						IStandingsFetcher fetcher = sff.getFetcher(r);
 						if (fetcher != null) {
 							if (r.getCompId() != null) {
-								cf.setId(r.getCompId());
-								ICompetition c = cf.getCompetition();
+								ICompetition c = cf.get(r.getCompId());
 								if (c != null) {
 									fetcher.setComp(c);
 									fetcher.setRound(r);
@@ -1935,8 +1930,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IMatchGroup AddMatchToRound(IRound round) {
 		try {
 			if (checkAdmin()) {
-				rf.setId(round.getId());
-				IRound r = rf.getRound();
+				IRound r = rf.get(round.getId());
 				IMatchGroup mg = mf.create();
 				mg.setDate(DateTime.now().toDate());
 				mg.setDisplayName("Change me");

@@ -78,8 +78,7 @@ public class OrchestrationServlet extends HttpServlet {
 				resp.getWriter().println("No id parameter (for comp).");
 				return;
 			}
-	        cf.setId(Long.parseLong(req.getParameter("id")));
-	        IOrchestration<ICompetition> orch = of.get(cf.getCompetition(), AdminOrchestrationActions.CompActions.valueOf(AdminOrchestrationActions.CompActions.class, action));
+	        IOrchestration<ICompetition> orch = of.get(cf.get(Long.parseLong(req.getParameter("id"))), AdminOrchestrationActions.CompActions.valueOf(AdminOrchestrationActions.CompActions.class, action));
 	        if (orch != null) {
 	        	orch.execute();
 	        }

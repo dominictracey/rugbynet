@@ -71,7 +71,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 			
 			// force top-level reload
 			if (g.getRoundId() != null) {
-				rf.build(g.getRoundId());
+				rf.invalidate(g.getRoundId());
 			}
 
 			return g;
@@ -83,8 +83,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 	
 	@Override
 	public List<IMatchGroup> getMatchesForRound(Long roundId) {
-		rf.setId(roundId);
-		IRound r = rf.getRound(); 
+		IRound r = rf.get(roundId); 
 		if (r != null) {
 			return r.getMatches();
 		} else {

@@ -71,11 +71,9 @@ public class OfyLeaderboardFactory implements ILeaderboardFactory {
 		}
 
 		if (lb != null) {
-			cf.setId(lb.getCompId());
-			lb.setComp(cf.getCompetition());
+			lb.setComp(cf.get(lb.getCompId()));
 
-			rf.setId(lb.getRoundId());
-			lb.setRound(rf.getRound());
+			lb.setRound(rf.get(lb.getRoundId()));
 
 			lf.setId(lb.getLeagueId()); 
 			lb.setLeague(lf.get());

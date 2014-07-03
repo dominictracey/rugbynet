@@ -74,44 +74,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	@Override
 	public ICompetition getComp(Long compId) {
 		try {
-			//			byte[] value = null;
-			//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			//			ICompetition c = null;
-			//
-			//			value = (byte[])syncCache.get(compId);
-			//			if (value == null) {
-			cf.setId(compId);
-			return cf.getCompetition();
-			//				if (c.getLastSaved() == null) {
-			//					c.setLastSaved(new Date());
-			//				}
-			//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			//				ObjectOutput out = new ObjectOutputStream(bos);   
-			//				out.writeObject(c);
-			//				byte[] yourBytes = bos.toByteArray(); 
-			//
-			//				out.close();
-			//				bos.close();
-			//
-			//				syncCache.put(compId, yourBytes);
-			//			} else {
-			//				Date lastUpdate = cf.getLastUpdate(compId);
-			//
-			//				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-			//				ObjectInput in = new ObjectInputStream(bis);
-			//				c = (ICompetition)in.readObject();
-			//
-			//				bis.close();
-			//				in.close();
-			//
-			//				// if there is a newer version flush the cache entry and re-try
-			//				if (c.getLastSaved().before(lastUpdate)) {
-			//					syncCache.delete(compId);
-			//					return getComp(compId);
-			//				}
-			//			}
-			//			return c;
-
+			return cf.get(compId);
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;

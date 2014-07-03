@@ -94,8 +94,7 @@ public class WorkflowCompetition implements IWorkflow {
 		
 		for (Long cid : wfc.getUnderwayCompetitions()) {
 			
-			cf.setId(cid);
-			ICompetition c = cf.getCompetition();
+			ICompetition c = cf.get(cid);
 			
 			// Check that the clubhouses are all ok (that they each have a valid CLM)
 			List<IClubhouse> clubhouses = chf.getAll();

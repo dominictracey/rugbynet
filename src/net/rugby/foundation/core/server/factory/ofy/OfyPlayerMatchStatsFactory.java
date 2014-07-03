@@ -346,8 +346,7 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 		// @REX case of just specifying the comp and not the rounds (want all rounds)
 		List<Long> matchIds = new ArrayList<Long>();
 		for (Long rid : rq.getRoundIds()) {
-			rf.setId(rid);
-			IRound r = rf.getRound();
+			IRound r = rf.get(rid);
 			for (Long mid : r.getMatchIDs()) {
 				matchIds.add(mid);
 			}
