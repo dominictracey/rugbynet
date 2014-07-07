@@ -22,6 +22,7 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 		void setTTIButtons(TopTenItemView itemView);
 		void parse(Widget widget);
 		void showRatingDetails(ITopTenItem value);
+		void setFBListLike(ITopTenList list, String baseUrl);
 	}
 	void setPresenter(TopTenListViewPresenter presenter); 
 	void setList(ITopTenList result, String baseUrl);
@@ -35,4 +36,5 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	int getItemCount();
 	void setItemCount(int i);
 
+	
 }

@@ -25,6 +25,7 @@ import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.TopTenListPlace;
+import net.rugby.foundation.topten.client.ui.toptenlistview.CompactTopTenListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText.EditTTITextPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo.EditTTLInfoPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenItemView;
@@ -43,7 +44,8 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	//private ICoreConfiguration coreConfig;
 
 	private TopTenListView<ITopTenItem> view;
-
+	private ICoreConfiguration _coreConfig;
+	private int detailCount=0;
 	public TopTenListActivity(TopTenListPlace place, ClientFactory clientFactory) {
 
 		this.clientFactory = clientFactory;
@@ -65,6 +67,8 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 		clientFactory.RegisterIdentityPresenter(this);
 
 		clientFactory.doSetup(new AsyncCallback<ICoreConfiguration>() {
+			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				// suffer in silence
@@ -72,7 +76,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(final ICoreConfiguration coreConfig) {
-				
+				_coreConfig = coreConfig;
 				if (place != null) {
 					if (place.getListId() != null) {
 						clientFactory.getRpcService().getTopTenList(place.getListId(), new AsyncCallback<ITopTenList>() {
@@ -448,7 +452,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 		// FB like for the whole list once all the items are set
 		if (view.getItemCount()>9) {
-			setFBListLike(view.getList(),clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
+			//setFBListLike(view.getList(),clientFactory.getCoreConfig().getBaseToptenUrlForFacebook());
 			refreshButtons();
 			view.setItemCount(0);
 			Element loadPanel = DOM.getElementById("loadPanel");
@@ -459,10 +463,11 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 	}
 
-	private void setFBListLike(ITopTenList list, String baseUrl) {
+	@Override
+	public void setFBListLike(ITopTenList list, String baseUrl) {
 		// set the fbLike div property
 		// data-href="http://dev.rugby.net/topten.html#List:listId=159002" 
-		Element e = Document.get().getElementById("fbLike");
+		Element e = Document.get().getElementById("fbListLike");
 		Element oldChild = e.getFirstChildElement();
 		if (oldChild != null) {
 			e.removeChild(oldChild);
@@ -470,9 +475,10 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 		// so we have to include the specifics both in the GET query parameters and the hash fragment to support the FB linting. See:
 		// https://developers.facebook.com/tools/debug/og/object?q=http%3A%2F%2Fdev.rugby.net%2Ffb%2Ftopten.html%3FlistId%3D159002%26playerId%3D148002%23List%3AlistId%3D159002%26playerId%3D148002
-		String encodedUrl= URL.encode(baseUrl + "?listId=" + list.getId() + "#List:listId=" + list.getId());
+		
+		//String encodedUrl= URL.encode(baseUrl + "?listId=" + list.getId() + "#List:listId=" + list.getId());
 
-		HTML fb = new HTML("<div class=\"fb-like\" id=\"fbListLike\" data-width=\"450\" data-layout=\"button_count\" data-show-faces=\"true\" data-send=\"true\" data-href=\"" + encodedUrl + "\"></div>");
+		HTML fb = new HTML("<br/><div class=\"fb-like\" id=\"fbListLike\" data-width=\"450\" data-layout=\"button_count\" data-show-faces=\"true\" data-send=\"true\" data-href=\"http://facebook.com/therugbynet\"></div>");
 
 		e.appendChild(fb.getElement());
 		parse("fbListLike");
@@ -534,7 +540,8 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	}
 
 	@Override
-	public void showRatingDetails(ITopTenItem value) {
+	public void showRatingDetails(final ITopTenItem value) {
+		++detailCount;
 		clientFactory.getRpcService().getPlayerRating(value.getPlayerRatingId(), new AsyncCallback<IPlayerRating>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -545,10 +552,24 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 			public void onSuccess(IPlayerRating result) {
 				clientFactory.getRatingPopup().setRating(result);
 				clientFactory.getRatingPopup().center();
+				recordAnalyticsEvent("ratingDetails", "click", result.getPlayer().getShortName(), 1);
 			}
 		});	
 		
 		
 	}
+	
+	@Override
+	public String mayStop()
+	{
+		if (view != null && view.getList() != null && view.getList().getTitle() != null) {
+			recordAnalyticsEvent("ratingDetailsCount", "click", view.getList().getTitle(), detailCount);
+		}
+		return null;
+	}
 
+	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
+	 
+    $wnd.ganew('send', 'event', cat, action, label, val);
+	}-*/;
 }

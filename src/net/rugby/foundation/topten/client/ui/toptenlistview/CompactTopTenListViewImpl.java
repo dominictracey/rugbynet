@@ -229,7 +229,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 			
 			title.setText(result.getTitle());
-			details1.setHTML(result.getContent());
+			details1.setHTML(result.getContent() + "<div id=\"fbListLike\"/>");
 			items.setRowData(result.getList());
 			//			Iterator<ITopTenItem> it = result.getList().iterator();
 			//			int count = 0;
@@ -258,6 +258,8 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 //				loadPanel.removeFromParent();
 //			}
 			//setVisible(true);
+			
+			presenter.setFBListLike(result, baseUrl);
 		} else {
 			items.setVisible(false);
 			clientFactory.getHeaderView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");

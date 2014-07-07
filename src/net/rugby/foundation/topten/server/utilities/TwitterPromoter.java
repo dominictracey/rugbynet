@@ -52,27 +52,39 @@ public class TwitterPromoter implements IPromotionHandler {
 		return retval;
 
 	}
-	public String createShortUrl(String longUrl) throws Exception {
+	public String createShortUrl(String longUrl) {
+		JSONObject request = new JSONObject();
+		AppIdentityService.GetAccessTokenResult accessToken = null;
+		HttpURLConnection connection = null;
+		
 		try {
 			ArrayList<String> scopes = new ArrayList<String>();
 			scopes.add("https://www.googleapis.com/auth/urlshortener");
 			AppIdentityService appIdentity = AppIdentityServiceFactory.getAppIdentityService();
-			AppIdentityService.GetAccessTokenResult accessToken = appIdentity.getAccessToken(scopes);
+			accessToken = appIdentity.getAccessToken(scopes);
 			// The token asserts the identity reported by appIdentity.getServiceAccountName()
-			JSONObject request = new JSONObject();
+			
 			request.put("longUrl", longUrl);
-
+		} catch (Exception e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem in Twitter Promotion establishing identity: " + e.getLocalizedMessage(), e);
+			return "short url";
+		}
+		try {
 			URL url = new URL("https://www.googleapis.com/urlshortener/v1/url?pp=1");
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestMethod("POST");
 			connection.addRequestProperty("Content-Type", "application/json");
 			connection.addRequestProperty("Authorization", "OAuth " + accessToken.getAccessToken());
-
 			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
 			request.write(writer);
 			writer.close();
-
+			
+		} catch (Exception e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem in Twitter Promotion establishing goo.gl connection: " + e.getLocalizedMessage(), e);
+			return "short url";
+		}
+		try {
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				// Note: Should check the content-encoding.
 				InputStream stream = connection.getInputStream();
@@ -80,11 +92,11 @@ public class TwitterPromoter implements IPromotionHandler {
 				JSONObject response = new JSONObject(response_tokens);
 				return (String) response.get("id");
 			} else {
-				throw new Exception();
+				throw new Exception("Got bad response code " + connection.getResponseCode() + " and message " + connection.getResponseMessage() + " trying to use access token " + accessToken.getAccessToken());
 			}
 		} catch (Exception e) {
-			// Error handling elided.
-			throw e;
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem in Twitter Promotion reading response: " + e.getLocalizedMessage(), e);
+			return "short url";
 		}
 	}
 }

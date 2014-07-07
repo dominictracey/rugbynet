@@ -43,4 +43,9 @@
         <property name="standing" direction="asc"/>
     </datastore-index>
     
+    <datastore-index kind="AdminTask" ancestor="false" source="manual">
+        <property name="status" direction="asc"/>
+        <property name="created" direction="asc"/>
+    </datastore-index>
+    
 </datastore-indexes>

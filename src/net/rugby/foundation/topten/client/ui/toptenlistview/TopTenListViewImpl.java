@@ -79,7 +79,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 		list = result;
 		//setVisible(false);
 		if (result != null) {
-			clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent());
+			clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent() + "<div id=\"fbListLike\"/>");
 
 			if (list.getPrevPublishedId() != null) {
 				prevButton.setVisible(true);
