@@ -104,7 +104,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				//					// keep looking
 				boolean stillLooking = true;
 				while(stillLooking) {
-					IPlayerMatchStats cursor = pmsf.getById(null);
+					IPlayerMatchStats cursor = pmsf.create();
 					cursor = getPlayerStats(it,cursor);
 					if (cursor != null) {
 						playerMap.put(cursor.getName(),cursor);
@@ -366,7 +366,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	}
 	
 	private IPlayerMatchStats noRunOn() {
-		stats = pmsf.getById(null);
+		stats = pmsf.create();
 		stats.setMatchId(match.getId()); // native ID, not scrum's
 		stats.setPlayerId(player.getId());  // native ID, not scrum's
 		stats.setSlot(slot);
@@ -595,7 +595,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 			} catch (Exception e) {
 				if (pms != null) {
-					setErrorMessage("Problem getting playing time information for player " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + e.getLocalizedMessage());
+					setErrorMessage("Problem getting playing time information for player " + player.getDisplayName() + " in match " + match.getDisplayName() + " (" + match.getDate() + ") : " + e.getLocalizedMessage());
 				} 
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Parsing timeline issue: " + e.getMessage(), e);
 

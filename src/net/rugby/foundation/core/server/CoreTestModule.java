@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -28,6 +29,7 @@ import net.rugby.foundation.core.server.factory.test.TestMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestMatchResultFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.test.TestRawScoreFactory;
 import net.rugby.foundation.core.server.factory.test.TestRoundFactory;
 import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamFactory;
@@ -59,7 +61,7 @@ public class CoreTestModule extends AbstractModule {
 		bind(ICountryFactory.class).to(TestCountryFactory.class);
 		bind(new TypeLiteral<ICachingFactory<IContent>>(){}).to(new TypeLiteral<TestContentFactory>(){});
 		bind(IStandingFactory.class).to(TestStandingFactory.class);
-
+		bind(IRawScoreFactory.class).to(TestRawScoreFactory.class);
 	}
 }
 

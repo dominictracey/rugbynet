@@ -637,7 +637,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	 */
 	@Override
 	public void fetchMatchStats(final IMatchGroup matchGroup) {
-		final EditMatch.Presenter presenter = this;  // there must be a way to do this...
+		//final EditMatch.Presenter presenter = this;  // there must be a way to do this...
 
 		clientFactory.getRpcService().fetchMatchStats(matchGroup.getId(), new AsyncCallback<String>() {
 

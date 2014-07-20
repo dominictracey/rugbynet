@@ -1,33 +1,27 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
+import net.rugby.foundation.core.server.factory.BasePlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 
 /**
@@ -42,71 +36,25 @@ import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
  * have its PMS id list dropped from the cache.
  *
  */
-public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Serializable {
+public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -175156134974074733L;
+
+	private IRawScoreFactory rsf;
+
 	private IRoundFactory rf;
 
 
 	@Inject
-	public OfyPlayerMatchStatsFactory(IRoundFactory rf) {
+	public OfyPlayerMatchStatsFactory(IRoundFactory rf, IRawScoreFactory rsf) {
 		this.rf = rf;
+		this.rsf = rsf;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory#get()
-	 */
 	@Override
-	public IPlayerMatchStats getById(Long id) {
-		try {
-			byte[] value = null;
-			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			IPlayerMatchStats p = null;
-
-			if (id == null) {
-				return (IPlayerMatchStats) put(null);
-			}
-
-			value = (byte[])syncCache.get(id);
-			if (value == null) {
-				p = getFromDB(id);
-
-				if (p != null) {
-					ByteArrayOutputStream bos = new ByteArrayOutputStream();
-					ObjectOutput out = new ObjectOutputStream(bos);   
-					out.writeObject(p);
-					byte[] yourBytes = bos.toByteArray(); 
-
-					out.close();
-					bos.close();
-
-					syncCache.put(id, yourBytes);
-				} else {
-					return (IPlayerMatchStats) put(null);
-				}
-			} else {
-
-				// send back the cached version
-				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-				ObjectInput in = new ObjectInputStream(bis);
-				p = (IPlayerMatchStats)in.readObject();
-
-				bis.close();
-				in.close();
-
-			}
-			return p;
-
-		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getById" + ex.getMessage(), ex);
-			return null;
-		}
-
-	}
-
-	private IPlayerMatchStats getFromDB(Long id) {
+	protected IPlayerMatchStats getFromPersistentDatastore(Long id) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			if (id != null)
@@ -123,7 +71,7 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 	 * @see net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory#put(net.rugby.foundation.model.shared.IPlayerMatchStats)
 	 */
 	@Override
-	public IPlayerMatchStats put(IPlayerMatchStats pms) {
+	protected IPlayerMatchStats putToPersistentDatastore(IPlayerMatchStats pms) {
 		try {
 			if (pms == null) {
 				return new ScrumPlayerMatchStats();
@@ -139,28 +87,12 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 			}
 
 			ofy.put(pms);
-
-			// now update the memcache version
-			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			syncCache.delete(pms.getId());
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutput out = new ObjectOutputStream(bos);   
-			out.writeObject(pms);
-			byte[] yourBytes = bos.toByteArray(); 
-
-			out.close();
-			bos.close();
-
-			syncCache.put(pms.getId(), yourBytes);
-
-			//also if there is a list of PMS ids for this PMS's match in memcache, it may now be no good so delete it
-			String mKey = getMatchIdCacheKey(pms.getMatchId());
-			if (syncCache.contains(mKey)) {
-				syncCache.delete(mKey);
-			}
-
-			// @REX @TODO updating a PMS should invalidate a query result set (List<IPlayerMatchRating>) that uses it
-			// so we should call rqf.deleteFor(pms), which in turn deletes the IRatingQuery and all its generated PMRs.
+			
+			// clear the memcache for this pms's match
+			super.flushByMatchId(pms.getMatchId());
+			
+			// @TODO need to also invalidate the memcache when ratingQueries have this PMS...
+			// 	in reality, the PlayerRatings are wrong a well so everything needs to go there.
 			
 			return pms;
 		} catch (Throwable ex) {
@@ -169,153 +101,25 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 		}
 	}
 
-
-	private String getMatchIdCacheKey(Long matchId) {
-		if (matchId == null) {
-			throw new RuntimeException("No matchId provided for getMatchIdCacheKey");
-		}
-		return "PMSIdsForMatch"+matchId.toString();
-	}
-
-	public Boolean delete(IPlayerMatchStats val) {
+	public boolean deleteFromPersistentDatastore(IPlayerMatchStats val) {
 		try {
 			if (val != null) {
+				// delete any dependencies first
+				rsf.deleteForPMSid(val.getId());
+				
 				Objectify ofy = DataStoreFactory.getOfy();
 				ofy.delete(val);
-				// also from cache
-				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-				if (syncCache.contains(val.getId())) {
-					syncCache.delete(val.getId());
-				}
+				
 				return true;
 			} else {
 				return false;
 			}
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "delete" + ex.getMessage(), ex);
-			return null;
+			return false;
 		}
 	}
 
-	@Override
-	public List<IPlayerMatchStats> getByMatchId(Long matchId) {
-		try {
-			byte[] value = null;
-			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			List<IPlayerMatchStats> p = null;
-
-			if (matchId == null) {
-				return new ArrayList<IPlayerMatchStats>();
-			}
-
-			value = (byte[])syncCache.get(getMatchIdCacheKey(matchId));
-			if (value == null) {
-				p = getByMatchIdFromDB(matchId);
-
-				if (p != null) {
-					// put a List<Long> in the cache in case this gets called again
-					List<Long> pMSIds = new ArrayList<Long>();
-					for (IPlayerMatchStats pms : p) {
-						pMSIds.add(pms.getId());
-						//also make sure each PMS is in the cache
-						if (!syncCache.contains(pms.getId())) {  //@REX should we replace existing entries?
-							ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
-							ObjectOutput out2 = new ObjectOutputStream(bos2);   
-							out2.writeObject(pms);
-							byte[] pmsBytes = bos2.toByteArray(); 
-
-							out2.close();
-							bos2.close();
-							syncCache.put(pms.getId(), pmsBytes);
-						}
-					}
-
-					ByteArrayOutputStream bos = new ByteArrayOutputStream();
-					ObjectOutput out = new ObjectOutputStream(bos);   
-					out.writeObject(pMSIds);
-					byte[] yourBytes = bos.toByteArray(); 
-
-					out.close();
-					bos.close();
-
-					syncCache.put(getMatchIdCacheKey(matchId), yourBytes);
-				} else {
-					return new ArrayList<IPlayerMatchStats>();
-				}
-			} else {
-
-				// send back the cached version
-				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-				ObjectInput in = new ObjectInputStream(bis);
-				@SuppressWarnings("unchecked")
-				List<Long>ids = (List<Long>)in.readObject();
-
-				bis.close();
-				in.close();
-
-				p = new ArrayList<IPlayerMatchStats>();
-
-				for (Long id : ids) {
-					p.add(getById(id));
-				}
-
-			}
-			return p;
-
-		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getByMatchId" + ex.getMessage(), ex);
-			return null;
-		}
-
-
-	}
-
-	private List<IPlayerMatchStats> getByMatchIdFromDB(Long matchId) {
-		Objectify ofy = DataStoreFactory.getOfy();
-
-		Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId",matchId).order("teamId").order("slot");
-
-		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
-
-		for (ScrumPlayerMatchStats spms : qpms) {
-			list.add(spms);
-		}
-
-		return list;
-	}
-	//return qpms.list();  // wish we could do this	}
-
-	@Override
-	public List<IPlayerMatchStats> query(List<Long> matchIds,
-			position posi, Long countryId, Long teamId) {
-		Objectify ofy = DataStoreFactory.getOfy();
-
-
-		Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId in",matchIds);
-		if (posi != null && !posi.equals(position.NONE)) {
-			qpms = qpms.filter("pos",posi);
-		}
-
-		//TODO should make country.NONE a constant
-		if (countryId != null && countryId != 5000L) {
-			qpms = qpms.filter("countryId", countryId);
-		}
-
-		if (teamId != null  && teamId != -1) {
-			qpms = qpms.filter("teamId", teamId);
-		}
-
-		//		qpms = qpms.order("teamId").order("slot");
-
-		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
-
-		for (ScrumPlayerMatchStats spms : qpms) {
-			list.add(spms);
-		}
-
-		return list;
-		//return (List<IPlayerMatchStats>)qpms.list();
-	}
 
 	@Override
 	public boolean deleteForMatch(IMatchGroup m) {
@@ -340,7 +144,40 @@ public class OfyPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Ser
 	}
 
 	@Override
-	public List<IPlayerMatchStats> query(IRatingQuery rq) {
+	public IPlayerMatchStats create() {
+		try {
+			return new ScrumPlayerMatchStats();
+			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in create: " + ex.getLocalizedMessage());
+			return null;
+		}
+		
+	}
+
+	@Override
+	protected List<IPlayerMatchStats> getFromPersistentDatastoreByMatchId(Long id) {
+		try {
+			List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
+			
+			Objectify ofy = DataStoreFactory.getOfy();
+			// @REX should we just check the match - don't we need to also cross-check against comp as well?
+			Query<ScrumPlayerMatchStats> qg = ofy.query(ScrumPlayerMatchStats.class).filter("matchId", id).order("teamId").order("slot");;
+
+			Iterator<ScrumPlayerMatchStats> it = qg.list().iterator();
+			while (it.hasNext()) {
+				list.add((IPlayerMatchStats)it.next());
+			}
+			
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in getFromPersistentDatastoreByMatchId: " + ex.getLocalizedMessage());
+			return null;
+		}
+	}
+	
+	@Override
+	protected List<IPlayerMatchStats> queryFromPersistentDatastore(IRatingQuery rq) {
 		Objectify ofy = DataStoreFactory.getOfy();
 
 		// @REX case of just specifying the comp and not the rounds (want all rounds)

@@ -1030,7 +1030,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				//			return null;
 				//		}
 
-				return (List<IPlayerMatchStats>) pmsf.getByMatchId(matchId);
+				return null; //(List<IPlayerMatchStats>) pmsf.getByMatchId(matchId);
 			} else {
 				return null;
 			}
@@ -1179,7 +1179,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IPlayerMatchStats getPlayerMatchStats(Long id) {
 		try {
 			if (checkAdmin()) {
-				return pmsf.getById(id);
+				return pmsf.get(id);
 			} else {
 				return null;
 			}
@@ -1418,7 +1418,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					JobInfo jobInfo = service.getJobInfo(pipelineId);
 					switch (jobInfo.getJobState()) {
 					case COMPLETED_SUCCESSFULLY:
-						service.deletePipelineRecords(pipelineId);
+						//service.deletePipelineRecords(pipelineId);
 						return getTeamMatchStats(match.getId(),tms.getTeamId()); // (List<IPlayerMatchStats>) jobInfo.getOutput();
 					case RUNNING:
 						break;
@@ -1903,10 +1903,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				JobInfo jobInfo = service.getJobInfo(id);
 				switch (jobInfo.getJobState()) {
 				case COMPLETED_SUCCESSFULLY:
-					service.deletePipelineRecords(id);
-					IMatchGroup m = mf.get(matchId);
-					m.setFetchMatchStatsPipelineId(null);
-					mf.put(m);
+//					service.deletePipelineRecords(id);
+//					IMatchGroup m = mf.get(matchId);
+//					m.setFetchMatchStatsPipelineId(null);
+//					mf.put(m);
 					return "COMPLETED"; // (List<IPlayerMatchStats>) jobInfo.getOutput();
 				case RUNNING:
 					break;

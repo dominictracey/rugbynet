@@ -56,7 +56,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 					rq.setPlayer(pf.get(rq.getPlayerId()));
 				}
 				for (Long pmsid : rq.getMatchStatIds()) {
-					rq.addMatchStats(pmsf.getById(pmsid));
+					rq.addMatchStats(pmsf.get(pmsid));
 				}
 				return rq;
 			} else {
@@ -112,7 +112,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 					r.setPlayer(pf.get(r.getPlayerId()));
 				}
 				for (Long pmsid : r.getMatchStatIds()) {
-					r.addMatchStats(pmsf.getById(pmsid));
+					r.addMatchStats(pmsf.get(pmsid));
 				}
 			}
 			return list;

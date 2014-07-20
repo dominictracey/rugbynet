@@ -74,7 +74,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(RatingQuery.class);
 			
 			ObjectifyService.register(RatingComponent.class);
-			
+			ObjectifyService.register(RawScore.class);
 		}
 		
 		return ofy;

@@ -3,9 +3,9 @@
 	<version>7</version>
   	<module>engine</module>
   <threadsafe>true</threadsafe>
-  <instance-class>B1</instance-class>
+  <instance-class>B2</instance-class>
   <basic-scaling>
     <max-instances>1</max-instances>
-    <idle-timeout>10m</idle-timeout>
+    <idle-timeout>20m</idle-timeout>
   </basic-scaling>
 </appengine-web-app>

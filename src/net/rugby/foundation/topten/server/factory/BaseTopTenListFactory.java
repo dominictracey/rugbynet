@@ -351,7 +351,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
 			while (it.hasNext() && count < 10) {
 				IPlayerRating pmr = it.next();
-				IPlayerMatchStats pms = pmsf.getById(pmr.getMatchStatIds().get(0));
+				IPlayerMatchStats pms = pmsf.get(pmr.getMatchStatIds().get(0));
 				IMatchGroup match = mf.get(pms.getMatchId());
 				ITeamGroup team = tf.get(pms.getTeamId());
 				

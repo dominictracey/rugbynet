@@ -15,6 +15,7 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
@@ -38,11 +39,12 @@ public class ScrumQueryRatingEngineFactory
 	private ICompetitionFactory cf;
 	private IPlayerRatingFactory prf;
 	private IMatchResultFactory mrf;
+	private IRawScoreFactory rsf;
 
 	@Inject
 	public ScrumQueryRatingEngineFactory(IPlayerFactory pf, IMatchGroupFactory mgf, ITeamMatchStatsFactory tmsf, 
 			IRoundFactory rf, IStandingFactory sf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, ICompetitionFactory cf, 
-			IPlayerRatingFactory prf, IMatchResultFactory mrf) {
+			IPlayerRatingFactory prf, IMatchResultFactory mrf, IRawScoreFactory rsf) {
 		this.pf = pf;
 		this.tmsf = tmsf;
 		this.mgf = mgf;
@@ -53,12 +55,13 @@ public class ScrumQueryRatingEngineFactory
 		this.cf = cf;
 		this.prf = prf;
 		this.mrf = mrf;
+		this.rsf = rsf;
 	}
 	
 	@Override
 	public IQueryRatingEngine get(IRatingEngineSchema schema, IRatingQuery rq) {
 		if (schema instanceof IV1EngineWeightValues) {
-			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf, mrf);
+			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf, mrf, rsf);
 			
 		} 
 		
@@ -68,7 +71,7 @@ public class ScrumQueryRatingEngineFactory
 	@Override
 	public IQueryRatingEngine get(IRatingEngineSchema schema) {
 		if (schema instanceof IV1EngineWeightValues) {
-			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf,mrf);
+			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf,mrf, rsf);
 		} 
 		
 		return null;
