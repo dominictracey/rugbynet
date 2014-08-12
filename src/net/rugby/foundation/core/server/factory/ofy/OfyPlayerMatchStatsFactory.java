@@ -205,10 +205,10 @@ public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory impl
 			qpms = qpms.filter("teamId in", rq.getTeamIds());
 		}
 
-
+		List<ScrumPlayerMatchStats> qlist = Lists.reverse(qpms.list());
 		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
 
-		for (ScrumPlayerMatchStats spms : qpms) {
+		for (ScrumPlayerMatchStats spms : qlist) {
 			list.add(spms);
 		}
 

@@ -349,7 +349,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 			compId = compIds.get(0);
 		}
 
-		TopTenSeedData data = new TopTenSeedData(rq.getId(), "", "", compId, roundIds, rqId, playersPerTeam);
+		TopTenSeedData data = new TopTenSeedData(rq.getId(), "", "", compId, roundIds, playersPerTeam);
 
 		listener.createTopTenList(data);
 

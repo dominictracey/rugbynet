@@ -14,7 +14,6 @@ public class TopTenSeedData implements Serializable {
 	protected String title;
 	protected String description;
 	protected Long compId;
-	protected Long ratingQueryId;
 	protected int playersPerTeam = 10;
 	protected List<Long> roundIds;
 	private Long queryId;
@@ -24,13 +23,12 @@ public class TopTenSeedData implements Serializable {
 	}
 	
 	public TopTenSeedData(Long queryId, String title,
-			String description, Long compId, List<Long> roundIds, Long ratingQueryId, int playersPerTeam) {
+			String description, Long compId, List<Long> roundIds, int playersPerTeam) {
 		super();
 		this.setQueryId(queryId);
 		this.title = title;
 		this.description = description;
 		this.compId = compId;
-		this.ratingQueryId = ratingQueryId;
 		this.playersPerTeam = playersPerTeam;
 		this.roundIds = roundIds;
 	}
@@ -66,14 +64,6 @@ public class TopTenSeedData implements Serializable {
 
 	public void setPlayersPerTeam(int playersPerTeam) {
 		this.playersPerTeam = playersPerTeam;
-	}
-
-	public Long getRatingQueryId() {
-		return ratingQueryId;
-	}
-
-	public void setRatingQueryId(Long ratingQueryId) {
-		this.ratingQueryId = ratingQueryId;
 	}
 
 	public List<Long> getRoundIds() {

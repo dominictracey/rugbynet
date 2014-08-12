@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 
@@ -18,6 +19,9 @@ public class MatchResult implements Serializable, IMatchResult {
 	@Id
 	private Long id;
 	private Long matchID;
+	@Transient
+	private IMatchGroup match;
+	
 	private Date recordedDate;
 	private String source;
 	private IMatchResult.ResultType type;
@@ -128,5 +132,13 @@ public class MatchResult implements Serializable, IMatchResult {
 	@Override
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	@Override
+	public IMatchGroup getMatch() {
+		return match;
+	}
+	@Override
+	public void setMatch(IMatchGroup match) {
+		this.match = match;
 	}
 }

@@ -21,6 +21,7 @@ public class TestMatchRatingEngineSchemaFactory implements
 	@Override
 	public IRatingEngineSchema getDefault() {
 		IRatingEngineSchema s = new ScrumMatchRatingEngineSchema20130713();
+		((ScrumMatchRatingEngineSchema20130713)s).setId(20130713L);
 		((ScrumMatchRatingEngineSchema20130713)s).setCleanBreaksWeight(.2F);
 		((ScrumMatchRatingEngineSchema20130713)s).setDefendersBeatenWeight(.2F);
 		((ScrumMatchRatingEngineSchema20130713)s).setIsDefault(true);

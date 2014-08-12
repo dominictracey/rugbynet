@@ -45,4 +45,16 @@ public interface IRatingQuery extends IHasId {
 	boolean getScaleStanding();
 
 	void setScaleStanding(boolean scaleStanding);
+
+	public abstract void setRatingMatrix(IRatingMatrix ratingMatrix);
+	
+	public abstract IRatingMatrix getRatingMatrix();
+	
+	public abstract void setRatingMatrixId(Long ratingMatrixId);
+	
+	public abstract Long getRatingMatrixId();
+
+	Long getTopTenListId();
+
+	void setTopTenListId(Long topTenListId);
 }

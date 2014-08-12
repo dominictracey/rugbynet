@@ -15,6 +15,7 @@ import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -30,6 +31,9 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 
 	@Override
 	protected IMatchGroup getFromPersistentDatastore(Long id) {
+		if (id == null) {
+			throw new RuntimeException("Error in MatchGroupFactory.getFromPersistentDatastore - don't pass in null please.");
+		}
 		MatchGroup g = null;
 		if (id != null) {
 			Objectify ofy = DataStoreFactory.getOfy();
@@ -38,11 +42,11 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 
 			if (g.getSimpleScoreMatchResultId() != null) {
-				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(g.getSimpleScoreMatchResultId()));  // @REX need to sort this out before other types of results are added
+				IMatchResult mr = mrf.get(g.getSimpleScoreMatchResultId());
+				mr.setMatch(g);
+				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);  // @REX need to sort this out before other types of results are added
+				
 			}
-		} else { // create new
-			// @REX cast
-			g = (MatchGroup) put(null);
 		}
 		return g;
 	}

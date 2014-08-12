@@ -7,16 +7,18 @@ import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.ui.HeaderView;
 import net.rugby.foundation.topten.client.ui.HeaderViewImpl;
-import net.rugby.foundation.topten.client.ui.RatingPopupView;
 import net.rugby.foundation.topten.client.ui.RatingPopupViewImpl;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
 import net.rugby.foundation.topten.client.ui.toptenlistview.CompactTopTenListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo;
+import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView;
+import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListViewImpl;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
@@ -42,6 +44,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	private static  TopTenListView<ITopTenItem> listView = null;
 	private static  TopTenListView<ITopTenItem> simpleView = null;
 	private static ContentView contentView = null;
+	private static SeriesListView<IRatingSeries> seriesView = null;
 	private static EditContent editContent = null;
 	private static TopTenListServiceAsync rpcService = null;
 	private static EditTTIText editTTIText = null;
@@ -259,6 +262,14 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 			}
  		}
 		return ratingPopup;
+	}
+	@Override
+	public SeriesListView<IRatingSeries> getSeriesView() {
+		if (seriesView == null) {
+			seriesView = new SeriesListViewImpl();
+			seriesView.setClientFactory(this);
+		}
+		return seriesView; 
 	}
 
 

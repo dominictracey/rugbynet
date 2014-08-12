@@ -39,19 +39,19 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
 	 */
-	private ClientFactory clientFactory;
+	protected ClientFactory clientFactory;
 	private TopTenListPlace place;
 	//private ICoreConfiguration coreConfig;
 
 	private TopTenListView<ITopTenItem> view;
-	private ICoreConfiguration _coreConfig;
-	private int detailCount=0;
+	protected ICoreConfiguration _coreConfig;
+	protected int detailCount=0;
 	public TopTenListActivity(TopTenListPlace place, ClientFactory clientFactory) {
 
 		this.clientFactory = clientFactory;
 		view = clientFactory.getListView();
 
-		if (place.getToken() != null) {
+		if (place != null && place.getToken() != null) {
 			this.place = place;
 		}
 	}
@@ -67,7 +67,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 		clientFactory.RegisterIdentityPresenter(this);
 
 		clientFactory.doSetup(new AsyncCallback<ICoreConfiguration>() {
-			
+
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -95,18 +95,18 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 									if (login.isTopTenContentContributor() || login.isTopTenContentEditor()) {
 										simple = false;
 									} 
-									
-//									else {
-//	 									Iterator<ITopTenItem> it = ttl.getList().iterator();
-//										while (it.hasNext())  {
-//											ITopTenItem i = it.next();
-//											if (i.getText() != null && !i.getText().isEmpty()) {
-//												simple = false; 
-//												break;
-//											}
-//										}
-//									}
-									
+
+									//									else {
+									//	 									Iterator<ITopTenItem> it = ttl.getList().iterator();
+									//										while (it.hasNext())  {
+									//											ITopTenItem i = it.next();
+									//											if (i.getText() != null && !i.getText().isEmpty()) {
+									//												simple = false; 
+									//												break;
+									//											}
+									//										}
+									//									}
+
 									if (!simple) {
 										view.setItemCount(0);
 										clientFactory.getHeaderView().collapseHero(false);
@@ -129,7 +129,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 								} else {
 									Window.alert("Failed to fetch top ten list.");
 								}
-								
+
 							}	
 						});
 					} else { // no listId
@@ -162,7 +162,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(Long result) {
-				
+
 				if (result != null) {
 					TopTenListPlace newPlace = new TopTenListPlace();
 					newPlace.setListId(result);
@@ -468,21 +468,23 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 		// set the fbLike div property
 		// data-href="http://dev.rugby.net/topten.html#List:listId=159002" 
 		Element e = Document.get().getElementById("fbListLike");
-		Element oldChild = e.getFirstChildElement();
-		if (oldChild != null) {
-			e.removeChild(oldChild);
+		if (e != null) {
+			Element oldChild = e.getFirstChildElement();
+			if (oldChild != null) {
+				e.removeChild(oldChild);
+			}
+
+
+			// so we have to include the specifics both in the GET query parameters and the hash fragment to support the FB linting. See:
+			// https://developers.facebook.com/tools/debug/og/object?q=http%3A%2F%2Fdev.rugby.net%2Ffb%2Ftopten.html%3FlistId%3D159002%26playerId%3D148002%23List%3AlistId%3D159002%26playerId%3D148002
+
+			//String encodedUrl= URL.encode(baseUrl + "?listId=" + list.getId() + "#List:listId=" + list.getId());
+
+			HTML fb = new HTML("<br/><div class=\"fb-like\" id=\"fbListLike\" data-width=\"450\" data-layout=\"button_count\" data-show-faces=\"true\" data-send=\"true\" data-href=\"http://facebook.com/therugbynet\"></div>");
+
+			e.appendChild(fb.getElement());
+			parse("fbListLike");
 		}
-
-		// so we have to include the specifics both in the GET query parameters and the hash fragment to support the FB linting. See:
-		// https://developers.facebook.com/tools/debug/og/object?q=http%3A%2F%2Fdev.rugby.net%2Ffb%2Ftopten.html%3FlistId%3D159002%26playerId%3D148002%23List%3AlistId%3D159002%26playerId%3D148002
-		
-		//String encodedUrl= URL.encode(baseUrl + "?listId=" + list.getId() + "#List:listId=" + list.getId());
-
-		HTML fb = new HTML("<br/><div class=\"fb-like\" id=\"fbListLike\" data-width=\"450\" data-layout=\"button_count\" data-show-faces=\"true\" data-send=\"true\" data-href=\"http://facebook.com/therugbynet\"></div>");
-
-		e.appendChild(fb.getElement());
-		parse("fbListLike");
-
 	}
 
 	/**
@@ -555,10 +557,10 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 				recordAnalyticsEvent("ratingDetails", "click", result.getPlayer().getShortName(), 1);
 			}
 		});	
-		
-		
+
+
 	}
-	
+
 	@Override
 	public String mayStop()
 	{
@@ -569,7 +571,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 	}
 
 	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
-	 
+
     $wnd.ganew('send', 'event', cat, action, label, val);
 	}-*/;
 }

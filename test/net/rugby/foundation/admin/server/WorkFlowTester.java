@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import net.rugby.foundation.admin.server.AdminTestModule;
 import net.rugby.foundation.admin.server.workflow.IWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflowFactory;
 import net.rugby.foundation.admin.shared.CompetitionWorkflow;

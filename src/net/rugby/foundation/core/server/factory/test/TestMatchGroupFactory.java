@@ -9,6 +9,7 @@ import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -32,71 +33,78 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -12);
 			g.setSimpleScoreMatchResultId(8001L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8001L));
+			IMatchResult mr = mrf.get(8001L);
+			mr.setMatch(g);
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);			
 			g.setStatus(Status.FINAL_HOME_WIN);
-			g.setRoundId(2L);
 		} else if (id == 101) {
 			g.setHomeTeamId(9003L);
 			g.setVisitingTeamId(9004L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -11);
 			g.setSimpleScoreMatchResultId(8002L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8002L));
+			IMatchResult mr = mrf.get(8002L);
+			mr.setMatch(g);
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_VISITOR_WIN);
-			g.setRoundId(2L);
+	//		g.setRoundId(2L);
 		} else if (id == 102) {
 			g.setHomeTeamId(9001L);
 			g.setVisitingTeamId(9004L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -4);
 			g.setSimpleScoreMatchResultId(8003L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8003L));
+			IMatchResult mr = mrf.get(8003L);
+			mr.setMatch(g);
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_DRAW_OT);
-			g.setRoundId(3L);
+		//	g.setRoundId(3L);
 		} else if (id == 103) {
 			g.setHomeTeamId(9005L);
 			g.setVisitingTeamId(9006L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -3);
 			g.setSimpleScoreMatchResultId(8004L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8004L));
+			IMatchResult mr = mrf.get(8004L);
+			mr.setMatch(g);
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_HOME_WIN);
-			g.setRoundId(3L);
+//			g.setRoundId(3L);
 		} else if (id == 104) {
 			g.setHomeTeamId(9002L);
 			g.setVisitingTeamId(9003L);
 			g.setLocked(true);
 			cal.add(Calendar.MINUTE, -120);
 			g.setStatus(Status.UNDERWAY_FIRST_HALF);
-			g.setRoundId(4L);
+//			g.setRoundId(4L);
 		} else if (id == 105) {
 			g.setHomeTeamId(9001L);
 			g.setVisitingTeamId(9005L);
 			g.setLocked(false);
 			cal.add(Calendar.DATE, 4);
 			g.setStatus(Status.SCHEDULED);
-			g.setRoundId(4L);
+//			g.setRoundId(4L);
 		} else if (id == 106) {
 			g.setHomeTeamId(9004L);
 			g.setVisitingTeamId(9006L);
 			g.setLocked(false);
 			cal.add(Calendar.DATE, 4);
 			g.setStatus(Status.SCHEDULED);
-			g.setRoundId(4L);
+//			g.setRoundId(4L);
 		} else if (id == 107) {
 			g.setHomeTeamId(0L);
 			g.setVisitingTeamId(0L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, 10);
 			g.setStatus(Status.SCHEDULED);
-			g.setRoundId(5L);
+//			g.setRoundId(5L);
 		} else if (id == 108) {
 			g.setHomeTeamId(0L);
 			g.setVisitingTeamId(0L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, 11);
 			g.setStatus(Status.SCHEDULED);
-			g.setRoundId(5L);
+//			g.setRoundId(5L);
 			// Begin Comp 2
 		} else if (id == 200) {
 			g.setHomeTeamId(9201L);
@@ -104,27 +112,33 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -7);
 			g.setSimpleScoreMatchResultId(8201L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8201L));
+			IMatchResult mr = mrf.get(8201L);
+			mr.setMatch(g);
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_HOME_WIN);
-			g.setRoundId(12L);
+//			g.setRoundId(12L);
 		} else if (id == 201) {
 			g.setHomeTeamId(9203L);
 			g.setVisitingTeamId(9204L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -8);
 			g.setSimpleScoreMatchResultId(8202L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8202L));
+			IMatchResult mr = mrf.get(8202L);
+			mr.setMatch(g);
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_VISITOR_WIN);
-			g.setRoundId(12L);
+//			g.setRoundId(12L);
 		} else if (id == 202) {
 			g.setHomeTeamId(9205L);
 			g.setVisitingTeamId(9206L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, -8);
 			g.setSimpleScoreMatchResultId(8203L);
-			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(8203L));
+			IMatchResult mr = mrf.get(8203L);
+			mr.setMatch(g);
+			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_VISITOR_WIN);
-			g.setRoundId(12L);
+//			g.setRoundId(12L);
 		} else if (id == 203) {
 			g.setHomeTeamId(9207L);
 			g.setVisitingTeamId(9208L);
@@ -132,37 +146,37 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.MINUTE, -120);
 //			mrf.setId(8204L);
 //			g.setSimpleScoreMatchResultId(8204L);
-//			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get());
+//			IMatchResult mr = mrf.get());
 			g.setStatus(Status.UNDERWAY_FIRST_HALF);
-			g.setRoundId(13L);
+//			g.setRoundId(13L);
 		} else if (id == 204) {
 			g.setHomeTeamId(9201L);
 			g.setVisitingTeamId(9208L);
 			g.setLocked(true);
 			cal.add(Calendar.DATE, 0);
 			g.setStatus(Status.UNDERWAY_FIRST_HALF);
-			g.setRoundId(13L);
+//			g.setRoundId(13L);
 		} else if (id == 205) {
 			g.setHomeTeamId(9202L);
 			g.setVisitingTeamId(9207L);
 			g.setLocked(false);
 			cal.add(Calendar.MINUTE, 50);
 			g.setStatus(Status.SCHEDULED);
-			g.setRoundId(13L);
+//			g.setRoundId(13L);
 		} else if (id == 206) {
 			g.setHomeTeamId(9203L);
 			g.setVisitingTeamId(9206L);
 			g.setLocked(false);
 			cal.add(Calendar.DATE, 8);
 			g.setStatus(Status.SCHEDULED);
-			g.setRoundId(14L);
+//			g.setRoundId(14L);
 		} else if (id == 207) {
 			g.setHomeTeamId(9204L);
 			g.setVisitingTeamId(9205L);
 			g.setLocked(false);
 			cal.add(Calendar.DATE, 9);
 			g.setStatus(Status.SCHEDULED);
-			g.setRoundId(14L);
+//			g.setRoundId(14L);
 		} else if (id == 208) {  // for testing 
 			g.setHomeTeamId(9209L);
 			g.setVisitingTeamId(9202L);

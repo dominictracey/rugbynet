@@ -120,10 +120,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void onModuleLoad() {
-		Element element = DOM.getElementById("loadProgress");
-		if (element != null) {
-			element.getStyle().setWidth(60, Unit.PCT);
-		}
+//		Element element = DOM.getElementById("loadProgress");
+//		if (element != null) {
+//			element.getStyle().setWidth(60, Unit.PCT);
+//		}
 		
 	}
 

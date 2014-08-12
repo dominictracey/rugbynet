@@ -84,8 +84,11 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		@Id
 		protected Long id;
 
+		@Unindexed
 		protected float backScore;
+		@Unindexed
 		protected float forwardScore;
+		@Unindexed
 		protected float rawScore; 
 		
 		private Long playerMatchStatsId;
@@ -96,7 +99,9 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		@Unindexed
 		protected String matchLabel;
 
+		@Unindexed
 		protected float scaledRating;
+		@Unindexed
 		protected float unscaledRating;
 
 	
@@ -213,6 +218,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long id;
 	protected Integer rating;
 	protected Long groupId;
+	@Unindexed
 	protected Date generated;
 	@Transient
 	protected IGroup group;
@@ -222,7 +228,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long playerId;
 	@Transient
 	protected IPlayer player;
-
+	@Unindexed
 	protected List<Long> playerMatchStatIds;
 	@Transient
 	private List<IPlayerMatchStats> playerMatchStats;
@@ -230,6 +236,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long queryId;
 	@Unindexed
 	protected String details;
+	@Unindexed
 	protected Float rawScore;
 	
 	@Embedded

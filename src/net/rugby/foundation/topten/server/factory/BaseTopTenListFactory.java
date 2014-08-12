@@ -33,6 +33,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.PlayerRating;
+import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
@@ -68,6 +69,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 	@Override
 	public ITopTenList delete(ITopTenList list) {
+		Long rqId = list.getQueryId();
+		
 		ITopTenList prev = null;
 		ITopTenList prevPub = null;
 		ITopTenList next = null;
@@ -140,6 +143,14 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		// and delete it
 		list = null;
 
+		// delete the ratingQuery reference
+		if (rqId != null) {
+			IRatingQuery rq = rqf.get(rqId);
+			if (rq != null) {
+				rq.setTopTenListId(null);
+				rqf.put(rq);
+			}
+		}
 		return list;
 	}
 
@@ -293,9 +304,14 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		setLatestPublishedForComp(null,compId);
 		
 	}
-
+	
 	@Override
 	public ITopTenList create(TopTenSeedData tti) {
+		return create(tti, null);
+	}
+
+	@Override
+	public ITopTenList create(TopTenSeedData tti, ITopTenList lastTTL) {
 		ITopTenList list = new TopTenList();
 		// a times series TTL won't have a compId set, so we need to get one
 		list.setCompId(getCompId(tti));
@@ -364,7 +380,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					//TopTenItem(Long id, Long playerId, IPlayer player, String text,
 					//String image, Long contributorId, Long editorId, boolean isSubmitted, 
 					//String matchReportLink, String teamName, ITopTenList parent)
-					ITopTenItem item = new TopTenItem(null, pmr.getPlayerId(), pmr.getPlayer(), "",
+					ITopTenItem item = new TopTenItem(count+1,null, pmr.getPlayerId(), pmr.getPlayer(), "",
 							"", null, null, true, match.getForeignUrl(), team.getDisplayName(), team.getId(), pms.getPosition(), list,
 							pmr.getId(), pmr.getRating());
 					list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
@@ -377,11 +393,64 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			}
 		}
 
+
+
+		// now figure out where the last TTL we need to compare to lives
+		if (lastTTL != null) {
+			compareListToLast(list,lastTTL);
+		}
+		
 		// save the items
 		put(list);
-
+		
+		// store reference in ratingQuery
+		rq.setTopTenListId(list.getId());
+		rqf.put(rq);
+		
 		setLastCreatedForComp(list,list.getCompId());
 
+		return list;
+	}
+
+	private ITopTenList compareListToLast(ITopTenList list, ITopTenList last) {
+
+		// key playerId, value position in last list
+		Map<Long, Integer> oldPosMap = new HashMap<Long, Integer>();
+		for (ITopTenItem newItem : list.getList()) {
+			int pos = 1;
+			for (ITopTenItem oldItem : last.getList()) {
+				if (newItem.getPlayerId().equals(oldItem.getPlayerId())) {
+					oldPosMap.put(newItem.getPlayerId(), pos);
+					break;
+				}
+				pos++;
+			}
+		}
+		
+		int count = 1;
+		String listDescription = "Notes:<br/>";
+		for (ITopTenItem newItem : list.getList()) {
+			newItem.setLastOrdinal(oldPosMap.get(newItem.getPlayerId()));
+			ITopTenItem oldItem = last.getList().get(newItem.getLastOrdinal());
+			String dir = "up";
+			if (newItem.getOrdinal() > newItem.getLastOrdinal()) {
+				dir = "down";
+			}
+			
+			IPlayerRating newPr = prf.get(newItem.getPlayerRatingId());
+			IPlayerRating oldPr = prf.get(oldItem.getPlayerRatingId());
+			String lastAction = " being idle.";
+			IPlayerMatchStats newPms = newPr.getMatchStats().get(newPr.getMatchStats().size());
+			IPlayerMatchStats oldPms = oldPr.getMatchStats().get(oldPr.getMatchStats().size());
+			if (!newPms.getMatchId().equals(oldPms.getMatchId())) {
+				IMatchGroup m = mf.get(newPms.getMatchId());
+				lastAction = " match " + m.getSimpleScoreMatchResult().toString();
+			}
+			
+			listDescription += "<p>" + newItem.getPlayer().getDisplayName() + " moves " + dir + " to #" + newItem.getOrdinal() + " after " + lastAction + ".</p>\n";
+					
+			count++;
+		}
 		return list;
 	}
 

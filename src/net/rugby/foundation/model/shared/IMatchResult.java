@@ -39,4 +39,8 @@ public interface IMatchResult extends IHasId {
 
 	public abstract void setStatus(Status status);
 
+	void setMatch(IMatchGroup match);
+
+	IMatchGroup getMatch();
+
 }

@@ -1,5 +1,6 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.BaseRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
@@ -18,7 +20,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingQuery;
 
-public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> implements IRatingQueryFactory {
+public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRatingQueryFactory {
 
 	private IPlayerRatingFactory prf;
 
@@ -162,6 +164,21 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}	
 		
+	}
+
+	@Override
+	protected List<IRatingQuery> getForMatrixFromPersistentDatastore(
+			Long matrixId) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		//@TODO confirm list is in ascending order?
+		Query<RatingQuery> qpms = ofy.query(RatingQuery.class).filter("matrixId", matrixId);
+		
+		List<IRatingQuery> list = new ArrayList<IRatingQuery>();
+		for (RatingQuery rq : qpms.list()) {
+			list.add(rq);
+		}
+		
+		return list;
 	}
 
 

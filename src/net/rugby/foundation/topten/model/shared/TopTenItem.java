@@ -33,19 +33,22 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected Long teamId;
 	protected Position.position position;
 	protected int ordinal;
+	protected int lastOrdinal;
 	protected Long playerRatingId;
 	protected int rating;
 	
-	public TopTenItem() {
+	public TopTenItem()
+	{
 		
 	}
 	
-	public TopTenItem(Long id, Long playerId, IPlayer player, String text,
+	public TopTenItem(int ordinal, Long id, Long playerId, IPlayer player, String text,
 			String image, Long contributorId, Long editorId, boolean isSubmitted, 
 			String matchReportLink, String teamName, Long teamId, Position.position position, 
 			ITopTenList list, Long playerRatingId, int rating) {
-		super();
+		//super();
 		this.id = id;
+		this.ordinal = ordinal;
 		this.playerId = playerId;
 		this.player = player;
 		this.text = text;
@@ -58,7 +61,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 		this.teamId = teamId;
 		this.parentId = list.getId();
 		//this.parent = list;
-		this.parentId = list.getId();
+
 		this.position = position;
 		this.playerRatingId = playerRatingId;
 		this.rating = rating;
@@ -239,6 +242,15 @@ public class TopTenItem implements Serializable, ITopTenItem
 	public int getOrdinal() {
 		return ordinal;
 	}
+	@Override
+	public int getLastOrdinal() {
+		return lastOrdinal;
+	}
+	@Override
+	public void setLastOrdinal(int lastOrdinal) {
+		this.lastOrdinal = lastOrdinal;
+	}
+
 	@Override
 	public Long getPlayerRatingId() {
 		return playerRatingId;

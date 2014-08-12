@@ -6,19 +6,16 @@ import java.util.logging.Logger;
 
 import net.rugby.foundation.topten.client.mvp.AppActivityMapper;
 import net.rugby.foundation.topten.client.mvp.AppPlaceHistoryMapper;
-import net.rugby.foundation.topten.client.place.TopTenListPlace;
-
+import net.rugby.foundation.topten.client.place.SeriesPlace;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -27,9 +24,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 public class TopTen implements EntryPoint {
   
 	private SimplePanel appWidget = new SimplePanel();
-	private Place defaultPlace = new TopTenListPlace("List:");
+	private Place defaultPlace = new SeriesPlace("TX:c=1");
 	private ClientFactory clientFactory = null;
-	//final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
 
 	@SuppressWarnings("deprecation")
 	public void onModuleLoad() {
@@ -57,18 +53,12 @@ public class TopTen implements EntryPoint {
 		AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
 		final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
 		historyHandler.register(placeController, eventBus, defaultPlace);
-
-		
 		
 		historyHandler.handleCurrentHistory();	
 		RootPanel.get("app").add(appWidget);
-
-		DOM.getElementById("loadProgress").getStyle().setWidth(80, Unit.PCT);
 		
 		Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "Creating Identity manager");
 		
-
-
 	}
 
 

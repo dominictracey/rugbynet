@@ -18,4 +18,5 @@ public interface IQueryRatingEngine {
 	List<IPlayerRating> generate(IRatingEngineSchema schema,
 			boolean scaleStandings, boolean scaleCompetition,
 			boolean scaleMatchAge);
+	String getMetrics();
 }

@@ -6,6 +6,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingGroup;
+import net.rugby.foundation.model.shared.IRatingMatrix;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -30,5 +35,14 @@ public interface TopTenListServiceAsync {
 			AsyncCallback<ITopTenList> asyncCallback);
 	public void getPlayerRating(Long playerRatingId,
 			AsyncCallback<IPlayerRating> asyncCallback);
-
+	public void getRatingSeries(Long seriesId,
+			AsyncCallback<IRatingSeries> asyncCallback);
+	public void getRatingSeries(Long compId, RatingMode mode,
+			AsyncCallback<IRatingSeries> asyncCallback);
+	public void getTopTenListForRatingQuery(Long id,
+			AsyncCallback<ITopTenList> asyncCallback);
+	public void  getRatingGroup(Long ratingGroupId, AsyncCallback<IRatingGroup> asyncCallback);
+	public void  getRatingMatrix(Long ratingMatrixId, AsyncCallback<IRatingMatrix> asyncCallback);
+	public void getRatingQueriesForMatrix(Long id,
+			AsyncCallback<List<IRatingQuery>> asyncCallback);
 }

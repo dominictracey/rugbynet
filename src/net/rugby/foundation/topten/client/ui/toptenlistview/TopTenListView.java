@@ -29,6 +29,7 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	void setClientFactory(ClientFactory clientFactory);
 	List<TopTenItemView> getItemViews();
 	ITopTenList getList();
+	void showContent(boolean show);
 
 	void hasNext(boolean has);
 	void hasPrev(boolean has);

@@ -37,4 +37,5 @@ public interface ITopTenListFactory {
 	 * @return returns true if no errors are logged. Check log if false returned.
 	 */
 	public boolean scan(Long compId);
+	ITopTenList create(TopTenSeedData tti, ITopTenList lastTTL);
 }

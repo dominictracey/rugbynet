@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server;
 
+import net.rugby.foundation.admin.server.model.IRatingSeriesManager;
+import net.rugby.foundation.admin.server.model.RatingSeriesManager;
 import net.rugby.foundation.admin.server.rules.CoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
@@ -13,6 +15,9 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
@@ -29,6 +34,9 @@ import net.rugby.foundation.core.server.factory.test.TestMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestMatchResultFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.test.TestRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.test.TestRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.test.TestRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.test.TestRawScoreFactory;
 import net.rugby.foundation.core.server.factory.test.TestRoundFactory;
 import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
@@ -62,6 +70,11 @@ public class CoreTestModule extends AbstractModule {
 		bind(new TypeLiteral<ICachingFactory<IContent>>(){}).to(new TypeLiteral<TestContentFactory>(){});
 		bind(IStandingFactory.class).to(TestStandingFactory.class);
 		bind(IRawScoreFactory.class).to(TestRawScoreFactory.class);
+		bind(IRatingSeriesFactory.class).to(TestRatingSeriesFactory.class);
+		bind(IRatingGroupFactory.class).to(TestRatingGroupFactory.class);
+		bind(IRatingMatrixFactory.class).to(TestRatingMatrixFactory.class);
+		bind(IRatingSeriesManager.class).to(RatingSeriesManager.class);
+	
 	}
 }
 

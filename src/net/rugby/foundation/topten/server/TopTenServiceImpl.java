@@ -11,11 +11,20 @@ import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IRatingGroup;
+import net.rugby.foundation.model.shared.IRatingMatrix;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.TopTenListService;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -32,7 +41,12 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private IAppUserFactory auf;
 	private ITopTenListFactory ttlf;
 	private ICachingFactory<IContent> ctf;
+	
 	private IPlayerRatingFactory prf;
+	private IRatingSeriesFactory rsf;
+	private IRatingQueryFactory rqf;
+	private IRatingGroupFactory rgf;
+	private IRatingMatrixFactory rmf;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -41,12 +55,17 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Inject
-	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf) {
+	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf,
+			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
 			this.ctf = ctf;
 			this.prf = prf;
+			this.rsf = rsf;
+			this.rqf = rqf;
+			this.rgf = rgf;
+			this.rmf = rmf;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 		}
@@ -263,6 +282,70 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		try {
 			IPlayerRating pr = prf.get(playerRatingId);
 			return pr;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IRatingSeries getRatingSeries(Long seriesId) {
+		try {
+			return rsf.get(seriesId);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IRatingSeries getRatingSeries(Long compId, RatingMode mode) {
+		try {
+			return rsf.get(compId, mode);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public ITopTenList getTopTenListForRatingQuery(Long id) {
+		try {
+			IRatingQuery rq = rqf.get(id);
+			return ttlf.get(rq.getTopTenListId());
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IRatingGroup getRatingGroup(Long ratingGroupId) {
+		try {
+			IRatingGroup rg = rgf.get(ratingGroupId);
+			return rg;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IRatingMatrix getRatingMatrix(Long ratingMatrixId) {
+		try {
+			IRatingMatrix rm = rmf.get(ratingMatrixId);
+			return rm;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public List<IRatingQuery> getRatingQueriesForMatrix(Long ratingMatrixId) {
+		try {
+			List<IRatingQuery> rqs = rqf.getForMatrix(ratingMatrixId);
+			return rqs;
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

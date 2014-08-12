@@ -22,8 +22,8 @@ public class BPMServletContextListener extends GuiceServletContextListener {
 	
 	public static final Injector getInjectorForNonServlets() {
 
-		return Guice.createInjector(new Game1MainModule(), new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
-//	return Guice.createInjector( new Game1TestModule(), new CoreTestModule(), new AdminTestModule(), new TopTenTestModule());		
+//		return Guice.createInjector(new Game1MainModule(), new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
+	return Guice.createInjector( new Game1TestModule(), new CoreTestModule(), new AdminTestModule(), new TopTenTestModule());		
 	}
 	
 	/* (non-Javadoc)
@@ -31,8 +31,8 @@ public class BPMServletContextListener extends GuiceServletContextListener {
 	 */
 	@Override
 	public Injector getInjector() {
-		return Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
-//		return Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule(), new TopTenTestModule());
+//		return Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
+		return Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule(), new TopTenTestModule());
 
 	}
 

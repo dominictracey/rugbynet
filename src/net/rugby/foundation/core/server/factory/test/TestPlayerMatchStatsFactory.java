@@ -145,7 +145,24 @@ public class TestPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory imp
 	}
 	@Override
 	protected List<IPlayerMatchStats> queryFromPersistentDatastore(IRatingQuery rq) {
-		return null;
+		// get the matchIds we need, then slam all the PMSs together
+		List<IPlayerMatchStats> retval = new ArrayList<IPlayerMatchStats>();
+		for (Long rid : rq.getRoundIds()) {
+			for (IMatchGroup m : mf.getMatchesForRound(rid)) {				
+				retval.addAll(getByMatchId(m.getId()));
+			}
+		}
+		
+		if (rq.getPositions() != null && rq.getPositions().size() > 0) {
+			List<IPlayerMatchStats> wrongPos = new ArrayList<IPlayerMatchStats>();
+			for (IPlayerMatchStats pms : retval) {
+				if (!rq.getPositions().contains(pms.getPosition())) {
+					wrongPos.add(pms);
+				}
+			}
+			retval.removeAll(wrongPos);
+		}
+		return retval;
 	}
 
 }

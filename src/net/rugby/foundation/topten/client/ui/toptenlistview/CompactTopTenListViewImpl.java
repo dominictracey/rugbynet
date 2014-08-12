@@ -10,6 +10,7 @@ import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.Row;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.Cell.Context;
@@ -43,7 +44,8 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	@UiField CellTable<ITopTenItem> items;
 	@UiField Heading title;
 	@UiField HTML details1;
-	@UiField com.github.gwtbootstrap.client.ui.Row contentPanel;
+	@UiField Row contentPanel;
+	@UiField com.github.gwtbootstrap.client.ui.Column contentDiv;
 	@UiField VerticalPanel contentArea;
 	@UiField Button prevButton;
 	@UiField Button nextButton;
@@ -59,6 +61,9 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 
 	private ClientFactory clientFactory;
+
+
+	private boolean showContent;
 
 
 	@UiTemplate("CompactTopTenListViewImpl.ui.xml")
@@ -228,6 +233,10 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 				nextButton.setVisible(false);
 			}
 			
+			
+			contentDiv.setVisible(showContent);
+
+			
 			title.setText(result.getTitle());
 			details1.setHTML(result.getContent() + "<div id=\"fbListLike\"/>");
 			items.setRowData(result.getList());
@@ -336,6 +345,13 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
  
     $wnd.ganew('send', 'pageview', {'page': url,'title': title});
 	}-*/;
+
+
+	@Override
+	public void showContent(boolean show) {
+		this.showContent = show;
+		
+	}
 
 
 }

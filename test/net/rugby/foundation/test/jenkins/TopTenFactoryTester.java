@@ -204,8 +204,19 @@ public class TopTenFactoryTester {
 //		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc,1L, null, 10);
 		return ttf.create(ttsd);
+	}
+	
+	private ITopTenList createLinkedTTL() {
+//		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
+		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
+
+		TopTenSeedData ttsd = new TopTenSeedData(7710001L, "Top Ten Props - Round 1", desc,1L, null, 10);
+		ITopTenList last =  ttf.create(ttsd);
+		
+		ttsd = new TopTenSeedData(7700001L, "Top Ten Props - Round 2", desc, 1L, null, 10);
+		return ttf.create(ttsd, last);
 	}
 
 	@Test 
@@ -408,7 +419,7 @@ public class TopTenFactoryTester {
 
 		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -429,7 +440,7 @@ public class TopTenFactoryTester {
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 		//List<IPlayerRating> 700L = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -458,7 +469,7 @@ public class TopTenFactoryTester {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10);
 		ITopTenList ttl1 = ttf.create(ttsd);
 
 		assertTrue(ttl1 != null);
@@ -536,7 +547,7 @@ public class TopTenFactoryTester {
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, "uno", "one", 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, "uno", "one", 2L, null, 10);
 		ITopTenList ttl1 = ttf.create(ttsd); //create 1
 		assertTrue(ttl1 != null);
 		assertFalse(ttl1.getLive());
@@ -545,7 +556,7 @@ public class TopTenFactoryTester {
 		ITopTenList latest = ttf.getLatestForComp(2L);
 		assertTrue(latest == null);
 		
-		ttsd = new TopTenSeedData(700L, "dos", "two", 2L, null, 12L, 10);
+		ttsd = new TopTenSeedData(700L, "dos", "two", 2L, null, 10);
 		ITopTenList ttl2 = ttf.create(ttsd); //create 2
 		assertTrue(ttl2 != null);
 		assertFalse(ttl2.getLive());
@@ -557,7 +568,7 @@ public class TopTenFactoryTester {
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest == null);
 		
-		ttsd = new TopTenSeedData(700L, "tres", "three", 2L, null, 12L, 10);
+		ttsd = new TopTenSeedData(700L, "tres", "three", 2L, null, 10);
 		ITopTenList ttl3 = ttf.create(ttsd); //create 3
 		assertTrue(ttl3 != null);
 		assertFalse(ttl3.getLive());
@@ -671,7 +682,7 @@ public class TopTenFactoryTester {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -744,7 +755,7 @@ public class TopTenFactoryTester {
 
 		int max = 5;
 	
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, max);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, max);
 		ITopTenList ttl = ttf.create(ttsd);
 		
 		assert (ttl != null);
@@ -775,7 +786,7 @@ public class TopTenFactoryTester {
 		//					Long countryId, Long teamId)
 		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc,1L, null, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
 		assert (ttl != null);
@@ -801,5 +812,12 @@ public class TopTenFactoryTester {
 		deleteAll();
 
 
+	}
+	
+	@Test
+	public void checkNotes() {
+		ITopTenList ttl = createLinkedTTL();
+		assert ttl.getContent() != null;
+		
 	}
 }

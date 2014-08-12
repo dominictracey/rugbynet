@@ -868,9 +868,16 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 	protected void sendReport() {
 		AdminEmailer emailer = new AdminEmailer();
-		String sep = " ================== ";
-		emailer.setSubject("Rating Engine Report");
 
+		emailer.setSubject("Rating Engine Report");
+		emailer.setMessage(getMetrics());
+		emailer.setSubject(query.toString());
+		emailer.send();
+	}
+
+	@Override
+	public String getMetrics() {
+		String sep = " ================== ";
 		String body = "<p> PlayerMatchStats count: " + pmsList.size() + " TMS count: " + (tmsHomeMap.size() + tmsVisitMap.size()) + "</p><p>";
 		body += query.toString() + "</p><p>";
 		body += "http://www.rugby.net/Admin.html#PortalPlace::queryId=" + query.getId().toString() + "</p><p>";
@@ -902,58 +909,61 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		body += sep + "Positions" + sep + "\n" + sep + sep + "\n";
 
-		for (int i=1; i<position.values().length-1; ++i) {
-			body += sep + position.getAt(i) + "\n";
-			ss = new SummaryStatistics();
-			for (IPlayerRating r : mrl) {
-				//				if (r instanceof IPlayerMatchRating) {
-				//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getPosition().equals(position.getAt(i))) {
-				//						((SummaryStatistics)ss).addValue(r.getRating());
-				//					}
-				//				} else 
-				if (r instanceof PlayerRating) {
-					for (RatingComponent rc : r.getRatingComponents()) {
-						IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
-						if (pms != null && pms.getPosition().equals(position.getAt(i))) {
-							((SummaryStatistics)ss).addValue(rc.getScaledRating());
+//		for (int i=1; i<position.values().length-1; ++i) {
+		for (position pos : position.values()) {
+			if (query.getPositions().contains(pos)) {
+				body += sep + pos + "\n";
+				ss = new SummaryStatistics();
+				for (IPlayerRating r : mrl) {
+					//				if (r instanceof IPlayerMatchRating) {
+					//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getPosition().equals(position.getAt(i))) {
+					//						((SummaryStatistics)ss).addValue(r.getRating());
+					//					}
+					//				} else 
+					if (r instanceof PlayerRating) {
+						for (RatingComponent rc : r.getRatingComponents()) {
+							IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
+							if (pms != null && pms.getPosition().equals(pos)) {
+								((SummaryStatistics)ss).addValue(rc.getScaledRating());
+							}
 						}
 					}
 				}
+				if (ss.getN() > 0)
+					body += ss.toString();
 			}
-			if (ss.getN() > 0)
-				body += ss.toString();
+
 		}
 
-		body += sep + "Matches" + sep + "\n" + sep + sep + "\n";
-		Iterator<ITeamMatchStats> it = tmsHomeMap.values().iterator();
-		while (it.hasNext()) {
-			Long id = it.next().getMatchId();
-			IMatchGroup m = mf.get(id);
-			body += sep + m.getDisplayName() + "\n";
-			ss = new SummaryStatistics();
-			for (IPlayerRating r : mrl) {
-				//				if (r instanceof IPlayerMatchRating) {
-				//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getMatchId().equals(id)) {
-				//						((SummaryStatistics)ss).addValue(r.getRating());
-				//					}
-				//				}  else 
-				if (r instanceof PlayerRating) {
-					for (RatingComponent rc : r.getRatingComponents()) {
-						IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
-						if (pms != null && pms.getMatchId() != null && pms.getMatchId().equals(id)) {
-							((SummaryStatistics)ss).addValue(rc.getScaledRating());
-						}
-					}
-				}	
-			}
-			if (ss.getN() > 0)
-				body += ss.toString();
-		}
-		emailer.setMessage(body + "</pre>");
-		emailer.setSubject(query.toString());
-		emailer.send();
+//		body += sep + "Matches" + sep + "\n" + sep + sep + "\n";
+//		Iterator<ITeamMatchStats> it = tmsHomeMap.values().iterator();
+//		while (it.hasNext()) {
+//			Long id = it.next().getMatchId();
+//			IMatchGroup m = mf.get(id);
+//			body += sep + m.getDisplayName() + "\n";
+//			ss = new SummaryStatistics();
+//			for (IPlayerRating r : mrl) {
+//				//				if (r instanceof IPlayerMatchRating) {
+//				//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getMatchId().equals(id)) {
+//				//						((SummaryStatistics)ss).addValue(r.getRating());
+//				//					}
+//				//				}  else 
+//				if (r instanceof PlayerRating) {
+//					for (RatingComponent rc : r.getRatingComponents()) {
+//						IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
+//						if (pms != null && pms.getMatchId() != null && pms.getMatchId().equals(id)) {
+//							((SummaryStatistics)ss).addValue(rc.getScaledRating());
+//						}
+//					}
+//				}	
+//			}
+//			if (ss.getN() > 0)
+//				body += ss.toString();
+//		}
+		body += "</pre>";
+		return body;
+		
 	}
-
 	@Override
 	public boolean setQuery(IRatingQuery q) {
 		this.query = q;

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
+
 import com.googlecode.objectify.annotation.Entity;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -26,6 +28,11 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	protected boolean scaleTime = true;
 	protected boolean scaleComp = true;
 	protected boolean scaleStanding = true;
+	@Transient
+	protected IRatingMatrix ratingMatrix;
+	protected Long ratingMatrixId;
+	
+	protected Long topTenListId;
 
 	public RatingQuery() {
 		compIds = new ArrayList<Long>();
@@ -196,6 +203,36 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	@Override
 	public void setScaleStanding(boolean scaleStanding) {
 		this.scaleStanding = scaleStanding;
+	}
+
+	@Override
+	public void setRatingMatrix(IRatingMatrix ratingMatrix) {
+		this.ratingMatrix = ratingMatrix;
+		
+	}
+
+	@Override
+	public IRatingMatrix getRatingMatrix() {
+		return ratingMatrix;
+	}
+
+	@Override
+	public void setRatingMatrixId(Long ratingMatrixId) {
+		this.ratingMatrixId = ratingMatrixId;
+		
+	}
+
+	@Override
+	public Long getRatingMatrixId() {
+		return ratingMatrixId;
+	}
+	@Override
+	public Long getTopTenListId() {
+		return topTenListId;
+	}
+	@Override
+	public void setTopTenListId(Long topTenListId) {
+		this.topTenListId = topTenListId;
 	}
 
 }

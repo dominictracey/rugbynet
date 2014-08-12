@@ -186,7 +186,7 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 				contentDropdown.addStyleName("transparentMenuBG");
 				while (it.hasNext()) {
 					final IContent content = it.next();
-					if (content.isShowInMenu()) {
+					if (content != null && content.isShowInMenu()) {
 						NavLink nl = new NavLink(content.getTitle());
 						nl.addClickHandler( new ClickHandler() {
 
@@ -212,7 +212,7 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 						//						});
 						//						footerLinks.appendChild(a.getElement());
 						//					}
-					} else if (!content.getDiv().isEmpty()) {
+					} else if (content.getDiv() != null && !content.getDiv().isEmpty()) {
 						setDivContent(content);
 					}
 					//					if (isEditor) {

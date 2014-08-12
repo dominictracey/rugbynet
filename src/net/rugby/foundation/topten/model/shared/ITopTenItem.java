@@ -75,4 +75,8 @@ public interface ITopTenItem {
 
 	Long getPlayerRatingId();
 
+	void setLastOrdinal(int lastOrdinal);
+
+	int getLastOrdinal();
+
 }

@@ -4,11 +4,11 @@
 	<inherits name="com.google.gwt.user.User"/>
 	<inherits name="com.google.gwt.place.Place"/>
 	<inherits name="com.google.gwt.activity.Activity"/>
-<!-- 	<inherits name="com.googlecode.objectify.Objectify" /> -->
 	<inherits name="net.rugby.foundation.model.Model" />
 <!-- 	<inherits name="com.google.gwt.logging.Logging"/> -->
 	<inherits name="net.rugby.foundation.core.Core" />
 <!-- 	<inherits name="net.rugby.foundation.result.Result" /> -->
+	<set-property name="bootstrap.responsiveDesign" value="true"/>
 	<entry-point class="net.rugby.foundation.topten.client.TopTen"/>
 	<replace-with class="net.rugby.foundation.topten.client.ClientFactoryImpl">
 		<when-type-is class="net.rugby.foundation.topten.client.ClientFactory"/>

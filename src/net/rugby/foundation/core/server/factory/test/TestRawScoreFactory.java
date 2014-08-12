@@ -42,6 +42,8 @@ public class TestRawScoreFactory extends BaseCachingFactory<IRawScore> implement
 		t.setSchemaId(sf.getDefault().getId());
 		t.setPlayerId(9002000L + r.nextInt(22)); //9002011L
 		t.setPlayerMatchStatsId(t.getPlayerId() + 10000);
+		t.setRawScore(r.nextFloat()*40f);
+		t.setDetails("Test Player Raw Score");
 		return t;
 	}
 	

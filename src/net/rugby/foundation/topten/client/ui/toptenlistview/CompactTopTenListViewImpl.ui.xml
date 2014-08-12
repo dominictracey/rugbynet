@@ -26,7 +26,7 @@
     	<b:Row>
     	    <b:Column size ="12">
     	        <b:Row ui:field="contentPanel">
-    	            <b:Column size="6" >
+    	            <b:Column size="6" ui:field="contentDiv">
     	                <g:VerticalPanel ui:field="contentArea">
     	                	<b:Heading ui:field="title" size="3"></b:Heading>
     	                	<g:HTML ui:field="details1"></g:HTML>

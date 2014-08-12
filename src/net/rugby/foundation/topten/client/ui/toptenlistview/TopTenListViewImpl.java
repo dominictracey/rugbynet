@@ -79,7 +79,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 		list = result;
 		//setVisible(false);
 		if (result != null) {
-			clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent() + "<div id=\"fbListLike\"/>");
+			//clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent() + "<div id=\"fbListLike\"/>");
 
 			if (list.getPrevPublishedId() != null) {
 				prevButton.setVisible(true);
@@ -182,6 +182,12 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 	@Override
 	public void setItemCount(int itemCount) {
 		this.itemCount = itemCount;
+	}
+
+
+	@Override
+	public void showContent(boolean show) {
+		// can ignore this here I think.	
 	}
 
 

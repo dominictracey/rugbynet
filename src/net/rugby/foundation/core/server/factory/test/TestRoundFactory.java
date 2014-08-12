@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Random;
+
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Round;
@@ -16,11 +19,13 @@ import net.rugby.foundation.model.shared.Round;
 public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRoundFactory {
 
 	private IMatchGroupFactory gf;
-
+	private Random random = new Random();
+	private ITeamGroupFactory tf;
 	
 	@Inject
-	TestRoundFactory(IMatchGroupFactory gf) {
+	TestRoundFactory(IMatchGroupFactory gf, ITeamGroupFactory tf) {
 		this.gf = gf;
+		this.tf = tf;
 	}
 
 
@@ -36,6 +41,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 		
 		// Begin COMP 1
 		if (roundId == 6L) {
+			r.setCompId(1L);
 			r.setAbbr("1");
 			r.setName("Round 1");
 			r.setOrdinal(1);
@@ -43,6 +49,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(101L);
 			r.setCompId(1L);
 		} else if (roundId == 7L) {
+			r.setCompId(1L);
 			r.setAbbr("2");
 			r.setName("Round 2");
 			r.setOrdinal(2);
@@ -50,6 +57,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(103L);
 			r.setCompId(1L);
 		} else if (roundId == 8L) {
+			r.setCompId(1L);
 			r.setAbbr("3");			
 			r.setName("Round 3");
 			r.setOrdinal(3);
@@ -58,6 +66,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(106L);
 			r.setCompId(1L);
 		} else  if (roundId == 9L) {
+			r.setCompId(1L);
 			r.setAbbr("F");
 			r.setName("Finals");
 			r.setOrdinal(4);
@@ -66,6 +75,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.setCompId(1L);
 			/** BEGIN COMP 2 **/
 		} else if (roundId == 12L) {
+			r.setCompId(2L);
 			r.setAbbr("1");
 			r.setName("Round 1");
 			r.setOrdinal(1);
@@ -74,6 +84,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(202L);
 			r.setCompId(2L);
 		} else if (roundId == 13L) {
+			r.setCompId(2L);
 			r.setAbbr("2");			
 			r.setName("Round 2");
 			r.setOrdinal(2);
@@ -82,6 +93,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(205L);
 			r.setCompId(2L);
 		} else  if (roundId == 14L) {
+			r.setCompId(2L);
 			r.setAbbr("3");
 			r.setName("Round 3");
 			r.setOrdinal(3);
@@ -112,6 +124,17 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 
 		for (Long gid : r.getMatchIDs()) {
 			IMatchGroup g = gf.get(gid);
+			g.setRoundId(r.getId());
+			Long homeTeamId = random.nextInt(6) + 9001L; // we want between 9001 and 9006
+			Long visitTeamId = random.nextInt(6) + 9001L;
+			while (homeTeamId.equals(visitTeamId)) {  // don't let a team play itself
+				visitTeamId = random.nextInt(6) + 9001L;
+			}
+			g.setHomeTeamId(homeTeamId);
+			g.setHomeTeam(tf.get(homeTeamId));
+			g.setVisitingTeamId(visitTeamId);
+			g.setVisitingTeam(tf.get(visitTeamId));
+			gf.put(g);
 			r.getMatches().add(g);
 			if (g.getDate().before(r.getBegin())) {
 				r.setBegin(g.getDate());
