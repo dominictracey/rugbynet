@@ -206,12 +206,13 @@ public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory impl
 		}
 
 
+		List<ScrumPlayerMatchStats> toFlop = Lists.reverse(qpms.list());
 		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
 
-		for (ScrumPlayerMatchStats spms : qpms) {
+		for (ScrumPlayerMatchStats spms : toFlop) {
 			list.add(spms);
 		}
 
-		return Lists.reverse(list);
+		return list;
 	}
 }
