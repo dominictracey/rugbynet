@@ -417,7 +417,7 @@ public class TopTenFactoryTester {
 	@Test
 	public void createInNewComp() {
 
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
+		//List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
 		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10);
 		ITopTenList ttl = ttf.create(ttsd);
@@ -545,7 +545,7 @@ public class TopTenFactoryTester {
 		// publish 2
 		// delete 1
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
+		//List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
 		TopTenSeedData ttsd = new TopTenSeedData(700L, "uno", "one", 2L, null, 10);
 		ITopTenList ttl1 = ttf.create(ttsd); //create 1
