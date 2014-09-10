@@ -306,6 +306,14 @@ public class GenerateMatchRatings extends Job1<GenerateMatchRatingsResults, IMat
 			}
 		}
 
+		// there may be another card!
+		if (line.contains("<td")) {
+			//skip card
+			for (int i=0; i<4; ++i) {
+				line = it.next();
+			}
+		}
+		
 		// just read innermost </tr>
 		for (int i=0; i<3; ++i) {
 			line = it.next();
