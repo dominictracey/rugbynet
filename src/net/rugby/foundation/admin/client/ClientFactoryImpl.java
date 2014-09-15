@@ -28,6 +28,9 @@ import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewFieldDefi
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewImpl;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalViewImpl;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewColumnDefinitions;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewImpl;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.task.TaskViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.task.TaskViewImpl;
@@ -35,6 +38,7 @@ import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPo
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICountry;
@@ -76,6 +80,8 @@ public class ClientFactoryImpl implements ClientFactory {
 	private MatchRatingEngineSchemaPopupViewFieldDefinitions<ScrumMatchRatingEngineSchema20130713> matchRatingEngineSchemaPopupViewFieldDefinitions;
 	
 	private PlayerListView<IPlayerRating> playerListView = null;
+	private SeriesConfigurationView<ISeriesConfiguration> seriesConfigurationView = null;
+	private SeriesConfigurationViewColumnDefinitions<ISeriesConfiguration> seriesConfigurationViewColumnDefinitions =  null; 
 	private List<ColumnDefinition<IPlayerRating>> playerListViewColumnDefinitions =  null; 
 	private PlayerListView<IPlayerRating> ratingListView = null;
 	private List<ColumnDefinition<IPlayerRating>> ratingListViewColumnDefinitions =  null;
@@ -395,6 +401,23 @@ public class ClientFactoryImpl implements ClientFactory {
 			}
 
 		});	}
+
+	@Override
+	public SeriesConfigurationView<ISeriesConfiguration> getSeriesView() {
+		if (seriesConfigurationView == null) {
+			seriesConfigurationView = new SeriesConfigurationViewImpl<ISeriesConfiguration>();
+			seriesConfigurationView.setClientFactory(this);
+
+
+			if (seriesConfigurationViewColumnDefinitions == null) {
+				seriesConfigurationViewColumnDefinitions = new SeriesConfigurationViewColumnDefinitions<ISeriesConfiguration>();
+		    }
+							
+			seriesConfigurationView.setColumnDefinitions(seriesConfigurationViewColumnDefinitions);
+			seriesConfigurationView.setColumnHeaders(seriesConfigurationViewColumnDefinitions.getHeaders());
+		}
+		return seriesConfigurationView;
+	}
 
 
 }

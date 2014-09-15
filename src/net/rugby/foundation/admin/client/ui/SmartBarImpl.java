@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.place.AdminOrchPlace;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.place.PortalPlace;
+import net.rugby.foundation.admin.client.place.SeriesPlace;
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
@@ -45,6 +46,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@UiField MenuBar taskBar;
 	@UiField MenuBar portalBar;
 	@UiField MenuItem portalMenuShow;
+	@UiField MenuItem seriesMenuShow;
 	@UiField MenuBar schemaBar;
 	@UiField MenuItem schemaMenuNew;
 	@UiField MenuBar schemaList;
@@ -91,6 +93,12 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			@Override
 			public void execute() {
 				listener.goTo(new PortalPlace(""));
+			}
+		});
+		seriesMenuShow.setCommand(new Command() {
+			@Override
+			public void execute() {
+				listener.goTo(new SeriesPlace(""));
 			}
 		});
 		adminMenuFlushAllPipelineJobs.setCommand(new Command() {

@@ -2,7 +2,7 @@ package net.rugby.foundation.model.shared;
 
 import java.util.Date;
 
-public interface IRatingEngineSchema {
+public interface IRatingEngineSchema extends IHasId {
 	public abstract Long getId();
 	public abstract String getName();
 	public abstract String getDescription();

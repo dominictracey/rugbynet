@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -161,4 +162,16 @@ public interface RugbyAdminServiceAsync {
 	public void AddMatchToRound(IRound round,
 			AsyncCallback<IMatchGroup> asyncCallback);
 	public void cleanUp(AsyncCallback<String> asyncCallback);
+	
+	//RatingSeries
+	public void  getAllSeriesConfigurations(
+			AsyncCallback<List<ISeriesConfiguration>> asyncCallback);
+	public void  getSeriesConfiguration(Long id,
+			AsyncCallback<ISeriesConfiguration> asyncCallback);
+	public void  processSeriesConfiguration(Long sConfigId,
+			AsyncCallback<String> asyncCallback);
+	public void  deleteSeriesConfiguration(Long sConfigId,
+			AsyncCallback<Boolean> asyncCallback);
+	public void  saveSeriesConfiguration(ISeriesConfiguration sConfig,
+			AsyncCallback<ISeriesConfiguration> asyncCallback);
 }

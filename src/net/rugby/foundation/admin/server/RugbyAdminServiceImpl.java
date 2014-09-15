@@ -19,6 +19,7 @@ import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFacto
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
@@ -38,6 +39,7 @@ import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
@@ -148,6 +150,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IUrlCacher uc;
 	private IRatingQueryFactory rqf;
 	private IPlayerRatingFactory prf;
+	private ISeriesConfigurationFactory scf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -169,7 +172,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IAdminTaskFactory atf, IMatchResultFactory mrf, 
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
 			ICachingFactory<IContent> ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
-			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf) {
+			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -199,6 +202,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.uc = uc;
 			this.rqf = rqf;
 			this.prf = prf;
+			this.scf = scf;
 
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -1488,7 +1492,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ScrumMatchRatingEngineSchema getMatchRatingEngineSchema(Long schemaId) {
 		try {
 			if (checkAdmin()) {
-				IRatingEngineSchema schema = mresf.getById(schemaId);
+				IRatingEngineSchema schema = mresf.get(schemaId);
 				if (schema instanceof ScrumMatchRatingEngineSchema) {
 					return (ScrumMatchRatingEngineSchema) schema;
 				} else {
@@ -1982,6 +1986,67 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				return null;
 			
 		}
+	}
+
+	@Override
+	public List<ISeriesConfiguration> getAllSeriesConfigurations() {
+		try {
+			return scf.getAllActive();
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;	
+		}
+	}
+
+	@Override
+	public ISeriesConfiguration getSeriesConfiguration(Long id) {
+		try {
+			return scf.get(id);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;	
+		}	
+	}
+
+	@Override
+	public String processSeriesConfiguration(Long sConfigId) {
+		try {
+			ISeriesConfiguration sc = scf.get(sConfigId);
+			if (sc != null) {
+				// do the pipeline stuff
+				return "processing...";
+			} else {
+				return "Series Configuration Not Found";
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;	
+		}	
+	}
+
+	@Override
+	public Boolean deleteSeriesConfiguration(Long sConfigId) {
+		try {
+			ISeriesConfiguration sc = scf.get(sConfigId);
+			if (sc != null) {
+				return scf.delete(sc);
+			} else {
+				return false;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;	
+		}	
+	}
+
+	@Override
+	public ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) {
+		try {
+			return scf.put(sConfig);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;	
+		}	
 	}
 
 

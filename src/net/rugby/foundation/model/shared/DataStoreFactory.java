@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.OrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.WorkflowConfiguration;
+import net.rugby.foundation.admin.shared.seriesconfig.BaseSeriesConfiguration;
 import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
@@ -66,6 +67,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(EditTeamMatchStatsAdminTask.class);
 			ObjectifyService.register(ScrumMatchRatingEngineSchema.class);
 			ObjectifyService.register(ScrumMatchRatingEngineSchema20130713.class);
+			ObjectifyService.register(BaseSeriesConfiguration.class);
 			
 			//topten
 			ObjectifyService.register(TopTenList.class);

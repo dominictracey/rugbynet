@@ -2,14 +2,13 @@ package net.rugby.foundation.admin.server.factory;
 
 import java.util.List;
 
+import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
-public interface IMatchRatingEngineSchemaFactory {
-	IRatingEngineSchema getById(Long id);
+public interface IMatchRatingEngineSchemaFactory extends ICachingFactory<IRatingEngineSchema> {
+
 	IRatingEngineSchema getDefault();
-	IRatingEngineSchema put (IRatingEngineSchema schema);
-	Boolean delete(IRatingEngineSchema schema);
 	IRatingEngineSchema setAsDefault(IRatingEngineSchema schema);
 	
 	// this is awkward downcast

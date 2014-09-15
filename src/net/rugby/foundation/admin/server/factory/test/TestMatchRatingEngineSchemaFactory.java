@@ -1,17 +1,19 @@
 package net.rugby.foundation.admin.server.factory.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import net.rugby.foundation.admin.server.factory.BaseMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
-public class TestMatchRatingEngineSchemaFactory implements
+public class TestMatchRatingEngineSchemaFactory extends BaseMatchRatingEngineSchemaFactory implements
 		IMatchRatingEngineSchemaFactory {
 
 	@Override
-	public IRatingEngineSchema getById(Long id) {
+	public IRatingEngineSchema getFromPersistentDatastore(Long id) {
 		if (id == 1000L) {
 			return new ScrumMatchRatingEngineSchema20130713();
 		}
@@ -19,7 +21,7 @@ public class TestMatchRatingEngineSchemaFactory implements
 	}
 
 	@Override
-	public IRatingEngineSchema getDefault() {
+	public IRatingEngineSchema getDefaultFromDB() {
 		IRatingEngineSchema s = new ScrumMatchRatingEngineSchema20130713();
 		((ScrumMatchRatingEngineSchema20130713)s).setId(20130713L);
 		((ScrumMatchRatingEngineSchema20130713)s).setCleanBreaksWeight(.2F);
@@ -61,26 +63,20 @@ public class TestMatchRatingEngineSchemaFactory implements
 	}
 
 	@Override
-	public IRatingEngineSchema put(IRatingEngineSchema schema) {
+	public IRatingEngineSchema putToPersistentDatastore(IRatingEngineSchema schema) {
 		return schema;
 	}
 
 	@Override
-	public Boolean delete(IRatingEngineSchema schema) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IRatingEngineSchema setAsDefault(IRatingEngineSchema schema) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean deleteFromPersistentDatastore(IRatingEngineSchema schema) {
+		return true;
 	}
 
 	@Override
 	public List<ScrumMatchRatingEngineSchema> getScrumList() {
-		// TODO Auto-generated method stub
-		return null;
+		List<ScrumMatchRatingEngineSchema>list = new ArrayList<ScrumMatchRatingEngineSchema>();
+		list.add((ScrumMatchRatingEngineSchema) getDefault());
+		return list;
 	}
 
 }

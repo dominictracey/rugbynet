@@ -7,6 +7,7 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -131,4 +132,11 @@ public interface RugbyAdminService extends RemoteService {
 	String checkPipelineStatus(String id, Long matchId);
 	IMatchGroup AddMatchToRound(IRound round);
 	String cleanUp();
+	
+	// rating series
+	List<ISeriesConfiguration> getAllSeriesConfigurations();
+	ISeriesConfiguration getSeriesConfiguration(Long id);
+	String processSeriesConfiguration(Long sConfigId);
+	Boolean deleteSeriesConfiguration(Long sConfigId);
+	ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig);
 }
