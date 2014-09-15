@@ -30,7 +30,7 @@ public class TwitterPromoter implements IPromotionHandler {
 	public String process(ITopTenList ttl) {
 
 		String retval = "<p>******** TWITTER *********</p>\n";
-		String longUrl = "http://www.rugby.net/fb/topten.html?listId="+ttl.getId();
+		String longUrl = "http://www.rugby.net/fb/topten.html?listId="+ttl.getId()+"#List:listId="+ttl.getId();
 		String shortURL = "short url";
 		try {
 			shortURL = createShortUrl(longUrl);
@@ -43,7 +43,7 @@ public class TwitterPromoter implements IPromotionHandler {
 			
 			if (i.getPlayer().getTwitterHandle() != null && !i.getPlayer().getTwitterHandle().isEmpty()) {
 				String player = i.getPlayer().getDisplayName();
-				String tweet = i.getPlayer().getTwitterHandle() + " You've made The Rugby Net " + ttl.getTitle() + "! How about a RT? ";
+				String tweet = i.getPlayer().getTwitterHandle() + " you've made @TheRugbyNet " + ttl.getTitle() + "! ";
 				String URL ="http://twitter.com/home?status="+ URLEncoder.encode(tweet + shortURL);
 				retval += "<p><a href=\"" + URL +"\">"+ player +"</a></p>\n" + "\n";
 			}
