@@ -60,7 +60,7 @@ public abstract class Position implements Serializable {
 		NUMBER8 ("Number 8", "NO8"), 
 		SCRUMHALF ("Scrum Half", "SCR"), 
 		FLYHALF ("Fly Half", "FLY"), 
-		CENTER ("Center", "CTR"), 
+		CENTER ("Centre", "CTR"), 
 		WING ("Wing", "WNG"), 
 		FULLBACK ("Fullback", "FUL"), 
 		RESERVE ("Reserve", "RES");
