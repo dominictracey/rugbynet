@@ -29,6 +29,7 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 
 public interface RugbyAdminServiceAsync {
@@ -174,4 +175,6 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<Boolean> asyncCallback);
 	public void  saveSeriesConfiguration(ISeriesConfiguration sConfig,
 			AsyncCallback<ISeriesConfiguration> asyncCallback);
+	public void getUniversalRounds(int size,
+			AsyncCallback<List<UniversalRound>> asyncCallback);
 }

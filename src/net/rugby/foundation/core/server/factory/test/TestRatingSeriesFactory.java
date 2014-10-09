@@ -1,28 +1,27 @@
 package net.rugby.foundation.core.server.factory.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.joda.time.DateTime;
 
-import com.google.inject.Inject;
-
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
-import net.rugby.foundation.core.server.factory.ICompetitionFactory;
-import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.BaseRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.RatingSeries;
 
-public class TestRatingSeriesFactory extends BaseCachingFactory<IRatingSeries> implements IRatingSeriesFactory {
+public class TestRatingSeriesFactory extends BaseRatingSeriesFactory implements IRatingSeriesFactory {
 
-	private ICompetitionFactory cf;
+//	private ICompetitionFactory cf;
 	private Long counter = 75100L;
-	private IRatingGroupFactory rgf;
-	@Inject
-	public TestRatingSeriesFactory(ICompetitionFactory cf, IRatingGroupFactory rgf) {
-		this.cf = cf;
-		this.rgf = rgf;
-	}
+//	private IRatingGroupFactory rgf;
+//	@Inject
+//	public TestRatingSeriesFactory(ICompetitionFactory cf, IRatingGroupFactory rgf) {
+//		this.cf = cf;
+//		this.rgf = rgf;
+//	}
 	
 	@Override
 	public IRatingSeries create() {
@@ -50,8 +49,10 @@ public class TestRatingSeriesFactory extends BaseCachingFactory<IRatingSeries> i
 			//retval.getComps().add(cf.get(1L));
 			retval.getRatingGroupIds().add(76000L);
 			retval.getRatingGroupIds().add(76001L);  
-			retval.getRatingGroups().add(rgf.get(76000L));
-			retval.getRatingGroups().add(rgf.get(76001L));
+//			retval.getRatingGroups().add(rgf.get(76000L));
+//			retval.getRatingGroups().add(rgf.get(76001L));
+			retval.setDisplayName("Best in The Rugby Championship By Position");
+			build(retval);
 			return retval;
 		}
 		
@@ -76,6 +77,14 @@ public class TestRatingSeriesFactory extends BaseCachingFactory<IRatingSeries> i
 	@Override
 	public IRatingSeries get(Long compId, RatingMode mode) {
 		return get(75000L);
+	}
+
+	@Override
+	public List<RatingMode> getModesForCompFromPersistentDatastore(Long compId) {
+		List<RatingMode> list = new ArrayList<RatingMode>();
+		list.add(RatingMode.BY_POSITION);
+		list.add(RatingMode.BY_LAST_MATCH);
+		return null;
 	}
 
 

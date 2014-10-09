@@ -7,18 +7,25 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
-import net.rugby.foundation.admin.shared.ISeriesConfiguration.ConfigurationType;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration.Status;
 import net.rugby.foundation.admin.shared.seriesconfig.BaseSeriesConfiguration;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.model.shared.Criteria;
+import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.RatingMode;
 
 public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesConfiguration> implements ISeriesConfigurationFactory {
 
 	private ICompetitionFactory cf;
+	private IUniversalRoundFactory urf;
+	private Long count = 47500100L;
 
 	@Inject 
-	public TestSeriesConfigurationFactory(ICompetitionFactory cf) {
+	public TestSeriesConfigurationFactory(ICompetitionFactory cf, IUniversalRoundFactory urf) {
 		this.cf = cf;
+		this.urf = urf;
 	}
 	
 	@Override
@@ -31,6 +38,7 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 		List<ISeriesConfiguration> list = new ArrayList<ISeriesConfiguration>();
 		//if (compId == 1) {
 			list.add(get(4750000L));
+			list.add(get(4750001L));
 		//}
 		return list;
 	}
@@ -43,14 +51,35 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 		if (id.equals(4750000L)) {
 			ISeriesConfiguration sc = new BaseSeriesConfiguration();
 			sc.setId(id);
-			sc.setCompId(1L);
-			sc.setCompName(cf.get(1L).getShortName());
-			sc.setStatus("Pending");
-			sc.setLastRoundId(null);
-			sc.setLastRound(null);
-			sc.setType(ConfigurationType.BY_POSITION);
+			sc.getCompIds().add(1L);
+			sc.getComps().add(cf.get(1L));
+			//sc.getCompNames().add(cf.get(1L).getShortName());
+			sc.setStatus(Status.PENDING);
+			sc.setLastRound(urf.get(cf.get(1L).getRounds().get(0)));
+			sc.setLastRoundOrdinal(sc.getLastRound().ordinal);
+			sc.setTargetRoundOrdinal(sc.getLastRoundOrdinal() + 1);
+			sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
+			sc.setMode(RatingMode.BY_POSITION);
+			sc.getActiveCriteria().add(Criteria.BEST_YEAR);
+			sc.setLive(true);
+			return sc;
+		} else if (id.equals(4750001L)) {
+			ISeriesConfiguration sc = new BaseSeriesConfiguration();
+			sc.setId(id);
+			sc.getCompIds().add(1L);
+			sc.getComps().add(cf.get(1L));
+			//sc.getCompNames().add(cf.get(1L).getShortName());
+			sc.setStatus(Status.PENDING);
+			sc.setLastRound(urf.get(cf.get(1L).getRounds().get(0)));
+			sc.setLastRoundOrdinal(sc.getLastRound().ordinal);
+			sc.setTargetRoundOrdinal(sc.getLastRoundOrdinal() + 1);
+			sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
+			sc.setMode(RatingMode.BY_LAST_MATCH);
+			sc.getActiveCriteria().add(Criteria.BEST_YEAR);
+			sc.setLive(true);
 			return sc;
 		}
+		
 		
 		
 		return null;
@@ -58,8 +87,14 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 
 	@Override
 	protected ISeriesConfiguration putToPersistentDatastore(
-			ISeriesConfiguration t) {
-		return t;
+			ISeriesConfiguration sc) {
+		sc.setId(count ++);
+		// repopulate the comps list
+		sc.setComps(new ArrayList<ICompetition>());
+		for (Long compId : sc.getCompIds()) {
+			sc.getComps().add(cf.get(compId));
+		}
+		return sc;
 	}
 
 	@Override

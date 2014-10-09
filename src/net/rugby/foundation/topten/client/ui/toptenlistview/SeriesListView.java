@@ -1,12 +1,11 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
 import java.util.List;
-
-import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -32,6 +31,7 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 		//void showRatingQuery(IRatingQuery rq);
 		//void showRatingGroup(long gid);
 		void gotoPlace(Place place);
+		void switchMode(Long compId, RatingMode _mode);
 	}
 	
 	void setSeries(IRatingSeries series, String baseUrl);
@@ -42,8 +42,8 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 	void setListView(TopTenListView<ITopTenItem> listView);
 	IRatingSeries getSeries();
 	void setPresenter(SeriesListViewPresenter presenter);
-	Criteria getCriteria();
-	void setCriteria(Criteria criteria);
+	RatingMode getMode();
+	void setMode(RatingMode mode);
 	void setCompId(Long compId);
 	IRatingQuery getQuery();
 	void setQuery(IRatingQuery query);
@@ -66,6 +66,8 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 	void setRatingQueries(IRatingMatrix matrix, List<IRatingQuery> result);
 
 	void copyPlace(SeriesPlace sPlace);
+
+	void setAvailableModes(List<RatingMode> modeMap);
 
 	
 }

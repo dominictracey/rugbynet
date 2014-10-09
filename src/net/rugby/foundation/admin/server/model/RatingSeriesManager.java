@@ -9,11 +9,15 @@ import org.joda.time.DateTime;
 
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -24,6 +28,7 @@ import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.Position;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.inject.Inject;
 
@@ -36,42 +41,136 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	private IQueryRatingEngineFactory qref;
 	private IMatchRatingEngineSchemaFactory mresf;
 
+	protected IRatingSeries rs;
+	protected ISeriesConfiguration sc;
+	private IUniversalRoundFactory urf;
+	private IRoundFactory rf;
+
 	@Inject
 	public RatingSeriesManager(IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IRatingQueryFactory rqf, 
-			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory rsef) {
+			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory rsef, IUniversalRoundFactory urf, IRoundFactory rf) {
 		this.rsf = rsf;
 		this.rgf = rgf;
 		this.rmf = rmf;
 		this.rqf = rqf;
 		this.qref = qref;
 		this.mresf = rsef;
+		this.urf = urf;
+		this.rf = rf;
 	}
 
 
-	// This creates the first RatingGroups and RatingMatrices and populates them with RatingQueries
+	// This determines whether we are ready to create a new RatingGroup
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.model.IRatingSeriesManager#initialize(net.rugby.foundation.model.shared.IRatingSeries)
 	 */
 	@Override
-	public List<IRatingGroup> initialize(IRatingSeries rs) {
+	public IRatingSeries initialize(ISeriesConfiguration sc) {
 
-		// create a RatingGroup for now
-		IRatingGroup rg = addRatingGroup(rs, DateTime.now());		
-		rs.getRatingGroups().add(rg);
-		rs.getRatingGroupIds().add(rg.getId());
+		this.sc = sc;
 
-		rsf.put(rs);
+		if (sc == null)
+			return null;
+
+		if (sc.getSeries() == null) {
+			IRatingSeries series = rsf.create();
+			series.getActiveCriteria().addAll(sc.getActiveCriteria());
+			series.getCompIds().addAll(sc.getCompIds());
+			series.getCountryIds().addAll(sc.getCountryIds());
+			series.setMode(sc.getMode());
+			series.setCreated(DateTime.now().toDate());
+			series.setLive(true);
+			series.setStart(DateTime.now().toDate());
+			rsf.build(series);
+			rsf.put(series);
+			sc.setSeries(series);
+			sc.setSeriesId(series.getId());
+
+			return series;
+		} else {
+			return sc.getSeries();
+		}
+
+	}
+
+	@Override
+	public Boolean readyForNewGroup(ISeriesConfiguration config) {	
+
+		// return true if
+		//	1) Series has been created
+		//	2) Series has a target UniversalRound specified
+		//	3) target UR is not in future
+		//	4) The comps configured for this series have all of the stats all fetched for the target UR
+
+		IRatingSeries series = config.getSeries();
+		if (series == null) {
+			return false;
+		}
+
+		int targetURordinal = config.getTargetRound().ordinal;
+		
+		// does the group already exist?
+		for (IRatingGroup g : series.getRatingGroups()) {
+			if (g.getUniversalRoundOrdinal() == targetURordinal) {
+				return false;
+			}
+		}
+		
+		int currentURordinal = urf.getCurrent().ordinal;
+
+		// can't do a future round
+		if (targetURordinal > currentURordinal) {
+			return false;
+		}
+
+		// can't do it if the necessary rounds are not in the FETCHED state
+		// it is ok if the comp doesn't have a round for the target UR.
+		// note this isn't true for when we are doing match review
+		if (!config.getMode().equals(RatingMode.BY_LAST_MATCH) && !config.getMode().equals(RatingMode.BY_POSITION)) {
+			for (ICompetition c : config.getComps()) {
+				// get the round for the target UniversalRound
+				for (IRound r : c.getRounds()) {
+					if (urf.get(r).ordinal == targetURordinal) {
+						if (r.getWorkflowStatus() == null) {
+							throw new RuntimeException(r.getName() + " in comp " + c.getShortName() + " does not have a valid workflow status.");
+						}
+						if (!r.getWorkflowStatus().equals(IRound.WorkflowStatus.FETCHED)) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+
+
+	@Override
+	public String process(IRatingSeries rs) {
+		//	
+		//		// start a workflow
+		//		IRatingGroup rg = addRatingGroup(rs, DateTime.now());		
+		//		rs.getRatingGroups().add(rg);
+		//		rs.getRatingGroupIds().add(rg.getId());
+		//
+		//		rsf.put(rs);
 
 		generateRatings(rs);
 
-		return rs.getRatingGroups();
+		return null;
 	}
 
-	protected IRatingGroup addRatingGroup(IRatingSeries rs, DateTime time ) {
+
+
+	public IRatingGroup addRatingGroup(IRatingSeries rs, UniversalRound time ) {
 		IRatingGroup rg = rgf.create();
 		rg.setRatingSeries(rs);
 		assert(rs.getId() != null);
 		rg.setRatingSeriesId(rs.getId());
+		rg.setUniversalRound(time);
+		rg.setUniversalRoundOrdinal(time.ordinal);
 		rgf.put(rg); // get id for ratingGroup
 
 		// now create the Rating Matrices for the group
@@ -91,7 +190,11 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 		}
 
+
 		rgf.put(rg);
+		rs.getRatingGroupIds().add(rg.getId());
+		rs.getRatingGroups().add(rg);
+		rsf.put(rs);
 
 		return rg;
 	}
@@ -103,16 +206,28 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			IRatingSeries rs = rm.getRatingGroup().getRatingSeries();
 
 			for (ICompetition comp : rs.getComps()) {
-				IRound round = comp.getPrevRound();
+				UniversalRound ur = sc.getTargetRound();
 				if (rs.getMode() == RatingMode.BY_LAST_MATCH) {
-					rids.add(round.getId());
-				} else if (rm.getCriteria() == Criteria.BEST_YEAR) {
+					// assume we only want the target round
+					IRound targetRound = null;
+					boolean found = false;
+					for (IRound r : comp.getRounds()) {
+						targetRound = r;
+						if (urf.get(r).ordinal == ur.ordinal) {
+							found = true;
+							break;
+						}
+					}
+					if (found) {
+						rids.add(targetRound.getId());
+					}
+				} else if (rm.getCriteria() == Criteria.BEST_YEAR || rm.getCriteria() == Criteria.IN_FORM) {
 					// get the rounds for the comps that happened in the last year.
 					List<IRound> rounds = getRoundsFromLastYear(comp);
 					for (IRound r : rounds) {
 						rids.add(r.getId());
 					}
-				}
+				} 
 			}
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage(), e);
@@ -150,12 +265,37 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					IRatingQuery rq = rqf.create();
 					rq.setRatingMatrix(rm);
 					rq.getPositions().add(pos);
+					rq.setLabel(pos.getName());
 					rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
 					rq.setScaleStanding(true);
 					rq.setScaleComp(false);
 					rq.setScaleTime(scaleTime);
 					rq.setStatus(Status.NEW);
 					rq.setRoundIds(rids);
+					rq.setRatingMatrixId(rm.getId());
+					rqf.put(rq);
+					rm.getRatingQueries().add(rq);
+					rm.getRatingQueryIds().add(rq.getId());
+					rmf.put(rm);
+				}
+			}
+		} else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_LAST_MATCH) {
+
+			for (Long rid : rids) {
+				IRound targetRound = rf.get(rid);
+				for (IMatchGroup m: targetRound.getMatches()) {
+
+					IRatingQuery rq = createRatingQuery(rm);
+
+					rq.setScaleStanding(true);
+					rq.setScaleComp(false);
+					rq.setScaleTime(scaleTime);
+
+					rq.setRoundIds(rids);
+					rq.getTeamIds().add(m.getHomeTeamId());
+					rq.getTeamIds().add(m.getVisitingTeamId());
+					rq.setRatingMatrixId(rm.getId());
+					rq.setLabel(m.getDisplayName());
 					rqf.put(rq);
 					rm.getRatingQueries().add(rq);
 					rm.getRatingQueryIds().add(rq.getId());
@@ -164,8 +304,19 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			}
 		}
 
-
 	}
+
+
+
+
+	private IRatingQuery createRatingQuery(IRatingMatrix rm) {
+		IRatingQuery rq = rqf.create();
+		rq.setStatus(Status.NEW);
+		rq.setRatingMatrix(rm);
+		rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
+		return rq;
+	}
+
 
 	public void generateRatings(IRatingSeries rs)
 	{
@@ -181,6 +332,8 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			}
 		}
 	}
+
+
 
 
 }

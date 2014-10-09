@@ -79,4 +79,8 @@ public interface ITopTenItem {
 
 	int getLastOrdinal();
 
+	void setPlaceGuid(String placeGuid);
+
+	String getPlaceGuid();
+
 }

@@ -105,14 +105,14 @@
 		</auth-constraint>
 	</security-constraint>
 	
-		<security-constraint>
-		<web-resource-collection>
-			<url-pattern>/_ah/pipeline/*</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>admin</role-name>
-		</auth-constraint>
-	</security-constraint>
+<!-- 		<security-constraint> -->
+<!-- 		<web-resource-collection> -->
+<!-- 			<url-pattern>/_ah/pipeline/*</url-pattern> -->
+<!-- 		</web-resource-collection> -->
+<!-- 		<auth-constraint> -->
+<!-- 			<role-name>admin</role-name> -->
+<!-- 		</auth-constraint> -->
+<!-- 	</security-constraint> -->
 	
 	<session-config>
 		<session-timeout>25000</session-timeout>

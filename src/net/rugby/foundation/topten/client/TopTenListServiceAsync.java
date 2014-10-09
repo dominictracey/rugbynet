@@ -1,6 +1,7 @@
 package net.rugby.foundation.topten.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -10,6 +11,7 @@ import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -45,4 +47,6 @@ public interface TopTenListServiceAsync {
 	public void  getRatingMatrix(Long ratingMatrixId, AsyncCallback<IRatingMatrix> asyncCallback);
 	public void getRatingQueriesForMatrix(Long id,
 			AsyncCallback<List<IRatingQuery>> asyncCallback);
+	public void getAvailableSeries(Long compId, AsyncCallback<List<RatingMode>> asyncCallback);
+	public void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
 }

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
@@ -15,13 +17,15 @@ import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
 
 public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Serializable,IMatchGroupFactory {
-	
+
 
 	/**
 	 * 
@@ -45,7 +49,23 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 				IMatchResult mr = mrf.get(g.getSimpleScoreMatchResultId());
 				mr.setMatch(g);
 				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);  // @REX need to sort this out before other types of results are added
-				
+
+			}
+
+			// self cleaning oven for workflowStatus			
+			if (g.getWorkflowStatus() == null) {
+				g.setWorkflowStatus(WorkflowStatus.PENDING);
+				// if the match happened more than two weeks ago we either got stats or didn't
+				DateTime mTime = new DateTime(g.getDate());
+				if (mTime.isBefore(DateTime.now().minusWeeks(2))) {
+					if (pmsf.getByMatchId(id).isEmpty()) {
+						g.setWorkflowStatus(WorkflowStatus.NO_STATS);
+
+					} else {
+						g.setWorkflowStatus(WorkflowStatus.FETCHED);
+					}
+				}
+				ofy.put(g); 
 			}
 		}
 		return g;
@@ -120,9 +140,11 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 	@Override
 	public IMatchGroup create() {
 		try {
-		IMatchGroup m =  new MatchGroup();
-		//m.setCreatedDate(new Date());
-		return m;
+			IMatchGroup m =  new MatchGroup();
+			m.setStatus(Status.SCHEDULED);
+			m.setWorkflowStatus(WorkflowStatus.PENDING);
+			//m.setCreatedDate(new Date());
+			return m;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error creating match " + ex.getLocalizedMessage(), ex);
 			return null;

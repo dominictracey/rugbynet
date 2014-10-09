@@ -27,6 +27,7 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected Date published;
 	protected Date expiration;
 	protected Boolean live;
+	protected Boolean series;
 	@Unindexed
 	protected String summary;
 	protected Long editorId;
@@ -236,6 +237,14 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setQueryId(Long id) {
 		this.queryId = id;
+	}
+	@Override
+	public Boolean getSeries() {
+		return series;
+	}
+	@Override
+	public void setSeries(Boolean series) {
+		this.series = series;
 	}
 
 }

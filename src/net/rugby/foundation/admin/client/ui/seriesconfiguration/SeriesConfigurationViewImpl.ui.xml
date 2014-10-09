@@ -24,7 +24,7 @@
 	 <g:SimplePanel ui:field='menuBarPanel'></g:SimplePanel>
     
     <g:HTMLPanel>
-	<g:Button ui:field="deleteSelected">Delete Selected</g:Button>
+	<g:Button ui:field="addNew">Add New</g:Button>
         <g:FlexTable
             addStyleNames="{style.playersViewPlayersFlexTable}"
             

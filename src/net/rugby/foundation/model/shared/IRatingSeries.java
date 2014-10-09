@@ -55,6 +55,10 @@ public interface IRatingSeries extends IHasId {
 	public abstract List<Long> getRatingGroupIds();
 
 	public abstract void setRatingGroupIds(List<Long> ratingGroupIds);
+
+	public abstract String getDisplayName();
+
+	public abstract void setDisplayName(String displayName);
 	
 
 }

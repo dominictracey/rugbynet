@@ -57,4 +57,7 @@ public interface IRatingQuery extends IHasId {
 	Long getTopTenListId();
 
 	void setTopTenListId(Long topTenListId);
+
+	public abstract String getLabel();
+	public abstract void setLabel(String name);
 }

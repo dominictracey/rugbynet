@@ -11,18 +11,22 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.orchestration.IOrchestration;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingSeries;
 
 @Singleton
 public class OrchestrationServlet extends HttpServlet {
@@ -33,13 +37,16 @@ public class OrchestrationServlet extends HttpServlet {
 	private ICompetitionFactory cf;
 	private IMatchGroupFactory mgf;
 	private IRatingQueryFactory rqf;
+	private ISeriesConfigurationFactory scf;
 
 	@Inject
-	public OrchestrationServlet(IOrchestrationFactory of, ICompetitionFactory cf, IMatchGroupFactory mgf, IRoundFactory rf, ITeamGroupFactory tf, IRatingQueryFactory rqf) {
+	public OrchestrationServlet(IOrchestrationFactory of, ICompetitionFactory cf, IMatchGroupFactory mgf, IRoundFactory rf, ITeamGroupFactory tf, 
+			IRatingQueryFactory rqf, ISeriesConfigurationFactory scf) {
 		this.of = of;
 		this.cf = cf;
 		this.mgf = mgf;
 		this.rqf = rqf;
+		this.scf = scf;
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -92,6 +99,19 @@ public class OrchestrationServlet extends HttpServlet {
 	        		rq = rqf.get(Long.parseLong(req.getParameter("id")));
 	        }
 	        IOrchestration<IRatingQuery> orch = of.get(rq, AdminOrchestrationActions.RatingActions.valueOf(AdminOrchestrationActions.RatingActions.class, action));
+	        if (orch != null) {
+	        	orch.execute();
+	        }
+		}  else if (target.equals(AdminOrchestrationTargets.Targets.SERIES.toString())) {
+			if (req.getParameter("id") == null) {
+				resp.getWriter().println("No id parameter (for RatingSeries).");
+				return;
+			}
+	        ISeriesConfiguration sc = null;
+	        if (Long.parseLong(req.getParameter("id")) != 0) {
+	        		sc = scf.get(Long.parseLong(req.getParameter("id")));
+	        }
+	        IOrchestration<ISeriesConfiguration> orch = of.get(sc, AdminOrchestrationActions.RatingActions.valueOf(AdminOrchestrationActions.SeriesActions.class, action));
 	        if (orch != null) {
 	        	orch.execute();
 	        }

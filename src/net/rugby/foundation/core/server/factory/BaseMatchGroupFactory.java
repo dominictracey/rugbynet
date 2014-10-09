@@ -15,6 +15,7 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.MatchGroup;
@@ -23,7 +24,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 5536925770981961238L;
+	//private static final long serialVersionUID = 5536925770981961238L;
 
 	protected ITeamGroupFactory tf;
 	protected IMatchResultFactory mrf;
@@ -34,7 +35,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 	
 	@Inject
 	protected void setFactories(IMatchResultFactory mrf, ITeamGroupFactory tf, IRoundFactory rf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf,
-			IPlayerRatingFactory pmrf) {
+			IPlayerRatingFactory prf) {
 
 		this.tf = tf;
 		this.mrf = mrf;
@@ -66,6 +67,11 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 
 			((MatchGroup)g).setHomeTeamId(g.getHomeTeam().getId());
 			((MatchGroup)g).setVisitingTeamId(g.getVisitingTeam().getId());
+			
+			// need to retroactively set these 
+			if (g.getWorkflowStatus() == null) {
+				g.setWorkflowStatus(WorkflowStatus.FETCHED);
+			}
 			
 			g = super.put(g);
 			

@@ -271,6 +271,14 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		}
 		return seriesView; 
 	}
+	@Override
+	public String getPlaceFromURL() {
+		if (Location.getPath().contains("/s/")) {
+			return Location.getPath().split("/")[2];
+		} else {
+			return null;
+		}
+	}
 
 
 }

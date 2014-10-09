@@ -20,7 +20,7 @@
 	</ui:style>
     <g:HTMLPanel width="100%" ui:field="topTenPanel" styleName="{style.shadow}">
         <b:Well>
-            <b:SplitDropdownButton text="Rate by" ui:field="criteriaDropDown" icon="GITHUB">
+            <b:SplitDropdownButton text="Ratings" ui:field="criteriaDropDown" icon="GITHUB">
 			</b:SplitDropdownButton>
 			<b:SplitDropdownButton text="Week" ui:field="weekDropDown" icon="GITHUB">
 			</b:SplitDropdownButton>

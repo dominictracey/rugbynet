@@ -8,7 +8,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import net.rugby.foundation.core.client.Identity.Presenter;
-import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
@@ -65,6 +64,22 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 						clientFactory.getPlaceController().goTo(view.getPlace());
 						return;
 					} else if (sPlace.getSeriesId() == null) {
+						clientFactory.getRpcService().getAvailableSeries(sPlace.getCompId(), new AsyncCallback<List<RatingMode>>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								Window.alert("We're in trouble here...");								
+							}
+
+							@Override
+							public void onSuccess(List<RatingMode> result) {
+								if (result != null) {
+									view.setAvailableModes(result);
+								}
+							}
+							
+						});
+						
 						// default series for comp is By Position
 						clientFactory.getRpcService().getRatingSeries(sPlace.getCompId(), RatingMode.BY_POSITION, new AsyncCallback<IRatingSeries>() {
 
@@ -75,7 +90,9 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 
 							@Override
 							public void onSuccess(IRatingSeries result) {
-								view.setSeries(result, _coreConfig.getBaseToptenUrl() );
+								if (result != null) {
+									view.setSeries(result, _coreConfig.getBaseToptenUrl() );
+								}
 							}
 
 						});
@@ -90,7 +107,9 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 
 							@Override
 							public void onSuccess(IRatingSeries result) {
-								view.setSeries(result, _coreConfig.getBaseToptenUrl());
+								if (result != null) {
+									view.setSeries(result, _coreConfig.getBaseToptenUrl());
+								}
 							}
 						});
 						return;
@@ -100,7 +119,7 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 						IRatingGroup latest = series.getRatingGroups().get(0);
 						assert (series != null);
 						for (IRatingGroup g : series.getRatingGroups()) {
-							if (g.getDate().after(latest.getDate())) {
+							if (g.getUniversalRoundOrdinal() > latest.getUniversalRoundOrdinal()) {
 								latest = g;
 							}
 						}
@@ -125,10 +144,10 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 						IRatingGroup g = view.getGroup();
 						assert (g != null);
 						for (IRatingMatrix m : g.getRatingMatrices()) {
-							if (m.getCriteria() == Criteria.BEST_YEAR) {
+							//if (m.getCriteria() == Criteria.BEST_YEAR) {
 								view.setMatrix(m);
 								break;
-							}
+							//}
 						}
 						return;
 					} else if (view.getMatrix() == null) { // view wants a different one
@@ -153,29 +172,38 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 							@Override
 							public void onFailure(Throwable caught) {
 								// TODO Auto-generated method stub
-								
+
 							}
 
 							@Override
 							public void onSuccess(List<IRatingQuery> result) {
 								view.setRatingQueries(view.getMatrix(),result);  // graft them on
 							}
-							
+
 						});
-					
+
 					} else if (sPlace.getQueryId() == null) {
-						
-						
-						// default query is first
-						view.setQuery(view.getMatrix().getRatingQueries().get(0));
-						//clientFactory.getPlaceController().goTo(view.getPlace());
+
+
+						// default query is first populated one
+						IRatingQuery rq = null;
+						for (IRatingQuery rql: view.getMatrix().getRatingQueries()) {
+							if (rql.getTopTenListId() != null) {
+								rq = rql;
+								break;
+							}
+						}
+
+						if (rq != null) {
+							view.setQuery(rq);
+						}
 						return;
 					} else if (view.getList() == null) { // changing tabs
-//						for (IRatingQuery q : view.getMatrix().getRatingQueries()) {
-//							if (q.getId().equals(view.getQueryId())) {
-//								view.setQuery(q);
-//							}
-//						}
+						//						for (IRatingQuery q : view.getMatrix().getRatingQueries()) {
+						//							if (q.getId().equals(view.getQueryId())) {
+						//								view.setQuery(q);
+						//							}
+						//						}
 						// and the top ten list
 						clientFactory.getRpcService().getTopTenListForRatingQuery(view.getQueryId(), new AsyncCallback<ITopTenList>() {
 
@@ -299,4 +327,26 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 	//});
 	//}
 	//}
+
+	@Override
+	public void switchMode(final Long compId, final RatingMode mode) {
+		clientFactory.getRpcService().getRatingSeries(compId, mode, new AsyncCallback<IRatingSeries>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onSuccess(IRatingSeries result) {
+				view.setSeriesId(result.getId());
+				view.setSeries(result,_coreConfig.getBaseToptenUrl());
+			}
+			
+		});
+
+		
+		
+	}
 }

@@ -4,12 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
-import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
@@ -20,8 +18,6 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SplitDropdownButton;
 import com.github.gwtbootstrap.client.ui.Tab;
 import com.github.gwtbootstrap.client.ui.TabPanel;
-import com.github.gwtbootstrap.client.ui.TabPanel.ShowEvent;
-import com.github.gwtbootstrap.client.ui.TabPanel.ShowEvent.Handler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -42,7 +38,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@UiField TabPanel tabPanel;
 	@UiField HTML notes;
 	@UiField HTML listTitle;
-	
+
 	private Long compId;
 	private Long seriesId;
 	private Long groupId;
@@ -62,9 +58,9 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 	private TopTenListView<ITopTenItem> listView;
 
-	private Criteria criteria;
+	private RatingMode mode;
 	private Map<Integer, Tab> tabIndexMap = new HashMap<Integer, Tab>();
-	
+
 
 	@UiTemplate("SeriesListViewImpl.ui.xml")
 
@@ -201,33 +197,33 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		ttlView = clientFactory.getListView();
 	}
 
-//	private void populateCriteria() {
-//		NavLink nl = new NavLink("In Form");
-//		nl.addClickHandler(new ClickHandler() {
-//
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.showCriteria(Criteria.IN_FORM);
-//
-//			}
-//
-//		});
-//		criteriaDropDown.add(nl);
-//
-//		nl = new NavLink("Best in Last Year");
-//		nl.addClickHandler(new ClickHandler() {
-//
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.showCriteria(Criteria.BEST_YEAR);
-//
-//			}
-//
-//		});
-//		criteriaDropDown.add(nl);
-//
-//		nl.setActive(true);
-//	}
+	//	private void populateCriteria() {
+	//		NavLink nl = new NavLink("In Form");
+	//		nl.addClickHandler(new ClickHandler() {
+	//
+	//			@Override
+	//			public void onClick(ClickEvent event) {
+	//				presenter.showCriteria(Criteria.IN_FORM);
+	//
+	//			}
+	//
+	//		});
+	//		criteriaDropDown.add(nl);
+	//
+	//		nl = new NavLink("Best in Last Year");
+	//		nl.addClickHandler(new ClickHandler() {
+	//
+	//			@Override
+	//			public void onClick(ClickEvent event) {
+	//				presenter.showCriteria(Criteria.BEST_YEAR);
+	//
+	//			}
+	//
+	//		});
+	//		criteriaDropDown.add(nl);
+	//
+	//		nl.setActive(true);
+	//	}
 
 	@Override
 	public void setListView(TopTenListView<ITopTenItem> listView) {
@@ -244,33 +240,41 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		this.group = group;
 		groupId = group.getId();
 		assert (group.getRatingSeriesId().equals(seriesId));
-		criteriaDropDown.clear();
-		// populate Rate by drop down
-		for (IRatingMatrix rm : group.getRatingMatrices()) {
-			final NavLink nl = new NavLink(rm.getCriteria().toString());
-			nl.setTarget(rm.getId().toString());
-			nl.addClickHandler(new ClickHandler() {
 
-				@Override
-				public void onClick(ClickEvent event) {
-					// flush everything below the new matrix we want.
-					matrix = null;
-					matrixId = Long.parseLong(nl.getTarget());
-					setQuery(null);
-					setList(null);
-					setPlayerId(null);
-					presenter.gotoPlace(getPlace());
-				}
-
-			});
-			criteriaDropDown.add(nl);
-		}
 		setMatrix(null);
 		setQuery(null);
 		setPlayerId(null);
 		presenter.gotoPlace(getPlace());
 	}
 
+	@Override
+	public void setAvailableModes(final List<RatingMode> modeMap) {
+		criteriaDropDown.clear();
+		// populate Rate by drop down
+		for (RatingMode mode : modeMap) {
+			final RatingMode _mode = mode;
+			final NavLink nl = new NavLink(mode.name());
+			
+			nl.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					// go to the new series
+					series = null;
+					seriesId = null;
+					group = null;
+					groupId = null;
+					setMatrix(null);
+					setQuery(null);
+					setList(null);
+					setPlayerId(null);
+					presenter.switchMode(compId, _mode);
+				}
+
+			});
+			criteriaDropDown.add(nl);
+		}
+	}
 	@Override	public IRatingMatrix getMatrix() {
 		return matrix;
 	}
@@ -286,31 +290,38 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			int count = 0;
 			for (IRatingQuery query : matrix.getRatingQueries()) {	
 				final IRatingQuery rq = query;
-				position fp = query.getPositions().get(0);
-				final Tab t = new Tab();
-				final int i = count;
-				tabIndexMap.put(count++, t);
-				t.setHeading(fp.getName());
-				final SeriesListViewImpl _this = this;
-				t.addClickHandler(new ClickHandler() {
+				if (rq.getTopTenListId() != null) {
+//					position fp = null;
+//					if (query.getPositions() != null && !query.getPositions().isEmpty()) {
+//						fp = query.getPositions().get(0);
+//					}
+					final Tab t = new Tab();
+					final int i = count;
+					tabIndexMap.put(count++, t);
 
-					@Override
-					public void onClick(ClickEvent event) {
-						//_this.setRatingQuery(series.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(fp.ordinal()));
-						//t.add(_this.listView.asWidget());
-						
-						_this.addListView(i);
-						setQuery(null);
-						queryId = rq.getId();
-						setList(null);
-						setPlayerId(null);
-						presenter.gotoPlace(getPlace());
-						//presenter.showRatingQuery(rq);
-					}
+					t.setHeading(rq.getLabel());
 
-				});
-				
-				tabPanel.add(t);
+					final SeriesListViewImpl _this = this;
+					t.addClickHandler(new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent event) {
+							//_this.setRatingQuery(series.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(fp.ordinal()));
+							//t.add(_this.listView.asWidget());
+
+							_this.addListView(i);
+							setQuery(null);
+							queryId = rq.getId();
+							setList(null);
+							setPlayerId(null);
+							presenter.gotoPlace(getPlace());
+							//presenter.showRatingQuery(rq);
+						}
+
+					});
+
+					tabPanel.add(t);
+				}
 			}
 
 			presenter.gotoPlace(getPlace());
@@ -367,13 +378,13 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	}
 
 	@Override
-	public void setCriteria(Criteria crit) {
-		this.criteria = crit;
+	public void setMode(RatingMode mode) {
+		this.mode = mode;
 	}
 
 	@Override
-	public Criteria getCriteria() {
-		return criteria;
+	public RatingMode getMode() {
+		return mode;
 	}
 
 	@Override
@@ -395,7 +406,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	public Long getQueryId() {
 		return queryId;
 	}
-	
+
 	@Override
 	public ITopTenList getList() {
 		return list;
@@ -412,14 +423,14 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@Override
 	public void setRatingQueries(IRatingMatrix matrix, List<IRatingQuery> result) {
 		assert (matrix == this.matrix);
-		
+
 		matrix.setRatingQueries(result);
-		
+
 		// now pick a rating query - first for now
 		//setQuery(matrix.getRatingQueries().get(0));
-		
+
 		setMatrix(matrix);
-		
+
 	}
 
 

@@ -1,6 +1,5 @@
 package net.rugby.foundation.model.shared;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -10,9 +9,9 @@ public interface IRatingGroup extends IHasId {
 
 	public abstract void setId(Long id);
 
-	public abstract Date getDate();
+	public abstract int getUniversalRoundOrdinal();
 
-	public abstract void setDate(Date date);
+	public abstract void setUniversalRoundOrdinal(int universalRoundOrdinal);
 
 	public abstract IRatingSeries getRatingSeries();
 
@@ -33,5 +32,9 @@ public interface IRatingGroup extends IHasId {
 	String getLabel();
 
 	void setLabel(String label);
+
+	UniversalRound getUniversalRound();
+
+	void setUniversalRound(UniversalRound universalRound);
 
 }

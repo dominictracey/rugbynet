@@ -9,9 +9,12 @@ import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.SeriesActions;
 import net.rugby.foundation.admin.shared.IOrchestrationActions;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -76,6 +79,7 @@ IOrchestrationFactory {
 	private IRatingQueryFactory rqf;
 	private IAdminTaskFactory atf;
 	private IPlayerRatingFactory prf;
+	private ISeriesConfigurationFactory scf;
 
 	//@REX this is probably horrendously inefficient
 	@Inject
@@ -87,7 +91,8 @@ IOrchestrationFactory {
 			//			IClubhouseMembershipFactory chmf, ILeaderboardRowFactory lbrf,
 			//			IClubhouseLeagueMapFactory chlmf, IMatchEntryFactory mef, IRoundEntryFactory ref, 
 			IMatchRatingEngineSchemaFactory mresf, IQueryRatingEngineFactory qref,
-			IRatingQueryFactory rqf, IAdminTaskFactory atf, IPlayerRatingFactory prf) {
+			IRatingQueryFactory rqf, IAdminTaskFactory atf, IPlayerRatingFactory prf,
+			ISeriesConfigurationFactory scf) {
 		this.cf = cf;
 		this.mf = mf;
 		//this.mf.setFactories(rf, tf);
@@ -108,6 +113,7 @@ IOrchestrationFactory {
 		this.rqf = rqf;
 		this.atf = atf;
 		this.prf = prf;
+		this.scf = scf;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.factory.IOrchestrationFactory#get(net.rugby.foundation.model.shared.IMatchGroup, net.rugby.foundation.admin.server.factory.IOrchestrationActions)
@@ -262,5 +268,18 @@ IOrchestrationFactory {
 		} 
 		return null;
 	}
-
+	@Override
+	public IOrchestration<ISeriesConfiguration> get(ISeriesConfiguration target,
+			SeriesActions action) {
+		if (action.equals(AdminOrchestrationActions.SeriesActions.PROCESS)) {
+			IOrchestration<ISeriesConfiguration> o = new ProcessSeriesOrchestration(scf, ocf, atf);
+			o.setTarget(target);
+			return o;
+		} //else if (action.equals(AdminOrchestrationActions.SeriesActions.CLEANUP)) {
+//			IOrchestration<IRatingQuery> o = new SeriesCleanupOrchestration(ocf, rqf, prf, mf);
+//			o.setTarget(target);
+//			return o;
+//		} 
+		return null;
+	}
 }

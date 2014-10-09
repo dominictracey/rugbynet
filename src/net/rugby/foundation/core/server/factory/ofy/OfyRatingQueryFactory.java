@@ -17,6 +17,7 @@ import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingQuery;
 
@@ -33,6 +34,7 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 	public IRatingQuery create() {
 		try {
 			IRatingQuery rq = new RatingQuery();
+			rq.setStatus(Status.NEW);
 			return rq;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -88,6 +90,7 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 		}
 	}
 
+	@Deprecated
 	@Override
 	public IRatingQuery query(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds) {
 		try {

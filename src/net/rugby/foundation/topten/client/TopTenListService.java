@@ -1,6 +1,7 @@
 package net.rugby.foundation.topten.client;
 
 import java.util.List;
+import java.util.Map;
 
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -8,6 +9,7 @@ import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -34,4 +36,6 @@ public interface TopTenListService extends RemoteService {
 	public IRatingGroup getRatingGroup(Long ratingGroupId);
 	public IRatingMatrix getRatingMatrix(Long ratingMatrixId);
 	public List<IRatingQuery> getRatingQueriesForMatrix(Long id);
+	public List<RatingMode> getAvailableSeries(Long compId);
+	public IServerPlace getPlace(String guid);
 }

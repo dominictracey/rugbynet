@@ -11,19 +11,12 @@ import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 
 public interface SeriesConfigurationView<T extends ISeriesConfiguration> extends IsWidget {
 	public interface SeriesConfigurationViewPresenter<T> {
-		
-//		Boolean isSelected(T c);
-//		Boolean onItemSelected(T c);
-//		Boolean onItemClicked(T c, int row);
-//		void deleteSelected();
-		
 		ClientFactory getClientFactory();
 		
 		void processSeriesConfig(Long seriesId);
-		Boolean peleteSeriesConfig(Long seriesId);
+		Boolean deleteSeriesConfig(Long seriesId);
 		T editSeriesConfig(Long seriesId);
-		T saveSeriesConfig(T config);
-//		void showTask(int i, T c);
+		void showConfigPopup(T config);
 	} 
 
 
@@ -40,10 +33,11 @@ public interface SeriesConfigurationView<T extends ISeriesConfiguration> extends
 
 	void setColumnDefinitions(SeriesConfigurationViewColumnDefinitions<T> defs);
 
-	public abstract void updateSeriesConfigurationRow(int index, T task);
+	public abstract void updateSeriesConfigurationRow(T sc);
 
 	SeriesConfigurationViewPresenter<T> getPresenter();
 
 	public abstract void setClientFactory(ClientFactory clientFactory);
+
 
 }

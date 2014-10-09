@@ -30,6 +30,8 @@ import net.rugby.foundation.admin.server.workflow.TestWorkflowConfigurationFacto
 import net.rugby.foundation.admin.server.workflow.TestWorkflowFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.factory.UniversalRoundFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.test.TestRatingQueryFactory;
 
@@ -55,6 +57,7 @@ public class AdminTestModule extends AbstractModule {
 		bind(IRatingQueryFactory.class).to(TestRatingQueryFactory.class);
 		bind(IPlayerRatingFactory.class).to(TestPlayerRatingFactory.class);
 		bind(ISeriesConfigurationFactory.class).to(TestSeriesConfigurationFactory.class);
+		bind(IUniversalRoundFactory.class).to(UniversalRoundFactory.class);
 	}
 	
 }

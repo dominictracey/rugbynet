@@ -260,7 +260,7 @@ public class SeriesPlace extends Place {
 		/**
 		 * PlaceTokenizer knows how to serialize the Place's state to a URL token.
 		 */
-		@Prefix(value="TX")
+		@Prefix(value="Tx")
 		public static class Tokenizer implements PlaceTokenizer<SeriesPlace> {
 
 			@Override

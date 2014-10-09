@@ -11,7 +11,7 @@ import com.googlecode.objectify.annotation.Entity;
 
 @Entity
 public class Round implements Serializable, IRound {
-
+	
 	private static final long serialVersionUID = 1L;
 	private Integer ordinal;
 	@Id
@@ -25,6 +25,7 @@ public class Round implements Serializable, IRound {
 	private String name;
 	private String abbr;
 	private Long compId;
+	protected WorkflowStatus workflowStatus;
 	
 	public Round() {
 		
@@ -246,6 +247,18 @@ public class Round implements Serializable, IRound {
 	@Override
 	public void setCompId(Long compId) {
 		this.compId = compId;
+	}
+
+
+	@Override
+	public WorkflowStatus getWorkflowStatus() {
+		return workflowStatus;
+	}
+
+
+	@Override
+	public void setWorkflowStatus(WorkflowStatus status) {
+		this.workflowStatus = status;
 	}
 
 }

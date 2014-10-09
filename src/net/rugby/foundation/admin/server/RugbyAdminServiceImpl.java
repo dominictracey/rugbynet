@@ -37,6 +37,7 @@ import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatin
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.SeriesActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
@@ -58,6 +59,7 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.game1.server.factory.IEntryFactory;
 import net.rugby.foundation.game1.server.factory.IMatchEntryFactory;
 import net.rugby.foundation.game1.server.factory.IRoundEntryFactory;
@@ -91,6 +93,7 @@ import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -151,6 +154,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IRatingQueryFactory rqf;
 	private IPlayerRatingFactory prf;
 	private ISeriesConfigurationFactory scf;
+	private IUniversalRoundFactory urf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -172,7 +176,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IAdminTaskFactory atf, IMatchResultFactory mrf, 
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
 			ICachingFactory<IContent> ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
-			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf) {
+			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
+			IUniversalRoundFactory urf) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -203,7 +208,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.rqf = rqf;
 			this.prf = prf;
 			this.scf = scf;
-
+			this.urf = urf;
+			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 		}
@@ -1348,7 +1354,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
                         "/orchestration/IRatingQuery";
 
 				//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Starting Rating Query " + rq.getId());
-				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
+				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(300000).
 						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.GENERATE.toString()).
 						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
 						param("id",rq.getId().toString()).
@@ -2001,7 +2007,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public ISeriesConfiguration getSeriesConfiguration(Long id) {
 		try {
-			return scf.get(id);
+			if (id == null)
+				return scf.create();
+			else
+				return scf.get(id);
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;	
@@ -2011,17 +2020,30 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public String processSeriesConfiguration(Long sConfigId) {
 		try {
-			ISeriesConfiguration sc = scf.get(sConfigId);
-			if (sc != null) {
-				// do the pipeline stuff
-				return "processing...";
+			if (checkAdmin()) {
+				
+				String url2 = ccf.get().getEngineUrl() +
+                        "/orchestration/ISeriesConfiguration";
+
+				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
+						param(AdminOrchestrationActions.SeriesActions.getKey(), SeriesActions.PROCESS.toString()).
+						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.SERIES.toString()).
+						param("id",sConfigId.toString()).
+						param("extraKey", "0"));
+
+				// give the orchestration 15 seconds to start the pipeline and look for the pipeline id
+				Thread.sleep(15000);
+				ISeriesConfiguration sc = scf.get(sConfigId);
+				
+				return sc.getPipelineId();
+				
 			} else {
-				return "Series Configuration Not Found";
+				return null;
 			}
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
-			return null;	
-		}	
+			return null;
+		}
 	}
 
 	@Override
@@ -2048,6 +2070,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;	
 		}	
 	}
+
+	@Override
+	public List<UniversalRound> getUniversalRounds(int size) {
+		try {
+			if (size == 20)
+				return urf.lastTwentyUniversalRounds();
+			else 
+				return urf.lastYearUniversalRounds();
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;	
+		}	}
 
 
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRatingQuery;
 
 public abstract class BaseRatingQueryFactory extends BaseCachingFactory<IRatingQuery> implements IRatingQueryFactory {

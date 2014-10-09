@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import com.google.appengine.datanucleus.annotations.Unindexed;
 import com.googlecode.objectify.annotation.Entity;
 import net.rugby.foundation.model.shared.Position.position;
 
@@ -24,9 +25,15 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	protected List<Long> teamIds;
 	protected List<Long> countryIds;
 	protected List<position> positions;
+	
 	protected Status status;
+	protected String label;
+	
+	@Unindexed
 	protected boolean scaleTime = true;
+	@Unindexed
 	protected boolean scaleComp = true;
+	@Unindexed
 	protected boolean scaleStanding = true;
 	@Transient
 	protected IRatingMatrix ratingMatrix;
@@ -233,6 +240,14 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	@Override
 	public void setTopTenListId(Long topTenListId) {
 		this.topTenListId = topTenListId;
+	}
+	@Override
+	public String getLabel() {
+		return label;
+	}
+	@Override
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 }

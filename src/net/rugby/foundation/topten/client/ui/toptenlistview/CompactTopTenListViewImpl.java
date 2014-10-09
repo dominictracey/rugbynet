@@ -168,7 +168,6 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
 				return "text-center compactTTL position";
-
 			}
 		});
 

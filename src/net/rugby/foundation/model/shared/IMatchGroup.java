@@ -12,7 +12,8 @@ import java.util.Date;
 public interface IMatchGroup extends IGroup  {
 
 	public enum Status {SCHEDULED, FINAL_HOME_WIN, FINAL_HOME_WIN_OT, FINAL_VISITOR_WIN, FINAL_VISITOR_WIN_OT, FINAL_DRAW, FINAL_DRAW_OT, UNDERWAY_FIRST_HALF, HALFTIME, UNDERWAY_SECOND_HALF, COMPLETE_AWAITING_RESULTS, POSTPONED, RESCHEDULED, CANCELED, UNREPORTED}
-
+	public enum WorkflowStatus {PENDING, TASKS_PENDING, NO_STATS, FETCHED} 
+	
 	public abstract void setDisplayName();
 	
 	public abstract ITeamGroup getHomeTeam();
@@ -40,6 +41,8 @@ public interface IMatchGroup extends IGroup  {
 	
 	public abstract Status getStatus();
 	public abstract void setStatus(Status status);
+	public abstract WorkflowStatus getWorkflowStatus();
+	public abstract void setWorkflowStatus(WorkflowStatus status);
 	
 	public abstract String getDisplayName();
 	public abstract void setDisplayName(String displayName);

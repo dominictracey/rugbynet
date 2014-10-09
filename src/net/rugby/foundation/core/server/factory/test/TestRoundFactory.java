@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Random;
 
+import org.joda.time.DateTime;
+
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
@@ -15,6 +17,7 @@ import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Round;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 
 public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRoundFactory {
 
@@ -48,6 +51,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(100L);
 			r.addMatchID(101L);
 			r.setCompId(1L);
+//			r.setWorkflowStatus(WorkflowStatus.FETCHED);
 		} else if (roundId == 7L) {
 			r.setCompId(1L);
 			r.setAbbr("2");
@@ -56,6 +60,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(102L);
 			r.addMatchID(103L);
 			r.setCompId(1L);
+//			r.setWorkflowStatus(WorkflowStatus.FETCHED);
 		} else if (roundId == 8L) {
 			r.setCompId(1L);
 			r.setAbbr("3");			
@@ -65,6 +70,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(105L);
 			r.addMatchID(106L);
 			r.setCompId(1L);
+//			r.setWorkflowStatus(WorkflowStatus.PENDING);
 		} else  if (roundId == 9L) {
 			r.setCompId(1L);
 			r.setAbbr("F");
@@ -73,6 +79,7 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			r.addMatchID(107L);
 			r.addMatchID(108L);
 			r.setCompId(1L);
+	//		r.setWorkflowStatus(WorkflowStatus.PENDING);
 			/** BEGIN COMP 2 **/
 		} else if (roundId == 12L) {
 			r.setCompId(2L);
@@ -145,6 +152,24 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			}
 		}
 
+		// self cleaning oven for workflowStatus
+		if (r.getWorkflowStatus() == null) {
+			// check it's matches to see if they are all fetched
+			r.setWorkflowStatus(WorkflowStatus.FETCHED);
+
+			for (IMatchGroup m : r.getMatches()) {
+				if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
+					r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+					break;
+				} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
+					r.setWorkflowStatus(WorkflowStatus.PENDING);
+					// don't break in case there are tasks pending
+				}
+				// ignore if match is NO_STATS - the round can still be in FETCHED state
+			}
+			putToPersistentDatastore(r); 	
+		}
+		
 		return r;
 	}
 

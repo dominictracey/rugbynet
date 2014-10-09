@@ -2,6 +2,8 @@ package net.rugby.foundation.admin.client;
 
 import java.util.List;
 
+import net.rugby.foundation.admin.client.ClientFactory.GetCompListCallback;
+import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.CompetitionViewImpl;
@@ -28,6 +30,9 @@ import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewFieldDefi
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewImpl;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalViewImpl;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupView;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupViewFieldDefinitions;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupViewImpl;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewImpl;
@@ -40,6 +45,7 @@ import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPo
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -49,6 +55,7 @@ import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -72,6 +79,8 @@ public class ClientFactoryImpl implements ClientFactory {
 	private static final RugbyAdminServiceAsync rpcService = GWT.create(RugbyAdminService.class);
 	private PlayerPopupView<IPlayer> playerPopupView;
 	private List<FieldDefinition<IPlayer>> playerPopupViewFieldDefinitions;
+	private SeriesConfigPopupView<ISeriesConfiguration> seriesConfigPopupView;
+	private List<FieldDefinition<ISeriesConfiguration>> seriesConfigPopupViewFieldDefinitions;
 	private PlayerMatchStatsPopupView<IPlayerMatchStats> playerMatchStatsPopupView;
 	private List<FieldDefinition<IPlayerMatchStats>> playerMatchStatsPopupViewFieldDefinitions;
 	private TeamMatchStatsPopupView<ITeamMatchStats> teamMatchStatsPopupView;
@@ -162,6 +171,38 @@ public class ClientFactoryImpl implements ClientFactory {
 			}
 		});
 		
+	}
+	
+	@Override
+	public void getCompListAsync(final GetCompListCallback cb)  {
+		getRpcService().getComps(Filter.UNDERWAY, new AsyncCallback<List<ICompetition>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+
+			@Override
+			public void onSuccess(List<ICompetition> result) {
+				cb.onCompListFetched(result);
+			}
+		});
+		
+	}
+	
+
+	@Override
+	public void getUniversalRoundsListAsync(int size, final GetUniversalRoundsListCallback cb) {
+		getRpcService().getUniversalRounds(size, new AsyncCallback<List<UniversalRound>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+
+			@Override
+			public void onSuccess(List<UniversalRound> result) {
+				cb.onUniversalRoundListFetched(result);
+			}
+		});
 	}
 
 	@Override
@@ -418,6 +459,22 @@ public class ClientFactoryImpl implements ClientFactory {
 		}
 		return seriesConfigurationView;
 	}
+
+	@Override
+	public SeriesConfigPopupView<ISeriesConfiguration> getSeriesConfigrPopupView() {
+		// lazily initialize our views, and keep them around to be reused
+        //
+        if (seriesConfigPopupView == null) {
+        	seriesConfigPopupView = new SeriesConfigPopupViewImpl<ISeriesConfiguration>();
+			if (seriesConfigPopupViewFieldDefinitions == null) {
+				seriesConfigPopupViewFieldDefinitions = new SeriesConfigPopupViewFieldDefinitions<ISeriesConfiguration>(this).getFieldDefinitions();
+	          }
+		
+			seriesConfigPopupView.setFieldDefinitions(seriesConfigPopupViewFieldDefinitions);
+        }
+
+		return seriesConfigPopupView;	}
+
 
 
 }

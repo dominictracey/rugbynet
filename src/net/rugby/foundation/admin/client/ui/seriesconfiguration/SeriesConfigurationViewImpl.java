@@ -42,7 +42,7 @@ public class SeriesConfigurationViewImpl<T extends ISeriesConfiguration> extends
 
 	@UiField FlexTable seriesConfigurationTable;
 	@UiField SimplePanel menuBarPanel;
-	@UiField Button deleteSelected;
+	@UiField Button addNew;
 
 	private SeriesConfigurationViewColumnDefinitions<T> columnDefinitions;
 	private List<T> seriesConfigurationList;
@@ -70,6 +70,11 @@ public class SeriesConfigurationViewImpl<T extends ISeriesConfiguration> extends
 		setColumnHeaders(columnDefinitions.getHeaders());
 	}
 	
+	@UiHandler("addNew")
+	void onAddNewClicked(ClickEvent event) {
+		listener.showConfigPopup(null);
+		
+	}
 //	@UiHandler("seriesConfigurationTable")
 //	void onTableClicked(ClickEvent event) {
 //		if (listener != null) {
@@ -195,6 +200,10 @@ public class SeriesConfigurationViewImpl<T extends ISeriesConfiguration> extends
 			}
 			smartBar.setPresenter((SmartBar.Presenter)listener);		
 		}
+		
+		if (columnDefinitions != null) {
+			columnDefinitions.setListener(p);
+		}
 	}
 
 	@Override
@@ -209,17 +218,36 @@ public class SeriesConfigurationViewImpl<T extends ISeriesConfiguration> extends
 	}
 
 	@Override
-	public void updateSeriesConfigurationRow(int i, T SeriesConfiguration) {
-		for (int j = 0; j < columnDefinitions.getColumnDefinitions().size(); ++j) {
-			ColumnDefinition<T> columnDefinition = columnDefinitions.getColumnDefinitions().get(j);
-			seriesConfigurationTable.setWidget(i+1, j, columnDefinition.render(SeriesConfiguration));
-		}		
+	public void updateSeriesConfigurationRow(T SeriesConfiguration) {
+		// ignore i
+		// find the right row
+		boolean found = false;
+		int index = -1;
+		for (int k = 0; k < seriesConfigurationList.size(); ++k) {
+			if (seriesConfigurationList.get(k).getId().equals(SeriesConfiguration.getId())) {
+				found = true;
+				index = k;
+				break;
+			}
+		}
+		if (found == true) {
+			for (int j = 0; j < columnDefinitions.getColumnDefinitions().size(); ++j) {
+				ColumnDefinition<T> columnDefinition = columnDefinitions.getColumnDefinitions().get(j);
+				seriesConfigurationTable.setWidget(index+1, j, columnDefinition.render(SeriesConfiguration));
+			}
+		} else {
+			// must be a new one, append and redraw
+			seriesConfigurationList.add(SeriesConfiguration);
+			showList(seriesConfigurationList);
+		}
 	}
 
 	@Override
 	public void setClientFactory(ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
 	}
+
+
 
 }
 

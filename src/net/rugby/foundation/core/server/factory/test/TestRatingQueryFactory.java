@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.BaseRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.RatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.Position.position;
 
 /**
@@ -68,21 +68,25 @@ public class TestRatingQueryFactory extends BaseRatingQueryFactory implements IR
 				rq.getRoundIds().add(7L);
 				rq.getRoundIds().add(6L);
 				rq.getPositions().add(position.getAt((int)((id-7710000))));
+				rq.setLabel(position.getAt((int)((id-7710000))).getName());
 				rq.setScaleTime(false);
 			} else if (id > 7710100L && id < 7710111L) {
 				rq.getCompIds().add(1L);
 				rq.getRoundIds().add(7L);
 				rq.getRoundIds().add(6L);
 				rq.getPositions().add(position.getAt((int)((id-7710100))));
+				rq.setLabel(position.getAt((int)((id-7710100))).getName());
 			} else if (id > 7700000L && id < 7700100L) {
 				rq.getCompIds().add(1L);
 				rq.getRoundIds().add(6L);
 				rq.setScaleTime(false);
 				rq.getPositions().add(position.getAt((int)((id-7700000))));
+				rq.setLabel(position.getAt((int)((id-7700000))).getName());
 			} else if (id > 7700100L && id < 7700111L) {
 				rq.getCompIds().add(1L);
 				rq.getRoundIds().add(6L);
 				rq.getPositions().add(position.getAt((int)((id-7700100))));
+				rq.setLabel(position.getAt((int)((id-7700100))).getName());
 			}
 			rq.setRatingMatrixId(id / 100);
 			rq.setTopTenListId(id + 10000000L);
@@ -103,7 +107,9 @@ public class TestRatingQueryFactory extends BaseRatingQueryFactory implements IR
 
 	@Override
 	public IRatingQuery create() {
-		return new RatingQuery();
+		IRatingQuery rq = new RatingQuery();
+		rq.setStatus(Status.NEW);
+		return rq;
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
+import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
@@ -21,6 +22,7 @@ import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -47,6 +49,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private IRatingQueryFactory rqf;
 	private IRatingGroupFactory rgf;
 	private IRatingMatrixFactory rmf;
+	private IPlaceFactory spf;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -56,7 +59,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 
 	@Inject
 	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf,
-			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
+			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IPlaceFactory spf) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
@@ -66,6 +69,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			this.rqf = rqf;
 			this.rgf = rgf;
 			this.rmf = rmf;
+			this.spf = spf;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 		}
@@ -346,6 +350,27 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		try {
 			List<IRatingQuery> rqs = rqf.getForMatrix(ratingMatrixId);
 			return rqs;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public List<RatingMode> getAvailableSeries(Long compId) {
+		try {
+			List<RatingMode> list = rsf.getModesForComp(compId);
+			return list;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IServerPlace getPlace(String guid) {
+		try {
+			return spf.getForGuid(guid);
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

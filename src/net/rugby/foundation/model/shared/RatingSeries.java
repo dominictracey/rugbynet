@@ -20,6 +20,7 @@ public class RatingSeries implements Serializable, IRatingSeries {
 
 	@Id
 	protected Long id;
+	protected String displayName;
 	protected Date start;
 	protected Date end;
 	protected Date created;
@@ -229,5 +230,15 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	@Override
 	public void setRatingGroupIds(List<Long> ratingGroupIds) {
 		this.ratingGroupIds = ratingGroupIds;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	@Override
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 }

@@ -27,6 +27,7 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -139,4 +140,5 @@ public interface RugbyAdminService extends RemoteService {
 	String processSeriesConfiguration(Long sConfigId);
 	Boolean deleteSeriesConfiguration(Long sConfigId);
 	ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig);
+	List<UniversalRound> getUniversalRounds(int size);
 }

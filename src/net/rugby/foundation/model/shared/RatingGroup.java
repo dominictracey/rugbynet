@@ -20,8 +20,9 @@ public class RatingGroup implements Serializable, IRatingGroup {
 	private static final long serialVersionUID = -7432948720351616742L;
 	@Id
 	protected Long id;
-	protected Date date;
-
+	protected int universalRoundOrdinal;
+	@Transient
+	protected UniversalRound universalRound;
 	protected String label;
 	
 	@Transient
@@ -53,24 +54,6 @@ public class RatingGroup implements Serializable, IRatingGroup {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.model.shared.IRatingGroup#getDate()
-	 */
-	@Override
-	public Date getDate() {
-		return date;
-	}
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.model.shared.IRatingGroup#setDate(org.joda.time.Date)
-	 */
-	@Override
-	public void setDate(Date date) {
-		this.date = date;
-	}
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.model.shared.IRatingGroup#getRound()
-	 */
-
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IRatingGroup#getRatingSeries()
 	 */
@@ -134,6 +117,22 @@ public class RatingGroup implements Serializable, IRatingGroup {
 	@Override
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	@Override
+	public int getUniversalRoundOrdinal() {
+		return universalRoundOrdinal;
+	}
+	@Override
+	public void setUniversalRoundOrdinal(int universalRoundOrdinal) {
+		this.universalRoundOrdinal = universalRoundOrdinal;
+	}
+	@Override
+	public UniversalRound getUniversalRound() {
+		return universalRound;
+	}
+	@Override
+	public void setUniversalRound(UniversalRound universalRound) {
+		this.universalRound = universalRound;
 	}
 	
 }

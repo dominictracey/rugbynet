@@ -6,6 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.Position;
 
 import com.googlecode.objectify.annotation.Entity;
@@ -36,6 +37,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected int lastOrdinal;
 	protected Long playerRatingId;
 	protected int rating;
+	protected String placeGuid;
 	
 	public TopTenItem()
 	{
@@ -45,7 +47,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 	public TopTenItem(int ordinal, Long id, Long playerId, IPlayer player, String text,
 			String image, Long contributorId, Long editorId, boolean isSubmitted, 
 			String matchReportLink, String teamName, Long teamId, Position.position position, 
-			ITopTenList list, Long playerRatingId, int rating) {
+			ITopTenList list, Long playerRatingId, int rating, String placeGuid) {
 		//super();
 		this.id = id;
 		this.ordinal = ordinal;
@@ -65,6 +67,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 		this.position = position;
 		this.playerRatingId = playerRatingId;
 		this.rating = rating;
+		this.placeGuid = placeGuid;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.ITopTenItem#getId()
@@ -266,6 +269,14 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setRating(int rating) {
 		this.rating = rating;
+	}
+	@Override
+	public String getPlaceGuid() {
+		return placeGuid;
+	}
+	@Override
+	public void setPlaceGuid(String placeGuid) {
+		this.placeGuid = placeGuid;
 	}
 
 }

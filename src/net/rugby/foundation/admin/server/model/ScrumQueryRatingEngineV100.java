@@ -79,7 +79,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 	// the sum of all of the stats*schemaValues
 	protected float totalRawScore;
-//	private float totalUnscaledScore;
+	//	private float totalUnscaledScore;
 	// the sum of all the stats*schemaValues*scalingFactor
 	private float totalScaledScore;
 
@@ -106,7 +106,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	protected final String NO_SCALE_KEY="Unscaled";
 	protected final String ALL_SCALE_KEY="ActualScaled";
 	private IRawScoreFactory rsf;
-	
+
 	public ScrumQueryRatingEngineV100() {
 
 	}
@@ -127,7 +127,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		this.cf = cf;
 		this.mrf = mrf;
 		this.rsf = rsf;
-		
+
 		scaleTotalMap.put(NO_SCALE_KEY, 0f);
 		scaleTotalMap.put(ALL_SCALE_KEY, 0f);
 		scaleTotalMap.put(AGE_SCALE_KEY, 0f);
@@ -225,7 +225,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		private String matchLabel;
 		private String details;
-		
+
 		public PlayerStatShares(IV1EngineWeightValues weights, ITeamMatchStats tms, ITeamMatchStats otms, IPlayerMatchStats pms, IMatchGroup match, int numStats) {
 
 			assert(tms.getTeamId().equals(pms.getTeamId()));
@@ -274,7 +274,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 			pms = adjustStatsByPosition(pms);
 			pms = adjustStatsByTimePlayed(pms);
-			
+
 			//this.numStats = numStats;
 			this.match = match;
 
@@ -295,7 +295,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		private IPlayerMatchStats adjustStatsByTimePlayed(IPlayerMatchStats pms) {
 			float timeScale = pms.getTimePlayed()/80f;
-			
+
 			scrumShare *= timeScale;
 			lineoutShare *= timeScale;
 			ruckShare *= timeScale;
@@ -420,7 +420,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 					"Min: "+ minutesShare+" ("+pms.getTimePlayed()+")\tPtDiff: "+ pointDifferential+" ("+(pointDifferential/weights.getPointsDifferentialWeight())+")\tWin: " + win + "\n"+
 					"Back: " + getBackScore() + "\tFwd:" + getForwardScore();
 			//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST, pms.getName() + toString());
-			
+
 		}
 
 		/* (non-Javadoc)
@@ -474,7 +474,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		public IPlayerMatchStats getPlayerMatchStats() {
 			return pms;
 		}
-		
+
 		@Override
 		public IMatchGroup getMatch() {
 			return match;
@@ -618,7 +618,6 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		DateTime now = DateTime.now();
 		for (IPlayerMatchStats pms : pmsList) {
 			try {
-
 				playerName = pms.getName();
 				IMatchGroup m = mf.get(pms.getMatchId());
 				matchName = m.getDisplayName();
@@ -640,7 +639,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 					}
 
 					float totalScales = 1f;
-					
+
 					// see if we have already crunched the numbers on the stats and reuse if so
 					IRawScore raw = rsf.getForPMSid(pms.getId(), schema.getId());
 					IPlayerStatShares score = null;					
@@ -657,7 +656,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 					} else {
 						score = getNewStatShares((IV1EngineWeightValues)schema, raw, pms, m);
 					}
-					
+
 					score.setMatchLabel(getMatchLabel(pms));
 					// scale the rating by the match's standingsFactor
 					if (scaleStandings) {
@@ -692,10 +691,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				} 
 			} catch (Throwable e) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Engine threw a rod on player " + playerName + " from match " + matchName, e);
-				// mark query errored
-				//					query.setStatus(Status.ERROR);
-				//					rqf.put(query);
-				//					return null;
+				throw e;
 			}
 		}
 		return pss;
@@ -714,60 +710,66 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	protected IPlayerStatShares getNewStatShares(IV1EngineWeightValues schema, IRawScore raw, IPlayerMatchStats pms, IMatchGroup m) {
 		return new PlayerStatShares(schema, raw, pms, m, pmsList.size());
 	}
-	
+
 	@Override
 	public List<IPlayerRating> generate(IRatingEngineSchema schema, boolean scaleStandings, boolean scaleCompetition, boolean scaleMatchAge) {
 
+
 		List<IPlayerStatShares> pss = new ArrayList<IPlayerStatShares>();
 		mrl = new ArrayList<IPlayerRating>();
+		try {
+			pss = populate(schema, pss, scaleStandings, scaleCompetition, scaleMatchAge);
 
-		pss = populate(schema, pss, scaleStandings, scaleCompetition, scaleMatchAge);
+			//set up our scaled total map
+			scaleTotalNumMap.put(NO_SCALE_KEY, (float) numStats);
+			scaleTotalNumMap.put(AGE_SCALE_KEY, numStatsTimeScaled);
+			scaleTotalNumMap.put(COMP_SCALE_KEY, numStatsCompScaled);
+			scaleTotalNumMap.put(STANDINGS_SCALE_KEY, numStatsStandingsScaled);
+			scaleTotalNumMap.put(ALL_SCALE_KEY, numStatsTotalScaled);
 
-		//set up our scaled total map
-		scaleTotalNumMap.put(NO_SCALE_KEY, (float) numStats);
-		scaleTotalNumMap.put(AGE_SCALE_KEY, numStatsTimeScaled);
-		scaleTotalNumMap.put(COMP_SCALE_KEY, numStatsCompScaled);
-		scaleTotalNumMap.put(STANDINGS_SCALE_KEY, numStatsStandingsScaled);
-		scaleTotalNumMap.put(ALL_SCALE_KEY, numStatsTotalScaled);
-
-		// now group the PlayerStatShares by player (since in a time series one player may have multiple matches)
-		for (IPlayerStatShares score : pss) {
-			if (!playerScoreMap.containsKey(score.getPlayerMatchStats().getPlayerId())) {
-				playerScoreMap.put(score.getPlayerMatchStats().getPlayerId(), new ArrayList<IPlayerStatShares>());
-			}
-			playerScoreMap.get(score.getPlayerMatchStats().getPlayerId()).add(score);
-		}
-
-		// go through the players and create a PlayerRating for them
-		for (Long p : playerScoreMap.keySet()) {
-			IPlayerRating pr = prf.create();
-			pr.setGenerated(DateTime.now().toDate());
-			pr.setPlayerId(playerScoreMap.get(p).get(0).getPlayerMatchStats().getPlayerId());
-			pr.setQueryId(query.getId());
-			pr.setSchemaId(schema.getId());
-			pr.setDetails(playerScoreMap.get(p).get(0).getPlayerMatchStats().getName() + "\nMatch\tScore\tUnscaled\tScaled\tMatch Aged\tStandings\tCompetition\n-----------------------------------------------------------\n");
-
-			float scores = 0f;
-			for (IPlayerStatShares s : playerScoreMap.get(p)) {
-				scores += s.getScaledScore();
-				pr.addMatchStatId(s.getPlayerMatchStats().getId());
-				pr.addMatchStats(s.getPlayerMatchStats());	
-				pr.addRatingComponent(s.getRatingComponent(scaleTotalNumMap, scaleTotalMap));
-				pr.setDetails(pr.getDetails()+s.getSummaryRow(scaleTotalNumMap, scaleTotalMap));
+			// now group the PlayerStatShares by player (since in a time series one player may have multiple matches)
+			for (IPlayerStatShares score : pss) {
+				if (!playerScoreMap.containsKey(score.getPlayerMatchStats().getPlayerId())) {
+					playerScoreMap.put(score.getPlayerMatchStats().getPlayerId(), new ArrayList<IPlayerStatShares>());
+				}
+				playerScoreMap.get(score.getPlayerMatchStats().getPlayerId()).add(score);
 			}
 
-			pr.setRating(Math.round((scores/totalScaledScore)*500*playerScoreMap.keySet().size())); //numStats)); //TotalScaled));
+			// go through the players and create a PlayerRating for them
+			for (Long p : playerScoreMap.keySet()) {
+				IPlayerRating pr = prf.create();
+				pr.setGenerated(DateTime.now().toDate());
+				pr.setPlayerId(playerScoreMap.get(p).get(0).getPlayerMatchStats().getPlayerId());
+				pr.setQueryId(query.getId());
+				pr.setSchemaId(schema.getId());
+				pr.setDetails(playerScoreMap.get(p).get(0).getPlayerMatchStats().getName() + "\nMatch\tScore\tUnscaled\tScaled\tMatch Aged\tStandings\tCompetition\n-----------------------------------------------------------\n");
 
-			prf.put(pr);
-			mrl.add(pr);
+				float scores = 0f;
+				for (IPlayerStatShares s : playerScoreMap.get(p)) {
+					scores += s.getScaledScore();
+					pr.addMatchStatId(s.getPlayerMatchStats().getId());
+					pr.addMatchStats(s.getPlayerMatchStats());	
+					pr.addRatingComponent(s.getRatingComponent(scaleTotalNumMap, scaleTotalMap));
+					pr.setDetails(pr.getDetails()+s.getSummaryRow(scaleTotalNumMap, scaleTotalMap));
+				}
 
+				pr.setRating(Math.round((scores/totalScaledScore)*500*playerScoreMap.keySet().size())); //numStats)); //TotalScaled));
+
+				prf.put(pr);
+				mrl.add(pr);
+
+			}
+			sendReport();
+
+			// mark query complete
+			query.setStatus(Status.COMPLETE);
+			rqf.put(query);
+		} catch (Exception e) {
+			// mark query errored out
+			query.setStatus(Status.ERROR);
+			rqf.put(query);
+			// we don't flush the ratings completed thus far. They may be handy and will get flushed on the re-run.
 		}
-		sendReport();
-
-		// mark query complete
-		query.setStatus(Status.COMPLETE);
-		rqf.put(query);
-
 		return mrl;
 
 	}
@@ -815,8 +817,14 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	}
 
 	//@Override
-	public void addTeamStats(List<ITeamMatchStats> teamStats) {
+	public boolean addTeamStats(List<ITeamMatchStats> teamStats) {
 		for (ITeamMatchStats ts : teamStats) {
+
+			// sanity check
+			if (ts.getLineoutsThrownIn() == null || ts.getRucksWon() == null) {
+				return false;
+			}
+
 			if (ts.getIsHome() == null) {
 				// have to figure out for the ones that were created before 9/12/2013
 				IMatchGroup m = mf.get(ts.getMatchId());
@@ -830,15 +838,23 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			}
 		}
 
+		return true;
 	}
 
 	//@Override
-	public void addPlayerStats(List<IPlayerMatchStats> playerStats) {
+	public Boolean addPlayerStats(List<IPlayerMatchStats> playerStats) {
+		if (playerStats == null || playerStats.isEmpty()) return false;
+
 		for (IPlayerMatchStats pms : playerStats) {
+			if (pms.getPosition() == position.RESERVE || pms.getTimePlayed() == null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Trying to invoke engine with PlayerMatchStats for " + pms.getName() + " from team " + pms.getTeamAbbr() + " but his position in RESERVE or timePlayed not set. A task was probably missed.");
+				return false;
+			}
 			if (pms.getPosition() != position.NONE) {
 				pmsList.add(pms);
 			}
 		}
+		return true;
 	}
 
 
@@ -909,7 +925,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		body += sep + "Positions" + sep + "\n" + sep + sep + "\n";
 
-//		for (int i=1; i<position.values().length-1; ++i) {
+		//		for (int i=1; i<position.values().length-1; ++i) {
 		for (position pos : position.values()) {
 			if (query.getPositions().contains(pos)) {
 				body += sep + pos + "\n";
@@ -935,41 +951,48 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		}
 
-//		body += sep + "Matches" + sep + "\n" + sep + sep + "\n";
-//		Iterator<ITeamMatchStats> it = tmsHomeMap.values().iterator();
-//		while (it.hasNext()) {
-//			Long id = it.next().getMatchId();
-//			IMatchGroup m = mf.get(id);
-//			body += sep + m.getDisplayName() + "\n";
-//			ss = new SummaryStatistics();
-//			for (IPlayerRating r : mrl) {
-//				//				if (r instanceof IPlayerMatchRating) {
-//				//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getMatchId().equals(id)) {
-//				//						((SummaryStatistics)ss).addValue(r.getRating());
-//				//					}
-//				//				}  else 
-//				if (r instanceof PlayerRating) {
-//					for (RatingComponent rc : r.getRatingComponents()) {
-//						IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
-//						if (pms != null && pms.getMatchId() != null && pms.getMatchId().equals(id)) {
-//							((SummaryStatistics)ss).addValue(rc.getScaledRating());
-//						}
-//					}
-//				}	
-//			}
-//			if (ss.getN() > 0)
-//				body += ss.toString();
-//		}
+		//		body += sep + "Matches" + sep + "\n" + sep + sep + "\n";
+		//		Iterator<ITeamMatchStats> it = tmsHomeMap.values().iterator();
+		//		while (it.hasNext()) {
+		//			Long id = it.next().getMatchId();
+		//			IMatchGroup m = mf.get(id);
+		//			body += sep + m.getDisplayName() + "\n";
+		//			ss = new SummaryStatistics();
+		//			for (IPlayerRating r : mrl) {
+		//				//				if (r instanceof IPlayerMatchRating) {
+		//				//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getMatchId().equals(id)) {
+		//				//						((SummaryStatistics)ss).addValue(r.getRating());
+		//				//					}
+		//				//				}  else 
+		//				if (r instanceof PlayerRating) {
+		//					for (RatingComponent rc : r.getRatingComponents()) {
+		//						IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
+		//						if (pms != null && pms.getMatchId() != null && pms.getMatchId().equals(id)) {
+		//							((SummaryStatistics)ss).addValue(rc.getScaledRating());
+		//						}
+		//					}
+		//				}	
+		//			}
+		//			if (ss.getN() > 0)
+		//				body += ss.toString();
+		//		}
 		body += "</pre>";
 		return body;
-		
+
 	}
+	
 	@Override
 	public boolean setQuery(IRatingQuery q) {
 		this.query = q;
-		addPlayerStats(pmsf.query(q));
-		addTeamStats(tmsf.query(q));
-		return true;
+		boolean retval = false;
+		List<IPlayerMatchStats> pmsl = pmsf.query(q);
+		if (pmsl != null && !pmsl.isEmpty()) {
+			retval = addPlayerStats(pmsl);
+			if (retval) {
+				retval = addTeamStats(tmsf.query(q));
+			}
+		}
+		return retval;
 	}
 
 

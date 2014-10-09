@@ -8,6 +8,7 @@ import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.RatingGroup;
 
@@ -17,12 +18,14 @@ public class TestRatingGroupFactory extends BaseCachingFactory<IRatingGroup> imp
 	private IRatingMatrixFactory rmf;
 	private IRatingSeriesFactory rsf;
 	private Long counter = 77100L;
+	private IUniversalRoundFactory urf;
 	
 	@Inject
-	public TestRatingGroupFactory(IRatingMatrixFactory rmf, IRatingSeriesFactory rsf)
+	public TestRatingGroupFactory(IRatingMatrixFactory rmf, IRatingSeriesFactory rsf, IUniversalRoundFactory urf)
 	{
 		this.rmf = rmf;
 		this.rsf = rsf;
+		this.urf = urf;
 	}
 	
 	@Override
@@ -35,8 +38,8 @@ public class TestRatingGroupFactory extends BaseCachingFactory<IRatingGroup> imp
 	protected IRatingGroup getFromPersistentDatastore(Long id) {
 		IRatingGroup rg = create();
 		rg.setId(id);
-		rg.setDate(new Date());
-		rg.setLabel(rg.getDate().toString());
+		rg.setUniversalRound(urf.get(rg.getUniversalRoundOrdinal()));
+		rg.setLabel(rg.getUniversalRound().abbr);
 		if (id == 76000L) {   // comp 1, round 1
 			rg.setRatingSeriesId(75000L);
 			rg.getRatingMatrixIds().add(77000L);  // best of year

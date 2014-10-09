@@ -13,6 +13,7 @@ import com.googlecode.objectify.Query;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
@@ -35,8 +36,9 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	Objectify ofy;
 
 	@Inject
-	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf);
+	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, 
+			IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf);
 		this.pf = pf;
 		this.cf = cf;
 
@@ -130,8 +132,19 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 					setLatestPublishedForComp(q.get(), compId);
 					return get(q.get().getId());
 				} else {
-					// something really wrong!
-					throw new RuntimeException("Corrupt TopTen database, there are multiple latest top ten lists for the comp " + compId);
+					// may be some series ones in here
+					ITopTenList matched = null;
+					for (TopTenList qttl : q.list()) {
+						if (qttl.getSeries() == null || qttl.getSeries() == false) {
+							if (matched == null) {
+								matched = qttl;
+							} else {
+								// something really wrong if we get two or more
+								throw new RuntimeException("Corrupt TopTen database, there are multiple latest top ten lists for the comp " + compId);
+							}
+						}
+					}
+					return matched;
 				}
 			}
 		} catch (Throwable e) {
@@ -149,7 +162,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 			if (ttl != null) {
 				return ttl;
 			} else {
-				Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("nextId", null);
+				Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("nextId", null).filter("series", false);
 				if (q.count() == 0) {
 					return null;
 				} else if (q.count() == 1 || q.count() == 2) {

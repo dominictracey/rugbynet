@@ -11,11 +11,13 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupView;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -24,6 +26,7 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
@@ -43,8 +46,16 @@ public interface ClientFactory extends EditContentPresenter {
 		void onPositionListFetched(List<position> result);
 	}
 	
+	public interface GetCompListCallback {
+		void onCompListFetched(List<ICompetition> result);
+	}
+	
 	public interface GetMatchGroupCallback {
 		void onMatchGroupFetched(IMatchGroup result);
+	}
+	
+	public interface GetUniversalRoundsListCallback {
+		void onUniversalRoundListFetched(List<UniversalRound> result);
 	}
 	
 	EventBus getEventBus();
@@ -53,8 +64,10 @@ public interface ClientFactory extends EditContentPresenter {
 	RugbyAdminServiceAsync getRpcService();
 
 	PlayerPopupView<IPlayer> getPlayerPopupView();
+	SeriesConfigPopupView<ISeriesConfiguration> getSeriesConfigrPopupView();
 	void getCountryListAsync(GetCountryListCallback cb);
 	void getPositionListAsync(GetPositionListCallback cb);
+	void getCompListAsync(GetCompListCallback cb);
 	void getMatchGroupAsync(Long id, GetMatchGroupCallback cb);
 	
 	PlayerMatchStatsPopupView<IPlayerMatchStats> getPlayerMatchStatsPopupView();
@@ -83,4 +96,6 @@ public interface ClientFactory extends EditContentPresenter {
 	EditContent getEditContent();
 
 	SeriesConfigurationView<ISeriesConfiguration> getSeriesView();
+
+	void getUniversalRoundsListAsync(int count,	GetUniversalRoundsListCallback getUniversalRounds20ListCallback);
 }

@@ -62,4 +62,6 @@ public interface ClientFactory {
 	RatingPopupViewImpl<IPlayerRating> getRatingPopup();
 
 	SeriesListView<IRatingSeries> getSeriesView();
+
+	String getPlaceFromURL();
 }

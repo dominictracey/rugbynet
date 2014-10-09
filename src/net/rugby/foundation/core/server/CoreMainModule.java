@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server;
 
+import net.rugby.foundation.admin.server.model.IRatingSeriesManager;
+import net.rugby.foundation.admin.server.model.RatingSeriesManager;
 import net.rugby.foundation.admin.server.rules.CoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
@@ -13,6 +15,9 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
@@ -29,11 +34,17 @@ import net.rugby.foundation.core.server.factory.ofy.OfyMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchResultFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRawScoreFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyStandingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.test.TestRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.test.TestRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.test.TestRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.test.TestRawScoreFactory;
 import net.rugby.foundation.model.shared.IContent;
 
@@ -66,6 +77,10 @@ public class CoreMainModule extends AbstractModule {
 		bind(new TypeLiteral<ICachingFactory<IContent>>(){}).to(new TypeLiteral<OfyContentFactory>(){});
 		bind(IStandingFactory.class).to(OfyStandingFactory.class);
 		bind(IRawScoreFactory.class).to(OfyRawScoreFactory.class);
+		bind(IRatingSeriesFactory.class).to(OfyRatingSeriesFactory.class);
+		bind(IRatingGroupFactory.class).to(OfyRatingGroupFactory.class);
+		bind(IRatingMatrixFactory.class).to(OfyRatingMatrixFactory.class);
+		bind(IRatingSeriesManager.class).to(RatingSeriesManager.class);
 	}
 }
 
