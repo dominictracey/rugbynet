@@ -12,4 +12,6 @@ public interface IRatingSeriesFactory extends ICachingFactory<IRatingSeries> {
 
 	List<RatingMode> getModesForComp(Long compId);
 
+	Long getDefaultSeriesId(Long compId);
+
 }

@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
@@ -45,10 +46,12 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	protected ISeriesConfiguration sc;
 	private IUniversalRoundFactory urf;
 	private IRoundFactory rf;
+	private ISeriesConfigurationFactory scf;
 
 	@Inject
-	public RatingSeriesManager(IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IRatingQueryFactory rqf, 
+	public RatingSeriesManager(ISeriesConfigurationFactory scf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IRatingQueryFactory rqf, 
 			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory rsef, IUniversalRoundFactory urf, IRoundFactory rf) {
+		this.scf = scf;
 		this.rsf = rsf;
 		this.rgf = rgf;
 		this.rmf = rmf;
@@ -67,12 +70,13 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	@Override
 	public IRatingSeries initialize(ISeriesConfiguration sc) {
 
+		assert sc.getPipelineId() != null;
 		this.sc = sc;
 
 		if (sc == null)
 			return null;
 
-		if (sc.getSeries() == null) {
+		if (sc.getSeriesId() == null) {
 			IRatingSeries series = rsf.create();
 			series.getActiveCriteria().addAll(sc.getActiveCriteria());
 			series.getCompIds().addAll(sc.getCompIds());
@@ -85,6 +89,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			rsf.put(series);
 			sc.setSeries(series);
 			sc.setSeriesId(series.getId());
+			scf.put(sc);
 
 			return series;
 		} else {
@@ -96,12 +101,14 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	@Override
 	public Boolean readyForNewGroup(ISeriesConfiguration config) {	
 
+		this.sc = config;
+				
 		// return true if
 		//	1) Series has been created
 		//	2) Series has a target UniversalRound specified
 		//	3) target UR is not in future
 		//	4) The comps configured for this series have all of the stats all fetched for the target UR
-
+		assert config.getPipelineId() != null;
 		IRatingSeries series = config.getSeries();
 		if (series == null) {
 			return false;
@@ -164,6 +171,12 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 
 
+	/*
+	 * Important note: when the RatingSeries graph is changed, we should drop the entire graph from memcache to keep it synched with what we are saving to the persistent datastore.
+	 * Unfortunately this might hose up the Test versions of the factories?
+	 * (non-Javadoc)
+	 * @see net.rugby.foundation.admin.server.model.IRatingSeriesManager#addRatingGroup(net.rugby.foundation.model.shared.IRatingSeries, net.rugby.foundation.model.shared.UniversalRound)
+	 */
 	public IRatingGroup addRatingGroup(IRatingSeries rs, UniversalRound time ) {
 		IRatingGroup rg = rgf.create();
 		rg.setRatingSeries(rs);
@@ -171,6 +184,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		rg.setRatingSeriesId(rs.getId());
 		rg.setUniversalRound(time);
 		rg.setUniversalRoundOrdinal(time.ordinal);
+		rg.setRatingSeries(rs);
 		rgf.put(rg); // get id for ratingGroup
 
 		// now create the Rating Matrices for the group
@@ -181,13 +195,11 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			rm.setRatingGroup(rg);
 			rm.setRatingGroupId(rg.getId());
 			rm.setGenerated(DateTime.now().toDate());
-			rm.setRatingGroupId(rg.getId());
-			rm.setRatingGroup(rg);
 			rmf.put(rm);
-			generateRatingQueries(rm);
 			rg.getRatingMatrices().add(rm);
 			rg.getRatingMatrixIds().add(rm.getId());
-
+			
+			generateRatingQueries(rm);
 		}
 
 

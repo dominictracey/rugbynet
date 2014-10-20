@@ -29,21 +29,21 @@ import net.rugby.foundation.topten.model.shared.TopTenItem;
 import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.BaseTopTenListFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
 
 public class TestTopTenListFactory extends BaseTopTenListFactory implements ITopTenListFactory {
 
 	protected IPlayerFactory pf;
-	protected ICompetitionFactory cf;
 	private Random r = new Random();
 
 	private Map<Long,List<ITopTenList>> listMap = new HashMap<Long,List<ITopTenList>>();
-	private IPlaceFactory spf;
 	
 	@Inject
-	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf);
+	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
+			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf,
+			ISocialMediaDirector smd) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd);
 		this.pf = pf;
-		this.cf = cf;
 	}
 
 

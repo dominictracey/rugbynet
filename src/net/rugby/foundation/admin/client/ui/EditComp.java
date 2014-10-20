@@ -54,6 +54,8 @@ public class EditComp extends Composite {
 	@UiField
 	TextBox abbr;
 	@UiField
+	TextBox twitter;
+	@UiField
 	TextBox ccid;
 	@UiField
 	CheckBox underway;
@@ -72,6 +74,7 @@ public class EditComp extends Composite {
 		comp.setLongName(longName.getText());
 		comp.setShortName(shortName.getText());
 		comp.setAbbr(abbr.getText());
+		comp.setTwitter(twitter.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
 		comp.setWeightingFactor(Float.parseFloat(weightingFactor.getText()));
@@ -86,6 +89,7 @@ public class EditComp extends Composite {
 		comp.setLongName(longName.getText());
 		comp.setShortName(shortName.getText());
 		comp.setAbbr(abbr.getText());
+		comp.setTwitter(twitter.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
 		listener.repairComp(comp);
@@ -108,6 +112,7 @@ public class EditComp extends Composite {
 		shortName.setText(comp.getShortName());
 		ccid.setText(comp.getCompClubhouseId().toString());
 		abbr.setText(comp.getAbbr());
+		twitter.setText(comp.getTwitter());
 		underway.setValue(comp.getUnderway());
 		if (comp.getWeightingFactor() != null) {
 			weightingFactor.setValue(comp.getWeightingFactor().toString());

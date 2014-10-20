@@ -142,15 +142,15 @@ public class SeriesPage extends HttpServlet {
 				} else {
 					// not a feature - create a description 
 					if (item != null && list != null) {
-						description += item.getPlayer().getDisplayName() + " of " + item.getTeamName() + " is #" + item.getOrdinal() + " on " + list.getTitle();
+						description = item.getPlayer().getDisplayName() + " of " + item.getTeamName() + " is #" + item.getOrdinal() + " on " + list.getTitle();
 					} else if (list != null) {
-						description += list.getTitle();			
+						description = list.getTitle();			
 					} else if (series != null && group != null) {
-						description += series.getDisplayName() + " " + group.getLabel();
+						description = series.getDisplayName() + " " + group.getLabel();
 					} else if (series != null && group != null) {
-						description += series.getDisplayName() + " " + group.getLabel();
+						description = series.getDisplayName() + " " + group.getLabel();
 					} else if (series != null)  {
-						description += series.getDisplayName();
+						description = series.getDisplayName();
 					}
 					title = description;
 				}
@@ -164,15 +164,17 @@ public class SeriesPage extends HttpServlet {
 					ITopTenItem target;
 					while (it.hasNext()) {
 						target = it.next();
-						keywords += target.getPlayer().getDisplayName() + ",";
+						keywords += target.getPlayer().getDisplayName();
 						players += target.getPlayer().getDisplayName();
 						if (it.hasNext()) {
 							players += ", ";
+							keywords += ", ";
 						} 
 						if (!keywords.contains(target.getTeamName())) {
-							keywords += target.getTeamName();
+							keywords += target.getTeamName() + ", ";
 						}
 					}
+				}
 
 
 					//		if (	(ttl == null && p == null) ||
@@ -207,10 +209,10 @@ public class SeriesPage extends HttpServlet {
 					resp.getWriter().print(third);
 					resp.getWriter().print(details2Div);
 					resp.getWriter().print(fifth);
-				} else {
-					resp.sendRedirect(req.getScheme() + "://" + req.getServerName() + "/404.html");
-					return;
-				}
+//				} else {
+//					resp.sendRedirect(req.getScheme() + "://" + req.getServerName() + "/404.html");
+//					return;
+//				}
 			}
 
 
@@ -236,7 +238,11 @@ public class SeriesPage extends HttpServlet {
 
 	private IServerPlace getPlace(HttpServletRequest req) {
 		// parse out the guid
-		String guid = req.getRequestURI().split("/")[2];
+		String chunks[] = req.getRequestURI().split("/");
+		String guid = "";
+		if (chunks.length > 2) {
+			guid = chunks[2];
+		}
 		return plf.getForGuid(guid);
 	}
 

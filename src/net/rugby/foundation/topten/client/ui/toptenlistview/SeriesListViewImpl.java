@@ -61,6 +61,8 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	private RatingMode mode;
 	private Map<Integer, Tab> tabIndexMap = new HashMap<Integer, Tab>();
 
+	private boolean ratingModesSet;
+
 
 	@UiTemplate("SeriesListViewImpl.ui.xml")
 
@@ -72,7 +74,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	public SeriesListViewImpl()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		//populateCriteria();
+		ratingModesSet = false;
 	}
 
 
@@ -238,9 +240,11 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 	@Override	public void setGroup(IRatingGroup group) {
 		this.group = group;
-		groupId = group.getId();
-		assert (group.getRatingSeriesId().equals(seriesId));
-
+		if (group != null) {
+			groupId = group.getId();
+			assert (group.getRatingSeriesId().equals(seriesId));
+		}
+		
 		setMatrix(null);
 		setQuery(null);
 		setPlayerId(null);
@@ -274,6 +278,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			});
 			criteriaDropDown.add(nl);
 		}
+		ratingModesSet = true;
 	}
 	@Override	public IRatingMatrix getMatrix() {
 		return matrix;
@@ -281,9 +286,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 	@Override	public void setMatrix(IRatingMatrix matrix) {
 		this.matrix = matrix;
-		if (matrix == null)
-			matrixId = null;
-		else {
+		if (matrix != null) {
 			matrixId = matrix.getId();
 			tabPanel.clear();
 			tabIndexMap.clear();
@@ -321,10 +324,13 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 					});
 
 					tabPanel.add(t);
-				}
-			}
 
+				}
+			
+			}
 			presenter.gotoPlace(getPlace());
+		} else {
+			matrixId = null;
 		}
 
 	}
@@ -344,11 +350,15 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		this.query = query;
 		if (query != null) {
 			queryId = query.getId();
-			if (query.getPositions() != null && series.getMode() == RatingMode.BY_POSITION) {
-				// assume one position
-				int ordinal = query.getPositions().get(0).ordinal()-1;
-				addListView(ordinal);
-				tabPanel.selectTab(ordinal);
+			int ordinal = 0;
+			for (IRatingQuery q : matrix.getRatingQueries()) {
+				if (q.getId().equals(query.getId())) {
+					addListView(ordinal);
+					tabPanel.selectTab(ordinal);
+				}
+				if (q.getTopTenListId() != null) {
+					ordinal++;
+				}
 			}
 			presenter.gotoPlace(getPlace());
 		} else {
@@ -374,7 +384,10 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 	@Override
 	public void setCompId(Long compId) {
-		this.compId = compId;
+		if (compId != this.compId) {
+			this.compId = compId;
+			ratingModesSet = false;
+		}
 	}
 
 	@Override
@@ -416,6 +429,12 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	public void setList(ITopTenList list) {
 		this.list = list;
 		if (list != null) {
+			// have to bump up and look at the matrix's query list to pick the right one.
+			for (IRatingQuery rq : matrix.getRatingQueries()) {
+				if (rq.getId().equals(queryId)) {
+					setQuery(rq);
+				}
+			}
 			listTitle.setHTML(list.getTitle());
 		}
 	}
@@ -443,6 +462,11 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		matrixId = sPlace.getMatrixId();
 		queryId = sPlace.getQueryId();
 		playerId = sPlace.getPlayerId();
+	}
+
+	@Override
+	public boolean isRatingModesSet() {
+		return ratingModesSet;
 	}
 
 

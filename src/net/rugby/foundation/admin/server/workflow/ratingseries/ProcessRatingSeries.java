@@ -67,6 +67,11 @@ public class ProcessRatingSeries extends Job1<ProcessRatingSeriesResult, ISeries
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Generate rating series pipeline invoked with null.");
 				return null;
 			}
+			
+			// first set the pipelineId we are running as
+			// comes back as pipeline-key("asd-423-sdf-sdgg") - strtok on double quote
+			seriesConfig.setPipelineId(this.getPipelineKey().toString().split("\"")[1]);
+			scf.put(seriesConfig);
 
 			// do we have a target round?
 			if (seriesConfig.getTargetRound() == null) {

@@ -7,30 +7,22 @@ import org.joda.time.DateTime;
 
 import com.google.inject.Inject;
 
-import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.BaseRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.RatingMatrix;
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 
-public class TestRatingMatrixFactory extends BaseCachingFactory<IRatingMatrix> implements IRatingMatrixFactory {
+public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements IRatingMatrixFactory {
 
 	private Long counter = 76100L;
-	private IRatingSeriesFactory rsf;
-	private IRoundFactory rf;
-	private IRatingGroupFactory rgf;
-	private IRatingQueryFactory rqf;
+
 	
 	@Inject 
-	public TestRatingMatrixFactory(IRatingSeriesFactory rsf, IRoundFactory rf, IRatingGroupFactory rgf, IRatingQueryFactory rqf) {
-		this.rsf = rsf;
-		this.rf = rf;
-		this.rgf = rgf;
-		this.rqf = rqf;
+	public TestRatingMatrixFactory(IRatingSeriesFactory rsf, IRatingQueryFactory rqf) {
+		super(rsf, rqf);
 	}
 	
 	@Override

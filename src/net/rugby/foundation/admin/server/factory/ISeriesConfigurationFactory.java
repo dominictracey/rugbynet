@@ -7,4 +7,6 @@ import net.rugby.foundation.core.server.factory.ICachingFactory;
 
 public interface ISeriesConfigurationFactory extends ICachingFactory<ISeriesConfiguration> {
 	List<ISeriesConfiguration> getAllActive();
+
+	ISeriesConfiguration getForSeriesId(Long id);
 }

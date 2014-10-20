@@ -3,23 +3,54 @@ package net.rugby.foundation.core.server.factory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.inject.Inject;
+
+import net.rugby.foundation.model.shared.IRatingGroup;
+import net.rugby.foundation.model.shared.IRatingMatrix;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
+import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.model.shared.ServerPlace;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 import net.rugby.foundation.admin.server.util.Hashids;
 
 
 public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> implements IPlaceFactory {
 
+	private ITopTenListFactory ttlf;
+	private IRatingQueryFactory rqf;
+	private IConfigurationFactory ccf;
+	private IRatingSeriesFactory rsf;
+
+	@Inject
+	public BasePlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf) {
+		this.ttlf = ttlf;
+		this.rqf = rqf;
+		this.ccf = ccf;
+		this.rsf = rsf;
+	}
+	
 	private Hashids hashids = null;
 	private final String SALT = "The Rugby Net Championship";
+	private final String DEFAULT_S_GUID = "DEFAULT_S_GUID";
 	@Override
 	public IServerPlace getForGuid(String guid) {
 		try {
 			IServerPlace place = null;
+			
+			if (guid == null || guid.isEmpty()) {
+				guid = DEFAULT_S_GUID;
+			}
 	
 			place = getItem(getGuidCacheId(guid));			
 
-			if (place == null) {
-				//place = getForGuidFromPersistentDatastore(guid);
+			if (place == null && guid.equals(DEFAULT_S_GUID)) {
+				place = buildDefaultSPlace();
+			} else if (place == null) {
 
 				if (hashids == null) {
 					hashids = new Hashids(SALT);
@@ -28,12 +59,11 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 				if (ids.length > 0) {
 					place = get(ids[0]);
 				}
-				
-				if (place != null) {
+			}
+			if (place != null) {
 					putItem(getGuidCacheId(guid), place);
-				}	else {
-					return null;
-				}
+			} else {
+				return null;
 			} 
 			return place;
 		} catch (Throwable ex) {
@@ -42,15 +72,20 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 		}
 	}
 	
+	private IServerPlace buildDefaultSPlace() {
+		IServerPlace p = new ServerPlace();
+		p.setCompId(ccf.get().getDefaultCompId());
+		p.setSeriesId(rsf.getDefaultSeriesId(p.getCompId()));
+		p.setType(PlaceType.SERIES);
+		return p;
+	}
+
 	private String getGuidCacheId(String guid) {
 		return guidPrefix + guid;
 	}
 
 	private final String guidPrefix = "spfGUID-";
 	
-	
-	protected abstract IServerPlace getForGuidFromPersistentDatastore(String guid);
-
 	@Override
 	public IServerPlace getForName(String name) {
 		try {
@@ -95,4 +130,43 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 			return null;
 		}	
 	}
+	
+	@Override
+	public void buildItem(IServerPlace p, ITopTenItem item) {
+		p.setItemId(item.getId());
+		p.setType(PlaceType.SERIES);
+		buildList(p, ttlf.get(item.getParentId()));
+	}
+
+	@Override
+	public void buildList(IServerPlace p, ITopTenList ttl) {
+		p.setListId(ttl.getId());
+		p.setType(PlaceType.SERIES);
+		buildQuery(p, rqf.get(ttl.getQueryId()));
+	}
+	@Override
+	public void buildQuery(IServerPlace p, IRatingQuery rq) {
+		p.setQueryId(rq.getId());
+		p.setType(PlaceType.SERIES);
+		buildMatrix(p, rq.getRatingMatrix());
+	}
+	@Override
+	public void buildMatrix(IServerPlace p, IRatingMatrix rm) {
+		p.setMatrixId(rm.getId());
+		p.setType(PlaceType.SERIES);
+		buildGroup(p, rm.getRatingGroup());
+	}
+	@Override
+	public void buildGroup(IServerPlace p, IRatingGroup rg) {
+		p.setGroupId(rg.getId());
+		p.setType(PlaceType.SERIES);
+		buildSeries(p,rg.getRatingSeries());
+	}
+	@Override
+	public void buildSeries(IServerPlace p, IRatingSeries rs) {
+		p.setSeriesId(rs.getId());
+		p.setType(PlaceType.SERIES);
+		put(p);
+	}
+
 }

@@ -66,6 +66,8 @@ public class ProcessSeriesOrchestration extends OrchestrationCore<ISeriesConfigu
 
 			// first check if this match already has a pipeline going and kill it if it does
 			if (sc.getPipelineId() != null && !sc.getPipelineId().isEmpty()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Flushing out existing pipeline records.");
+				
 				// delete adminTasks first
 				List<? extends IAdminTask> tasks = atf.getForPipeline(sc.getPipelineId());
 				atf.delete((List<IAdminTask>) tasks);
@@ -73,17 +75,20 @@ public class ProcessSeriesOrchestration extends OrchestrationCore<ISeriesConfigu
 				// now the pipeline records
 				service.deletePipelineRecords(sc.getPipelineId(), true, false);
 				sc.setPipelineId(null);
-
+				rsf.put(sc);
 			}
 
-			//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
 			try {
 				pipelineId = service.startNewPipeline(new ProcessRatingSeries(), sc, new JobSetting.MaxAttempts(3));
 			} catch (RetriesExhaustedException ree) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Bad stuff", ree);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Giving up", ree);
+				service.deletePipelineRecords(sc.getPipelineId(), true, false);
+				sc.setPipelineId(null);
+				rsf.put(sc);
+				return;
 			}
-			sc.setPipelineId(pipelineId);
-			rsf.put(sc);
+//			sc.setPipelineId(pipelineId);
+//			rsf.put(sc);
 
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
@@ -94,7 +99,7 @@ public class ProcessSeriesOrchestration extends OrchestrationCore<ISeriesConfigu
 				//subj += target.getDisplayName() + "(" + target.getId() + ")";
 			}
 
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Match Stats Fetcher Orchestration Error", caught);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Process Series Error", caught);
 
 			AdminEmailer ae = new AdminEmailer();
 			ae.setSubject(subj);

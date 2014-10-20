@@ -9,6 +9,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.client.ui.HeaderView;
 import net.rugby.foundation.topten.client.ui.HeaderViewImpl;
 import net.rugby.foundation.topten.client.ui.RatingPopupViewImpl;
@@ -27,6 +28,7 @@ import net.rugby.foundation.core.client.Identity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
+import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
@@ -274,11 +276,23 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	@Override
 	public String getPlaceFromURL() {
 		if (Location.getPath().contains("/s/")) {
-			return Location.getPath().split("/")[2];
+			// parse out the guid
+			String chunks[] = Location.getPath().split("/");
+			String guid = "";
+			if (chunks.length > 2) {
+				guid = chunks[2];
+			}
+			return guid;
 		} else {
 			return null;
 		}
 	}
 
+	@Override
+	public void setPlaceInUrl(SeriesPlace place) {
+		UrlBuilder builder = Location.createUrlBuilder().setPath("/s/" + place.getToken()).removeParameter("listId").removeParameter("compId").removeParameter("playerId");
+		Window.Location.replace(builder.buildString());
+
+	}
 
 }

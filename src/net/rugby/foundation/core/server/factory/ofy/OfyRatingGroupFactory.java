@@ -8,27 +8,26 @@ import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.BaseRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.RatingGroup;
 
-public class OfyRatingGroupFactory extends BaseCachingFactory<IRatingGroup> implements IRatingGroupFactory, Serializable {
+public class OfyRatingGroupFactory extends BaseRatingGroupFactory implements IRatingGroupFactory, Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -63026632234487370L;
-	private IRatingMatrixFactory rmf;
-	private IUniversalRoundFactory urf;
+
 
 	@Inject
-	OfyRatingGroupFactory(IRatingMatrixFactory rmf, IUniversalRoundFactory urf) {
-		this.rmf = rmf;
-		this.urf = urf;
+	OfyRatingGroupFactory(IRatingMatrixFactory rmf, IUniversalRoundFactory urf, IRatingSeriesFactory rsf) {
+		super(rsf, rmf, urf);
 	}
 
 	@Override
@@ -36,14 +35,14 @@ public class OfyRatingGroupFactory extends BaseCachingFactory<IRatingGroup> impl
 		if (id != null) {
 			Objectify ofy = DataStoreFactory.getOfy();
 			IRatingGroup retval = ofy.get(new Key<RatingGroup>(RatingGroup.class,id));
-			for (Long rmid : retval.getRatingMatrixIds()) {
-				IRatingMatrix rm = rmf.get(rmid);
-				rm.setRatingGroup(retval);
-				retval.getRatingMatrices().add(rm);
-			}
-			retval.setUniversalRound(urf.get(retval.getUniversalRoundOrdinal()));
-			retval.setLabel(retval.getUniversalRound().abbr);
-			return retval;
+//			for (Long rmid : retval.getRatingMatrixIds()) {
+//				IRatingMatrix rm = rmf.get(rmid);
+//				rm.setRatingGroup(retval);
+//				retval.getRatingMatrices().add(rm);
+//			}
+//			retval.setUniversalRound(urf.get(retval.getUniversalRoundOrdinal()));
+//			retval.setLabel(retval.getUniversalRound().abbr);
+			return build(retval);
 		} else
 			return null;
 	}
@@ -68,8 +67,11 @@ public class OfyRatingGroupFactory extends BaseCachingFactory<IRatingGroup> impl
 	public boolean deleteFromPersistentDatastore(IRatingGroup r) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			for (IRatingMatrix rm : r.getRatingMatrices()) {
-				rmf.delete(rm);
+			for (Long rid : r.getRatingMatrixIds()) {
+				IRatingMatrix rm = rmf.get(rid);
+				if (rm != null) {
+					rmf.delete(rm);
+				}
 			}
 			
 			ofy.delete(r);

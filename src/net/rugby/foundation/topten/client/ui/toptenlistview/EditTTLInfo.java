@@ -13,6 +13,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -41,15 +42,21 @@ public class EditTTLInfo extends DialogBox {
 	@UiField Button cancel;
 	@UiField TextArea description;
 	@UiField TextBox title;
+	@UiField TextBox twitter;
 	
 	private EditTTLInfoPresenter listener;
 	private ITopTenList list;
 	
 	@UiHandler("save")
 	void onClickSave(ClickEvent e) {
-		list.setTitle(title.getText());
-		list.setContent(description.getText());
-		listener.saveTTLInfo(list);
+		if (twitter.getText().length() < 50)  {
+			list.setTitle(title.getText());
+			list.setContent(description.getText());
+			list.setTwitterDescription(twitter.getText());
+			listener.saveTTLInfo(list);
+		} else {
+			Window.alert("Twitter description must be less than 50 chars. Current length is " + twitter.getText().length() + ".");
+		}
 	}
 	
 	
@@ -63,6 +70,7 @@ public class EditTTLInfo extends DialogBox {
 		this.list = list;
 		title.setText(list.getTitle());
 		description.setText(list.getContent());
+		twitter.setText(list.getTwitterDescription());
 		this.setWidth("800px");
 		show();
 	}

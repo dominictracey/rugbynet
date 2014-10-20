@@ -102,4 +102,10 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 		return true;
 	}
 
+	@Override
+	public ISeriesConfiguration getForSeriesId(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

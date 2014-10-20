@@ -9,6 +9,8 @@ import com.googlecode.objectify.annotation.Entity;
 
 import net.rugby.foundation.model.shared.MatchPopupData;
 import net.rugby.foundation.model.shared.Position;
+import net.rugby.foundation.model.shared.fantasy.PlayerPopupData;
+import net.rugby.foundation.model.shared.fantasy.PlayerRowData;
 
 
 

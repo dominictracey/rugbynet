@@ -7,6 +7,7 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.ListBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ClientFactory.GetCompListCallback;
@@ -112,10 +113,13 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				private ListBox w;
 				// need this bit of gorminess as the first player is passed in before the country list is completely loaded.
 				private List<Long> selectedIds = new ArrayList<Long>();
+				private boolean compsLoaded = false;
+				private Timer t = null;
 
 				@Override
 				public void bind (Widget in)
 				{
+					compsLoaded = false;
 					w = (ListBox) in;
 					clientFactory.getCompListAsync(new GetCompListCallback() {
 
@@ -130,38 +134,58 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 								}
 								count++;
 							}
+							compsLoaded = true;
 						}
 					});
 				}
 
 				@Override
 				public Widget render(ISeriesConfiguration c) {
-					if (w.getItemCount() > 0) {
-						int i = 0;
-						String index = w.getItemText(i);
-						if (c.getCountries() != null && c.getCountries().size() > 0) {
-							while (!c.getCountries().get(i).getName().equals(index) && i < w.getItemCount()) {
-								++i;
-								index = w.getItemText(i);
+
+					final ISeriesConfiguration _c = c;
+
+
+					t = new Timer() {
+						@Override
+						public void run() {
+							if (compsLoaded) {
+								if (w.getItemCount() > 0) {
+									int i = 0;
+									if (_c.getCompIds() != null && _c.getCompIds().size() > 0) {
+										while (i < w.getItemCount()) {
+											if (_c.getCompIds().contains(Long.valueOf(w.getValue(i)))) {
+												w.setItemSelected(i, true);
+											}
+											++i;
+										}
+									}
+								}
+							} else {
+								// go again
+								t.schedule(5000);
 							}
-
-							w.setItemSelected(i, true);
 						}
-					} else {
-						//selectedIds.addAll(c.getCountryIds());
-					}
+					};
 
+					t.schedule(50);
 					return w;
 				}
 
+
+
+
+
 				@Override
 				public void clear() {
-					//w.setItemSelected(0, false);
+					for (int i=0; i<w.getVisibleItemCount(); ++i) {
+						w.setItemSelected(i, false);
+					}
 				}
 
 				@Override
 				public ISeriesConfiguration update(ISeriesConfiguration p) {
 					int index = 0;
+					p.getCompIds().clear();
 					while (index < w.getItemCount() && !w.getValue(index).isEmpty())
 					{
 						if (w.isItemSelected(index)) {
@@ -180,7 +204,8 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				private ListBox w;
 				// need this bit of gorminess as the first player is passed in before the country list is completely loaded.
 				private List<Long> selectedIds = new ArrayList<Long>();
-
+				Timer t = null;
+				boolean countriesLoaded = false;
 				@Override
 				public void bind (Widget in)
 				{
@@ -198,38 +223,56 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 								}
 								count++;
 							}
+							countriesLoaded = true;
 						}
 					});
 				}
 
 				@Override
 				public Widget render(ISeriesConfiguration c) {
-					if (w.getItemCount() > 0) {
-						int i = 0;
-						String index = w.getItemText(i);
-						if (c.getCountries() != null && c.getCountries().size() > 0) {
-							while (!c.getCountries().get(i).getName().equals(index) && i < w.getItemCount()) {
-								++i;
-								index = w.getItemText(i);
+
+					final ISeriesConfiguration _c = c;
+
+
+					t = new Timer() {
+						@Override
+						public void run() {
+							if (countriesLoaded) {
+								if (w.getItemCount() > 0) {
+									int i = 0;
+									if (_c.getCountryIds() != null && _c.getCountryIds().size() > 0) {
+										while (i < w.getItemCount()) {
+											if (_c.getCountryIds().contains(Long.valueOf(w.getValue(i)))) {
+												w.setItemSelected(i, true);
+											}
+											++i;
+										}
+									}
+								}
+							} else {
+								// go again
+								t.schedule(5000);
 							}
-
-							w.setItemSelected(i, true);
 						}
-					} else {
-						//selectedIds.addAll(c.getCountryIds());
-					}
+					};
 
+					t.schedule(50);
 					return w;
 				}
 
 				@Override
 				public void clear() {
-					//w.setItemSelected(0, false);
+					for (int i=0; i<w.getVisibleItemCount(); ++i) {
+						w.setItemSelected(i, false);
+					}
+					//
+
 				}
 
 				@Override
 				public ISeriesConfiguration update(ISeriesConfiguration p) {
 					int index = 0;
+					p.getCountryIds().clear();
 					while (index < w.getItemCount() && !w.getValue(index).isEmpty())
 					{
 						if (w.isItemSelected(index)) {
@@ -247,7 +290,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				//mode
 				private ListBox w;
 				// need this bit of gorminess as the first player is passed in before the country list is completely loaded.
-				private List<Long> selectedIds = new ArrayList<Long>();
+				//private List<Long> selectedIds = new ArrayList<Long>();
 
 				@Override
 				public void bind (Widget in)
@@ -264,8 +307,8 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				@Override
 				public Widget render(ISeriesConfiguration c) {
 					if (w.getItemCount() > 0) {
-						int i = 0;
-						String index = w.getItemText(i);
+						//int i = 0;
+						//String index = w.getItemText(i);
 						if (c.getMode() != null) {
 							if (c.getMode().equals(RatingMode.OVERALL)) {
 								w.setItemSelected(0, true);
@@ -290,7 +333,9 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 
 				@Override
 				public void clear() {
-					w.setItemSelected(0, false);
+					for (int i=0; i<w.getVisibleItemCount(); ++i) {
+						w.setItemSelected(i, false);
+					}
 				}
 
 				@Override
@@ -320,8 +365,11 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				//startDate
 				private ListBox w;
 				// need this bit of gorminess as the first player is passed in before the country list is completely loaded.
-				private List<Long> selectedIds = new ArrayList<Long>();
+				//private List<Long> selectedIds = new ArrayList<Long>();
 				private List<UniversalRound> rounds =  null;
+				boolean roundsLoaded = false;
+				Timer t = null;
+				
 				@Override
 				public void bind (Widget in)
 				{
@@ -335,36 +383,49 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 							for (UniversalRound c : urs) {
 								w.addItem(c.shortDesc, Integer.toString(c.ordinal));
 							}
+							roundsLoaded = true;
 						}
 					});
 				}
 
 				@Override
 				public Widget render(ISeriesConfiguration c) {
-					int index = 0;
-//					while (rounds == null) {
-//						try {
-//							Thread.sleep(100);
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//					}
-					if (rounds != null) {
-						for (UniversalRound ur: rounds) {
-							if (ur.equals(c.getTargetRound()))
-								break;
-							++index;
+
+					final ISeriesConfiguration _c = c;
+
+
+					t = new Timer() {
+						@Override
+						public void run() {
+							if (roundsLoaded) {
+								if (w.getItemCount() > 0) {
+									int i = 0;
+									if (_c.getTargetRound() != null) {
+										while (i < w.getItemCount()) {
+											if (_c.getTargetRound().ordinal == Integer.valueOf(w.getValue(i))) {
+												w.setItemSelected(i, true);
+												break;
+											}
+											++i;
+										}
+									}
+								}
+							} else {
+								// go again
+								t.schedule(5000);
+							}
 						}
-	
-						w.setSelectedIndex(index);
-					}
+					};
+
+					t.schedule(50);
 					return w;
 				}
 
 				@Override
 				public void clear() {
-					//w.setItemSelected(0, false);
+					for (int i=0; i<w.getVisibleItemCount(); ++i) {
+						w.setItemSelected(i, false);
+					}
 				}
 
 				@Override

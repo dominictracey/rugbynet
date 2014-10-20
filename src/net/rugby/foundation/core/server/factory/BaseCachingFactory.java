@@ -257,4 +257,19 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 			return false;
 		}	
 	}
+	
+	/**
+	 * 
+	 */
+	public void dropFromCache(Long id) {
+		try {
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			//T t = get(id);
+			if (syncCache.contains(id)) {
+				syncCache.delete(id);
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+		}	
+	}
 }

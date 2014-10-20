@@ -75,7 +75,7 @@
 		
 	<!-- Default page to serve -->
 	<welcome-file-list>
-		<welcome-file>topten.html</welcome-file>
+		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 
 	<security-constraint>
@@ -89,7 +89,7 @@
 	
 		<security-constraint>
 		<web-resource-collection>
-			<url-pattern>/index.html</url-pattern>
+			<url-pattern>/topten.html</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>admin</role-name>
@@ -105,14 +105,14 @@
 		</auth-constraint>
 	</security-constraint>
 	
-<!-- 		<security-constraint> -->
-<!-- 		<web-resource-collection> -->
-<!-- 			<url-pattern>/_ah/pipeline/*</url-pattern> -->
-<!-- 		</web-resource-collection> -->
-<!-- 		<auth-constraint> -->
-<!-- 			<role-name>admin</role-name> -->
-<!-- 		</auth-constraint> -->
-<!-- 	</security-constraint> -->
+	<security-constraint>
+		<web-resource-collection>
+			<url-pattern>/_ah/pipeline/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
 	
 	<session-config>
 		<session-timeout>25000</session-timeout>

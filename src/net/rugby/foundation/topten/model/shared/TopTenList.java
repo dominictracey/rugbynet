@@ -42,6 +42,9 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected Long prevPublishedId;
 	protected Long compId;
 	protected Long queryId;
+	@Unindexed
+	protected String twitterDescription;
+	protected String guid;
 	
 	public class TopTenListSummary implements ITopTenListSummary {
 		protected Long id;
@@ -245,6 +248,22 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setSeries(Boolean series) {
 		this.series = series;
+	}
+	@Override
+	public String getTwitterDescription() {
+		return twitterDescription;
+	}
+	@Override
+	public void setTwitterDescription(String twitterDescription) {
+		this.twitterDescription = twitterDescription;
+	}
+	@Override
+	public String getGuid() {
+		return guid;
+	}
+	@Override
+	public void setGuid(String guid) {
+		this.guid = guid;
 	}
 
 }

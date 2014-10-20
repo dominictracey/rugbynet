@@ -6,7 +6,6 @@ import java.util.List;
 import com.google.gwt.user.client.ui.IsWidget;
 
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 
 public interface SeriesConfigurationView<T extends ISeriesConfiguration> extends IsWidget {
@@ -15,8 +14,8 @@ public interface SeriesConfigurationView<T extends ISeriesConfiguration> extends
 		
 		void processSeriesConfig(Long seriesId);
 		Boolean deleteSeriesConfig(Long seriesId);
-		T editSeriesConfig(Long seriesId);
 		void showConfigPopup(T config);
+		void editSeriesConfig(T seriesConf);
 	} 
 
 

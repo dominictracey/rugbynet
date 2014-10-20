@@ -11,6 +11,7 @@ import net.rugby.foundation.admin.shared.OrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.WorkflowConfiguration;
 import net.rugby.foundation.admin.shared.seriesconfig.BaseSeriesConfiguration;
 import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
+import net.rugby.foundation.model.shared.fantasy.MyGroup;
 import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
 import com.googlecode.objectify.Objectify;

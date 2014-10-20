@@ -38,6 +38,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected Long playerRatingId;
 	protected int rating;
 	protected String placeGuid;
+	protected String tweet;
 	
 	public TopTenItem()
 	{
@@ -277,6 +278,14 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setPlaceGuid(String placeGuid) {
 		this.placeGuid = placeGuid;
+	}
+	@Override
+	public String getTweet() {
+		return tweet;
+	}
+	@Override
+	public void setTweet(String tweet) {
+		this.tweet = tweet;
 	}
 
 }

@@ -9,9 +9,10 @@
 		<b:Form type="VERTICAL">
 		    <b:ControlLabel>Title</b:ControlLabel>
 			<b:TextBox ui:field='title' width="75%"></b:TextBox>
-			<b:ControlLabel >Description</b:ControlLabel>
+			<b:ControlLabel>Description</b:ControlLabel>
 			<b:TextArea ui:field='description' width="100%"></b:TextArea>
-
+			<b:ControlLabel>Twitter Description</b:ControlLabel>
+			<b:TextBox ui:field='twitter' width="75%"></b:TextBox> 
 	        <b:Nav>
 	        	<b:NavWidget ui:field='buttonBar'>
 	        	    <b:Button ui:field="save" type="PRIMARY">Save</b:Button>

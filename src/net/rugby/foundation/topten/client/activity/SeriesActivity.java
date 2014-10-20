@@ -1,12 +1,15 @@
 package net.rugby.foundation.topten.client.activity;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IRatingGroup;
@@ -54,6 +57,23 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 			@Override
 			public void onSuccess(final ICoreConfiguration coreConfig) {
 				_coreConfig = coreConfig;
+				if (!view.isRatingModesSet()) {
+					clientFactory.getRpcService().getAvailableSeries(sPlace.getCompId(), new AsyncCallback<List<RatingMode>>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("We're in trouble here...");								
+						}
+
+						@Override
+						public void onSuccess(List<RatingMode> result) {
+							if (result != null) {
+								view.setAvailableModes(result);
+							}
+						}
+
+					});
+				}
 				if (sPlace != null) {
 					view.copyPlace(sPlace);
 					if (sPlace.getCompId() == null) {
@@ -62,24 +82,8 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 							throw new RuntimeException("No default configuration defined for site.");
 						}
 						clientFactory.getPlaceController().goTo(view.getPlace());
-						return;
 					} else if (sPlace.getSeriesId() == null) {
-						clientFactory.getRpcService().getAvailableSeries(sPlace.getCompId(), new AsyncCallback<List<RatingMode>>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								Window.alert("We're in trouble here...");								
-							}
-
-							@Override
-							public void onSuccess(List<RatingMode> result) {
-								if (result != null) {
-									view.setAvailableModes(result);
-								}
-							}
-							
-						});
-						
 						// default series for comp is By Position
 						clientFactory.getRpcService().getRatingSeries(sPlace.getCompId(), RatingMode.BY_POSITION, new AsyncCallback<IRatingSeries>() {
 
@@ -92,6 +96,7 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 							public void onSuccess(IRatingSeries result) {
 								if (result != null) {
 									view.setSeries(result, _coreConfig.getBaseToptenUrl() );
+									clientFactory.setPlaceInUrl(sPlace);
 								}
 							}
 
@@ -145,8 +150,8 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 						assert (g != null);
 						for (IRatingMatrix m : g.getRatingMatrices()) {
 							//if (m.getCriteria() == Criteria.BEST_YEAR) {
-								view.setMatrix(m);
-								break;
+							view.setMatrix(m);
+							break;
 							//}
 						}
 						return;
@@ -194,16 +199,10 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 							}
 						}
 
-						if (rq != null) {
-							view.setQuery(rq);
-						}
-						return;
-					} else if (view.getList() == null) { // changing tabs
-						//						for (IRatingQuery q : view.getMatrix().getRatingQueries()) {
-						//							if (q.getId().equals(view.getQueryId())) {
-						//								view.setQuery(q);
-						//							}
-						//						}
+						view.setQuery(rq);
+
+
+					} else if (view.getQuery() == null || view.getList() == null)  {
 						// and the top ten list
 						clientFactory.getRpcService().getTopTenListForRatingQuery(view.getQueryId(), new AsyncCallback<ITopTenList>() {
 
@@ -219,15 +218,16 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 							}
 
 						});
-						return;
+					} else {
+						Logger.getLogger("SeriesActivity").log(Level.INFO, "Happy");
 					}
 				} else {
+					// @REX WE SHOULD NEVER GET HERE
 					// if we have nothing - start with default compId
 					SeriesPlace newPlace = new SeriesPlace();
 					newPlace.setCompId(coreConfig.getDefaultCompId());
 					view.setCompId(coreConfig.getDefaultCompId());
 					clientFactory.getPlaceController().goTo(newPlace);
-					return;
 				}
 			}	
 		});
@@ -335,18 +335,18 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 			@Override
 			public void onFailure(Throwable caught) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onSuccess(IRatingSeries result) {
-				view.setSeriesId(result.getId());
+//				view.setSeriesId(result.getId());
 				view.setSeries(result,_coreConfig.getBaseToptenUrl());
 			}
-			
+
 		});
 
-		
-		
+
+
 	}
 }

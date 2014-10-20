@@ -11,9 +11,14 @@ import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.model.shared.Criteria;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
+import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
@@ -39,6 +44,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 
 	private ITopTenListFactory ttlf;
 
+	private IRoundFactory rf;
+
 
 	public ProcessRatingQuery() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -56,7 +63,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		this.qref = injector.getInstance(IQueryRatingEngineFactory.class);
 		this.prf = injector.getInstance(IPlayerRatingFactory.class);
 		this.ttlf = injector.getInstance(ITopTenListFactory.class);
-
+		this.rf = injector.getInstance(IRoundFactory.class);
+		
 		// first see if we are re-running, in which case clear out any ratings already in place
 		if (!rq.getStatus().equals(Status.NEW)) {
 			prf.deleteForQuery(rq);
@@ -95,7 +103,62 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			IRatingQuery procked = rqf.get(rq.getId());
 	
 			// now create the TTL
-			TopTenSeedData data = new TopTenSeedData(rq.getId(), "", "", null, rq.getRoundIds(), 10);
+			String title = "Top Ten ";
+			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_LAST_MATCH)) {
+				title += "Players from ";
+				IRound r = rf.get(rq.getRoundIds().get(0));
+				IMatchGroup match = null;
+				if (r != null) {
+					for (IMatchGroup m : r.getMatches()) {
+						if (rq.getTeamIds().contains(m.getHomeTeamId()) && rq.getTeamIds().contains(m.getVisitingTeamId())) {
+							match = m;
+							break;
+						}
+					}
+					if (match != null) {
+						title +=  match.getHomeTeam().getShortName() + "v" + match.getVisitingTeam().getShortName();
+					} else {
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match in setting title for RQ " + rq.getId() + " teamIds " + rq.getTeamIds().toString());
+					}
+				}
+			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_POSITION)) {
+				// is this In Form or Last Round?
+				boolean inForm = false;
+				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
+					title += "In Form ";
+					inForm = true;
+				}
+				
+				title += rq.getPositions().get(0).getPlural();
+				
+				if (inForm) {
+					title += "Through ";
+				} else {
+					title += "From ";
+				}
+				
+				// now we need the last round
+				if (rq.getRoundIds().size() == 1) {
+					IRound r = rf.get(rq.getRoundIds().get(0));
+					title += r.getName();
+				} else {
+					IRound last = null;
+					for (Long rid : rq.getRoundIds()) {
+						if (last == null) {
+							last = rf.get(rid);
+						} else {
+							IRound t = rf.get(rid);
+							if (t.getEnd().after(last.getEnd())) {
+								last = t;
+							}
+						}
+					}
+					title += last.getName();
+				}
+				
+			}
+
+			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", null, rq.getRoundIds(), 10);
 			ITopTenList ttl = ttlf.create(data);
 			ttlf.put(ttl);
 			

@@ -8,8 +8,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.inject.Inject;
+
 import net.rugby.foundation.core.server.factory.BaseRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.RatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
@@ -20,6 +24,11 @@ import net.rugby.foundation.model.shared.Position.position;
  *
  */
 public class TestRatingQueryFactory extends BaseRatingQueryFactory implements IRatingQueryFactory {
+
+	@Inject
+	public TestRatingQueryFactory(IRatingSeriesFactory rsf) {
+		super(rsf);
+	}
 
 	private Long count = 750L;
 	/* (non-Javadoc)

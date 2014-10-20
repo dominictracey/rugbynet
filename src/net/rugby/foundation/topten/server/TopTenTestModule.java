@@ -4,6 +4,8 @@ import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlaceFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 import net.rugby.foundation.topten.server.factory.test.TestTopTenListFactory;
+import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
+import net.rugby.foundation.topten.server.utilities.SocialMediaDirector;
 
 import com.google.inject.AbstractModule;
 
@@ -12,6 +14,7 @@ public class TopTenTestModule extends AbstractModule {
 	 protected void configure() {
 		bind(ITopTenListFactory.class).to(TestTopTenListFactory.class);
 		bind(IPlaceFactory.class).to(TestPlaceFactory.class);
+		bind(ISocialMediaDirector.class).to(SocialMediaDirector.class);
 	}
 	
 }

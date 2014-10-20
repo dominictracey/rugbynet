@@ -14,4 +14,5 @@ public interface ICachingFactory<T extends IHasId> {
 	public abstract T put(T t);
 	public abstract boolean delete(T t);
 	public abstract T create();
+	public abstract void dropFromCache(Long id);
 }

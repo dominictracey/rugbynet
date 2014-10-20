@@ -9,6 +9,12 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 public abstract class BaseRatingQueryFactory extends BaseCachingFactory<IRatingQuery> implements IRatingQueryFactory {
 	
 	private final String prefix = "RQ-Mid";
+	private IRatingSeriesFactory rsf;
+	
+	public BaseRatingQueryFactory(IRatingSeriesFactory rsf) {
+		this.rsf = rsf;
+	}
+	
 	
 	@Override
 	public List<IRatingQuery> getForMatrix(Long matrixId)
@@ -40,5 +46,18 @@ public abstract class BaseRatingQueryFactory extends BaseCachingFactory<IRatingQ
 	
 	private String getCacheId(Long id) {
 		return prefix + id.toString();
+	}
+	
+	@Override
+	public IRatingQuery put(IRatingQuery t) {
+		super.put(t);
+		
+		// force upstream memcache update
+		if (t.getRatingMatrix() != null && t.getRatingMatrix().getRatingGroup() != null && t.getRatingMatrix().getRatingGroup().getRatingSeriesId() != null) {
+			rsf.dropFromCache( t.getRatingMatrix().getRatingGroup().getRatingSeriesId());
+			//t.setRatingMatrix(rmf.get(t.getRatingMatrixId()));
+		}
+		
+		return t;
 	}
 }

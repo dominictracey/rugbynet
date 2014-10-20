@@ -1,5 +1,6 @@
 package net.rugby.foundation.admin.client.activity;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -36,9 +37,6 @@ public class SeriesActivity extends AbstractActivity implements
 AdminView.Presenter,  
 SmartBar.Presenter,
 SeriesConfigurationViewPresenter<ISeriesConfiguration>
-//PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, 
-//TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, 
-//TaskViewPresenter<IAdminTask> 
 , Presenter<ISeriesConfiguration>
 { 
 	/**
@@ -48,9 +46,7 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 	private ClientFactory clientFactory;
 	private SeriesPlace place;
 	SelectionModel<IAdminTask> selectionModel;
-	int index; // the task line item number
-	//private IAdminTask target;
-	//private TaskView<IAdminTask> view;
+	int index; 
 	private SeriesConfigurationView<ISeriesConfiguration> view;
 	private MenuItemDelegate menuItemDelegate;
 	protected Timer t = null;
@@ -60,12 +56,9 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 
 		this.clientFactory = clientFactory;
 		view = clientFactory.getSeriesView();
-		// Select the tab corresponding to the token value
-		//if (place.getToken() != null) {
-		//			view.selectTab(2, false);
-
+		
 		this.place = place;
-		//}
+		
 	}
 
 	@Override
@@ -75,7 +68,6 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 		panel.setWidget(view.asWidget());
 
 		if (place != null) {
-			//			if (place.getTaskId() != null) {
 			clientFactory.getRpcService().getAllSeriesConfigurations(new AsyncCallback<List<ISeriesConfiguration>>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -85,49 +77,8 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 				@Override
 				public void onSuccess(List<ISeriesConfiguration> result) {
 					view.showList(result);
-
-					//						IAdminTask target = null;
-					//						index = 0;
-					//						// find the task specified in the url
-					//						for (IAdminTask task : result) {
-					//							if (task.getId().toString().equals(place.getTaskId())) {
-					//								target = task;
-					//								break;
-					//							}
-					//							++index;
-					//						}
-					//
-					//						// if we found it, go to the right editor for it
-					//						if (target != null) {
-					//							showTask(index,target);
-					//
-					//						} 
 				}
 			});
-			//			} else /*if (place.getFilter() != null)*/ {
-			//				clientFactory.getRpcService().getAllOpenAdminTasks( new AsyncCallback<List<IAdminTask>>() {
-			//					@Override
-			//					public void onFailure(Throwable caught) {
-			//						Window.alert("Failed to fetch admin tasks");
-			//					}
-			//
-			//					@Override
-			//					public void onSuccess(List<IAdminTask> result) {
-			//						view.showList(result);
-			//
-			//						IAdminTask target = null;
-			//						index = 0;
-			//						// find the task specified in the url
-			//						for (IAdminTask task : result) {
-			//							if (task.getId().toString().equals(place.getTaskId())) {
-			//								target = task;
-			//								break;
-			//							}
-			//							++index;
-			//						}
-			//					}
-			//				});
-			//			}
 		}
 	}
 
@@ -150,106 +101,12 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 		clientFactory.getPlaceController().goTo(place);
 	}
 
-	//	@Override
-	//	public Boolean onItemSelected(IAdminTask c) {
-	//		if (selectionModel.isSelected(c)) {
-	//			selectionModel.removeSelection(c);
-	//		}
-	//
-	//		else {
-	//			selectionModel.addSelection(c);
-	//		}
-	//
-	//		return true;
-	//	}
-	//
-	//	@Override
-	//	public Boolean isSelected(IAdminTask c) {
-	//		return selectionModel.isSelected(c);
-	//	}
-	//	
-	//	private void updateTask() {
-	//		// get the updated task and display it
-	//		clientFactory.getRpcService().getTask(target.getId(), new AsyncCallback<IAdminTask>() {
-	//			@Override
-	//			public void onFailure(Throwable caught) {
-	//				Window.alert("Failed to save player");
-	//			}
-	//			
-	//			@Override
-	//			public void onSuccess(IAdminTask result) {
-	//				view.updateTaskRow(index, result);
-	//			}
-	//		});
-	//	}
-	//
-	//	@Override
-	//	public void onSavePlayerMatchStatsClicked(IPlayerMatchStats pms) {
-	//		clientFactory.getRpcService().savePlayerMatchStats(pms, target, new AsyncCallback<IPlayerRating>() {
-	//			@Override
-	//			public void onFailure(Throwable caught) {
-	//				Window.alert("Failed to save player match stats");
-	//			}
-	//
-	//			@Override
-	//			public void onSuccess(IPlayerRating result) {
-	//				((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).hide();
-	//				updateTask();
-	//			}
-	//
-	//
-	//		});		
-	//	}
-	//
-	//	@Override
-	//	public void onCancelEditPlayerMatchStatsClicked() {
-	//		((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).hide();
-	//	}
-	//
 	@Override
 	public void compPicked(Long id) {
 		// TODO Auto-generated method stub
 
 	}
-	//
-	//	@Override
-	//	public void showPlayerPopup(IPlayerMatchStats target, PlayerPopupView.Presenter<IPlayer> presenter) {
-	//		// note the popup dialog will call back to the presenter (which may not be this activity)
-	//		if (presenter == null) {
-	//			presenter = this;
-	//		}
-	//		clientFactory.getPlayerPopupView().setPresenter(presenter);
-	//		clientFactory.getRpcService().getPlayer(target.getPlayerId(), new AsyncCallback<IPlayer>() {
-	//			@Override
-	//			public void onFailure(Throwable caught) {
-	//				Window.alert("Failed to fetch player to edit");
-	//			}
-	//
-	//			@Override
-	//			public void onSuccess(IPlayer result) {
-	//				clientFactory.getPlayerPopupView().setPlayer(result);
-	//				((DialogBox)clientFactory.getPlayerPopupView()).center();
-	//			}
-	//		});
-	//		
-	//	}
 
-	//	@Override
-	//	public void onRefetchEditPlayerMatchStatsClicked(IPlayerMatchStats target) {
-	//		clientFactory.getRpcService().refetchPlayerMatchStats(target, new AsyncCallback<IPlayerMatchStats>() {
-	//			@Override
-	//			public void onFailure(Throwable caught) {
-	//				Window.alert("Failed to fetch playerMatchStats, see logs for details");
-	//			}
-	//
-	//			@Override
-	//			public void onSuccess(IPlayerMatchStats result) {
-	//				clientFactory.getPlayerMatchStatsPopupView().setTarget(result);
-	//				((DialogBox)clientFactory.getPlayerMatchStatsPopupView()).center();
-	//			}
-	//		});
-	//		
-	//	}
 
 	@Override
 	public void flushAllPipelineJobs() {
@@ -257,35 +114,7 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 
 	}
 
-	//	@Override
-	//	public void onSaveTeamMatchStatsClicked(ITeamMatchStats tms) {
-	//		clientFactory.getRpcService().saveTeamMatchStats(tms, target, new AsyncCallback<ITeamMatchStats>() {
-	//			@Override
-	//			public void onFailure(Throwable caught) {
-	//				Window.alert("Failed to save team match stats: " + caught.getLocalizedMessage());
-	//			}
-	//
-	//			@Override
-	//			public void onSuccess(ITeamMatchStats result) {
-	//				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).hide();
-	//				updateTask();
-	//			}
-	//
-	//
-	//		});	
-	//		
-	//	}
-	//
-	//	@Override
-	//	public void onCancelEditTeamMatchStatsClicked() {
-	//		((DialogBox)clientFactory.getTeamMatchStatsPopupView()).hide();
-	//	}
-	//
-	//	@Override
-	//	public void onRefetchEditTeamMatchStatsClicked(ITeamMatchStats target) {
-	//		Window.alert("Not implemented");
-	//		
-	//	}
+
 
 	@Override
 	public void createContent() {
@@ -310,7 +139,8 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 	@Override
 	public void processSeriesConfig(final Long seriesId) {
 		// the processing has been kicked off in the View, we just need to start polling to see if it is done yet
-		// we keep checking until the seriesConfig moves from state PENDING to something else or the activity ends (mayStop)
+		// we keep checking until the seriesConfig moves from state PENDING to something else or the activity ends (mayStop) or the lastRun timestamp changes
+		final Date start = new Date();
 
 		if (t == null) {
 			t = new Timer() {
@@ -325,7 +155,10 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 
 						@Override
 						public void onSuccess(final ISeriesConfiguration result) {
-							if (!result.getStatus().equals(ISeriesConfiguration.Status.PENDING)) {
+							boolean ran = false;
+							if (result!= null && result.getLastRun() != null)
+								ran = result.getLastRun().after(start);
+							if (result != null && result.getStatus() != null && result.getLastRun() != null && (!result.getStatus().equals(ISeriesConfiguration.Status.PENDING) || ran)) {
 								view.updateSeriesConfigurationRow(result);  
 								t = null;
 							} else {
@@ -343,15 +176,27 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 	}
 
 	@Override
-	public ISeriesConfiguration editSeriesConfig(Long seriesId) {
-		// TODO Auto-generated method stub
-		return null;
+	public void editSeriesConfig(ISeriesConfiguration seriesConf) {
+		clientFactory.getRpcService().saveSeriesConfiguration(seriesConf, new AsyncCallback<ISeriesConfiguration>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed saving Series Conf: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(ISeriesConfiguration result) {
+				clientFactory.getSeriesView().updateSeriesConfigurationRow(result);			
+			}
+			
+		});
 	}
 
 
 	@Override
 	public Boolean deleteSeriesConfig(Long seriesId) {
-		// TODO Auto-generated method stub
+		SeriesPlace place = new SeriesPlace("srsly");
+		clientFactory.getPlaceController().goTo(place);
 		return null;
 	}
 

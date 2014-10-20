@@ -22,11 +22,14 @@ import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestCo
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.CoreTestModule;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -54,13 +57,20 @@ public class TopTenFactoryTester {
 	private IPlayerFactory pf;
 	private IPlayerRatingFactory prf;
 	private IRatingQueryFactory rqf;
+	private ITeamGroupFactory tgf;
+	private IMatchRatingEngineSchemaFactory resf;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	public void setFactory(ITopTenListFactory ttf, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf) {
+	public void setFactory(ITopTenListFactory ttf, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf, 
+			ITeamGroupFactory tgf, IMatchRatingEngineSchemaFactory resf, IConfigurationFactory ccf) {
 		this.ttf = ttf;
 		this.pf = pf;
 		this.prf = prf;
 		this.rqf = rqf;
+		this.tgf = tgf;
+		this.resf = resf;
+		this.ccf = ccf;
 	}
 
 	@Before
@@ -784,8 +794,10 @@ public class TopTenFactoryTester {
 		//		  (List<IPlayerMatchInfo> pmiList, String title,
 		//					String description, Long compId, Long roundId, position pos,
 		//					Long countryId, Long teamId)
-		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+		//MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 
+		prf.getForMatch(5L, resf.getDefault());
+		prf.getForMatch(6L, resf.getDefault());
 		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc,1L, null, 10);
 		ITopTenList ttl = ttf.create(ttsd);
 
@@ -797,7 +809,7 @@ public class TopTenFactoryTester {
 				i.getPlayer().setTwitterHandle(null);
 			}
 		}
-		ISocialMediaDirector smd = new SocialMediaDirector();
+		ISocialMediaDirector smd = new SocialMediaDirector(tgf, ttf, ccf);
 
 		smd.PromoteTopTenList(ttl);
 //		assertTrue(ms.contains(ttl.getId()));

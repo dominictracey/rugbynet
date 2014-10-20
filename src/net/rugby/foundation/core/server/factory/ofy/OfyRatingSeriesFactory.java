@@ -2,9 +2,7 @@ package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +17,6 @@ import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingSeries;
-import net.rugby.foundation.model.shared.MatchResult;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.RatingSeries;
 
@@ -65,8 +62,12 @@ public class OfyRatingSeriesFactory extends BaseRatingSeriesFactory implements I
 	public boolean deleteFromPersistentDatastore(IRatingSeries r) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			for (IRatingGroup g : r.getRatingGroups()) {
-				rgf.delete(g);
+			// be more explicit about the deleting in case we get more granular in lazy loading
+			for (Long gid : r.getRatingGroupIds()) {
+				IRatingGroup g = rgf.get(gid);
+				if (g != null) {
+					rgf.delete(g);
+				}
 			}
 			ofy.delete(r);
 		} catch (Throwable ex) {
@@ -85,7 +86,6 @@ public class OfyRatingSeriesFactory extends BaseRatingSeriesFactory implements I
 	public IRatingSeries get(Long compId, RatingMode mode) {
 
 		try {
-			IRatingSeries rs = null;
 			Objectify ofy = DataStoreFactory.getOfy();
 			Query<RatingSeries> qrm = ofy.query(RatingSeries.class).filter("live", true).filter("mode", mode);
 			if (qrm.count() == 0) {
@@ -95,7 +95,6 @@ public class OfyRatingSeriesFactory extends BaseRatingSeriesFactory implements I
 				if (qrs.getCompIds().contains(compId)) 
 					return build(qrs);
 			}
-			//rs = qrm.list().get(0);
 			return null;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());

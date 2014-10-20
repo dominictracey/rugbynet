@@ -13,6 +13,7 @@ public class TeamGroup extends Group implements ITeamGroup {
 	private String pool;
 	private String abbr;
 	private String shortName;
+	private String twitter;
 	private String color;
 	
 	public TeamGroup() {
@@ -122,7 +123,15 @@ public class TeamGroup extends Group implements ITeamGroup {
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
-	
+	@Override	
+	public String getTwitter() {
+		return twitter;
+	}
+	@Override
+	public void setTwitter(String twitter) {
+		this.twitter = twitter;
+	}
+
 	@Override
 	public String getDisplayName() {
 		

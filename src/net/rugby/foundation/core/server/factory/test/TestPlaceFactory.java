@@ -1,15 +1,24 @@
 package net.rugby.foundation.core.server.factory.test;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.BasePlaceFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ServerPlace;
 import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory {
+
+	@Inject
+	public TestPlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf) {
+		super(ttlf, rqf, ccf, rsf);
+		
+	}
 
 	private Long count = 33900L;
 
@@ -32,37 +41,6 @@ public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory 
 		return p;
 	}
 	
-	// use: http://jsfiddle.net/ivanakimov/8z6d8o94/
-	@Override
-	protected IServerPlace getForGuidFromPersistentDatastore(String guid) {
-		if (guid.equals(generate(33000L))) {
-			// default series for comp
-			return build(33000L, PlaceType.SERIES, 1L, null, null, null, null, null, null, null);
-		} else if (guid.equals(generate(33001L))) {
-			// BY_POSITION series for comp 1
-			return build(33001L, PlaceType.SERIES, 1L, null, 75000L, null, null, null, null, null);
-		} else if (guid.equals(generate(33002L))) {
-			// Round 1
-			return build(33002L, PlaceType.SERIES, 1L, null, 75000L, 76000L, null, null, null, null);
-		} else if (guid.equals(generate(33003L))) {
-			// BEST_YEAR criteria
-			return build(33003L, PlaceType.SERIES, 1L, null, 75000L, 76000L, 77100L, null, null, null);
-		} else if (guid.equals(generate(33004L))) {
-			// the RQ - do we need to specify this?
-			return build(33004L, PlaceType.SERIES, 1L, null, 75000L, 76000L, 77100L, 7710000L, null, null);
-		} else if (guid.equals(generate(33005L))) {
-			// the TTL - see above
-			return build(33005L, PlaceType.SERIES, 1L, null, 75000L, 76000L, 77100L, 7710000L, 1000L, null);
-		} else if (guid.equals(generate(33006L))) {
-			// TTI - particular player
-			return build(33006L, PlaceType.SERIES, 1L, null, 75000L, 76000L, 77100L, 7710000L, 1000L, 1000007L);
-		} else if (guid.equals(generate(33100L))) {
-			// latest feature for comp
-			return build(33100L, PlaceType.FEATURE, 1L, null, null, null, null, null, null, null);
-		}
-		return null;
-	}
-
 	@Override
 	protected IServerPlace getForNameFromPersistentDatastore(String name) {
 		// TODO Auto-generated method stub
@@ -71,9 +49,9 @@ public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory 
 
 	@Override
 	protected IServerPlace getFromPersistentDatastore(Long id) {
-		for (Long l = 33000L; l < 33009L; l++) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, l + "=>" + generate(l));
-		}
+//		for (Long l = 33000L; l < 33009L; l++) {
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, l + "=>" + generate(l));
+//		}
 		if (id == 33000L) { // PeaJ
 			// default series for comp
 			return build(33000L, PlaceType.SERIES, 1L, null, null, null, null, null, null, null);

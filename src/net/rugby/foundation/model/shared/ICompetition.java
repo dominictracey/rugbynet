@@ -97,6 +97,8 @@ public interface ICompetition extends IHasId {
 	 */
 	public abstract Float getWeightingFactor();
 	public abstract void setWeightingFactor(Float weightingFactor);
+	public abstract void setTwitter(String twitter);
+	public abstract String getTwitter();
 	
 	// don't put getNextRound and getPrevRound in here, see note at bottom of Competition.java
 	//public abstract void setNextAndPrevRound();

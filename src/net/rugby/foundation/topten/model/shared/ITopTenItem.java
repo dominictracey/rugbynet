@@ -83,4 +83,8 @@ public interface ITopTenItem {
 
 	String getPlaceGuid();
 
+	void setTweet(String tweet);
+
+	String getTweet();
+
 }

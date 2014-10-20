@@ -19,6 +19,7 @@ public class Competition implements Serializable, ICompetition {
 	private String longName;
 	private String shortName;
 	private String abbr;
+	private String twitter;
 	private Date begin;
 	private Date end;
 	private Boolean underway;
@@ -179,6 +180,14 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setAbbr(String abbr) {
 		this.abbr = abbr;
+	}
+	@Override
+	public String getTwitter() {
+		return twitter;
+	}
+	@Override
+	public void setTwitter(String twitter) {
+		this.twitter = twitter;
 	}
 
 	/* (non-Javadoc)

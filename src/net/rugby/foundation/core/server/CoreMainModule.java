@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
+import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
@@ -32,6 +33,7 @@ import net.rugby.foundation.core.server.factory.ofy.OfyContentFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyCountryFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchResultFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyPlaceFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRatingGroupFactory;
@@ -81,6 +83,7 @@ public class CoreMainModule extends AbstractModule {
 		bind(IRatingGroupFactory.class).to(OfyRatingGroupFactory.class);
 		bind(IRatingMatrixFactory.class).to(OfyRatingMatrixFactory.class);
 		bind(IRatingSeriesManager.class).to(RatingSeriesManager.class);
+		bind(IPlaceFactory.class).to(OfyPlaceFactory.class);
 	}
 }
 

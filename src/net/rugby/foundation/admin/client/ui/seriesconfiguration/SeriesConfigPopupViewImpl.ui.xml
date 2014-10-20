@@ -76,7 +76,7 @@
 
 			<tr>
 				<td>
-					Start date:
+					Target Round (start):
 				</td>
 				<td>
 
@@ -122,10 +122,10 @@
 
 				<td colspan="2">
 
-					<b:Button styleName="{style.important}" ui:field="saveButton">
+					<b:Button type="PRIMARY" ui:field="saveButton">
 						Save
 					</b:Button>
-					<b:Button styleName="{style.important}" ui:field="cancelButton">
+					<b:Button ui:field="cancelButton">
 						Cancel
 
 					</b:Button>

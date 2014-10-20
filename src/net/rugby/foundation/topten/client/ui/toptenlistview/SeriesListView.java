@@ -69,5 +69,7 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 
 	void setAvailableModes(List<RatingMode> modeMap);
 
+	boolean isRatingModesSet();
+
 	
 }

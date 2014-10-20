@@ -1,10 +1,8 @@
 package net.rugby.foundation.core.server.factory.test;
 
-import java.util.Date;
-
 import com.google.inject.Inject;
 
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.BaseRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
@@ -13,19 +11,17 @@ import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.RatingGroup;
 
 
-public class TestRatingGroupFactory extends BaseCachingFactory<IRatingGroup> implements IRatingGroupFactory {
+public class TestRatingGroupFactory extends BaseRatingGroupFactory implements IRatingGroupFactory {
 
-	private IRatingMatrixFactory rmf;
-	private IRatingSeriesFactory rsf;
+
 	private Long counter = 77100L;
-	private IUniversalRoundFactory urf;
+
 	
 	@Inject
 	public TestRatingGroupFactory(IRatingMatrixFactory rmf, IRatingSeriesFactory rsf, IUniversalRoundFactory urf)
 	{
-		this.rmf = rmf;
-		this.rsf = rsf;
-		this.urf = urf;
+		super(rsf, rmf, urf);
+
 	}
 	
 	@Override

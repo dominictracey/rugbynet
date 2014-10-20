@@ -49,9 +49,9 @@ public class TopTen implements EntryPoint {
 		final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
 		// Get rid of the dynamically generated page as quick as we can, it just causes problems when the hash fragment changes.
 		String guid = clientFactory.getPlaceFromURL();
-		if (guid != null && !guid.isEmpty()) {
-			//			UrlBuilder builder = Location.createUrlBuilder().removeParameter("listId").removeParameter("compId").removeParameter("playerId").setPath("topten.html");
-			//			Window.Location.replace(builder.buildString());
+//		if (guid != null && !guid.isEmpty()) {
+//			UrlBuilder builder = Location.createUrlBuilder().removeParameter("listId").removeParameter("compId").removeParameter("playerId").setPath("topten.html");
+//			Window.Location.replace(builder.buildString());
 			clientFactory.getRpcService().getPlace(guid, new AsyncCallback<IServerPlace>() {
 
 				@Override
@@ -67,10 +67,10 @@ public class TopTen implements EntryPoint {
 				}
 
 			});
-		} else {
-			historyHandler.register(placeController, eventBus, defaultPlace);
-			historyHandler.handleCurrentHistory();
-		}
+//		} else {
+//			historyHandler.register(placeController, eventBus, defaultPlace);
+//			historyHandler.handleCurrentHistory();
+//		}
 
 
 		RootPanel.get("app").add(appWidget);

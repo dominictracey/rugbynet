@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
@@ -43,6 +44,7 @@ import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
 import net.rugby.foundation.topten.server.utilities.SocialMediaDirector;
+import net.rugby.foundation.topten.server.utilities.TwitterPromoter;
 
 public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
@@ -56,11 +58,13 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	private IRatingQueryFactory rqf;
 	private IPlayerRatingFactory prf;
 	private IConfigurationFactory ccf;
-	private IPlaceFactory spf;
+	protected IPlaceFactory spf;
+	private ICompetitionFactory cf;
+	private ISocialMediaDirector smd;
 
 	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
 			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf,
-			IPlaceFactory spf) {
+			IPlaceFactory spf, ICompetitionFactory cf, ISocialMediaDirector smd) {
 		this.mf = mf;
 		this.tf = tf;
 		this.rf = rf;
@@ -69,94 +73,131 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		this.prf = prf;
 		this.ccf = ccf;
 		this.spf = spf;
+		this.cf = cf;
+		this.smd = smd;
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
 	@Override
 	public ITopTenList delete(ITopTenList list) {
-		Long rqId = list.getQueryId();
+		if (list != null) {
+			Long rqId = list.getQueryId();
 
-		ITopTenList prev = null;
-		ITopTenList prevPub = null;
-		ITopTenList next = null;
-		ITopTenList nextPub = null;
+			boolean isSeries = false;
+			IRatingQuery rq = null;
+			if (rqId != null) {
+				rq = rqf.get(rqId);
+				if (rq.getRatingMatrixId() != null) {
+					isSeries = true;
+				}
 
-		if (list.getPrevId() != null) {
-			prev = get(list.getPrevId());
-		}
-
-		// there is a weird memcache thing wherein if prev and prevPub are the same, these gets can retrieve different objects and the 
-		// putting of prevPub can overwrite the putting of prev. So check for this condition and re-use rather than re-fetch.
-		if (list.getPrevPublishedId() != null) {
-			if (list.getPrevPublishedId().equals(list.getPrevId())) {
-				prevPub = prev;
-			} else {
-				prevPub = get(list.getPrevPublishedId());
+				// if it has been tagged as a feature, mark it as not a series so it doesn't get treated as such
+				if (list.getNextId() != null || list.getPrevId() != null) {
+					isSeries = false;
+				}
 			}
-		}
 
-		if (list.getNextId() != null) {
-			next = get(list.getNextId());
-		}
 
-		if (list.getNextPublishedId() != null) {
-			if (list.getNextPublishedId().equals(list.getNextId())) {
-				nextPub = next;
-			} else {
-				nextPub = get(list.getNextPublishedId());
+
+
+			ITopTenList prev = null;
+			ITopTenList prevPub = null;
+			ITopTenList next = null;
+			ITopTenList nextPub = null;
+
+			if (list.getPrevId() != null) {
+				prev = get(list.getPrevId());
 			}
-		}
 
-		if (prev != null) {
-			prev.setNextId(list.getNextId());
-			put(prev);
-		}
+			// there is a weird memcache thing wherein if prev and prevPub are the same, these gets can retrieve different objects and the 
+			// putting of prevPub can overwrite the putting of prev. So check for this condition and re-use rather than re-fetch.
+			if (list.getPrevPublishedId() != null) {
+				if (list.getPrevPublishedId().equals(list.getPrevId())) {
+					prevPub = prev;
+				} else {
+					prevPub = get(list.getPrevPublishedId());
+				}
+			}
 
-		if (prevPub != null) {
-			prevPub.setNextPublishedId(list.getNextPublishedId());
-			put(prevPub);
-		}
+			if (list.getNextId() != null) {
+				next = get(list.getNextId());
+			}
 
-		if (next != null) {
-			next.setPrevId(list.getPrevId());
-			put(next);
-		} else {
-			// it was the last created so reset our special memcache object
-			setLastCreatedForComp(prev,list.getCompId());
-		}
+			if (list.getNextPublishedId() != null) {
+				if (list.getNextPublishedId().equals(list.getNextId())) {
+					nextPub = next;
+				} else {
+					nextPub = get(list.getNextPublishedId());
+				}
+			}
 
-		if (nextPub != null) {
-			nextPub.setPrevPublishedId(list.getPrevPublishedId());
-			put(nextPub);
-		} else {
-			// it was the last
-			setLatestPublishedForComp(prevPub,list.getCompId());
-		}
+			if (prev != null) {
+				prev.setNextId(list.getNextId());
+				put(prev);
+			}
 
-		// delete the component items from memcache
-		Iterator<ITopTenItem> it = list.getList().iterator();
-		while (it.hasNext()) {
-			deleteFromMemcache(it.next());
-		}
+			if (prevPub != null) {
+				prevPub.setNextPublishedId(list.getNextPublishedId());
+				put(prevPub);
+			}
 
-		// delete the list object itself from memcache
-		deleteFromMemcache(list);
+			if (next != null) {
+				next.setPrevId(list.getPrevId());
+				put(next);
+			} else {
+				if (!isSeries) {
+					// it was the last created so reset our special memcache object
+					setLastCreatedForComp(prev,list.getCompId());
+				}
+			}
 
-		// allow subclasses to delete the objects from the persistent datastore
-		deleteFromPersistentDatastore(list);
+			if (nextPub != null) {
+				nextPub.setPrevPublishedId(list.getPrevPublishedId());
+				put(nextPub);
+			} else {
+				if (!isSeries) {
+					// it was the last
+					setLatestPublishedForComp(prevPub,list.getCompId());
+				}
+			}
 
-		// and delete it
-		list = null;
+			// delete any associated seriesPlaces
+			for (ITopTenItem item : list.getList()) {
+				if (item != null && item.getPlaceGuid() != null) {
+					spf.delete(spf.getForGuid(item.getPlaceGuid()));
+				}
+			}
 
-		// delete the ratingQuery reference
-		if (rqId != null) {
-			IRatingQuery rq = rqf.get(rqId);
+			// delete the place associated with the list if necessary
+			if (list.getGuid() != null && !list.getGuid().isEmpty()) {
+				spf.delete(spf.getForGuid(list.getGuid()));
+			}
+
+			// delete the component items from memcache
+			Iterator<ITopTenItem> it = list.getList().iterator();
+			while (it.hasNext()) {
+				deleteFromMemcache(it.next());
+			}
+
+			// delete the list object itself from memcache
+			deleteFromMemcache(list);
+
+			// allow subclasses to delete the objects from the persistent datastore
+			deleteFromPersistentDatastore(list);
+
+			// and delete it
+			list = null;
+
+			// delete the ratingQuery reference
 			if (rq != null) {
-				rq.setTopTenListId(null);
-				rqf.put(rq);
+				if (rq != null) {
+					rq.setTopTenListId(null);
+					rqf.put(rq);
+				}
 			}
+			return list;
 		}
-		return list;
+		return null;
 	}
 
 	abstract protected void deleteFromPersistentDatastore(ITopTenList list);
@@ -297,7 +338,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			// dump the memcached versions of last and latest and let them reconstitute
 			clearMemCacheLastAndLatest(list.getCompId());
 
-			ISocialMediaDirector smd = new SocialMediaDirector();
+
 
 			smd.PromoteTopTenList(list);
 		}
@@ -341,6 +382,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			list.setSeries(false);
 		}
 
+		buildTwitterDescription(list, rq);
+
 		// get the list of player ratings generated by the query
 		List<IPlayerRating> prl = prf.query(rq);
 
@@ -378,7 +421,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Map<Long,Integer> numFromTeam = new HashMap<Long, Integer>();
 			Iterator<IPlayerRating> it = set.iterator();
 			int count = 0;
-			list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
+			list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
+
 			while (it.hasNext() && count < 10) {
 				IPlayerRating pmr = it.next();
 				IPlayerMatchStats pms = pmsf.get(pmr.getMatchStatIds().get(0));
@@ -394,10 +438,14 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					//TopTenItem(Long id, Long playerId, IPlayer player, String text,
 					//String image, Long contributorId, Long editorId, boolean isSubmitted, 
 					//String matchReportLink, String teamName, ITopTenList parent)
-					IServerPlace p = spf.create();
+
 					ITopTenItem item = new TopTenItem(count+1,null, pmr.getPlayerId(), pmr.getPlayer(), "",
 							"", null, null, true, match.getForeignUrl(), team.getDisplayName(), team.getId(), pms.getPosition(), list,
-							pmr.getId(), pmr.getRating(), p.getGuid());
+							pmr.getId(), pmr.getRating(), null);
+					put(item);  // get id for guid hashing
+					IServerPlace p = spf.create();
+					item.setPlaceGuid(p.getGuid());
+					spf.buildItem(p,item);
 					list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
 					put(item);
 					list.getList().add(item);
@@ -406,6 +454,10 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					count++;
 				}
 			}
+
+			// update the line item tweets
+			TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf);
+			twitterPromoter.process(list);
 		}
 
 
@@ -414,6 +466,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		if (lastTTL != null) {
 			compareListToLast(list,lastTTL);
 		}
+
+		// create the place guid
+		IServerPlace p = spf.create();
+		spf.buildList(p,list);
+		list.setGuid(p.getGuid());
 
 		// save the items
 		put(list);
@@ -427,6 +484,54 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		}
 
 		return list;
+	}
+
+	private void buildTwitterDescription(ITopTenList list, IRatingQuery rq) {
+		String desc = "Top Ten ";
+
+		// For a match
+		if (rq.getRoundIds().size() == 1 && rq.getTeamIds().size() == 2) {
+			// find the match
+			IMatchGroup match = null;
+			String matchTwitterHandle = "in ";
+			IRound r = rf.get(rq.getRoundIds().get(0));
+			if (r != null) {
+				for (IMatchGroup m : r.getMatches()) {
+					if (rq.getTeamIds().contains(m.getHomeTeamId()) && rq.getTeamIds().contains(m.getVisitingTeamId())) {
+						match = m;
+						break;
+					}
+				}
+				if (match != null) {
+					matchTwitterHandle += "#" +  match.getHomeTeam().getAbbr() + "v" + match.getVisitingTeam().getAbbr();
+				} else {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match in buildTwitterDescription for TTL " + list.getTitle() + " teamIds " + rq.getTeamIds().toString());
+				}
+			}
+			desc += " Performances " + matchTwitterHandle;
+			list.setTwitterDescription(desc);
+		} else if (rq.getPositions().size() == 1) {
+			// by position : (*** = currently supported)
+			//	*** Top Ten In Form Flankers of @premRugby
+			//	*** Top Ten In Form Flankers in the World
+			//	Top Ten Flankers (in the last year)
+			//	Top Ten Flankers in Round 2 of @premRugby
+			desc += "In Form " + rq.getPositions().get(0).getPlural();
+			if (rq.getCompIds().size() > 1) {
+				desc += " in the World";
+			} else {
+				if (rq.getCompIds().size() == 1) {
+					Long compId = rq.getCompIds().get(0);
+					if (compId != null) {
+						desc += " of " + cf.get(compId).getTwitter();
+					}
+				}
+			}
+			list.setTwitterDescription(desc);
+		} else {
+			// default should be edited by the ad hoc creator
+
+		}
 	}
 
 	private ITopTenList compareListToLast(ITopTenList list, ITopTenList last) {
@@ -550,6 +655,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		try {
 			if (item != null) {
 				item = putToPersistentDatastore(item);
+				
+				// need to update the list in memcache too
+				
 			}
 
 			return item;

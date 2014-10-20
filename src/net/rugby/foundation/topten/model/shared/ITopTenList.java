@@ -52,5 +52,9 @@ public interface ITopTenList {
 	List<Long> getItemIds();
 	void setSeries(Boolean series);
 	Boolean getSeries();
+	void setTwitterDescription(String twitterDescription);
+	String getTwitterDescription();
+	public abstract void setGuid(String guid);
+	String getGuid();
 
 }

@@ -28,19 +28,18 @@ import net.rugby.foundation.topten.model.shared.TopTenItem;
 import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.BaseTopTenListFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
 
 public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopTenListFactory {
 
 	protected IPlayerFactory pf;
-	protected ICompetitionFactory cf;
 	Objectify ofy;
 
 	@Inject
 	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, 
-			IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf);
+			IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf, ISocialMediaDirector smd) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd);
 		this.pf = pf;
-		this.cf = cf;
 
 		ofy = DataStoreFactory.getOfy();
 	}
@@ -75,7 +74,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 			ITopTenItem item = ofy.get(TopTenItem.class,id);
 			item.setPlayer(pf.get(item.getPlayerId()));
 			//item.setOrdinal(ordinal);
-			assert(parent.getId()==item.getParentId());
+			assert(parent.getId().equals(item.getParentId()));
 			//item.setParent(parent);
 			return item;
 		} catch (Throwable e) {
@@ -182,9 +181,28 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 
 	@Override
 	protected void deleteFromPersistentDatastore(ITopTenList list) {
-		// first the items
-		ofy.delete(list.getList());
-		ofy.delete(list);
+		try {
+			// first the items
+			if (list != null) {
+				if (list.getList() != null) {
+					for (ITopTenItem item : list.getList()) {
+						if (item.getPlaceGuid() != null && !item.getPlaceGuid().isEmpty()) {
+							spf.delete(spf.getForGuid(item.getPlaceGuid()));
+						}
+					}
+					ofy.delete(list.getList());
+				}
+				
+				if (list.getGuid() != null && !list.getGuid().isEmpty()) {
+					spf.delete(spf.getForGuid(list.getGuid()));
+				}
+				
+				ofy.delete(list);
+				
+			}
+		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "deleteFromPersistentDatastore()" + e.getLocalizedMessage(), e);
+		}
 	}
 
 }

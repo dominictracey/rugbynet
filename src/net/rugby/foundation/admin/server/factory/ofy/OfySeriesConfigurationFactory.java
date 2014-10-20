@@ -19,6 +19,7 @@ import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IRatingSeries;
 
 public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesConfiguration> implements ISeriesConfigurationFactory {
 
@@ -40,6 +41,9 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 		sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
 		sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
 		sc.setSeries(sf.get(sc.getSeriesId()));
+		for (Long compId : sc.getCompIds()) {
+			sc.getComps().add(cf.get(compId));
+		}
 		return sc;
 	}
 
@@ -69,7 +73,10 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 	@Override
 	public boolean deleteFromPersistentDatastore(ISeriesConfiguration sc) {
 		try {
-			sf.delete(sc.getSeries());
+			if (sc.getSeriesId() != null) {
+				IRatingSeries rs = sf.get(sc.getSeriesId());
+				sf.delete(rs);
+			}
 			ofy.delete(sc);
 		} catch (Exception ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,ex.getLocalizedMessage());
@@ -97,6 +104,13 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 		ISeriesConfiguration sc = new BaseSeriesConfiguration();
 
 		return sc;
+	}
+
+	@Override
+	public ISeriesConfiguration getForSeriesId(Long id) {
+		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("live",true);
+		assert (qs.list().size() == 1);
+		return qs.list().get(0);
 	}
 
 }

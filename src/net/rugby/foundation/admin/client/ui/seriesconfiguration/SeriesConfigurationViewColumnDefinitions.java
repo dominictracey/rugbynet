@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupView.Presenter;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView.SeriesConfigurationViewPresenter;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -131,7 +132,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// created
+				// LastRun
 				public Widget render(T c) {
 					if (c.getLastRun() != null) {
 						String pos = c.getLastRun().toString();
@@ -149,7 +150,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// created
+				// NextRun
 				public Widget render(T c) {
 					if (c != null && c.getNextRun() != null) {
 						String pos = c.getNextRun().toString();
@@ -226,7 +227,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// Process
+				// Delete
 				public Widget render(final T c) {
 
 					Button a =  new Button("Delete");
@@ -249,6 +250,9 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 											Window.alert("Deleted");
 
 											// remove the row...
+											listener.deleteSeriesConfig(c.getId());
+										} else {
+											Window.alert("No bueno, senor");
 										}
 									}
 
@@ -275,7 +279,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// Process
+				// Edit
 				public Widget render(final T c) {
 
 					Button a =  new Button("Edit");
@@ -293,6 +297,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 
 								@Override
 								public void onSuccess(ISeriesConfiguration result) {
+									listener.getClientFactory().getSeriesConfigrPopupView().setPresenter((Presenter<ISeriesConfiguration>) listener);
 									listener.getClientFactory().getSeriesConfigrPopupView().setConfig(result);
 									((DialogBox)listener.getClientFactory().getSeriesConfigrPopupView()).center();
 								}

@@ -109,7 +109,7 @@ public class OrchestrationServlet extends HttpServlet {
 			}
 	        ISeriesConfiguration sc = null;
 	        if (Long.parseLong(req.getParameter("id")) != 0) {
-	        		sc = scf.get(Long.parseLong(req.getParameter("id")));
+	        	sc = scf.get(Long.parseLong(req.getParameter("id")));
 	        }
 	        IOrchestration<ISeriesConfiguration> orch = of.get(sc, AdminOrchestrationActions.RatingActions.valueOf(AdminOrchestrationActions.SeriesActions.class, action));
 	        if (orch != null) {

@@ -11,10 +11,10 @@ import com.googlecode.objectify.Query;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.BaseRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
@@ -26,7 +26,8 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 	private IPlayerRatingFactory prf;
 
 	@Inject 
-	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf) {
+	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf, IRatingSeriesFactory rsf) {
+		super(rsf);
 		this.prf = pmrf;
 	}
 	
@@ -80,6 +81,8 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			ofy.delete(rq);
+			
+			// don't delete the TTLs in here so we don't drop the feature TTLs when we delete a series.
 			
 			// also delete all the PMRs associated with this query
 			prf.deleteForQuery(rq);
