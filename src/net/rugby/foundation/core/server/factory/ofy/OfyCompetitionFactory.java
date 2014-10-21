@@ -304,7 +304,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			put(comp);
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Repaired comp by adding teamIds for comp " + comp.getLongName());
 
-		}
+		//}
 
 		return comp;
 		} catch (Throwable ex) {
