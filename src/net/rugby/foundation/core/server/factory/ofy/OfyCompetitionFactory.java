@@ -289,7 +289,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 		try {
 		// make sure teams are populated
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Requested repair comp " + comp.getLongName());
-		if (comp.getTeamIds() == null || comp.getTeamIds().isEmpty()) {
+		//if (comp.getTeamIds() == null || comp.getTeamIds().isEmpty()) {
 			comp.setTeamIds(new ArrayList<Long>());
 			for (IRound r: comp.getRounds()) {
 				for (IMatchGroup m : r.getMatches()) {
@@ -304,7 +304,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			put(comp);
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Repaired comp by adding teamIds for comp " + comp.getLongName());
 
-		}
+		//}
 
 		return comp;
 		} catch (Throwable ex) {
