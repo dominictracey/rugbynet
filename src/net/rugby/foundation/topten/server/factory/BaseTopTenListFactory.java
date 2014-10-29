@@ -16,6 +16,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
@@ -26,24 +27,32 @@ import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingGroup;
+import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.PlayerRating;
-import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
+import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
 import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+import net.rugby.foundation.topten.server.utilities.INotesCreator;
 import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
-import net.rugby.foundation.topten.server.utilities.SocialMediaDirector;
 import net.rugby.foundation.topten.server.utilities.TwitterPromoter;
 
 public abstract class BaseTopTenListFactory implements ITopTenListFactory {
@@ -61,10 +70,15 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	protected IPlaceFactory spf;
 	private ICompetitionFactory cf;
 	private ISocialMediaDirector smd;
+	private INotesCreator nc;
+	private IRatingSeriesFactory rsf;
+	private IUniversalRoundFactory urf;
+	private INoteFactory nf;
 
 	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
 			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf,
-			IPlaceFactory spf, ICompetitionFactory cf, ISocialMediaDirector smd) {
+			IPlaceFactory spf, ICompetitionFactory cf, ISocialMediaDirector smd, INotesCreator nc, IRatingSeriesFactory rsf,
+			IUniversalRoundFactory urf, INoteFactory nf) {
 		this.mf = mf;
 		this.tf = tf;
 		this.rf = rf;
@@ -75,6 +89,10 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		this.spf = spf;
 		this.cf = cf;
 		this.smd = smd;
+		this.nc = nc;
+		this.rsf = rsf;
+		this.urf = urf;
+		this.nf = nf;
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -96,9 +114,6 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					isSeries = false;
 				}
 			}
-
-
-
 
 			ITopTenList prev = null;
 			ITopTenList prevPub = null;
@@ -173,6 +188,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				spf.delete(spf.getForGuid(list.getGuid()));
 			}
 
+			// delete notes and noteRefs
+			nf.deleteForList(list);
+			
 			// delete the component items from memcache
 			Iterator<ITopTenItem> it = list.getList().iterator();
 			while (it.hasNext()) {
@@ -206,7 +224,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		try {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(list.getId());
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** deleted item from memcache" + list.getId() + " *** \n" + syncCache.getStatistics());
+			//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** deleted item from memcache" + list.getId() + " *** \n" + syncCache.getStatistics());
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}		
@@ -467,6 +485,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			compareListToLast(list,lastTTL);
 		}
 
+
 		// create the place guid
 		IServerPlace p = spf.create();
 		spf.buildList(p,list);
@@ -478,6 +497,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		// store reference in ratingQuery
 		rq.setTopTenListId(list.getId());
 		rqf.put(rq);
+		
+		// create notes once the query and TTL are linked up
+		nc.createNotes(rq);
 
 		if (!list.getSeries()) {
 			setLastCreatedForComp(list,list.getCompId());
@@ -625,7 +647,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					bos.close();
 
 					syncCache.put(id, yourBytes);
-					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** getting item (and putting in memcache)" + mr.getId() + " *** \n" + syncCache.getStatistics());
+					//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** getting item (and putting in memcache)" + mr.getId() + " *** \n" + syncCache.getStatistics());
 
 				}
 			} else {
@@ -692,7 +714,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			bos.close();
 
 			syncCache.put(list.getId(), yourBytes);
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list " + list.getId() + " *** \n" + syncCache.getStatistics());
+			//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** putting list " + list.getId() + " *** \n" + syncCache.getStatistics());
 
 			// refresh latest and last
 			//			ITopTenList last = getLastCreatedForComp(list.getCompId());
@@ -889,5 +911,57 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		}
 		return retval;
 	}
+	
+	public String getGuidForMatch(IMatchGroup m) {
+		// chase back up to the comp
+		//ICompetition c = cf.get(rf.get(m.getRoundId()).getCompId());
+		
+		// now find the series for Mode=BY_MATCH, Criteria=ROUND
+		IRound r = rf.get(m.getRoundId());
+		IRatingSeries series = rsf.get(r.getCompId(), RatingMode.BY_MATCH);
+		UniversalRound ur = urf.get(r);
+		if (series != null) {
+			IRatingGroup rg = null;
+			for (IRatingGroup rgi : series.getRatingGroups()) {
+				if (rgi.getUniversalRoundOrdinal() == ur.ordinal) {
+					rg = rgi;
+					break;
+				}
+			}
+			
+			if (rg != null) {
+				IRatingMatrix rm = null;
+				for (IRatingMatrix rmi : rg.getRatingMatrices()) {
+					if (rmi.getCriteria().equals(Criteria.ROUND)) {
+						rm = rmi;
+						break;
+					}
+				}
+			
+				// now the right query
+				if (rm != null) {
+					IRatingQuery rq = null;
+					for (IRatingQuery rqi : rm.getRatingQueries()) {
+						if (rqi.getTeamIds().contains(m.getHomeTeamId()) && rqi.getTeamIds().contains(m.getVisitingTeamId())) {
+							rq = rqi;
+							break;
+						}
+					}
+					
+					// and the TTL to get the guid from
+					if (rq.getTopTenListId() != null) {
+						ITopTenList ttl = get(rq.getTopTenListId());
+					
+						if (ttl != null) {
+							return ttl.getGuid();
+						}
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
+
 
 }

@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IRatingMatrix;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.RatingMatrix;
 
 public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements IRatingMatrixFactory {
@@ -36,12 +37,12 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 	protected IRatingMatrix getFromPersistentDatastore(Long id) {
 		IRatingMatrix rm = new RatingMatrix();
 		rm.setId(id);
-		if (id == 77100L) {  // DEFAULT IS LATEST AND BEST_YEAR
+		if (id.equals(77100L)) {  // DEFAULT IS LATEST AND ROUND?
 			rm.setRatingGroupId(76001L);
 			//rm.setRatingGroup(rgf.get(76001L));
 			rm.getRoundIds().add(7L);
 			rm.getRoundIds().add(6L);
-			rm.setCriteria(Criteria.BEST_YEAR);
+			rm.setCriteria(Criteria.ROUND);
 			rm.setGenerated(DateTime.now().toDate());
 			rm.getRatingQueryIds().add(7710001L);
 			rm.getRatingQueries().add(rqf.get(7710001L)); // first in list is default
@@ -63,7 +64,7 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 			rm.getRatingQueries().add(rqf.get(7710009L));
 			rm.getRatingQueryIds().add(7710010L);
 			rm.getRatingQueries().add(rqf.get(7710010L));
-		} else if (id == 77101L) {
+		} else if (id.equals(77101L)) {
 			rm.setRatingGroupId(76001L);
 			//rm.setRatingGroup(rgf.get(76001L));
 			rm.getRoundIds().add(7L);
@@ -80,11 +81,22 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 			rm.getRatingQueryIds().add(7710108L);
 			rm.getRatingQueryIds().add(7710109L);
 			rm.getRatingQueryIds().add(7710110L);
-		} else if (id == 77000L) {
+			rm.getRatingQueries().add(rqf.get(7710101L));
+			rm.getRatingQueries().add(rqf.get(7710102L));
+			rm.getRatingQueries().add(rqf.get(7710103L));
+			rm.getRatingQueries().add(rqf.get(7710104L));
+			rm.getRatingQueries().add(rqf.get(7710105L));
+			rm.getRatingQueries().add(rqf.get(7710106L));
+			rm.getRatingQueries().add(rqf.get(7710107L));
+			rm.getRatingQueries().add(rqf.get(7710108L));
+			rm.getRatingQueries().add(rqf.get(7710109L));
+			rm.getRatingQueries().add(rqf.get(7710110L));	
+			
+		} else if (id.equals(77000L)) {
 			rm.setRatingGroupId(76000L);
 			//rm.setRatingGroup(rgf.get(76000L));
 			rm.getRoundIds().add(6L);
-			rm.setCriteria(Criteria.BEST_YEAR);
+			rm.setCriteria(Criteria.ROUND);
 			rm.setGenerated(DateTime.now().toDate());
 			rm.getRatingQueryIds().add(7700001L);
 			rm.getRatingQueryIds().add(7700002L);
@@ -96,7 +108,17 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 			rm.getRatingQueryIds().add(7700008L);
 			rm.getRatingQueryIds().add(7700009L);
 			rm.getRatingQueryIds().add(7700010L);
-		} else if (id == 77001L) {
+			rm.getRatingQueries().add(rqf.get(7700001L));
+			rm.getRatingQueries().add(rqf.get(7700002L));
+			rm.getRatingQueries().add(rqf.get(7700003L));
+			rm.getRatingQueries().add(rqf.get(7700004L));
+			rm.getRatingQueries().add(rqf.get(7700005L));
+			rm.getRatingQueries().add(rqf.get(7700006L));
+			rm.getRatingQueries().add(rqf.get(7700007L));
+			rm.getRatingQueries().add(rqf.get(7700008L));
+			rm.getRatingQueries().add(rqf.get(7700009L));
+			rm.getRatingQueries().add(rqf.get(7700010L));
+		} else if (id.equals(77001L)) {
 			rm.setRatingGroupId(76000L);
 			//rm.setRatingGroup(rgf.get(76000L));
 			rm.getRoundIds().add(6L);
@@ -112,6 +134,21 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 			rm.getRatingQueryIds().add(7700108L);
 			rm.getRatingQueryIds().add(7700109L);
 			rm.getRatingQueryIds().add(7700110L);
+			rm.getRatingQueries().add(rqf.get(7700101L));
+			rm.getRatingQueries().add(rqf.get(7700102L));
+			rm.getRatingQueries().add(rqf.get(7700103L));
+			rm.getRatingQueries().add(rqf.get(7700104L));
+			rm.getRatingQueries().add(rqf.get(7700105L));
+			rm.getRatingQueries().add(rqf.get(7700106L));
+			rm.getRatingQueries().add(rqf.get(7700107L));
+			rm.getRatingQueries().add(rqf.get(7700108L));
+			rm.getRatingQueries().add(rqf.get(7700109L));
+			rm.getRatingQueries().add(rqf.get(7700110L));
+		}
+		
+		for (IRatingQuery rq: rm.getRatingQueries()) {
+			rq.setRatingMatrix(rm);
+			rq.setRatingMatrixId(rm.getId());
 		}
 		
 		return rm;

@@ -38,4 +38,5 @@ public interface TopTenListService extends RemoteService {
 	public List<IRatingQuery> getRatingQueriesForMatrix(Long id);
 	public List<RatingMode> getAvailableSeries(Long compId);
 	public IServerPlace getPlace(String guid);
+	public IRatingSeries getDefaultRatingSeries(Long compId);
 }

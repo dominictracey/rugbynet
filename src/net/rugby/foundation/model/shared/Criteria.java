@@ -1,8 +1,9 @@
 package net.rugby.foundation.model.shared;
 
 public enum Criteria {
-	BEST_ALLTIME,
-	BEST_YEAR,
+	ROUND,
 	IN_FORM,
+	BEST_YEAR,
+	BEST_ALLTIME,
 	AVERAGE_IMPACT
 }

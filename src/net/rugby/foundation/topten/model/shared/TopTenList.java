@@ -46,6 +46,11 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected String twitterDescription;
 	protected String guid;
 	
+	// because these can be greater than 500 chars we keep them in a separate table
+	protected Long notesId;
+	@Transient
+	protected String notes;
+	
 	public class TopTenListSummary implements ITopTenListSummary {
 		protected Long id;
 		protected String title;
@@ -264,6 +269,22 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setGuid(String guid) {
 		this.guid = guid;
+	}
+	@Override
+	public Long getNotesId() {
+		return notesId;
+	}
+	@Override
+	public void setNotesId(Long notesId) {
+		this.notesId = notesId;
+	}
+	@Override
+	public String getNotes() {
+		return notes;
+	}
+	@Override
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 }

@@ -44,7 +44,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 	private ITeamGroupFactory tf;
 	private IClubhouseFactory chf;
 	private IConfigurationFactory ccf;
-//	private boolean saving = false;
+	//	private boolean saving = false;
 	private ICompetition globalComp;
 
 
@@ -55,49 +55,49 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 		this.chf = chf;
 		this.ccf = ccf;
 	}
-//
-//	@Override
-//	public ICompetition getCompetition() {
-//		try {
-//			byte[] value = null;
-//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-//			ICompetition c = null;
-//
-//			value = (byte[])syncCache.get(id);
-//			if (value == null) {
-//				setId(id);
-//				c = getFromDB();
-//				if (c.getLastSaved() == null) {
-//					c.setLastSaved(new Date());
-//				}
-//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//				ObjectOutput out = new ObjectOutputStream(bos);   
-//				out.writeObject(c);
-//				byte[] yourBytes = bos.toByteArray(); 
-//
-//				out.close();
-//				bos.close();
-//
-//				syncCache.put(id, yourBytes);
-//			} else {
-//
-//				// send back the cached version
-//				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-//				ObjectInput in = new ObjectInputStream(bis);
-//				c = (ICompetition)in.readObject();
-//
-//				bis.close();
-//				in.close();
-//
-//			}
-//			return c;
-//
-//		} catch (Throwable ex) {
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-//			return null;
-//		}
-//
-//	}
+	//
+	//	@Override
+	//	public ICompetition getCompetition() {
+	//		try {
+	//			byte[] value = null;
+	//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+	//			ICompetition c = null;
+	//
+	//			value = (byte[])syncCache.get(id);
+	//			if (value == null) {
+	//				setId(id);
+	//				c = getFromDB();
+	//				if (c.getLastSaved() == null) {
+	//					c.setLastSaved(new Date());
+	//				}
+	//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	//				ObjectOutput out = new ObjectOutputStream(bos);   
+	//				out.writeObject(c);
+	//				byte[] yourBytes = bos.toByteArray(); 
+	//
+	//				out.close();
+	//				bos.close();
+	//
+	//				syncCache.put(id, yourBytes);
+	//			} else {
+	//
+	//				// send back the cached version
+	//				ByteArrayInputStream bis = new ByteArrayInputStream(value);
+	//				ObjectInput in = new ObjectInputStream(bis);
+	//				c = (ICompetition)in.readObject();
+	//
+	//				bis.close();
+	//				in.close();
+	//
+	//			}
+	//			return c;
+	//
+	//		} catch (Throwable ex) {
+	//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+	//			return null;
+	//		}
+	//
+	//	}
 
 	@Override
 	public void invalidate(Long compId) {
@@ -106,30 +106,30 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			if (c != null) {
 				deleteFromMemcache(c);
 			}
-//			if (!saving) {
-//				// now update the memcache version
-//				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-//
-//				setId(compId);
-//				ICompetition comp = getFromDB();
-//
-//				syncCache.delete(comp.getId());
-//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//				ObjectOutput out = new ObjectOutputStream(bos);   
-//				out.writeObject(comp);
-//				byte[] yourBytes = bos.toByteArray(); 
-//
-//				out.close();
-//				bos.close();
-//
-//				syncCache.put(id, yourBytes);
-//			}
+			//			if (!saving) {
+			//				// now update the memcache version
+			//				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			//
+			//				setId(compId);
+			//				ICompetition comp = getFromDB();
+			//
+			//				syncCache.delete(comp.getId());
+			//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			//				ObjectOutput out = new ObjectOutputStream(bos);   
+			//				out.writeObject(comp);
+			//				byte[] yourBytes = bos.toByteArray(); 
+			//
+			//				out.close();
+			//				bos.close();
+			//
+			//				syncCache.put(id, yourBytes);
+			//			}
 
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 		}
 	}
-	
+
 	@Override
 	protected ICompetition getFromPersistentDatastore(Long id) {
 
@@ -222,18 +222,18 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 
 			ofy.put(c);
 
-//			// now update the memcache version
-//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-//			syncCache.delete(c.getId());
-//			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//			ObjectOutput out = new ObjectOutputStream(bos);   
-//			out.writeObject(c);
-//			byte[] yourBytes = bos.toByteArray(); 
-//
-//			out.close();
-//			bos.close();
-//
-//			syncCache.put(id, yourBytes);
+			//			// now update the memcache version
+			//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			//			syncCache.delete(c.getId());
+			//			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			//			ObjectOutput out = new ObjectOutputStream(bos);   
+			//			out.writeObject(c);
+			//			byte[] yourBytes = bos.toByteArray(); 
+			//
+			//			out.close();
+			//			bos.close();
+			//
+			//			syncCache.put(id, yourBytes);
 
 			return c;
 		} catch (Throwable ex) {
@@ -267,29 +267,29 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 	@Override
 	public List<ICompetition> getAllComps() {
 		try {
-		List<ICompetition> list = new ArrayList<ICompetition>();
-		Objectify ofy = DataStoreFactory.getOfy();
-		Query<Competition> cq = ofy.query(Competition.class);
-		for (Competition c : cq) {
+			List<ICompetition> list = new ArrayList<ICompetition>();
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Competition> cq = ofy.query(Competition.class);
+			for (Competition c : cq) {
 
-			// never let a competition out the door that you get back from Objectify. Always call get() or 
-			// Bad Things (tm) will happen.
-			list.add(get(c.getId()));
+				// never let a competition out the door that you get back from Objectify. Always call get() or 
+				// Bad Things (tm) will happen.
+				list.add(get(c.getId()));
+			}
+
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
 		}
-
-		return list;
-	} catch (Throwable ex) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-		return null;
-	}
 	}
 
 	@Override
 	public ICompetition repair(ICompetition comp) {
 		try {
-		// make sure teams are populated
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Requested repair comp " + comp.getLongName());
-		//if (comp.getTeamIds() == null || comp.getTeamIds().isEmpty()) {
+			// make sure teams are populated
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Requested repair comp " + comp.getLongName());
+			//if (comp.getTeamIds() == null || comp.getTeamIds().isEmpty()) {
 			comp.setTeamIds(new ArrayList<Long>());
 			for (IRound r: comp.getRounds()) {
 				for (IMatchGroup m : r.getMatches()) {
@@ -300,13 +300,13 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 						comp.getTeamIds().add(m.getVisitingTeamId());
 					}
 				}
-			//}
+			}
 			put(comp);
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Repaired comp by adding teamIds for comp " + comp.getLongName());
 
-		//}
+			//}
 
-		return comp;
+			return comp;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
@@ -324,18 +324,18 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 				// save compClubhouse 
 				// can't have more than 5 entity types in the transaction so we have to break it up.
 				Long ccid = c.getCompClubhouseId();
-				
+
 				Iterator<IRound> it = c.getRounds().iterator();
 
 				while (it.hasNext() && ok) {
 					ok = rf.delete(it.next());
 				}
-				
+
 				// the competition clubhouse
 				if (ok) {
 					ok = chf.delete(ccid);
 				}
-				
+
 				// the core configuration entry
 				if (ok) {
 					ICoreConfiguration cc = ccf.get();
@@ -344,15 +344,15 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 						ccf.put(cc);
 					}
 				}
-				
+
 				//@REX workflow configuration
-				
+
 				//@REX game1 configuration
-				
+
 				if (ok) {
 					ofy.delete(c);
 				}
-				
+
 				if (ofy.getTxn().isActive()) {
 					if (ok) {
 						ofy.getTxn().commit();
@@ -362,7 +362,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 					}
 				}
 			}
-			
+
 			return false;
 
 		} catch (Throwable ex) {
@@ -376,21 +376,21 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 	@Override
 	public ICompetition getGlobalComp() {
 		try {
-		if (globalComp == null) {
-			Objectify ofy = DataStoreFactory.getOfy();
-			Query<Competition> cq = ofy.query(Competition.class).filter("CompetitionType", CompetitionType.GLOBAL);
-			if (cq.count() > 0) {
-				globalComp = cq.get();
-			} else {
-				globalComp = new Competition();
-				globalComp.setLongName("All Global Competitions");
-				globalComp.setCompType(CompetitionType.GLOBAL);
-				globalComp.setAbbr("Global");
-				globalComp.setUnderway(true);
-				ofy.put(globalComp);
+			if (globalComp == null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+				Query<Competition> cq = ofy.query(Competition.class).filter("CompetitionType", CompetitionType.GLOBAL);
+				if (cq.count() > 0) {
+					globalComp = cq.get();
+				} else {
+					globalComp = new Competition();
+					globalComp.setLongName("All Global Competitions");
+					globalComp.setCompType(CompetitionType.GLOBAL);
+					globalComp.setAbbr("Global");
+					globalComp.setUnderway(true);
+					ofy.put(globalComp);
+				}
 			}
-		}
-		return globalComp;
+			return globalComp;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
@@ -405,7 +405,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
-		
+
 	}
 
 

@@ -40,7 +40,7 @@ public class TestRatingSeriesFactory extends BaseRatingSeriesFactory implements 
 		if (id == 75000L) {
 			// Position lists for Comp 1
 			retval.getActiveCriteria().add(Criteria.IN_FORM);
-			retval.getActiveCriteria().add(Criteria.BEST_YEAR);
+			retval.getActiveCriteria().add(Criteria.ROUND);
 			retval.setStart(DateTime.now().minusMonths(2).toDate());
 			retval.setEnd(DateTime.now().plusMonths(2).toDate());
 			retval.setLive(true);
@@ -83,7 +83,7 @@ public class TestRatingSeriesFactory extends BaseRatingSeriesFactory implements 
 	public List<RatingMode> getModesForCompFromPersistentDatastore(Long compId) {
 		List<RatingMode> list = new ArrayList<RatingMode>();
 		list.add(RatingMode.BY_POSITION);
-		list.add(RatingMode.BY_LAST_MATCH);
+		list.add(RatingMode.BY_MATCH);
 		return null;
 	}
 

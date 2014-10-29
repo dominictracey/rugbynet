@@ -3,6 +3,7 @@ package net.rugby.foundation.topten.server.factory;
 import java.util.List;
 
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -38,4 +39,5 @@ public interface ITopTenListFactory {
 	 */
 	public boolean scan(Long compId);
 	ITopTenList create(TopTenSeedData tti, ITopTenList lastTTL);
+	public String getGuidForMatch(IMatchGroup m);
 }

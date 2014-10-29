@@ -34,7 +34,7 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 	}
 
 	@Override
-	public List<ISeriesConfiguration> getAllActive() {
+	public List<ISeriesConfiguration> getAll(Boolean active) {
 		List<ISeriesConfiguration> list = new ArrayList<ISeriesConfiguration>();
 		//if (compId == 1) {
 			list.add(get(4750000L));
@@ -60,7 +60,7 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 			sc.setTargetRoundOrdinal(sc.getLastRoundOrdinal() + 1);
 			sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
 			sc.setMode(RatingMode.BY_POSITION);
-			sc.getActiveCriteria().add(Criteria.BEST_YEAR);
+			sc.getActiveCriteria().add(Criteria.IN_FORM);
 			sc.setLive(true);
 			return sc;
 		} else if (id.equals(4750001L)) {
@@ -74,8 +74,23 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 			sc.setLastRoundOrdinal(sc.getLastRound().ordinal);
 			sc.setTargetRoundOrdinal(sc.getLastRoundOrdinal() + 1);
 			sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
-			sc.setMode(RatingMode.BY_LAST_MATCH);
-			sc.getActiveCriteria().add(Criteria.BEST_YEAR);
+			sc.setMode(RatingMode.BY_MATCH);
+			sc.getActiveCriteria().add(Criteria.ROUND);
+			sc.setLive(true);
+			return sc;
+		} else if (id.equals(4750002L)) {
+			ISeriesConfiguration sc = new BaseSeriesConfiguration();
+			sc.setId(id);
+			sc.getCompIds().add(1L);
+			sc.getComps().add(cf.get(1L));
+			//sc.getCompNames().add(cf.get(1L).getShortName());
+			sc.setStatus(Status.PENDING);
+			sc.setLastRound(urf.get(cf.get(1L).getRounds().get(0)));
+			sc.setLastRoundOrdinal(sc.getLastRound().ordinal);
+			sc.setTargetRoundOrdinal(sc.getLastRoundOrdinal() + 1);
+			sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
+			sc.setMode(RatingMode.BY_COMP);
+			sc.getActiveCriteria().add(Criteria.ROUND);
 			sc.setLive(true);
 			return sc;
 		}
@@ -104,7 +119,10 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 
 	@Override
 	public ISeriesConfiguration getForSeriesId(Long id) {
-		// TODO Auto-generated method stub
+		if (id.equals(75000L)) {
+			// this is wrong
+			return get(4750001L); 
+		}
 		return null;
 	}
 

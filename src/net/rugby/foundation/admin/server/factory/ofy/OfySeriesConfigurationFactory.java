@@ -12,6 +12,7 @@ import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration.Status;
 import net.rugby.foundation.admin.shared.seriesconfig.BaseSeriesConfiguration;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -87,8 +88,11 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 	}
 
 	@Override
-	public List<ISeriesConfiguration> getAllActive() {
-		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("live",true);
+	public List<ISeriesConfiguration> getAll(Boolean active) {
+		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class);
+		if (active) {
+			qs = qs.filter("live",active);
+		}
 		List<ISeriesConfiguration> retval = new ArrayList<ISeriesConfiguration>();
 		retval.addAll(qs.list());
 		for (ISeriesConfiguration sc : retval) {
@@ -102,13 +106,14 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 	@Override
 	public ISeriesConfiguration create() {
 		ISeriesConfiguration sc = new BaseSeriesConfiguration();
-
+		sc.setStatus(Status.PENDING);
+		sc.setLive(true);
 		return sc;
 	}
 
 	@Override
 	public ISeriesConfiguration getForSeriesId(Long id) {
-		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("live",true);
+		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("seriesId",id);
 		assert (qs.list().size() == 1);
 		return qs.list().get(0);
 	}

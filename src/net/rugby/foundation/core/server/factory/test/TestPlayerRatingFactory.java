@@ -8,6 +8,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.inject.Inject;
 
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -39,10 +41,13 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 	private IPlayerMatchStatsFactory pmsf;
 	private IPlayerFactory pf;
 
+	private IMatchRatingEngineSchemaFactory resf;
+
 	@Inject
-	public TestPlayerRatingFactory(IPlayerMatchStatsFactory pmsf, IPlayerFactory pf) {
+	public TestPlayerRatingFactory(IPlayerMatchStatsFactory pmsf, IPlayerFactory pf, IMatchRatingEngineSchemaFactory resf) {
 		this.pmsf = pmsf;
 		this.pf = pf;
+		this.resf = resf;
 	}
 
 	@Override
@@ -61,6 +66,11 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 	protected IPlayerRating getFromPersistentDatastore(Long id) {
 		try {
 			if (id != null) {
+				IPlayerRating pr = idMap.get(id);
+				if (pr == null) {
+					pr = build(id);
+					idMap.put(id, pr);
+				}
 				return idMap.get(id);
 			} else {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Don't try to get with null. Call create() instead!");
@@ -70,6 +80,30 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
+	}
+
+	private IPlayerRating build(Long id) {
+		
+		// this will only work for 770000101-20 and
+		// 770000201-20 I think
+		IPlayerRating pr = create();
+		pr.setId(id);
+		pr.setGenerated(new Date());
+		List<Long> msids = new ArrayList<Long>();
+		msids.add(id+1000000000L);
+		pr.setMatchStatIds(msids);
+		List<IPlayerMatchStats> pmss = new ArrayList<IPlayerMatchStats>();
+		for (Long msid : msids) {
+			pmss.add(pmsf.get(msid));
+		}
+		pr.setMatchStats(pmss);
+		pr.setPlayerId(msids.get(0) + 1000000000L);
+		pr.setPlayer(pf.get(pr.getPlayerId()));
+		pr.setQueryId(id/100);
+		pr.setSchema(resf.getDefault());
+		pr.setSchemaId(pr.getSchema().getId());
+		
+		return pr;
 	}
 
 	@Override
@@ -190,12 +224,25 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 			Map<Long,List<Long>> queryMap = getQueryMapFromMemCache();
 			List<IPlayerRating> retval = new ArrayList<IPlayerRating>();
 			
-			for (Long rid : queryMap.get(query.getId())) {
-				IPlayerRating pr = get(rid);
-				pr.setPlayer(pf.get(pr.getPlayerId()));
-				pr.getPlayer().setPosition(pr.getMatchStats().get(0).getPosition());
-				retval.add(pr);
-			}	
+			if (queryMap.containsKey(query.getId())) {
+				for (Long rid : queryMap.get(query.getId())) {
+					IPlayerRating pr = get(rid);
+					pr.setPlayer(pf.get(pr.getPlayerId()));
+					pr.getPlayer().setPosition(pr.getMatchStats().get(0).getPosition());
+					retval.add(pr);
+				}	
+			} else {
+				// create the pmrs (20 per query)
+				// pmr.id = pmq.id * 100 + (i => 1:20)
+				List<Long> pmrids = new ArrayList<Long>();
+				Long base = query.getId() * 100L;
+				for (Long i = 1L; i < 21L; ++i) {
+					pmrids.add(base + i);
+				}
+				queryMap.put(query.getId(),pmrids);
+				putQueryMapToMemCache(queryMap);
+				return query(query);  // :)
+			}
 
 			return retval;
 

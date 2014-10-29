@@ -6,17 +6,19 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.model.IRatingSeriesManager;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration.Status;
 import net.rugby.foundation.core.server.BPMServletContextListener;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.RatingMode;
+
 import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.ImmediateValue;
 import com.google.appengine.tools.pipeline.Job1;
@@ -31,6 +33,8 @@ public class ProcessRatingSeries extends Job1<ProcessRatingSeriesResult, ISeries
 	private static Injector injector = null;
 
 	private ISeriesConfigurationFactory scf;
+	private IRatingSeriesFactory rsf;
+	private IRatingGroupFactory rgf;
 
 	public ProcessRatingSeries() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -62,7 +66,9 @@ public class ProcessRatingSeries extends Job1<ProcessRatingSeriesResult, ISeries
 			}
 
 			this.scf = injector.getInstance(ISeriesConfigurationFactory.class);
-
+			this.rsf = injector.getInstance(IRatingSeriesFactory.class);
+			this.rgf = injector.getInstance(IRatingGroupFactory.class);
+			
 			if (seriesConfig == null) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Generate rating series pipeline invoked with null.");
 				return null;
@@ -97,8 +103,19 @@ public class ProcessRatingSeries extends Job1<ProcessRatingSeriesResult, ISeries
 			} else {
 				for (IRatingGroup rg : series.getRatingGroups()) {
 					if (rg.getUniversalRoundOrdinal() == seriesConfig.getTargetRoundOrdinal()) {
-						group = rg;
-						break;
+						// only do partial processing on BY_MATCH series
+						if (seriesConfig.getMode().equals(RatingMode.BY_MATCH)) {
+							group = rg;
+							break;
+						} else { 
+							// otherwise delete the existing group and create another
+							series.getRatingGroupIds().remove(rg.getId());
+							rsf.put(series);
+							rgf.deleteTTLs(rg);
+							rgf.delete(rg);
+							group = rm.addRatingGroup(series, seriesConfig.getTargetRound());
+							break;
+						}
 					}
 				}
 			}

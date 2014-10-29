@@ -11,12 +11,14 @@ import com.googlecode.objectify.Objectify;
 import net.rugby.foundation.core.server.factory.BaseRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.RatingGroup;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 public class OfyRatingGroupFactory extends BaseRatingGroupFactory implements IRatingGroupFactory, Serializable {
 	/**
@@ -26,8 +28,8 @@ public class OfyRatingGroupFactory extends BaseRatingGroupFactory implements IRa
 
 
 	@Inject
-	OfyRatingGroupFactory(IRatingMatrixFactory rmf, IUniversalRoundFactory urf, IRatingSeriesFactory rsf) {
-		super(rsf, rmf, urf);
+	OfyRatingGroupFactory(IRatingMatrixFactory rmf, IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingQueryFactory rqf, ITopTenListFactory ttlf) {
+		super(rsf, rmf, urf, rqf, ttlf);
 	}
 
 	@Override

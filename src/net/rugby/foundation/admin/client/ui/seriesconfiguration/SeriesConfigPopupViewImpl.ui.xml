@@ -102,6 +102,7 @@
 					Criteria:
 				</td>
 				<td>
+				    <b:CheckBox ui:field="round">Round</b:CheckBox>
 					<b:CheckBox ui:field="inForm">In Form</b:CheckBox>
 					<b:CheckBox ui:field="bestYear">Best Last Year</b:CheckBox>
 					<b:CheckBox ui:field="bestAllTime">Best All Time</b:CheckBox>

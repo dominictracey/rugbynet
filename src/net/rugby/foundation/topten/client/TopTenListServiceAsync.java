@@ -49,4 +49,6 @@ public interface TopTenListServiceAsync {
 			AsyncCallback<List<IRatingQuery>> asyncCallback);
 	public void getAvailableSeries(Long compId, AsyncCallback<List<RatingMode>> asyncCallback);
 	public void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
+	public void getDefaultRatingSeries(Long compId,
+			AsyncCallback<IRatingSeries> asyncCallback);
 }

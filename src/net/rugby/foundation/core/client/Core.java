@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -120,10 +121,12 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void onModuleLoad() {
-//		Element element = DOM.getElementById("loadProgress");
-//		if (element != null) {
-//			element.getStyle().setWidth(60, Unit.PCT);
-//		}
+//		GWT.setUncaughtExceptionHandler(new
+//		        GWT.UncaughtExceptionHandler() {
+//		        public void onUncaughtException(Throwable e) {
+//		          Window.
+//		      }
+//		});
 		
 	}
 

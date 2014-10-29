@@ -238,16 +238,19 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		return group;
 	}
 
-	@Override	public void setGroup(IRatingGroup group) {
+	@Override	public void setGroup(IRatingGroup group, boolean flush) {
 		this.group = group;
 		if (group != null) {
 			groupId = group.getId();
 			assert (group.getRatingSeriesId().equals(seriesId));
 		}
 		
-		setMatrix(null);
-		setQuery(null);
-		setPlayerId(null);
+		if (flush) {
+			setMatrix(null);
+			setQuery(null);
+			setPlayerId(null);
+		}
+		
 		presenter.gotoPlace(getPlace());
 	}
 
@@ -279,7 +282,9 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			criteriaDropDown.add(nl);
 		}
 		ratingModesSet = true;
+		presenter.gotoPlace(getPlace());
 	}
+	
 	@Override	public IRatingMatrix getMatrix() {
 		return matrix;
 	}
@@ -387,6 +392,8 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		if (compId != this.compId) {
 			this.compId = compId;
 			ratingModesSet = false;
+			// @REX clear everything else?
+			presenter.gotoPlace(getPlace());
 		}
 	}
 

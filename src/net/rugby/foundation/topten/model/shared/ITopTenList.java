@@ -56,5 +56,9 @@ public interface ITopTenList {
 	String getTwitterDescription();
 	public abstract void setGuid(String guid);
 	String getGuid();
+	void setNotes(String notes);
+	String getNotes();
+	void setNotesId(Long notesId);
+	Long getNotesId();
 
 }

@@ -18,7 +18,7 @@ public class SeriesPlace extends Place {
   
 	private String token;
 	private String seps = "&|=";
-	private String queryId;
+	private String active;
 	private Map<String,String> map;
 	
 	
@@ -28,8 +28,8 @@ public class SeriesPlace extends Place {
 		String[] tok = token.split(seps);
 		
 		if (tok.length > 1) {
-			assert (tok[0].equals("queryId"));
-			queryId = URL.decode(tok[1]);	
+			assert (tok[0].equals("active"));
+			active = URL.decode(tok[1]);	
 			
 		}
 
@@ -54,8 +54,8 @@ public class SeriesPlace extends Place {
 	
 	public String getToken() {
 		token = "";
-		token += "queryId=";
-		token += queryId;
+		token += "active=";
+		token += active;
 		for (String key : map.keySet()) {
 			token += "&" + key + "=" + map.get(key);
 		}
@@ -63,7 +63,15 @@ public class SeriesPlace extends Place {
 		return token;
 	}
 	
-	public String getqueryId() { return queryId; }
+	public Boolean getActive() { 
+		if (active == null) {
+			return true;
+		} else if (active.toLowerCase().equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * PlaceTokenizer knows how to serialize the Place's state to a URL token.

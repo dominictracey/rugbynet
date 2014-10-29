@@ -161,7 +161,12 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 	public void deleteAll() {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			QueryResultIterable<Key<RatingQuery>> keys = ofy.query(RatingQuery.class).fetchKeys();
+			
+//			QueryResultIterable<Key<RatingQuery>> keys = ofy.query(RatingQuery.class).fetchKeys();
+			
+			// with the new Series work, we should only delete RQs that are ad hoc - i.e. without a parent matrix
+			QueryResultIterable<Key<RatingQuery>> keys = ofy.query(RatingQuery.class).filter("ratingMatrixId", null).fetchKeys();
+
 			ofy.delete(keys);
 
 			// note the PMRs are left orphaned

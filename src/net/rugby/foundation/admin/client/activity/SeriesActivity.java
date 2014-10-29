@@ -68,7 +68,7 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 		panel.setWidget(view.asWidget());
 
 		if (place != null) {
-			clientFactory.getRpcService().getAllSeriesConfigurations(new AsyncCallback<List<ISeriesConfiguration>>() {
+			clientFactory.getRpcService().getAllSeriesConfigurations(place.getActive(), new AsyncCallback<List<ISeriesConfiguration>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					Window.alert("Failed to fetch series configs");

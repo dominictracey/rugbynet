@@ -38,10 +38,12 @@ public class TestPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory imp
 	 */
 	@Override
 	public IPlayerMatchStats getFromPersistentDatastore(Long id) {
-		if (id == null) {
-			return new ScrumPlayerMatchStats();
+
+		Long pid = -10000L;
+		if (id > 1000000000L) {
+			pid = id+1000000000L;  //
 		}
-		Long pid = id-10000L;
+		
 		Long teamId = 9002L; //AUS
 		int slot = (int) (pid-9002000);
 		if (id < 9001999) {
@@ -118,7 +120,7 @@ public class TestPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory imp
 		pms.setRedCards(0);
 		pms.setRuns(random.nextInt(5));
 		pms.setSlot(slot);
-		pms.setTacklesMade(random.nextInt(5));
+		pms.setTacklesMade(random.nextInt(20));
 		pms.setTacklesMissed(random.nextInt(5));
 		pms.setTeamId(teamId);
 		pms.setTimePlayed(random.nextInt(80));

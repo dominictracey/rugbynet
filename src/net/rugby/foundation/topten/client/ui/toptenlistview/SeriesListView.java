@@ -53,7 +53,7 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 	Long getCompId();
 	void setMatrix(IRatingMatrix matrix);
 	IRatingMatrix getMatrix();
-	void setGroup(IRatingGroup group);
+	void setGroup(IRatingGroup group, boolean flush);
 	IRatingGroup getGroup();
 	SeriesPlace getPlace();
 	Long getSeriesId();

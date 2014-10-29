@@ -84,7 +84,9 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 			}
 			
 			// tell the configuration object to repull from cache
-			scf.dropFromCache(scf.getForSeriesId(rs.getId()).getId());
+			if (rs.getId() != null) {
+				scf.dropFromCache(scf.getForSeriesId(rs.getId()).getId());
+			}
 			
 			return rs;
 			
@@ -149,8 +151,10 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 	@Override
 	public Long getDefaultSeriesId(Long compId) {
 		List<RatingMode> modes = getModesForCompFromPersistentDatastore(compId);
-		if (modes.contains(RatingMode.BY_LAST_MATCH)) {
-			return get(compId, RatingMode.BY_LAST_MATCH).getId();
+		if (modes.contains(RatingMode.BY_COMP)) {
+			return get(compId, RatingMode.BY_COMP).getId();
+		} else if (modes.contains(RatingMode.BY_MATCH)) {
+			return get(compId, RatingMode.BY_MATCH).getId();
 		} else if (modes.contains(RatingMode.BY_POSITION)) {
 			return get(compId, RatingMode.BY_POSITION).getId();
 		} else if (modes.contains(RatingMode.BY_TEAM)) {

@@ -1,6 +1,5 @@
 package net.rugby.foundation.admin.server;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.matchrating.FetchTeamMatchStats;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
@@ -72,6 +70,7 @@ import net.rugby.foundation.game1.shared.IRoundEntry;
 import net.rugby.foundation.game1.shared.MatchEntry;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.Country;
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
@@ -96,6 +95,7 @@ import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ITopTenUser;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.Position.position;
@@ -104,13 +104,10 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.DateTime;
 
-import com.google.appengine.api.modules.ModulesService;
-import com.google.appengine.api.modules.ModulesServiceFactory;
-import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.pipeline.JobInfo;
 import com.google.appengine.tools.pipeline.JobSetting;
@@ -118,8 +115,6 @@ import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
-
-import com.google.appengine.tools.cloudstorage.RetriesExhaustedException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -2008,11 +2003,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public List<ISeriesConfiguration> getAllSeriesConfigurations() {
+	public List<ISeriesConfiguration> getAllSeriesConfigurations(Boolean active) {
 		try {
-			List<ISeriesConfiguration> retval = scf.getAllActive();
+			List<ISeriesConfiguration> retval = scf.getAll(active);
 			for (ISeriesConfiguration sc : retval) {
 				// clear out the pipeline as soon as it is completed
+				try {
+					
+
 				if (sc.getPipelineId() != null) {
 					PipelineService service = PipelineServiceFactory.newPipelineService();
 					JobInfo jobInfo = service.getJobInfo(sc.getPipelineId());
@@ -2033,6 +2031,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					default:
 						break;
 					};
+				}
+				} catch (Throwable ex) {
+					
+					// bad pipeline handle. delete
+					sc.setPipelineId(null);
+					scf.put(sc);
 					
 				}
 			}
@@ -2052,28 +2056,28 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				ISeriesConfiguration sc = scf.get(id);
 				
 				// clear out the pipeline as soon as it is completed
-				if (sc.getPipelineId() != null) {
-					PipelineService service = PipelineServiceFactory.newPipelineService();
-					JobInfo jobInfo = service.getJobInfo(sc.getPipelineId());
-					switch (jobInfo.getJobState()) {
-					case COMPLETED_SUCCESSFULLY:
-						service.deletePipelineRecords(sc.getPipelineId());
-						sc.setPipelineId(null);
-						scf.put(sc);
-						break;
-					case RUNNING:
-						break;
-					case STOPPED_BY_ERROR:
-						throw new RuntimeException("Job stopped " + jobInfo.getError());
-					case STOPPED_BY_REQUEST:
-						throw new RuntimeException("Job stopped by request.");
-					case WAITING_TO_RETRY:
-						break;
-					default:
-						break;
-					};
-					
-				}
+//				if (sc.getPipelineId() != null) {
+//					PipelineService service = PipelineServiceFactory.newPipelineService();
+//					JobInfo jobInfo = service.getJobInfo(sc.getPipelineId());
+//					switch (jobInfo.getJobState()) {
+//					case COMPLETED_SUCCESSFULLY:
+//						service.deletePipelineRecords(sc.getPipelineId());
+//						sc.setPipelineId(null);
+//						scf.put(sc);
+//						break;
+//					case RUNNING:
+//						break;
+//					case STOPPED_BY_ERROR:
+//						throw new RuntimeException("Job stopped " + jobInfo.getError());
+//					case STOPPED_BY_REQUEST:
+//						throw new RuntimeException("Job stopped by request.");
+//					case WAITING_TO_RETRY:
+//						break;
+//					default:
+//						break;
+//					};
+//					
+//				}
 				return sc;
 			}
 		} catch (Throwable ex) {
@@ -2123,16 +2127,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 						// first delete TTLs associated
 						for (Long rgid : series.getRatingGroupIds()) {
 							IRatingGroup rg = rgf.get(rgid);
-							for (Long rmid : rg.getRatingMatrixIds()) {
-								IRatingMatrix rm = rmf.get(rmid);
-								for (Long rqid : rm.getRatingQueryIds()) {
-									IRatingQuery rq = rqf.get(rqid);
-									if (rq.getTopTenListId() != null) {
-										ITopTenList ttl = ttlf.get(rq.getTopTenListId());
-										ttlf.delete(ttl);
-									}
-								}
-							}
+							rgf.deleteTTLs(rg);
 						}
 					}
 				}
@@ -2154,13 +2149,45 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) {
+	public ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) throws Exception {
 		try {
+			// valid configs are:
+			//	1) Mode == BY_MATCH and Criteria == ROUND
+			//	2) Mode == BY_POSITION and Criteria == IN_FORM
+			//	3) Mode == BY_COMP and Criteria == ROUND
+			if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT) || sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME) || sConfig.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
+				throwUnsupportedSeriesConfigException();
+			}
+			
+			if (sConfig.getMode().equals(RatingMode.BY_COUNTRY) || sConfig.getMode().equals(RatingMode.BY_TEAM)) {
+				throwUnsupportedSeriesConfigException();
+			}
+			
+			if (sConfig.getActiveCriteria().contains(Criteria.ROUND)) {
+				if (!sConfig.getMode().equals(RatingMode.BY_MATCH) && !sConfig.getMode().equals(RatingMode.BY_COMP)) {
+					throwUnsupportedSeriesConfigException();
+				}
+			}
+				
+			if (sConfig.getActiveCriteria().contains(Criteria.IN_FORM)) {
+				if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
+					throwUnsupportedSeriesConfigException();
+				}
+			}
+			
 			return scf.put(sConfig);
-		} catch (Throwable ex) {
+		} catch (Exception ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
-			return null;	
+			throw ex;	 // rethrow to client?
 		}	
+	}
+
+	private void throwUnsupportedSeriesConfigException() throws Exception {
+		throw new Exception("Invalid Mode/Criteria combo. Valid values are: \n" +
+				"1) Mode == BY_MATCH and Criteria == ROUND \n" +
+				"2) Mode == BY_POSITION and Criteria == IN_FORM \n" + 
+				"3) Mode == BY_COMP and Criteria == ROUND");
+		
 	}
 
 	@Override

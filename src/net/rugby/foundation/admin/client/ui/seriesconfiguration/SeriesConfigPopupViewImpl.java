@@ -36,7 +36,7 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 	@UiField ListBox comps;
 	@UiField ListBox mode;
 	
-	
+	@UiField CheckBox round;
 	@UiField CheckBox inForm;
 	@UiField CheckBox bestYear;
 	@UiField CheckBox bestAllTime;
@@ -56,10 +56,9 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 		fieldDefinitions.get(i++).bind(displayName);        
 		fieldDefinitions.get(i++).bind(comps);        
 		fieldDefinitions.get(i++).bind(countries);    
- 
-//		fieldDefinitions.get(i++).bind(endDate); 
 		fieldDefinitions.get(i++).bind(mode); 
 		fieldDefinitions.get(i++).bind(startDate);	
+		fieldDefinitions.get(i++).bind(round); 
 		fieldDefinitions.get(i++).bind(inForm); 
 		fieldDefinitions.get(i++).bind(bestYear); 
 		fieldDefinitions.get(i++).bind(bestAllTime); 
@@ -113,40 +112,6 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 		}
 	}
 
-//	@Override
-//	public void setComps(ICoreConfiguration result) {
-//		config = result;
-//		//if (!timeSeries.isToggled()) {
-//		comps.clear();
-//		comps.addItem("All","-1");
-//
-//		for (Long id: result.getCompetitionMap().keySet()) {
-//			comps.addItem(result.getCompetitionMap().get(id), id.toString());
-//		}
-//
-//		comps.addChangeHandler(new ChangeHandler() {
-//
-//			@Override
-//			public void onChange(ChangeEvent event) {
-////				rq = null;
-////				compIds = null;
-////				roundIds = null;
-////				teamIds = null;
-////				round.clear();
-////				team.clear();
-////				for (int i=0; i<pos.getItemCount(); i++) {
-////					pos.setItemSelected(i, false);
-////				}
-////
-////				for (int i=0; i<country.getItemCount(); i++) {
-////					country.setItemSelected(i, false);
-////				}
-//
-//				presenter.seriesConfigViewCompSelected(Long.parseLong(comps.getValue((comps.getSelectedIndex()))));			
-//			}
-//
-//		});
-//	}
 	@Override
 	public void setPresenter(Presenter<T> listener) {
 		presenter = listener;	

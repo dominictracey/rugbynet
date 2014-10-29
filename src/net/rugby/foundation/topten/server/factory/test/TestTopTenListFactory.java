@@ -18,17 +18,22 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.ServerPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
 import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.BaseTopTenListFactory;
+import net.rugby.foundation.topten.server.factory.INoteFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+import net.rugby.foundation.topten.server.utilities.INotesCreator;
 import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
 
 public class TestTopTenListFactory extends BaseTopTenListFactory implements ITopTenListFactory {
@@ -41,8 +46,8 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 	@Inject
 	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
 			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf,
-			ISocialMediaDirector smd) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd);
+			ISocialMediaDirector smd, INotesCreator nc, IRatingSeriesFactory rsf, IUniversalRoundFactory urf, INoteFactory nf) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd, nc, rsf, urf, nf);
 		this.pf = pf;
 	}
 
@@ -138,6 +143,8 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 			list.setPublished(new Date());
 			list.setQueryId(id - 10000000L);
 			list.setLive(true);
+			IServerPlace place = spf.get(33006L);
+			list.setGuid(place.getGuid());
 			
 			list.setContent("What an exciting week of rugby. Lots of great performances to choose from!");
 			list.setList(getListOfItemsForSimpleList(list));

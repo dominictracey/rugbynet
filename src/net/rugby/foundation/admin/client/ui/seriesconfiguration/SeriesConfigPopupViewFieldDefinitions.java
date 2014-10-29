@@ -296,34 +296,43 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				public void bind (Widget in)
 				{
 					w = (ListBox) in;
-					w.addItem("OVERALL");
-					w.addItem("BY_POSITION");
-					w.addItem("BY_COUNTRY");
-					w.addItem("BY_TEAM");
-					w.addItem("BY_NEXT_MATCH");
-					w.addItem("BY_LAST_MATCH");
+					for (RatingMode mode : RatingMode.values()) {
+						w.addItem(mode.toString());
+					}
+					//					w.addItem("BY_POSITION");
+					//					w.addItem("BY_COUNTRY");
+					//					w.addItem("BY_TEAM");
+					//					w.addItem("BY_MATCH");
+					//					w.addItem("BY_LAST_MATCH");
 				}
 
 				@Override
 				public Widget render(ISeriesConfiguration c) {
 					if (w.getItemCount() > 0) {
-						//int i = 0;
+						int i = 0;
 						//String index = w.getItemText(i);
 						if (c.getMode() != null) {
-							if (c.getMode().equals(RatingMode.OVERALL)) {
-								w.setItemSelected(0, true);
-							} else if (c.getMode().equals(RatingMode.BY_POSITION)) {
-								w.setItemSelected(1, true);
-							}  else if (c.getMode().equals(RatingMode.BY_COUNTRY)) {
-								w.setItemSelected(2, true);
-							}  else if (c.getMode().equals(RatingMode.BY_TEAM)) {
-								w.setItemSelected(3, true);
-							}  else if (c.getMode().equals(RatingMode.BY_NEXT_MATCH)) {
-								w.setItemSelected(4, true);
-							}   else if (c.getMode().equals(RatingMode.BY_LAST_MATCH)) {
-								w.setItemSelected(5, true);
+							for (RatingMode mode : RatingMode.values()) {
+								if (c.getMode().equals(mode)) {
+									w.setItemSelected(i, true);
+									break;
+								}
+								++i;
 							}
 						}
+						//						if (c.getMode() != null) {
+						//							if (c.getMode().equals(RatingMode.BY_COMP)) {
+						//								w.setItemSelected(0, true);
+						//							} else if (c.getMode().equals(RatingMode.BY_POSITION)) {
+						//								w.setItemSelected(1, true);
+						//							}  else if (c.getMode().equals(RatingMode.BY_COUNTRY)) {
+						//								w.setItemSelected(2, true);
+						//							}  else if (c.getMode().equals(RatingMode.BY_TEAM)) {
+						//								w.setItemSelected(3, true);
+						//							}  else if (c.getMode().equals(RatingMode.BY_MATCH)) {
+						//								w.setItemSelected(4, true);
+						//							}
+						//						}
 					} else {
 						//selectedIds.addAll(c.getCountryIds());
 					}
@@ -343,7 +352,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 					int i = w.getSelectedIndex();
 
 					if (i == 0) {
-						p.setMode(RatingMode.OVERALL);
+						p.setMode(RatingMode.BY_COMP);
 					} else if (i == 1) {
 						p.setMode(RatingMode.BY_POSITION);
 					} else if (i == 2) {
@@ -351,9 +360,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 					} else if (i == 3) {
 						p.setMode(RatingMode.BY_TEAM);
 					} else if (i == 4) {
-						p.setMode(RatingMode.BY_NEXT_MATCH);
-					} else if (i == 5) {
-						p.setMode(RatingMode.BY_LAST_MATCH);
+						p.setMode(RatingMode.BY_MATCH);
 					}
 
 					return p;
@@ -369,7 +376,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				private List<UniversalRound> rounds =  null;
 				boolean roundsLoaded = false;
 				Timer t = null;
-				
+
 				@Override
 				public void bind (Widget in)
 				{
@@ -500,7 +507,37 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 			//
 			//			});
 
+			fieldDefinitions.add(new FieldDefinition<ISeriesConfiguration>() {
+				//Criteria.ROUND
+				private CheckBox w;
 
+				@Override
+				public void bind (Widget in)
+				{
+					w = (CheckBox) in;
+				}
+
+				@Override
+				public Widget render(ISeriesConfiguration c) {
+					w.setValue(c.getActiveCriteria().contains(Criteria.ROUND));
+
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					w.setValue(false);
+				}
+
+				@Override
+				public ISeriesConfiguration update(ISeriesConfiguration p) {
+					p.getActiveCriteria().remove(Criteria.ROUND);
+					if (w.getValue())
+						p.getActiveCriteria().add(Criteria.ROUND);
+					return p;
+				}
+
+			});
 
 			fieldDefinitions.add(new FieldDefinition<ISeriesConfiguration>() {
 				//Criteria.IN_FORM

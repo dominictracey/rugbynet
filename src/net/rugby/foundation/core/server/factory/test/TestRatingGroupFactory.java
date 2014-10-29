@@ -5,10 +5,13 @@ import com.google.inject.Inject;
 import net.rugby.foundation.core.server.factory.BaseRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
+import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.RatingGroup;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 
 public class TestRatingGroupFactory extends BaseRatingGroupFactory implements IRatingGroupFactory {
@@ -18,9 +21,9 @@ public class TestRatingGroupFactory extends BaseRatingGroupFactory implements IR
 
 	
 	@Inject
-	public TestRatingGroupFactory(IRatingMatrixFactory rmf, IRatingSeriesFactory rsf, IUniversalRoundFactory urf)
+	public TestRatingGroupFactory(IRatingMatrixFactory rmf, IRatingSeriesFactory rsf, IUniversalRoundFactory urf, IRatingQueryFactory rqf, ITopTenListFactory ttlf)
 	{
-		super(rsf, rmf, urf);
+		super(rsf, rmf, urf, rqf, ttlf);
 
 	}
 	
@@ -53,6 +56,11 @@ public class TestRatingGroupFactory extends BaseRatingGroupFactory implements IR
 			rg.getRatingMatrices().add(rmf.get(77101L));
 			rg.setLabel("Round 2");
 			return rg;
+		}
+		
+		for (IRatingMatrix rm : rg.getRatingMatrices()) {
+			rm.setRatingGroup(rg);
+			rm.setRatingGroupId(rg.getId());
 		}
 		return null;
 	}

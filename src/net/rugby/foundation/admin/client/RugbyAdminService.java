@@ -135,10 +135,10 @@ public interface RugbyAdminService extends RemoteService {
 	String cleanUp();
 	
 	// rating series
-	List<ISeriesConfiguration> getAllSeriesConfigurations();
+	List<ISeriesConfiguration> getAllSeriesConfigurations(Boolean active);
 	ISeriesConfiguration getSeriesConfiguration(Long id);
 	String processSeriesConfiguration(Long sConfigId);
 	Boolean deleteSeriesConfiguration(Long sConfigId);
-	ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig);
+	ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) throws Exception;
 	List<UniversalRound> getUniversalRounds(int size);
 }

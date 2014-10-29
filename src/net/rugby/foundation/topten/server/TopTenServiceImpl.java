@@ -377,4 +377,14 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		}
 	}
 
+	@Override
+	public IRatingSeries getDefaultRatingSeries(Long compId) {
+		try {
+			return rsf.get(compId, RatingMode.BY_POSITION);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
 }

@@ -165,7 +165,7 @@ public interface RugbyAdminServiceAsync {
 	public void cleanUp(AsyncCallback<String> asyncCallback);
 	
 	//RatingSeries
-	public void  getAllSeriesConfigurations(
+	public void  getAllSeriesConfigurations(Boolean active,
 			AsyncCallback<List<ISeriesConfiguration>> asyncCallback);
 	public void  getSeriesConfiguration(Long id,
 			AsyncCallback<ISeriesConfiguration> asyncCallback);

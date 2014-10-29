@@ -104,7 +104,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	
 			// now create the TTL
 			String title = "Top Ten ";
-			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_LAST_MATCH)) {
+			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH)) {
 				title += "Players from ";
 				IRound r = rf.get(rq.getRoundIds().get(0));
 				IMatchGroup match = null;

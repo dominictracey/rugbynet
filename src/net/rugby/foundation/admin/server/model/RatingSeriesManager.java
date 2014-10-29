@@ -102,7 +102,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	public Boolean readyForNewGroup(ISeriesConfiguration config) {	
 
 		this.sc = config;
-				
+
 		// return true if
 		//	1) Series has been created
 		//	2) Series has a target UniversalRound specified
@@ -115,14 +115,14 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		}
 
 		int targetURordinal = config.getTargetRound().ordinal;
-		
+
 		// does the group already exist?
 		for (IRatingGroup g : series.getRatingGroups()) {
 			if (g.getUniversalRoundOrdinal() == targetURordinal) {
 				return false;
 			}
 		}
-		
+
 		int currentURordinal = urf.getCurrent().ordinal;
 
 		// can't do a future round
@@ -133,7 +133,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		// can't do it if the necessary rounds are not in the FETCHED state
 		// it is ok if the comp doesn't have a round for the target UR.
 		// note this isn't true for when we are doing match review
-		if (!config.getMode().equals(RatingMode.BY_LAST_MATCH) && !config.getMode().equals(RatingMode.BY_POSITION)) {
+		if (!config.getMode().equals(RatingMode.BY_MATCH) && !config.getMode().equals(RatingMode.BY_POSITION) && !config.getMode().equals(RatingMode.BY_COMP)) {
 			for (ICompetition c : config.getComps()) {
 				// get the round for the target UniversalRound
 				for (IRound r : c.getRounds()) {
@@ -198,7 +198,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			rmf.put(rm);
 			rg.getRatingMatrices().add(rm);
 			rg.getRatingMatrixIds().add(rm.getId());
-			
+
 			generateRatingQueries(rm);
 		}
 
@@ -219,8 +219,8 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 			for (ICompetition comp : rs.getComps()) {
 				UniversalRound ur = sc.getTargetRound();
-				if (rs.getMode() == RatingMode.BY_LAST_MATCH) {
-					// assume we only want the target round
+				if (rm.getCriteria() == Criteria.ROUND) {
+					// we only want the target round
 					IRound targetRound = null;
 					boolean found = false;
 					for (IRound r : comp.getRounds()) {
@@ -237,7 +237,9 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					// get the rounds for the comps that happened in the last year.
 					List<IRound> rounds = getRoundsFromLastYear(comp);
 					for (IRound r : rounds) {
-						rids.add(r.getId());
+						if (urf.get(r).ordinal <= ur.ordinal) {
+							rids.add(r.getId());
+						}
 					}
 				} 
 			}
@@ -291,7 +293,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rmf.put(rm);
 				}
 			}
-		} else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_LAST_MATCH) {
+		} else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_MATCH) {
 
 			for (Long rid : rids) {
 				IRound targetRound = rf.get(rid);
@@ -313,6 +315,26 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rm.getRatingQueryIds().add(rq.getId());
 					rmf.put(rm);
 				}
+			}
+		}  else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_COMP) {
+
+			for (Long rid : rids) {
+				IRound targetRound = rf.get(rid);
+				IRatingQuery rq = createRatingQuery(rm);
+
+				rq.setScaleStanding(true);
+				rq.setScaleComp(false);
+				rq.setScaleTime(scaleTime);
+
+				rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
+
+				rq.setRoundIds(rids);
+				rq.setRatingMatrixId(rm.getId());
+				rq.setLabel(targetRound.getName());
+				rqf.put(rq);
+				rm.getRatingQueries().add(rq);
+				rm.getRatingQueryIds().add(rq.getId());
+				rmf.put(rm);
 			}
 		}
 
