@@ -11,6 +11,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -36,7 +37,10 @@ public interface TopTenListService extends RemoteService {
 	public IRatingGroup getRatingGroup(Long ratingGroupId);
 	public IRatingMatrix getRatingMatrix(Long ratingMatrixId);
 	public List<IRatingQuery> getRatingQueriesForMatrix(Long id);
-	public List<RatingMode> getAvailableSeries(Long compId);
+	public Map<RatingMode, Long> getAvailableSeries(Long compId);
 	public IServerPlace getPlace(String guid);
 	public IRatingSeries getDefaultRatingSeries(Long compId);
+	public List<INote> getNotesForList(Long id);
+	public Map<Long, String> getPlayerNames(List<Long> needPlayerNames);
+	public Map<Long, String> getTTLNames(List<Long> needTTLNames);
 }

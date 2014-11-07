@@ -43,7 +43,16 @@ public class OfyNoteRefFactory extends BaseCachingFactory<INoteRef> implements I
 	protected INoteRef putToPersistentDatastore(INoteRef t) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			return (INoteRef) ofy.put(t);
+			// make sure we don't save the xlink more than once
+			Query<NoteRef> qRef = ofy.query(NoteRef.class).filter("noteId", t.getId());
+			for (NoteRef ref : qRef) {
+				if (ref.getContextId().equals(t.getContextId()) && ref.getNoteId().equals(t.getNoteId())) {
+					return ref;
+				}
+			}
+			
+			ofy.put(t);
+			return t;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put" + e.getLocalizedMessage(), e);
 			return null;

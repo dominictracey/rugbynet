@@ -17,4 +17,6 @@ public interface IPlaceFactory extends ICachingFactory<IServerPlace>{
 	public abstract void buildMatrix(IServerPlace p, IRatingMatrix rm);
 	public abstract void buildGroup(IServerPlace p, IRatingGroup rg);
 	public abstract void buildSeries(IServerPlace p, IRatingSeries rs);
+	public abstract void buildComp(IServerPlace p, Long compId);
+
 }

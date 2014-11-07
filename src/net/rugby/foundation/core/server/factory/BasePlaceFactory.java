@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -165,6 +166,17 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 	@Override
 	public void buildSeries(IServerPlace p, IRatingSeries rs) {
 		p.setSeriesId(rs.getId());
+		p.setType(PlaceType.SERIES);
+		if (rs.getCompIds().size() > 1) {
+			buildComp(p,ccf.get().getDefaultCompId());
+		} else {
+			buildComp(p,rs.getCompIds().get(0));
+			
+		}
+	}
+	@Override
+	public void buildComp(IServerPlace p, Long compId) {
+		p.setCompId(compId);
 		p.setType(PlaceType.SERIES);
 		put(p);
 	}

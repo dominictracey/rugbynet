@@ -12,13 +12,16 @@ import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.Criteria;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
@@ -46,6 +49,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 
 	private IRoundFactory rf;
 
+	private IUniversalRoundFactory urf;
+
 
 	public ProcessRatingQuery() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -64,6 +69,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		this.prf = injector.getInstance(IPlayerRatingFactory.class);
 		this.ttlf = injector.getInstance(ITopTenListFactory.class);
 		this.rf = injector.getInstance(IRoundFactory.class);
+		this.urf = injector.getInstance(IUniversalRoundFactory.class);
 		
 		// first see if we are re-running, in which case clear out any ratings already in place
 		if (!rq.getStatus().equals(Status.NEW)) {
@@ -156,8 +162,53 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					title += last.getName();
 				}
 				
+			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_COMP)) {
+				// BY_COMP can be either:
+				//			a Round List "Top Ten Performances in Round 8 of the Aviva Premiership"
+				//			an overall In Form list "Top Ten In Form Players through Round 8 of the Aviva Premiership"
+				//
+				// they can also be comp-specific or global. If global we use the UR date and omit the comp name
+				//			"Top Ten In Form Players through 5 October"   << in form
+				//			"Top Ten Performances from the week of 5 October"   << round
+			
+				
+				// is this In Form or Last Round?
+				boolean inForm = false;
+				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
+					title += "In Form Players ";
+					inForm = true;
+				} else {
+					title += "Performances ";
+				}
+				
+				// the round we are talking about is the UR of the Rating Group
+				UniversalRound ur = rq.getRatingMatrix().getRatingGroup().getUniversalRound();
+				
+				if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getCompIds().size() > 1) {
+					//global - need to go by UR				
+					if (inForm) {
+						title += "Through " + ur.longDesc;
+					} else {
+						title += "From The " + ur.longDesc;
+					}
+				} else {
+					// comp specific
+					ICompetition comp = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getComps().get(0);
+					
+					for (IRound r : comp.getRounds()) {
+						UniversalRound urs = urf.get(r);
+						if (urs.ordinal == ur.ordinal) {
+							title += "From The " + ur.longDesc + " In The " + comp.getShortName();
+							break;
+						}
+					}
+				}
+				
+				
+				
 			}
-
+			
+			
 			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", null, rq.getRoundIds(), 10);
 			ITopTenList ttl = ttlf.create(data);
 			ttlf.put(ttl);

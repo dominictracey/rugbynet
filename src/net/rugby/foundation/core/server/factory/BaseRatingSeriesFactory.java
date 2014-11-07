@@ -8,6 +8,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,10 +101,10 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 	private final String prefix = "RS-mode";
 	
 	@Override
-	public List<RatingMode> getModesForComp(Long compId)
+	public Map<RatingMode, Long> getModesForComp(Long compId)
 	{
 		try {
-			List<RatingMode> list = null;
+			Map<RatingMode, Long> list = null;
 	
 			String key = prefix+compId.toString();
 			byte[] value = null;
@@ -134,7 +135,7 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 				Object obj = in.readObject();
 
 				//				if (typeLiteral.equals(obj.getClass())) {  // can't do 'obj instanceof List<T>' *sadfase*
-				list = (List<RatingMode>)obj;
+				list = (Map<RatingMode, Long>)obj;
 
 				bis.close();
 				in.close();
@@ -150,16 +151,16 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 	
 	@Override
 	public Long getDefaultSeriesId(Long compId) {
-		List<RatingMode> modes = getModesForCompFromPersistentDatastore(compId);
-		if (modes.contains(RatingMode.BY_COMP)) {
+		Map<RatingMode, Long> modes = getModesForCompFromPersistentDatastore(compId);
+		if (modes.keySet().contains(RatingMode.BY_COMP)) {
 			return get(compId, RatingMode.BY_COMP).getId();
-		} else if (modes.contains(RatingMode.BY_MATCH)) {
+		} else if (modes.keySet().contains(RatingMode.BY_MATCH)) {
 			return get(compId, RatingMode.BY_MATCH).getId();
-		} else if (modes.contains(RatingMode.BY_POSITION)) {
+		} else if (modes.keySet().contains(RatingMode.BY_POSITION)) {
 			return get(compId, RatingMode.BY_POSITION).getId();
-		} else if (modes.contains(RatingMode.BY_TEAM)) {
+		} else if (modes.keySet().contains(RatingMode.BY_TEAM)) {
 			return get(compId, RatingMode.BY_TEAM).getId();
-		}  else if (modes.contains(RatingMode.BY_COUNTRY)) {
+		}  else if (modes.keySet().contains(RatingMode.BY_COUNTRY)) {
 			return get(compId, RatingMode.BY_COUNTRY).getId();
 		} else {
 			throw new RuntimeException("No default mode found for compId " + compId);
@@ -167,7 +168,7 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 		
 	}
 	
-	public abstract List<RatingMode> getModesForCompFromPersistentDatastore(Long compId);
+	public abstract Map<RatingMode, Long> getModesForCompFromPersistentDatastore(Long compId);
 	
 //	@Override
 //	public IRatingSeries put(IRatingSeries t) {

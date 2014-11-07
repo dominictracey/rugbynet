@@ -112,6 +112,7 @@ public class TriesScoredNotesCreator implements INotesCreator {
 							retval.add(note);
 						} 
 						
+						
 //						else if (mode == RatingMode.BY_COMP) {
 //							// a round list
 //							if (rq.getRatingMatrix().getCriteria().equals(Criteria.ROUND)) {
@@ -137,6 +138,7 @@ public class TriesScoredNotesCreator implements INotesCreator {
 //							}
 //						}
 					}
+					++j;
 				}
 			}
 		} 

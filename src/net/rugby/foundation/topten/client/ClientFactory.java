@@ -11,17 +11,21 @@ import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
+import net.rugby.foundation.topten.client.ui.notes.NoteView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
 import net.rugby.foundation.topten.client.ui.HeaderView;
 import net.rugby.foundation.topten.client.ui.RatingPopupViewImpl;
+import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * ClientFactory helpful to use a factory or dependency injection framework like GIN to obtain 
@@ -65,7 +69,12 @@ public interface ClientFactory {
 	SeriesListView<IRatingSeries> getSeriesView();
 
 	String getPlaceFromURL();
+//
+//	void setPlaceInUrl(SeriesPlace place);
 
-	void setPlaceInUrl(SeriesPlace place);
+	void renderNotes(List<INote> notes, final ITopTenList ttl, AsyncCallback<List<INote>> cb);
 
+	Widget render(INote note, ITopTenList context, boolean includeDetails);
+	NoteView<INote> getNoteView();
+	String getPlayerName(long playerId);
 }

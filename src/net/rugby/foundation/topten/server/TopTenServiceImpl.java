@@ -1,6 +1,8 @@
 package net.rugby.foundation.topten.server;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,6 +13,7 @@ import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
@@ -18,6 +21,7 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -28,9 +32,11 @@ import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.TopTenListService;
+import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
+import net.rugby.foundation.topten.server.factory.INoteFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -50,6 +56,8 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private IRatingGroupFactory rgf;
 	private IRatingMatrixFactory rmf;
 	private IPlaceFactory spf;
+	private INoteFactory nf;
+	private IPlayerFactory pf;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -59,7 +67,8 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 
 	@Inject
 	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf,
-			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IPlaceFactory spf) {
+			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IPlaceFactory spf,
+			INoteFactory nf, IPlayerFactory pf) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
@@ -70,6 +79,8 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			this.rgf = rgf;
 			this.rmf = rmf;
 			this.spf = spf;
+			this.nf = nf;
+			this.pf = pf;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 		}
@@ -357,10 +368,10 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Override
-	public List<RatingMode> getAvailableSeries(Long compId) {
+	public Map<RatingMode, Long> getAvailableSeries(Long compId) {
 		try {
-			List<RatingMode> list = rsf.getModesForComp(compId);
-			return list;
+			Map<RatingMode, Long> map = rsf.getModesForComp(compId);
+			return map;
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;
@@ -381,6 +392,57 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	public IRatingSeries getDefaultRatingSeries(Long compId) {
 		try {
 			return rsf.get(compId, RatingMode.BY_POSITION);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public List<INote> getNotesForList(Long id) {
+		try {
+			ITopTenList ttl = ttlf.get(id);
+			if (ttl != null) {
+				return nf.getForList(ttl);
+			} else {
+				return null;
+			}
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Map<Long, String> getPlayerNames(List<Long> needPlayerNames) {
+		try {
+			Map<Long, String> retval = new HashMap<Long, String>();
+			
+			for (Long id : needPlayerNames) {
+				IPlayer p = pf.get(id);
+				if (p != null) {
+					retval.put(id, p.getDisplayName());
+				}
+			}
+			return retval;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Map<Long, String> getTTLNames(List<Long> needTTLNames) {
+		try {
+			Map<Long, String> retval = new HashMap<Long, String>();
+			
+			for (Long id : needTTLNames) {
+				ITopTenList ttl = ttlf.get(id);
+				if (ttl != null) {
+					retval.put(id, ttl.getTitle());
+				}
+			}
+			return retval;
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

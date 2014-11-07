@@ -1,7 +1,5 @@
 package net.rugby.foundation.topten.client.place;
 
-import net.rugby.foundation.model.shared.Criteria;
-
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
@@ -22,7 +20,7 @@ public class SeriesPlace extends Place {
 	private Long groupId = null;
 	private Long queryId = null;
 	private Long compId = null;
-	private Long playerId = null;
+	private Long itemId = null;
 
 	public SeriesPlace(String token) {
 		try {
@@ -35,8 +33,6 @@ public class SeriesPlace extends Place {
 					String sseriesId = URL.decode(tok[1]);
 					seriesId = Long.parseLong(sseriesId);
 				} else if (tok[0].equals("m")) {
-//					String Scriteria = URL.decode(tok[1]);
-//					criteria = Criteria.valueOf(Scriteria);
 					String str = URL.decode(tok[1]);
 					matrixId = Long.parseLong(str);
 				}  else if (tok[0].equals("g")) {
@@ -48,9 +44,9 @@ public class SeriesPlace extends Place {
 				}   else if (tok[0].equals("c")) {
 					String str = URL.decode(tok[1]);
 					compId = Long.parseLong(str);
-				}   else if (tok[0].equals("p")) {
+				}   else if (tok[0].equals("i")) {
 					String str = URL.decode(tok[1]);
-					playerId = Long.parseLong(str);
+					itemId = Long.parseLong(str);
 				}
 			}
 
@@ -72,7 +68,7 @@ public class SeriesPlace extends Place {
 					compId = Long.parseLong(str);
 				}   else if (tok[2].equals("p")) {
 					String str = URL.decode(tok[3]);
-					playerId = Long.parseLong(str);
+					itemId = Long.parseLong(str);
 				}
 			}
 
@@ -94,7 +90,7 @@ public class SeriesPlace extends Place {
 					compId = Long.parseLong(str);
 				}   else if (tok[4].equals("p")) {
 					String str = URL.decode(tok[5]);
-					playerId = Long.parseLong(str);
+					itemId = Long.parseLong(str);
 				}
 			}
 			
@@ -116,7 +112,7 @@ public class SeriesPlace extends Place {
 					compId = Long.parseLong(str);
 				}   else if (tok[6].equals("p")) {
 					String str = URL.decode(tok[7]);
-					playerId = Long.parseLong(str);
+					itemId = Long.parseLong(str);
 				}
 			}
 			
@@ -138,7 +134,7 @@ public class SeriesPlace extends Place {
 					compId = Long.parseLong(str);
 				}   else if (tok[8].equals("p")) {
 					String str = URL.decode(tok[9]);
-					playerId = Long.parseLong(str);
+					itemId = Long.parseLong(str);
 				}
 			}
 			
@@ -160,7 +156,7 @@ public class SeriesPlace extends Place {
 					compId = Long.parseLong(str);
 				}   else if (tok[10].equals("p")) {
 					String str = URL.decode(tok[11]);
-					playerId = Long.parseLong(str);
+					itemId = Long.parseLong(str);
 				}
 			}
 			
@@ -177,15 +173,15 @@ public class SeriesPlace extends Place {
 	 * @param groupId
 	 * @param matrixId
 	 * @param queryId
-	 * @param playerId
+	 * @param itemId
 	 */
-		public SeriesPlace(Long compId, Long seriesId, Long groupId, Long matrixId, Long queryId, Long playerId) {
+		public SeriesPlace(Long compId, Long seriesId, Long groupId, Long matrixId, Long queryId, Long itemId) {
 			this.seriesId = seriesId;
 			this.matrixId = matrixId;
 			this.groupId = groupId;
 			this.queryId = queryId;
 			this.compId = compId;
-			this.playerId = playerId;
+			this.itemId = itemId;
 		}
 
 
@@ -244,14 +240,14 @@ public class SeriesPlace extends Place {
 				token += queryId;
 			}
 			
-			if (!(playerId == null)) {
+			if (!(itemId == null)) {
 				if (started) {
 					token += "&";
 				} else {
 					started = true;
 				}
 				token += "p=";
-				token += playerId;
+				token += itemId;
 			}
 
 			return token;
@@ -305,8 +301,8 @@ public class SeriesPlace extends Place {
 		}
 
 
-		public Long getPlayerId() {
-			return playerId;
+		public Long getItemId() {
+			return itemId;
 		}
 
 
@@ -330,7 +326,7 @@ public class SeriesPlace extends Place {
 		}
 
 
-		public void setPlayerId(Long playerId) {
-			this.playerId = playerId;
+		public void setItemId(Long itemId) {
+			this.itemId = itemId;
 		}
 	}

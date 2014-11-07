@@ -26,6 +26,7 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected Date created;
 	protected Date published;
 	protected Date expiration;
+	protected int roundOrdinal;
 	protected Boolean live;
 	protected Boolean series;
 	@Unindexed
@@ -139,7 +140,14 @@ public class TopTenList  implements Serializable, ITopTenList {
 	public void setExpiration(Date expiration) {
 		this.expiration = expiration;
 	}
-
+	@Override
+	public int getRoundOrdinal() {
+		return roundOrdinal;
+	}
+	@Override
+	public void setRoundOrdinal(int roundOrdinal) {
+		this.roundOrdinal = roundOrdinal;
+	}
 	@Override
 	public Boolean getLive() {
 		return live;

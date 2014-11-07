@@ -54,7 +54,8 @@ public class OfyNoteFactory extends BaseNoteFactory implements INoteFactory {
 	protected INote putToPersistentDatastore(INote t) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			return (INote) ofy.put(t);
+			ofy.put(t);
+			return t;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "putToPersistentDatastore" + e.getLocalizedMessage(), e);
 			return null;

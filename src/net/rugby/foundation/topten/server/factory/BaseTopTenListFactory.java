@@ -396,6 +396,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		IRatingQuery rq = rqf.get(tti.getQueryId());
 		if (rq.getRatingMatrix() != null) {
 			list.setSeries(true);
+			list.setRoundOrdinal(rq.getRatingMatrix().getRatingGroup().getUniversalRoundOrdinal());
 		} else {
 			list.setSeries(false);
 		}
@@ -439,7 +440,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Map<Long,Integer> numFromTeam = new HashMap<Long, Integer>();
 			Iterator<IPlayerRating> it = set.iterator();
 			int count = 0;
-			list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
+			if (!list.getSeries())
+				list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
 
 			while (it.hasNext() && count < 10) {
 				IPlayerRating pmr = it.next();
@@ -464,7 +466,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					IServerPlace p = spf.create();
 					item.setPlaceGuid(p.getGuid());
 					spf.buildItem(p,item);
-					list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
+					if (!list.getSeries())
+						list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
 					put(item);
 					list.getList().add(item);
 					list.getItemIds().add(item.getId());

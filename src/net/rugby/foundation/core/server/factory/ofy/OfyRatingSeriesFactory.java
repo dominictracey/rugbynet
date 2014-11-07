@@ -2,7 +2,9 @@ package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,25 +99,25 @@ public class OfyRatingSeriesFactory extends BaseRatingSeriesFactory implements I
 			}
 			return null;
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in get(Long compId, RatingMode mode): " + ex.getLocalizedMessage());
 			return null;
 		}
 	}
 
 	@Override
-	public List<RatingMode> getModesForCompFromPersistentDatastore(Long compId) {
-		List<RatingMode> list = new ArrayList<RatingMode>();
+	public Map<RatingMode,Long> getModesForCompFromPersistentDatastore(Long compId) {
+		Map<RatingMode,Long> map = new HashMap<RatingMode,Long>();
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			Query<RatingSeries> qrm = ofy.query(RatingSeries.class);
 
 			for (RatingSeries qrs : qrm.list()) {
 				if (qrs.getCompIds().contains(compId)) 
-					list.add(qrs.getMode());
+					map.put(qrs.getMode(), qrs.getId());
 			}
-			return list;
+			return map;
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in getModesForCompFromPersistentDatastore: " + ex.getLocalizedMessage());
 			return null;
 		}
 	}

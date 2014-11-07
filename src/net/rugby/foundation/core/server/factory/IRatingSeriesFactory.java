@@ -1,6 +1,7 @@
 package net.rugby.foundation.core.server.factory;
 
-import java.util.List;
+import java.util.Map;
+
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.RatingMode;
 
@@ -10,7 +11,7 @@ public interface IRatingSeriesFactory extends ICachingFactory<IRatingSeries> {
 
 	IRatingSeries build(IRatingSeries series);
 
-	List<RatingMode> getModesForComp(Long compId);
+	Map<RatingMode, Long> getModesForComp(Long compId);
 
 	Long getDefaultSeriesId(Long compId);
 

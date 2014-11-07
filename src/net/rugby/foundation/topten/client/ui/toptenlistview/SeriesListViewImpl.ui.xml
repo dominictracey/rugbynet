@@ -27,7 +27,7 @@
 			<g:HTML ui:field="listTitle"></g:HTML>
         </b:Well>
     	<b:TabPanel tabPosition="left" ui:field="tabPanel"/>
-    	<g:HTML ui:field="notes"></g:HTML>
+    	<b:Well><g:VerticalPanel ui:field="notes"></g:VerticalPanel></b:Well>
 	</g:HTMLPanel>
 
 

@@ -13,6 +13,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -47,8 +48,14 @@ public interface TopTenListServiceAsync {
 	public void  getRatingMatrix(Long ratingMatrixId, AsyncCallback<IRatingMatrix> asyncCallback);
 	public void getRatingQueriesForMatrix(Long id,
 			AsyncCallback<List<IRatingQuery>> asyncCallback);
-	public void getAvailableSeries(Long compId, AsyncCallback<List<RatingMode>> asyncCallback);
+	public void getAvailableSeries(Long compId, AsyncCallback<Map<RatingMode, Long>> asyncCallback);
 	public void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
 	public void getDefaultRatingSeries(Long compId,
 			AsyncCallback<IRatingSeries> asyncCallback);
+	public void getNotesForList(Long id,
+			AsyncCallback<List<INote>> asyncCallback);
+	public void getPlayerNames(List<Long> needPlayerNames,
+			AsyncCallback<Map<Long, String>> asyncCallback);
+	public void getTTLNames(List<Long> needTTLNames,
+			AsyncCallback<Map<Long, String>> asyncCallback);
 }

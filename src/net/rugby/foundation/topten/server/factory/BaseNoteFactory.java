@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.INoteRef;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implements INoteFactory {

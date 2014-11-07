@@ -2,6 +2,7 @@ package net.rugby.foundation.core.server.factory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,7 @@ public class UniversalRoundFactory extends BaseCachingFactory<UniversalRound> im
 		Weeks weeks = Weeks.weeksBetween(epoch, midnight);
 		
 		int ordinal = weeks.getWeeks();
-		DateTimeFormatter fmtShort = DateTimeFormat.forStyle("S-");
+		DateTimeFormatter fmtShort = DateTimeFormat.forStyle("M-").withLocale(Locale.UK);
 		UniversalRound retval = new UniversalRound(ordinal, midnight.getYear() + "-" + midnight.getWeekOfWeekyear(), midnight.toString(fmtShort), "Week starting " + midnight.toString(fmtShort), midnight.toDate());		
 		
 		return retval;

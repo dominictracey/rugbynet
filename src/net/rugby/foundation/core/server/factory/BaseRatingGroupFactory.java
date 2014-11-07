@@ -41,7 +41,7 @@ public abstract class BaseRatingGroupFactory extends BaseCachingFactory<IRatingG
 			}
 			
 			t.setUniversalRound(urf.get(t.getUniversalRoundOrdinal()));
-			t.setLabel(t.getUniversalRound().abbr);
+			t.setLabel(t.getUniversalRound().longDesc);
 			return t;
 			
 		} catch (Throwable ex) {

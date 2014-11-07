@@ -11,7 +11,7 @@ import net.rugby.foundation.topten.server.factory.test.TestNoteRefFactory;
 import net.rugby.foundation.topten.server.factory.test.TestTopTenListFactory;
 import net.rugby.foundation.topten.server.utilities.INotesCreator;
 import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
-import net.rugby.foundation.topten.server.utilities.MasterNotesCreator;
+import net.rugby.foundation.topten.server.utilities.MatchNotesCreator;
 import net.rugby.foundation.topten.server.utilities.SocialMediaDirector;
 import net.rugby.foundation.topten.server.utilities.notes.TacklesNotesCreator;
 import net.rugby.foundation.topten.server.utilities.notes.TopTenNotesCreator;
@@ -29,7 +29,7 @@ public class TopTenTestModule extends AbstractModule {
 		bind(ISocialMediaDirector.class).to(SocialMediaDirector.class);
 		bind(INoteFactory.class).to(TestNoteFactory.class);
 		bind(INoteRefFactory.class).to(TestNoteRefFactory.class);
-		bind(INotesCreator.class).to(MasterNotesCreator.class);
+		bind(INotesCreator.class).to(MatchNotesCreator.class);
 		bind(TopTenNotesRenderer.class);
 		bind(TwitterNotesRenderer.class);
 		bind(TopTenNotesCreator.class);

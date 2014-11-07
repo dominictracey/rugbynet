@@ -1,7 +1,9 @@
 package net.rugby.foundation.core.server.factory.test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 
@@ -80,10 +82,10 @@ public class TestRatingSeriesFactory extends BaseRatingSeriesFactory implements 
 	}
 
 	@Override
-	public List<RatingMode> getModesForCompFromPersistentDatastore(Long compId) {
-		List<RatingMode> list = new ArrayList<RatingMode>();
-		list.add(RatingMode.BY_POSITION);
-		list.add(RatingMode.BY_MATCH);
+	public Map<RatingMode, Long> getModesForCompFromPersistentDatastore(Long compId) {
+		Map<RatingMode, Long> list = new HashMap<RatingMode, Long>();
+		list.put(RatingMode.BY_POSITION,75000L);
+//		list.add(RatingMode.BY_MATCH,75000L);
 		return null;
 	}
 

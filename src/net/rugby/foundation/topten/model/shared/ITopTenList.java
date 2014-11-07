@@ -60,5 +60,7 @@ public interface ITopTenList {
 	String getNotes();
 	void setNotesId(Long notesId);
 	Long getNotesId();
+	int getRoundOrdinal();
+	void setRoundOrdinal(int roundOrdinal);
 
 }
