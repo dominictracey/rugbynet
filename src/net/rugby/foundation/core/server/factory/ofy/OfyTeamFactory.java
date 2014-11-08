@@ -49,8 +49,8 @@ public class OfyTeamFactory extends BaseCachingFactory<ITeamGroup> implements IT
 		Objectify ofy = DataStoreFactory.getOfy();
 		Query<Group> team = ofy.query(Group.class).filter("displayName", name);
 				
-		if (team.count() == 1) {
-			return (ITeamGroup)team.get();
+		if (team.count() > 0) {
+			return (ITeamGroup)team.list().get(0);
 		}
 		
 		return null;

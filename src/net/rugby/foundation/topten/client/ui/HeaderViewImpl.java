@@ -3,6 +3,7 @@ package net.rugby.foundation.topten.client.ui;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.rugby.foundation.core.client.Core;
@@ -83,11 +84,11 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 	 */
 	@Override
 	public void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway) {
-		Iterator<Long> it = compsUnderway.iterator();
+		ListIterator<Long> it = compsUnderway.listIterator(compsUnderway.size());
 		if (it != null) {
 			compDropdown.clear();
-			while (it.hasNext()) {
-				final Long compId = it.next();
+			while (it.hasPrevious()) {
+				final Long compId = it.previous();
 				NavLink nl = new NavLink(competitionMap.get(compId));
 				nl.addClickHandler( new ClickHandler() {
 

@@ -4,6 +4,10 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 import com.googlecode.objectify.Objectify;
@@ -48,9 +52,23 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 			c = new CoreConfiguration();			
 		}
 		
-		for (Long compId : c.getCompsUnderway()) {
+		List<Long> copyOf = new ArrayList<Long>();
+		copyOf.addAll(c.getCompsUnderway());
+		boolean dirty = false;
+		for (Long compId : copyOf) {
 			ICompetition comp = cf.get(compId);
-			c.addCompetition(compId, comp.getLongName());
+			if (comp != null) {
+				c.addCompetition(compId, comp.getLongName());
+			} else {
+				// remove orphan
+				c.getCompsUnderway().remove(compId);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Removing compId from active comp list in core config: " + compId);
+				dirty = true;
+			}
+		}
+		
+		if (dirty) {
+			put(c);
 		}
 		
 
