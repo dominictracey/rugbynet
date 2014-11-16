@@ -5,6 +5,8 @@ import com.google.inject.Inject;
 import net.rugby.foundation.core.server.factory.BasePlaceFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
@@ -15,8 +17,8 @@ import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory {
 
 	@Inject
-	public TestPlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf) {
-		super(ttlf, rqf, ccf, rsf);
+	public TestPlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
+		super(ttlf, rqf, ccf, rsf, rmf, rgf);
 		
 	}
 

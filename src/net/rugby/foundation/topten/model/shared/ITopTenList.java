@@ -61,6 +61,20 @@ public interface ITopTenList {
 	void setNotesId(Long notesId);
 	Long getNotesId();
 	int getRoundOrdinal();
+	/**
+	 * 
+	 * @param roundOrdinal - ordinal of Universal Round the list was created for
+	 */
 	void setRoundOrdinal(int roundOrdinal);
+	/**
+	 * 
+	 * @return for a match, will be "Gloucester vs. Newcastle"; for a round will be "Round 2"
+	 */
+	String getContext();
+	/**
+	 * 
+	 * @param context - for a match, should be "Gloucester vs. Newcastle"; for a round should be "Round 2"
+	 */
+	void setContext(String context);
 
 }

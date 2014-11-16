@@ -19,6 +19,8 @@ import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -45,8 +47,8 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	@Inject
 	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, 
 			IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf, ISocialMediaDirector smd, INotesCreator nc, 
-			IRatingSeriesFactory rsf, IUniversalRoundFactory urf, INoteFactory nf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd, nc, rsf, urf, nf);
+			IRatingSeriesFactory rsf, IUniversalRoundFactory urf, INoteFactory nf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd, nc, rsf, urf, nf, rmf, rgf);
 		this.pf = pf;
 
 		ofy = DataStoreFactory.getOfy();

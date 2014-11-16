@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:core='urn:import:net.rugby.foundation.core.client.ui'
-	xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" >
 
 	<g:FlowPanel ui:field="topLevel">
 		<g:LayoutPanel styleName="accountPanel" ui:field="nonNativeLayer">
@@ -29,25 +29,25 @@
 
 
 <g:layer>
-	<b:WellForm>
-	    <b:ControlLabel>Email address</b:ControlLabel>
+	<b:FormGroup>
+	    <b:Label>Email address</b:Label>
 	    <b:TextBox placeholder="email" ui:field="emailAddress"></b:TextBox>
 	    <b:HelpBlock>We never share your email address. Promise.</b:HelpBlock>
-	    <b:ControlLabel>Screen Name</b:ControlLabel>
+	    <b:Label>Screen Name</b:Label>
 	    <b:TextBox placeholder="nickname" ui:field="nickName"></b:TextBox>
 	    <b:HelpBlock>This is how others will see you.</b:HelpBlock>
-	    <b:ControlLabel ui:field="password1Label">Password</b:ControlLabel>
-	    <b:PasswordTextBox ui:field="password1"></b:PasswordTextBox>
-	   	<b:ControlLabel ui:field="password2Label">Password (again)</b:ControlLabel>
-	    <b:PasswordTextBox ui:field="password2"></b:PasswordTextBox>
+	    <b:Label ui:field="password1Label">Password</b:Label>
+	    <b:Input ui:field="password1" type="PASSWORD"></b:Input>
+	   	<b:Label ui:field="password2Label"  type="PASSWORD">Password (again)</b:Label>
+	    <b:Input ui:field="password2"></b:Input>
 
         <b:Nav alignment="RIGHT">
-        	<b:NavWidget ui:field='buttonBar'>
+        	<b:ButtonGroup ui:field='buttonBar'>
         	    		<b:Button ui:field="submit" >Sign Up</b:Button>
 						<b:Button ui:field="cancel">Cancel</b:Button>	
-        	</b:NavWidget>
+        	</b:ButtonGroup>
         </b:Nav>
-	</b:WellForm>
+	</b:FormGroup>
 	</g:layer>
 		</g:LayoutPanel>
 		<g:LayoutPanel styleName="accountPanel" ui:field="changePasswordLayer">

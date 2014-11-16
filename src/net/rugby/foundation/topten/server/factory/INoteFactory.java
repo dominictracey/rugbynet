@@ -11,5 +11,6 @@ public interface INoteFactory extends ICachingFactory<INote> {
 	List<INote> getByUROrdinal(int urOrd);
 	List<INote> getForList(ITopTenList list);
 	boolean deleteForList(ITopTenList list);
-
+	void dropMemcacheForUniversalRound(int uro);
+	void dropMemcacheForList(Long listId);
 }

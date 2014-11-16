@@ -91,9 +91,10 @@ public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implemen
 	@Override
 	public boolean deleteForList(ITopTenList list) {
 		try {
-			deleteItemFromMemcache(getTTLCacheId(list.getId()));
 			
 			List<INote> notes = getForList(list);
+			
+			deleteItemFromMemcache(getTTLCacheId(list.getId()));
 						
 			for (INote n : notes) {
 				List<INoteRef> refs = nrf.getForNote(n);
@@ -111,4 +112,14 @@ public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implemen
 		}
 	}
 	
+	@Override
+	public void dropMemcacheForUniversalRound(int uro) {
+		deleteItemFromMemcache(getCacheId(uro));
+	}
+	
+	@Override
+	public
+	void dropMemcacheForList(Long listId) {
+		deleteItemFromMemcache(getTTLCacheId(listId));
+	}
 }

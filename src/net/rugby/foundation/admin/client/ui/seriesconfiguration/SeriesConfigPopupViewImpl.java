@@ -4,11 +4,11 @@ import java.util.List;
 
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.Label;
-import com.github.gwtbootstrap.client.ui.ListBox;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -17,7 +17,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DatePicker;
 
 public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesConfigPopupView<T>
 {

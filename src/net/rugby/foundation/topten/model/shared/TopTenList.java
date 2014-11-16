@@ -34,7 +34,11 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected Long editorId;
 	@Unindexed
 	protected String pipeLineId;
+	@Unindexed
 	protected String title;
+	@Unindexed
+	protected String context;
+	
 	@Unindexed
 	protected String content;
 	protected Long nextId;
@@ -196,6 +200,15 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	@Override
+	public String getContext() {
+		return context;
+	}
+	@Override
+	public void setContext(String context) {
+		this.context = context;
 	}
 	
 	@Override

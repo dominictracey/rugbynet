@@ -163,13 +163,13 @@ li#yahoo a:hover  {
 	height: 464px;
 }
 
-#header {
-	background-image:url('/resources/header_bg_withTag.png');
-	background-repeat:no-repeat;
-	height: 464px;
-	width: 958px;
-	margin: 0 auto;
-}
+/* #header { */
+/* 	background-image:url('/resources/header_bg_withTag.png'); */
+/* 	background-repeat:no-repeat; */
+/* 	height: 464px; */
+/* 	width: 958px; */
+/* 	margin: 0 auto; */
+/* } */
 
 #banner .navbar-inner {
 	background: none;
@@ -225,12 +225,12 @@ td.compactTTL {
 	padding: 4px;
 	overflow: hidden;
 	font-size: 16px;
-	background-color: #052038;
-	color: #fff;
+	background-color: #eee;
+	color: #444;
 	border: 0px;
 	padding-left: 20px;
 	font-weight: bold;
-	border-bottom: 2px solid #223344;
+	border-bottom: 2px solid #dedede;
 	border-bottom-style: groove;
 }
 

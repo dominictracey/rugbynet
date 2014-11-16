@@ -10,6 +10,8 @@ import com.googlecode.objectify.Objectify;
 import net.rugby.foundation.core.server.factory.BasePlaceFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
@@ -20,8 +22,8 @@ import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 public class OfyPlaceFactory extends BasePlaceFactory implements IPlaceFactory {
 
 	@Inject
-	public OfyPlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf) {
-		super(ttlf, rqf, ccf, rsf);
+	public OfyPlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
+		super(ttlf, rqf, ccf, rsf, rmf, rgf);
 
 	}
 

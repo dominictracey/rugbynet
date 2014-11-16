@@ -3,6 +3,8 @@ package net.rugby.foundation.topten.server.utilities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 
@@ -47,81 +49,71 @@ public class MatchNotesCreator implements INotesCreator {
 
 	@Override
 	public List<INote> createNotes(IRatingQuery rq) {
-		// tackle notes
-		List<INote> retval = tnc.createNotes(rq);
-		// tries scored notes
-		retval.addAll(tsnc.createNotes(rq));
 
-		// link these notes to the universal round
+		// first add any notes we already have for this round to the current list
 		int uro = rq.getRatingMatrix().getRatingGroup().getUniversalRound().ordinal;
-		for (INote note : retval) {
-			nf.put(note); // get an Id
-			INoteRef ref = nrf.create();
-			ref.setContextId(rq.getTopTenListId());
-			ref.setNoteId(note.getId());
-			ref.setUrId(uro);
-			nrf.put(ref);
-		}
-
-		// create xlinks
-		// now also get for the round and see if any of the players have x-linked notes
-		List<INote> xlinks = nf.getByUROrdinal(uro);
 		ITopTenList ttl = ttlf.get(rq.getTopTenListId());
-		List<Long> playerIds = new ArrayList<Long>();
-		for (ITopTenItem item : ttl.getList()) {
-			for (INote n : xlinks) {
-				if (!n.getContextListId().equals(ttl.getId()) && n.getPlayer1Id().equals(item.getPlayerId())) {
-					INoteRef ref = nrf.create();
-					ref.setContextId(rq.getTopTenListId());
-					ref.setNoteId(n.getId());
-					ref.setUrId(uro);
-					nrf.put(ref);
-					playerIds.add(item.getPlayerId());
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "******* Creating notes for " + ttl.getTitle());
+
+		
+		if (ttl != null) {
+			List<INote> existing = nf.getByUROrdinal(uro);
+			for (INote note : existing) {
+				for (ITopTenItem tti : ttl.getList()) {
+					if (tti.getPlayerId().equals(note.getPlayer1Id())) {
+						LinkNoteToList(note,ttl,uro);
+					}
 				}
 			}
-		}
 
-		// don't link the izzon notes to the list they are about
-		List<INote> izzon = ttc.createNotes(rq);
-		for (INote note : izzon) {
-			nf.put(note); // just save them for others to x-link to
-		}
-		retval.addAll(izzon);
+			// Now create new notes for this list
+			// tackle notes
+			List<INote> retval = tnc.createNotes(rq);
+			// tries scored notes
+			retval.addAll(tsnc.createNotes(rq));
+			// izzon notes
+			retval.addAll(ttc.createNotes(rq));
 
-		// we can put them on other lists though
-		// cycle through all the notes and create crosslinks to other
-		for (INote note : retval) {
-			for (Long compId : rq.getCompIds()) {
-				Map<RatingMode,Long> modes = rsf.getModesForComp(compId);
-				for (RatingMode mode : modes.keySet()) {
-					IRatingSeries series = rsf.get(compId, mode);
-					if (series != null && !series.getId().equals(rq.getRatingMatrix().getRatingGroup().getRatingSeriesId())) {
-						// get the right RatingGroup
-						List<IRatingGroup> groups = series.getRatingGroups();
-						int i = groups.size()-1;
-						IRatingGroup group = groups.get(i);
-						// go backwards
-						while (group != null) {
-							if (group.getUniversalRoundOrdinal() == uro) {
-								break;
+			// save notes
+			for (INote note : retval) {
+				nf.put(note); // get an Id
+			}
+
+			// we now have to create links from lists to notes:
+			//	1) Link the notes we just created to lists in this universal round (including the current list)
+
+			// cycle through all the notes and create crosslinks to other
+			for (INote note : retval) {
+				for (Long compId : rq.getCompIds()) {
+					Map<RatingMode,Long> modes = rsf.getModesForComp(compId);
+					for (RatingMode mode : modes.keySet()) {
+						IRatingSeries series = rsf.get(compId, mode);
+						if (series != null ) { //&& !series.getId().equals(rq.getRatingMatrix().getRatingGroup().getRatingSeriesId())) {
+							// get the right RatingGroup
+							List<IRatingGroup> groups = series.getRatingGroups();
+							int i = groups.size()-1;
+							IRatingGroup group = groups.get(i);
+							// go backwards
+							while (group != null) {
+								if (group.getUniversalRoundOrdinal() == uro) {
+									break;
+								}
+								groups.get(--i);
 							}
-							groups.get(++i);
-						}
 
-						if (group != null) {
-							// search through the lists to see if we can create xlinks
-							for (IRatingMatrix matrix : group.getRatingMatrices()) {
-								for (IRatingQuery query : matrix.getRatingQueries()) {
-									if (query.getTopTenListId() != null) {
-										ITopTenList list = ttlf.get(query.getTopTenListId());
-										for (ITopTenItem item : list.getList()) {
-											if (item.getPlayerId().equals(note.getPlayer1Id())) {
-												// create xlink
-												INoteRef ref = nrf.create();
-												ref.setContextId(query.getTopTenListId());
-												ref.setNoteId(note.getId());
-												ref.setUrId(uro);
-												nrf.put(ref);
+							if (group != null) {
+								// search through the lists to see if we can create xlinks
+								for (IRatingMatrix matrix : group.getRatingMatrices()) {
+									for (IRatingQuery query : matrix.getRatingQueries()) {
+										if (query.getTopTenListId() != null) {
+											ITopTenList list = ttlf.get(query.getTopTenListId());
+											for (ITopTenItem item : list.getList()) {
+												if (item.getPlayerId().equals(note.getPlayer1Id())) {
+													// create xlink if this isn't an izzon note for the note target
+													if (!(note.getContextListId().equals(list.getId()) && note.getTemplateSelector().equals("TT")))
+															LinkNoteToList(note, list, uro);
+												}
 											}
 										}
 									}
@@ -131,7 +123,18 @@ public class MatchNotesCreator implements INotesCreator {
 					}
 				}
 			}
+			return retval;
 		}
-		return retval;
+		return null; // TTL not created or invalid query
+	}
+
+	private void LinkNoteToList(INote note, ITopTenList ttl, int uro) {
+		INoteRef ref = nrf.create();
+		ref.setContextId(ttl.getId());
+		ref.setNoteId(note.getId());
+		ref.setUrId(uro);
+		nrf.put(ref);
+		if (note.getSignificance() > 1)
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Linking note " + note.getTemplateSelector() + " for " + note.getPlayer1Id() + " to " + ttl.getTitle());
 	}
 }

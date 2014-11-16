@@ -1,7 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" >
 
 
 
@@ -13,10 +13,10 @@
 				<b:TextArea ui:field='text'></b:TextArea><br/>
 
         <b:Nav alignment="RIGHT">
-        	<b:NavWidget ui:field='buttonBar'>
+        	<b:ButtonGroup ui:field='buttonBar'>
         	    		<b:Button ui:field="save" type="PRIMARY">Save</b:Button>
 						<b:Button ui:field="cancel">Cancel</b:Button>	
-        	</b:NavWidget>
+        	</b:ButtonGroup>
         </b:Nav>
 			
 	</b:Well>

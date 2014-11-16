@@ -104,7 +104,6 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.DateTime;
 
 import com.google.appengine.api.taskqueue.QueueFactory;

@@ -449,4 +449,22 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		}
 	}
 
+	@Override
+	public Map<Long, String> getTTLContexts(List<Long> needTTLContexts) {
+		try {
+			Map<Long, String> retval = new HashMap<Long, String>();
+			
+			for (Long id : needTTLContexts) {
+				ITopTenList ttl = ttlf.get(id);
+				if (ttl != null) {
+					retval.put(id, ttl.getContext());
+				}
+			}
+			return retval;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
 }

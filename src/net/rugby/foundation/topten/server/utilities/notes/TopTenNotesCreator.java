@@ -55,7 +55,7 @@ public class TopTenNotesCreator implements INotesCreator {
 		if (rq.getRatingMatrix() != null) {
 			RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
 			
-			if (rq.getRatingMatrix().getCriteria().equals(Criteria.ROUND)) {				
+			//if (rq.getRatingMatrix().getCriteria().equals(Criteria.ROUND)) {				
 				ITopTenList ttl = ttlf.get(rq.getTopTenListId());
 				if (ttl != null) {
 					for (ITopTenItem i : ttl.getList()) {
@@ -83,7 +83,7 @@ public class TopTenNotesCreator implements INotesCreator {
 						retval.add(note);
 					}
 				}
-			}
+			//}
 		}
 
 

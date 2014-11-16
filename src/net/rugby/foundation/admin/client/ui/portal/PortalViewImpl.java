@@ -20,7 +20,9 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Position.position;
 
-import com.github.gwtbootstrap.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.CheckBoxButton;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -29,7 +31,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -61,7 +62,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@UiField ListBox country;
 	@UiField ListBox team;
 
-	@UiField com.github.gwtbootstrap.client.ui.Button timeSeries;
+	@UiField CheckBoxButton timeSeries;
 	@UiField Button query;
 	@UiField Button clear;
 	@UiField Button delete;
@@ -285,7 +286,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 
 	private void populateVals() {
-		if (!timeSeries.isToggled()) {
+		if (!timeSeries.isActive()) {
 			compIds = new ArrayList<Long>();
 			compIds.add(Long.parseLong(comp.getValue(comp.getSelectedIndex())));
 
@@ -501,7 +502,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 	@UiHandler("timeSeries")
 	void onTimeSeriesClick(ClickEvent e) {
-		setTimeSeries(!timeSeries.isToggled()); 
+		setTimeSeries(!timeSeries.isActive()); 
 	}
 	
 	private void setTimeSeries(boolean timeSeriesOn) {

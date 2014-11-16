@@ -3,7 +3,7 @@ package net.rugby.foundation.admin.client.ui.seriesconfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.gwtbootstrap.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.Column;

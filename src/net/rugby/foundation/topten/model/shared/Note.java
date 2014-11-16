@@ -42,6 +42,7 @@ public class Note implements Serializable, IHasId, INote {
 	public static final String PLACE = "[PLACE]";
 	public static final String CONTEXT = "[CONTEXT]";
 	public static final String LINK = "[LINK]";
+	public static final String LIST = "[LIST]";
 
 	/**
 	 * 

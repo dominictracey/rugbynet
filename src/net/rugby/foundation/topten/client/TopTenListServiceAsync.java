@@ -58,4 +58,6 @@ public interface TopTenListServiceAsync {
 			AsyncCallback<Map<Long, String>> asyncCallback);
 	public void getTTLNames(List<Long> needTTLNames,
 			AsyncCallback<Map<Long, String>> asyncCallback);
+	public void getTTLContexts(List<Long> needTTLNames,
+			AsyncCallback<Map<Long, String>> asyncCallback);
 }

@@ -85,6 +85,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	// Here are our note rendering caches
 	private static Map<Long, String> playerNames = new HashMap<Long, String>();
 	private static Map<Long, String> ttlNames = new HashMap<Long, String>();
+	private static Map<Long, String> ttlContexts = new HashMap<Long, String>();
 	private static Map<String, String> templateMap = new HashMap<String, String>();
 
 
@@ -304,7 +305,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		}
 		return seriesView; 
 	}
-	
+
 	@Override
 	public NoteView<INote> getNoteView() {
 		if (noteView == null) {
@@ -314,14 +315,14 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 
 			if (noteViewColumnDefinitions == null) {
 				noteViewColumnDefinitions = new NoteViewColumnDefinitions<INote>();
-		    }
-							
+			}
+
 			noteView.setColumnDefinitions(noteViewColumnDefinitions);
-			
+
 		}
 		return noteView; 
 	}
-	
+
 	@Override
 	public String getPlaceFromURL() {
 		if (Location.getPath().contains("/s/")) {
@@ -337,12 +338,12 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		}
 	}
 
-//	@Override
-//	public void setPlaceInUrl(SeriesPlace place) throws Exception {
-////		UrlBuilder builder = Location.createUrlBuilder().setPath("/s/" + place.getToken()).removeParameter("listId").removeParameter("compId").removeParameter("playerId");
-////		Window.Location.replace(builder.buildString());
-//		throw new Exception("don't use");
-//	}
+	//	@Override
+	//	public void setPlaceInUrl(SeriesPlace place) throws Exception {
+	////		UrlBuilder builder = Location.createUrlBuilder().setPath("/s/" + place.getToken()).removeParameter("listId").removeParameter("compId").removeParameter("playerId");
+	////		Window.Location.replace(builder.buildString());
+	//		throw new Exception("don't use");
+	//	}
 
 
 	@Override
@@ -383,35 +384,46 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 							ttlNames.put(id, result.get(id));
 						}
 
-						//SafeHtml rendered = render(notes, ttl, false);
-						
-						// we are ready for the NoteView to call render now...
-						cb.onSuccess(notes);
+						rpcService.getTTLContexts(needTTLNames, new AsyncCallback<Map<Long, String>>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
 
+							}
+
+							@Override
+							public void onSuccess(Map<Long, String> result) {
+								// cache them
+								for (Long id : result.keySet()) {
+									ttlContexts.put(id, result.get(id));
+
+									// we are ready for the NoteView to call render now...
+									cb.onSuccess(notes);
+								}
+							}
+						});
 					}
+
 				});
 			}
 
 		});
-
-
-
 	}
 
 
 	public SafeHtml render(List<INote> notes, ITopTenList context, boolean includeDetails) throws Exception {
 		throw new Exception("Don't use");
-//		SafeHtmlBuilder builder = new SafeHtmlBuilder();
-//		builder.appendHtmlConstant("<ul>\n");
-//		for (INote note : notes) {
-//			if (note.getSignificance() > 10 || note.getContextListId() != context.getId()) {
-//				builder.appendHtmlConstant("<li>\n");
-//				builder.appendHtmlConstant(render(note, context, includeDetails));
-//				builder.appendHtmlConstant("</li>\n");
-//			}
-//		}
-//		builder.appendHtmlConstant("</ul>\n");
-//		return builder.toSafeHtml();
+		//		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		//		builder.appendHtmlConstant("<ul>\n");
+		//		for (INote note : notes) {
+		//			if (note.getSignificance() > 10 || note.getContextListId() != context.getId()) {
+		//				builder.appendHtmlConstant("<li>\n");
+		//				builder.appendHtmlConstant(render(note, context, includeDetails));
+		//				builder.appendHtmlConstant("</li>\n");
+		//			}
+		//		}
+		//		builder.appendHtmlConstant("</ul>\n");
+		//		return builder.toSafeHtml();
 	}
 
 	@Override
@@ -438,64 +450,80 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 			swap(builder, Note.DETAILS, "");			
 		}
 
-		//if (context != null && context.getId().equals(note.getContextListId())) {
+		Anchor a = null;
+		
+		if (context != null && context.getId().equals(note.getContextListId())) {
 			// just blank out the context and link (since we are going to show this with the TTL, which is the context)
 			swap(builder, Note.CONTEXT, "");
+			swap(builder, Note.LIST, "");
 			swap(builder, Note.LINK, "");
-		//} else {
-//			String ttlTitle = ttlNames.get(note.getContextListId());
-//			swap(builder, Note.CONTEXT, " on " +  ttlTitle);
-//			swap(builder, Note.LINK, "http://rugby.net/" + note.getLink());
-		//}
+		} else {
+			//			String ttlTitle = ttlNames.get(note.getContextListId());
+			//			swap(builder, Note.CONTEXT, " on " +  ttlTitle);
+			//			swap(builder, Note.LINK, "http://rugby.net/" + note.getLink());
+			//}
+			String linkText = "";
+			if (template.contains(Note.CONTEXT)) {
+				linkText = ttlContexts.get(note.getContextListId());
+			} else {
+				linkText = ttlNames.get(note.getContextListId());
+			}
+			
+			swap(builder, Note.LIST, "");
+			swap(builder, Note.CONTEXT, "in&nbsp;");
+			swap(builder, Note.LINK, "");
 
+			a = new Anchor(linkText);
+			a.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					getRpcService().getPlace(note.getLink(), new AsyncCallback<IServerPlace>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert(caught.getLocalizedMessage());
+						}
+
+						@Override
+						public void onSuccess(IServerPlace place) {
+							getSeriesView().reset();
+							SeriesPlace p = new SeriesPlace();
+							p.setCompId(place.getCompId());
+							p.setGroupId(place.getGroupId());
+							p.setMatrixId(place.getMatrixId());
+							p.setItemId(place.getItemId());
+							p.setQueryId(place.getQueryId());
+							p.setSeriesId(place.getSeriesId());
+
+							// what we want to track about the note-sourced click stream:
+							//		1) the template that caught the user's eye
+							//		2) the list type the user left
+							//		3) the list type the user went to
+							//		4) the player name being followed
+							recordAnalyticsEvent("note", "template", note.getTemplateSelector(), 1);
+							recordAnalyticsEvent("note", "link", note.getLink(), 1);
+							recordAnalyticsEvent("note", "type", note.getType().toString(), 1);
+							recordAnalyticsEvent("note", "player", getPlayerName(note.getPlayer1Id()), 1);
+
+							getPlaceController().goTo(p);
+						}
+
+					});
+				}
+
+			});
+
+			
+		}
+		
 		HTML text = new HTML(builder.toString());
 		HorizontalPanel w = new HorizontalPanel();
-		
+
 		w.add(text);
-		
-		Anchor a =  new Anchor(ttlNames.get(note.getContextListId()));
-		a.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				getRpcService().getPlace(note.getLink(), new AsyncCallback<IServerPlace>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Window.alert(caught.getLocalizedMessage());
-					}
-
-					@Override
-					public void onSuccess(IServerPlace place) {
-						getSeriesView().reset();
-						SeriesPlace p = new SeriesPlace();
-						p.setCompId(place.getCompId());
-						p.setGroupId(place.getGroupId());
-						p.setMatrixId(place.getMatrixId());
-						p.setItemId(place.getItemId());
-						p.setQueryId(place.getQueryId());
-						p.setSeriesId(place.getSeriesId());
-						
-						// what we want to track about the note-sourced click stream:
-						//		1) the template that caught the user's eye
-						//		2) the list type the user left
-						//		3) the list type the user went to
-						//		4) the player name being followed
-//						recordAnalyticsEvent("note", "template", note.getTemplateSelector(), 1);
-//						recordAnalyticsEvent("note", "link", note.getLink(), 1);
-//						recordAnalyticsEvent("note", "type", note.getType().toString(), 1);
-//						recordAnalyticsEvent("note", "player", getPlayerName(note.getPlayer1Id()), 1);
-//						listener.gotoPlace(p);
-						getPlaceController().goTo(p);
-					}
-
-				});
-			}
-
-		});
-		
-		w.add(a);
-		
+		if (a != null) {
+			w.add(a);
+		}
 		return w.asWidget();
 	}
 
@@ -554,7 +582,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 
 		return retval;
 	}
-	
+
 	@Override
 	public String getPlayerName(long playerId) {
 		if (playerNames.containsKey(playerId)) {
@@ -563,7 +591,12 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 			return "n/a";
 		}
 	}
-	
+
+
+	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
+
+		$wnd.ganew('send', 'event', cat, action, label, val);
+	}-*/;
 
 
 }

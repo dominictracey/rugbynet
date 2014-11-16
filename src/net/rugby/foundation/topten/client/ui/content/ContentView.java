@@ -2,7 +2,7 @@ package net.rugby.foundation.topten.client.ui.content;
 
 import net.rugby.foundation.model.shared.IContent;
 
-import com.github.gwtbootstrap.client.ui.NavWidget;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -17,7 +17,7 @@ public class ContentView extends Composite
 	private static ContentViewUiBinder uiBinder = GWT.create(ContentViewUiBinder.class);
 
 	@UiField HTML content;
-	@UiField NavWidget buttonBar;
+	@UiField ButtonGroup buttonBar;
 	
 	@UiTemplate("ContentView.ui.xml")
 
@@ -40,7 +40,7 @@ public class ContentView extends Composite
 		
 	}
 	
-	public NavWidget getButtonBar() {
+	public ButtonGroup getButtonBar() {
 		return buttonBar;
 	}
 

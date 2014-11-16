@@ -12,6 +12,7 @@ public class TopTenSeedData implements Serializable {
 	private static final long serialVersionUID = 6761184923411466077L;
 	protected List<IPlayerRating> pmiList;
 	protected String title;
+	protected String context;
 	protected String description;
 	protected Long compId;
 	protected int playersPerTeam = 10;
@@ -80,5 +81,13 @@ public class TopTenSeedData implements Serializable {
 
 	public void setQueryId(Long queryId) {
 		this.queryId = queryId;
+	}
+
+	public String getContext() {
+		return context;
+	}
+
+	public void setContext(String context) {
+		this.context = context;
 	}
 }

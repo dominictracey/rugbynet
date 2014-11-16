@@ -3,10 +3,10 @@ package net.rugby.foundation.core.client.ui;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.PasswordTextBox;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -17,7 +17,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -31,10 +30,10 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 
 	@UiField TextBox emailAddress;
 	@UiField TextBox nickName;
-	@UiField PasswordTextBox password1;
-	@UiField PasswordTextBox password2;
-	@UiField ControlLabel password1Label;
-	@UiField ControlLabel password2Label;
+	@UiField Input password1;
+	@UiField Input password2;
+	@UiField Label password1Label;
+	@UiField Label password2Label;
 	@UiField Button submit;
 	@UiField Button cancel;
 	@UiField Label error;

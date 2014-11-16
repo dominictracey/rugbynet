@@ -65,9 +65,10 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	Presenter listener = null;
 	TreeItem base = null;
 	TreeItem root = null;
-	TreeItem teams = new TreeItem("Teams");
-	TreeItem matches = new TreeItem("Matches");
-	TreeItem rounds = new TreeItem("Rounds");
+	TreeItem teams = new TreeItem();
+
+	TreeItem matches = new TreeItem();
+	TreeItem rounds = new TreeItem();
 
 	Map<String, ITeamGroup> teamMap = null;
 	List<IRound> roundMap = null;
@@ -99,6 +100,10 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 //			}
 		}
 		
+		teams.setText("Teams");
+		matches.setText("Matches");
+		rounds.setText("Rounds");
+
 		save.setVisible(false);
 		fetch.setText("Fetch teams");
 		step = Step.TEAMS;
@@ -291,7 +296,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		teamMap = tgs;
 		teams.removeItems();
 		for (String tg : tgs.keySet()) {
-			teams.addItem(tg);
+			teams.addTextItem(tg);
 			if (tgs.get(tg).getId() == null) {
 				teams.getChild(teams.getChildCount()-1).getElement().addClassName("gnu");
 			}
@@ -324,7 +329,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			matchMap = mgs;
 			matches.removeItems();
 			for (IMatchGroup m : mgs.values()) {
-				matches.addItem(m.getDisplayName());
+				matches.addTextItem(m.getDisplayName());
 				if (m.getId() == null) {
 					matches.getChild(matches.getChildCount()-1).getElement().addClassName("gnu");
 				}
@@ -357,8 +362,10 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public void addComps(List<ICompetition> result) {
 
 		compTree.removeItems();
-		base = new TreeItem("Competitions");
-		root = new TreeItem("Competition");
+		base = new TreeItem();
+		base.setText("Competitions");
+		root = new TreeItem();
+		root.setText("Competition");
 		compTree.addItem(base);
 		base.addItem(root);
 		root.addItem(teams);
@@ -371,10 +378,10 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		for (ICompetition c : result) {
 			compMap.put(c.getId().toString(),c);
 
-			TreeItem ti = base.addItem(c.getLongName() + "|" + c.getId());
-			ti.addItem("teams");
+			TreeItem ti = base.addTextItem(c.getLongName() + "|" + c.getId());
+			ti.addTextItem("teams");
 			addTeams(c.getId(), c.getTeams());
-			ti.addItem("rounds");
+			ti.addTextItem("rounds");
 			addRounds(c,c.getRounds());
 			for (IRound r : c.getRounds()) {
 				addRound(c.getId(),r.getId(),r.getMatches());
@@ -409,7 +416,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 					final int id = i;
 					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 						public void execute() {
-							base.getChild(id).getChild(1).addItem(rd.getName() + " (" + rd.getBegin().toString() +") |" + rd.getId());
+							base.getChild(id).getChild(1).addTextItem(rd.getName() + " (" + rd.getBegin().toString() +") |" + rd.getId());
 						}
 					});
 				}
@@ -430,7 +437,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			if (base.getChild(i).getText().contains(compId.toString())) {
 				base.getChild(i).getChild(0).removeItems();
 				for (ITeamGroup tg : result) {
-					base.getChild(i).getChild(0).addItem(tg.getDisplayName() + "|" + tg.getId());
+					base.getChild(i).getChild(0).addTextItem(tg.getDisplayName() + "|" + tg.getId());
 				}
 				break;
 			}
@@ -459,17 +466,17 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 					if (round.getText().contains(rid)) {
 						round.removeItems();
 						for (IMatchGroup mg : result) {
-							TreeItem ti = round.addItem(mg.getDisplayName() + "|" + mg.getId());
-							ti.addItem(mg.getDate().toString());
+							TreeItem ti = round.addTextItem(mg.getDisplayName() + "|" + mg.getId());
+							ti.addTextItem(mg.getDate().toString());
 							if (mg.getLocked() != null) {
 								if (mg.getLocked()) {
-									ti.addItem("Locked");
+									ti.addTextItem("Locked");
 								} else {
-									ti.addItem("Not Locked");									
+									ti.addTextItem("Not Locked");									
 								}
 							} else 
-								ti.addItem("Not Locked");
-							ti.addItem("results");
+								ti.addTextItem("Not Locked");
+							ti.addTextItem("results");
 						}
 						break;
 					}
@@ -498,9 +505,9 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						while (k < base.getChild(i).getChild(1).getChild(j).getChildCount()) {
 							if (base.getChild(i).getChild(1).getChild(j).getChild(k).getText().contains(match.getId().toString()) && base.getChild(i).getChild(1).getChild(j).getChild(k).getText().contains(match.getDisplayName())) {
 								for (IMatchResult mr: result) {
-									TreeItem ti = base.getChild(i).getChild(1).getChild(j).getChild(k).getChild(2).addItem(mr.getRecordedDate().toString());
+									TreeItem ti = base.getChild(i).getChild(1).getChild(j).getChild(k).getChild(2).addTextItem(mr.getRecordedDate().toString());
 									if (mr instanceof SimpleScoreMatchResult) {
-										ti.addItem(((ISimpleScoreMatchResult)mr).getHomeScore() + " - " + ((ISimpleScoreMatchResult)mr).getVisitScore());
+										ti.addTextItem(((ISimpleScoreMatchResult)mr).getHomeScore() + " - " + ((ISimpleScoreMatchResult)mr).getVisitScore());
 									}
 								}
 								break;

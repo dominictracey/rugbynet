@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.model.shared.IRatingMatrix;
+import net.rugby.foundation.model.shared.IRatingQuery;
 
 public abstract class BaseRatingMatrixFactory extends BaseCachingFactory<IRatingMatrix> implements IRatingMatrixFactory {
 	
@@ -24,7 +25,9 @@ public abstract class BaseRatingMatrixFactory extends BaseCachingFactory<IRating
 				}
 				for (Long rqid : t.getRatingQueryIds()){
 					// this will populate down to the RatingQuery
-					t.getRatingQueries().add(rqf.get(rqid));
+					IRatingQuery rq = rqf.get(rqid);
+					t.getRatingQueries().add(rq);
+					rq.setRatingMatrix(t);
 				}
 			}
 

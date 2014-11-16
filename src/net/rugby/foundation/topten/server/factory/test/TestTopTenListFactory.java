@@ -17,6 +17,8 @@ import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -24,7 +26,6 @@ import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.Position.position;
-import net.rugby.foundation.model.shared.ServerPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -46,8 +47,8 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 	@Inject
 	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
 			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf,
-			ISocialMediaDirector smd, INotesCreator nc, IRatingSeriesFactory rsf, IUniversalRoundFactory urf, INoteFactory nf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd, nc, rsf, urf, nf);
+			ISocialMediaDirector smd, INotesCreator nc, IRatingSeriesFactory rsf, IUniversalRoundFactory urf, INoteFactory nf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd, nc, rsf, urf, nf, rmf, rgf);
 		this.pf = pf;
 	}
 

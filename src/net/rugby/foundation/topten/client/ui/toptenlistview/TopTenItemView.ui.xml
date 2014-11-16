@@ -1,14 +1,14 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+    xmlns:b="urn:import:org.gwtbootstrap3.client.ui" >
 
     <g:HTMLPanel>
 <b:Row>
   <b:Column size="10" offset="2">
     <b:Well>
         <b:Nav alignment="RIGHT">
-        	<b:NavWidget ui:field='buttonBar'></b:NavWidget>
+        	<b:ButtonGroup ui:field='buttonBar'></b:ButtonGroup>
         </b:Nav>
         <div style="text-align: left; margin: 10px 0px;"><div style="float: left; margin: 0px 10px 3px 0px;">
             

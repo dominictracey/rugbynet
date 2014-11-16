@@ -3,10 +3,10 @@ package net.rugby.foundation.admin.client.ui.seriesconfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.Label;
-import com.github.gwtbootstrap.client.ui.ListBox;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.admin.client.ClientFactory;

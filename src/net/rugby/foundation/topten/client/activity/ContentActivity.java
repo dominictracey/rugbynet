@@ -2,8 +2,8 @@ package net.rugby.foundation.topten.client.activity;
 
 import java.util.Iterator;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -79,7 +79,7 @@ public class ContentActivity extends AbstractActivity implements EditContentPres
 				final IContent content = result;
 				LoginInfo login = clientFactory.getLoginInfo();
 				view.getButtonBar().clear();
-				clientFactory.getHeaderView().collapseHero(true);
+//				clientFactory.getHeaderView().collapseHero(true);
 				Element loadPanel = DOM.getElementById("loadPanel");
 				if (loadPanel != null && loadPanel.hasParentElement()) {
 					loadPanel.removeFromParent();

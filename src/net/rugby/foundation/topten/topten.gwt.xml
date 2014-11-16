@@ -8,11 +8,14 @@
 <!-- 	<inherits name="com.google.gwt.logging.Logging"/> -->
 	<inherits name="net.rugby.foundation.core.Core" />
 <!-- 	<inherits name="net.rugby.foundation.result.Result" /> -->
-	<set-property name="bootstrap.responsiveDesign" value="true"/>
+<!-- 	<set-property name="bootstrap.responsiveDesign" value="true"/> -->
 	<entry-point class="net.rugby.foundation.topten.client.TopTen"/>
 	<replace-with class="net.rugby.foundation.topten.client.ClientFactoryImpl">
 		<when-type-is class="net.rugby.foundation.topten.client.ClientFactory"/>
 	</replace-with>
 	<source path='client'/>
     <source path='model/shared'/>
+    
+   
+    
 </module>

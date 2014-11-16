@@ -6,8 +6,8 @@ import java.util.Map;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 
-import com.github.gwtbootstrap.client.ui.NavPills;
-import com.github.gwtbootstrap.client.ui.NavWidget;
+import org.gwtbootstrap3.client.ui.NavPills;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 
 public interface HeaderView {
@@ -21,20 +21,20 @@ public interface HeaderView {
 
 	public abstract void setClientFactory(ClientFactory clientFactory);
 
-	public abstract void setHeroListInfo(String title1, String details11);
+//	public abstract void setHeroListInfo(String title1, String details11);
 
 //	public abstract void setDetails(String details11);
 
-	public abstract void setFBLikeAttribute(String name, String value);
+//	public abstract void setFBLikeAttribute(String name, String value);
 
-	public abstract NavWidget getButtonBar();
+	public abstract ButtonGroup getButtonBar();
 
-	public abstract void collapseHero(boolean b);
+//	public abstract void collapseHero(boolean b);
 
 	void setContent(List<IContent> list, boolean isEditor);
 
-	void setDetails(String details11);
+//	void setDetails(String details11);
 	
-	void setHeroTextBig(Boolean big);
+//	void setHeroTextBig(Boolean big);
 
 }

@@ -8,9 +8,9 @@ import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.constants.IconSize;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -119,7 +119,7 @@ public class TopTenListViewImpl extends Composite implements TopTenListView<ITop
 			//setVisible(true);
 		} else {
 			items.clear();
-			clientFactory.getHeaderView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
+//			clientFactory.getHeaderView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
 			//clientFactory.getNavBarView().setDetails("Check back every Monday for top ten performances from competitions.");
 			prevButton.setVisible(false);
 			nextButton.setVisible(false);

@@ -3,8 +3,8 @@
  */
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextArea;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;

@@ -49,6 +49,7 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 			Objectify ofy = DataStoreFactory.getOfy();
 			if (id != null) {
 				IRatingQuery rq = ofy.get(new Key<RatingQuery>(RatingQuery.class,id));
+				
 				return rq;
 			} else {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Don't try to get with null. Call create() instead!");

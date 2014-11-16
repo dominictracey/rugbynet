@@ -2,7 +2,7 @@ package net.rugby.foundation.topten.client.ui.toptenlistview;
 
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
-import com.github.gwtbootstrap.client.ui.NavWidget;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -22,7 +22,7 @@ public class TopTenItemView extends Composite
 	@UiField HTML name;
 	@UiField HTML text;
 	@UiField HTMLPanel fblike;
-	@UiField NavWidget buttonBar;
+	@UiField ButtonGroup buttonBar;
 
 
 	private ITopTenItem item;
@@ -88,7 +88,7 @@ public class TopTenItemView extends Composite
 		}
 	}
 
-	public NavWidget getButtonBar() {
+	public ButtonGroup getButtonBar() {
 		return buttonBar;
 	}
 

@@ -26,13 +26,16 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 	private IRatingQueryFactory rqf;
 	private IConfigurationFactory ccf;
 	private IRatingSeriesFactory rsf;
+	private IRatingMatrixFactory rmf;
+	private IRatingGroupFactory rgf;
 
-	@Inject
-	public BasePlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf) {
+	public BasePlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
 		this.ttlf = ttlf;
 		this.rqf = rqf;
 		this.ccf = ccf;
 		this.rsf = rsf;
+		this.rmf = rmf;
+		this.rgf = rgf;
 	}
 	
 	private Hashids hashids = null;
@@ -149,19 +152,19 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 	public void buildQuery(IServerPlace p, IRatingQuery rq) {
 		p.setQueryId(rq.getId());
 		p.setType(PlaceType.SERIES);
-		buildMatrix(p, rq.getRatingMatrix());
+		buildMatrix(p, rmf.get(rq.getRatingMatrixId()));
 	}
 	@Override
 	public void buildMatrix(IServerPlace p, IRatingMatrix rm) {
 		p.setMatrixId(rm.getId());
 		p.setType(PlaceType.SERIES);
-		buildGroup(p, rm.getRatingGroup());
+		buildGroup(p, rgf.get(rm.getRatingGroupId()));
 	}
 	@Override
 	public void buildGroup(IServerPlace p, IRatingGroup rg) {
 		p.setGroupId(rg.getId());
 		p.setType(PlaceType.SERIES);
-		buildSeries(p,rg.getRatingSeries());
+		buildSeries(p,rsf.get(rg.getRatingSeriesId()));
 	}
 	@Override
 	public void buildSeries(IServerPlace p, IRatingSeries rs) {

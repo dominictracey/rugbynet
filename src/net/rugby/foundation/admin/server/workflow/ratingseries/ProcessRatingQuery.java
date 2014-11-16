@@ -110,6 +110,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	
 			// now create the TTL
 			String title = "Top Ten ";
+			String context = "";
 			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH)) {
 				title += "Players from ";
 				IRound r = rf.get(rq.getRoundIds().get(0));
@@ -121,8 +122,9 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 							break;
 						}
 					}
-					if (match != null) {
-						title +=  match.getHomeTeam().getShortName() + "v" + match.getVisitingTeam().getShortName();
+					if (match != null) {						
+						context = match.getHomeTeam().getShortName() + " vs. " + match.getVisitingTeam().getShortName();
+						title += context;
 					} else {
 						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match in setting title for RQ " + rq.getId() + " teamIds " + rq.getTeamIds().toString());
 					}
@@ -138,9 +140,9 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				title += rq.getPositions().get(0).getPlural();
 				
 				if (inForm) {
-					title += "Through ";
+					title += " Through ";
 				} else {
-					title += "From ";
+					title += " From ";
 				}
 				
 				// now we need the last round
@@ -159,7 +161,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 							}
 						}
 					}
-					title += last.getName();
+					context = last.getName();
+					title += context;
 				}
 				
 			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_COMP)) {
@@ -198,7 +201,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					for (IRound r : comp.getRounds()) {
 						UniversalRound urs = urf.get(r);
 						if (urs.ordinal == ur.ordinal) {
-							title += "From The " + ur.longDesc + " In The " + comp.getShortName();
+							title += "from " + r.getName() + " of the " + comp.getShortName();
+							context = r.getName();
 							break;
 						}
 					}
@@ -210,6 +214,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			
 			
 			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", null, rq.getRoundIds(), 10);
+			data.setContext(context);
 			ITopTenList ttl = ttlf.create(data);
 			ttlf.put(ttl);
 			

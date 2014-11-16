@@ -3,23 +3,22 @@ package net.rugby.foundation.topten.client.ui;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.ContentPlace;
-import net.rugby.foundation.topten.client.place.TopTenListPlace;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
 import net.rugby.foundation.topten.client.ui.content.EditContent.EditContentPresenter;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Dropdown;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.NavPills;
-import com.github.gwtbootstrap.client.ui.NavWidget;
-import com.github.gwtbootstrap.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDown;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.NavPills;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -41,15 +40,15 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 
 
 	@UiField NavPills loginPanel;
-	@UiField Dropdown compDropdown;
-	@UiField Dropdown contentDropdown;
+	//@UiField Dropdown compDropdown;
+	@UiField DropDownMenu contentDropdown;
 	Element title;
 	Element details1;
 	Element details2;
 	Element fbLike;
 	Element footerLinks;
 	Element hero;
-	NavWidget buttonBar;
+	ButtonGroup buttonBar;
 
 	private ClientFactory clientFactory;
 
@@ -84,27 +83,27 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 	 */
 	@Override
 	public void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway) {
-		ListIterator<Long> it = compsUnderway.listIterator(compsUnderway.size());
-		if (it != null) {
-			compDropdown.clear();
-			while (it.hasPrevious()) {
-				final Long compId = it.previous();
-				NavLink nl = new NavLink(competitionMap.get(compId));
-				nl.addClickHandler( new ClickHandler() {
-
-					@Override
-					public void onClick(ClickEvent event) {
-						TopTenListPlace newPlace = new TopTenListPlace();
-						newPlace.setCompId(compId);
-						assert (clientFactory != null);
-						clientFactory.getPlaceController().goTo(newPlace);
-					}
-				});
-				compDropdown.add(nl);
-
-			}
-			compDropdown.addStyleName("transparentMenuBG");
-		}
+//		ListIterator<Long> it = compsUnderway.listIterator(compsUnderway.size());
+//		if (it != null) {
+//			compDropdown.clear();
+//			while (it.hasPrevious()) {
+//				final Long compId = it.previous();
+//				NavLink nl = new NavLink(competitionMap.get(compId));
+//				nl.addClickHandler( new ClickHandler() {
+//
+//					@Override
+//					public void onClick(ClickEvent event) {
+//						TopTenListPlace newPlace = new TopTenListPlace();
+//						newPlace.setCompId(compId);
+//						assert (clientFactory != null);
+//						clientFactory.getPlaceController().goTo(newPlace);
+//					}
+//				});
+//				compDropdown.add(nl);
+//
+//			}
+//			compDropdown.addStyleName("transparentMenuBG");
+//		}
 
 	}
 
@@ -138,35 +137,35 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setHeroListInfo(java.lang.String, java.lang.String)
 	 */
-	@Override
-	public void setHeroListInfo(String title1, String details11) {
-//		title.setInnerHTML(title1);
-//		details1.setInnerHTML(details11);
-	}
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setDetails(java.lang.String)
-	 */
-	@Override
-	public void setDetails(String details11) {
-		//details2.setInnerHTML(details11);
-	}
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setFBLikeAttribute(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void setFBLikeAttribute(String name, String value) {
-		fbLike.setAttribute(name, value);
-	}
+//	@Override
+//	public void setHeroListInfo(String title1, String details11) {
+////		title.setInnerHTML(title1);
+////		details1.setInnerHTML(details11);
+//	}
+//
+//	/* (non-Javadoc)
+//	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setDetails(java.lang.String)
+//	 */
+//	@Override
+//	public void setDetails(String details11) {
+//		//details2.setInnerHTML(details11);
+//	}
+//
+//	/* (non-Javadoc)
+//	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setFBLikeAttribute(java.lang.String, java.lang.String)
+//	 */
+//	@Override
+//	public void setFBLikeAttribute(String name, String value) {
+//		fbLike.setAttribute(name, value);
+//	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.topten.client.ui.NavBarView#getButtonBar()
 	 */
 	@Override
-	public NavWidget getButtonBar() {
+	public ButtonGroup getButtonBar() {
 		if (buttonBar == null) {
-			buttonBar = new NavWidget();
+			buttonBar = new ButtonGroup();
 			//buttonBar.addStyleName("btn-group");
 			RootPanel.get("buttons").add(buttonBar);
 		}
@@ -188,7 +187,7 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 				while (it.hasNext()) {
 					final IContent content = it.next();
 					if (content != null && content.isShowInMenu()) {
-						NavLink nl = new NavLink(content.getTitle());
+						AnchorListItem nl = new AnchorListItem(content.getTitle());
 						nl.addClickHandler( new ClickHandler() {
 
 							@Override
@@ -277,17 +276,17 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 		DOM.getElementById(content.getDiv()).setInnerHTML(c);
 	}
 
-	@Override
-	public void collapseHero(boolean collapse) {
-//		if (collapse) {
-//			hero.removeClassName("hero-unit");
-//			hero.addClassName("collapse");
-//		} else {
-//			hero.removeClassName("collapse");
-//			hero.addClassName("hero-unit");
-//		}
-
-	}
+//	@Override
+//	public void collapseHero(boolean collapse) {
+////		if (collapse) {
+////			hero.removeClassName("hero-unit");
+////			hero.addClassName("collapse");
+////		} else {
+////			hero.removeClassName("collapse");
+////			hero.addClassName("hero-unit");
+////		}
+//
+//	}
 
 
 	@Override
@@ -320,20 +319,20 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 
 	}
 
-
-	@Override
-	public void setHeroTextBig(Boolean big) {
-		if (!big) {
-			details1.removeClassName("lead");
-			details2.removeClassName("lead");
-			details1.addClassName("compactContent");
-			details2.addClassName("compactContent");
-		} else {
-			details1.addClassName("lead");
-			details2.addClassName("lead");
-			details1.removeClassName("compactContent");
-			details2.removeClassName("compactContent");
-		}
-
-	}
+//
+//	@Override
+//	public void setHeroTextBig(Boolean big) {
+//		if (!big) {
+//			details1.removeClassName("lead");
+//			details2.removeClassName("lead");
+//			details1.addClassName("compactContent");
+//			details2.addClassName("compactContent");
+//		} else {
+//			details1.addClassName("lead");
+//			details2.addClassName("lead");
+//			details1.removeClassName("compactContent");
+//			details2.removeClassName("compactContent");
+//		}
+//
+//	}
 }

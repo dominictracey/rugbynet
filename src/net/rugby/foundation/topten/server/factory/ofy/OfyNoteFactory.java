@@ -13,6 +13,7 @@ import com.googlecode.objectify.Query;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.INoteRef;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.Note;
 import net.rugby.foundation.topten.model.shared.NoteRef;
@@ -55,6 +56,11 @@ public class OfyNoteFactory extends BaseNoteFactory implements INoteFactory {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			ofy.put(t);
+			
+			// for memcache lists for UR and list to refetch
+			dropMemcacheForUniversalRound(t.getRound());
+			dropMemcacheForList(t.getContextListId());
+			
 			return t;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "putToPersistentDatastore" + e.getLocalizedMessage(), e);
@@ -103,6 +109,32 @@ public class OfyNoteFactory extends BaseNoteFactory implements INoteFactory {
 			
 			for (INoteRef ref : noteRefQ) {
 				retval.add(get(ref.getNoteId()));
+			}
+			
+			// cull out izzon notes when there is a higher significance note from the same context
+			for (ITopTenItem tti : ttl.getList()) {
+				// scan for high (>1) and low (==1) significance notes, building lists we can compare
+
+				List<INote> lowSig = new ArrayList<INote>();
+				List<INote> hiSig = new ArrayList<INote>();
+				for (INote n : retval) {
+					if (n.getPlayer1Id().equals(tti.getPlayerId())) {
+						if (n.getSignificance() > 1) {
+							hiSig.add(n);
+						} else {
+							lowSig.add(n);
+						}
+					}
+				}
+				
+				// if we have a low significance note AND a high significance FOR THE SAME CONTEXT, remove the low from the final list
+				for (INote hi : hiSig) {
+					for (INote lo : lowSig) {
+						if (lo.getContextListId().equals(hi.getContextListId())) {
+							retval.remove(lowSig);
+						}
+					}
+				}
 			}
 
 			return retval;

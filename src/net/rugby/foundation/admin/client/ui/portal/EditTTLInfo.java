@@ -9,19 +9,19 @@ import java.util.Map;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.IPlayer;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.TextArea;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Well;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -31,6 +31,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class EditTTLInfo extends DialogBox {
 
+	public int numPlayersPerTeam = 10;
+	
 	private static EditTTLInfoUiBinder uiBinder = GWT
 			.create(EditTTLInfoUiBinder.class);
 
@@ -44,13 +46,26 @@ public class EditTTLInfo extends DialogBox {
 	
 	public EditTTLInfo() {
 		setWidget(uiBinder.createAndBindUi(this));
+		
+		for (int i=0; i<10; ++i) {
+			final int _i = i;
+			AnchorListItem ali = new AnchorListItem();
+			ali.setText(Integer.toString(i));
+			ali.addClickHandler(new ClickHandler() {
+			    @Override
+			    public void onClick(ClickEvent clickEvent) {
+			    	numPlayersPerTeam = _i;
+			    }
+			  });
+			playersPerTeam.add(ali);
+		}
 	}
 
 	@UiField Button save;
 	@UiField Button cancel;
 	@UiField TextArea description;
 	@UiField TextBox title;
-	@UiField DropdownButton playersPerTeam;
+	@UiField DropDownMenu playersPerTeam;
 	@UiField HTMLPanel twitterHandles;
 	
 	Map<IPlayer,TextBox> twitterDictionary = new HashMap<IPlayer,TextBox>();
@@ -62,12 +77,7 @@ public class EditTTLInfo extends DialogBox {
 	void onClickSave(ClickEvent e) {
 		v.setTitle(title.getText());
 		v.setDescription(description.getText());
-		if (playersPerTeam.getLastSelectedNavLink() != null) {
-			int ppt = Integer.parseInt(playersPerTeam.getLastSelectedNavLink().getText());
-			v.setPlayersPerTeam(ppt);
-		} else {
-			v.setPlayersPerTeam(10);
-		}
+		v.setPlayersPerTeam(numPlayersPerTeam);
 		listener.saveTTIText(v);
 	}
 	
@@ -91,7 +101,7 @@ public class EditTTLInfo extends DialogBox {
 
 
 	public void addTwitterPlayer(IPlayer p) {
-		twitterHandles.add(new ControlLabel(p.getDisplayName()));
+		twitterHandles.add(new Label(p.getDisplayName()));
 		TextBox textBox = new TextBox();
 		twitterHandles.add(textBox);
 		if (p.getTwitterHandle() != null) {

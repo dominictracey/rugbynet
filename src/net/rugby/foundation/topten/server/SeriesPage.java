@@ -262,7 +262,7 @@ public class SeriesPage extends HttpServlet {
 				String[] chunks = everything.split("(<!-- split -->|<div id=\"split\"></div>)");
 				first = chunks[0];
 				third = chunks[2];
-				fifth = chunks[4];
+//				fifth = chunks[4];
 
 				inputStream.close();
 			} catch (Throwable ex) {

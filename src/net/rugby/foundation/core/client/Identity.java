@@ -12,9 +12,9 @@ import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.NavPills;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.NavPills;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -279,7 +279,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				signInLink.setIcon(IconType.LOCK);
 				signInLink.addClickHandler(signInHandler);
 				signUpLink = new Button("sign up");
-				signUpLink.setIcon(IconType.PLUS_SIGN);
+				signUpLink.setIcon(IconType.PLUS);
 				signUpLink.addClickHandler(signUpHandler);
 
 				accountManagement.add(signInLink);

@@ -3,21 +3,10 @@ package net.rugby.foundation.topten.client.ui.notes;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
-import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.client.ui.ColumnDefinition;
-import net.rugby.foundation.model.shared.ICompetition;
-import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.topten.client.ui.notes.NoteView.NoteViewPresenter;
 import net.rugby.foundation.topten.model.shared.INote;
 
@@ -34,7 +23,8 @@ public class NoteViewColumnDefinitions<T extends INote> {
 			columnDefinitions.add(new ColumnDefinition<T>() {
 				//id
 				public Widget render(final T c) {
-					Widget w = listener.getClientFactory().render(c, null, false);
+					
+					Widget w = listener.getClientFactory().render(c, listener.getClientFactory().getSeriesView().getList(), false);
 					
 					return w;
 				}     
@@ -119,9 +109,5 @@ public class NoteViewColumnDefinitions<T extends INote> {
 		this.listener =  listener2;
 	}
 	
-	
-	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
 
-		$wnd.ganew('send', 'event', cat, action, label, val);
-	}-*/;
 }

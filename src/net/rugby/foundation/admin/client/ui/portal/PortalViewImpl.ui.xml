@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:d="urn:import:com.google.gwt.user.datepicker.client" 
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui">
+    xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
     <ui:style>
 		/* Add CSS here. See the GWT docs on UI Binder for more details */
@@ -69,7 +69,7 @@ Team:
             </g:HTMLPanel>
             <g:VerticalPanel>
                 <g:HorizontalPanel>
-            <b:Button ui:field="timeSeries" icon="TIME" toggle="true">Time Series</b:Button>
+            <b:CheckBoxButton ui:field="timeSeries" icon="TIME" toggle="true">Time Series</b:CheckBoxButton>
             <g:Button ui:field="query">Query</g:Button>
             <g:Button ui:field="clear">Clear</g:Button>
             <g:Button ui:field="delete">Delete</g:Button>

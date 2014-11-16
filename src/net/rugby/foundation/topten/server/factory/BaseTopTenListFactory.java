@@ -26,6 +26,8 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -74,11 +76,13 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	private IRatingSeriesFactory rsf;
 	private IUniversalRoundFactory urf;
 	private INoteFactory nf;
+	private IRatingMatrixFactory rmf;
+	private IRatingGroupFactory rgf;
 
 	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
 			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf,
 			IPlaceFactory spf, ICompetitionFactory cf, ISocialMediaDirector smd, INotesCreator nc, IRatingSeriesFactory rsf,
-			IUniversalRoundFactory urf, INoteFactory nf) {
+			IUniversalRoundFactory urf, INoteFactory nf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
 		this.mf = mf;
 		this.tf = tf;
 		this.rf = rf;
@@ -93,6 +97,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		this.rsf = rsf;
 		this.urf = urf;
 		this.nf = nf;
+		this.rmf = rmf;
+		this.rgf = rgf;
+		
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -387,6 +394,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		list.setPipeLineId(null);
 		list.setPublished(null);
 		list.setTitle(tti.getTitle());
+		list.setContext(tti.getContext());
 		list.setList(new ArrayList<ITopTenItem>());
 		list.setItemIds(new ArrayList<Long>());
 		list.setQueryId(tti.getQueryId());
@@ -698,6 +706,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	public ITopTenList put(ITopTenList list) {
 		// Allow subclasses to put it in peristent data stores, then put in memcache
 		try {
+			// clear out the memcache copies of this list from the instances that may contain it
+			dropContainersFromMemcache(list);
+			
 			list = putToPersistentDatastore(list);
 
 			Iterator<ITopTenItem> it = list.getList().iterator();
@@ -743,6 +754,27 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}	}
+
+	private void dropContainersFromMemcache(ITopTenList ttl) {
+		IRatingMatrix rm = null;
+		IRatingGroup rg = null;
+		IRatingSeries rs = null;
+		IRatingQuery rq = rqf.get(ttl.getQueryId());
+		if (rq != null) {
+			rm = rmf.get(rq.getRatingMatrixId());
+			if (rm != null) {
+				rg = rgf.get(rm.getRatingGroupId());
+				if (rg != null) {
+					rs = rsf.get(rg.getRatingSeriesId());
+					if (rs != null)
+						rsf.dropFromCache(rs.getId());
+					rgf.dropFromCache(rg.getId());
+				}
+				rmf.dropFromCache(rm.getId());
+			}
+			rqf.dropFromCache(rq.getId());			
+		}
+	}
 
 	abstract protected ITopTenList putToPersistentDatastore(ITopTenList list);
 

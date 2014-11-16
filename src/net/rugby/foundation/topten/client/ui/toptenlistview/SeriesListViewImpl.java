@@ -16,10 +16,12 @@ import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.SplitDropdownButton;
-import com.github.gwtbootstrap.client.ui.Tab;
-import com.github.gwtbootstrap.client.ui.TabPanel;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.NavTabs;
+import org.gwtbootstrap3.client.ui.TabContent;
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -36,9 +38,11 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 {
 	private static SeriesListViewImplUiBinder uiBinder = GWT.create(SeriesListViewImplUiBinder.class);
 
-	@UiField SplitDropdownButton criteriaDropDown;
-	@UiField SplitDropdownButton weekDropDown;
+	@UiField DropDownMenu criteriaDropDown;
+	@UiField DropDownMenu weekDropDown;
 	@UiField TabPanel tabPanel;
+	@UiField NavTabs navTabs;
+	@UiField TabContent tabContent;
 	@UiField VerticalPanel notes;
 	@UiField HTML listTitle;
 
@@ -63,7 +67,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	private TopTenListView<ITopTenItem> listView;
 
 	private RatingMode mode;
-	private Map<Integer, Tab> tabIndexMap = new HashMap<Integer, Tab>();
+	private Map<Integer, TabListItem> tabIndexMap = new HashMap<Integer, TabListItem>();
 
 	private boolean ratingModesSet;
 
@@ -99,8 +103,10 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			weekDropDown.clear();
 			for (IRatingGroup rg : series.getRatingGroups()) {
 				// add item to date dropdown
-				final NavLink nl = new NavLink(rg.getLabel());
-				nl.setTarget(rg.getId().toString());
+				final AnchorListItem nl = new AnchorListItem(rg.getLabel());
+				final Long gid = rg.getId();
+				//nl.setId(rg.getId().toString());
+				//nl.setTarget(rg.getId().toString());
 				nl.setText(rg.getLabel());
 				nl.addClickHandler(new ClickHandler() {
 
@@ -110,7 +116,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 						// flush everything below the new group we want.
 						group = null;
-						groupId = Long.parseLong(nl.getTarget());
+						groupId = gid;
 						setMatrix(null);
 						setQuery(null);
 						setList(null);
@@ -141,7 +147,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			//				for (IRatingQuery query : matrix.getRatingQueries()) {	
 			//					final IRatingQuery rq = query;
 			//					position fp = query.getPositions().get(0);
-			//					final Tab t = new Tab();
+			//					final TabContent t = new TabContent();
 			//					t.setHeading(fp.getName());
 			//					final SeriesListViewImpl _this = this;
 			//					t.addClickHandler(new ClickHandler() {
@@ -207,7 +213,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	}
 
 	//	private void populateCriteria() {
-	//		NavLink nl = new NavLink("In Form");
+	//		ButtonGroup nl = new ButtonGroup("In Form");
 	//		nl.addClickHandler(new ClickHandler() {
 	//
 	//			@Override
@@ -219,7 +225,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	//		});
 	//		criteriaDropDown.add(nl);
 	//
-	//		nl = new NavLink("Best in Last Year");
+	//		nl = new ButtonGroup("Best in Last Year");
 	//		nl.addClickHandler(new ClickHandler() {
 	//
 	//			@Override
@@ -268,7 +274,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		// populate Rate by drop down
 		for (RatingMode mode : modeMap.keySet()) {
 			//final RatingMode _mode = mode;
-			final NavLink nl = new NavLink(mode.name());
+			final AnchorListItem nl = new AnchorListItem(mode.name());
 			final Long _seriesId = modeMap.get(mode);
 			nl.addClickHandler(new ClickHandler() {
 
@@ -312,11 +318,9 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 //					if (query.getPositions() != null && !query.getPositions().isEmpty()) {
 //						fp = query.getPositions().get(0);
 //					}
-					final Tab t = new Tab();
+					final TabListItem t = new TabListItem(rq.getLabel());
 					final int i = count;
 					tabIndexMap.put(count++, t);
-
-					t.setHeading(rq.getLabel());
 
 					final SeriesListViewImpl _this = this;
 					t.addClickHandler(new ClickHandler() {
@@ -369,7 +373,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				if (q.getId().equals(query.getId())) {
 					addListView(ordinal);
 					//if (tabPanel.get > ordinal)
-						tabPanel.selectTab(ordinal);
+					tabIndexMap.get(ordinal).showTab();
 				}
 				if (q.getTopTenListId() != null) {
 					ordinal++;

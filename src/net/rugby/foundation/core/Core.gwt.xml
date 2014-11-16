@@ -4,8 +4,22 @@
 <!-- 	<inherits name="com.google.gwt.user.theme.standard.Standard"/> -->
 <!-- 	<inherits name="com.googlecode.objectify.Objectify" /> -->
 	<inherits name="net.rugby.foundation.model.Model"/>
-	<inherits name="com.github.gwtbootstrap.Bootstrap"/>
+<!-- 	<inherits name="com.github.gwtbootstrap.Bootstrap"/> -->
+	<inherits name="org.gwtbootstrap3.GwtBootstrap3"/>
+<!-- 	<inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/> -->
+	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
 	<inherits name="com.gwtfb.GwtFB"/>
+	
+	 <!-- Theming GWTBootstrap per http://carlosbecker.com/posts/using-a-custom-bootstrap-theme-in-gwt-bootstrap/ -->
+    <source path='resources'/>
+    <replace-with class="net.rugby.foundation.core.resources.BootstrapConfigurator">
+      <when-type-is class="com.github.gwtbootstrap.client.ui.config.Configurator"/>
+    </replace-with>
+    <public path="resources">
+      <exclude name="** /*.java"/>
+      <exclude name="** /*.class"/>
+    </public>
+    
 	<entry-point class="net.rugby.foundation.core.client.Core"/>
 	<source path='client'/>
     <source path='shared'/>

@@ -1,8 +1,8 @@
 package net.rugby.foundation.topten.client.activity;
 
 import java.util.Iterator;
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -109,7 +109,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 									if (!simple) {
 										view.setItemCount(0);
-										clientFactory.getHeaderView().collapseHero(false);
+										//clientFactory.getHeaderView().collapseHero(false);
 										if ( clientFactory.getLoginInfo().isTopTenContentEditor()) {
 											clientFactory.getHeaderView().getButtonBar().clear();
 										}
@@ -120,7 +120,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 										view.setPresenter(This);
 										view.setClientFactory(clientFactory);
 										Panel.setWidget(view.asWidget());
-										clientFactory.getHeaderView().collapseHero(false);
+										//clientFactory.getHeaderView().collapseHero(false);
 										if (clientFactory.getLoginInfo().isTopTenContentEditor())
 											clientFactory.getHeaderView().getButtonBar().clear();
 										clientFactory.getHeaderView().setContent(clientFactory.getContentList(), clientFactory.getLoginInfo().isTopTenContentEditor());
@@ -391,7 +391,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 		view.setItemCount(view.getItemCount() +1);
 
-		v.getButtonBar().clear();
+		//v.getButtonBar().clear();
 		if (login.isTopTenContentContributor()) {
 			//Badge edit = new Badge("Edit");				
 			Button edit = new Button("Edit");
@@ -411,7 +411,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 				// have to retract before editing
 				edit.setEnabled(false);
 			}
-			v.getButtonBar().add(edit);
+			//v.getButtonBar().add(edit);
 
 			// Submit/Retract
 			Button submit;
@@ -438,13 +438,13 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 
 			});
-			v.getButtonBar().add(submit);
+			//v.getButtonBar().add(submit);
 
 			// Match Report
 			Anchor report = new Anchor("Match Report");
 			report.setHref(v.getItem().getMatchReportLink());
 			report.setTarget("blank");
-			v.getButtonBar().add(report);
+			//v.getButtonBar().add(report);
 		} 
 		//		else {
 		//			v.getButtonBar().clear();
@@ -530,7 +530,7 @@ public class TopTenListActivity extends AbstractActivity implements Presenter, E
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				clientFactory.getHeaderView().setHeroListInfo(result.getTitle(), result.getContent());
+				//clientFactory.getHeaderView().setHeroListInfo(result.getTitle(), result.getContent());
 				clientFactory.getEditTTLInfoDialog().hide();
 			}
 		});		

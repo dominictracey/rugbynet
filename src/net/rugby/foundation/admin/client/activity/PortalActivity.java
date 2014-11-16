@@ -2,20 +2,13 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
-import com.github.gwtbootstrap.client.ui.Container;
-import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTMLPanel;
-
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.PortalPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;

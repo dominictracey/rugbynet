@@ -1,8 +1,0 @@
-TT = [P1] was on [CONTEXT] [LINK]
-TTP1 = [P1] was the top tackler [DETAILS] [CONTEXT] [LINK]
-TTP2 = [P1] and [P2] were the top tacklers [DETAILS] [CONTEXT] [LINK]
-TTP3 = [P1], [P2] and [P3] were the top tacklers [DETAILS] [CONTEXT] [LINK]
-1T = [P1] scored a try [CONTEXT] [LINK]
-2T = [P1] had a brace of tries [CONTEXT] [LINK]
-3T = [P1] had a hat trick [CONTEXT] [LINK]
-MT = [P1] had an amazing [DETAILS] tries [CONTEXT] [LINK]

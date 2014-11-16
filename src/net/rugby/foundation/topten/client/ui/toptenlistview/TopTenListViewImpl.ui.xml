@@ -1,7 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    		 xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+    		 xmlns:b="urn:import:org.gwtbootstrap3.client.ui" >
 
     <g:HTMLPanel width="100%" ui:field="topTenPanel">
 
@@ -13,11 +13,11 @@
     	        <b:Row><g:HTMLPanel ui:field="items"/></b:Row>
     	        <b:Row>
     	            <b:Column size="3" offset="5">
-	    	            <b:Nav alignment="RIGHT">
-	    	                <b:NavWidget>
+	    	            <b:Nav>
+	    	                <b:ButtonGroup>
 	    	                    <b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
 	    	                    <b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
-	    	                </b:NavWidget>
+	    	                </b:ButtonGroup>
 	    	            </b:Nav>
     	            </b:Column>
     	        </b:Row>
