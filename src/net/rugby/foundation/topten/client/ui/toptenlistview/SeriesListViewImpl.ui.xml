@@ -4,7 +4,6 @@
 	xmlns:b.html='urn:import:org.gwtbootstrap3.client.ui.html'>
 
 	<g:HTMLPanel width="100%" ui:field="topTenPanel">
-		<b:Well>
 			<b:ButtonGroup>
 				<b:Button>Ratings</b:Button>
 				<b:Button dataToggle="DROPDOWN" />
@@ -21,18 +20,19 @@
 				</b:DropDownMenu>
 			</b:ButtonGroup>
 			<g:HTML ui:field="listTitle"></g:HTML>
-		</b:Well>
-		<b:TabPanel tabPosition="LEFT" ui:field="tabPanel">
-			<b:NavTabs ui:field="navTabs"></b:NavTabs>
-			<b:TabContent ui:field="tabContent">
-				<b:TabPane active="true" b:id="ttl">
-				</b:TabPane>
-			</b:TabContent>
-			<b.html:ClearFix />
-		</b:TabPanel>
-		<b:Well>
-			<g:VerticalPanel ui:field="notes"></g:VerticalPanel>
-		</b:Well>
+
+			<b:TabPanel tabPosition="LEFT" ui:field="tabPanel">
+				<b:NavTabs ui:field="navTabs">
+				</b:NavTabs>
+				<b:TabContent ui:field="tabContent">			    
+				</b:TabContent>
+				<b.html:ClearFix />
+			</b:TabPanel>
+			
+			<b:Panel ui:field="adminButtons">
+			    <b:Button ui:field="createFeature" type="DEFAULT">Create Feature</b:Button>
+			    <b:Button ui:field="promote" type="DEFAULT">Promote</b:Button>
+			</b:Panel>
 	</g:HTMLPanel>
 
 

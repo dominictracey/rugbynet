@@ -6,12 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.core.client.ui.CreateClubhouse;
@@ -30,6 +26,14 @@ public class Core implements CoreServiceAsync, EntryPoint {
 
 	public interface CompChangeListener {
 		void compChanged(Long id);
+	}
+	
+	public interface RoundChangeListener {
+		void roundChanged(Long roundId);
+	}
+	
+	public interface GuidChangeListener {
+		void guidChanged(String guid);
 	}
 	
 	private CoreClientFactory clientFactory = new CoreClientFactoryImpl();
@@ -55,13 +59,17 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	//	Cleared to default without login
 	private Long currentCompId = 0L;
 	
+	private String currentGuid = "";
+	
 	// a map of all competitions (underway or not). key id, value ICompetition.
 	//	Login agnostic
 	private Map<Long, ICompetition> compMap = new HashMap<Long, ICompetition>();
 		
-	// components that are interested in getting notified when the currentCompId changes
+	// components that are interested in getting notified when the current CompId and roundId changes
 	//	Login agnostic
 	private ArrayList<CompChangeListener> compChangeListeners = new ArrayList<CompChangeListener>();
+	private ArrayList<RoundChangeListener> roundChangeListeners = new ArrayList<RoundChangeListener>();
+	private ArrayList<GuidChangeListener> guidChangeListeners = new ArrayList<GuidChangeListener>();
 	
 	// map that contains the last completed round for a comp. key compId, value IRound of previous round. 
 	//	Login agnostic
@@ -84,14 +92,16 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	private CreateClubhouse createClubhouse = null;
 	
 	// map that contains content
-	private Map<Long, IContent> contentMap = null; 
+	private Map<Long, IContent> contentMap = null;
+	private Long currentRoundId; 
 	
 	/**
 	 * Use the static getInstance factory method
 	 */
 	private Core()
 	{
-		
+		//CssBundle.INSTANCE.bootstrapOverridesCss().ensureInjected();
+		//CssBundle.INSTANCE.defaultCss().ensureInjected();
 	}
 	
 	/** Singleton 
@@ -127,6 +137,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 //		          Window.
 //		      }
 //		});
+		
 		
 	}
 
@@ -592,7 +603,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			});
 		}	
 	}
-
+	@Override
 	public void saveContent(IContent content, final AsyncCallback<IContent> cb) {
 		clientFactory.getRpcService().saveContent(content, new AsyncCallback<IContent> () {
 			@Override
@@ -609,7 +620,6 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		});
 		
 	}
-	
 	private Map<Long, IContent> getContentMap() {
 		if (contentMap == null) {
 			contentMap = new HashMap<Long,IContent>();
@@ -623,6 +633,35 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		}
 		
 		return clubhouseMap;
+	}
+
+	public void setCurrentRoundId(Long rid) {
+		if (this.currentRoundId != rid) {
+			this.currentRoundId = rid;
+
+			for (RoundChangeListener l : roundChangeListeners) {
+				l.roundChanged(rid);
+			}
+		}
+		
+	}
+
+	public void registerRoundChangeListener(RoundChangeListener l) {
+		roundChangeListeners.add(l);
+	}
+
+	public void registerGuidChangeListener(GuidChangeListener l) {
+		guidChangeListeners.add(l);
+	}
+	
+	public void changeGuid(String guid) {
+		if (this.currentGuid != guid) {
+			this.currentGuid = guid;
+
+			for (GuidChangeListener l : guidChangeListeners) {
+				l.guidChanged(currentGuid);
+			}
+		}
 	}
 
 }

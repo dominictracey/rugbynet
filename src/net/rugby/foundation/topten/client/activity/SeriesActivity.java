@@ -5,30 +5,33 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-
+import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.ClientFactory;
+import net.rugby.foundation.topten.client.place.FeatureListPlace;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
+import net.rugby.foundation.topten.client.ui.SidebarViewImpl;
 import net.rugby.foundation.topten.client.ui.notes.NoteView;
 import net.rugby.foundation.topten.client.ui.notes.NoteView.NoteViewPresenter;
+import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo.EditTTLInfoPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView.SeriesListViewPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
@@ -37,16 +40,20 @@ import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
-public class SeriesActivity extends TopTenListActivity implements SeriesListViewPresenter, TopTenListViewPresenter, Presenter, NoteViewPresenter<INote> { 
+public class SeriesActivity extends AbstractActivity /*extends TopTenListActivity*/ implements SeriesListViewPresenter, TopTenListViewPresenter, EditTTLInfoPresenter, Presenter, NoteViewPresenter<INote> { 
 	private SeriesPlace sPlace;
 	private SeriesListView<IRatingSeries> view;
 	private TopTenListView<ITopTenItem> listView;
 	private NoteView<INote> noteView;
-//	private boolean starting;
-//	private static boolean ignore = false;
+	protected ClientFactory clientFactory;
+	protected ICoreConfiguration _coreConfig;
+	protected int detailCount=0;
+	private SidebarViewImpl sidebarView;
+
 
 	public SeriesActivity(SeriesPlace sPlace, ClientFactory clientFactory) {
-		super(null,clientFactory);
+		//super(null,clientFactory);
+		this.clientFactory = clientFactory;
 		view = clientFactory.getSeriesView();
 		view.setPresenter(this);
 		listView = clientFactory.getSimpleView();
@@ -54,37 +61,11 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 		noteView = clientFactory.getNoteView();
 		noteView.setPresenter(this);
 		view.setListView(listView);
-		view.setNotesView(noteView);
-
+		sidebarView = clientFactory.getSidebarView();
+		
 		if (sPlace.getToken() != null) {
 			this.sPlace = sPlace;
 		}
-		
-//		final HandlerRegistration reg =  History.addValueChangeHandler(new ValueChangeHandler<String>() {
-//			
-//			public void onValueChange(ValueChangeEvent<String> event) {
-//				String placeToken = event.getValue();
-//				SeriesPlace p = new SeriesPlace(event.getValue());
-//				Logger.getLogger("HistChangeHandler").log(Level.INFO,"history changed " + placeToken);
-//				//view.prepareForHere(p);
-//				//SeriesPlace place = new SeriesPlace(placeToken);
-//				//gotoPlace(place);
-////				if (selectedContactName == null || selectedContact.equals(“”)){
-////					// do nothing
-////				}else{
-////					Contact contact = findContactByName(selectedContactName);
-////					
-////					/*
-////					 * Prior to refactoring, this was on the click-handler.  
-////					 * To provide 'Back' support, we will now do this on a URL 
-////					 * change.  All the click-handler does now is change the URL
-////					 * which, in turn, calls this History ValueChangeHandler. 
-////					 */
-////					eventBus.fireEvent(new ContactSelectedEvent(contact));
-////					showContactAsSelected(contact);	
-////				}
-//			}
-//		});
 	}
 
 	@Override
@@ -172,6 +153,8 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 //			}
 //			starting = false;
 			Logger.getLogger("SeriesActivity").log(Level.INFO, "Happy");
+			
+			refreshButtons();
 		}
 		
 	}
@@ -350,8 +333,9 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 				break;
 			}
 		}
-
-		view.setQuery(rq);
+		if (rq != null) {
+			view.setQuery(rq);
+		}
 	}
 
 	private void getList(Long queryId) {
@@ -504,4 +488,119 @@ public class SeriesActivity extends TopTenListActivity implements SeriesListView
 
 		$wnd.ganew('send', 'event', cat, action, label, val);
 	}-*/;
+
+	@Override
+	public void onLoginComplete(String destination) {
+		clientFactory.getPlaceController().goTo(sPlace);	
+	}
+	
+	@Override
+	public void showNext() {
+//		LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
+//		if (login.isTopTenContentContributor() || login.isTopTenContentEditor()) {
+//			clientFactory.getPlaceController().goTo(new TopTenListPlace(view.getList().getNextId()));
+//		} else {
+//			clientFactory.getPlaceController().goTo(new TopTenListPlace(view.getList().getNextPublishedId()));
+//		}
+
+	}
+
+	@Override
+	public void showPrev() {
+//		LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
+//		if (login.isTopTenContentContributor() || login.isTopTenContentEditor()) {
+//			clientFactory.getPlaceController().goTo(new TopTenListPlace(view.getList().getPrevId()));
+//		} else {
+//			clientFactory.getPlaceController().goTo(new TopTenListPlace(view.getList().getPrevPublishedId()));
+//		}	
+	}
+
+
+	@Override
+	public void cancelEditTTLInfo(ITopTenList ttl) {
+		clientFactory.getEditTTLInfoDialog().hide();
+	}
+
+	@Override
+	public void showRatingDetails(final ITopTenItem value) {
+		++detailCount;
+		clientFactory.getRpcService().getPlayerRating(value.getPlayerRatingId(), new AsyncCallback<IPlayerRating>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save Top Ten List. See event log for details.");
+			}
+
+			@Override
+			public void onSuccess(IPlayerRating result) {
+				clientFactory.getRatingPopup().setRating(result);
+				clientFactory.getRatingPopup().center();
+				recordAnalyticsEvent("ratingDetails", "click", result.getPlayer().getShortName(), 1);
+			}
+		});	
+
+
+	}
+
+	@Override
+	public String mayStop()
+	{
+		if (view != null && view.getList() != null && view.getList().getTitle() != null) {
+			recordAnalyticsEvent("ratingDetailsCount", "click", view.getList().getTitle(), detailCount);
+		}
+		return null;
+	}
+
+	@Override
+	public void saveTTLInfo(ITopTenList list) {
+		clientFactory.getRpcService().saveTopTenList(list, new AsyncCallback<ITopTenList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to save Top Ten List. See event log for details.");
+			}
+
+			@Override
+			public void onSuccess(ITopTenList result) {
+				//clientFactory.getHeaderView().setHeroListInfo(result.getTitle(), result.getContent());
+				clientFactory.getEditTTLInfoDialog().hide();
+			}
+		});		
+	}
+	
+	private void refreshButtons() {
+
+		LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
+
+		// create feature
+		view.showButtons(!(login == null || login.isLoggedIn() == false || (login.isTopTenContentContributor() == false && login.isTopTenContentEditor() == false)));
+	}
+
+	@Override
+	public void createFeature(final SeriesPlace place) {
+		if (place.getCompId() == null || place.getQueryId() == null) {
+			Window.alert("Bad competition or query Id");
+			return;
+		}
+		
+		clientFactory.getRpcService().createFeature(place.getCompId(), place.getQueryId(), new AsyncCallback<IServerPlace>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to create feature. See event log for details.");
+			}
+
+			@Override
+			public void onSuccess(IServerPlace result) {
+				// go to the Feature view
+				FeatureListPlace fPlace = new FeatureListPlace(result);
+				clientFactory.getPlaceController().goTo(fPlace);
+			}
+		});		
+	}
+
+	@Override
+	public void promote(SeriesPlace place) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+
 }

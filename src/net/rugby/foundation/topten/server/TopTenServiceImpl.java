@@ -49,7 +49,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private IAppUserFactory auf;
 	private ITopTenListFactory ttlf;
 	private ICachingFactory<IContent> ctf;
-	
+
 	private IPlayerRatingFactory prf;
 	private IRatingSeriesFactory rsf;
 	private IRatingQueryFactory rqf;
@@ -327,7 +327,11 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	public ITopTenList getTopTenListForRatingQuery(Long id) {
 		try {
 			IRatingQuery rq = rqf.get(id);
-			return ttlf.get(rq.getTopTenListId());
+			if (rq != null && rq.getTopTenListId() != null) {
+				return ttlf.get(rq.getTopTenListId());
+			} else {
+				return null;
+			}
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;
@@ -377,16 +381,16 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			return null;
 		}
 	}
-
-	@Override
-	public IServerPlace getPlace(String guid) {
-		try {
-			return spf.getForGuid(guid);
-		}  catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
-			return null;
-		}
-	}
+	//
+	//	@Override
+	//	public IServerPlace getPlace(String guid) {
+	//		try {
+	//			return spf.getForGuid(guid);
+	//		}  catch (Throwable e) {
+	//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+	//			return null;
+	//		}
+	//	}
 
 	@Override
 	public IRatingSeries getDefaultRatingSeries(Long compId) {
@@ -403,7 +407,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		try {
 			ITopTenList ttl = ttlf.get(id);
 			if (ttl != null) {
-				return nf.getForList(ttl);
+				return nf.getForList(ttl, false);
 			} else {
 				return null;
 			}
@@ -417,7 +421,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	public Map<Long, String> getPlayerNames(List<Long> needPlayerNames) {
 		try {
 			Map<Long, String> retval = new HashMap<Long, String>();
-			
+
 			for (Long id : needPlayerNames) {
 				IPlayer p = pf.get(id);
 				if (p != null) {
@@ -435,7 +439,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	public Map<Long, String> getTTLNames(List<Long> needTTLNames) {
 		try {
 			Map<Long, String> retval = new HashMap<Long, String>();
-			
+
 			for (Long id : needTTLNames) {
 				ITopTenList ttl = ttlf.get(id);
 				if (ttl != null) {
@@ -453,7 +457,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	public Map<Long, String> getTTLContexts(List<Long> needTTLContexts) {
 		try {
 			Map<Long, String> retval = new HashMap<Long, String>();
-			
+
 			for (Long id : needTTLContexts) {
 				ITopTenList ttl = ttlf.get(id);
 				if (ttl != null) {
@@ -466,5 +470,49 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			return null;
 		}
 	}
+
+
+	@Override
+	public IServerPlace getPlace(String guid) {
+		try {
+			return spf.getForGuid(guid);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IServerPlace createFeature(Long compId, Long queryId) {
+		try {
+			IAppUser u = getAppUser();
+			if (u instanceof ITopTenUser && (((ITopTenUser)u).isTopTenContentContributor() || ((ITopTenUser)u).isTopTenContentEditor())) {
+				if (queryId != null) {
+					ITopTenList list = getTopTenListForRatingQuery(queryId);
+					ttlf.makeFeature(list);
+					IServerPlace place = spf.create();
+					place.setCompId(compId);
+					place.setListId(list.getId());
+					place.setItemId(null);
+					return place;
+				}
+				
+				return null;
+				
+			} else {
+				String user = "a not logged on user ";
+				if (u != null) {
+					user = "The user " + u.getEmailAddress() + " (" + u.getId() + ")";
+				}
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, user + " is trying to create a feature from queryId" + queryId);
+				return null;
+			}
+		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+
+	}
+
 
 }

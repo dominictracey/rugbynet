@@ -16,7 +16,6 @@ import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("TopTenService")
@@ -45,4 +44,5 @@ public interface TopTenListService extends RemoteService {
 	public Map<Long, String> getPlayerNames(List<Long> needPlayerNames);
 	public Map<Long, String> getTTLNames(List<Long> needTTLNames);
 	public Map<Long, String> getTTLContexts(List<Long> needTTLContexts);
+	public IServerPlace createFeature(Long compId, Long queryId);
 }

@@ -101,11 +101,18 @@ public class OfyNoteFactory extends BaseNoteFactory implements INoteFactory {
 	}
 
 	@Override
-	protected List<INote> getFromPersistentDatastoreByList(ITopTenList ttl) {
+	protected List<INote> getFromPersistentDatastoreByList(ITopTenList ttl, boolean includeAll) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
+			
+			List<INote> retval = new ArrayList<INote>();	
+			if (includeAll) {
+				Query<Note> noteQ = ofy.query(Note.class).filter("contextListId", ttl.getId());
+				retval.addAll(noteQ.list());
+			}
+			
 			Query<NoteRef> noteRefQ = ofy.query(NoteRef.class).filter("contextId", ttl.getId());
-			List<INote> retval = new ArrayList<INote>();
+
 			
 			for (INoteRef ref : noteRefQ) {
 				retval.add(get(ref.getNoteId()));

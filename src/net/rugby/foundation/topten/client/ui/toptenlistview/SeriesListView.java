@@ -28,12 +28,14 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 {
 	public interface SeriesListViewPresenter {
 		void setButtons();
-		void parse(Widget widget);
+//		void parse(Widget widget);
 		void showRatingDetails(ITopTenItem value);
-		void setFBListLike(ITopTenList list, String baseUrl);
+//		void setFBListLike(ITopTenList list, String baseUrl);
 		void gotoPlace(Place place);
 		void switchMode(Long compId, RatingMode _mode);
 		void process(SeriesPlace place);
+		void createFeature(SeriesPlace place);
+		void promote(SeriesPlace place);
 	}
 	
 	void setSeries(IRatingSeries series, String baseUrl);
@@ -70,13 +72,19 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 
 	boolean isRatingModesSet();
 
-	void setNotes(String notes);
-	void setNotesView(NoteView<INote> noteView);
+//	void setNotes(String notes);
+//	void setNotesView(NoteView<INote> noteView);
 	
 	/**
 	 * Clear all UI elements and backing data members to prepare for a link jump
 	 */
 	void reset();
 	void prepareForHere(SeriesPlace sPlace);
+	
+	/**
+	 * 
+	 * @param show - whether the create feature, promote, etc. buttons should be displayed.
+	 */
+	void showButtons(boolean show);
 	
 }

@@ -69,6 +69,8 @@ public interface CompetitionView extends IsWidget {
 		 * @param matchId
 		 */
 		void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerRating> editMatchStats, long matchId, long roundId, long compId);
+		
+		void virtualCompClicked();
 
 	}
 

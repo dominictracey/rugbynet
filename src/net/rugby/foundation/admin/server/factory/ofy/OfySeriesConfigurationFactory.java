@@ -45,6 +45,10 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 		for (Long compId : sc.getCompIds()) {
 			sc.getComps().add(cf.get(compId));
 		}
+		if (sc.getHostCompId() != null) {
+			sc.setHostComp(cf.get(sc.getHostCompId()));
+		}
+		
 		return sc;
 	}
 

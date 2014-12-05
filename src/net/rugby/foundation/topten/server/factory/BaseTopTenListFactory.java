@@ -47,6 +47,7 @@ import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -99,7 +100,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		this.nf = nf;
 		this.rmf = rmf;
 		this.rgf = rgf;
-		
+
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -197,7 +198,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 			// delete notes and noteRefs
 			nf.deleteForList(list);
-			
+
 			// delete the component items from memcache
 			Iterator<ITopTenItem> it = list.getList().iterator();
 			while (it.hasNext()) {
@@ -425,17 +426,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 		// append it onto the comp's linked list if it is ad hoc
 		if (!list.getSeries()) {
-			ITopTenList last = getLastCreatedForComp(list.getCompId());
-			if (last != null) { // might be the first one
-				assert (last.getNextId() == null);
-				if (list.getId() == null) {
-					put(list);
-				}
-				last.setNextId(list.getId());
-				put(last);
-
-				list.setPrevId(last.getId());
-			}
+			makeFeature(list);
 		}
 
 		//get an id
@@ -508,7 +499,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		// store reference in ratingQuery
 		rq.setTopTenListId(list.getId());
 		rqf.put(rq);
-		
+
 		// create notes once the query and TTL are linked up
 		nc.createNotes(rq);
 
@@ -517,6 +508,35 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		}
 
 		return list;
+	}
+
+	@Override
+	public void makeFeature(ITopTenList list) {
+		ITopTenList last = getLastCreatedForComp(list.getCompId());
+		if (last != null) { // might be the first one
+			assert (last.getNextId() == null);
+			if (list.getId() == null) {
+				put(list);
+			}
+			last.setNextId(list.getId());
+			put(last);
+
+			list.setPrevId(last.getId());
+		}
+
+		// and create a feature guid
+		// create the place guid
+		IServerPlace p = spf.create();
+		p.setCompId(list.getCompId());
+		p.setListId(list.getId());
+		p.setItemId(null);
+		p.setType(PlaceType.FEATURE);
+		spf.put(p);  
+
+		list.setSeries(false);
+		list.setGuid(p.getGuid());
+		put(list);
+
 	}
 
 	private void buildTwitterDescription(ITopTenList list, IRatingQuery rq) {
@@ -688,9 +708,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		try {
 			if (item != null) {
 				item = putToPersistentDatastore(item);
-				
+
 				// need to update the list in memcache too
-				
+
 			}
 
 			return item;
@@ -708,7 +728,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		try {
 			// clear out the memcache copies of this list from the instances that may contain it
 			dropContainersFromMemcache(list);
-			
+
 			list = putToPersistentDatastore(list);
 
 			Iterator<ITopTenItem> it = list.getList().iterator();
@@ -946,11 +966,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		}
 		return retval;
 	}
-	
+
 	public String getGuidForMatch(IMatchGroup m) {
 		// chase back up to the comp
 		//ICompetition c = cf.get(rf.get(m.getRoundId()).getCompId());
-		
+
 		// now find the series for Mode=BY_MATCH, Criteria=ROUND
 		IRound r = rf.get(m.getRoundId());
 		IRatingSeries series = rsf.get(r.getCompId(), RatingMode.BY_MATCH);
@@ -963,7 +983,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					break;
 				}
 			}
-			
+
 			if (rg != null) {
 				IRatingMatrix rm = null;
 				for (IRatingMatrix rmi : rg.getRatingMatrices()) {
@@ -972,7 +992,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 						break;
 					}
 				}
-			
+
 				// now the right query
 				if (rm != null) {
 					IRatingQuery rq = null;
@@ -982,11 +1002,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 							break;
 						}
 					}
-					
+
 					// and the TTL to get the guid from
 					if (rq.getTopTenListId() != null) {
 						ITopTenList ttl = get(rq.getTopTenListId());
-					
+
 						if (ttl != null) {
 							return ttl.getGuid();
 						}
@@ -994,7 +1014,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 

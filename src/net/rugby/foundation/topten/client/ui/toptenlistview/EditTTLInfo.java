@@ -37,6 +37,7 @@ public class EditTTLInfo extends DialogBox {
 	public EditTTLInfo() {
 		setWidget(uiBinder.createAndBindUi(this));
 	}
+	
 
 	@UiField Button save;
 	@UiField Button cancel;

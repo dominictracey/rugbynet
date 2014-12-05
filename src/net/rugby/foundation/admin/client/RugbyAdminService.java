@@ -141,4 +141,5 @@ public interface RugbyAdminService extends RemoteService {
 	Boolean deleteSeriesConfiguration(Long sConfigId);
 	ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) throws Exception;
 	List<UniversalRound> getUniversalRounds(int size);
+	ICompetition addVirtualComp();
 }

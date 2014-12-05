@@ -76,5 +76,7 @@ public interface ITopTenList {
 	 * @param context - for a match, should be "Gloucester vs. Newcastle"; for a round should be "Round 2"
 	 */
 	void setContext(String context);
+	String getFeatureGuid();
+	void setFeatureGuid(String featureGuid);
 
 }

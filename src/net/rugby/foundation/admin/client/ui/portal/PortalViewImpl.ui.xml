@@ -69,11 +69,11 @@ Team:
             </g:HTMLPanel>
             <g:VerticalPanel>
                 <g:HorizontalPanel>
-            <b:CheckBoxButton ui:field="timeSeries" icon="TIME" toggle="true">Time Series</b:CheckBoxButton>
-            <g:Button ui:field="query">Query</g:Button>
-            <g:Button ui:field="clear">Clear</g:Button>
-            <g:Button ui:field="delete">Delete</g:Button>
-            <g:Button ui:field="topTen">Create Top Ten List</g:Button>
+            <b:CheckBoxButton ui:field="timeSeries">Time Series</b:CheckBoxButton>
+            <b:Button ui:field="query">Query</b:Button>
+            <b:Button ui:field="clear">Clear</b:Button>
+            <b:Button ui:field="delete">Delete</b:Button>
+            <b:Button ui:field="topTen">Create Top Ten List</b:Button>
             </g:HorizontalPanel>
             <g:VerticalPanel>
                 <b:CheckBox ui:field="scaleTime">Scale for Match Age</b:CheckBox>

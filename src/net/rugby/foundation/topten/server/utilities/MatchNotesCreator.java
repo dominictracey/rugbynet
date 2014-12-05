@@ -99,7 +99,11 @@ public class MatchNotesCreator implements INotesCreator {
 								if (group.getUniversalRoundOrdinal() == uro) {
 									break;
 								}
-								groups.get(--i);
+								if (i == 0) {
+									group = null;
+								} else {
+									group = groups.get(--i);
+								}
 							}
 
 							if (group != null) {

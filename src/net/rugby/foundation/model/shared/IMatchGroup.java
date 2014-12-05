@@ -58,5 +58,13 @@ public interface IMatchGroup extends IGroup  {
 	public abstract void setForeignUrl(String foreignUrl);
 	public abstract void setFetchMatchStatsPipelineId(String pipelineId);
 	public abstract String getFetchMatchStatsPipelineId();
+
+	/**
+	 * 
+	 * @return the url identifier to get to the match top ten list
+	 */
+	public abstract String getGuid();
+
+	public abstract void setGuid(String guid);
 	
 }

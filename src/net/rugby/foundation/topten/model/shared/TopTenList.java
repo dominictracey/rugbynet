@@ -50,6 +50,7 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Unindexed
 	protected String twitterDescription;
 	protected String guid;
+	protected String featureGuid;
 	
 	// because these can be greater than 500 chars we keep them in a separate table
 	protected Long notesId;
@@ -306,6 +307,14 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+	@Override
+	public String getFeatureGuid() {
+		return featureGuid;
+	}
+	@Override
+	public void setFeatureGuid(String featureGuid) {
+		this.featureGuid = featureGuid;
 	}
 
 }

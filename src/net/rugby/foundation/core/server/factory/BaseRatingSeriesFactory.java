@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -101,10 +102,10 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 	private final String prefix = "RS-mode";
 	
 	@Override
-	public Map<RatingMode, Long> getModesForComp(Long compId)
+	public HashMap<RatingMode, Long> getModesForComp(Long compId)
 	{
 		try {
-			Map<RatingMode, Long> list = null;
+			HashMap<RatingMode, Long> list = null;
 	
 			String key = prefix+compId.toString();
 			byte[] value = null;
@@ -135,7 +136,7 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 				Object obj = in.readObject();
 
 				//				if (typeLiteral.equals(obj.getClass())) {  // can't do 'obj instanceof List<T>' *sadfase*
-				list = (Map<RatingMode, Long>)obj;
+				list = (HashMap<RatingMode, Long>)obj;
 
 				bis.close();
 				in.close();
@@ -168,7 +169,7 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 		
 	}
 	
-	public abstract Map<RatingMode, Long> getModesForCompFromPersistentDatastore(Long compId);
+	public abstract HashMap<RatingMode, Long> getModesForCompFromPersistentDatastore(Long compId);
 	
 //	@Override
 //	public IRatingSeries put(IRatingSeries t) {

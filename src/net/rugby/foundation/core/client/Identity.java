@@ -10,22 +10,36 @@ import net.rugby.foundation.core.client.ui.ManageProfile;
 import net.rugby.foundation.core.shared.IdentityTypes.Actions;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
+import net.rugby.foundation.topten.client.place.SeriesPlace;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.ListGroup;
+import org.gwtbootstrap3.client.ui.ListGroupItem;
 import org.gwtbootstrap3.client.ui.NavPills;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Toggle;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.gwtfb.client.Callback;
-import com.gwtfb.client.JSOModel;
-import com.gwtfb.sdk.FBCore;
+import com.google.gwt.user.client.ui.RootPanel;
+//import com.gwtfb.client.Callback;
+//import com.gwtfb.client.JSOModel;
+//import com.gwtfb.sdk.FBCore;
+import com.google.gwt.user.client.ui.Widget;
 
 public class Identity implements ManageProfile.Presenter, Login.Presenter, ExternalAuthenticatorPanel.Presenter, ChangePasswordPanel.Presenter {
 
@@ -63,15 +77,16 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 //		return null;
 //	}
 
-	private FBCore fbCore;
+//	private FBCore fbCore;
 
 
 	CoreClientFactory clientFactory = null;
-	NavPills parent = null;
-	Button signUpLink;
-	Button signInLink;
-	Button signOutLink;
-	Button editProfileLink;
+	RootPanel parent = null;
+	private ListGroupItem parentWidget;
+	AnchorListItem signUpLink;
+	AnchorListItem signInLink;
+	AnchorListItem signOutLink;
+	AnchorListItem editProfileLink;
 
 	Label sep = new HTML("&nbsp;&nbsp;| ");
 	private Presenter presenter = null;
@@ -86,27 +101,29 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	private final String FACEBOOK_DEV_APP_ID="341652969207503";
 	private final String FACEBOOK_BETA_APP_ID="401094413237618";
 	private final String FACEBOOK_PROD_APP_ID="191288450939341";
-	LoginStatusCallback loginStatusCallback = null;
+//	LoginStatusCallback loginStatusCallback = null;
 
 	public interface checkLoginStatusCallback {
 		void onLoginStatusChecked(LoginInfo loginInfo);
 	}
 
-	public NavPills getParent() {
+	public RootPanel getParent() {
 		return parent;
 	}
 
-	public void setParent(NavPills parent) {
-		this.parent = parent;
+	public void setParent(RootPanel rootPanel) {
+		this.parent = rootPanel;
+		parentWidget = null;
 	}
 
-	HorizontalPanel accountManagement = null;
+	DropDownMenu accountManagement = null;
+	Anchor tog = null;
 
 	public Identity(CoreClientFactory clientFactory) {
 		super();
 		this.clientFactory = clientFactory;
 
-		fbCore = GWT.create(FBCore.class);
+//		fbCore = GWT.create(FBCore.class);
 		String appId = "";
 		
 		if (!GWT.isProdMode()) {
@@ -123,7 +140,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		
 		// if they are showing logged in via Facebook we need to check they are still logged in to facebook
 		// using the FB.getLoginStatus JS call.
-		loginStatusCallback = new LoginStatusCallback();
+//		loginStatusCallback = new LoginStatusCallback();
 	}
 
 	protected ManageProfile getManageProfileDialog() {
@@ -182,6 +199,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		}	
 	};
 
+
 	public CoreClientFactory getClientFactory() {
 		return clientFactory;
 	}
@@ -195,18 +213,27 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		if (accountManagement != null) {
 			accountManagement.removeFromParent();
 		}
+		
+		if (tog != null) {
+			tog.removeFromParent();
+		}
 
-		accountManagement = new HorizontalPanel();
-		parent.add(accountManagement);
+		accountManagement = new DropDownMenu(); //HorizontalPanel();
+		tog = new Anchor();
+		tog.setDataToggle(Toggle.DROPDOWN);
+		tog.setIcon(IconType.USER);
+		
+
 
 		if (clientFactory.getLoginInfo() != null && clientFactory.getLoginInfo().isLoggedIn()) {
 			if (clientFactory.getLoginInfo().getProviderType() == null || !clientFactory.getLoginInfo().getProviderType().equals(ProviderType.facebook)) {
 				// native or openid
-				signOutLink = new Button("sign out");
+				tog.setHTML(clientFactory.getLoginInfo().getNickname() + "<b class=\"caret\"></b>");
+				signOutLink = new AnchorListItem("sign out");
 				signOutLink.setIcon(IconType.UNLOCK);
 				signOutLink.addClickHandler(signOutHandler);
 				signOutLink.addStyleDependentName("IdentityButton");
-				editProfileLink = new Button(clientFactory.getLoginInfo().getNickname());
+				editProfileLink = new AnchorListItem("Profile"); 				
 				editProfileLink.addClickHandler(editProfileHandler);
 				editProfileLink.addStyleDependentName("IdentityButton");
 				editProfileLink.setIcon(IconType.COG);
@@ -217,16 +244,18 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			} else {
 
 				// Get login status - will update the Facebook UI element in the header appropriately
-				fbCore.getLoginStatus(loginStatusCallback);
+//				fbCore.getLoginStatus(loginStatusCallback);
 			}
 
 		}
 		else {
-			signInLink = new Button("sign in");
+			tog.setHTML("Account" + "<b class=\"caret\"></b>");
+			
+			signInLink = new AnchorListItem("sign in");
 			signInLink.setIcon(IconType.KEY);
 			signInLink.addClickHandler(signInHandler);
 			signInLink.addStyleDependentName("IdentityButton");
-			signUpLink = new Button("sign up");
+			signUpLink = new AnchorListItem("sign up");
 			signUpLink.addStyleDependentName("IdentityButton");
 			signUpLink.setIcon(IconType.LOCK);
 			signUpLink.addClickHandler(signUpHandler);
@@ -236,60 +265,68 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			signUpLink.setVisible(true);
 			signInLink.setVisible(true);
 
-		};		
-	}
-
-	// Callback used when checking login status at facebook
-	class LoginStatusCallback extends Callback<JavaScriptObject> {
-		public void onSuccess ( JavaScriptObject response ) {
-			JSOModel jso = response.cast ();
-			if ( jso.hasKey ( "error" ) ) {
-				actionsComplete(new LoginInfo());
-				return;
-			}
-
-			if (accountManagement != null) {
-				accountManagement.removeFromParent();
-			}
-			accountManagement = new HorizontalPanel();
+		}	
+		if (parent != null) {
+			parent.add(tog);
 			parent.add(accountManagement);
-			
-			String status = jso.get("status");
-
-			if (status.equals("connected")) {
-				// @TODO show the facebook user's name in the top bar & sign out link
-				signOutLink = new Button("sign out");
-				signOutLink.setIcon(IconType.UNLOCK);
-				signOutLink.addClickHandler(signOutHandler);
-				editProfileLink = new Button(clientFactory.getLoginInfo().getNickname());
-				editProfileLink.setIcon(IconType.COG);
-				editProfileLink.addClickHandler(editProfileHandler);	
-				accountManagement.add(editProfileLink);
-				accountManagement.add(signOutLink);
-				signOutLink.setVisible(true);
-				editProfileLink.setVisible(true);
-			} else if (status.equals("disconnected")) {
-				// @TODO show login button in the top bar
-				HTML facebookLogin = new HTML ( "<div style='margin-top: 2px; float: right;'><div class='fb-login-button' autologoutlink='true' scope='email' /> </div>");
-				accountManagement.add(facebookLogin);
-				accountManagement.add(sep);				
-			} else {
-				// @TODO unknown - so they have de-authorized us. Just show the normal sign in | sign up
-				signInLink = new Button("sign in");
-				signInLink.setIcon(IconType.LOCK);
-				signInLink.addClickHandler(signInHandler);
-				signUpLink = new Button("sign up");
-				signUpLink.setIcon(IconType.PLUS);
-				signUpLink.addClickHandler(signUpHandler);
-
-				accountManagement.add(signInLink);
-				accountManagement.add(signUpLink);
-				signUpLink.setVisible(true);
-				signInLink.setVisible(true);
-			}
+		} else if (parentWidget != null) {
+//			parentWidget.add(tog);
+//			parentWidget.add(accountManagement);
 		}
 	}
 
+	
+	// Callback used when checking login status at facebook
+//	class LoginStatusCallback extends Callback<JavaScriptObject> {
+//		public void onSuccess ( JavaScriptObject response ) {
+//			JSOModel jso = response.cast ();
+//			if ( jso.hasKey ( "error" ) ) {
+//				actionsComplete(new LoginInfo());
+//				return;
+//			}
+//
+//			if (accountManagement != null) {
+//				accountManagement.removeFromParent();
+//			}
+//			accountManagement = new HorizontalPanel();
+//			parent.add(accountManagement);
+//			
+//			String status = jso.get("status");
+//
+//			if (status.equals("connected")) {
+//				// @TODO show the facebook user's name in the top bar & sign out link
+//				signOutLink = new Button("sign out");
+//				signOutLink.setIcon(IconType.UNLOCK);
+//				signOutLink.addClickHandler(signOutHandler);
+//				editProfileLink = new Button(clientFactory.getLoginInfo().getNickname());
+//				editProfileLink.setIcon(IconType.COG);
+//				editProfileLink.addClickHandler(editProfileHandler);	
+//				accountManagement.add(editProfileLink);
+//				accountManagement.add(signOutLink);
+//				signOutLink.setVisible(true);
+//				editProfileLink.setVisible(true);
+//			} else if (status.equals("disconnected")) {
+//				// @TODO show login button in the top bar
+//				HTML facebookLogin = new HTML ( "<div style='margin-top: 2px; float: right;'><div class='fb-login-button' autologoutlink='true' scope='email' /> </div>");
+//				accountManagement.add(facebookLogin);
+//				accountManagement.add(sep);				
+//			} else {
+//				// @TODO unknown - so they have de-authorized us. Just show the normal sign in | sign up
+//				signInLink = new Button("sign in");
+//				signInLink.setIcon(IconType.LOCK);
+//				signInLink.addClickHandler(signInHandler);
+//				signUpLink = new Button("sign up");
+//				signUpLink.setIcon(IconType.PLUS);
+//				signUpLink.addClickHandler(signUpHandler);
+//
+//				accountManagement.add(signInLink);
+//				accountManagement.add(signUpLink);
+//				signUpLink.setVisible(true);
+//				signInLink.setVisible(true);
+//			}
+//		}
+//	}
+//
 
 	public Presenter getPresenter() {
 		return presenter;
@@ -634,4 +671,73 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		getManageProfileDialog().hide();
 		
 	}
+
+	public void setParentWidget(ListGroupItem parentWidget) {
+		this.parentWidget = parentWidget;
+		parent = null;
+	}
+	
+//	private void showLoggedInMobile()
+//	{
+//		Widget parent = RootPanel.get("sidebar-profile");
+//		
+//		final ListGroupItem li = new ListGroupItem();
+//		Anchor a = new Anchor();
+//		a.setHTML("<i class=\"fa fa-laptop\"></i><span>" + compName + "</span><b class=\"caret\"></b>");
+//		anchorMap.put(compId, a);
+//		liMap.put(compId, li);
+//		li.add(a);
+//		dashboardMenu.add(li);
+//		li.removeStyleName("list-group-item");
+//		
+//		if (modeMap.isEmpty()) {
+//			a.addClickHandler(new ClickHandler() {
+//
+//				@Override
+//				public void onClick(ClickEvent event) {
+//					// TODO Auto-generated method stub
+//
+//				}
+//
+//			});
+//		} else {
+//			// first create submenu
+//			ListGroup submenu = new ListGroup();
+//			submenuMap.put(compId, submenu);
+//			submenu.setStyleName("submenu");
+//			for (RatingMode mode: modeMap.keySet()) {
+//				ListGroupItem lgi = new ListGroupItem();
+//				lgi.removeStyleName("list-group-item");
+//				Anchor modeLink = new Anchor();
+//				modeLink.setText(mode.getMenuName());
+//				final RatingMode _mode = mode;
+//				modeLink.addClickHandler(new ClickHandler() {
+//
+//					@Override
+//					public void onClick(ClickEvent event) {
+//						SeriesPlace place = new SeriesPlace();
+//						place.setCompId(compId);
+//						place.setSeriesId(modeMap.get(_mode));
+//						
+//						// remove the carat if it is somewhere else
+//						if (caratParent != null && carat != null) {
+//							caratParent.remove(carat);
+//						}
+//						
+//						// add the carat
+//						li.add(carat);
+//						caratParent = li;
+//						
+//						clientFactory.getPlaceController().goTo(place);
+//					}
+//					
+//				});
+//				lgi.add(modeLink);
+//				submenu.add(lgi);
+//			}
+//			li.add(submenu);
+//			a.setStyleName("dropdown-toggle");
+//
+//		}
+//	}
 }

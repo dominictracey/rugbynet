@@ -1,24 +1,36 @@
 <module rename-to="core">
 	<inherits name="com.google.gwt.user.User"/>
 	<inherits name="com.google.gwt.http.HTTP"/>
-<!-- 	<inherits name="com.google.gwt.user.theme.standard.Standard"/> -->
-<!-- 	<inherits name="com.googlecode.objectify.Objectify" /> -->
 	<inherits name="net.rugby.foundation.model.Model"/>
-<!-- 	<inherits name="com.github.gwtbootstrap.Bootstrap"/> -->
-	<inherits name="org.gwtbootstrap3.GwtBootstrap3"/>
-<!-- 	<inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/> -->
-	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
-	<inherits name="com.gwtfb.GwtFB"/>
-	
-	 <!-- Theming GWTBootstrap per http://carlosbecker.com/posts/using-a-custom-bootstrap-theme-in-gwt-bootstrap/ -->
-    <source path='resources'/>
-    <replace-with class="net.rugby.foundation.core.resources.BootstrapConfigurator">
-      <when-type-is class="com.github.gwtbootstrap.client.ui.config.Configurator"/>
-    </replace-with>
-    <public path="resources">
-      <exclude name="** /*.java"/>
-      <exclude name="** /*.class"/>
-    </public>
+<!-- 	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
+	<inherits name="org.gwtbootstrap3.GwtBootstrap3NoTheme"/>
+
+<!-- 		<inherits name="org.gwtbootstrap3.GwtBootstrap3"/> -->
+<!-- 	<inherits name="com.gwtfb.GwtFB"/> -->
+
+<!--     <public path='theme'> -->
+<!--         <include name='/core/theme/css/*.css'/> -->
+<!--         <include name='/core/theme/js/*.js'/> -->
+<!--     </public> -->
+
+<!--     <stylesheet src='/core/theme/css/bootstrap-overrides.css'/> -->
+<!--     <stylesheet src='/core/theme/css/theme/default.css'/> -->
+    
+    <!-- bootstrap -->
+<!-- <stylesheet src='/core/theme/css/bootstrap.css'/> -->
+<!-- <stylesheet src='/core/theme/css/bootstrap-overrides.css'/> -->
+
+<!-- theme -->
+<!-- <stylesheet src='/core/theme/css/theme/default.css' /> -->
+
+<!-- libraries -->
+<!-- <stylesheet src='/core/theme/css/font-awesome.css' /> -->
+<!-- <stylesheet src='/core/theme/css/elements/dashboard.css' /> -->
+<!-- <stylesheet src='/core/theme/css/elements/notify.css' /> -->
+<!-- <stylesheet src='/core/theme/css/elements/bootstrap_calendar.css' /> -->
+<!-- <stylesheet src='/core/theme/css/elements/pizza.css' /> -->
+
+<!--     <script src='/core/theme/js/theme.js'/> -->
     
 	<entry-point class="net.rugby.foundation.core.client.Core"/>
 	<source path='client'/>

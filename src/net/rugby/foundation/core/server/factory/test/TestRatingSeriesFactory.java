@@ -82,8 +82,8 @@ public class TestRatingSeriesFactory extends BaseRatingSeriesFactory implements 
 	}
 
 	@Override
-	public Map<RatingMode, Long> getModesForCompFromPersistentDatastore(Long compId) {
-		Map<RatingMode, Long> list = new HashMap<RatingMode, Long>();
+	public HashMap<RatingMode, Long> getModesForCompFromPersistentDatastore(Long compId) {
+		HashMap<RatingMode, Long> list = new HashMap<RatingMode, Long>();
 		list.put(RatingMode.BY_POSITION,75000L);
 //		list.add(RatingMode.BY_MATCH,75000L);
 		return null;

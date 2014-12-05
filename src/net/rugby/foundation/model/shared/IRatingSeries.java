@@ -59,6 +59,14 @@ public interface IRatingSeries extends IHasId {
 	public abstract String getDisplayName();
 
 	public abstract void setDisplayName(String displayName);
+
+	void setHostCompId(Long hostCompId);
+
+	Long getHostCompId();
+
+	void setHostComp(ICompetition hostComp);
+
+	ICompetition getHostComp();
 	
 
 }

@@ -114,6 +114,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 		scaleComp.setValue(true);
 		scaleTime.setValue(true);
 		scaleStanding.setValue(true);
+
 	}
 
 

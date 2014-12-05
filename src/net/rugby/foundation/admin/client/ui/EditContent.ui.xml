@@ -27,7 +27,7 @@
 	    <b:TextBox ui:field="menuOrder"></b:TextBox>
 	    <b:HelpBlock>Smaller numbers display earlier</b:HelpBlock>
 	    
-        <b:Nav alignment="RIGHT">
+        <b:Nav>
         	<b:Nav ui:field='buttonBar'>
         	    		<b:Button ui:field="save" type="PRIMARY">Save</b:Button>
 						<b:Button ui:field="cancel">Cancel</b:Button>	

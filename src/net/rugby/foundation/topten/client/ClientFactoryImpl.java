@@ -6,10 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewColumnDefinitions;
-import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewImpl;
-import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+import org.gwtbootstrap3.client.ui.html.Span;
+
+import net.rugby.foundation.core.client.Core.CompChangeListener;
+import net.rugby.foundation.core.client.Core.GuidChangeListener;
+import net.rugby.foundation.core.client.Core.RoundChangeListener;
 import net.rugby.foundation.core.client.Identity.Presenter;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -21,18 +24,19 @@ import net.rugby.foundation.topten.client.resources.noteTemplates.NoteTemplates;
 import net.rugby.foundation.topten.client.ui.HeaderView;
 import net.rugby.foundation.topten.client.ui.HeaderViewImpl;
 import net.rugby.foundation.topten.client.ui.RatingPopupViewImpl;
+import net.rugby.foundation.topten.client.ui.SidebarViewImpl;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
 import net.rugby.foundation.topten.client.ui.notes.NoteView;
 import net.rugby.foundation.topten.client.ui.notes.NoteViewColumnDefinitions;
 import net.rugby.foundation.topten.client.ui.notes.NoteViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.CompactTopTenListViewImpl;
-import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTIText;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo;
+import net.rugby.foundation.topten.client.ui.toptenlistview.FeatureListView;
+import net.rugby.foundation.topten.client.ui.toptenlistview.FeatureListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
-import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListViewImpl;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -44,36 +48,33 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.place.shared.PlaceController;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Sample implementation of {@link ClientFactory}.
  */
-public class ClientFactoryImpl implements ClientFactory, Presenter {
+public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeListener, RoundChangeListener, GuidChangeListener {
 
 	private static final EventBus eventBus = new SimpleEventBus();
 
 	private static PlaceController placeController = null;
-	private static  TopTenListView<ITopTenItem> listView = null;
+	//private static  TopTenListView<ITopTenItem> listView = null;
 	private static  TopTenListView<ITopTenItem> simpleView = null;
 	private static  NoteView<INote> noteView = null;
 	private NoteViewColumnDefinitions<INote> noteViewColumnDefinitions;
+	private static  SidebarViewImpl sidebarView = null;
 	private static ContentView contentView = null;
 	private static SeriesListView<IRatingSeries> seriesView = null;
+	private static FeatureListView<ITopTenList> featureView = null;
 	private static EditContent editContent = null;
 	private static TopTenListServiceAsync rpcService = null;
-	private static EditTTIText editTTIText = null;
+//	private static EditTTIText editTTIText = null;
 	private static HeaderView headerView = null;
 	private static EditTTLInfo editTTLInfo = null;
 	private static Presenter identityPresenter = null;
@@ -103,13 +104,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		return placeController;
 	}
 
-	@Override
-	public TopTenListView<ITopTenItem> getListView() {
-		if (listView == null) {
-			listView = new TopTenListViewImpl();
-		}
-		return listView;
-	}
+//	@Override
+//	public TopTenListView<ITopTenItem> getListView() {
+//		if (listView == null) {
+//			listView = new TopTenListViewImpl();
+//		}
+//		return listView;
+//	}
 
 	@Override
 	public TopTenListServiceAsync getRpcService() {
@@ -119,13 +120,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		return rpcService;
 	}
 
-	@Override
-	public EditTTIText getEditTTITextDialog() {
-		if (editTTIText == null) {
-			editTTIText = new EditTTIText();
-		}
-		return editTTIText;
-	}
+//	@Override
+//	public EditTTIText getEditTTITextDialog() {
+//		if (editTTIText == null) {
+//			editTTIText = new EditTTIText();
+//		}
+//		return editTTIText;
+//	}
 
 	@Override
 	public ContentView getContentView() {
@@ -156,6 +157,14 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 			headerView.setClientFactory(this);
 		}
 		return headerView; 
+	}
+	@Override
+	public SidebarViewImpl getSidebarView() {
+		if (sidebarView == null) {
+			sidebarView = new SidebarViewImpl();
+			sidebarView.setClientFactory(this);
+		}
+		return sidebarView; 
 	}
 	@Override
 	public EditTTLInfo getEditTTLInfoDialog() {
@@ -189,7 +198,10 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 	@Override
 	public void doSetup(final AsyncCallback<ICoreConfiguration> cb) {
 		final Identity.Presenter iPresenter = this;
-
+		final CompChangeListener _compListener = this;
+		final RoundChangeListener _roundListener = this;
+		final GuidChangeListener _guidListener = this;
+		
 		if (coreConfig == null) {
 			Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 
@@ -203,7 +215,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 					final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
 					// where we keep the sign in/sign out
 					if (i.getParent() == null) {
-						i.setParent(getHeaderView().getLoginPanel());
+						// are we in a mobile screen?
+						if (Window.getClientWidth() < 768) {
+							// for now, no login from mobile devices
+							//i.setParentWidget(getSidebarView().getSidebarProfile());
+						} else {
+							i.setParent(RootPanel.get("login"));
+						}
 						i.setPresenter(iPresenter);
 					}
 					Core.getCore().login(new AsyncCallback<LoginInfo>() {
@@ -218,27 +236,34 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 
 							loginInfo = result;
 							coreConfig = config;
-							getHeaderView().setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
-
-							// set up content 
-							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
-
-
-
-								@Override
-								public void onFailure(Throwable caught) {
-									cb.onFailure(caught);
-								}
-
-								@Override
-								public void onSuccess(List<IContent> contentList) {
-									ClientFactoryImpl.contentList = contentList;
-									//getNavBarView().getButtonBar().clear();
-									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
-									cb.onSuccess(coreConfig);
-								}
-
-							});
+//							getHeaderView().setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
+//
+//							// set up content 
+//							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
+//
+//
+//
+//								@Override
+//								public void onFailure(Throwable caught) {
+//									cb.onFailure(caught);
+//								}
+//
+//								@Override
+//								public void onSuccess(List<IContent> contentList) {
+//									ClientFactoryImpl.contentList = contentList;
+//									//getNavBarView().getButtonBar().clear();
+//									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
+									getSidebarView().setup(coreConfig);
+									
+									Core.getCore().registerCompChangeListener(_compListener);
+									Core.getCore().registerRoundChangeListener(_roundListener);
+									Core.getCore().registerGuidChangeListener(_guidListener);
+									
+									Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
+									cb.onSuccess(coreConfig);									
+//								}
+//
+//							});
 						}
 					});
 				}
@@ -305,13 +330,23 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		}
 		return seriesView; 
 	}
+	
+	@Override
+	public FeatureListView<ITopTenList> getFeatureListView() {
+		if (featureView == null) {
+			featureView = new FeatureListViewImpl();
+			featureView.setClientFactory(this);
+		}
+		return featureView; 
+	}
+
 
 	@Override
 	public NoteView<INote> getNoteView() {
 		if (noteView == null) {
 			noteView = new NoteViewImpl<INote>();
 			noteView.setClientFactory(this);
-
+			RootPanel.get("notes").add(noteView);
 
 			if (noteViewColumnDefinitions == null) {
 				noteViewColumnDefinitions = new NoteViewColumnDefinitions<INote>();
@@ -397,9 +432,10 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 								for (Long id : result.keySet()) {
 									ttlContexts.put(id, result.get(id));
 
-									// we are ready for the NoteView to call render now...
-									cb.onSuccess(notes);
-								}
+								}									
+								// we are ready for the NoteView to call render now...
+								cb.onSuccess(notes);
+
 							}
 						});
 					}
@@ -408,22 +444,6 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 			}
 
 		});
-	}
-
-
-	public SafeHtml render(List<INote> notes, ITopTenList context, boolean includeDetails) throws Exception {
-		throw new Exception("Don't use");
-		//		SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		//		builder.appendHtmlConstant("<ul>\n");
-		//		for (INote note : notes) {
-		//			if (note.getSignificance() > 10 || note.getContextListId() != context.getId()) {
-		//				builder.appendHtmlConstant("<li>\n");
-		//				builder.appendHtmlConstant(render(note, context, includeDetails));
-		//				builder.appendHtmlConstant("</li>\n");
-		//			}
-		//		}
-		//		builder.appendHtmlConstant("</ul>\n");
-		//		return builder.toSafeHtml();
 	}
 
 	@Override
@@ -478,38 +498,17 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					getRpcService().getPlace(note.getLink(), new AsyncCallback<IServerPlace>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							Window.alert(caught.getLocalizedMessage());
-						}
-
-						@Override
-						public void onSuccess(IServerPlace place) {
-							getSeriesView().reset();
-							SeriesPlace p = new SeriesPlace();
-							p.setCompId(place.getCompId());
-							p.setGroupId(place.getGroupId());
-							p.setMatrixId(place.getMatrixId());
-							p.setItemId(place.getItemId());
-							p.setQueryId(place.getQueryId());
-							p.setSeriesId(place.getSeriesId());
-
-							// what we want to track about the note-sourced click stream:
-							//		1) the template that caught the user's eye
-							//		2) the list type the user left
-							//		3) the list type the user went to
-							//		4) the player name being followed
-							recordAnalyticsEvent("note", "template", note.getTemplateSelector(), 1);
-							recordAnalyticsEvent("note", "link", note.getLink(), 1);
-							recordAnalyticsEvent("note", "type", note.getType().toString(), 1);
-							recordAnalyticsEvent("note", "player", getPlayerName(note.getPlayer1Id()), 1);
-
-							getPlaceController().goTo(p);
-						}
-
-					});
+					Core.getCore().changeGuid(note.getLink());
+					
+					// what we want to track about the note-sourced click stream:
+					//		1) the template that caught the user's eye
+					//		2) the list type the user left
+					//		3) the list type the user went to
+					//		4) the player name being followed
+					recordAnalyticsEvent("note", "template", note.getTemplateSelector(), 1);
+					recordAnalyticsEvent("note", "link", note.getLink(), 1);
+					recordAnalyticsEvent("note", "type", note.getType().toString(), 1);
+					recordAnalyticsEvent("note", "player", getPlayerName(note.getPlayer1Id()), 1);
 				}
 
 			});
@@ -517,10 +516,9 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 			
 		}
 		
-		HTML text = new HTML(builder.toString());
-		HorizontalPanel w = new HorizontalPanel();
-
-		w.add(text);
+		Span w = new Span();
+		w.setHTML(builder.toString());
+		//w.add(text);
 		if (a != null) {
 			w.add(a);
 		}
@@ -592,11 +590,68 @@ public class ClientFactoryImpl implements ClientFactory, Presenter {
 		}
 	}
 
+	@Override
+	public void compChanged(final Long compId) {
+		
+		Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
 
+
+			@Override
+			public void onFailure(Throwable caught) {
+				
+			}
+
+			@Override
+			public void onSuccess(final ICompetition comp) {
+				sidebarView.setComp(comp);				
+			}
+			
+		});
+		
+
+	
+	}
+
+	@Override
+	public void roundChanged(Long id) {
+
+		
+	}
+
+	@Override
+	public void guidChanged(String guid) {
+		rpcService.getPlace(guid, new AsyncCallback<IServerPlace>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert(caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(IServerPlace place) {
+				getSeriesView().reset();
+				SeriesPlace p = new SeriesPlace();
+				p.setCompId(place.getCompId());
+				p.setGroupId(place.getGroupId());
+				p.setMatrixId(place.getMatrixId());
+				p.setItemId(place.getItemId());
+				p.setQueryId(place.getQueryId());
+				p.setSeriesId(place.getSeriesId());
+
+
+
+				getPlaceController().goTo(p);
+			}
+
+		});
+		
+	}
+	
 	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
 
 		$wnd.ganew('send', 'event', cat, action, label, val);
 	}-*/;
+
 
 
 }

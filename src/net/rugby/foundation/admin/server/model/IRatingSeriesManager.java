@@ -21,7 +21,7 @@ public interface IRatingSeriesManager {
 	 * @param rs
 	 * @return pipeline handle of created workflow
 	 */
-	public abstract String process(IRatingSeries rs);
+//	public abstract String process(IRatingSeries rs);
 
 	Boolean readyForNewGroup(ISeriesConfiguration config);
 

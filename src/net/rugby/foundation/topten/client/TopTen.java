@@ -1,24 +1,20 @@
 package net.rugby.foundation.topten.client;
 
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
 import net.rugby.foundation.topten.client.mvp.AppActivityMapper;
 import net.rugby.foundation.topten.client.mvp.AppPlaceHistoryMapper;
+import net.rugby.foundation.topten.client.place.FeatureListPlace;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -53,7 +49,6 @@ public class TopTen implements EntryPoint {
 //			UrlBuilder builder = Location.createUrlBuilder().removeParameter("listId").removeParameter("compId").removeParameter("playerId").setPath("topten.html");
 //			Window.Location.replace(builder.buildString());
 			clientFactory.getRpcService().getPlace(guid, new AsyncCallback<IServerPlace>() {
-
 				@Override
 				public void onFailure(Throwable caught) {
 					historyHandler.register(placeController, eventBus, defaultPlace);					
@@ -61,7 +56,12 @@ public class TopTen implements EntryPoint {
 
 				@Override
 				public void onSuccess(IServerPlace result) {
-					SeriesPlace sp = new SeriesPlace(result.getCompId(), result.getSeriesId(), result.getGroupId(), result.getMatrixId(), result.getQueryId(), result.getItemId());
+					Place sp = null;
+					if (result.getType().equals(PlaceType.SERIES)) {
+						sp = new SeriesPlace(result.getCompId(), result.getSeriesId(), result.getGroupId(), result.getMatrixId(), result.getQueryId(), result.getItemId());
+					} else {
+						sp = new FeatureListPlace(result.getCompId(), result.getQueryId(), result.getItemId());
+					}
 					historyHandler.register(placeController, eventBus, sp);	
 					historyHandler.handleCurrentHistory();
 				}

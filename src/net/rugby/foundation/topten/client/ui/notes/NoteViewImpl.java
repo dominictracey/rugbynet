@@ -6,6 +6,8 @@ package net.rugby.foundation.topten.client.ui.notes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.PanelHeader;
+
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.ui.ColumnDefinition;
 import net.rugby.foundation.topten.model.shared.INote;
@@ -39,6 +41,7 @@ public class NoteViewImpl<T extends INote> extends Composite implements NoteView
 	private static NoteViewImplUiBinder uiBinder = GWT
 			.create(NoteViewImplUiBinder.class);
 
+	@UiField PanelHeader header;
 	@UiField FlexTable noteTable;
 
 	private NoteViewColumnDefinitions<T> columnDefinitions;
@@ -54,7 +57,7 @@ public class NoteViewImpl<T extends INote> extends Composite implements NoteView
 		noteTable.getRowFormatter().addStyleName(0, "groupListHeader");
 		noteTable.addStyleName("groupList");
 		noteTable.getCellFormatter().addStyleName(0, 1, "groupListNumericColumn");
-
+		header.setText("Notes");
 	}
 
 	@Override

@@ -85,6 +85,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			series.setCreated(DateTime.now().toDate());
 			series.setLive(true);
 			series.setStart(DateTime.now().toDate());
+			series.setHostCompId(sc.getHostCompId());
 			rsf.build(series);
 			rsf.put(series);
 			sc.setSeries(series);
@@ -153,21 +154,21 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	}
 
 
-
-	@Override
-	public String process(IRatingSeries rs) {
-		//	
-		//		// start a workflow
-		//		IRatingGroup rg = addRatingGroup(rs, DateTime.now());		
-		//		rs.getRatingGroups().add(rg);
-		//		rs.getRatingGroupIds().add(rg.getId());
-		//
-		//		rsf.put(rs);
-
-		generateRatings(rs);
-
-		return null;
-	}
+//
+//	@Override
+//	public String process(IRatingSeries rs) {
+//		//	
+//		//		// start a workflow
+//		//		IRatingGroup rg = addRatingGroup(rs, DateTime.now());		
+//		//		rs.getRatingGroups().add(rg);
+//		//		rs.getRatingGroupIds().add(rg.getId());
+//		//
+//		//		rsf.put(rs);
+//
+//		generateRatings(rs);
+//
+//		return null;
+//	}
 
 
 
@@ -318,24 +319,24 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			}
 		}  else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_COMP) {
 
-			for (Long rid : rids) {
-				IRound targetRound = rf.get(rid);
+			//for (Long rid : rids) {
+				//IRound targetRound = rf.get(rid);
 				IRatingQuery rq = createRatingQuery(rm);
 
 				rq.setScaleStanding(true);
-				rq.setScaleComp(false);
+				rq.setScaleComp(true);
 				rq.setScaleTime(scaleTime);
 
 				rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
 
 				rq.setRoundIds(rids);
 				rq.setRatingMatrixId(rm.getId());
-				rq.setLabel(targetRound.getName());
+				rq.setLabel(rm.getRatingGroup().getUniversalRound().longDesc);
 				rqf.put(rq);
 				rm.getRatingQueries().add(rq);
 				rm.getRatingQueryIds().add(rq.getId());
 				rmf.put(rm);
-			}
+			//}
 		}
 
 	}
@@ -352,20 +353,20 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	}
 
 
-	public void generateRatings(IRatingSeries rs)
-	{
-		for (IRatingGroup rg : rs.getRatingGroups())
-		{
-			for (IRatingMatrix rm : rg.getRatingMatrices()) {
-				for (IRatingQuery rq : rm.getRatingQueries()) {
-					IQueryRatingEngine qre = qref.get(mresf.getDefault());
-					qre.setQuery(rq);
-					qre.generate(mresf.getDefault(), true, true, true);
-					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,qre.getMetrics());
-				}
-			}
-		}
-	}
+//	public void generateRatings(IRatingSeries rs)
+//	{
+//		for (IRatingGroup rg : rs.getRatingGroups())
+//		{
+//			for (IRatingMatrix rm : rg.getRatingMatrices()) {
+//				for (IRatingQuery rq : rm.getRatingQueries()) {
+//					IQueryRatingEngine qre = qref.get(mresf.getDefault());
+//					qre.setQuery(rq);
+//					qre.generate(mresf.getDefault(), true, true, true, false);
+//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,qre.getMetrics());
+//				}
+//			}
+//		}
+//	}
 
 
 

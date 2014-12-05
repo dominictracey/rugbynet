@@ -1,0 +1,54 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+  <ui:style>
+    .childDiv2 { /*float:left;*/ }
+	.childDiv3 { position:relative; float:right; }
+  </ui:style>
+	<g:HTMLPanel width="100%" ui:field="topTenPanel">
+		<b:Row>
+			<b:Column size="12">
+				<b:Row>
+					<b:Panel ui:field="featureBody" addStyleNames='{style.childDiv2}'>
+						<b:PanelBody ui:field="featuredTTL"  addStyleNames='{style.childDiv3}'>
+
+						</b:PanelBody>
+						
+					</b:Panel>
+<!-- 					<g:HTML> -->
+
+<!-- 		                <div class="childDiv2" id="body"> -->
+<!-- 		                    <div class="childDiv3" id="ttl"> -->
+		                       
+<!-- 		                    </div> -->
+<!-- 		                   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. -->
+		
+<!-- 		                </div>                 -->
+
+
+					    
+<!-- 					</g:HTML> -->
+				</b:Row>
+				<b:Row>
+					<b:Column size="3" offset="5">
+						<b:Nav>
+							<b:ButtonGroup>
+								<b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button>
+								<b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button>
+							</b:ButtonGroup>
+						</b:Nav>
+					</b:Column>
+				</b:Row>
+				<b:Row>
+					<b:Panel ui:field="adminButtons">
+						<b:Button ui:field="edit" type="PRIMARY">Edit</b:Button>
+						<b:Button ui:field="publish" type="DANGER">Publish</b:Button>
+						<b:Button ui:field="promote" type="PRIMARY">Promote</b:Button>
+					</b:Panel>
+				</b:Row>
+			</b:Column>
+		</b:Row>
+	</g:HTMLPanel>
+
+
+</ui:UiBinder>

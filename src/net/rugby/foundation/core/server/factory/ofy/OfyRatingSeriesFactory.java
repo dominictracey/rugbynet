@@ -14,6 +14,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.BaseRatingSeriesFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
@@ -27,10 +28,12 @@ public class OfyRatingSeriesFactory extends BaseRatingSeriesFactory implements I
 	 * 
 	 */
 	private static final long serialVersionUID = -63026632234487370L;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	OfyRatingSeriesFactory(IRatingGroupFactory rgf) {
+	OfyRatingSeriesFactory(IRatingGroupFactory rgf, IConfigurationFactory ccf) {
 		this.rgf = rgf;
+		this.ccf = ccf;
 	}
 
 	@Override
@@ -105,15 +108,21 @@ public class OfyRatingSeriesFactory extends BaseRatingSeriesFactory implements I
 	}
 
 	@Override
-	public Map<RatingMode,Long> getModesForCompFromPersistentDatastore(Long compId) {
-		Map<RatingMode,Long> map = new HashMap<RatingMode,Long>();
+	public HashMap<RatingMode,Long> getModesForCompFromPersistentDatastore(Long compId) {
+		HashMap<RatingMode,Long> map = new HashMap<RatingMode,Long>();
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			Query<RatingSeries> qrm = ofy.query(RatingSeries.class);
-
+			
 			for (RatingSeries qrs : qrm.list()) {
-				if (qrs.getCompIds().contains(compId)) 
+				if (qrs.getCompIds().size() > 1) {
+					// it's a virtual comp
+					if (compId.equals(qrs.getHostCompId())) {
+						map.put(qrs.getMode(), qrs.getId());
+					}
+				} else if (qrs.getCompIds().contains(compId)) {
 					map.put(qrs.getMode(), qrs.getId());
+				}
 			}
 			return map;
 		} catch (Throwable ex) {

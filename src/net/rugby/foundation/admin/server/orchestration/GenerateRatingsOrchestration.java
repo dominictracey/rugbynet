@@ -70,7 +70,7 @@ public class GenerateRatingsOrchestration extends OrchestrationCore<IRatingQuery
 				assert (mre != null);
 				//pmif.query(compId, roundId, posi, countryId, teamId, null);
 				mre.setQuery(target);
-				mre.generate(mres,target.getScaleStanding(),target.getScaleComp(),target.getScaleTime());
+				mre.generate(mres,target.getScaleStanding(),target.getScaleComp(),target.getScaleTime(), true);
 //				List<IPlayerMatchInfo> pmis = pmif.query(compId, roundId, posi, countryId, teamId, null);
 	//			return pmis;
 	//		}

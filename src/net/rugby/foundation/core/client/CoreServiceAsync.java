@@ -11,6 +11,7 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.LoginInfo;
 
 /**
@@ -70,4 +71,6 @@ public interface CoreServiceAsync {
 	void forgotPassword(String email, AsyncCallback<LoginInfo> asyncCallback);
 	void getContent(Long contentId, AsyncCallback<IContent> asyncCallback);
 	void saveContent(IContent content, AsyncCallback<IContent> asyncCallback);
+	
+//	void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
 }

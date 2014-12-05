@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
@@ -18,6 +16,7 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
@@ -33,12 +32,14 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 	private IMatchGroupFactory gf;
 	private ICompetitionFactory cf;
 	private IStandingFactory sf;
+	private IUniversalRoundFactory urf;
 
 	@Inject
-	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf, IStandingFactory sf) {
+	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf, IStandingFactory sf, IUniversalRoundFactory urf) {
 		this.gf = gf;
 		this.cf = cf;
 		this.sf = sf;
+		this.urf = urf;
 	}
 
 	@Override
@@ -75,6 +76,12 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 				// ignore if match is NO_STATS - the round can still be in FETCHED state
 			}
 			ofy.put(r); 	
+		}
+		
+		// self cleaning oven for urOrdinal
+		if (r.getUrOrdinal() < 1) {
+			r.setUrOrdinal(urf.get(r).ordinal);
+			ofy.put(r);
 		}
 		
 		return r;

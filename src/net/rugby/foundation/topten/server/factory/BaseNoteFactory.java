@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.googlecode.objectify.Query;
+
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.INoteRef;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
+import net.rugby.foundation.topten.model.shared.Note;
 
 public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implements INoteFactory {
 
@@ -48,7 +51,7 @@ public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implemen
 	}
 
 	@Override
-	public List<INote> getForList(ITopTenList ttl)
+	public List<INote> getForList(ITopTenList ttl, boolean includeAll)
 	{
 		try {
 			List<INote> list = null;
@@ -57,7 +60,7 @@ public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implemen
 
 
 			if (list == null) {
-				list = getFromPersistentDatastoreByList(ttl);
+				list = getFromPersistentDatastoreByList(ttl, includeAll);
 
 				if (list != null) {
 					putList(getTTLCacheId(ttl.getId()), list);
@@ -73,7 +76,7 @@ public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implemen
 
 	}
 
-	protected abstract List<INote> getFromPersistentDatastoreByList(ITopTenList ttl);
+	protected abstract List<INote> getFromPersistentDatastoreByList(ITopTenList ttl, boolean includeAll);
 	private String getTTLCacheId(Long id) {
 		return TTLprefix + id;
 	}
@@ -91,8 +94,10 @@ public abstract class BaseNoteFactory extends BaseCachingFactory<INote> implemen
 	@Override
 	public boolean deleteForList(ITopTenList list) {
 		try {
+						
+			List<INote> notes = getForList(list, true);
 			
-			List<INote> notes = getForList(list);
+			// add in any self-referential notes.
 			
 			deleteItemFromMemcache(getTTLCacheId(list.getId()));
 						

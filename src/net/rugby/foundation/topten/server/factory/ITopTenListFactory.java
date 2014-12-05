@@ -40,4 +40,5 @@ public interface ITopTenListFactory {
 	public boolean scan(Long compId);
 	ITopTenList create(TopTenSeedData tti, ITopTenList lastTTL);
 	public String getGuidForMatch(IMatchGroup m);
+	void makeFeature(ITopTenList list);
 }

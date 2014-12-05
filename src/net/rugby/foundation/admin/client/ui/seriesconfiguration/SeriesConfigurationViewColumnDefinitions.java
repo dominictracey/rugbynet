@@ -44,11 +44,12 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 				//id
 				public Widget render(final T c) {
 					String comp = "";
-					if (c != null) {
-						for (ICompetition cp : c.getComps()) {
-							comp += cp.getAbbr() + ", ";
-						}
-					}
+//					if (c != null) {
+//						for (ICompetition cp : c.getComps()) {
+//							comp += cp.getAbbr() + ", ";
+//						}
+//					}
+					comp = c.getDisplayName();
 					return new HTML(comp);
 				}     
 

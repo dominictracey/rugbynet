@@ -33,6 +33,7 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 	@UiField ListBox startDate;
 	@UiField ListBox countries;
 	@UiField ListBox comps;
+	@UiField ListBox hostComp;
 	@UiField ListBox mode;
 	
 	@UiField CheckBox round;
@@ -53,9 +54,10 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 		int i = 0;
 		fieldDefinitions.get(i++).bind(id);      
 		fieldDefinitions.get(i++).bind(displayName);        
-		fieldDefinitions.get(i++).bind(comps);        
+		fieldDefinitions.get(i++).bind(comps);  
 		fieldDefinitions.get(i++).bind(countries);    
 		fieldDefinitions.get(i++).bind(mode); 
+		fieldDefinitions.get(i++).bind(hostComp);
 		fieldDefinitions.get(i++).bind(startDate);	
 		fieldDefinitions.get(i++).bind(round); 
 		fieldDefinitions.get(i++).bind(inForm); 

@@ -15,6 +15,7 @@
 				Long Name: <g:TextBox ui:field='longName'></g:TextBox><br/>
 				Short Name:  <g:TextBox ui:field='shortName'></g:TextBox><br/>
 				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
+				TTL Desc: <g:TextBox ui:field='ttlDesc'></g:TextBox><span class="small">Top Ten In Form Flankers in XXXXX for Round 7</span><br/>
 				Twitter: <g:TextBox ui:field='twitter'></g:TextBox><br/>
 				CompClubhouse Id: <g:TextBox ui:field='ccid'></g:TextBox><br/>
 				Underway: <g:CheckBox ui:field="underway"/><br/>

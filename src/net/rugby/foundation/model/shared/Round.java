@@ -26,6 +26,7 @@ public class Round implements Serializable, IRound {
 	private String abbr;
 	private Long compId;
 	protected WorkflowStatus workflowStatus;
+	protected int urOrdinal;
 	
 	public Round() {
 		
@@ -259,6 +260,16 @@ public class Round implements Serializable, IRound {
 	@Override
 	public void setWorkflowStatus(WorkflowStatus status) {
 		this.workflowStatus = status;
+	}
+
+	@Override
+	public int getUrOrdinal() {
+		return urOrdinal;
+	}
+
+	@Override
+	public void setUrOrdinal(int universalRound) {
+		this.urOrdinal = universalRound;
 	}
 
 }

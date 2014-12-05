@@ -16,11 +16,8 @@
                     </g:HTML>
                 </g:HTMLPanel>
 
-                <b:Nav alignment="RIGHT" >
-
-                    <b:ButtonGroup ui:field="buttonBar" >
-                    </b:ButtonGroup>
-                </b:Nav>
+                <b:ButtonGroup ui:field="buttonBar" >
+                </b:ButtonGroup>
             </b:Well>
         </b:Column>
     </b:Row>

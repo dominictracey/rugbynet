@@ -18,54 +18,54 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class EditTTIText extends DialogBox {
-
-	private static EditTTITextUiBinder uiBinder = GWT
-			.create(EditTTITextUiBinder.class);
-
-	interface EditTTITextUiBinder extends UiBinder<Widget, EditTTIText> {
-	}
-
-	public interface EditTTITextPresenter {
-		void saveTTIText(TopTenItemView tti);
-		void cancelTTITextEdit(TopTenItemView tti);
-	} 
-	
-	public EditTTIText() {
-		setWidget(uiBinder.createAndBindUi(this));
-	}
-
-	@UiField
-	Button save;
-	@UiField
-	Button cancel;
-	@UiField
-	TextArea text;
-	
-	
-	TopTenItemView v = null;
-	private EditTTITextPresenter listener;
-	
-	@UiHandler("save")
-	void onClickSave(ClickEvent e) {
-		v.getItem().setText(text.getText());
-		listener.saveTTIText(v);
-	}
-	
-	
-	@UiHandler("cancel")
-	void onClickCacnel(ClickEvent e) {
-		listener.cancelTTITextEdit(v);
-	}
-
-
-	public void showTTI(TopTenItemView v) {
-		this.v = v;
-		this.setText(this.v.getItem().getPlayer().getDisplayName());
-		text.setText(v.getItem().getText());
-	}
-
-	public void setPresenter(EditTTITextPresenter p) {
-		listener = p;
-	}
+//
+//	private static EditTTITextUiBinder uiBinder = GWT
+//			.create(EditTTITextUiBinder.class);
+//
+//	interface EditTTITextUiBinder extends UiBinder<Widget, EditTTIText> {
+//	}
+//
+//	public interface EditTTITextPresenter {
+//		void saveTTIText(TopTenItemView tti);
+//		void cancelTTITextEdit(TopTenItemView tti);
+//	} 
+//	
+//	public EditTTIText() {
+//		setWidget(uiBinder.createAndBindUi(this));
+//	}
+//
+//	@UiField
+//	Button save;
+//	@UiField
+//	Button cancel;
+//	@UiField
+//	TextArea text;
+//	
+//	
+//	TopTenItemView v = null;
+//	private EditTTITextPresenter listener;
+//	
+//	@UiHandler("save")
+//	void onClickSave(ClickEvent e) {
+//		v.getItem().setText(text.getText());
+//		listener.saveTTIText(v);
+//	}
+//	
+//	
+//	@UiHandler("cancel")
+//	void onClickCacnel(ClickEvent e) {
+//		listener.cancelTTITextEdit(v);
+//	}
+//
+//
+//	public void showTTI(TopTenItemView v) {
+//		this.v = v;
+//		this.setText(this.v.getItem().getPlayer().getDisplayName());
+//		text.setText(v.getItem().getText());
+//	}
+//
+//	public void setPresenter(EditTTITextPresenter p) {
+//		listener = p;
+//	}
 
 }

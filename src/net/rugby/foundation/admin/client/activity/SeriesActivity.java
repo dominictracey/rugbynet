@@ -230,6 +230,7 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 	@Override
 	public void onSaveConfigClicked(ISeriesConfiguration config) {
 		((DialogBox) clientFactory.getSeriesConfigrPopupView()).hide();
+		
 		clientFactory.getRpcService().saveSeriesConfiguration(config, new AsyncCallback<ISeriesConfiguration>() {
 
 			@Override

@@ -4,6 +4,7 @@
 package net.rugby.foundation.model.shared;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -99,6 +100,15 @@ public interface ICompetition extends IHasId {
 	public abstract void setWeightingFactor(Float weightingFactor);
 	public abstract void setTwitter(String twitter);
 	public abstract String getTwitter();
+	void setTwitterChannel2(String twitterChannel2);
+	String getTwitterChannel2();
+	void setTwitterChannel1(String twitterChannel1);
+	String getTwitterChannel1();
+	void setImageUrl(String imageUrl);
+	String getImageUrl();
+	HashMap<RatingMode, Long> getSeriesMap();
+	public abstract String getTTLTitleDesc();
+	void setTTLTitleDesc(String tTLTitleDesc);
 	
 	// don't put getNextRound and getPrevRound in here, see note at bottom of Competition.java
 	//public abstract void setNextAndPrevRound();

@@ -100,6 +100,10 @@ Create Admin
                         <g:Button ui:field="sanityCheck" >
 Sanity Check
                         </g:Button>
+                        
+                        <g:Button ui:field="virtualComp" >
+New Virtual Comp
+                        </g:Button>
 
                     </g:HorizontalPanel>
                 </g:VerticalPanel>

@@ -5,6 +5,7 @@ package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +20,7 @@ import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.RatingMode;
 
 /**
  * @author home
@@ -59,6 +61,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 			ICompetition comp = cf.get(compId);
 			if (comp != null) {
 				c.addCompetition(compId, comp.getLongName());
+				c.getSeriesMap().put(compId, comp.getSeriesMap());
 			} else {
 				// remove orphan
 				c.getCompsUnderway().remove(compId);
@@ -89,6 +92,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		
 		return c;
 	}
+
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IConfigurationFactory#put(net.rugby.foundation.model.shared.ICoreConfiguration)

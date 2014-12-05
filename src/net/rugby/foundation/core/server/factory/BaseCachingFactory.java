@@ -112,8 +112,10 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 
 	protected void deleteFromMemcache(T t) {
 		try {
-			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			syncCache.delete(t.getId());
+			if (t != null) {
+				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+				syncCache.delete(t.getId());
+			}
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}
@@ -127,7 +129,7 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}
 	}
-	
+
 	abstract protected boolean deleteFromPersistentDatastore(T t);
 
 	/**
@@ -175,7 +177,7 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 	protected boolean putList(String key, List<T> list) {
 		try {
 			Serializable sList = (Serializable) list;
-			
+
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(key);
 			if (sList != null) {
@@ -257,7 +259,7 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 			return false;
 		}	
 	}
-	
+
 	/**
 	 * 
 	 */

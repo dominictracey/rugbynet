@@ -11,6 +11,7 @@ import net.rugby.foundation.model.shared.IPlayer;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.TextArea;
@@ -65,7 +66,7 @@ public class EditTTLInfo extends DialogBox {
 	@UiField Button cancel;
 	@UiField TextArea description;
 	@UiField TextBox title;
-	@UiField DropDownMenu playersPerTeam;
+	@UiField ButtonGroup playersPerTeam;
 	@UiField HTMLPanel twitterHandles;
 	
 	Map<IPlayer,TextBox> twitterDictionary = new HashMap<IPlayer,TextBox>();

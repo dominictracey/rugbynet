@@ -23,6 +23,8 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	// competition name map
 	private Map<Long, String> compNameMap = null;
 	
+	@Transient
+	private HashMap<Long, HashMap<RatingMode,Long>> seriesMap = new HashMap<Long, HashMap<RatingMode,Long>>();
 	private List<Long> compsUnderway = new ArrayList<Long>();
 	
 	// default compId
@@ -514,8 +516,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	 */
 	@Override
 	public void addCompetition(Long id, String name) {
-		compNameMap.put(id, name);
-		
+		compNameMap.put(id, name);		
 	}
 
 
@@ -523,8 +524,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	 * @see net.rugby.foundation.model.shared.IConfiguration#getCompetitionMap(java.lang.Long)
 	 */
 	@Override
-	public final Map<Long, String> getCompetitionMap() {
-		
+	public final Map<Long, String> getCompetitionMap() {		
 		return compNameMap;
 	}
 
@@ -660,6 +660,14 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	@Override
 	public String getFacebookAppid() {
 		return FACEBOOK_APPID;
+	}
+	@Override
+	public HashMap<Long, HashMap<RatingMode, Long>> getSeriesMap() {
+		return seriesMap;
+	}
+	@Override
+	public void setSeriesMap(HashMap<Long, HashMap<RatingMode, Long>> seriesMap) {
+		this.seriesMap = seriesMap;
 	}
 
 

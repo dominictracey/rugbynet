@@ -10,6 +10,7 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -107,4 +108,11 @@ public interface CoreService extends RemoteService {
 	
 	IContent getContent(Long contentId);
 	IContent saveContent(IContent content);
+
+	/**
+	 * 
+	 * @param the guid of the target location
+	 * @return a place structure containing the fields necessary to construct a SeriesPlace for use with the GWT PlaceController
+	 */
+	//
 }

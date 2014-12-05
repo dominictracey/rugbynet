@@ -216,7 +216,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.rsf = rsf;
 			this.rgf = rgf;
 			this.rmf = rmf;
-			
+
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 		}
@@ -433,22 +433,22 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				// do we have this in our database? If so, replace the fetched one with the one that already has an ID
 				// a round in the DB is considered the same if it contains the same matches
 
-				Map<Integer,IRound> changes = new HashMap<Integer,IRound>();
-
-				// have to do two-pass to avoid concurrentChangeException
-				for (IRound r : rounds) {
-					IRound roundDB = rf.find(r);
-
-					if (roundDB != null) {
-						changes.put(rounds.indexOf(r), roundDB);
-					}
-				}
-
-				// now swap in the found round for the in situ one
-				for (Integer index : changes.keySet()) {
-					rounds.remove((int)index);
-					rounds.add(index,changes.get(index));	
-				}
+				//				Map<Integer,IRound> changes = new HashMap<Integer,IRound>();
+				//
+				//				// have to do two-pass to avoid concurrentChangeException
+				//				for (IRound r : rounds) {
+				//					IRound roundDB = rf.find(r);
+				//
+				//					if (roundDB != null) {
+				//						changes.put(rounds.indexOf(r), roundDB);
+				//					}
+				//				}
+				//
+				//				// now swap in the found round for the in situ one
+				//				for (Integer index : changes.keySet()) {
+				//					rounds.remove((int)index);
+				//					rounds.add(index,changes.get(index));	
+				//				}
 
 
 				return rounds;
@@ -469,14 +469,20 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				//				IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff, tf);
 				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
 				Map<String, IMatchGroup> matches = fetcher.getMatches(url, teams);
+				Map<String, IMatchGroup> dupes = new HashMap<String, IMatchGroup>();
 
 				if (matches != null) {
 					for (IMatchGroup m: matches.values()) {
 						IMatchGroup found = mf.find(m);
 						if (found != null) {
-							matches.put(found.getDisplayName(), found);
+							dupes.put(found.getDisplayName(), found);
 						}
 					}
+				}
+
+				// swap out the copies with the real ones.
+				for (String name: dupes.keySet()) {
+					matches.put(name, dupes.get(name));
 				}
 
 				return matches;
@@ -2008,35 +2014,35 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			for (ISeriesConfiguration sc : retval) {
 				// clear out the pipeline as soon as it is completed
 				try {
-					
 
-				if (sc.getPipelineId() != null) {
-					PipelineService service = PipelineServiceFactory.newPipelineService();
-					JobInfo jobInfo = service.getJobInfo(sc.getPipelineId());
-					switch (jobInfo.getJobState()) {
-					case COMPLETED_SUCCESSFULLY:
-						service.deletePipelineRecords(sc.getPipelineId());
-						sc.setPipelineId(null);
-						scf.put(sc);
-						break;
-					case RUNNING:
-						break;
-					case STOPPED_BY_ERROR:
-						throw new RuntimeException("Job stopped " + jobInfo.getError());
-					case STOPPED_BY_REQUEST:
-						throw new RuntimeException("Job stopped by request.");
-					case WAITING_TO_RETRY:
-						break;
-					default:
-						break;
-					};
-				}
+
+					if (sc.getPipelineId() != null) {
+						PipelineService service = PipelineServiceFactory.newPipelineService();
+						JobInfo jobInfo = service.getJobInfo(sc.getPipelineId());
+						switch (jobInfo.getJobState()) {
+						case COMPLETED_SUCCESSFULLY:
+							service.deletePipelineRecords(sc.getPipelineId());
+							sc.setPipelineId(null);
+							scf.put(sc);
+							break;
+						case RUNNING:
+							break;
+						case STOPPED_BY_ERROR:
+							throw new RuntimeException("Job stopped " + jobInfo.getError());
+						case STOPPED_BY_REQUEST:
+							throw new RuntimeException("Job stopped by request.");
+						case WAITING_TO_RETRY:
+							break;
+						default:
+							break;
+						};
+					}
 				} catch (Throwable ex) {
-					
+
 					// bad pipeline handle. delete
 					sc.setPipelineId(null);
 					scf.put(sc);
-					
+
 				}
 			}
 			return retval;
@@ -2053,30 +2059,30 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				return scf.create();
 			else {
 				ISeriesConfiguration sc = scf.get(id);
-				
+
 				// clear out the pipeline as soon as it is completed
-//				if (sc.getPipelineId() != null) {
-//					PipelineService service = PipelineServiceFactory.newPipelineService();
-//					JobInfo jobInfo = service.getJobInfo(sc.getPipelineId());
-//					switch (jobInfo.getJobState()) {
-//					case COMPLETED_SUCCESSFULLY:
-//						service.deletePipelineRecords(sc.getPipelineId());
-//						sc.setPipelineId(null);
-//						scf.put(sc);
-//						break;
-//					case RUNNING:
-//						break;
-//					case STOPPED_BY_ERROR:
-//						throw new RuntimeException("Job stopped " + jobInfo.getError());
-//					case STOPPED_BY_REQUEST:
-//						throw new RuntimeException("Job stopped by request.");
-//					case WAITING_TO_RETRY:
-//						break;
-//					default:
-//						break;
-//					};
-//					
-//				}
+				//				if (sc.getPipelineId() != null) {
+				//					PipelineService service = PipelineServiceFactory.newPipelineService();
+				//					JobInfo jobInfo = service.getJobInfo(sc.getPipelineId());
+				//					switch (jobInfo.getJobState()) {
+				//					case COMPLETED_SUCCESSFULLY:
+				//						service.deletePipelineRecords(sc.getPipelineId());
+				//						sc.setPipelineId(null);
+				//						scf.put(sc);
+				//						break;
+				//					case RUNNING:
+				//						break;
+				//					case STOPPED_BY_ERROR:
+				//						throw new RuntimeException("Job stopped " + jobInfo.getError());
+				//					case STOPPED_BY_REQUEST:
+				//						throw new RuntimeException("Job stopped by request.");
+				//					case WAITING_TO_RETRY:
+				//						break;
+				//					default:
+				//						break;
+				//					};
+				//					
+				//				}
 				return sc;
 			}
 		} catch (Throwable ex) {
@@ -2117,27 +2123,31 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public Boolean deleteSeriesConfiguration(Long sConfigId) {
 		try {
-			ISeriesConfiguration sc = scf.get(sConfigId);
-			IRatingSeries series = null;
-			if (sc != null) {
-				if (sc.getSeriesId() != null) {
-					series = rsf.get(sc.getSeriesId());
-					if (series != null) {
-						// first delete TTLs associated
-						for (Long rgid : series.getRatingGroupIds()) {
-							IRatingGroup rg = rgf.get(rgid);
-							rgf.deleteTTLs(rg);
+			if (checkAdmin()) {
+				ISeriesConfiguration sc = scf.get(sConfigId);
+				IRatingSeries series = null;
+				if (sc != null) {
+					if (sc.getSeriesId() != null) {
+						series = rsf.get(sc.getSeriesId());
+						if (series != null) {
+							// first delete TTLs associated
+							for (Long rgid : series.getRatingGroupIds()) {
+								IRatingGroup rg = rgf.get(rgid);
+								rgf.deleteTTLs(rg);
+							}
 						}
 					}
-				}
 
-				if (sc.getPipelineId() != null) {
-					PipelineService service = PipelineServiceFactory.newPipelineService();
-					service.deletePipelineRecords(sc.getPipelineId(), true, true);
-					sc.setPipelineId(null);
-				}
+					if (sc.getPipelineId() != null) {
+						PipelineService service = PipelineServiceFactory.newPipelineService();
+						service.deletePipelineRecords(sc.getPipelineId(), true, true);
+						sc.setPipelineId(null);
+					}
 
-				return scf.delete(sc);
+					return scf.delete(sc);
+				} else {
+					return false;
+				}
 			} else {
 				return false;
 			}
@@ -2150,31 +2160,35 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) throws Exception {
 		try {
-			// valid configs are:
-			//	1) Mode == BY_MATCH and Criteria == ROUND
-			//	2) Mode == BY_POSITION and Criteria == IN_FORM
-			//	3) Mode == BY_COMP and Criteria == ROUND
-			if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT) || sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME) || sConfig.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
-				throwUnsupportedSeriesConfigException();
-			}
-			
-			if (sConfig.getMode().equals(RatingMode.BY_COUNTRY) || sConfig.getMode().equals(RatingMode.BY_TEAM)) {
-				throwUnsupportedSeriesConfigException();
-			}
-			
-			if (sConfig.getActiveCriteria().contains(Criteria.ROUND)) {
-				if (!sConfig.getMode().equals(RatingMode.BY_MATCH) && !sConfig.getMode().equals(RatingMode.BY_COMP)) {
+			if (checkAdmin()) {
+				// valid configs are:
+				//	1) Mode == BY_MATCH and Criteria == ROUND
+				//	2) Mode == BY_POSITION and Criteria == IN_FORM
+				//	3) Mode == BY_COMP and Criteria == ROUND
+				if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT) || sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME) || sConfig.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
 					throwUnsupportedSeriesConfigException();
 				}
-			}
-				
-			if (sConfig.getActiveCriteria().contains(Criteria.IN_FORM)) {
-				if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
+
+				if (sConfig.getMode().equals(RatingMode.BY_COUNTRY) || sConfig.getMode().equals(RatingMode.BY_TEAM)) {
 					throwUnsupportedSeriesConfigException();
 				}
+
+				if (sConfig.getActiveCriteria().contains(Criteria.ROUND)) {
+					if (!sConfig.getMode().equals(RatingMode.BY_MATCH) && !sConfig.getMode().equals(RatingMode.BY_COMP)) {
+						throwUnsupportedSeriesConfigException();
+					}
+				}
+
+				if (sConfig.getActiveCriteria().contains(Criteria.IN_FORM)) {
+					if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
+						throwUnsupportedSeriesConfigException();
+					}
+				}
+
+				return scf.put(sConfig);
+			} else {
+				return null;
 			}
-			
-			return scf.put(sConfig);
 		} catch (Exception ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			throw ex;	 // rethrow to client?
@@ -2186,7 +2200,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				"1) Mode == BY_MATCH and Criteria == ROUND \n" +
 				"2) Mode == BY_POSITION and Criteria == IN_FORM \n" + 
 				"3) Mode == BY_COMP and Criteria == ROUND");
-		
+
 	}
 
 	@Override
@@ -2200,6 +2214,27 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;	
 		}	}
+
+	@Override
+	public ICompetition addVirtualComp() {
+		try {
+			if (checkAdmin()) {
+				ICompetition comp = cf.create();
+				comp.setLongName("CHANGE ME");
+				comp.setShortName("CHANGE");
+				comp.setAbbr("CHNG");
+				comp.setUnderway(false);
+				comp.setCompType(CompetitionType.GLOBAL);
+				cf.put(comp);
+				return comp;
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			throw ex;	 // rethrow to client?
+		}	
+	}
 
 
 

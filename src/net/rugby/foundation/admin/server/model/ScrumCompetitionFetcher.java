@@ -361,7 +361,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 			Boolean hasLink = false;
 			while (it.hasNext()) {
 				line = it.next();
-				if( line.contains("fixtureTblDateColHdr")) {
+				if( line.contains("fixtureTblDateColHdr") && !line.contains(".fixtureTblDateColHdr") ) {  // they added an inline styling thing to ignore
 					//            		if (firstIn) { // have to skip some stuff
 					//	            		for (int i=0; i<5;++i) {
 					//	            			line = it.next();
@@ -377,6 +377,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 					line = it.next();
 					String dayDate = line.trim().split("<|>")[0];
 					day = dayDate.trim().split(" ")[1];
+					line = it.next();
 					line = it.next();
 					line = it.next();
 					line = it.next();

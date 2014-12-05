@@ -56,7 +56,7 @@ public class TestNoteFactory extends BaseNoteFactory implements INoteFactory {
 	}
 
 	@Override
-	protected List<INote> getFromPersistentDatastoreByList(ITopTenList ttl) {
+	protected List<INote> getFromPersistentDatastoreByList(ITopTenList ttl, boolean includeAll) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -9,6 +9,8 @@ import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.BPMServletContextListener;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -51,6 +53,10 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 
 	private IUniversalRoundFactory urf;
 
+	private IMatchGroupFactory mgf;
+
+	private ICompetitionFactory cf;
+
 
 	public ProcessRatingQuery() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -59,6 +65,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	@Override
 	public Value<Boolean> run(IRatingQuery rq) {
 
+		IMatchGroup match = null;  // to support delayed guid linking
+		
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();
 		}
@@ -70,6 +78,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		this.ttlf = injector.getInstance(ITopTenListFactory.class);
 		this.rf = injector.getInstance(IRoundFactory.class);
 		this.urf = injector.getInstance(IUniversalRoundFactory.class);
+		this.mgf = injector.getInstance(IMatchGroupFactory.class);
+		this.cf = injector.getInstance(ICompetitionFactory.class);
 		
 		// first see if we are re-running, in which case clear out any ratings already in place
 		if (!rq.getStatus().equals(Status.NEW)) {
@@ -91,7 +101,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		try {
 			ok = mre.setQuery(rq);
 			if (ok) {
-				mre.generate(mres,rq.getScaleStanding(),rq.getScaleComp(),rq.getScaleTime());
+				mre.generate(mres,rq.getScaleStanding(),rq.getScaleComp(),rq.getScaleTime(), false);
 			} else {
 				// stats aren't ready
 				rq.setStatus(Status.NEW);
@@ -114,7 +124,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH)) {
 				title += "Players from ";
 				IRound r = rf.get(rq.getRoundIds().get(0));
-				IMatchGroup match = null;
+
 				if (r != null) {
 					for (IMatchGroup m : r.getMatches()) {
 						if (rq.getTeamIds().contains(m.getHomeTeamId()) && rq.getTeamIds().contains(m.getVisitingTeamId())) {
@@ -139,6 +149,14 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				
 				title += rq.getPositions().get(0).getPlural();
 				
+				Long hostId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId();
+				if (hostId != null) {
+					ICompetition hostComp = cf.get(hostId);
+					if (hostComp.getTTLTitleDesc() != null && !hostComp.getTTLTitleDesc().isEmpty()) {
+						title += " of " + hostComp.getTTLTitleDesc();
+					}
+				}
+				
 				if (inForm) {
 					title += " Through ";
 				} else {
@@ -161,8 +179,14 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 							}
 						}
 					}
-					context = last.getName();
-					title += context;
+					if (rq.getCompIds().size() < 2) {
+						context = last.getName();
+						title += context;
+					} else {
+						// virtual comp
+						UniversalRound ur = urf.get(last);
+						title += ur.longDesc;
+					}
 				}
 				
 			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_COMP)) {
@@ -216,7 +240,15 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", null, rq.getRoundIds(), 10);
 			data.setContext(context);
 			ITopTenList ttl = ttlf.create(data);
+			
+			
 			ttlf.put(ttl);
+			
+			// if this is a match list, link the ttl guid to the match so we can support the result panel in the UI
+			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH) && match != null) {
+				match.setGuid(ttl.getGuid());
+				mgf.put(match);
+			}
 			
 			return new ImmediateValue<Boolean>(procked.getStatus().equals(Status.COMPLETE));
 		}

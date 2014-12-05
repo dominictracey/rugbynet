@@ -712,7 +712,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	}
 
 	@Override
-	public List<IPlayerRating> generate(IRatingEngineSchema schema, boolean scaleStandings, boolean scaleCompetition, boolean scaleMatchAge) {
+	public List<IPlayerRating> generate(IRatingEngineSchema schema, boolean scaleStandings, boolean scaleCompetition, boolean scaleMatchAge, boolean sendReport) {
 
 
 		List<IPlayerStatShares> pss = new ArrayList<IPlayerStatShares>();
@@ -759,7 +759,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				mrl.add(pr);
 
 			}
-			sendReport();
+			
+			if (sendReport) {
+				sendReport();
+			}
 
 			// mark query complete
 			query.setStatus(Status.COMPLETE);

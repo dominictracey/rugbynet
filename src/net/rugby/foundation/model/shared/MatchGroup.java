@@ -40,6 +40,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 	
 	protected String fetchMatchStatsPipelineId;
 	
+	protected String guid;
 
 	@Override
 	public boolean equals(Object o) {
@@ -291,6 +292,16 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public void setWorkflowStatus(WorkflowStatus workflowStatus) {
 		this.workflowStatus = workflowStatus;	
+	}
+
+	@Override
+	public String getGuid() {
+		return guid;
+	}
+
+	@Override
+	public void setGuid(String guid) {
+		this.guid = guid;
 	}
 
 

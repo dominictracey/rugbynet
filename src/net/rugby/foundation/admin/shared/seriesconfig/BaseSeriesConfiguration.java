@@ -64,6 +64,10 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	@Transient
 	private List<ICompetition> comps;
 	
+	private Long hostCompId;
+	@Transient
+	private ICompetition hostComp;
+	
 	private Boolean live;
 	
 
@@ -280,6 +284,26 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	@Override
 	public void setLive(Boolean live) {
 		this.live = live;
+	}
+
+	@Override
+	public Long getHostCompId() {
+		return hostCompId;
+	}
+
+	@Override
+	public void setHostCompId(Long hostCompId) {
+		this.hostCompId = hostCompId;
+	}
+
+	@Override
+	public ICompetition getHostComp() {
+		return hostComp;
+	}
+
+	@Override
+	public void setHostComp(ICompetition hostComp) {
+		this.hostComp = hostComp;
 	}
 	
 //	@Override

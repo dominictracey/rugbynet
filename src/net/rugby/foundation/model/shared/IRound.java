@@ -63,4 +63,8 @@ public interface IRound extends IHasId {
 	public abstract WorkflowStatus getWorkflowStatus();
 	public abstract void setWorkflowStatus(WorkflowStatus status);
 
+	int getUrOrdinal();
+
+	void setUrOrdinal(int universalRound);
+
 }

@@ -1,15 +1,14 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<!--[if lt IE 9]>
-		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-<!--[if IE 7]>
- 		<link rel="stylesheet" href="topten/css/font-awesome-ie7.css">
-		<![endif]-->
-<script type="text/javascript" language="javascript"
-	src="/topten/topten.nocache.js"></script>
+<title>MYX Dashboard</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- GWT -->
+<script language="javascript" src="/topten/topten.nocache.js"></script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- split -->
@@ -91,20 +90,6 @@
 </script>
 <!-- End New Google Analytics -->
 
-    <link href="/topten/css/bootstrap-overrides.css" type="text/css" rel="stylesheet" />
-
-    <!-- theme -->
-    <link rel="stylesheet" type="text/css" href="/topten/css/theme/default.css" />
-
-    <!-- libraries -->
-    <link rel="stylesheet" type="text/css" href="/topten/css/font-awesome.css" />
-    <link rel="stylesheet" type="text/css" href="/topten/css/elements/dashboard.css" />
-    <link rel="stylesheet" type="text/css" href="/topten/css/elements/notify.css" />
-    <link rel="stylesheet" type="text/css" href="/topten/css/elements/bootstrap_calendar.css" />
-    <link rel="stylesheet" type="text/css" href="/topten/css/elements/pizza.css" />
-    
-	<link href="/stylesheets/master.css" rel="stylesheet">
-
 <!-- ADDTHIS BUTTON BEGIN -->
 <script type="text/javascript">
 	var addthis_config = {
@@ -117,88 +102,253 @@
 <script type="text/javascript"
 	src="http://s7.addthis.com/js/250/addthis_widget.js"></script>
 <!-- ADDTHIS BUTTON END -->
+
+<!-- bootstrap -->
+<link href="/theme/css/bootstrap.css" rel="stylesheet" />
+<link href="/theme/css/bootstrap-overrides.css" type="text/css"
+	rel="stylesheet" />
+
+<!-- theme -->
+<link rel="stylesheet" type="text/css"
+	href="/theme/css//theme/default.css" />
+
+<!-- libraries -->
+<link rel="stylesheet" type="text/css"
+	href="/theme/css/font-awesome.css" />
+<link rel="stylesheet" type="text/css"
+	href="/theme/css/elements/dashboard.css" />
+<link rel="stylesheet" type="text/css"
+	href="/theme/css/elements/notify.css" />
+<link rel="stylesheet" type="text/css"
+	href="/theme/css/elements/bootstrap_calendar.css" />
+<link rel="stylesheet" type="text/css"
+	href="/theme/css/elements/pizza.css" />
+
+
+<!-- open sans font -->
+<link
+	href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+	rel='stylesheet' type='text/css' />
+
+<!--[if lt IE 9]>
+      <script src="/theme//theme/js/html5.js"></script>
+    <![endif]-->
+
 </head>
 <body>
-	<div id="wrap">
 
+	<!-- navbar -->
+	<header class="navbar navbar-inverse navbar-fixed-top" role="banner">
+		<div class="navbar-header">
+			<button class="navbar-toggle" type="button" data-toggle="collapse"
+				id="menu-toggler">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand no-horizontal-padding hidden-xs" href="/s/"><img
+				src="/icons/logo.png" alt="logo" class="logo" /></a> <a
+				class="navbar-brand no-horizontal-padding hidden-sm hidden-md hidden-lg"
+				href="/s/"><img src="/icons/favicon-32x32.png" alt="logo" /></a>
+		</div>
 
+		<ul class="nav navbar-nav pull-right hidden-xs">
+			<li class="dropdown"><a href="#"
+				class="dropdown-toggle hidden-xs" data-toggle="dropdown"><i
+					class="glyphicon glyphicon-question-sign"></i> WTF <b class="caret"></b></a>
+				<ul class="dropdown-menu">
+					<li><a href="profile.html">Profile</a></li>
+					<li><a href="#">Settings</a></li>
+					<li class="divider"></li>
+					<li><a href="#">Sign Out</a></li>
+				</ul></li>
+			<li class="dropdown" id="login">
+		</ul>
 
 		<div id="header"></div>
-		<div id="app"></div>
+	</header>
+	<!-- end navbar -->
 
-		<!-- PRODUCT -->
-		<div class="col-md-6">
-			<div class="panel panel-default post-wrap pro-box">
-				<div class="post-info">
-					<span class="arrow-pro right"></span>
+	<!-- sidebar -->
+	<div id="sidebar-nav"></div>
+	<!-- end sidebar -->
+
+
+	<!-- main container -->
+	<div class="content">
+		<div id="pad-wrapper">
+
+			<!-- RESULTS -->
+			<div class="col-md-8">
+				<div class="panel panel-default">
+					<div class="panel-heading" id="resultHeader">Results</div>
 					<div class="panel-body">
-						<h2>Product of the week</h2>
-						<div class="desk based" id="app">
-							<h3>Ebook Pro</h3>
-							<p>Lorem ipsum dolor set amet lorem ipsum dolor set amet
-								ipsum dolor set amet dolor set amet lorem ipsum dolor set amet
-								ipsum</p>
-						</div>
-						<div class="post-btn">
-							<a href="javascript:;"> <i class="fa fa-chevron-circle-left"></i>
-							</a> <a href="javascript:;"> <i
-								class="fa fa-chevron-circle-right"></i>
-							</a>
-						</div>
+						<div id="resultPanel"></div>
 					</div>
 				</div>
-
-				<aside class="post-highlight based v-align">
-					<div class="panel-body text-center">
-						<div class="pro-thumb">
-							<img src="/icons/favicon-96x96.png" alt="">
-						</div>
-					</div>
-				</aside>
 			</div>
-		</div>
-		<!-- /PRODUCT -->
+			<!-- END RESULTS -->
 
-		<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
-			style="position: absolute; width: 0; height: 0; border: 0"></iframe>
-		<div class="adBack" align="center">
-			<script async
-				src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-			<!-- top ten top banner -->
-			<ins class="adsbygoogle"
-				style="display: inline-block; width: 728px; height: 90px;"
-				data-ad-client="ca-pub-9355939918394201" data-ad-slot="1278737769"></ins>
-			<script>
-				(adsbygoogle = window.adsbygoogle || []).push({});
-			</script>
-			<script>
-				(function(d, s, id) {
-					var js, fjs = d.getElementsByTagName(s)[0];
-					if (d.getElementById(id))
-						return;
-					js = d.createElement(s);
-					js.id = id;
-					js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=499268570161982";
-					fjs.parentNode.insertBefore(js, fjs);
-				}(document, 'script', 'facebook-jssdk'));
-			</script>
-		</div>
-		<div id="fb-root"></div>
+			<div class="col-md-4 hidden-xs">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Social Media</strong>
+					</div>
+					<div class="panel-body">
+						<div class="addthis_horizontal_follow_toolbox"></div>
+					</div>
+				</div>
+			</div>
 
-		<div id="push"></div>
+			<!-- TOPTEN -->
+			<div class="col-md-8 col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-body" id="app"></div>
+				</div>
+			</div>
+			<!-- END TOPTEN -->
+
+			<!-- HISTORY -->
+			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
+				style="position: absolute; width: 0; height: 0; border: 0"></iframe>
+			<!-- END HISTORY -->
+
+			<!-- GOOGLE AD -->
+			<div class="col-md-4 col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<script async
+							src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+						<!-- responsive -->
+						<ins class="adsbygoogle" style="display: block"
+							data-ad-client="ca-pub-9355939918394201"
+							data-ad-slot="5541524166" data-ad-format="auto"></ins>
+						<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+					</div>
+				</div>
+			</div>
+			<!-- GOOGLE AD -->
+
+			<!-- NOTES -->
+			<div class="col-md-4  col-xs-12" id="notes"></div>
+			<!-- END NOTES -->
+
+
+
+
+
+
+			<div class="clearfix"></div>
+
+
+
+
+
+
+
+			<div class="clearfix"></div>
+			<footer id="footer">
+				<div class="text-center clearfix">
+					<p>
+						<small>&copy myxdashboard 2014, Admin dashboard framework
+							base on bootstrap</small> <br /> <br /> <a href="#"
+							class="btn btn-xs btn-circle btn-twitter"><i
+							class="fa fa-twitter"></i></a> <a href="#"
+							class="btn btn-xs btn-circle btn-facebook"><i
+							class="fa fa-facebook"></i></a> <a href="#"
+							class="btn btn-xs btn-circle btn-gplus"><i
+							class="fa fa-google-plus"></i></a>
+					</p>
+				</div>
+			</footer>
+
+
+		</div>
+		<!-- /pad-wrapper -->
 	</div>
-	<div id="footer">
-		<div class="navbar">
-			<div class="navbar-inner"
-				style="background-image: -webkit-linear-gradient(top, #05213c, #03172b)">
-				<div class="container" style="width: 960px;">
-					<ul id="footerLinks" class="nav" style="width: 100%">
-						<li class="footerItem">&copy; 2011-2014 RUGBY.NET LLC</li>
-					</ul>
+	<!-- content -->
+	<!-- /main container -->
+
+
+
+
+	<!--post modal-->
+	<div id="myModal" class="modal fade" tabindex="-1" role="dialog"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true"></button>
+					<h4>
+						<strong>Delete Confirmation</strong>
+					</h4>
 				</div>
 
+				<div class="modal-body">
+					<p></p>
+				</div>
+
+				<div class="modal-footer">
+					<button class="btn btn-default btn-sm" data-dismiss="modal"
+						aria-hidden="true">Close</button>
+					<button data-dismiss="modal" class="btn btn-danger btn-sm"
+						id="btnYes">Confirm</button>
+				</div>
 			</div>
 		</div>
 	</div>
+
+	<!-- Notification -->
+	<!-- 	<div id="container"> -->
+	<!-- 		<div id="default"> -->
+	<!-- 			<h1>#{title}</h1> -->
+	<!-- 			<p>#{text}</p> -->
+	<!-- 		</div> -->
+	<!-- 	</div> -->
+
+
+
+	<!-- scripts -->
+	<!-- 	<script src="/theme/js/jquery.min.js"></script> -->
+	<!-- 	<script src="/theme/js/bootstrap.js"></script> -->
+	<script src="/theme/js/theme.js"></script>
+
+	<!-- 	<script src="/theme/js/bootstrap-modal.js"></script> -->
+
+	<!-- 	<script src="/theme/js/flot/jquery.flot.js"></script> -->
+	<!-- 	<script src="/theme/js/flot/jquery.flot.resize.js"></script> -->
+
+	<!-- notification  -->
+	<script src="/theme/js/notify/jquery-ui.js"></script>
+	<script src="/theme/js/notify/jquery.notify.js"></script>
+	<script src="/theme/js/jquery.slimscroll.js"></script>
+	<script src="/theme/js/LazyLoad/LazyLoad.min.js"></script>
+
+	<script type="text/javascript">
+
+		//NOTIFICATION
+		function create(template, vars, opts) {
+			return $container.notify("create", template, vars, opts);
+		}
+
+		$(function() {
+			// initialize widget on a container, passing in all the defaults.
+			// the defaults will apply to any notification created within this
+			// container, but can be overwritten on notification-by-notification
+			// basis.
+			$container = $("#container").notify();
+			// create two when the pg loads
+			create(
+					"default",
+					{
+						title : 'YOU HAVE 3 NEW MESSAGES',
+						text : 'Go to <a href=\'inbox.html\'>Mailbox</a> to see who wrote to you. Check the date and today\'s tasks.'
+					});
+		});
+	</script>
+
 </body>
 </html>

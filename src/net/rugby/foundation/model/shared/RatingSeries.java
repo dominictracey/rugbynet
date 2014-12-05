@@ -37,6 +37,10 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	@Transient
 	private List<ICompetition> comps;
 	
+	private Long hostCompId;
+	@Transient
+	private ICompetition hostComp;
+	
 	private Boolean isGlobal;
 
 	@Transient
@@ -240,5 +244,26 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	@Override
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+
+	@Override
+	public ICompetition getHostComp() {
+		return hostComp;
+	}
+
+	@Override
+	public void setHostComp(ICompetition hostComp) {
+		this.hostComp = hostComp;
+	}
+
+	@Override
+	public Long getHostCompId() {
+		return hostCompId;
+	}
+
+	@Override
+	public void setHostCompId(Long hostCompId) {
+		this.hostCompId = hostCompId;
 	}
 }

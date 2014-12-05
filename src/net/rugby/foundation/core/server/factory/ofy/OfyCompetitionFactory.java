@@ -12,6 +12,7 @@ import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Competition;
@@ -21,6 +22,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
@@ -46,14 +48,16 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 	private IConfigurationFactory ccf;
 	//	private boolean saving = false;
 	private ICompetition globalComp;
+	private IRatingSeriesFactory rsf;
 
 
 	@Inject
-	OfyCompetitionFactory(IRoundFactory rf, ITeamGroupFactory tf, IClubhouseFactory chf, IConfigurationFactory ccf) {
+	OfyCompetitionFactory(IRoundFactory rf, ITeamGroupFactory tf, IClubhouseFactory chf, IConfigurationFactory ccf, IRatingSeriesFactory rsf) {
 		this.rf = rf;
 		this.tf = tf;
 		this.chf = chf;
 		this.ccf = ccf;
+		this.rsf = rsf;
 	}
 	//
 	//	@Override
@@ -152,6 +156,9 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			c = new Competition();
 		}
 
+		// populate the seriesMap
+		c.setSeriesMap(rsf.getModesForComp(id));
+		
 		return c;
 	}
 

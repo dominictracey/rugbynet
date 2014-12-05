@@ -1428,5 +1428,33 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 		
 		return menuItemDelegate;
 	}
+
+
+
+	@Override
+	public void virtualCompClicked() {
+		clientFactory.getRpcService().addVirtualComp(new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles creating virtual comp: " + caught.getLocalizedMessage());
+
+			}
+
+			@Override
+			public void onSuccess(ICompetition result) {
+				if (result != null)
+				{
+					Window.alert("Comp	Added");	
+					comps.add(result);
+					view.addComps(comps);
+				} else {
+					Window.alert("Comp not added. See server log for details");
+				}
+			}
+
+		});
+		
+	}
 	
 }

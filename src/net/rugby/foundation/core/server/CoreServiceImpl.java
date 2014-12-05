@@ -20,12 +20,14 @@ import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 
@@ -52,11 +54,13 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	private IAccountManager am;
 	private IExternalAuthticatorProviderFactory eapf;
 	private ICachingFactory<IContent> ctf;
+	private IPlaceFactory spf;
 
 
 	@Inject
 	public CoreServiceImpl(ICompetitionFactory cf, IAppUserFactory auf, IClubhouseFactory chf,  IClubhouseMembershipFactory chmf, 
-			IConfigurationFactory configF, IAccountManager am, IExternalAuthticatorProviderFactory eapf, ICachingFactory<IContent> ctf) {
+			IConfigurationFactory configF, IAccountManager am, IExternalAuthticatorProviderFactory eapf, ICachingFactory<IContent> ctf,
+			IPlaceFactory spf) {
 		//		this.ofy = DataStoreFactory.getOfy();
 		this.cf = cf;
 		this.auf = auf;
@@ -66,6 +70,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 		this.am = am;
 		this.eapf = eapf;
 		this.ctf = ctf;
+		this.spf = spf;
 	}
 
 	/* (non-Javadoc)

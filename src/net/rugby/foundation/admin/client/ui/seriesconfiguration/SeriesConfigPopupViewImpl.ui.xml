@@ -63,6 +63,18 @@
 			<tr>
 
 				<td>
+					Host Comp:
+				</td>
+
+				<td>
+
+					<b:ListBox ui:field="hostComp">
+					</b:ListBox>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
 					Countries:
 				</td>
 

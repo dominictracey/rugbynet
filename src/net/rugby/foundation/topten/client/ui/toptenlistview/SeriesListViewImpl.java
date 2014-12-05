@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -17,20 +18,24 @@ import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.NavTabs;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.TabContent;
 import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -43,8 +48,12 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@UiField TabPanel tabPanel;
 	@UiField NavTabs navTabs;
 	@UiField TabContent tabContent;
-	@UiField VerticalPanel notes;
 	@UiField HTML listTitle;
+	
+	// admin buttons
+	@UiField Panel adminButtons;
+	@UiField Button createFeature;
+	@UiField Button promote;
 
 	private Long compId;
 	private Long seriesId;
@@ -67,11 +76,10 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	private TopTenListView<ITopTenItem> listView;
 
 	private RatingMode mode;
-	private Map<Integer, TabListItem> tabIndexMap = new HashMap<Integer, TabListItem>();
-
+	private Map<Long, TabListItem> tabIndexMap = new HashMap<Long, TabListItem>();
+	private Map<Long, TabPane> paneIndexMap = new HashMap<Long, TabPane>();
+	
 	private boolean ratingModesSet;
-
-	private NoteView<INote> noteView;
 
 
 	@UiTemplate("SeriesListViewImpl.ui.xml")
@@ -85,7 +93,6 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		ratingModesSet = false;
-		//notes = DOM.getElementById("notes");
 	}
 
 
@@ -96,17 +103,15 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 		if (result != null) {
 			seriesId = series.getId();
-			tabPanel.setVisible(true);
-			//clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent() + "<div id=\"fbListLike\"/>");
-
-			tabPanel.clear();
+			navTabs.setVisible(true);
+			tabContent.setVisible(true);
+			
+			navTabs.clear();
 			weekDropDown.clear();
 			for (IRatingGroup rg : series.getRatingGroups()) {
 				// add item to date dropdown
 				final AnchorListItem nl = new AnchorListItem(rg.getLabel());
 				final Long gid = rg.getId();
-				//nl.setId(rg.getId().toString());
-				//nl.setTarget(rg.getId().toString());
 				nl.setText(rg.getLabel());
 				nl.addClickHandler(new ClickHandler() {
 
@@ -121,75 +126,17 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						setQuery(null);
 						setList(null);
 						setItemId(null);
+						//Core.getCore().setCurrentRoundId(rid);
 						presenter.gotoPlace(getPlace());
 					}
 
 				});
 				weekDropDown.add(nl);
-				//group = rg;
 			}
-
-
-			//			if (series.getMode() == RatingMode.BY_POSITION) {
-			//				// start with the latest ratingGroup
-			//				IRatingGroup group = series.getRatingGroups().get(series.getRatingGroups().size()-1);
-			//				assert (group != null);
-			//
-			//				// default to best of year
-			//				IRatingMatrix matrix = null;
-			//				for (IRatingMatrix m : group.getRatingMatrices()) {
-			//					if (m.getCriteria() == Criteria.BEST_YEAR) {
-			//						matrix = m;
-			//					}
-			//				}
-			//				assert (matrix != null);
-			//
-			//				for (IRatingQuery query : matrix.getRatingQueries()) {	
-			//					final IRatingQuery rq = query;
-			//					position fp = query.getPositions().get(0);
-			//					final TabContent t = new TabContent();
-			//					t.setHeading(fp.getName());
-			//					final SeriesListViewImpl _this = this;
-			//					t.addClickHandler(new ClickHandler() {
-			//
-			//						@Override
-			//						public void onClick(ClickEvent event) {
-			//							//_this.setRatingQuery(series.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(fp.ordinal()));
-			//							t.add(_this.listView.asWidget());
-			//							presenter.showRatingQuery(rq);
-			//						}
-			//
-			//					});
-			//					tabPanel.add(t);
-			//				}
-			//			}
-
-			//			int count = 0;
-			//			if (it != null) {
-			//				itemList = new ArrayList<TopTenItemView>();
-			//
-			//				while (it.hasNext()) {
-			//					final ITopTenItem item = it.next();
-			//
-			//					final int fCount = count++;
-			//					Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
-			//						@Override
-			//						public void execute() {
-			//
-			//							TopTenItemView itemView = new TopTenItemView(item, fCount, result.getId(), item.getPlayerId(), baseUrl);
-			//							itemList.add(itemView);
-			//							items.add(itemView);
-			//							presenter.setTTIButtons(itemView);
-			//						}
-			//					});
-			//				}
-			//			}
-
-
-			//setVisible(true);
 		} else {
 			// no info to display
-			tabPanel.setVisible(false);
+			navTabs.setVisible(false);
+			tabContent.setVisible(false);
 		}
 		presenter.process(getPlace());
 
@@ -209,41 +156,12 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@Override
 	public void setClientFactory(ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
-		ttlView = clientFactory.getListView();
+		ttlView = clientFactory.getSimpleView();  // changed from getListView() on 11/20/14
 	}
-
-	//	private void populateCriteria() {
-	//		ButtonGroup nl = new ButtonGroup("In Form");
-	//		nl.addClickHandler(new ClickHandler() {
-	//
-	//			@Override
-	//			public void onClick(ClickEvent event) {
-	//				presenter.showCriteria(Criteria.IN_FORM);
-	//
-	//			}
-	//
-	//		});
-	//		criteriaDropDown.add(nl);
-	//
-	//		nl = new ButtonGroup("Best in Last Year");
-	//		nl.addClickHandler(new ClickHandler() {
-	//
-	//			@Override
-	//			public void onClick(ClickEvent event) {
-	//				presenter.showCriteria(Criteria.BEST_YEAR);
-	//
-	//			}
-	//
-	//		});
-	//		criteriaDropDown.add(nl);
-	//
-	//		nl.setActive(true);
-	//	}
 
 	@Override
 	public void setListView(TopTenListView<ITopTenItem> listView) {
 		this.listView = listView;
-
 	}
 
 	@Override
@@ -308,40 +226,43 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		this.matrix = matrix;
 		if (matrix != null) {
 			matrixId = matrix.getId();
-			tabPanel.clear();
+			navTabs.clear();
+			tabContent.clear();
 			tabIndexMap.clear();
-			int count = 0;
+			paneIndexMap.clear();
 			for (IRatingQuery query : matrix.getRatingQueries()) {	
 				final IRatingQuery rq = query;
 				if (rq.getTopTenListId() != null) {
-//					position fp = null;
-//					if (query.getPositions() != null && !query.getPositions().isEmpty()) {
-//						fp = query.getPositions().get(0);
-//					}
-					final TabListItem t = new TabListItem(rq.getLabel());
-					final int i = count;
-					tabIndexMap.put(count++, t);
 
-					final SeriesListViewImpl _this = this;
+					final TabListItem t = new TabListItem(rq.getLabel());
+					
+					// the paired TabPane to show when the tab is clicked
+					final TabPane pane = new TabPane();
+					tabIndexMap.put(rq.getId(), t);
+					paneIndexMap.put(rq.getId(), pane);
+					tabContent.add(pane);
+
 					t.addClickHandler(new ClickHandler() {
 
 						@Override
 						public void onClick(ClickEvent event) {
-							//_this.setRatingQuery(series.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(fp.ordinal()));
-							//t.add(_this.listView.asWidget());
 
-							_this.addListView(i);
+							pane.add(listView);
 							setQuery(null);
 							queryId = rq.getId();
 							setList(null);
 							setItemId(null);
 							presenter.gotoPlace(getPlace());
-							//presenter.showRatingQuery(rq);
 						}
 
 					});
 
-					tabPanel.add(t);
+
+					
+					t.setDataTargetWidget(pane);
+					navTabs.add(t);
+					
+
 
 				}
 			
@@ -351,10 +272,6 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			matrixId = null;
 		}
 
-	}
-
-	protected void addListView(int index) {
-		tabIndexMap.get(index).add(listView.asWidget());
 	}
 
 
@@ -368,17 +285,10 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		this.query = query;
 		if (query != null) {
 			queryId = query.getId();
-			int ordinal = 0;
-			for (IRatingQuery q : matrix.getRatingQueries()) {
-				if (q.getId().equals(query.getId())) {
-					addListView(ordinal);
-					//if (tabPanel.get > ordinal)
-					tabIndexMap.get(ordinal).showTab();
-				}
-				if (q.getTopTenListId() != null) {
-					ordinal++;
-				}
-			}
+			
+			tabIndexMap.get(query.getId()).showTab();
+			paneIndexMap.get(query.getId()).add(listView);
+
 			presenter.process(getPlace());
 		} else {
 			queryId = null;
@@ -457,6 +367,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				}
 			}
 			listTitle.setHTML(list.getTitle());
+			listView.setList(list, "");
 		}
 	}
 
@@ -465,9 +376,6 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		assert (matrix == this.matrix);
 
 		matrix.setRatingQueries(result);
-
-		// now pick a rating query - first for now
-		//setQuery(matrix.getRatingQueries().get(0));
 
 		setMatrix(matrix);
 
@@ -492,21 +400,21 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 
 
-	@Override
-	public void setNotes(String n) {
-//		SafeHtmlBuilder builder = new SafeHtmlBuilder();
-//		builder.appendHtmlConstant(n);
-//		notes.setHTML(builder.toSafeHtml());
-		
-	}
-
-
-
-	@Override
-	public void setNotesView(NoteView<INote> noteView) {
-		this.noteView = noteView;
-		notes.add(noteView.asWidget());
-	}
+//	@Override
+//	public void setNotes(String n) {
+////		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+////		builder.appendHtmlConstant(n);
+////		notes.setHTML(builder.toSafeHtml());
+//		
+//	}
+//
+//
+//
+//	@Override
+//	public void setNotesView(NoteView<INote> noteView) {
+//		this.noteView = noteView;
+//		notes.add(noteView.asWidget());
+//	}
 
 
 
@@ -552,6 +460,14 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		
 	}
 
+	@Override
+	public void showButtons(boolean show) {
+		adminButtons.setVisible(show);	
+	}
 
+	@UiHandler("createFeature")
+	void onNextButtonClicked(ClickEvent event) {	
+		presenter.createFeature(getPlace());
+	}
 
 }

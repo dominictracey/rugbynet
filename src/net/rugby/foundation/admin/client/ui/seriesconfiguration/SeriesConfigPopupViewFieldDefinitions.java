@@ -39,7 +39,9 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 	//	@UiField CheckBox average;
 	//	
 	//	@UiField CheckBox live;
-
+	protected List<ICompetition> compList = null;
+	protected boolean compsLoaded = false;
+	
 	public SeriesConfigPopupViewFieldDefinitions(final ClientFactory clientFactory) {
 		if (fieldDefinitions.isEmpty()) {
 
@@ -113,7 +115,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				private ListBox w;
 				// need this bit of gorminess as the first player is passed in before the country list is completely loaded.
 				private List<Long> selectedIds = new ArrayList<Long>();
-				private boolean compsLoaded = false;
+
 				private Timer t = null;
 
 				@Override
@@ -126,6 +128,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 						@Override
 						public void onCompListFetched(List<ICompetition> comps) {
 							int count = 0;
+							compList = comps;
 							for (ICompetition c : comps) {
 								w.addItem(c.getShortName(), c.getId().toString());
 								// check to see if the one we are adding is the one we want selected (as set in render())
@@ -368,6 +371,93 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 
 			});
 
+			fieldDefinitions.add(new FieldDefinition<ISeriesConfiguration>() {
+				//host Comp
+				private ListBox w;
+				Timer t = null;
+				// need this bit of gorminess as the first player is passed in before the country list is completely loaded.
+				//private List<Long> selectedIds = new ArrayList<Long>();
+
+				@Override
+				public void bind (Widget in)
+				{
+					w = (ListBox) in;
+					
+					// compList gets loaded above, we just have to wait to render
+
+
+					t = new Timer() {
+						@Override
+						public void run() {
+							if (compsLoaded) {
+								for (ICompetition c : compList) {
+									w.addItem(c.getShortName(), c.getId().toString());
+								}
+								t.cancel();
+							}
+						}
+					};
+
+					t.schedule(2000);
+
+				}
+
+				@Override
+				public Widget render(ISeriesConfiguration c) {
+					final ISeriesConfiguration _c = c;
+
+
+					t = new Timer() {
+						@Override
+						public void run() {
+							if (compsLoaded) {
+								if (w.getItemCount() > 0) {
+									int i = 0;
+									if (_c.getCompIds() != null && _c.getCompIds().size() > 0) {
+										while (i < w.getItemCount()) {
+											if (_c.getCompIds().contains(Long.valueOf(w.getValue(i)))) {
+												w.setItemSelected(i, true);
+											}
+											++i;
+										}
+									}
+								}
+							} else {
+								// go again
+								t.schedule(5000);
+							}
+						}
+					};
+
+					t.schedule(50);
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					for (int i=0; i<w.getVisibleItemCount(); ++i) {
+						w.setItemSelected(i, false);
+					}
+				}
+
+				@Override
+				public ISeriesConfiguration update(ISeriesConfiguration p) {
+					int index = 0;
+					p.setHostCompId(null);
+					while (index < w.getItemCount() && !w.getValue(index).isEmpty())
+					{
+						if (w.isItemSelected(index)) {
+							p.setHostCompId(Long.valueOf(w.getValue(index)));
+							break;
+						}
+						index++;
+					}
+
+					return p;
+				}
+
+			});
+			
 			fieldDefinitions.add(new FieldDefinition<ISeriesConfiguration>() {
 				//startDate
 				private ListBox w;

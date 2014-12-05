@@ -73,4 +73,8 @@ public interface ISeriesConfiguration  extends IHasId {
 	void setDisplayName(String displayName);
 	Boolean getLive();
 	void setLive(Boolean live);
+	Long getHostCompId();
+	ICompetition getHostComp();
+	void setHostCompId(Long hostCompId);
+	void setHostComp(ICompetition hostComp);
 }
