@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -15,6 +17,7 @@ import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IClubhouse;
@@ -25,6 +28,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -49,59 +53,19 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 	//	private boolean saving = false;
 	private ICompetition globalComp;
 	private IRatingSeriesFactory rsf;
+	private IUniversalRoundFactory urf;
 
 
 	@Inject
-	OfyCompetitionFactory(IRoundFactory rf, ITeamGroupFactory tf, IClubhouseFactory chf, IConfigurationFactory ccf, IRatingSeriesFactory rsf) {
+	OfyCompetitionFactory(IRoundFactory rf, ITeamGroupFactory tf, IClubhouseFactory chf, IConfigurationFactory ccf, IRatingSeriesFactory rsf,
+			IUniversalRoundFactory urf) {
 		this.rf = rf;
 		this.tf = tf;
 		this.chf = chf;
 		this.ccf = ccf;
 		this.rsf = rsf;
+		this.urf = urf;
 	}
-	//
-	//	@Override
-	//	public ICompetition getCompetition() {
-	//		try {
-	//			byte[] value = null;
-	//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-	//			ICompetition c = null;
-	//
-	//			value = (byte[])syncCache.get(id);
-	//			if (value == null) {
-	//				setId(id);
-	//				c = getFromDB();
-	//				if (c.getLastSaved() == null) {
-	//					c.setLastSaved(new Date());
-	//				}
-	//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	//				ObjectOutput out = new ObjectOutputStream(bos);   
-	//				out.writeObject(c);
-	//				byte[] yourBytes = bos.toByteArray(); 
-	//
-	//				out.close();
-	//				bos.close();
-	//
-	//				syncCache.put(id, yourBytes);
-	//			} else {
-	//
-	//				// send back the cached version
-	//				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-	//				ObjectInput in = new ObjectInputStream(bis);
-	//				c = (ICompetition)in.readObject();
-	//
-	//				bis.close();
-	//				in.close();
-	//
-	//			}
-	//			return c;
-	//
-	//		} catch (Throwable ex) {
-	//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-	//			return null;
-	//		}
-	//
-	//	}
 
 	@Override
 	public void invalidate(Long compId) {
@@ -110,24 +74,6 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			if (c != null) {
 				deleteFromMemcache(c);
 			}
-			//			if (!saving) {
-			//				// now update the memcache version
-			//				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			//
-			//				setId(compId);
-			//				ICompetition comp = getFromDB();
-			//
-			//				syncCache.delete(comp.getId());
-			//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			//				ObjectOutput out = new ObjectOutputStream(bos);   
-			//				out.writeObject(comp);
-			//				byte[] yourBytes = bos.toByteArray(); 
-			//
-			//				out.close();
-			//				bos.close();
-			//
-			//				syncCache.put(id, yourBytes);
-			//			}
 
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -139,13 +85,24 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 
 		Objectify ofy = DataStoreFactory.getOfy();
 		Competition c = ofy.get(new Key<Competition>(Competition.class,id));
-
+		UniversalRound now = urf.get(new DateTime());
+		
 		if (c != null) {
 			c.setRounds(new ArrayList<IRound>());
+			int count = 0;
+			c.setPrevRoundIndex(-1);
+			c.setNextRoundIndex(-1);
 			for (Long rid : c.getRoundIds()) {
 				IRound r = rf.get(rid);
 				c.getRounds().add(r);
+				if (r.getUrOrdinal() > now.ordinal && c.getPrevRoundIndex() == -1) {
+					c.setPrevRoundIndex(count-1);
+				} else if (r.getUrOrdinal() > now.ordinal + 1 && c.getNextRoundIndex() == -1) {
+					c.setNextRoundIndex(count);
+				}			
+				count++;
 			}
+			
 
 			c.setTeams(new ArrayList<ITeamGroup>());
 			for (Long tid : c.getTeamIds()) {

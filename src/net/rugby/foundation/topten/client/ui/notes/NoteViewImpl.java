@@ -3,7 +3,6 @@
  */
 package net.rugby.foundation.topten.client.ui.notes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.PanelHeader;
@@ -13,18 +12,12 @@ import net.rugby.foundation.topten.client.ui.ColumnDefinition;
 import net.rugby.foundation.topten.model.shared.INote;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLTable;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**

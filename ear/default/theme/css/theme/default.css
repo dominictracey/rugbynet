@@ -1,3 +1,14 @@
+    /* rugby.net additions */
+html {
+  max-width: 2200px;
+  min-width: 320px;
+  margin: 0 auto;
+  background: #eee; /* Fills the page */
+  position: relative; /* Fix for absolute positioning */
+}
+
+    /* end rugby.net additions */
+    
 body {
   font-family: 'Open Sans', sans-serif;
   background-color: #252d3a;
@@ -642,7 +653,7 @@ footer i:hover{
     }
 
     #pad-wrapper {
-    padding: 0px 15px; 
+    padding: 0px 0px;  // changed from 0px 15px on 12/9/14 DPT
     }
 
     .content {
@@ -735,7 +746,7 @@ footer i:hover{
     }
 
     #pad-wrapper {
-    padding: 0px 15px; 
+    padding: 0px 0px;  // changed from 0px 15px on 12/9/14 DPT
     }
 
     .content {
@@ -775,5 +786,7 @@ footer i:hover{
     border-bottom: 0px;
     box-shadow: none; 
     } 
+    
+
 
 }

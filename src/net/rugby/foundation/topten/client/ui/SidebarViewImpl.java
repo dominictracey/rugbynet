@@ -24,10 +24,12 @@ import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.UnorderedList;
 
+import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.ClientFactory;
+import net.rugby.foundation.topten.client.place.FeatureListPlace;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 
 import com.google.gwt.core.client.GWT;
@@ -139,8 +141,44 @@ public class SidebarViewImpl extends Composite
 			ListGroup submenu = new ListGroup();
 			submenuMap.put(compId, submenu);
 			submenu.setStyleName("submenu");
+			
+			// add home link
+			ListGroupItem lgi = new ListGroupItem();
+			lgi.removeStyleName("list-group-item");
+			Anchor homeLink = new Anchor();
+			homeLink.setText("Home");
+
+			homeLink.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+									
+					// allow other elements to display this comp
+					if (Core.getCore().getCurrentCompId() != compId) {
+						Core.getCore().setCurrentCompId(compId);
+					}
+					
+					FeatureListPlace place = new FeatureListPlace();
+					place.setCompId(compId);
+					
+					// remove the carat if it is somewhere else
+					if (caratParent != null && carat != null) {
+						caratParent.remove(carat);
+					}
+					
+					// add the carat
+					li.add(carat);
+					caratParent = li;
+					
+					clientFactory.getPlaceController().goTo(place);
+				}
+				
+			});
+			lgi.add(homeLink);
+			submenu.add(lgi);
+			
 			for (RatingMode mode: modeMap.keySet()) {
-				ListGroupItem lgi = new ListGroupItem();
+				lgi = new ListGroupItem();
 				lgi.removeStyleName("list-group-item");
 				Anchor modeLink = new Anchor();
 				modeLink.setText(mode.getMenuName());
@@ -149,6 +187,12 @@ public class SidebarViewImpl extends Composite
 
 					@Override
 					public void onClick(ClickEvent event) {
+						
+						// allow other elements to display this comp
+						if (Core.getCore().getCurrentCompId() != compId) {
+							Core.getCore().setCurrentCompId(compId);
+						}
+						
 						SeriesPlace place = new SeriesPlace();
 						place.setCompId(compId);
 						place.setSeriesId(modeMap.get(_mode));

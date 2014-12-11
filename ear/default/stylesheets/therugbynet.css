@@ -1,0 +1,169 @@
+/* ######## RESPONSIVE #########  */ 
+@media (min-width: 992px) {  
+
+	.sponsor {
+		padding-bottom: 20px;
+	}
+	
+	.sponsor-logo {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}
+
+@media(min-width: 768px) and (max-width: 991px) {
+
+	.sponsor {
+		padding-bottom: 15px;
+	}
+	
+	.sponsor-logo {
+		padding-left: 10px;
+		padding-right: 10px;
+		background-image: url("/resources/comps/ap/200R.png");
+    	background-repeat: no-repeat;
+    	min-height: 38px;
+/*     	background-position: right top; */
+    	background-size:cover
+	}
+}
+
+@media(min-width: 480px) and (max-width: 767px) {
+	
+	.sponsor {
+		padding-bottom: 10px;
+	}
+	
+	.sponsor-logo {
+		padding-left: 5px;
+		padding-right: 5px;
+		background-image: url("/resources/comps/ap/100R.png");
+    	background-repeat: no-repeat;
+    	min-height: 38px;
+/*     	background-position: right top; */
+    	background-size:cover
+	}
+	
+	.sponsor-buttons {
+
+	}
+}
+
+@media(max-width:480px) { 
+
+	.sponsor {
+		padding-bottom: 5px;
+	}
+	
+	.sponsor-logo {
+/* 		padding-left: 0px; */
+/* 		padding-right: 0px; */
+		background: url("/resources/comps/ap/100R.png") no-repeat left top;
+    -webkit-background-size: cover; /* For WebKit*/
+    -moz-background-size: cover;    /* Mozilla*/
+    -o-background-size: cover;      /* Opera*/
+    background-size: cover;         /* Generic*/
+    height:auto;
+    min-height:25px;
+	}
+	
+	.sponsor-buttons {
+		margin-left: auto;
+    	margin-right: auto;
+	}
+}
+
+/* top ten panel */
+.toptentext {
+	padding-right: 10px;
+}
+
+/* OpenId navigation */
+.openId {
+    padding: 0;
+    margin: 10px 0 8px;
+    list-style: none;
+    overflow: hidden;
+}
+
+
+ul.openId li {
+    margin: 10px 0 8px;
+    padding: 0;
+}
+
+.openId li a {
+	height: 50px;
+	width: 150px;
+    display: block;
+	background-image: url(/icons/login/login.png);
+}
+
+li#google a {
+    background-position: -0px -150px;
+}
+li#google a:hover  {
+    background-position: -150px -150px;
+}
+
+li#facebook a {
+    background-position: -0px -100px;
+}
+li#facebook a:hover  {
+    background-position: -150px -100px;
+}
+
+li#aol a {
+    background-position: -0px -0px;
+}
+li#aol a:hover  {
+    background-position: -150px -0px;
+}
+
+li#openid a {
+    background-position: -0px -250px;
+}
+li#openid a:hover  {
+    background-position: -150px -250px;
+}
+
+li#yahoo a {
+    background-position: -0px -400px;
+}
+li#yahoo a:hover  {
+    background-position: -150px -400px;
+}
+
+
+/*  Login Panel  */
+input.accountInput {
+	float:right;
+	width:180px;
+}
+
+.accountLabel {
+	padding:2px;
+	text-align:left;
+	margin:2px;
+	width:120px;
+}
+
+.createAccountLabel {
+	padding:2px;
+	text-align:right;
+	margin:2px;
+	width:200px;
+}
+
+.accountPanel {
+	margin:20px;
+}
+
+.serverResponseLabelError {
+	color:red;
+	font-weight:bold;
+}
+
+input.joinLink {
+	width:250px;
+}

@@ -48,6 +48,7 @@ import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
+import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -58,6 +59,17 @@ import net.rugby.foundation.topten.server.utilities.INotesCreator;
 import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
 import net.rugby.foundation.topten.server.utilities.TwitterPromoter;
 
+/**
+ * Here are the important attributes of a TTL that are maintained here:
+ * 		live - true if it has been published as a feature, false otherwise. Note that for live to be true, series MUST be true.
+ * 		series - true if it is a feature, false otherwise (note they can be unpublished features)
+ * 		nextid/previd - the id next/prev list that has series == true
+ * 		nextPublishedId/prevPublishedId - the id of the next/prev list that has live == true
+ * 
+ * 
+ * @author home
+ *
+ */
 public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 	private IMatchGroupFactory mf;
@@ -363,7 +375,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 			// dump the memcached versions of last and latest and let them reconstitute
 			clearMemCacheLastAndLatest(list.getCompId());
-
+			
+			// flush the latest features from memcache to force a re-read
+			MemcacheServiceFactory.getMemcacheService().delete(latestFeatureMemcacheKey);
 
 
 			smd.PromoteTopTenList(list);
@@ -511,7 +525,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	}
 
 	@Override
-	public void makeFeature(ITopTenList list) {
+	public IServerPlace makeFeature(ITopTenList list) {
 		ITopTenList last = getLastCreatedForComp(list.getCompId());
 		if (last != null) { // might be the first one
 			assert (last.getNextId() == null);
@@ -522,6 +536,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			put(last);
 
 			list.setPrevId(last.getId());
+		} else {
+			setLastCreatedForComp(list,list.getCompId());
 		}
 
 		// and create a feature guid
@@ -534,9 +550,10 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		spf.put(p);  
 
 		list.setSeries(false);
-		list.setGuid(p.getGuid());
+		list.setFeatureGuid(p.getGuid());
 		put(list);
-
+		
+		return p;
 	}
 
 	private void buildTwitterDescription(ITopTenList list, IRatingQuery rq) {
@@ -1018,5 +1035,47 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		return null;
 	}
 
+	protected final String latestFeatureMemcacheKey="TopTenListFactory:LatestFeatures";
+	@Override
+	public List<Feature> getLatestFeatures() {
+		List<Feature> retval = new ArrayList<Feature>();
+		
+		try {
+			byte[] value = null;
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 
+			value = (byte[])syncCache.get(latestFeatureMemcacheKey);
+			if (value != null) {
+				// send back the cached version
+				ByteArrayInputStream bis = new ByteArrayInputStream(value);
+				ObjectInput in = new ObjectInputStream(bis);
+				retval = (List<Feature>)in.readObject();
+
+				bis.close();
+				in.close();
+			} else {
+				retval = getLatestFeaturesFromPeristentDatastore();
+				if (retval == null) {
+					retval = new ArrayList<Feature>();
+				}
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutput out = new ObjectOutputStream(bos);   
+				out.writeObject(retval);
+				byte[] yourBytes = bos.toByteArray(); 
+
+				out.close();
+				bos.close();
+
+				syncCache.put(latestFeatureMemcacheKey, yourBytes);
+			}
+
+			return retval;
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+	
+	protected abstract List<Feature> getLatestFeaturesFromPeristentDatastore(); 
 }

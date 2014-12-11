@@ -3,37 +3,76 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:b.html='urn:import:org.gwtbootstrap3.client.ui.html'>
 
-	<g:HTMLPanel width="100%" ui:field="topTenPanel">
-			<b:ButtonGroup>
-				<b:Button>Ratings</b:Button>
-				<b:Button dataToggle="DROPDOWN" />
-				<b:DropDownMenu ui:field="criteriaDropDown">
+	<b:Panel width="100%" ui:field="topTenPanel">
+		<b:PanelHeader ui:field="seriesHeader">
+			<b:Container fluid="true">
+				<b:Row ui:field="sponsorRow">
+					<b:Column size="XS_3" ui:field="compCol">
+<!-- 						<b:Image ui:field="compImage" type="ROUNDED" -->
+<!-- 							url="/resources/comps/ap/100.png" /> -->
+						<b.html:Div ui:field="compImage"></b.html:Div>
 
-				</b:DropDownMenu>
-			</b:ButtonGroup>
+					</b:Column>
+					<b:Column size="XS_6" ui:field="dropdownCol">
+<!-- 						<g:HTMLPanel> -->
+<!-- 							<center> -->
 
-			<b:ButtonGroup>
-				<b:Button>Week</b:Button>
-				<b:Button dataToggle="DROPDOWN" />
-				<b:DropDownMenu ui:field="weekDropDown">
+								<b:ButtonGroup ui:field="criteriaGroup">
+									<b:Button ui:field="criteriaButton" type="PRIMARY"
+										size="EXTRA_SMALL">Ratings</b:Button>
+									<b:Button dataToggle="DROPDOWN" type="PRIMARY" size="EXTRA_SMALL" />
+									<b:DropDownMenu ui:field="criteriaDropDown">
 
-				</b:DropDownMenu>
-			</b:ButtonGroup>
-			<g:HTML ui:field="listTitle"></g:HTML>
+									</b:DropDownMenu>
+								</b:ButtonGroup>
 
-			<b:TabPanel tabPosition="LEFT" ui:field="tabPanel">
-				<b:NavTabs ui:field="navTabs">
-				</b:NavTabs>
-				<b:TabContent ui:field="tabContent">			    
-				</b:TabContent>
-				<b.html:ClearFix />
-			</b:TabPanel>
-			
-			<b:Panel ui:field="adminButtons">
-			    <b:Button ui:field="createFeature" type="DEFAULT">Create Feature</b:Button>
-			    <b:Button ui:field="promote" type="DEFAULT">Promote</b:Button>
-			</b:Panel>
-	</g:HTMLPanel>
+								<b:ButtonGroup ui:field="weekGroup">
+									<b:Button ui:field="weekButton" type="PRIMARY" size="EXTRA_SMALL">Week</b:Button>
+									<b:Button dataToggle="DROPDOWN" type="PRIMARY" size="EXTRA_SMALL" />
+									<b:DropDownMenu ui:field="weekDropDown">
+
+									</b:DropDownMenu>
+								</b:ButtonGroup>
+
+								<b:ButtonGroup ui:field="matrixGroup">
+									<b:Button ui:field="matrixButton" type="PRIMARY" size="EXTRA_SMALL">Rate
+										By</b:Button>
+									<b:Button ui:field="matrixToggle" dataToggle="DROPDOWN"
+										type="PRIMARY" size="EXTRA_SMALL" />
+									<b:DropDownMenu ui:field="matrixDropDown">
+
+									</b:DropDownMenu>
+								</b:ButtonGroup>
+
+<!-- 							</center> -->
+<!-- 						</g:HTMLPanel> -->
+					</b:Column>
+					<b:Column size="XS_3" ui:field="sponsorCol">
+						<b.html:Div ui:field="sponsorDiv">
+							<b:Image ui:field="sponsorImage" type="ROUNDED"
+								url="/resources/sponsors/dhl/100.png" />
+							
+						</b.html:Div>
+					</b:Column>
+				</b:Row>
+				<b:Row>
+					<g:HTML ui:field="listTitle">
+					</g:HTML>
+					<g:HTML ui:field="sponsorTag"></g:HTML>
+				</b:Row>
+			</b:Container>
+		</b:PanelHeader>
+
+		<b:PanelBody>
+			<b.html:Div ui:field="content">
+			</b.html:Div>
+		</b:PanelBody>
+
+		<b:PanelFooter ui:field="adminButtons">
+			<b:Button ui:field="createFeature" type="PRIMARY">Create Feature</b:Button>
+			<b:Button ui:field="promote" type="PRIMARY">Promote</b:Button>
+		</b:PanelFooter>
+	</b:Panel>
 
 
 </ui:UiBinder>

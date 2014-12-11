@@ -13,6 +13,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -62,4 +63,5 @@ public interface TopTenListServiceAsync {
 			AsyncCallback<Map<Long, String>> asyncCallback);
 	public void createFeature(Long compId, Long queryId,
 			AsyncCallback<IServerPlace> asyncCallback);
+	public void getLatestFeatures(AsyncCallback<List<Feature>> asyncCallback);
 }

@@ -26,6 +26,8 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
@@ -76,15 +78,6 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		//		RootPanel.get("navbar").add(navbar);
 
 		initWidget(uiBinder.createAndBindUi(this));
-//		prevButton.setIconSize(IconSize.LARGE);
-//		prevButton.setIcon(IconType.CHEVRON_LEFT);
-//		nextButton.setIconSize(IconSize.LARGE);
-//		nextButton.setIcon(IconType.CHEVRON_RIGHT);
-//		prevButton.setVisible(false);
-//		nextButton.setVisible(false);
-//		contentPanel.addStyleName("contentPanel");
-//		contentArea.addStyleName("contentArea");
-//		items = new CellTable<ITopTenItem>();
 
 		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
@@ -94,7 +87,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return ""; //return "compactTTL";
+				return "compactTTL";
 
 			}
 		});
@@ -105,36 +98,27 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			{
 				SafeHtmlBuilder sb = new SafeHtmlBuilder();
 				String name = s.getPlayer() == null ? "" : s.getPlayer().getDisplayName();
-//				sb.appendHtmlConstant("<table width=\"100%\"><tr><td>" + name + "</td></tr><tr><td>"
-//						+ "<div class=\"addthis_toolbox addthis_default_style addthis_32x32_style\" addthis:url=\"" + clientFactory.getCoreConfig().getBaseToptenUrl() + "/s/" + s.getPlaceGuid() + "\" addthis:title=\"" + s.getPlayer().getDisplayName() + "\">"
-////						+ "<a class=\"addthis_button_email\"></a>"
-//						+ "<a class=\"addthis_button_facebook\"></a>"
-//						+ "<a class=\"addthis_button_twitter\"></a>"
-//						+ "<a class=\"addthis_button_compact\">Share</a>"
-//						+ "</div></td></tr></table>");
 				sb.appendHtmlConstant(name);
 				return sb.toSafeHtml().asString();
-				
-				//return s.getPlayer() == null ? "" : s.getPlayer().getDisplayName();
-				
 			}
+			
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return ""; //return "lead text-center compactTTL";
+				return "lead text-center compactTTL";
 
 			}
+			
 		});
 
 		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-
 				return s.getRating() == 0 ? "" : "(" + Integer.toString(s.getRating()) + ")";
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return ""; //return "text-right compactTTL position";
+				return "text-right compactTTL position";
 
 			}
 		});
@@ -155,7 +139,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 		};
 
-		items.addColumn(new TextColumn<ITopTenItem>(){
+		items.addColumn(new Column<ITopTenItem,String>(ratingDetailsCell) {
 			@Override
 			public String getValue(ITopTenItem s)
 			{ //
@@ -163,7 +147,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return ""; //return "compactTTL";
+				return "compactTTL";
 			}
 
 		});
@@ -172,7 +156,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-				return s.getPosition() == null ? "" : s.getPosition().getName();
+				return s.getPosition() == null ? "" : s.getPosition().getAbbr();
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
@@ -224,20 +208,32 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 		});
 
-		items.addCellPreviewHandler( new Handler<ITopTenItem>() {
-
-			@Override
-			public void onCellPreview(CellPreviewEvent<ITopTenItem> event) {
-				if (event.getColumn() == 3) {
-					boolean isClick = "click".equals(event.getNativeEvent().getType());
-					if (isClick) {
-						presenter.showRatingDetails(event.getValue());
-					}
-				}
-			}
-		});
+//		items.addCellPreviewHandler( new Handler<ITopTenItem>() {
+//
+//			@Override
+//			public void onCellPreview(CellPreviewEvent<ITopTenItem> event) {
+//				//if (event.getColumn() == 3) {
+//					boolean isClick = "click".equals(event.getNativeEvent().getType());
+//					if (isClick) {
+//						presenter.showRatingDetails(event.getValue());
+//					}
+//				//}
+//			}
+//		});
 		
 //		tableCol.add(items);
+		
+		 // Add a selection model to handle user selection.
+	    final SingleSelectionModel<ITopTenItem> selectionModel = new SingleSelectionModel<ITopTenItem>();
+	    items.setSelectionModel(selectionModel);
+	    selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+	      public void onSelectionChange(SelectionChangeEvent event) {
+	        ITopTenItem selected = selectionModel.getSelectedObject();
+	        if (selected != null) {
+	          presenter.showRatingDetails(selected);
+	        }
+	      }
+	    });
 	}
 
 

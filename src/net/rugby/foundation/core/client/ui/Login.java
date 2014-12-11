@@ -1,5 +1,9 @@
 package net.rugby.foundation.core.client.ui;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.base.modal.ModalDialog;
+
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -9,14 +13,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class Login extends PopupPanel implements net.rugby.foundation.core.client.ui.ExternalAuthenticatorPanel.Presenter
+public class Login extends DialogBox implements net.rugby.foundation.core.client.ui.ExternalAuthenticatorPanel.Presenter
 {
 	private static CreateAccountUiBinder uiBinder = GWT.create(CreateAccountUiBinder.class);
 
@@ -55,13 +59,11 @@ public class Login extends PopupPanel implements net.rugby.foundation.core.clien
 
 	public Login()
 	{
-
-		setAutoHideEnabled(true);
-		setModal(true);
-
 		setWidget(uiBinder.createAndBindUi(this));
 		error.setVisible(false);
 		nonNativeLogins.setPresenter(this);
+		
+		this.addStyleName("padding:20px;");
 	}
 	
 	@UiHandler("password1")
@@ -100,7 +102,7 @@ public class Login extends PopupPanel implements net.rugby.foundation.core.clien
 
 	@UiHandler("cancel")
 	void onCancelButtonClicked(ClickEvent event) {
-		hide();
+		//hide();
 		presenter.onCancelLogin();
 		error.setVisible(false);
 

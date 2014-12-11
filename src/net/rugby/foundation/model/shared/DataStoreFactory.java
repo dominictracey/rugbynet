@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.shared.WorkflowConfiguration;
 import net.rugby.foundation.admin.shared.seriesconfig.BaseSeriesConfiguration;
 import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.model.shared.fantasy.MyGroup;
+import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.Note;
 import net.rugby.foundation.topten.model.shared.NoteRef;
 import net.rugby.foundation.topten.model.shared.TopTenList;
@@ -45,7 +46,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(MyGroup.class);
 			ObjectifyService.register(MatchRating.class);
 			ObjectifyService.register(Content.class);
-			ObjectifyService.register(Feature.class);
+//			ObjectifyService.register(Feature.class);
 			ObjectifyService.register(Clubhouse.class);
 			ObjectifyService.register(ClubhouseMembership.class);
 			ObjectifyService.register(TeamMembership.class);
@@ -88,6 +89,8 @@ public class DataStoreFactory {
 			ObjectifyService.register(RatingGroup.class);
 			
 			ObjectifyService.register(ServerPlace.class);
+			
+			//ObjectifyService.register(Feature.class);
 		}
 		
 		return ofy;

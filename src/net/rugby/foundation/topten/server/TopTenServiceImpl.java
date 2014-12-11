@@ -32,6 +32,7 @@ import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.TopTenListService;
+import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -489,11 +490,8 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			if (u instanceof ITopTenUser && (((ITopTenUser)u).isTopTenContentContributor() || ((ITopTenUser)u).isTopTenContentEditor())) {
 				if (queryId != null) {
 					ITopTenList list = getTopTenListForRatingQuery(queryId);
-					ttlf.makeFeature(list);
-					IServerPlace place = spf.create();
-					place.setCompId(compId);
-					place.setListId(list.getId());
-					place.setItemId(null);
+					IServerPlace place = ttlf.makeFeature(list);
+					
 					return place;
 				}
 				
@@ -512,6 +510,16 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			return null;
 		}
 
+	}
+
+	@Override
+	public List<Feature> getLatestFeatures() {
+		try {
+			return ttlf.getLatestFeatures();
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
 	}
 
 

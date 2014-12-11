@@ -24,6 +24,7 @@ import net.rugby.foundation.topten.client.resources.noteTemplates.NoteTemplates;
 import net.rugby.foundation.topten.client.ui.HeaderView;
 import net.rugby.foundation.topten.client.ui.HeaderViewImpl;
 import net.rugby.foundation.topten.client.ui.RatingPopupViewImpl;
+import net.rugby.foundation.topten.client.ui.RecentFeaturesViewImpl;
 import net.rugby.foundation.topten.client.ui.SidebarViewImpl;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
@@ -31,12 +32,14 @@ import net.rugby.foundation.topten.client.ui.notes.NoteView;
 import net.rugby.foundation.topten.client.ui.notes.NoteViewColumnDefinitions;
 import net.rugby.foundation.topten.client.ui.notes.NoteViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.CompactTopTenListViewImpl;
+import net.rugby.foundation.topten.client.ui.toptenlistview.DesktopSeriesListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo;
 import net.rugby.foundation.topten.client.ui.toptenlistview.FeatureListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.FeatureListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListViewImpl;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
+import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -49,8 +52,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -68,13 +73,15 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	private static  TopTenListView<ITopTenItem> simpleView = null;
 	private static  NoteView<INote> noteView = null;
 	private NoteViewColumnDefinitions<INote> noteViewColumnDefinitions;
+
+	private RecentFeaturesViewImpl recentFeaturesView;
 	private static  SidebarViewImpl sidebarView = null;
 	private static ContentView contentView = null;
 	private static SeriesListView<IRatingSeries> seriesView = null;
 	private static FeatureListView<ITopTenList> featureView = null;
 	private static EditContent editContent = null;
 	private static TopTenListServiceAsync rpcService = null;
-//	private static EditTTIText editTTIText = null;
+	//	private static EditTTIText editTTIText = null;
 	private static HeaderView headerView = null;
 	private static EditTTLInfo editTTLInfo = null;
 	private static Presenter identityPresenter = null;
@@ -104,13 +111,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		return placeController;
 	}
 
-//	@Override
-//	public TopTenListView<ITopTenItem> getListView() {
-//		if (listView == null) {
-//			listView = new TopTenListViewImpl();
-//		}
-//		return listView;
-//	}
+	//	@Override
+	//	public TopTenListView<ITopTenItem> getListView() {
+	//		if (listView == null) {
+	//			listView = new TopTenListViewImpl();
+	//		}
+	//		return listView;
+	//	}
 
 	@Override
 	public TopTenListServiceAsync getRpcService() {
@@ -120,13 +127,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		return rpcService;
 	}
 
-//	@Override
-//	public EditTTIText getEditTTITextDialog() {
-//		if (editTTIText == null) {
-//			editTTIText = new EditTTIText();
-//		}
-//		return editTTIText;
-//	}
+	//	@Override
+	//	public EditTTIText getEditTTITextDialog() {
+	//		if (editTTIText == null) {
+	//			editTTIText = new EditTTIText();
+	//		}
+	//		return editTTIText;
+	//	}
 
 	@Override
 	public ContentView getContentView() {
@@ -167,9 +174,10 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		return sidebarView; 
 	}
 	@Override
-	public EditTTLInfo getEditTTLInfoDialog() {
+	public EditTTLInfo getEditTTLInfo() {
 		if (editTTLInfo == null) {
 			editTTLInfo = new EditTTLInfo();
+			loadWYSIWYGEditor("edit..");
 		}
 		return editTTLInfo;
 	}
@@ -185,6 +193,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 			@Override
 			public void onSuccess(LoginInfo result) {
 
+
+				// @REX how is this different from the Callback passed in to doSetup below?
 				loginInfo = result;
 				if (identityPresenter != null) {
 
@@ -201,7 +211,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		final CompChangeListener _compListener = this;
 		final RoundChangeListener _roundListener = this;
 		final GuidChangeListener _guidListener = this;
-		
+
 		if (coreConfig == null) {
 			Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 
@@ -220,7 +230,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 							// for now, no login from mobile devices
 							//i.setParentWidget(getSidebarView().getSidebarProfile());
 						} else {
-							i.setParent(RootPanel.get("login"));
+							i.setParent(getHeaderView().getLoginPanel());
 						}
 						i.setPresenter(iPresenter);
 					}
@@ -236,34 +246,50 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 							loginInfo = result;
 							coreConfig = config;
-//							getHeaderView().setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
-//
-//							// set up content 
-//							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
-//
-//
-//
-//								@Override
-//								public void onFailure(Throwable caught) {
-//									cb.onFailure(caught);
-//								}
-//
-//								@Override
-//								public void onSuccess(List<IContent> contentList) {
-//									ClientFactoryImpl.contentList = contentList;
-//									//getNavBarView().getButtonBar().clear();
-//									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
-									getSidebarView().setup(coreConfig);
+							//							getHeaderView().setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
+							//
+							//							// set up content 
+							//							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
+							//
+							//
+							//
+							//								@Override
+							//								public void onFailure(Throwable caught) {
+							//									cb.onFailure(caught);
+							//								}
+							//
+							//								@Override
+							//								public void onSuccess(List<IContent> contentList) {
+							//									ClientFactoryImpl.contentList = contentList;
+							//									//getNavBarView().getButtonBar().clear();
+							//									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
+							getSidebarView().setup(coreConfig);
+							
+							getRpcService().getLatestFeatures(new AsyncCallback<List<Feature>>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									// TODO Auto-generated method stub
+									
+								}
+
+								@Override
+								public void onSuccess(List<Feature> result) {
+									if (result != null) {
+										getLatestFeatureView().setRecentFeatures(result);
+									}
 									
 									Core.getCore().registerCompChangeListener(_compListener);
 									Core.getCore().registerRoundChangeListener(_roundListener);
 									Core.getCore().registerGuidChangeListener(_guidListener);
-									
+
 									Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
-									cb.onSuccess(coreConfig);									
-//								}
-//
-//							});
+									cb.onSuccess(coreConfig);	
+								}
+
+
+								
+							});
 						}
 					});
 				}
@@ -273,7 +299,22 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 	}
 
-
+	private RecentFeaturesViewImpl getLatestFeatureView() {
+		if (recentFeaturesView == null) {
+			recentFeaturesView = new RecentFeaturesViewImpl();
+			recentFeaturesView.setClientFactory(this);
+			RootPanel div = RootPanel.get("features");
+			if (div != null) {
+				div.add(recentFeaturesView);
+			} else {
+				// bummer
+			}
+		}
+		
+		return recentFeaturesView;
+		
+	}
+	
 	@Override
 	public void RegisterIdentityPresenter(Presenter identityPresenter) {
 		ClientFactoryImpl.identityPresenter = identityPresenter;
@@ -325,12 +366,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	@Override
 	public SeriesListView<IRatingSeries> getSeriesView() {
 		if (seriesView == null) {
+			//seriesView = new DesktopSeriesListView();
 			seriesView = new SeriesListViewImpl();
 			seriesView.setClientFactory(this);
 		}
 		return seriesView; 
 	}
-	
+
 	@Override
 	public FeatureListView<ITopTenList> getFeatureListView() {
 		if (featureView == null) {
@@ -471,7 +513,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 
 		Anchor a = null;
-		
+
 		if (context != null && context.getId().equals(note.getContextListId())) {
 			// just blank out the context and link (since we are going to show this with the TTL, which is the context)
 			swap(builder, Note.CONTEXT, "");
@@ -488,7 +530,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 			} else {
 				linkText = ttlNames.get(note.getContextListId());
 			}
-			
+
 			swap(builder, Note.LIST, "");
 			swap(builder, Note.CONTEXT, "in&nbsp;");
 			swap(builder, Note.LINK, "");
@@ -499,7 +541,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 				@Override
 				public void onClick(ClickEvent event) {
 					Core.getCore().changeGuid(note.getLink());
-					
+
 					// what we want to track about the note-sourced click stream:
 					//		1) the template that caught the user's eye
 					//		2) the list type the user left
@@ -513,9 +555,9 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 			});
 
-			
+
 		}
-		
+
 		Span w = new Span();
 		w.setHTML(builder.toString());
 		//w.add(text);
@@ -592,30 +634,30 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 	@Override
 	public void compChanged(final Long compId) {
-		
+
 		Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
 
 
 			@Override
 			public void onFailure(Throwable caught) {
-				
+
 			}
 
 			@Override
 			public void onSuccess(final ICompetition comp) {
-				sidebarView.setComp(comp);				
+				sidebarView.setComp(comp);	
 			}
-			
-		});
-		
 
-	
+		});
+
+
+
 	}
 
 	@Override
-	public void roundChanged(Long id) {
+	public void roundChanged(int ordinal) {
 
-		
+
 	}
 
 	@Override
@@ -630,28 +672,90 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 			@Override
 			public void onSuccess(IServerPlace place) {
 				getSeriesView().reset();
-				SeriesPlace p = new SeriesPlace();
-				p.setCompId(place.getCompId());
-				p.setGroupId(place.getGroupId());
-				p.setMatrixId(place.getMatrixId());
-				p.setItemId(place.getItemId());
-				p.setQueryId(place.getQueryId());
-				p.setSeriesId(place.getSeriesId());
+				if (place != null) {
+					SeriesPlace p = new SeriesPlace();
+					p.setCompId(place.getCompId());
+					p.setGroupId(place.getGroupId());
+					p.setMatrixId(place.getMatrixId());
+					p.setItemId(place.getItemId());
+					p.setQueryId(place.getQueryId());
+					p.setSeriesId(place.getSeriesId());
 
 
 
-				getPlaceController().goTo(p);
+					getPlaceController().goTo(p);
+				}
 			}
 
 		});
-		
+
 	}
-	
+
+	@Override
+	public void setTTLName(final Long nextId, final org.gwtbootstrap3.client.ui.Anchor anchor) {
+		if (nextId != null) {
+			if (ttlNames.containsKey(nextId)) {
+				anchor.setText(ttlNames.get(nextId));
+			} else {
+				// fetch and cache
+				List<Long> needTTLNames = new ArrayList<Long>();
+				needTTLNames.add(nextId);
+				rpcService.getTTLNames(needTTLNames, new AsyncCallback<Map<Long, String>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onSuccess(Map<Long, String> result) {
+						// cache them
+						for (Long id : result.keySet()) {
+							ttlNames.put(id, result.get(id));
+						}
+
+						anchor.setText(ttlNames.get(nextId));
+					}
+				});
+			}
+		}
+
+	}
+
+
 	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
 
 		$wnd.ganew('send', 'event', cat, action, label, val);
 	}-*/;
 
+	public static native void loadWYSIWYGEditor(String text) /*-{
+
+		$wnd.LazyLoad.js(["/theme/js/editor/wysihtml5-0.3.0.js","/theme/js/editor/bootstrap3-wysihtml5.js"], function() {
+
+			$wnd.LazyLoad.css(["/theme/css/elements/form.css", "/theme/css/elements/bootstrap-wysihtml5.css"], function() { 
+
+			//js all loaded
+				$wnd.$('.textarea').wysihtml5({
+			        "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+			        "emphasis": true, //Italics, bold, etc. Default true
+			        "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+			        "html": true, //Button which allows you to edit the generated HTML. Default false
+			        "link": true, //Button to insert a link. Default true
+			        "image": true, //Button to insert an image. Default true,
+			        "color": false, //Button to change color of font
+			        "size": 'sm' //Button size like sm, xs etc.
+			    });
+
+			    $wnd.$('#modal').on('hidden', function(){
+        			$wnd.$('.wysihtml5-sandbox, .wysihtml5-toolbar').remove();
+        			$wnd.$('#textarea').show();
+    			});
+
+			});
+		});
+
+	}-*/;
 
 
 }

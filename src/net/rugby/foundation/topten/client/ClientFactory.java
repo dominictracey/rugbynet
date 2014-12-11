@@ -2,6 +2,8 @@ package net.rugby.foundation.topten.client;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
@@ -48,7 +50,7 @@ public interface ClientFactory {
 //	EditTTIText getEditTTITextDialog();
 	ContentView getContentView();
 	EditContent getEditContentDialog();
-	EditTTLInfo getEditTTLInfoDialog();
+	EditTTLInfo getEditTTLInfo();
 
 	boolean isDualParamString();
 	HeaderView getHeaderView();
@@ -81,4 +83,11 @@ public interface ClientFactory {
 	SidebarViewImpl getSidebarView();
 
 	FeatureListView<ITopTenList> getFeatureListView();
+
+	/**
+	 *  given a widget and a listId, will fetch the name (caching as needed) and setText on the anchor the name of the list
+	 * @param nextId
+	 * @param nextLabel
+	 */
+	void setTTLName(Long nextId, Anchor nextLabel);
 }

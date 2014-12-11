@@ -1,19 +1,25 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.PanelBody;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,29 +32,54 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	interface TopTenListViewImplUiBinder extends UiBinder<Widget, FeatureListViewImpl>
 	{
 	}
+
+	@UiField Div featureBody;
+	@UiField Div featuredTTL;
 	
-	@UiField Button prevButton;
-	@UiField Button nextButton;
-	@UiField Panel featureBody;
-	@UiField PanelBody featuredTTL;
+	// next and prev features nav
+	@UiField Column topColumn;
+	@UiField Column left;
+	@UiField Anchor left_arrow;
+	@UiField Column prev;
+	@UiField Anchor prevList;
+	@UiField Column right;
+	@UiField Anchor right_arrow;
+	@UiField Column next;
+	@UiField Anchor nextList;
 	
 	// admin buttons
-	@UiField Panel adminButtons;
+	@UiField Div adminButtons;
 	@UiField Button edit;
 	@UiField Button publish;
 	@UiField Button promote;
 	
 	ITopTenList list = null;
 	
+	Element root = null;
+	
+	HTML body = null;
+	
 	public FeatureListViewImpl()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		prevButton.setIconSize(IconSize.LARGE);
-		prevButton.setIcon(IconType.BACKWARD);
-		nextButton.setIconSize(IconSize.LARGE);
-		nextButton.setIcon(IconType.FORWARD);
-		nextButton.setVisible(false);
-		prevButton.setVisible(false);
+		
+		edit.setVisible(false);
+		publish.setVisible(false);
+		promote.setVisible(false);
+		
+		left_arrow.setIcon(IconType.CHEVRON_LEFT);
+		left.addStyleName("col-xs-1");
+		left.addStyleName("vertical-center");
+		left.addStyleName("pull-left");
+		right_arrow.setIcon(IconType.CHEVRON_RIGHT);
+		right.addStyleName("col-xs-1");
+		right.addStyleName("vertical-center");
+		right.addStyleName("pull-right");
+		prev.addStyleName("col-xs-5");
+		next.addStyleName("col-xs-5");
+		
+		root = DOM.getElementById("toptenRoot");
+		topColumn.setStyleName("col-md-9");
 	}
 	
 
@@ -58,23 +89,34 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	@Override
 	public void setList(ITopTenList result, String baseUrl) {
 		list = result;
-		clientFactory.getSimpleView().setList(result, baseUrl);
-		
-		featuredTTL.add(clientFactory.getSimpleView());
+		//featureBody.clear();
+		if (added) {
+			clientFactory.getEditTTLInfo().setVisible(false);
+		}
 		
 		if (result != null) {
-			if (list.getPrevPublishedId() != null) {
-				prevButton.setVisible(true);
-			} else {
-				prevButton.setVisible(false);
+			clientFactory.getSimpleView().setList(result, baseUrl);
+			
+			if (body != null) {
+				featureBody.remove(body);
 			}
-
-			if (list.getNextPublishedId() != null) {
-				nextButton.setVisible(true);
+			body = new HTML(list.getContent());
+			body.addStyleName("toptentext");
+			featureBody.add(body);
+			
+			featuredTTL.add(clientFactory.getSimpleView());
+						
+			if (list.getLive()) {
+				publish.setText("Unpublish");
 			} else {
-				nextButton.setVisible(false);
-			}	
+				publish.setText("Publish");
+			}
 		}
+
+	
+		
+//		this.removeStyleName("row-md-12");
+//		this.addStyleName("row-md-8");
 	}
 
 	@Override
@@ -95,31 +137,96 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	
 	@Override
 	public void hasNext(boolean has) {
-		nextButton.setVisible(has);
-
+		right_arrow.setVisible(has);
+		if (!has) {
+			nextList.setText("");
+		}
 	}
 
 
 	@Override
 	public void hasPrev(boolean has) {
-		prevButton.setVisible(has);	
+		left_arrow.setVisible(has);
+		if (!has) {
+			prevList.setText("");
+		}
 	}
+	
+	protected HandlerRegistration nextArrowReg = null;
+	protected HandlerRegistration prevArrowReg = null;
+	protected HandlerRegistration nextReg = null;
+	protected HandlerRegistration prevReg = null;
 	
 	@Override
-	public void setPresenter(FeatureListViewPresenter presenter) {
-		this.presenter = presenter;		
+	public void setPresenter(final FeatureListViewPresenter presenter) {
+		this.presenter = presenter;	
+		
+		// tie in next and prev anchors
+		if (nextReg != null) {
+			nextReg.removeHandler();
+			nextReg = null;
+		}
+		if (prevReg != null) {
+			prevReg.removeHandler();
+			prevReg = null;
+		}
+		
+		if (nextArrowReg != null) {
+			nextArrowReg.removeHandler();
+			nextArrowReg = null;
+		}
+		if (prevArrowReg != null) {
+			prevArrowReg.removeHandler();
+			prevArrowReg = null;
+		}
+		
+		nextReg = nextList.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showNext();
+			}
+			
+		});
+		
+		prevReg = prevList.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showPrev();
+			}
+			
+		});
+		
+		nextArrowReg = right_arrow.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showNext();
+			}
+			
+		});
+		
+		prevArrowReg = left_arrow.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showPrev();
+			}
+			
+		});
 	}
 
 	
-	@UiHandler("prevButton")
-	void onPrevButtonClicked(ClickEvent event) {	
-		presenter.showPrev();
-	}
-
-	@UiHandler("nextButton")
-	void onNextButtonClicked(ClickEvent event) {	
-		presenter.showNext();
-	}
+//	@UiHandler("prevButton")
+//	void onPrevButtonClicked(ClickEvent event) {	
+//		presenter.showPrev();
+//	}
+//
+//	@UiHandler("nextButton")
+//	void onNextButtonClicked(ClickEvent event) {	
+//		presenter.showNext();
+//	}
 
 	@UiHandler("edit")
 	void onEditButtonClicked(ClickEvent event) {	
@@ -128,65 +235,75 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 
 	@UiHandler("publish")
 	void onPublishButtonClicked(ClickEvent event) {	
-		presenter.publish(list);
+		if (list != null) {
+			if (list.getLive()) {
+				presenter.unpublish(list);
+			} else {
+				presenter.publish(list);
+			}
+		}
 	}
 	
 	@UiHandler("promote")
 	void onPromoteButtonClicked(ClickEvent event) {	
 		presenter.promote(list);
 	}
-//
-//	@Override
-//	public void setList(final ITopTenList result, final String baseUrl) {
-//		list = result;
-//		//setVisible(false);
-//		if (result != null) {
-//			//clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent() + "<div id=\"fbListLike\"/>");
-//
-//			if (list.getPrevPublishedId() != null) {
-//				prevButton.setVisible(true);
-//			} else {
-//				prevButton.setVisible(false);
-//			}
-//
-//			if (list.getNextPublishedId() != null) {
-//				nextButton.setVisible(true);
-//			} else {
-//				nextButton.setVisible(false);
-//			}
-//			items.clear();
-//			Iterator<ITopTenItem> it = result.getList().iterator();
-//			int count = 0;
-//			if (it != null) {
-//				itemList = new ArrayList<TopTenItemView>();
-//
-//				while (it.hasNext()) {
-//					final ITopTenItem item = it.next();
-//
-//					final int fCount = count++;
-//					Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
-//						@Override
-//						public void execute() {
-//
-//							TopTenItemView itemView = new TopTenItemView(item, fCount, result.getId(), item.getPlayerId(), baseUrl);
-//							itemList.add(itemView);
-//							items.add(itemView);
-//							presenter.setTTIButtons(itemView);
-//						}
-//					});
-//				}
-//			}
-//
-//
-//			//setVisible(true);
-//		} else {
-//			items.clear();
-////			clientFactory.getHeaderView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
-//			//clientFactory.getNavBarView().setDetails("Check back every Monday for top ten performances from competitions.");
-//			prevButton.setVisible(false);
-//			nextButton.setVisible(false);
-//		}
-// }
+	
+	private boolean added=false;
+	@Override
+	public void editList(ITopTenList list) {
+		clientFactory.getEditTTLInfo().showTTL(list);
+		if (body != null) {
+			featureBody.remove(body);
+		}
+		
+		if (!added) {
+			featureBody.add(clientFactory.getEditTTLInfo());
+			added=true;
+		} else {
+			clientFactory.getEditTTLInfo().setVisible(true);
+		}
+
+	}
+
+	@Override
+	public void showEditorButtons(boolean show) {
+		publish.setVisible(show);
+		
+	}
+
+	@Override
+	public void showContributorButtons(boolean show) {
+		edit.setVisible(show);
+		promote.setVisible(show);
+
+		if (list != null) {
+			promote.setEnabled(list.getLive());	
+		}
+	}
+	
+	@Override
+	public void expandView(boolean expand) {
+		if (topColumn != null) {
+			if (expand) {
+				topColumn.setStyleName("col-md-12");
+			} else {
+				topColumn.setStyleName("col-md-9");
+			}
+		}
+	}
+
+	@Override
+	public Anchor getNextLabel() {
+		return nextList;
+	}
+
+	@Override
+	public Anchor getPrevLabel() {
+		return prevList;
+	}
+
+
 
 
 

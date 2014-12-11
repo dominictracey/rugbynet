@@ -26,6 +26,7 @@ import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -421,6 +422,13 @@ public class TestTopTenListFactory extends BaseTopTenListFactory implements ITop
 			set.add(list);
 		
 		return list;
+	}
+
+
+	@Override
+	protected List<Feature> getLatestFeaturesFromPeristentDatastore() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

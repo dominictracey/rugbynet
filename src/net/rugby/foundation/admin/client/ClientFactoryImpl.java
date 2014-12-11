@@ -2,7 +2,6 @@ package net.rugby.foundation.admin.client;
 
 import java.util.List;
 
-import net.rugby.foundation.admin.client.ClientFactory.GetCompListCallback;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
@@ -80,7 +79,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	private PlayerPopupView<IPlayer> playerPopupView;
 	private List<FieldDefinition<IPlayer>> playerPopupViewFieldDefinitions;
 	private SeriesConfigPopupView<ISeriesConfiguration> seriesConfigPopupView;
-	private List<FieldDefinition<ISeriesConfiguration>> seriesConfigPopupViewFieldDefinitions;
+	private SeriesConfigPopupViewFieldDefinitions<ISeriesConfiguration> seriesConfigPopupViewFieldDefinitions;
 	private PlayerMatchStatsPopupView<IPlayerMatchStats> playerMatchStatsPopupView;
 	private List<FieldDefinition<IPlayerMatchStats>> playerMatchStatsPopupViewFieldDefinitions;
 	private TeamMatchStatsPopupView<ITeamMatchStats> teamMatchStatsPopupView;
@@ -467,10 +466,10 @@ public class ClientFactoryImpl implements ClientFactory {
         if (seriesConfigPopupView == null) {
         	seriesConfigPopupView = new SeriesConfigPopupViewImpl<ISeriesConfiguration>();
 			if (seriesConfigPopupViewFieldDefinitions == null) {
-				seriesConfigPopupViewFieldDefinitions = new SeriesConfigPopupViewFieldDefinitions<ISeriesConfiguration>(this).getFieldDefinitions();
+				seriesConfigPopupViewFieldDefinitions = new SeriesConfigPopupViewFieldDefinitions<ISeriesConfiguration>(this);
 	          }
 		
-			seriesConfigPopupView.setFieldDefinitions(seriesConfigPopupViewFieldDefinitions);
+			seriesConfigPopupView.setFieldDefinitions(seriesConfigPopupViewFieldDefinitions, this);
         }
 
 		return seriesConfigPopupView;	}

@@ -2,11 +2,9 @@ package net.rugby.foundation.result.client;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Column;
-import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.html.Span;
-
+import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,7 +24,7 @@ public class ResultPanel extends Composite
 	Element header;
 
 	@UiField HTMLPanel root;
-	@UiField Panel scores;
+	@UiField Div scores;
 
 	@UiField Anchor left_arrow;
 	@UiField Anchor right_arrow;
@@ -56,7 +54,7 @@ public class ResultPanel extends Composite
 		right.addStyleName("pull-right");
 		RootPanel resultPanel = RootPanel.get("resultPanel");
 		resultPanel.addStyleName("no-padding");
-		root.addStyleName("no-padding");
+		root.setStyleName("no-padding");
 		resultPanel.add(this);
 		header = DOM.getElementById("resultHeader");
 	}

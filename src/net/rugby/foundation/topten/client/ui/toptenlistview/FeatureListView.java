@@ -1,8 +1,11 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * View interface. Extends IsWidget so a view impl can easily provide
@@ -31,5 +34,11 @@ public interface FeatureListView<T extends ITopTenList> extends IsWidget
 	void hasPrev(boolean has);
 
 	void setPresenter(FeatureListViewPresenter presenter);
+	void editList(ITopTenList list);
 	
+	void showEditorButtons(boolean show);
+	void showContributorButtons(boolean show);
+	void expandView(boolean expand);
+	Anchor getNextLabel();
+	Anchor getPrevLabel();
 }

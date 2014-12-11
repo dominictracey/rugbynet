@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>MYX Dashboard</title>
+<title>The Rugby Net Top Ten Lists</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -110,7 +110,7 @@
 
 <!-- theme -->
 <link rel="stylesheet" type="text/css"
-	href="/theme/css//theme/default.css" />
+	href="/theme/css/theme/default.css" />
 
 <!-- libraries -->
 <link rel="stylesheet" type="text/css"
@@ -124,6 +124,10 @@
 <link rel="stylesheet" type="text/css"
 	href="/theme/css/elements/pizza.css" />
 
+<!-- local style -->
+<link rel="stylesheet" type="text/css"
+	href="/stylesheets/therugbynet.css" />
+"
 
 <!-- open sans font -->
 <link
@@ -138,7 +142,8 @@
 <body>
 
 	<!-- navbar -->
-	<header class="navbar navbar-inverse navbar-fixed-top" role="banner">
+	<header class="navbar navbar-inverse navbar-fixed-top" role="banner"
+		id="header">
 		<div class="navbar-header">
 			<button class="navbar-toggle" type="button" data-toggle="collapse"
 				id="menu-toggler">
@@ -152,20 +157,20 @@
 				href="/s/"><img src="/icons/favicon-32x32.png" alt="logo" /></a>
 		</div>
 
-		<ul class="nav navbar-nav pull-right hidden-xs">
-			<li class="dropdown"><a href="#"
-				class="dropdown-toggle hidden-xs" data-toggle="dropdown"><i
-					class="glyphicon glyphicon-question-sign"></i> WTF <b class="caret"></b></a>
-				<ul class="dropdown-menu">
-					<li><a href="profile.html">Profile</a></li>
-					<li><a href="#">Settings</a></li>
-					<li class="divider"></li>
-					<li><a href="#">Sign Out</a></li>
-				</ul></li>
-			<li class="dropdown" id="login">
-		</ul>
+		<!-- 		<ul class="nav navbar-nav pull-right hidden-xs"> -->
+		<!-- 			<li class="dropdown"><a href="#" -->
+		<!-- 				class="dropdown-toggle hidden-xs" data-toggle="dropdown"><i -->
+		<!-- 					class="glyphicon glyphicon-question-sign"></i> WTF <b class="caret"></b></a> -->
+		<!-- 				<ul class="dropdown-menu"> -->
+		<!-- 					<li><a href="profile.html">Profile</a></li> -->
+		<!-- 					<li><a href="#">Settings</a></li> -->
+		<!-- 					<li class="divider"></li> -->
+		<!-- 					<li><a href="#">Sign Out</a></li> -->
+		<!-- 				</ul></li> -->
+		<!-- 			<li class="dropdown" id="login"></li> -->
+		<!-- 		</ul> -->
 
-		<div id="header"></div>
+		<!-- 		<div id="header"></div> -->
 	</header>
 	<!-- end navbar -->
 
@@ -201,10 +206,9 @@
 			</div>
 
 			<!-- TOPTEN -->
-			<div class="col-md-8 col-xs-12">
-				<div class="panel panel-default">
-					<div class="panel-body" id="app"></div>
-				</div>
+			<!-- 			<div class="col-md-8 col-sm-12" id="toptenRoot" > -->
+			<div class="col-md-8 col-sm-12" id="app">
+
 			</div>
 			<!-- END TOPTEN -->
 
@@ -224,37 +228,32 @@
 							data-ad-client="ca-pub-9355939918394201"
 							data-ad-slot="5541524166" data-ad-format="auto"></ins>
 						<script>
-					(adsbygoogle = window.adsbygoogle || []).push({});
-					</script>
+							(adsbygoogle = window.adsbygoogle || []).push({});
+						</script>
 					</div>
 				</div>
 			</div>
 			<!-- GOOGLE AD -->
 
+
 			<!-- NOTES -->
 			<div class="col-md-4  col-xs-12" id="notes"></div>
 			<!-- END NOTES -->
+			<div class="clearfix"></div>
 
-
-
-
+			<!-- FEATURES -->
+			<div class="col-md-8  col-xs-12" id="features"></div>
+			<!-- END FEATURES -->
 
 
 			<div class="clearfix"></div>
 
 
-
-
-
-
-
-			<div class="clearfix"></div>
 			<footer id="footer">
 				<div class="text-center clearfix">
 					<p>
-						<small>&copy myxdashboard 2014, Admin dashboard framework
-							base on bootstrap</small> <br /> <br /> <a href="#"
-							class="btn btn-xs btn-circle btn-twitter"><i
+						<small>&copy The Rugby Net 2014, Smart and Tough </small> <br />
+						<br /> <a href="#" class="btn btn-xs btn-circle btn-twitter"><i
 							class="fa fa-twitter"></i></a> <a href="#"
 							class="btn btn-xs btn-circle btn-facebook"><i
 							class="fa fa-facebook"></i></a> <a href="#"
@@ -312,7 +311,7 @@
 
 
 	<!-- scripts -->
-	<!-- 	<script src="/theme/js/jquery.min.js"></script> -->
+	<script src="/theme/js/jquery.min.js"></script>
 	<!-- 	<script src="/theme/js/bootstrap.js"></script> -->
 	<script src="/theme/js/theme.js"></script>
 
@@ -327,8 +326,11 @@
 	<script src="/theme/js/jquery.slimscroll.js"></script>
 	<script src="/theme/js/LazyLoad/LazyLoad.min.js"></script>
 
-	<script type="text/javascript">
+	<!--     wysiwyg editor -->
+	<!--     <script src="/theme/js/editor/wysihtml5-0.3.0.js"></script> -->
+	<!--     <script src="/theme/js/editor/bootstrap3-wysihtml5.js"></script> -->
 
+	<script type="text/javascript">
 		//NOTIFICATION
 		function create(template, vars, opts) {
 			return $container.notify("create", template, vars, opts);

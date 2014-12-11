@@ -31,7 +31,6 @@ import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.client.ui.SidebarViewImpl;
 import net.rugby.foundation.topten.client.ui.notes.NoteView;
 import net.rugby.foundation.topten.client.ui.notes.NoteView.NoteViewPresenter;
-import net.rugby.foundation.topten.client.ui.toptenlistview.EditTTLInfo.EditTTLInfoPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView.SeriesListViewPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.TopTenListView;
@@ -40,7 +39,7 @@ import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
-public class SeriesActivity extends AbstractActivity /*extends TopTenListActivity*/ implements SeriesListViewPresenter, TopTenListViewPresenter, EditTTLInfoPresenter, Presenter, NoteViewPresenter<INote> { 
+public class SeriesActivity extends AbstractActivity /*extends TopTenListActivity*/ implements SeriesListViewPresenter, TopTenListViewPresenter, Presenter, NoteViewPresenter<INote> { 
 	private SeriesPlace sPlace;
 	private SeriesListView<IRatingSeries> view;
 	private TopTenListView<ITopTenItem> listView;
@@ -71,11 +70,8 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		
-//		if (ignore) {  // allows us to manipulate the hash fragment manually in setUrl
-//			ignore = false;
-//			return;
-//		}
-//		starting = true;
+		clientFactory.RegisterIdentityPresenter(this);
+		
 		panel.setWidget(view.asWidget());
 
 		clientFactory.doSetup(new AsyncCallback<ICoreConfiguration>() {
@@ -159,7 +155,13 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		
 	}
 
-	protected void getAvailableSeries(Long compId) {
+	private void getAvailableSeries(Long compId) {
+		
+		// allow other elements to display this comp
+		if (Core.getCore().getCurrentCompId() != compId) {
+			Core.getCore().setCurrentCompId(compId);
+		}
+		
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "CALL getAvailableSeries");
 		clientFactory.getRpcService().getAvailableSeries(sPlace.getCompId(), new AsyncCallback<Map<RatingMode, Long>>() {
 
@@ -354,12 +356,14 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 				view.setList(result);
 				listView.setList(result, _coreConfig.getBaseToptenUrlForFacebook());
 				getNotes(result);
+				refreshButtons();
+				Core.getCore().setCurrentRoundOrdinal(result.getRoundOrdinal());
 			}
 
 		});
 	}
 
-	protected void getNotes(final ITopTenList result) {
+	private void getNotes(final ITopTenList result) {
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "CALL getNotes");
 		clientFactory.getRpcService().getNotesForList(result.getId(), new AsyncCallback<List<INote>>() {
 
@@ -411,10 +415,6 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		
 		Document.get().setTitle(view.getList().getTitle());
 		UrlBuilder builder = Window.Location.createUrlBuilder().setPath("/s/" + view.getList().getGuid());
-//		if (!Window.Location.getHash().equals(sPlace.getToken())) {
-//			ignore = true;
-//			builder.setHash(sPlace.getToken()); 
-//		}
 		updateURLWithoutReloading(sPlace.getToken(), view.getList().getTitle(), builder.buildString());
 	}
 
@@ -491,7 +491,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 	@Override
 	public void onLoginComplete(String destination) {
-		clientFactory.getPlaceController().goTo(sPlace);	
+		refreshButtons();	
 	}
 	
 	@Override
@@ -515,11 +515,6 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 //		}	
 	}
 
-
-	@Override
-	public void cancelEditTTLInfo(ITopTenList ttl) {
-		clientFactory.getEditTTLInfoDialog().hide();
-	}
 
 	@Override
 	public void showRatingDetails(final ITopTenItem value) {
@@ -550,22 +545,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		return null;
 	}
 
-	@Override
-	public void saveTTLInfo(ITopTenList list) {
-		clientFactory.getRpcService().saveTopTenList(list, new AsyncCallback<ITopTenList>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Failed to save Top Ten List. See event log for details.");
-			}
 
-			@Override
-			public void onSuccess(ITopTenList result) {
-				//clientFactory.getHeaderView().setHeroListInfo(result.getTitle(), result.getContent());
-				clientFactory.getEditTTLInfoDialog().hide();
-			}
-		});		
-	}
-	
 	private void refreshButtons() {
 
 		LoginInfo login = Core.getCore().getClientFactory().getLoginInfo();
@@ -575,25 +555,46 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	}
 
 	@Override
-	public void createFeature(final SeriesPlace place) {
+	public void clickFeature(final SeriesPlace place) {
 		if (place.getCompId() == null || place.getQueryId() == null) {
 			Window.alert("Bad competition or query Id");
 			return;
 		}
 		
-		clientFactory.getRpcService().createFeature(place.getCompId(), place.getQueryId(), new AsyncCallback<IServerPlace>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Failed to create feature. See event log for details.");
-			}
+		if (view.getList() != null && view.getList().getSeries() == true) {
+			// there is no feature associated with this list so create one.
+			clientFactory.getRpcService().createFeature(place.getCompId(), place.getQueryId(), new AsyncCallback<IServerPlace>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Failed to create feature. See event log for details.");
+				}
+	
+				@Override
+				public void onSuccess(IServerPlace result) {
+					// go to the Feature view
+					FeatureListPlace fPlace = new FeatureListPlace(result);
+					clientFactory.getPlaceController().goTo(fPlace);
+				}
+			});		
+		} else if (view.getList() != null && view.getList().getSeries() == false && view.getList().getFeatureGuid() != null) {
+			// go to the feature place for the list (list.featureGuid)
+			clientFactory.getRpcService().getPlace(view.getList().getFeatureGuid(), new AsyncCallback<IServerPlace>() {
 
-			@Override
-			public void onSuccess(IServerPlace result) {
-				// go to the Feature view
-				FeatureListPlace fPlace = new FeatureListPlace(result);
-				clientFactory.getPlaceController().goTo(fPlace);
-			}
-		});		
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("Couldn't find feature place for list");
+				}
+
+				@Override
+				public void onSuccess(IServerPlace result) {
+					FeatureListPlace place = new FeatureListPlace(result);
+					clientFactory.getPlaceController().goTo(place);
+				}
+				
+			});
+		} else {
+			Window.alert("Bad list in view.");
+		}
 	}
 
 	@Override

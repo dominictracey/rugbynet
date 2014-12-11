@@ -1,9 +1,6 @@
 package net.rugby.foundation.admin.client.ui.seriesconfiguration;
 
-import java.util.List;
-
 import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.ui.FieldDefinition;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -14,7 +11,7 @@ public interface SeriesConfigPopupView<T> extends IsWidget
 {
 	void setConfig(T config);
 	void setPresenter(Presenter<T> listener);
-	void setFieldDefinitions(List<FieldDefinition<T>> fieldDefinitions);
+	void setFieldDefinitions(SeriesConfigPopupViewFieldDefinitions<T> fieldDefinitions, ClientFactory clientFactory);
 	void clear();
 	
 	public interface Presenter<T>

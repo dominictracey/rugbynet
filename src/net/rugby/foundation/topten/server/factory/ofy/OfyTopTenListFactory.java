@@ -27,6 +27,7 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
@@ -68,7 +69,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 				while (it.hasNext()) {
 					list.getList().add(getItem(it.next(), list, ordinal++));
 				}
-				
+
 				if (list.getNotesId() != null) {
 					Notes notes = ofy.get(Notes.class, list.getNotesId());
 					if (notes != null) {
@@ -123,7 +124,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	public ITopTenList putToPersistentDatastore(ITopTenList list) {
 		try {
 			ofy.put(list);
-			
+
 			// and store the notes
 			if (list.getNotesId() != null) {
 				// already exists so update
@@ -137,7 +138,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 				notes.setNotesText(notesText);
 				ofy.put(notes);
 			}
-			
+
 			return list;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put(list)" + e.getLocalizedMessage(), e);
@@ -222,26 +223,54 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 							spf.delete(spf.getForGuid(item.getPlaceGuid()));
 						}
 					}
-					
+
 					// delete notes
 					if (list.getNotesId() != null) {
 						ofy.delete(new Key<Notes>(Notes.class,list.getNotesId()));
 					}
-					
+
 					// and the list itself
 					ofy.delete(list.getList());
 				}
-				
+
 				if (list.getGuid() != null && !list.getGuid().isEmpty()) {
 					spf.delete(spf.getForGuid(list.getGuid()));
 				}
-				
+
 				ofy.delete(list);
-				
+
 			}
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "deleteFromPersistentDatastore()" + e.getLocalizedMessage(), e);
 		}
+	}
+
+	private final int NUM_FEATURES = 7;
+
+	@Override
+	protected List<Feature> getLatestFeaturesFromPeristentDatastore() {
+		try {
+			List<Feature> retval = new ArrayList<Feature>();
+			
+			// find 10 lists that have the latest published dates
+			Query<TopTenList> ttlq = ofy.query(TopTenList.class).filter("live",true).order("-published");
+			
+			int count = 0;
+			for (TopTenList ttl : ttlq.list()) {
+				if (count == NUM_FEATURES) 
+					break;
+								
+				retval.add(new Feature(spf.getForGuid(ttl.getFeatureGuid()),ttl.getPublished(),ttl.getTitle()));
+				
+				count++;
+			}
+
+			return retval;
+		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getLatestFeaturesFromPeristentDatastore()" + e.getLocalizedMessage(), e);
+			return null;
+		}
+
 	}
 
 }

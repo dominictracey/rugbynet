@@ -14,7 +14,7 @@
 				<b:Anchor ui:field="left_arrow"></b:Anchor>
 			</b:Column>
 			<b:Column ui:field="mid" size="10">
-				<b:Panel ui:field="scores"></b:Panel>
+				<b.html:Div ui:field="scores"></b.html:Div>
 			</b:Column>
 			<b:Column ui:field="right" size="1">
 				<b:Anchor ui:field="right_arrow"></b:Anchor>

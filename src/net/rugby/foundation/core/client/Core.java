@@ -29,7 +29,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	}
 	
 	public interface RoundChangeListener {
-		void roundChanged(Long roundId);
+		void roundChanged(int roundOrdinal);
 	}
 	
 	public interface GuidChangeListener {
@@ -93,7 +93,8 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	
 	// map that contains content
 	private Map<Long, IContent> contentMap = null;
-	private Long currentRoundId; 
+	
+	private int currentRoundOrdinal; 
 	
 	/**
 	 * Use the static getInstance factory method
@@ -635,12 +636,12 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		return clubhouseMap;
 	}
 
-	public void setCurrentRoundId(Long rid) {
-		if (this.currentRoundId != rid) {
-			this.currentRoundId = rid;
+	public void setCurrentRoundOrdinal(int i) {
+		if (this.currentRoundOrdinal != i) {
+			this.currentRoundOrdinal = i;
 
 			for (RoundChangeListener l : roundChangeListeners) {
-				l.roundChanged(rid);
+				l.roundChanged(i);
 			}
 		}
 		

@@ -10,36 +10,20 @@ import net.rugby.foundation.core.client.ui.ManageProfile;
 import net.rugby.foundation.core.shared.IdentityTypes.Actions;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
-import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
-import net.rugby.foundation.topten.client.place.SeriesPlace;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.ListGroupItem;
-import org.gwtbootstrap3.client.ui.NavPills;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Toggle;
-
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
-//import com.gwtfb.client.Callback;
-//import com.gwtfb.client.JSOModel;
-//import com.gwtfb.sdk.FBCore;
-import com.google.gwt.user.client.ui.Widget;
 
 public class Identity implements ManageProfile.Presenter, Login.Presenter, ExternalAuthenticatorPanel.Presenter, ChangePasswordPanel.Presenter {
 
@@ -81,8 +65,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 
 	CoreClientFactory clientFactory = null;
-	RootPanel parent = null;
-	private ListGroupItem parentWidget;
+	ListGroupItem parent = null;
 	AnchorListItem signUpLink;
 	AnchorListItem signInLink;
 	AnchorListItem signOutLink;
@@ -107,13 +90,12 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		void onLoginStatusChecked(LoginInfo loginInfo);
 	}
 
-	public RootPanel getParent() {
+	public ListGroupItem getParent() {
 		return parent;
 	}
 
-	public void setParent(RootPanel rootPanel) {
-		this.parent = rootPanel;
-		parentWidget = null;
+	public void setParent(ListGroupItem listGroupItem) {
+		this.parent = listGroupItem;
 	}
 
 	DropDownMenu accountManagement = null;
@@ -221,7 +203,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		accountManagement = new DropDownMenu(); //HorizontalPanel();
 		tog = new Anchor();
 		tog.setDataToggle(Toggle.DROPDOWN);
-		tog.setIcon(IconType.USER);
+		//tog.setIcon(IconType.USER);
 		
 
 
@@ -269,9 +251,6 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		if (parent != null) {
 			parent.add(tog);
 			parent.add(accountManagement);
-		} else if (parentWidget != null) {
-//			parentWidget.add(tog);
-//			parentWidget.add(accountManagement);
 		}
 	}
 
@@ -672,10 +651,6 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		
 	}
 
-	public void setParentWidget(ListGroupItem parentWidget) {
-		this.parentWidget = parentWidget;
-		parent = null;
-	}
 	
 //	private void showLoggedInMobile()
 //	{

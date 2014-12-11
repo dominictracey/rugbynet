@@ -60,7 +60,7 @@ public class SeriesConfigurationViewImpl<T extends ISeriesConfiguration> extends
 		seriesConfigurationTable.getRowFormatter().addStyleName(0, "groupListHeader");
 		seriesConfigurationTable.addStyleName("groupList");
 		seriesConfigurationTable.getCellFormatter().addStyleName(0, 1, "groupListNumericColumn");
-
+		
 	}
 
 	@Override
@@ -245,6 +245,9 @@ public class SeriesConfigurationViewImpl<T extends ISeriesConfiguration> extends
 	@Override
 	public void setClientFactory(ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
+		
+		// get this all set up.
+		clientFactory.getSeriesConfigrPopupView();
 	}
 
 

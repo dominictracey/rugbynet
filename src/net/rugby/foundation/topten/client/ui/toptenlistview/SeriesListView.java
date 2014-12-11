@@ -28,14 +28,15 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 {
 	public interface SeriesListViewPresenter {
 		void setButtons();
-//		void parse(Widget widget);
 		void showRatingDetails(ITopTenItem value);
-//		void setFBListLike(ITopTenList list, String baseUrl);
 		void gotoPlace(Place place);
 		void switchMode(Long compId, RatingMode _mode);
 		void process(SeriesPlace place);
-		void createFeature(SeriesPlace place);
 		void promote(SeriesPlace place);
+		/**
+		 * The admin user has indicated they want to create or edit a feature
+		 */
+		void clickFeature(SeriesPlace place);
 	}
 	
 	void setSeries(IRatingSeries series, String baseUrl);

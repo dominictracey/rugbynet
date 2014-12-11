@@ -66,7 +66,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 				public void onClick(ClickEvent event) {
 					// scroll everything away to the right with animations!
 					if (roundIndex > 0) {  // don't run off the front
-						Core.getCore().setCurrentRoundId(comp.getRounds().get(roundIndex-1).getId());
+						Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex-1).getOrdinal());
 					}
 					
 				}
@@ -79,14 +79,14 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 			public void onClick(ClickEvent event) {
 				// scroll everything away to the left with animations!
 				if (roundIndex < comp.getRounds().size()) {  // don't run off the front
-					Core.getCore().setCurrentRoundId(comp.getRounds().get(roundIndex+1).getId());
+					Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex+1).getOrdinal());
 				}
 				
 			}
 			
 		});
 		
-		rpcService.getComp(compId, new AsyncCallback<ICompetition>() {
+		Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
 
 
 			@Override
@@ -98,14 +98,16 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 			@Override
 			public void onSuccess(final ICompetition result) {
 				comp = result;
-				currentRound = result.getRounds().get(0);
-				roundIndex = result.getRounds().indexOf(currentRound);
-				
-				if (currentRound == null)
-					currentRound = result.getNextRound();
+				currentRound = result.getPrevRound();
+				if (currentRound == null) {
+					currentRound = result.getNextRound(); // hasn't started
+					roundIndex = result.getNextRoundIndex();
+				} else {
+					roundIndex = result.getPrevRoundIndex();
+				}
 				
 				addPanels();
-				resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + currentRound.getName() + " Results</strong>");
+				resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + " " + currentRound.getName() + " Results</strong>");
 				rootPanel.add(resultPanel);
 				
 			}
@@ -115,47 +117,9 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 
 	
 	}
-//	protected Widget getArrow(boolean left) {
-//		Container cont = new Container();
-//		cont.setStyleName("col-md-1");   // remove container style
-//		cont.addStyleName("padding-top: 50%");
-//		Anchor arrow = new Anchor();
-//		//arrow.addStyleName("center-block");
-//		cont.add(arrow);
-//		if (left) {
-//			arrow.setIcon(IconType.CHEVRON_LEFT); //"fa fa-chevron-circle-right"
-//			
-//			arrow.addClickHandler(new ClickHandler() {
-//
-//				@Override
-//				public void onClick(ClickEvent event) {
-//					// scroll everything away to the right with animations!
-//					if (roundIndex > 0) {  // don't run off the front
-//						Core.getCore().setCurrentRoundId(comp.getRounds().get(roundIndex-1).getId());
-//					}
-//					
-//				}
-//				
-//			});
-//		} else {
-//			arrow.setIcon(IconType.CHEVRON_RIGHT); //"fa fa-chevron-circle-left"
-//			arrow.addClickHandler(new ClickHandler() {
-//
-//				@Override
-//				public void onClick(ClickEvent event) {
-//					// scroll everything away to the left with animations!
-//					if (roundIndex < comp.getRounds().size()) {  // don't run off the front
-//						Core.getCore().setCurrentRoundId(comp.getRounds().get(roundIndex+1).getId());
-//					}
-//					
-//				}
-//				
-//			});
-//		}
-//		return cont;
-//	}
+
 	@Override
-	public void roundChanged(Long id) {
+	public void roundChanged(int ordinal) {
 		resultPanel.scores.clear();
 		currentRound = null;
 		if (comp != null) {
@@ -163,7 +127,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 			roundIndex = 0;
 			while (it.hasNext()) {
 				IRound r = it.next();
-				if (r.getId().equals(id)) {
+				if (r.getUrOrdinal() >= ordinal) {
 					currentRound = r;
 					break;
 				}
@@ -173,7 +137,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 		
 		if (currentRound != null) {
 			addPanels();
-			resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + currentRound.getName() + " Results</strong>");
+			resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + " " + currentRound.getName() + " Results</strong>");
 					
 		}
 		
