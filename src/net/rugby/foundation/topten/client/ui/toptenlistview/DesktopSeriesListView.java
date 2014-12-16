@@ -40,13 +40,16 @@ public class DesktopSeriesListView extends SeriesListViewImpl {
 		tabPanel.setTabPosition(TabPosition.LEFT);
 		
 		navTabs = new NavTabs();
+		navTabs.setId("tabPanelWidget");
 		tabContent = new TabContent();
 		
 		tabPanel.add(navTabs);
 		tabPanel.add(tabContent);
-		tabPanel.add(new ClearFix());
+//		tabPanel.add(new ClearFix());
 		
 		content.add(tabPanel);
+		
+		matrixGroup.setVisible(false);
 	}
 	
 	@Override	
@@ -66,6 +69,8 @@ public class DesktopSeriesListView extends SeriesListViewImpl {
 					
 					// the paired TabPane to show when the tab is clicked
 					final TabPane pane = new TabPane();
+					pane.setFade(true);
+
 					tabIndexMap.put(rq.getId(), t);
 					paneIndexMap.put(rq.getId(), pane);
 					tabContent.add(pane);
@@ -74,13 +79,12 @@ public class DesktopSeriesListView extends SeriesListViewImpl {
 
 						@Override
 						public void onClick(ClickEvent event) {
-
-							pane.add(listView);
 							setQuery(null);
 							queryId = rq.getId();
 							setList(null);
 							setItemId(null);
 							presenter.gotoPlace(getPlace());
+							pane.add(listView);
 						}
 
 					});

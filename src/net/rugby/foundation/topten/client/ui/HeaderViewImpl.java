@@ -2,35 +2,34 @@ package net.rugby.foundation.topten.client.ui;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.ContentPlace;
-import net.rugby.foundation.topten.client.ui.content.EditContent.EditContentPresenter;
-
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.ListGroupItem;
 import org.gwtbootstrap3.client.ui.Nav;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 
-public class HeaderViewImpl extends Composite implements HeaderView, EditContentPresenter 
+public class HeaderViewImpl extends Composite implements HeaderView 
 {
 	private static NavBarViewImplUiBinder uiBinder = GWT.create(NavBarViewImplUiBinder.class);
 
 	@UiField Nav nav;
 	@UiField ListGroupItem loginDropdown;
 	@UiField ListGroupItem contentDropdown;
+	
+	@UiField DropDownMenu contentDropdownMenu;
 	
 
 	private ClientFactory clientFactory;
@@ -53,41 +52,12 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 		
 		loginDropdown.setStyleName("dropdown");
 		contentDropdown.setStyleName("dropdown");
+		contentDropdownMenu.addStyleName("dropdown-menu-right");
 		
 		nav.addStyleName("navbar-nav");
 		nav.addStyleName("pull-right");
 		nav.addStyleName("hidden-xs");
 
-
-	}
-
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setComps(java.util.Map, java.util.List)
-	 */
-	@Override
-	public void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway) {
-//		ListIterator<Long> it = compsUnderway.listIterator(compsUnderway.size());
-//		if (it != null) {
-//			compDropdown.clear();
-//			while (it.hasPrevious()) {
-//				final Long compId = it.previous();
-//				NavLink nl = new NavLink(competitionMap.get(compId));
-//				nl.addClickHandler( new ClickHandler() {
-//
-//					@Override
-//					public void onClick(ClickEvent event) {
-//						TopTenListPlace newPlace = new TopTenListPlace();
-//						newPlace.setCompId(compId);
-//						assert (clientFactory != null);
-//						clientFactory.getPlaceController().goTo(newPlace);
-//					}
-//				});
-//				compDropdown.add(nl);
-//
-//			}
-//			compDropdown.addStyleName("transparentMenuBG");
-//		}
 
 	}
 
@@ -120,8 +90,8 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 		if (list != null) {
 			Iterator<IContent> it = list.iterator();
 			if (it != null) {
-				contentDropdown.clear();
-				contentDropdown.addStyleName("transparentMenuBG");
+				contentDropdownMenu.clear();
+
 				while (it.hasNext()) {
 					final IContent content = it.next();
 					if (content != null && content.isShowInMenu()) {
@@ -136,20 +106,8 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 							}
 						});
 
-						contentDropdown.add(nl);
-						//					if (content.isShowInFooter()) {
-						//						NavLink a = new NavLink(content.getTitle());
-						//						a.addClickHandler( new ClickHandler() {
-						//
-						//							@Override
-						//							public void onClick(ClickEvent event) {
-						//								ContentPlace newPlace = new ContentPlace(content.getId());
-						//								assert (clientFactory != null);
-						//								clientFactory.getPlaceController().goTo(newPlace);
-						//							}
-						//						});
-						//						footerLinks.appendChild(a.getElement());
-						//					}
+						contentDropdownMenu.add(nl);
+
 					} else if (content.getDiv() != null && !content.getDiv().isEmpty()) {
 						setDivContent(content);
 					}
@@ -226,34 +184,27 @@ public class HeaderViewImpl extends Composite implements HeaderView, EditContent
 //
 //	}
 
-
-	@Override
-	public void saveContent(IContent content) {
-		Core.getCore().saveContent(content, new AsyncCallback<IContent>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				// fail silently
-			}
+	
+	protected void AddContentMenuItem(final IContent c, ListGroupItem p) {
+//		tog.setHTML(clientFactory.getLoginInfo().getNickname() + "<b class=\"caret\"></b>");
+		AnchorListItem linky = new AnchorListItem(c.getTitle());
+		linky.setIcon(IconType.UNLOCK);
+		linky.addClickHandler(new ClickHandler() {
 
 			@Override
-			public void onSuccess(final IContent result) {
-				setDivContent(result);
-				clientFactory.getEditContentDialog().hide();
+			public void onClick(ClickEvent event) {
+				ContentPlace place =  new ContentPlace(c.getId());
+				clientFactory.getPlaceController().goTo(place);
 			}
+			
 		});
-
-	}
-//
-//	private Map<String, Button> getButtonMap() {
-//		if (buttonMap == null) {
-//			buttonMap = new HashMap<String,Button>();
-//		}
-//		return buttonMap;
-//	}
-
-	@Override
-	public void cancelEditContent() {
-		clientFactory.getEditContentDialog().hide();
+		
+		linky.addStyleDependentName("IdentityButton");
+		
+		linky.setIcon(IconType.COG);
+		  		
+		p.add(linky);
+		linky.setVisible(true);
 
 	}
 

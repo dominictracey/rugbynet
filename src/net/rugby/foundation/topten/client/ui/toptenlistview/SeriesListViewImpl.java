@@ -18,8 +18,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Image;
-import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelFooter;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.Row;
@@ -79,11 +77,11 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	protected PanelHeader seriesHeader;
 	
 	@UiField
-	protected Div compImage;
+	protected Div compSpacer;
 	@UiField 
 	Div sponsorDiv;
 	@UiField
-	protected Image sponsorImage;
+	protected Div sponsorSpacer;
 	@UiField
 	protected HTML sponsorTag;
 	
@@ -114,8 +112,6 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	protected SeriesListViewPresenter presenter;
 	protected ClientFactory clientFactory;
 
-	//protected TopTenListView<ITopTenItem> ttlView;
-
 	protected TopTenListView<ITopTenItem> listView;
 
 	protected RatingMode mode;
@@ -138,17 +134,17 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 		criteriaGroup.setVisible(false);
 		seriesHeader.setPaddingBottom(5);
-		seriesHeader.addStyleName("center");
+//		seriesHeader.addStyleName("center");
 		
-		compImage.addStyleName("pull-left");
-		sponsorDiv.addStyleName("pull-right");
 		sponsorTag.setHTML("<center>delivered by DHL</center>");
 		sponsorTag.addStyleName("font-size:.5em");
 		
 		sponsorRow.addStyleName("sponsor");
 		
-		compCol.addStyleName("sponsor-logo");
-		//sponsorCol.addStyleName("sponsor-logo");
+		compCol.addStyleName("comp-logo");
+		sponsorCol.addStyleName("sponsor-logo");
+		compSpacer.setHeight("38px");
+		sponsorSpacer.setHeight("38px");
 		dropdownCol.addStyleName("sponsor-buttons");
 	}
 
@@ -418,7 +414,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				}
 			}
 			listTitle.setHTML("<center><h5>"+list.getTitle()+"</h5></center>");
-			listView.setList(list, "");
+			//listView.setList(list, "");
 
 			if (list.getFeatureGuid() != null) {
 				createFeature.setText("View Feature");

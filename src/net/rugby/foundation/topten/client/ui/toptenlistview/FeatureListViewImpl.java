@@ -3,11 +3,11 @@ package net.rugby.foundation.topten.client.ui.toptenlistview;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
-import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 
+import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
@@ -36,6 +36,25 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	@UiField Div featureBody;
 	@UiField Div featuredTTL;
 	
+	@UiField
+	protected Row sponsorRow;
+	@UiField 
+	protected Column compCol;
+//	@UiField 
+//	protected Column dropdownCol;
+	@UiField 
+	protected Column sponsorCol;
+	@UiField
+	protected Div compSpacer;
+	@UiField 
+	Div sponsorDiv;
+	@UiField
+	protected Div sponsorSpacer;
+	@UiField
+	protected HTML sponsorTag;
+	@UiField 
+	protected HTML listTitle;
+	
 	// next and prev features nav
 	@UiField Column topColumn;
 	@UiField Column left;
@@ -54,8 +73,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	@UiField Button promote;
 	
 	ITopTenList list = null;
-	
-	Element root = null;
+
 	
 	HTML body = null;
 	
@@ -78,8 +96,16 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 		prev.addStyleName("col-xs-5");
 		next.addStyleName("col-xs-5");
 		
-		root = DOM.getElementById("toptenRoot");
-		topColumn.setStyleName("col-md-9");
+		sponsorTag.setHTML("<center>delivered by DHL</center>");
+		sponsorTag.addStyleName("font-size:.5em");
+		
+		sponsorRow.addStyleName("sponsor");
+		
+		compCol.addStyleName("comp-logo");
+		sponsorCol.addStyleName("sponsor-logo");
+		compSpacer.setHeight("38px");
+		sponsorSpacer.setHeight("38px");
+
 	}
 	
 
@@ -105,18 +131,26 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 			featureBody.add(body);
 			
 			featuredTTL.add(clientFactory.getSimpleView());
-						
+			listTitle.setHTML("<center><h5>"+list.getTitle()+"</h5></center>");			
 			if (list.getLive()) {
 				publish.setText("Unpublish");
 			} else {
 				publish.setText("Publish");
 			}
+		} else {
+			// just blank everything out I guess
+			if (body != null) {
+				featureBody.remove(body);
+			}
+			
+			listTitle.setHTML("No feature");
 		}
 
-	
-		
-//		this.removeStyleName("row-md-12");
-//		this.addStyleName("row-md-8");
+		Element elem = DOM.getElementById("app");
+	    if (elem != null) {
+	        elem.scrollIntoView();
+	    }
+
 	}
 
 	@Override

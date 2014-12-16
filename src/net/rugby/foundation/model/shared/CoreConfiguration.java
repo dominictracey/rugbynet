@@ -130,10 +130,10 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 //	
 //	private static final String DEFAULT_COMPETITION_SHORT_NAME = "2011 RWC Knockout"; 
 	
-	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/topten.html?gwt.codesvr=127.0.0.1:9997";
-	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/topten.html";
-	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/topten.html";
-	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/topten.html";
+	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/s/?gwt.codesvr=127.0.0.1:9997";
+	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/s/";
+	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/s/";
+	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/s/";
 	
 	// Facebook
 	private final static String FB_LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/fb/topten.html?gwt.codesvr=127.0.0.1:9997";

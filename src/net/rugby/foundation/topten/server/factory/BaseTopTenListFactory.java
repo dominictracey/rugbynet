@@ -947,7 +947,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Long prevId = cursor.getPrevId();
 			if (prevId != null) { // might be the first
 				ITopTenList prev = get(prevId);
-				if (!prev.getNextId().equals(cursor.getId())) {
+				if (prev.getNextId() == null || !prev.getNextId().equals(cursor.getId())) {
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Scan of TTL for comp " + compId + " discovered bad nextId for TTL " + prev.getId() + ". The TTL who points to it with it's prevId is TTL " + cursor.getId() + " but the nextId for this TTL is " + prev.getNextId() + ".");
 					retval = false;
 				}

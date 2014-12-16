@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.datastore.Text;
 import com.google.inject.Inject;
-import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
@@ -36,7 +34,6 @@ import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.server.factory.BaseTopTenListFactory;
 import net.rugby.foundation.topten.server.factory.INoteFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
-import net.rugby.foundation.topten.server.model.Notes;
 import net.rugby.foundation.topten.server.utilities.INotesCreator;
 import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
 
@@ -70,12 +67,12 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 					list.getList().add(getItem(it.next(), list, ordinal++));
 				}
 
-				if (list.getNotesId() != null) {
-					Notes notes = ofy.get(Notes.class, list.getNotesId());
-					if (notes != null) {
-						list.setNotes(notes.getNotes());
-					}
-				}
+//				if (list.getNotesId() != null) {
+//					Notes notes = ofy.get(Notes.class, list.getNotesId());
+//					if (notes != null) {
+//						list.setNotes(notes.getNotes());
+//					}
+//				}
 			}
 
 			return list;
@@ -125,19 +122,19 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 		try {
 			ofy.put(list);
 
-			// and store the notes
-			if (list.getNotesId() != null) {
-				// already exists so update
-				Notes notes = ofy.get(Notes.class, list.getNotesId());
-				notes.setNotesText(new Text(list.getNotes()));
-				ofy.put(notes);
-			} else if (list.getNotes() != null && !list.getNotes().isEmpty()) {
-				// new
-				Text notesText = new Text(list.getNotes());
-				Notes notes = new Notes();
-				notes.setNotesText(notesText);
-				ofy.put(notes);
-			}
+//			// and store the notes
+//			if (list.getNotesId() != null) {
+//				// already exists so update
+//				Notes notes = ofy.get(Notes.class, list.getNotesId());
+//				notes.setNotesText(new Text(list.getNotes()));
+//				ofy.put(notes);
+//			} else if (list.getNotes() != null && !list.getNotes().isEmpty()) {
+//				// new
+//				Text notesText = new Text(list.getNotes());
+//				Notes notes = new Notes();
+//				notes.setNotesText(notesText);
+//				ofy.put(notes);
+//			}
 
 			return list;
 		} catch (Throwable e) {
@@ -224,10 +221,10 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 						}
 					}
 
-					// delete notes
-					if (list.getNotesId() != null) {
-						ofy.delete(new Key<Notes>(Notes.class,list.getNotesId()));
-					}
+//					// delete notes
+//					if (list.getNotesId() != null) {
+//						ofy.delete(new Key<Notes>(Notes.class,list.getNotesId()));
+//					}
 
 					// and the list itself
 					ofy.delete(list.getList());

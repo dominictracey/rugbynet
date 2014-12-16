@@ -1,48 +1,120 @@
+.comp-logo {
+		padding-left: 5px;
+		padding-right: 5px;
+		background-image: url("/resources/comps/ap/200R.png");
+    	background-repeat: no-repeat;
+    	background-size: contain;
+}
+
+.sponsor-logo {
+		padding-left: 5px;
+		padding-right: 5px;
+		background-image: url("/resources/sponsors/dhl/200.png");
+    	background-repeat: no-repeat;
+    	background-size: contain;
+    	float: right;
+}
+
+.usa  {
+		padding-left: 5px;
+		padding-right: 5px;
+		background: url("/resources/19/200.png") no-repeat center center;
+    	background-size: contain;
+    	min-width: 30px;
+}
+
+.compactTTL {
+/* 	padding: 4px; */
+/* 	overflow: hidden; */
+/* 	font-size: 16px; */
+/* 	background-color: #eee; */
+/* 	color: #444; */
+/* 	border: 0px; */
+/* 	padding-left: 20px; */
+/* 	font-weight: bold; */
+/* 	border-bottom: 2px solid #dedede; */
+/* 	border-bottom-style: groove; */
+	vertical-align: middle;
+}
+
+.toptentext {
+	padding: 15px;
+}
+
+.compactTopTenPanel {
+	box-shadow: 3px 3px 7px #888888;
+	width: 70%; /* solves jumping */
+}
+
+#tabPanelWidget {
+	margin-right: 0px;
+}
+
+.popupCaption {
+	width: 100%;
+	padding: 4px;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.popupCloseButton {
+	float:right;
+}
+
+.popupPlayerInfo {
+	font-size: 1.5em;
+	font-weight: bold;
+	padding: 10px;
+}
+
+.popupContent {
+/* 	width: 400px; */
+	padding: 12px;
+}
+
+.dialogGlass {
+	background-color: black;
+	opacity: 0.5;
+}
 /* ######## RESPONSIVE #########  */ 
-@media (min-width: 992px) {  
+@media (min-width: 1200px) {  
 
 	.sponsor {
-		padding-bottom: 20px;
+
 	}
 	
-	.sponsor-logo {
-		padding-left: 15px;
-		padding-right: 15px;
+	.tagline {
+		font-size: 1.2em;
 	}
+	
+}
+
+@media(min-width: 992px) and (max-width: 1199px) {
+
+	.sponsor {
+	
+	.tagline {
+		font-size: .9em;
+	}
+	
 }
 
 @media(min-width: 768px) and (max-width: 991px) {
 
 	.sponsor {
-		padding-bottom: 15px;
+	
+	.tagline {
+		font-size: 1em;
 	}
 	
-	.sponsor-logo {
-		padding-left: 10px;
-		padding-right: 10px;
-		background-image: url("/resources/comps/ap/200R.png");
-    	background-repeat: no-repeat;
-    	min-height: 38px;
-/*     	background-position: right top; */
-    	background-size:cover
-	}
 }
 
 @media(min-width: 480px) and (max-width: 767px) {
 	
 	.sponsor {
-		padding-bottom: 10px;
+
 	}
 	
-	.sponsor-logo {
-		padding-left: 5px;
-		padding-right: 5px;
-		background-image: url("/resources/comps/ap/100R.png");
-    	background-repeat: no-repeat;
-    	min-height: 38px;
-/*     	background-position: right top; */
-    	background-size:cover
-	}
 	
 	.sponsor-buttons {
 
@@ -52,24 +124,11 @@
 @media(max-width:480px) { 
 
 	.sponsor {
-		padding-bottom: 5px;
-	}
-	
-	.sponsor-logo {
-/* 		padding-left: 0px; */
-/* 		padding-right: 0px; */
-		background: url("/resources/comps/ap/100R.png") no-repeat left top;
-    -webkit-background-size: cover; /* For WebKit*/
-    -moz-background-size: cover;    /* Mozilla*/
-    -o-background-size: cover;      /* Opera*/
-    background-size: cover;         /* Generic*/
-    height:auto;
-    min-height:25px;
+
 	}
 	
 	.sponsor-buttons {
-		margin-left: auto;
-    	margin-right: auto;
+
 	}
 }
 

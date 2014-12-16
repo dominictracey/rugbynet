@@ -253,4 +253,35 @@ SeriesConfigurationViewPresenter<ISeriesConfiguration>
 		
 	}
 
+	@Override
+	public void rollbackSeriesConfig(ISeriesConfiguration seriesConf) {
+		if (seriesConf.getLastRoundOrdinal() == 0) {
+			Window.alert("Nothing to roll back");
+			return;
+		}
+		
+		if (Window.confirm("Are you sure you want to roll back the target RatingGroup and all of its Top Ten Lists? This will do one of two things. If the targetRound status is OK, it will delete all queries and TTLs for the last round (" + seriesConf.getLastRound().longDesc + ") and set the target round to that round. Otherwise the target round (" + seriesConf.getTargetRound().longDesc + ") will be flushed and it's status set to OK.")) {
+			clientFactory.getRpcService().rollBackSeriesConfiguration(seriesConf.getId(), new AsyncCallback<ISeriesConfiguration>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert(caught.getLocalizedMessage());
+				}
+
+				@Override
+				public void onSuccess(ISeriesConfiguration result) {
+					if (result != null) {
+						Window.alert("Rolled back");
+
+						view.updateSeriesConfigurationRow(result);
+					} else {
+						Window.alert("No bueno, senor");
+					}
+				}
+
+			});
+		}
+		
+	}
+
 }

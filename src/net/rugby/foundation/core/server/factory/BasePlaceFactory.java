@@ -50,7 +50,11 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 				guid = DEFAULT_S_GUID;
 			}
 	
-			place = getItem(getGuidCacheId(guid));			
+			place = getItem(getGuidCacheId(guid));		
+			
+			if (place != null) {
+				return place;
+			}
 
 			if (place == null && guid.equals(DEFAULT_S_GUID)) {
 				place = buildDefaultSPlace();

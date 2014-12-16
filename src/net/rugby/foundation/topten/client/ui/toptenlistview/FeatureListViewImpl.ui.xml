@@ -3,60 +3,124 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html">
 	<ui:style>
-		.childDiv2 { /*float:left;*/ }
+		.childDiv2 { 
+			
+		 }
 		.childDiv3 {
-		position:relative;
-		float:right;
-		padding-left:15px;
+			position:relative;
+			float:right;
+			padding-left:15px;
+			padding-bottom:20px;
 		}
 		.vertical-align {
-	        display: flex;
-    		align-items: center;
+			display: flex;
+			align-items: center;
+		}
+		.panelBody {
+			margin-right: 20px;
 		}
 	</ui:style>
-	<b:Container ui:field="topTenPanel">
-		<b:Row>
-			<b:Column ui:field="topColumn" size="9">
-				<b:Row>
+	<!-- <b:Container > -->
+	<b:Panel ui:field="topTenPanel">
+		<b:PanelHeader ui:field="seriesHeader">
+			<b:Container fluid="true">
+				<b:Row ui:field="sponsorRow">
+					<b:Column size="XS_3" ui:field="compCol">
+						<b.html:Div ui:field="compSpacer"></b.html:Div>
+					</b:Column>
+					<b:Column size="XS_6" ui:field="dropdownCol">
+						<g:HTML ui:field="listTitle">
+						</g:HTML>
+						<g:HTML ui:field="sponsorTag"></g:HTML>
+					</b:Column>
+					<!-- <g:HTMLPanel> -->
+					<!-- <center> -->
+
+					<!-- <b:ButtonGroup ui:field="criteriaGroup"> -->
+					<!-- <b:Button ui:field="criteriaButton" type="PRIMARY" -->
+					<!-- size="EXTRA_SMALL">Ratings</b:Button> -->
+					<!-- <b:Button dataToggle="DROPDOWN" type="PRIMARY" size="EXTRA_SMALL" 
+						/> -->
+					<!-- <b:DropDownMenu ui:field="criteriaDropDown"> -->
+
+					<!-- </b:DropDownMenu> -->
+					<!-- </b:ButtonGroup> -->
+
+					<!-- <b:ButtonGroup ui:field="weekGroup"> -->
+					<!-- <b:Button ui:field="weekButton" type="PRIMARY" size="EXTRA_SMALL">Week</b:Button> -->
+					<!-- <b:Button dataToggle="DROPDOWN" type="PRIMARY" size="EXTRA_SMALL" 
+						/> -->
+					<!-- <b:DropDownMenu ui:field="weekDropDown"> -->
+
+					<!-- </b:DropDownMenu> -->
+					<!-- </b:ButtonGroup> -->
+
+					<!-- <b:ButtonGroup ui:field="matrixGroup"> -->
+					<!-- <b:Button ui:field="matrixButton" type="PRIMARY" size="EXTRA_SMALL">Rate -->
+					<!-- By</b:Button> -->
+					<!-- <b:Button ui:field="matrixToggle" dataToggle="DROPDOWN" -->
+					<!-- type="PRIMARY" size="EXTRA_SMALL" /> -->
+					<!-- <b:DropDownMenu ui:field="matrixDropDown"> -->
+
+					<!-- </b:DropDownMenu> -->
+					<!-- </b:ButtonGroup> -->
+
+					<!-- </center> -->
+					<!-- </g:HTMLPanel> -->
+					<!-- </b:Column> -->
+					<b:Column size="XS_3" ui:field="sponsorCol">
+						<b.html:Div ui:field="sponsorDiv">
+							<b.html:Div ui:field="sponsorSpacer"></b.html:Div>
+						</b.html:Div>
+					</b:Column>
+				</b:Row>
+				<!-- <b:Row> -->
+				<!-- <g:HTML ui:field="listTitle"> -->
+				<!-- </g:HTML> -->
+				<!-- <g:HTML ui:field="sponsorTag"></g:HTML> -->
+				<!-- </b:Row> -->
+			</b:Container>
+		</b:PanelHeader>
+		<b:PanelBody addStyleNames='{style.panelBody}'>
+			<b:Row>
+				<b:Column ui:field="topColumn" size="12">
+					<!-- <b:Row> -->
 					<b.html:Div ui:field="featuredTTL" addStyleNames='{style.childDiv3}'>
 					</b.html:Div>
-					<b.html:Div ui:field="featureBody">
+					<b.html:Div ui:field="featureBody" >
 					</b.html:Div>
-				</b:Row>
-<!-- 				<b:Row> -->
-<!-- 					<b:Column size="3" offset="5"> -->
-<!-- 						<b:Nav> -->
-<!-- 							<b:ButtonGroup> -->
-<!-- 								<b:Button size="LARGE" icon="BACKWARD" ui:field="prevButton">Prev</b:Button> -->
-<!-- 								<b:Button size="LARGE" icon="FORWARD" ui:field="nextButton">Next</b:Button> -->
-<!-- 							</b:ButtonGroup> -->
-<!-- 						</b:Nav> -->
-<!-- 					</b:Column> -->
-<!-- 				</b:Row> -->
-				<b:Row ui:field="row" addStyleNames='{style.vertical-align}'>
-					<b:Column ui:field="left" size="1">
-						<b:Anchor ui:field="left_arrow"></b:Anchor>
-					</b:Column>
-					<b:Column ui:field="prev" size="5">
-						<b:Anchor ui:field="prevList"></b:Anchor>
-					</b:Column>
-					<b:Column ui:field="next" size="5">
-						<b:Anchor ui:field="nextList"></b:Anchor>
-					</b:Column>
-					<b:Column ui:field="right" size="1">
-						<b:Anchor ui:field="right_arrow"></b:Anchor>
-					</b:Column>
-				</b:Row>
-				<b:Row>
-					<b.html:Div ui:field="adminButtons">
-						<b:Button ui:field="edit" type="PRIMARY">Edit</b:Button>
-						<b:Button ui:field="publish" type="DANGER">Publish</b:Button>
-						<b:Button ui:field="promote" type="PRIMARY">Promote</b:Button>
-					</b.html:Div>
-				</b:Row>
-			</b:Column>
-		</b:Row>
-	</b:Container>
+					<!-- </b:Row> -->
+				</b:Column>
+			</b:Row>
+		</b:PanelBody>
+		<b:PanelFooter>
+			<!-- <b:Container> -->
+			<b:Row ui:field="row" addStyleNames='{style.vertical-align}'>
+				<b:Column ui:field="left" size="1">
+					<b:Anchor ui:field="left_arrow"></b:Anchor>
+				</b:Column>
+				<b:Column ui:field="prev" size="5">
+					<b:Anchor ui:field="prevList"></b:Anchor>
+				</b:Column>
+				<b:Column ui:field="next" size="5">
+					<b:Anchor ui:field="nextList"></b:Anchor>
+				</b:Column>
+				<b:Column ui:field="right" size="1">
+					<b:Anchor ui:field="right_arrow"></b:Anchor>
+				</b:Column>
+			</b:Row>
+			<b:Row>
+				<b.html:Div ui:field="adminButtons">
+					<b:Button ui:field="edit" type="PRIMARY">Edit</b:Button>
+					<b:Button ui:field="publish" type="DANGER">Publish</b:Button>
+					<b:Button ui:field="promote" type="PRIMARY">Promote</b:Button>
+				</b.html:Div>
+			</b:Row>
+			<!-- </b:Container> -->
+		</b:PanelFooter>
+
+	</b:Panel>
+	<!-- </b:Container> -->
 
 
 </ui:UiBinder>

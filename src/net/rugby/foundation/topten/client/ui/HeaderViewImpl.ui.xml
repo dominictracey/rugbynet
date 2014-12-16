@@ -11,10 +11,10 @@
 			<b:Nav ui:field="nav">
 				<b:ListGroupItem ui:field="contentDropdown">
 					<b:Anchor dataToggle="DROPDOWN">WTF</b:Anchor>
-<!-- 					<b:DropDownMenu> -->
+					<b:DropDownMenu ui:field="contentDropdownMenu">
 <!-- 						<b:AnchorListItem>Action 1</b:AnchorListItem> -->
 <!--     					<b:AnchorListItem icon="CAMERA">Action 2</b:AnchorListItem> -->
-<!-- 					</b:DropDownMenu> -->
+					</b:DropDownMenu>
 				</b:ListGroupItem>
 				<b:ListGroupItem ui:field="loginDropdown">
 				</b:ListGroupItem>

@@ -117,17 +117,16 @@
 	href="/theme/css/font-awesome.css" />
 <link rel="stylesheet" type="text/css"
 	href="/theme/css/elements/dashboard.css" />
-<link rel="stylesheet" type="text/css"
-	href="/theme/css/elements/notify.css" />
-<link rel="stylesheet" type="text/css"
-	href="/theme/css/elements/bootstrap_calendar.css" />
-<link rel="stylesheet" type="text/css"
-	href="/theme/css/elements/pizza.css" />
+<!-- <link rel="stylesheet" type="text/css" -->
+<!-- 	href="/theme/css/elements/notify.css" /> -->
+<!-- <link rel="stylesheet" type="text/css" -->
+<!-- 	href="/theme/css/elements/bootstrap_calendar.css" /> -->
+<!-- <link rel="stylesheet" type="text/css" -->
+<!-- 	href="/theme/css/elements/pizza.css" /> -->
 
 <!-- local style -->
 <link rel="stylesheet" type="text/css"
 	href="/stylesheets/therugbynet.css" />
-"
 
 <!-- open sans font -->
 <link
@@ -141,6 +140,17 @@
 </head>
 <body>
 
+	<!-- FACEBOOK JS -->
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=499268570161982&version=v2.0";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+	<!-- FACEBOOK JS -->
+	
 	<!-- navbar -->
 	<header class="navbar navbar-inverse navbar-fixed-top" role="banner"
 		id="header">
@@ -186,7 +196,7 @@
 			<!-- RESULTS -->
 			<div class="col-md-8">
 				<div class="panel panel-default">
-					<div class="panel-heading" id="resultHeader">Results</div>
+					<div class="panel-heading" id="resultHeader"><strong>Results</strong></div>
 					<div class="panel-body">
 						<div id="resultPanel"></div>
 					</div>
@@ -194,14 +204,16 @@
 			</div>
 			<!-- END RESULTS -->
 
-			<div class="col-md-4 hidden-xs">
+			<div class="col-md-4 hidden-sm hidden-xs">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<strong>Social Media</strong>
+						<strong>The Rugby Net</strong>
 					</div>
 					<div class="panel-body">
-						<div class="addthis_horizontal_follow_toolbox"></div>
+						<div class= "col-md-8 tagline">Follow us for Player Ratings from Match Statistics and Results</div>
+						<div class="addthis_horizontal_follow_toolbox col-md-4"></div>
 					</div>
+					
 				</div>
 			</div>
 
@@ -236,18 +248,27 @@
 			<!-- GOOGLE AD -->
 
 
+			<!-- FEATURES -->
+			<div class="col-md-4 col-xs-12" id="features"></div>
+			<!-- END FEATURES -->
+
 			<!-- NOTES -->
-			<div class="col-md-4  col-xs-12" id="notes"></div>
+			<div class="col-md-8 col-xs-12" id="notes"></div>
 			<!-- END NOTES -->
 			<div class="clearfix"></div>
 
-			<!-- FEATURES -->
-			<div class="col-md-8  col-xs-12" id="features"></div>
-			<!-- END FEATURES -->
 
+			
 
 			<div class="clearfix"></div>
+			
+			<!-- FB COMMENTS -->
+			<div class="col-md-8 col-xs-12">			
+				<div id="fbComments" class="fb-comments" data-width="100%" data-numposts="5" data-colorscheme="light"></div>
+			</div>
+			<!-- FB COMMENTS -->
 
+			<div class="clearfix"></div>
 
 			<footer id="footer">
 				<div class="text-center clearfix">
@@ -271,86 +292,15 @@
 	<!-- /main container -->
 
 
-
-
-	<!--post modal-->
-	<div id="myModal" class="modal fade" tabindex="-1" role="dialog"
-		aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"
-						aria-hidden="true"></button>
-					<h4>
-						<strong>Delete Confirmation</strong>
-					</h4>
-				</div>
-
-				<div class="modal-body">
-					<p></p>
-				</div>
-
-				<div class="modal-footer">
-					<button class="btn btn-default btn-sm" data-dismiss="modal"
-						aria-hidden="true">Close</button>
-					<button data-dismiss="modal" class="btn btn-danger btn-sm"
-						id="btnYes">Confirm</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Notification -->
-	<!-- 	<div id="container"> -->
-	<!-- 		<div id="default"> -->
-	<!-- 			<h1>#{title}</h1> -->
-	<!-- 			<p>#{text}</p> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-
-
-
 	<!-- scripts -->
 	<script src="/theme/js/jquery.min.js"></script>
-	<!-- 	<script src="/theme/js/bootstrap.js"></script> -->
 	<script src="/theme/js/theme.js"></script>
-
-	<!-- 	<script src="/theme/js/bootstrap-modal.js"></script> -->
-
-	<!-- 	<script src="/theme/js/flot/jquery.flot.js"></script> -->
-	<!-- 	<script src="/theme/js/flot/jquery.flot.resize.js"></script> -->
 
 	<!-- notification  -->
 	<script src="/theme/js/notify/jquery-ui.js"></script>
 	<script src="/theme/js/notify/jquery.notify.js"></script>
 	<script src="/theme/js/jquery.slimscroll.js"></script>
 	<script src="/theme/js/LazyLoad/LazyLoad.min.js"></script>
-
-	<!--     wysiwyg editor -->
-	<!--     <script src="/theme/js/editor/wysihtml5-0.3.0.js"></script> -->
-	<!--     <script src="/theme/js/editor/bootstrap3-wysihtml5.js"></script> -->
-
-	<script type="text/javascript">
-		//NOTIFICATION
-		function create(template, vars, opts) {
-			return $container.notify("create", template, vars, opts);
-		}
-
-		$(function() {
-			// initialize widget on a container, passing in all the defaults.
-			// the defaults will apply to any notification created within this
-			// container, but can be overwritten on notification-by-notification
-			// basis.
-			$container = $("#container").notify();
-			// create two when the pg loads
-			create(
-					"default",
-					{
-						title : 'YOU HAVE 3 NEW MESSAGES',
-						text : 'Go to <a href=\'inbox.html\'>Mailbox</a> to see who wrote to you. Check the date and today\'s tasks.'
-					});
-		});
-	</script>
 
 </body>
 </html>

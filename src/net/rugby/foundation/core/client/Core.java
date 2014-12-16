@@ -94,7 +94,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	// map that contains content
 	private Map<Long, IContent> contentMap = null;
 	
-	private int currentRoundOrdinal; 
+	private int currentRoundOrdinal = -1; 
 	
 	/**
 	 * Use the static getInstance factory method
@@ -256,15 +256,12 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		});
 	}
 
-	public Long getCurrentCompId() {
-		//if it is not set yet, we need to use the system default (which is a Core.Configuration value)
-		assert (currentCompId != 0L);
-			 
+	public Long getCurrentCompId() {			 
 		return currentCompId;
 	}
 
 	public void setCurrentCompId(final Long currentCompId) {
-		if (this.currentCompId != currentCompId) {
+		if (!this.currentCompId.equals(currentCompId)) {
 			this.currentCompId = currentCompId;
 
 			for (CompChangeListener l : compChangeListeners) {
@@ -636,8 +633,8 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		return clubhouseMap;
 	}
 
-	public void setCurrentRoundOrdinal(int i) {
-		if (this.currentRoundOrdinal != i) {
+	public void setCurrentRoundOrdinal(int i, boolean force) {
+		if (this.currentRoundOrdinal != i || force) {
 			this.currentRoundOrdinal = i;
 
 			for (RoundChangeListener l : roundChangeListeners) {
@@ -645,6 +642,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 		}
 		
+	}
+	
+	public int getCurrentRoundOrdinal() {
+		return currentRoundOrdinal;
 	}
 
 	public void registerRoundChangeListener(RoundChangeListener l) {

@@ -1,6 +1,5 @@
 package net.rugby.foundation.topten.server.utilities;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -47,16 +46,17 @@ public class MatchNotesCreator implements INotesCreator {
 		this.rsf = rsf;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public List<INote> createNotes(IRatingQuery rq) {
 
 		// first add any notes we already have for this round to the current list
 		int uro = rq.getRatingMatrix().getRatingGroup().getUniversalRound().ordinal;
 		ITopTenList ttl = ttlf.get(rq.getTopTenListId());
-		
+
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "******* Creating notes for " + ttl.getTitle());
 
-		
+
 		if (ttl != null) {
 			List<INote> existing = nf.getByUROrdinal(uro);
 			for (INote note : existing) {
@@ -92,31 +92,33 @@ public class MatchNotesCreator implements INotesCreator {
 						if (series != null ) { //&& !series.getId().equals(rq.getRatingMatrix().getRatingGroup().getRatingSeriesId())) {
 							// get the right RatingGroup
 							List<IRatingGroup> groups = series.getRatingGroups();
-							int i = groups.size()-1;
-							IRatingGroup group = groups.get(i);
-							// go backwards
-							while (group != null) {
-								if (group.getUniversalRoundOrdinal() == uro) {
-									break;
+							if (groups.size() > 0) {
+								int i = groups.size()-1;
+								IRatingGroup group = groups.get(i);
+								// go backwards
+								while (group != null) {
+									if (group.getUniversalRoundOrdinal() == uro) {
+										break;
+									}
+									if (i == 0) {
+										group = null;
+									} else {
+										group = groups.get(--i);
+									}
 								}
-								if (i == 0) {
-									group = null;
-								} else {
-									group = groups.get(--i);
-								}
-							}
 
-							if (group != null) {
-								// search through the lists to see if we can create xlinks
-								for (IRatingMatrix matrix : group.getRatingMatrices()) {
-									for (IRatingQuery query : matrix.getRatingQueries()) {
-										if (query.getTopTenListId() != null) {
-											ITopTenList list = ttlf.get(query.getTopTenListId());
-											for (ITopTenItem item : list.getList()) {
-												if (item.getPlayerId().equals(note.getPlayer1Id())) {
-													// create xlink if this isn't an izzon note for the note target
-													if (!(note.getContextListId().equals(list.getId()) && note.getTemplateSelector().equals("TT")))
+								if (group != null) {
+									// search through the lists to see if we can create xlinks
+									for (IRatingMatrix matrix : group.getRatingMatrices()) {
+										for (IRatingQuery query : matrix.getRatingQueries()) {
+											if (query.getTopTenListId() != null) {
+												ITopTenList list = ttlf.get(query.getTopTenListId());
+												for (ITopTenItem item : list.getList()) {
+													if (item.getPlayerId().equals(note.getPlayer1Id())) {
+														// create xlink if this isn't an izzon note for the note target
+														if (!(note.getContextListId().equals(list.getId()) && note.getTemplateSelector().equals("TT")))
 															LinkNoteToList(note, list, uro);
+													}
 												}
 											}
 										}

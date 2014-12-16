@@ -201,6 +201,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		}
 
 		accountManagement = new DropDownMenu(); //HorizontalPanel();
+		accountManagement.addStyleName("dropdown-menu-right");
 		tog = new Anchor();
 		tog.setDataToggle(Toggle.DROPDOWN);
 		//tog.setIcon(IconType.USER);

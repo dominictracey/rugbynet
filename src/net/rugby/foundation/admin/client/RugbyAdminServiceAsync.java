@@ -178,4 +178,5 @@ public interface RugbyAdminServiceAsync {
 	public void getUniversalRounds(int size,
 			AsyncCallback<List<UniversalRound>> asyncCallback);
 	public void addVirtualComp(AsyncCallback<ICompetition> asyncCallback);
+	public void rollBackSeriesConfiguration(Long id, AsyncCallback<ISeriesConfiguration> asyncCallback);
 }

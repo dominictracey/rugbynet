@@ -22,15 +22,20 @@ public class TopTenList  implements Serializable, ITopTenList {
 
 	protected @Id Long id;
 	@Transient protected List<ITopTenItem> list;
+	@Unindexed
 	protected List<Long> itemIds;
+	@Unindexed
 	protected Date created;
+	@Unindexed
 	protected Date published;
 	protected Date expiration;
+	@Unindexed
 	protected int roundOrdinal;
 	protected Boolean live;
 	protected Boolean series;
 	@Unindexed
 	protected String summary;
+	@Unindexed
 	protected Long editorId;
 	@Unindexed
 	protected String pipeLineId;
@@ -53,9 +58,9 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected String featureGuid;
 	
 	// because these can be greater than 500 chars we keep them in a separate table
-	protected Long notesId;
-	@Transient
-	protected String notes;
+//	protected Long notesId;
+//	@Transient
+//	protected String notes;
 	
 	public class TopTenListSummary implements ITopTenListSummary {
 		protected Long id;
@@ -292,22 +297,22 @@ public class TopTenList  implements Serializable, ITopTenList {
 	public void setGuid(String guid) {
 		this.guid = guid;
 	}
-	@Override
-	public Long getNotesId() {
-		return notesId;
-	}
-	@Override
-	public void setNotesId(Long notesId) {
-		this.notesId = notesId;
-	}
-	@Override
-	public String getNotes() {
-		return notes;
-	}
-	@Override
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
+//	@Override
+//	public Long getNotesId() {
+//		return notesId;
+//	}
+//	@Override
+//	public void setNotesId(Long notesId) {
+//		this.notesId = notesId;
+//	}
+//	@Override
+//	public String getNotes() {
+//		return notes;
+//	}
+//	@Override
+//	public void setNotes(String notes) {
+//		this.notes = notes;
+//	}
 	@Override
 	public String getFeatureGuid() {
 		return featureGuid;

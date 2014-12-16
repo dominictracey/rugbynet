@@ -43,6 +43,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 	private int roundIndex;
 	private ICompetition comp;
 	private ResultPanel resultPanel;
+	private boolean drawn = false;
 	
 	public void onModuleLoad() {
 		
@@ -66,7 +67,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 				public void onClick(ClickEvent event) {
 					// scroll everything away to the right with animations!
 					if (roundIndex > 0) {  // don't run off the front
-						Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex-1).getOrdinal());
+						Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex-1).getOrdinal(), true);
 					}
 					
 				}
@@ -79,7 +80,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 			public void onClick(ClickEvent event) {
 				// scroll everything away to the left with animations!
 				if (roundIndex < comp.getRounds().size()) {  // don't run off the front
-					Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex+1).getOrdinal());
+					Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex+1).getOrdinal(), true);
 				}
 				
 			}
@@ -98,18 +99,13 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 			@Override
 			public void onSuccess(final ICompetition result) {
 				comp = result;
-				currentRound = result.getPrevRound();
-				if (currentRound == null) {
-					currentRound = result.getNextRound(); // hasn't started
-					roundIndex = result.getNextRoundIndex();
-				} else {
-					roundIndex = result.getPrevRoundIndex();
+				
+				if (!drawn && Core.getCore().getCurrentRoundOrdinal() != -1) {
+					roundChanged(Core.getCore().getCurrentRoundOrdinal());
 				}
 				
-				addPanels();
-				resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + " " + currentRound.getName() + " Results</strong>");
 				rootPanel.add(resultPanel);
-				
+
 			}
 			
 		});
@@ -120,18 +116,20 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 
 	@Override
 	public void roundChanged(int ordinal) {
-		resultPanel.scores.clear();
-		currentRound = null;
-		if (comp != null) {
-			Iterator<IRound> it = comp.getRounds().iterator();
-			roundIndex = 0;
-			while (it.hasNext()) {
-				IRound r = it.next();
-				if (r.getUrOrdinal() >= ordinal) {
-					currentRound = r;
-					break;
+		if (resultPanel.scores != null) {
+			resultPanel.scores.clear();
+			currentRound = null;
+			if (comp != null) {
+				Iterator<IRound> it = comp.getRounds().iterator();
+				roundIndex = 0;
+				while (it.hasNext()) {
+					IRound r = it.next();
+					if (r.getUrOrdinal() >= ordinal) {
+						currentRound = r;
+						break;
+					}
+					roundIndex++;
 				}
-				roundIndex++;
 			}
 		}
 		

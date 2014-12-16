@@ -32,13 +32,13 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ICompetitionFactory cf;
+
 
 	
 	@Inject
-	OfyConfigurationFactory(ICompetitionFactory cf) {
-		
-		this.cf = cf;
+	public OfyConfigurationFactory(ICompetitionFactory cf) {
+		super(cf);
+
 	}
 
 	/* (non-Javadoc)

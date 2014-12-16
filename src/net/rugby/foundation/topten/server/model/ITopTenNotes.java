@@ -1,5 +1,5 @@
 package net.rugby.foundation.topten.server.model;
 
-public interface ITopTenNotes {
-	
-}
+//public interface ITopTenNotes {
+//	
+//}

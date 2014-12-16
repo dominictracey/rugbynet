@@ -16,6 +16,7 @@ public interface SeriesConfigurationView<T extends ISeriesConfiguration> extends
 		Boolean deleteSeriesConfig(Long seriesId);
 		void showConfigPopup(T config);
 		void editSeriesConfig(T seriesConf);
+		void rollbackSeriesConfig(T seriesConf);
 	} 
 
 

@@ -56,6 +56,8 @@ public class SidebarViewImpl extends Composite
 
 	@UiField
 	protected ListGroup dashboardMenu;
+	
+	boolean ignore = false;
 //	@UiField
 //	protected ListGroup profileMenu;
 
@@ -105,7 +107,7 @@ public class SidebarViewImpl extends Composite
 	}
 
 	public void setup(ICoreConfiguration coreConfig) {
-		for (Long compId : coreConfig.getCompetitionMap().keySet()) {
+		for (Long compId : coreConfig.getCompsUnderway()) {
 			addCompMenu(compId, coreConfig.getCompetitionMap().get(compId), coreConfig.getSeriesMap().get(compId));
 		}
 
@@ -118,25 +120,26 @@ public class SidebarViewImpl extends Composite
 	protected void addCompMenu(final Long compId, String compName, final HashMap<RatingMode, Long>  modeMap) {
 
 		final ListGroupItem li = new ListGroupItem();
+		li.remove(0);
 		Anchor a = new Anchor();
-		a.setHTML("<i class=\"fa fa-laptop\"></i><span>" + compName + "</span><b class=\"caret\"></b>");
+		a.setHTML("<i class=\"fa fa-globe\"></i><span>" + compName + "</span><b class=\"caret\"></b>");
 		anchorMap.put(compId, a);
 		liMap.put(compId, li);
 		li.add(a);
 		dashboardMenu.add(li);
 		li.removeStyleName("list-group-item");
 		
-		if (modeMap.isEmpty()) {
-			a.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					// TODO Auto-generated method stub
-
-				}
-
-			});
-		} else {
+//		if (modeMap.isEmpty()) {
+//			a.addClickHandler(new ClickHandler() {
+//
+//				@Override
+//				public void onClick(ClickEvent event) {
+//					// TODO Auto-generated method stub
+//
+//				}
+//
+//			});
+//		} else {
 			// first create submenu
 			ListGroup submenu = new ListGroup();
 			submenuMap.put(compId, submenu);
@@ -155,6 +158,7 @@ public class SidebarViewImpl extends Composite
 									
 					// allow other elements to display this comp
 					if (Core.getCore().getCurrentCompId() != compId) {
+						ignore = true;
 						Core.getCore().setCurrentCompId(compId);
 					}
 					
@@ -162,8 +166,10 @@ public class SidebarViewImpl extends Composite
 					place.setCompId(compId);
 					
 					// remove the carat if it is somewhere else
-					if (caratParent != null && carat != null) {
+					if (caratParent != null && carat != null && !caratParent.equals(li)) {
 						caratParent.remove(carat);
+						caratParent.removeStyleName("active");
+						caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
 					}
 					
 					// add the carat
@@ -189,7 +195,8 @@ public class SidebarViewImpl extends Composite
 					public void onClick(ClickEvent event) {
 						
 						// allow other elements to display this comp
-						if (Core.getCore().getCurrentCompId() != compId) {
+						if (!Core.getCore().getCurrentCompId().equals(compId)) {
+							ignore = true;
 							Core.getCore().setCurrentCompId(compId);
 						}
 						
@@ -198,8 +205,12 @@ public class SidebarViewImpl extends Composite
 						place.setSeriesId(modeMap.get(_mode));
 						
 						// remove the carat if it is somewhere else
-						if (caratParent != null && carat != null) {
+						if (caratParent != null && carat != null && !caratParent.equals(li)) {
 							caratParent.remove(carat);
+							caratParent.removeStyleName("active");
+							caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
+//							li.setStyleName("active");
+//							li.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "block");
 						}
 						
 						// add the carat
@@ -216,7 +227,7 @@ public class SidebarViewImpl extends Composite
 			li.add(submenu);
 			a.setStyleName("dropdown-toggle");
 
-		}
+//		}
 
 	}
 
@@ -225,21 +236,25 @@ public class SidebarViewImpl extends Composite
 	}-*/;
 
 	public void setComp(ICompetition comp) {
+		
+		if (!ignore) {
 		ListGroupItem li = liMap.get(comp.getId());
 		// apply active class to li
 		li.setStyleName("active");
 		
-		// apply display: block to submenu
-		submenuMap.get(comp.getId()).setStyleName("display: block;");
-		
 		// remove the carat if it is somewhere else
 		if (caratParent != null && carat != null) {
 			caratParent.remove(carat);
+			caratParent.removeStyleName("active");
+			caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
 		}
 		
 		// add the carat
 		li.add(carat);
 		caratParent = li;
+		} else {
+			ignore = false;
+		}
 		
 	}
 

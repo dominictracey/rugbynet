@@ -76,17 +76,30 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 								view.setPresenter(This);
 								view.setClientFactory(clientFactory);
 								_panel.setWidget(view.asWidget());
+								
 
 								if (ttl != null) {
 									view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+									// allow other elements to display this comp/round
+									Long compId = ttl.getCompId();
+									if (!Core.getCore().getCurrentCompId().equals(compId)) {
+										Core.getCore().setCurrentCompId(compId);
+									}
+									Core.getCore().setCurrentRoundOrdinal(ttl.getRoundOrdinal(), false);
+									
 								} else {
 									Window.alert("Failed to fetch top ten list.");
 									view.setList(null,"");
 								}
 
 								refreshButtons(login, ttl);
+								
+								_panel.setWidget(view.asWidget());
+
 								setURL();
 
+								// show facebook comments				
+								clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + ttl.getGuid() + "/");
 							}
 
 						});
@@ -150,7 +163,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 	private void showListForComp(final Long compId) {
 				
 		// allow other elements to display this comp
-		if (Core.getCore().getCurrentCompId() != compId) {
+		if (!Core.getCore().getCurrentCompId().equals(compId)) {
 			Core.getCore().setCurrentCompId(compId);
 		}
 		

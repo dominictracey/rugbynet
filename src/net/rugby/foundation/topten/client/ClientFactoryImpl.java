@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import net.rugby.foundation.core.client.Core.CompChangeListener;
@@ -47,6 +48,7 @@ import net.rugby.foundation.topten.model.shared.Note;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -246,51 +248,54 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 							loginInfo = result;
 							coreConfig = config;
-							//							getHeaderView().setComps(coreConfig.getCompetitionMap(), coreConfig.getCompsUnderway());
-							//
-							//							// set up content 
-							//							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
-							//
-							//
-							//
-							//								@Override
-							//								public void onFailure(Throwable caught) {
-							//									cb.onFailure(caught);
-							//								}
-							//
-							//								@Override
-							//								public void onSuccess(List<IContent> contentList) {
-							//									ClientFactoryImpl.contentList = contentList;
-							//									//getNavBarView().getButtonBar().clear();
-							//									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
-							getSidebarView().setup(coreConfig);
-							
-							getRpcService().getLatestFeatures(new AsyncCallback<List<Feature>>() {
+							// set up content 
+							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
+
+
 
 								@Override
 								public void onFailure(Throwable caught) {
-									// TODO Auto-generated method stub
-									
+									cb.onFailure(caught);
 								}
 
 								@Override
-								public void onSuccess(List<Feature> result) {
-									if (result != null) {
-										getLatestFeatureView().setRecentFeatures(result);
-									}
-									
-									Core.getCore().registerCompChangeListener(_compListener);
-									Core.getCore().registerRoundChangeListener(_roundListener);
-									Core.getCore().registerGuidChangeListener(_guidListener);
+								public void onSuccess(List<IContent> contentList) {
+									ClientFactoryImpl.contentList = contentList;
 
-									Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
-									cb.onSuccess(coreConfig);	
+									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
+
+									getSidebarView().setup(coreConfig);
+
+									getRpcService().getLatestFeatures(new AsyncCallback<List<Feature>>() {
+
+										@Override
+										public void onFailure(Throwable caught) {
+											// TODO Auto-generated method stub
+
+										}
+
+										@Override
+										public void onSuccess(List<Feature> result) {
+											if (result != null) {
+												getLatestFeatureView().setRecentFeatures(result);
+											}
+
+											Core.getCore().registerCompChangeListener(_compListener);
+											Core.getCore().registerRoundChangeListener(_roundListener);
+											Core.getCore().registerGuidChangeListener(_guidListener);
+
+											//Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
+											cb.onSuccess(coreConfig);	
+										}
+
+
+
+									});
 								}
 
-
-								
 							});
 						}
+
 					});
 				}
 			});
@@ -310,11 +315,11 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 				// bummer
 			}
 		}
-		
+
 		return recentFeaturesView;
-		
+
 	}
-	
+
 	@Override
 	public void RegisterIdentityPresenter(Presenter identityPresenter) {
 		ClientFactoryImpl.identityPresenter = identityPresenter;
@@ -366,8 +371,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	@Override
 	public SeriesListView<IRatingSeries> getSeriesView() {
 		if (seriesView == null) {
-			//seriesView = new DesktopSeriesListView();
-			seriesView = new SeriesListViewImpl();
+			if (Window.getClientWidth() > 992) {
+				// col-lg, col-md
+				seriesView = new DesktopSeriesListView();
+			} else {
+				// col-xs, col-sm
+				seriesView = new SeriesListViewImpl();
+			}
 			seriesView.setClientFactory(this);
 		}
 		return seriesView; 
@@ -722,7 +732,32 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 
 	}
+	
+	private Element fbDiv = null;
+	@Override
+	public void showFacebookComments(String url) {
+		//<div class="fb-comments" data-href="**FACEBOOKDATAREF**" data-width="500" data-numposts="5" data-colorscheme="light"></div>
 
+		if (fbDiv == null) {
+			fbDiv = DOM.getElementById("fbComments");
+			initFacebook();
+		}
+		
+		if (fbDiv != null) {
+			//data-href="**FACEBOOKDATAREF**"
+			fbDiv.setAttribute("data-href", url);
+			// trigger fb parse
+			parseFacebook();
+		}
+	}
+	
+	public static native void initFacebook() /*-{
+		$wnd.FB.init()
+	}-*/;
+	
+	public static native void parseFacebook() /*-{
+		$wnd.FB.XFBML.parse();
+	}-*/;
 
 	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
 

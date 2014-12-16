@@ -21,9 +21,10 @@ import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.ContentPlace;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
-import net.rugby.foundation.topten.client.ui.content.EditContent.EditContentPresenter;
+import net.rugby.foundation.topten.client.ui.content.EditContent.ContentPresenter;
 
-public class ContentActivity extends AbstractActivity implements EditContentPresenter, Presenter { 
+
+public class ContentActivity extends AbstractActivity implements ContentPresenter, Presenter { 
 	private ContentPlace place;
 	private ContentView view;
 	private ClientFactory clientFactory;
@@ -41,7 +42,7 @@ public class ContentActivity extends AbstractActivity implements EditContentPres
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(view.asWidget());
-
+		view.setPresenter(this);
 		clientFactory.doSetup(new AsyncCallback<ICoreConfiguration>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -76,36 +77,20 @@ public class ContentActivity extends AbstractActivity implements EditContentPres
 					view.setContent(result);
 				}
 				
-				final IContent content = result;
 				LoginInfo login = clientFactory.getLoginInfo();
-				view.getButtonBar().clear();
-//				clientFactory.getHeaderView().collapseHero(true);
-				Element loadPanel = DOM.getElementById("loadPanel");
-				if (loadPanel != null && loadPanel.hasParentElement()) {
-					loadPanel.removeFromParent();
-				}
+
 				if (login != null && login.isTopTenContentEditor()) {
-					Button edit = new Button("Edit");
-				
-					edit.setType(ButtonType.DANGER);
-
-					view.getButtonBar().add(edit);
-					edit.addClickHandler( new ClickHandler() {
-
-						@Override
-						public void onClick(ClickEvent event) {
-							editContent(content);
-						}
-
-					});
+					view.showFooter(true);
+				} else {
+					view.showFooter(false);
 				}
 			}	
 		});
 		
 	}
 	
-
-	private void editContent(IContent result) {
+	@Override
+	public void editContent(IContent result) {
 		EditContent ec = clientFactory.getEditContentDialog();
 		ec.setContent(result, this);
 		ec.center();

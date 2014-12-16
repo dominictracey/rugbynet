@@ -10,6 +10,7 @@ import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.Position;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 
 @Entity
 public class TopTenItem implements Serializable, ITopTenItem 
@@ -22,22 +23,34 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Id  protected Long id;
 	protected Long playerId;
 	@Transient protected IPlayer player;
+	@Unindexed
 	protected String text;
+	@Unindexed
 	protected String imageUrl;
 	protected Long contributorId;
 	protected Long editorId;
+	@Unindexed
 	protected boolean isSubmitted;
+	@Unindexed
 	protected String matchReportLink;
+	@Unindexed
 	protected String teamName;
 	//@Transient protected ITopTenList parent;
 	protected Long parentId;
+	@Unindexed
 	protected Long teamId;
+	@Unindexed
 	protected Position.position position;
+	@Unindexed
 	protected int ordinal;
+	@Unindexed
 	protected int lastOrdinal;
+	@Unindexed
 	protected Long playerRatingId;
+	@Unindexed
 	protected int rating;
 	protected String placeGuid;
+	@Unindexed
 	protected String tweet;
 	
 	public TopTenItem()

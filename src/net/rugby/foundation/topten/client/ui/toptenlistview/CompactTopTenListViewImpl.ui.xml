@@ -6,7 +6,9 @@
 	<g:HTMLPanel width="100%" ui:field="topTenPanel">
 
 		<b.gwt:CellTable ui:field="items" width="100%" />
-
+		<center>
+			<g:HTML ui:field="generated"></g:HTML>
+		</center>
 	</g:HTMLPanel>
 
 

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Id;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 
 import net.rugby.foundation.model.shared.IHasId;
 
@@ -54,22 +55,28 @@ public class Note implements Serializable, IHasId, INote {
 	Long id;
 
 	Long player1Id;
+	@Unindexed
 	Long player2Id;
+	@Unindexed
 	Long player3Id;
 
 	Long teamId;
 	int round;  // universal round ordinal
 	Long matchId;
 	Long compId;
+	@Unindexed
 	String details;
+	@Unindexed
 	int movement; // (expressed as a positive or negative integer)
+	@Unindexed
 	int duration; // (expressed in number of weeks)
 	Long placeId;
 	Long contextListId; // - The list the note is attached to
 	String Link; // GUID of contextList
 	LinkType type; // -  [Match, Round, Position, Comp, Team]
+	@Unindexed
 	String templateSelector; //- i18n
-	
+	@Unindexed
 	String text;
 	int significance;
 	

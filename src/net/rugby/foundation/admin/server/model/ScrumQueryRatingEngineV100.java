@@ -1,6 +1,8 @@
 package net.rugby.foundation.admin.server.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -754,10 +756,27 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				}
 
 				pr.setRating(Math.round((scores/totalScaledScore)*500*playerScoreMap.keySet().size())); //numStats)); //TotalScaled));
-
-				prf.put(pr);
 				mrl.add(pr);
 
+			}
+
+			// sort by rating
+			Collections.sort(mrl, new Comparator<IPlayerRating>() {
+				@Override
+				public int compare(IPlayerRating o1, IPlayerRating o2) {
+					return Integer.compare(o2.getRating(), o1.getRating());
+				}
+			});
+
+
+			// put the first 30 results in the db
+			Iterator<IPlayerRating> iter = mrl.iterator();
+			for (int i = 0; i<30; ++i) {
+				if (iter.hasNext()) {	
+					prf.put(iter.next());
+				} else {
+					break;
+				}
 			}
 			
 			if (sendReport) {
@@ -983,7 +1002,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		return body;
 
 	}
-	
+
 	@Override
 	public boolean setQuery(IRatingQuery q) {
 		this.query = q;

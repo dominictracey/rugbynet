@@ -13,11 +13,38 @@ import net.rugby.foundation.model.shared.UniversalRound;
 
 public interface ISeriesConfiguration  extends IHasId {
 
-	public enum Status { OK, PENDING, RUNNING, ERROR }
+	/**
+	 * OK - The LastRound completed successfully and the TargetRound hasn't been created yet
+	 * PENDING - The TargetRound has been created but isn't complete yet
+	 * RUNNING - The Series Orchestration is actively working on the TargetRound
+	 * ERROR - The TargetRound has had an unrecoverable error happen
+	 * @author home
+	 *
+	 */
+	public enum Status { OK, 
+						PENDING,
+						RUNNING,
+						ERROR }
 	Long getId();
 	void setId(Long id);
 	List<Long> getTargets();
+	/**
+	 * OK - The LastRound completed successfully and the TargetRound hasn't been created yet
+	 * PENDING - The TargetRound has been created but isn't complete yet
+	 * RUNNING - The Series Orchestration is actively working on the TargetRound
+	 * ERROR - The TargetRound has had an unrecoverable error happen
+	 * @author home
+	 *
+	 */
 	void setStatus(Status status);
+	/**
+	 * OK - The LastRound completed successfully and the TargetRound hasn't been created yet
+	 * PENDING - The TargetRound has been created but isn't complete yet
+	 * RUNNING - The Series Orchestration is actively working on the TargetRound
+	 * ERROR - The TargetRound has had an unrecoverable error happen
+	 * @author home
+	 *
+	 */
 	Status getStatus();
 	void setLastRoundOrdinal(int lastRound);
 	int getLastRoundOrdinal();

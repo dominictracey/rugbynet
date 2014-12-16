@@ -10,9 +10,6 @@ import org.gwtbootstrap3.client.ui.ListGroupItem;
 
 public interface HeaderView {
 
-	public abstract void setComps(Map<Long, String> competitionMap,
-			List<Long> compsUnderway);
-
 	public abstract ListGroupItem getLoginPanel();
 
 	public abstract void setClientFactory(ClientFactory clientFactory);

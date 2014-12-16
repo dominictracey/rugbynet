@@ -13,41 +13,41 @@ import com.googlecode.objectify.annotation.Unindexed;
  * @author home
  *
  */
-@Entity
-public class Notes implements Serializable, ITopTenNotes {
+//@Entity
+//public class Notes implements Serializable, ITopTenNotes {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 5579142166586030276L;
-
-	@Id
-	protected Long id;
-	
-	@Unindexed
-	protected Text notesText;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Text getNotesText() {
-		return notesText;
-	}
-
-	public void setNotesText(Text notesText) {
-		this.notesText = notesText;
-	}
-	
-	public String getNotes() {
-		return notesText.getValue();
-	}
-	
-	public void setNotes(String value) {
-		notesText = new Text(value);
-	}
-}
+//	/**
+//	 *
+//	 */
+//	private static final long serialVersionUID = 5579142166586030276L;
+//
+//	@Id
+//	protected Long id;
+//	
+//	@Unindexed
+//	protected Text notesText;
+//
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
+//
+//	public Text getNotesText() {
+//		return notesText;
+//	}
+//
+//	public void setNotesText(Text notesText) {
+//		this.notesText = notesText;
+//	}
+//	
+//	public String getNotes() {
+//		return notesText.getValue();
+//	}
+//	
+//	public void setNotes(String value) {
+//		notesText = new Text(value);
+//	}
+//}

@@ -8,14 +8,11 @@
 			<b:Container fluid="true">
 				<b:Row ui:field="sponsorRow">
 					<b:Column size="XS_3" ui:field="compCol">
-<!-- 						<b:Image ui:field="compImage" type="ROUNDED" -->
-<!-- 							url="/resources/comps/ap/100.png" /> -->
-						<b.html:Div ui:field="compImage"></b.html:Div>
-
+						<b.html:Div ui:field="compSpacer"></b.html:Div>
 					</b:Column>
 					<b:Column size="XS_6" ui:field="dropdownCol">
-<!-- 						<g:HTMLPanel> -->
-<!-- 							<center> -->
+						<g:HTMLPanel>
+							<center>
 
 								<b:ButtonGroup ui:field="criteriaGroup">
 									<b:Button ui:field="criteriaButton" type="PRIMARY"
@@ -44,14 +41,12 @@
 									</b:DropDownMenu>
 								</b:ButtonGroup>
 
-<!-- 							</center> -->
-<!-- 						</g:HTMLPanel> -->
+							</center>
+						</g:HTMLPanel>
 					</b:Column>
 					<b:Column size="XS_3" ui:field="sponsorCol">
 						<b.html:Div ui:field="sponsorDiv">
-							<b:Image ui:field="sponsorImage" type="ROUNDED"
-								url="/resources/sponsors/dhl/100.png" />
-							
+							<b.html:Div ui:field="sponsorSpacer"></b.html:Div>
 						</b.html:Div>
 					</b:Column>
 				</b:Row>

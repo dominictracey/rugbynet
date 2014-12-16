@@ -110,11 +110,15 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		// do we have a comp?
 		if (sPlace.getCompId() == null) {
 			view.setCompId(_coreConfig.getDefaultCompId());
+		} else if (!sPlace.getCompId().equals(view.getCompId())) {
+			view.setCompId(sPlace.getCompId());
 		} else if (!view.isRatingModesSet()) {
 			getAvailableSeries(sPlace.getCompId());
-		} else if (sPlace.getCompId() == null) {
-			setCompId(_coreConfig.getDefaultCompId());
-		} else if (sPlace.getSeriesId() == null) {
+		} 
+//		else if (sPlace.getCompId() == null) {
+//			setCompId(_coreConfig.getDefaultCompId());
+//		} 
+		else if (sPlace.getSeriesId() == null) {
 			// the service knows what the default series is
 			getDefaultRatingSeries(sPlace.getCompId());
 		}  else if (view.getSeries() == null) { 
@@ -158,8 +162,9 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	private void getAvailableSeries(Long compId) {
 		
 		// allow other elements to display this comp
-		if (Core.getCore().getCurrentCompId() != compId) {
+		if (!Core.getCore().getCurrentCompId().equals(compId)) {
 			Core.getCore().setCurrentCompId(compId);
+			view.setCompId(compId);
 		}
 		
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "CALL getAvailableSeries");
@@ -242,6 +247,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			@Override
 			public void onSuccess(IRatingGroup result) {
 				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getRatingGroup");
+				Core.getCore().setCurrentRoundOrdinal(result.getUniversalRoundOrdinal(), true);
 				view.setGroup(result, false);
 			}
 		});
@@ -357,7 +363,10 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 				listView.setList(result, _coreConfig.getBaseToptenUrlForFacebook());
 				getNotes(result);
 				refreshButtons();
-				Core.getCore().setCurrentRoundOrdinal(result.getRoundOrdinal());
+				Core.getCore().setCurrentRoundOrdinal(result.getRoundOrdinal(), false);
+				
+				// show facebook comments				
+				clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + result.getGuid() + "/");
 			}
 
 		});
@@ -408,6 +417,8 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 				latest = g;
 			}
 		}
+		Core.getCore().setCurrentRoundOrdinal(latest.getUniversalRoundOrdinal(), true);
+
 		view.setGroup(latest, true);	
 	}
 

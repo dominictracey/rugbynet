@@ -103,7 +103,7 @@ public class SeriesPage extends HttpServlet {
 				ITopTenItem item = null;
 
 				IServerPlace place = getPlace(req);
-				if (place.getType().equals(IServerPlace.PlaceType.SERIES)) {
+				if (place.getType().equals(IServerPlace.PlaceType.SERIES) || place.getType().equals(IServerPlace.PlaceType.FEATURE)) {
 					parseHTML();
 					// populate
 					if (place.getCompId() != null) {

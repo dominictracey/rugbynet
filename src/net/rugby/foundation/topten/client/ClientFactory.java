@@ -90,4 +90,6 @@ public interface ClientFactory {
 	 * @param nextLabel
 	 */
 	void setTTLName(Long nextId, Anchor nextLabel);
+
+	void showFacebookComments(String url);
 }

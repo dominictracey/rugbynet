@@ -142,4 +142,5 @@ public interface RugbyAdminService extends RemoteService {
 	ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) throws Exception;
 	List<UniversalRound> getUniversalRounds(int size);
 	ICompetition addVirtualComp();
+	ISeriesConfiguration rollBackSeriesConfiguration(Long id);
 }

@@ -79,7 +79,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// status
+				// last round
 				public Widget render(T c) {
 					if (c.getLastRound() != null) {
 						String pos = c.getLastRound().shortDesc;
@@ -97,7 +97,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// status
+				// target round
 				public Widget render(T c) {
 					if (c.getTargetRound() != null) {
 						String pos = c.getTargetRound().shortDesc;
@@ -115,7 +115,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// created
+				// status
 				public Widget render(T c) {
 					if (c != null && c.getStatus() != null) {
 						String pos = c.getStatus().toString();
@@ -166,24 +166,7 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 					return null;
 				}
 			});
-			//
-			//			columnDefinitions.add(new ColumnDefinition<T>() {
-			//				// pipeline link
-			//				public Widget render(final T c) {
-			//					Anchor a =  new Anchor("Pipeline", c.getPipelineUrl(), "_blank");
-			//					return a;
-			//				}
-			//
-			//				public boolean isClickable() {
-			//					return false;  // it's an a href
-			//				}
-			//
-			//				@Override
-			//				public Column<T, ?> getColumn() {
-			//					// TODO Auto-generated method stub
-			//					return null;
-			//				}
-			//			});
+
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
 				// Process
@@ -212,6 +195,37 @@ public class SeriesConfigurationViewColumnDefinitions<T extends ISeriesConfigura
 
 					});
 
+					return a;
+				}
+
+				public boolean isClickable() {
+					return false;  // it's a button
+				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			});
+
+			columnDefinitions.add(new ColumnDefinition<T>() {
+				// Rollback
+				public Widget render(final T c) {
+
+					Button a =  new Button("Rollback");
+					//if (c.getLog() != null) {
+					a.addClickHandler(new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent event) {
+							listener.rollbackSeriesConfig(c);;
+						}
+					});
+
+					//} else {
+					//	a.setEnabled(false);
+					//}
 					return a;
 				}
 

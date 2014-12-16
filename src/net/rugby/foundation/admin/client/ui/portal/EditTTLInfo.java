@@ -12,8 +12,8 @@ import net.rugby.foundation.model.shared.IPlayer;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
@@ -48,25 +48,25 @@ public class EditTTLInfo extends DialogBox {
 	public EditTTLInfo() {
 		setWidget(uiBinder.createAndBindUi(this));
 		
-		for (int i=0; i<10; ++i) {
-			final int _i = i;
-			AnchorListItem ali = new AnchorListItem();
-			ali.setText(Integer.toString(i));
-			ali.addClickHandler(new ClickHandler() {
-			    @Override
-			    public void onClick(ClickEvent clickEvent) {
-			    	numPlayersPerTeam = _i;
-			    }
-			  });
-			playersPerTeam.add(ali);
-		}
+//		for (int i=0; i<10; ++i) {
+//			final int _i = i;
+//			AnchorListItem ali = new AnchorListItem();
+//			ali.setText(Integer.toString(i));
+//			ali.addClickHandler(new ClickHandler() {
+//			    @Override
+//			    public void onClick(ClickEvent clickEvent) {
+//			    	numPlayersPerTeam = _i;
+//			    }
+//			  });
+//			playersPerTeam.add(ali);
+//		}
 	}
 
 	@UiField Button save;
 	@UiField Button cancel;
 	@UiField TextArea description;
 	@UiField TextBox title;
-	@UiField ButtonGroup playersPerTeam;
+	@UiField ListBox playersPerTeam;
 	@UiField HTMLPanel twitterHandles;
 	
 	Map<IPlayer,TextBox> twitterDictionary = new HashMap<IPlayer,TextBox>();
@@ -78,6 +78,7 @@ public class EditTTLInfo extends DialogBox {
 	void onClickSave(ClickEvent e) {
 		v.setTitle(title.getText());
 		v.setDescription(description.getText());
+		numPlayersPerTeam = playersPerTeam.getSelectedIndex()+1;
 		v.setPlayersPerTeam(numPlayersPerTeam);
 		listener.saveTTIText(v);
 	}

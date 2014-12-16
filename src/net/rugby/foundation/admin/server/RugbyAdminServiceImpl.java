@@ -2236,6 +2236,61 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}	
 	}
 
+	@Override
+	public ISeriesConfiguration rollBackSeriesConfiguration(Long id) {
+		try {
+			if (checkAdmin()) {
+				ISeriesConfiguration sc = scf.get(id);
+				IRatingSeries series = null;
+				if (sc != null) {
+					if (sc.getSeriesId() != null) {
+						series = rsf.get(sc.getSeriesId());
+						if (series != null) {
+							// we either need to remove a pending RatingGroup (status != OK) or a complete one (status == OK)
+							// 	- in the second instance, need to bump the target and last round back one.
+							if (sc.getStatus().equals(ISeriesConfiguration.Status.OK)) {
+								sc.setTargetRoundOrdinal(sc.getLastRoundOrdinal());
+								if (series.getRatingGroupIds().size() == 1) {
+									sc.setLastRoundOrdinal(0);
+								} else {
+									sc.setLastRoundOrdinal(sc.getLastRoundOrdinal()-1);
+								}
+							}
+							// So we need to delete the latest RatingGroup and set the status to OK
+							Long rgid = series.getRatingGroupIds().get(series.getRatingGroupIds().size()-1);
+							IRatingGroup rg = rgf.get(rgid);
+							rgf.deleteTTLs(rg);
+							rgf.delete(rg);
+							rgf.dropFromCache(rgid);
+							series.getRatingGroupIds().remove(rgid);
+							series.getRatingGroups().remove(rg);
+							sc.setStatus(ISeriesConfiguration.Status.OK);
+							rsf.put(series);
+							rsf.dropFromCache(series.getId());
+							scf.put(sc);
+							scf.dropFromCache(id);
+						}
+					}
+
+					if (sc.getPipelineId() != null) {
+						PipelineService service = PipelineServiceFactory.newPipelineService();
+						service.deletePipelineRecords(sc.getPipelineId(), true, true);
+						sc.setPipelineId(null);
+					}
+
+					return scf.get(id);
+				} else {
+					return null;
+				}
+			}
+			return null;
+		} catch (Exception ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			//throw ex;	 // rethrow to client?
+			return null;
+		}	
+	}
+
 
 
 }
