@@ -35,7 +35,7 @@ public class AdminEmailer {
 	        Message msg = new MimeMessage(session);
 	        MimeMultipart mpart = new MimeMultipart();
 	        MimeBodyPart bp = new MimeBodyPart();
-	        bp.setContent(message, "text/html");
+	        bp.setContent("<html><body>" + message + "</body></html>", "text/html");
 	        // add message body
 	        mpart.addBodyPart(bp);
 //	        msg.setFrom(new InternetAddress("info@rugby.net", "The Rugby Net"));

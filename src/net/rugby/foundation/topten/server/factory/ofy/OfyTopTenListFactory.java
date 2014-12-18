@@ -31,14 +31,13 @@ import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopTenListFactory {
 
 	protected IPlayerFactory pf;
-	protected ICompetitionFactory cf;
 	Objectify ofy;
 
 	@Inject
 	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf);
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, cf);
 		this.pf = pf;
-		this.cf = cf;
+
 
 		ofy = DataStoreFactory.getOfy();
 	}

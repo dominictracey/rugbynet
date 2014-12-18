@@ -54,5 +54,7 @@ interface IPlayerStatShares {
 
 	String getSummaryRow(Map<String, Float> scaleTotalNumMap, Map<String, Float> scaleTotalMap);
 
+	String getEmailSummaryRow(Map<String, Float> scaleTotalNumMap, Map<String, Float> scaleTotalMap);
+
 
 }

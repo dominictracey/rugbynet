@@ -31,16 +31,16 @@ import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 public class TestTopTenListFactory extends BaseTopTenListFactory implements ITopTenListFactory {
 
 	protected IPlayerFactory pf;
-	protected ICompetitionFactory cf;
+
 	private Random r = new Random();
 
 	private Map<Long,List<ITopTenList>> listMap = new HashMap<Long,List<ITopTenList>>();
 	
 	@Inject
 	public TestTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf);
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, cf);
 		this.pf = pf;
-		this.cf = cf;
+
 	}
 
 

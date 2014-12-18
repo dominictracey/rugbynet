@@ -131,113 +131,113 @@ public class QueryMatchRatingTester {
 //		qre.addTeamStats(list);
 //	}
 	
-	@Test
-	public void testGenerate700() {
-
-		IQueryRatingEngine qre = qref.get(mresf.getDefault());
-
-		IRatingQuery rq = rqf.get(700L);
-		
-		qre.setQuery(rq);
-		qre.generate(mresf.getDefault(), true,true,true);
-		
-		StatisticalSummary ss = qre.getStatisticalSummary();
-		assertTrue(ss.getMean()>498 && ss.getMean()<502);
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
-	}
-
-	@Test
-	public void testGenerate701() {
-
-		IQueryRatingEngine qre = qref.get(mresf.getDefault());
-
-		IRatingQuery rq = rqf.get(701L);
-		
-		qre.setQuery(rq);
-		qre.generate(mresf.getDefault(), true,true,true);
-		
-		StatisticalSummary ss = qre.getStatisticalSummary();
-		assertTrue(ss.getMean()>498 && ss.getMean()<502);
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
-	}
-	
-	@Test
-	public void testGenerate702() {
-
-		IQueryRatingEngine qre = qref.get(mresf.getDefault());
-
-		IRatingQuery rq = rqf.get(702L);
-		
-		qre.setQuery(rq);
-		qre.generate(mresf.getDefault(), true,true,true);
-		
-		StatisticalSummary ss = qre.getStatisticalSummary();
-		assertTrue(ss.getMean()>498 && ss.getMean()<502);
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
-	}
-	
-	@Test
-	public void testGenerate703() {
-
-		IQueryRatingEngine qre = qref.get(mresf.getDefault());
-
-		IRatingQuery rq = rqf.get(703L);
-		
-		qre.setQuery(rq);
-		qre.generate(mresf.getDefault(), true,true,true);
-		
-		StatisticalSummary ss = qre.getStatisticalSummary();
-		assertTrue(ss.getMean()>498 && ss.getMean()<502);
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
-	}
-	
-	@Test
-	public void testGenerate704() {
-
-		IRatingQuery rq = rqf.get(704L);
-		IQueryRatingEngine qre = qref.get(mresf.getDefault(), rq);
-		
-		assertTrue(rq.isTimeSeries());
-		
-		qre.setQuery(rq);
-		qre.generate(mresf.getDefault(),true,true,true);
-		
-		StatisticalSummary ss = qre.getStatisticalSummary();
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		
-		assertTrue(ss.getMean()>498 && ss.getMean()<502);
-		rq = rqf.get(704L);
-		assertTrue(rq.getStatus() == Status.COMPLETE);
-		
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
-	}
-	
-	@Test
-	public void testGenerate705() {
-
-		IRatingQuery rq = rqf.get(705L);
-		IQueryRatingEngine qre = qref.get(mresf.getDefault(), rq);
-		
-		assertTrue(rq.isTimeSeries());
-		
-		qre.setQuery(rq);
-		qre.generate(mresf.getDefault(),true,true,true);
-		
-		StatisticalSummary ss = qre.getStatisticalSummary();
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		
-		assertTrue(ss.getMean()>498 && ss.getMean()<502);
-		rq = rqf.get(705L);
-		assertTrue(rq.getStatus() == Status.COMPLETE);
-		
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
-	}
+//	@Test
+//	public void testGenerate700() {
+//
+//		IQueryRatingEngine qre = qref.get(mresf.getDefault());
+//
+//		IRatingQuery rq = rqf.get(700L);
+//		
+//		qre.setQuery(rq);
+//		qre.generate(mresf.getDefault(), true,true,true);
+//		
+//		StatisticalSummary ss = qre.getStatisticalSummary();
+//		assertTrue(ss.getMean()>498 && ss.getMean()<502);
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
+//	}
+//
+//	@Test
+//	public void testGenerate701() {
+//
+//		IQueryRatingEngine qre = qref.get(mresf.getDefault());
+//
+//		IRatingQuery rq = rqf.get(701L);
+//		
+//		qre.setQuery(rq);
+//		qre.generate(mresf.getDefault(), true,true,true);
+//		
+//		StatisticalSummary ss = qre.getStatisticalSummary();
+//		assertTrue(ss.getMean()>498 && ss.getMean()<502);
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
+//	}
+//	
+//	@Test
+//	public void testGenerate702() {
+//
+//		IQueryRatingEngine qre = qref.get(mresf.getDefault());
+//
+//		IRatingQuery rq = rqf.get(702L);
+//		
+//		qre.setQuery(rq);
+//		qre.generate(mresf.getDefault(), true,true,true);
+//		
+//		StatisticalSummary ss = qre.getStatisticalSummary();
+//		assertTrue(ss.getMean()>498 && ss.getMean()<502);
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
+//	}
+//	
+//	@Test
+//	public void testGenerate703() {
+//
+//		IQueryRatingEngine qre = qref.get(mresf.getDefault());
+//
+//		IRatingQuery rq = rqf.get(703L);
+//		
+//		qre.setQuery(rq);
+//		qre.generate(mresf.getDefault(), true,true,true);
+//		
+//		StatisticalSummary ss = qre.getStatisticalSummary();
+//		assertTrue(ss.getMean()>498 && ss.getMean()<502);
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
+//	}
+//	
+//	@Test
+//	public void testGenerate704() {
+//
+//		IRatingQuery rq = rqf.get(704L);
+//		IQueryRatingEngine qre = qref.get(mresf.getDefault(), rq);
+//		
+//		assertTrue(rq.isTimeSeries());
+//		
+//		qre.setQuery(rq);
+//		qre.generate(mresf.getDefault(),true,true,true);
+//		
+//		StatisticalSummary ss = qre.getStatisticalSummary();
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		
+//		assertTrue(ss.getMean()>498 && ss.getMean()<502);
+//		rq = rqf.get(704L);
+//		assertTrue(rq.getStatus() == Status.COMPLETE);
+//		
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
+//	}
+//	
+//	@Test
+//	public void testGenerate705() {
+//
+//		IRatingQuery rq = rqf.get(705L);
+//		IQueryRatingEngine qre = qref.get(mresf.getDefault(), rq);
+//		
+//		assertTrue(rq.isTimeSeries());
+//		
+//		qre.setQuery(rq);
+//		qre.generate(mresf.getDefault(),true,true,true);
+//		
+//		StatisticalSummary ss = qre.getStatisticalSummary();
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		
+//		assertTrue(ss.getMean()>498 && ss.getMean()<502);
+//		rq = rqf.get(705L);
+//		assertTrue(rq.getStatus() == Status.COMPLETE);
+//		
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, ss.toString());
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, qre.toString());
+//	}
 	
 //	@Test
 //	public void testOrchestrationQueue() {

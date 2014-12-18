@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -26,6 +27,7 @@ import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -33,6 +35,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.PlayerRating;
+import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
@@ -53,9 +56,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	private IRatingQueryFactory rqf;
 	private IPlayerRatingFactory prf;
 	private IConfigurationFactory ccf;
+	private ICompetitionFactory cf;
 
 	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
-			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf) {
+			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf,
+			ICompetitionFactory cf) {
 		this.mf = mf;
 		this.tf = tf;
 		this.rf = rf;
@@ -63,6 +68,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		this.rqf = rqf;
 		this.prf = prf;
 		this.ccf = ccf;
+		this.cf = cf;
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -351,7 +357,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
 			while (it.hasNext() && count < 10) {
 				IPlayerRating pmr = it.next();
-				IPlayerMatchStats pms = pmsf.get(pmr.getMatchStatIds().get(0));
+				IPlayerMatchStats pms = getBestMatch(pmr); //pmsf.get(pmr.getMatchStatIds().get(0));
 				IMatchGroup match = mf.get(pms.getMatchId());
 				ITeamGroup team = tf.get(pms.getTeamId());
 				
@@ -384,6 +390,26 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 		return list;
 	}
+
+	private IPlayerMatchStats getBestMatch(IPlayerRating pmr) {
+		Float currentWeightingFactor = 0f;
+		IPlayerMatchStats retval = null;
+		// cycle through all of the ratingComponents and pick the one with the highest comp weighting factor
+		for (RatingComponent rc: pmr.getRatingComponents()) {
+			IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
+			IMatchGroup m = mf.get(pms.getMatchId());
+			IRound r = rf.get(m.getRoundId());
+			ICompetition c = cf.get(r.getCompId());
+
+			if (c.getWeightingFactor() > currentWeightingFactor) {
+				retval = pms;
+				currentWeightingFactor = c.getWeightingFactor();
+			}
+		}		
+		
+		return retval;
+	}
+
 
 	private Long getCompId(TopTenSeedData tti) {
 		if (tti.getCompId() != null && !tti.getCompId().equals(-1L)) {
