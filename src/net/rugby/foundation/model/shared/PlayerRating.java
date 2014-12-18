@@ -104,7 +104,13 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		@Unindexed
 		protected float unscaledRating;
 
-	
+		protected float offence;
+		protected float defence;
+		protected float setPlay;
+		protected float loosePlay;
+		protected float discipline;
+		protected float matchResult;
+		
 		public Long getId() {
 			return id;
 		}
@@ -209,6 +215,58 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 
 		public String getStatsDetails() {
 			return statsDetails;
+		}
+
+		public float getOffence() {
+			return offence;
+		}
+
+		public void setOffence(float offence) {
+			this.offence = offence;
+		}
+
+		public float getDefence() {
+			return defence;
+		}
+
+		public void setDefence(float defence) {
+			this.defence = defence;
+		}
+
+		public float getSetPlay() {
+			return setPlay;
+		}
+
+		public void setSetPlay(float setPlay) {
+			this.setPlay = setPlay;
+		}
+
+		public float getLoosePlay() {
+			return loosePlay;
+		}
+
+		public void setLoosePlay(float loosePlay) {
+			this.loosePlay = loosePlay;
+		}
+
+		public float getDiscipline() {
+			return discipline;
+		}
+
+		public void setDiscipline(float discipline) {
+			this.discipline = discipline;
+		}
+
+		public float getMatchResult() {
+			return matchResult;
+		}
+
+		public void setMatchResult(float matchResult) {
+			this.matchResult = matchResult;
+		}
+
+		public void setRatingDetails(String ratingDetails) {
+			this.ratingDetails = ratingDetails;
 		}
 		
 		

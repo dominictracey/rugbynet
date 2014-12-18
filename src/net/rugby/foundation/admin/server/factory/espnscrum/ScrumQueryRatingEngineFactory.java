@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
 import net.rugby.foundation.admin.server.model.ScrumQueryRatingEngineV100;
 import net.rugby.foundation.admin.shared.IV1EngineWeightValues;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
@@ -18,6 +19,7 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -40,11 +42,13 @@ public class ScrumQueryRatingEngineFactory
 	private IPlayerRatingFactory prf;
 	private IMatchResultFactory mrf;
 	private IRawScoreFactory rsf;
+	private ITeamGroupFactory tgf;
+	private ICountryFactory cnf;
 
 	@Inject
 	public ScrumQueryRatingEngineFactory(IPlayerFactory pf, IMatchGroupFactory mgf, ITeamMatchStatsFactory tmsf, 
 			IRoundFactory rf, IStandingFactory sf, IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, ICompetitionFactory cf, 
-			IPlayerRatingFactory prf, IMatchResultFactory mrf, IRawScoreFactory rsf) {
+			IPlayerRatingFactory prf, IMatchResultFactory mrf, IRawScoreFactory rsf, ITeamGroupFactory tgf, ICountryFactory cnf) {
 		this.pf = pf;
 		this.tmsf = tmsf;
 		this.mgf = mgf;
@@ -56,12 +60,14 @@ public class ScrumQueryRatingEngineFactory
 		this.prf = prf;
 		this.mrf = mrf;
 		this.rsf = rsf;
+		this.tgf = tgf;
+		this.cnf = cnf;
 	}
 	
 	@Override
 	public IQueryRatingEngine get(IRatingEngineSchema schema, IRatingQuery rq) {
 		if (schema instanceof IV1EngineWeightValues) {
-			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf, mrf, rsf);
+			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf, mrf, rsf, cnf, tgf);
 			
 		} 
 		
@@ -71,7 +77,7 @@ public class ScrumQueryRatingEngineFactory
 	@Override
 	public IQueryRatingEngine get(IRatingEngineSchema schema) {
 		if (schema instanceof IV1EngineWeightValues) {
-			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf,mrf, rsf);
+			return new ScrumQueryRatingEngineV100(pf, mgf, prf, rf, sf, pmsf, tmsf, rqf, cf,mrf, rsf, cnf, tgf);
 		} 
 		
 		return null;
