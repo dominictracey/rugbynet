@@ -43,15 +43,15 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 	public IRatingSeries build(IRatingSeries rs)
 	{
 		try {
-			if (rs.getCompIds() != null && !rs.getCompIds().isEmpty()) {
-				assert(rs.getComps() != null);
-				if (!rs.getComps().isEmpty()) {
-					rs.getComps().clear();
-				}
-				for (Long cid : rs.getCompIds()) {
-					rs.getComps().add(cf.get(cid));
-				}
-			}
+//			if (rs.getCompIds() != null && !rs.getCompIds().isEmpty()) {
+//				assert(rs.getComps() != null);
+//				if (!rs.getComps().isEmpty()) {
+//					rs.getComps().clear();
+//				}
+//				for (Long cid : rs.getCompIds()) {
+//					rs.getComps().add(cf.get(cid));
+//				}
+//			}
 			
 			if (rs.getCountryIds() != null && !rs.getCountryIds().isEmpty()) {
 				assert (rs.getCountries() != null);

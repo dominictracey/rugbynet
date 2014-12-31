@@ -98,6 +98,8 @@ public class TriesScoredNotesCreator implements INotesCreator {
 						} else if (tries > 3) {
 							note.setTemplateSelector("MT");
 						}
+						
+						note.setTeamId(stats.get(0).getTeamId());
 
 						// the context of scoring tries is a match
 						RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();

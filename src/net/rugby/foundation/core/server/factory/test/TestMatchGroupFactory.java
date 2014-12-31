@@ -297,5 +297,13 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 	}
 
 
+	@Override
+	protected List<IMatchGroup> getMatchesForVirualCompFromPersistentDatastore(
+			int ordinal, Long virtualCompId) {
+		// @REX implement
+		return null;
+	}
+
+
 
 }

@@ -21,6 +21,7 @@ import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.ISponsorFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
@@ -41,13 +42,10 @@ import net.rugby.foundation.core.server.factory.ofy.OfyRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRawScoreFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfySponsorFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyStandingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.test.TestRatingGroupFactory;
-import net.rugby.foundation.core.server.factory.test.TestRatingMatrixFactory;
-import net.rugby.foundation.core.server.factory.test.TestRatingSeriesFactory;
-import net.rugby.foundation.core.server.factory.test.TestRawScoreFactory;
 import net.rugby.foundation.model.shared.IContent;
 
 import com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet;
@@ -84,6 +82,7 @@ public class CoreMainModule extends AbstractModule {
 		bind(IRatingMatrixFactory.class).to(OfyRatingMatrixFactory.class);
 		bind(IRatingSeriesManager.class).to(RatingSeriesManager.class);
 		bind(IPlaceFactory.class).to(OfyPlaceFactory.class);
+		bind(ISponsorFactory.class).to(OfySponsorFactory.class);
 	}
 }
 

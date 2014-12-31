@@ -413,7 +413,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		list.setList(new ArrayList<ITopTenItem>());
 		list.setItemIds(new ArrayList<Long>());
 		list.setQueryId(tti.getQueryId());
-
+		list.setSponsorId(tti.getSponsorId());
 
 		// if this is a series generated query we set it up a little differently since it doesn't participate in the publish chain
 		IRatingQuery rq = rqf.get(tti.getQueryId());
@@ -422,6 +422,19 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			list.setRoundOrdinal(rq.getRatingMatrix().getRatingGroup().getUniversalRoundOrdinal());
 		} else {
 			list.setSeries(false);
+			// set the list's round ordinal from the latest of the component rounds not in the future
+			int current = urf.getCurrent().ordinal;
+			int uro = -1;
+			for (Long rid : tti.getRoundIds()) {
+				IRound r = rf.get(rid);
+				if (urf.get(r).ordinal > uro) {
+					uro = urf.get(r).ordinal;
+				}
+				if (uro == current) {
+					break; // go no further
+				}
+			}
+			list.setRoundOrdinal(uro);
 		}
 
 		buildTwitterDescription(list, rq);
@@ -473,14 +486,21 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					//String matchReportLink, String teamName, ITopTenList parent)
 
 					ITopTenItem item = new TopTenItem(count+1,null, pmr.getPlayerId(), pmr.getPlayer(), "",
-							"", null, null, true, match.getForeignUrl(), team.getDisplayName(), team.getId(), pms.getPosition(), list,
+							"", null, null, true, null, team.getDisplayName(), team.getId(), pms.getPosition(), list,
 							pmr.getId(), pmr.getRating(), null);
 					put(item);  // get id for guid hashing
 					IServerPlace p = spf.create();
 					item.setPlaceGuid(p.getGuid());
-					spf.buildItem(p,item);
-					if (!list.getSeries())
+					if (list.getSeries()) {
+						spf.buildItem(p,item);
+					} else {
+						p.setCompId(list.getCompId());
+						p.setListId(list.getId());
+						p.setItemId(null);
+						p.setType(PlaceType.FEATURE);
+						spf.put(p);  
 						list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
+					}
 					put(item);
 					list.getList().add(item);
 					list.getItemIds().add(item.getId());
@@ -504,8 +524,18 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 		// create the place guid
 		IServerPlace p = spf.create();
-		spf.buildList(p,list);
-		list.setGuid(p.getGuid());
+		if (list.getSeries()) {
+			spf.buildList(p,list);
+			list.setGuid(p.getGuid());
+		} else {
+			// and create a feature guid
+			p.setCompId(list.getCompId());
+			p.setListId(list.getId());
+			p.setItemId(null);
+			p.setType(PlaceType.FEATURE);
+			spf.put(p);  
+			list.setGuid(p.getGuid());
+		}
 
 		// save the items
 		put(list);
@@ -552,6 +582,19 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		list.setSeries(false);
 		list.setFeatureGuid(p.getGuid());
 		put(list);
+		
+		// now add the per-item guids to point to the feature as well
+		for (ITopTenItem item : list.getList()) {
+			
+			IServerPlace ip = spf.create();
+			ip.setCompId(list.getCompId());
+			ip.setListId(list.getId());
+			ip.setItemId(item.getId());
+			ip.setType(PlaceType.FEATURE);
+			spf.put(ip); 
+			item.setFeatureGuid(ip.getGuid());
+			put(item);
+		}
 		
 		return p;
 	}
@@ -951,7 +994,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Scan of TTL for comp " + compId + " discovered bad nextId for TTL " + prev.getId() + ". The TTL who points to it with it's prevId is TTL " + cursor.getId() + " but the nextId for this TTL is " + prev.getNextId() + ".");
 					retval = false;
 				}
-				cursor = prev;
+				if (!cursor.getId().equals(prev.getId())) {
+					cursor = prev;
+				} else {
+					return false; // otherwise infinite loopage
+				}
 			}
 		}
 

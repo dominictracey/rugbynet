@@ -24,20 +24,15 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Transient protected List<ITopTenItem> list;
 	@Unindexed
 	protected List<Long> itemIds;
-	@Unindexed
 	protected Date created;
-	@Unindexed
 	protected Date published;
 	protected Date expiration;
-	@Unindexed
 	protected int roundOrdinal;
 	protected Boolean live;
 	protected Boolean series;
 	@Unindexed
 	protected String summary;
-	@Unindexed
 	protected Long editorId;
-	@Unindexed
 	protected String pipeLineId;
 	@Unindexed
 	protected String title;
@@ -56,6 +51,8 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected String twitterDescription;
 	protected String guid;
 	protected String featureGuid;
+	
+	protected Long sponsorId;
 	
 	// because these can be greater than 500 chars we keep them in a separate table
 //	protected Long notesId;
@@ -297,22 +294,6 @@ public class TopTenList  implements Serializable, ITopTenList {
 	public void setGuid(String guid) {
 		this.guid = guid;
 	}
-//	@Override
-//	public Long getNotesId() {
-//		return notesId;
-//	}
-//	@Override
-//	public void setNotesId(Long notesId) {
-//		this.notesId = notesId;
-//	}
-//	@Override
-//	public String getNotes() {
-//		return notes;
-//	}
-//	@Override
-//	public void setNotes(String notes) {
-//		this.notes = notes;
-//	}
 	@Override
 	public String getFeatureGuid() {
 		return featureGuid;
@@ -320,6 +301,14 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setFeatureGuid(String featureGuid) {
 		this.featureGuid = featureGuid;
+	}
+	@Override
+	public Long getSponsorId() {
+		return sponsorId;
+	}
+	@Override
+	public void setSponsorId(Long sponsorId) {
+		this.sponsorId = sponsorId;
 	}
 
 }

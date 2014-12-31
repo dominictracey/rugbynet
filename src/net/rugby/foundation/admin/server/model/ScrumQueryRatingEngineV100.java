@@ -116,6 +116,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	private ICountryFactory cnf;
 	private ITeamGroupFactory tgf;
 
+	protected List<Long> roundPruneList = new ArrayList<Long>();
+	
 	public ScrumQueryRatingEngineV100() {
 
 	}
@@ -824,7 +826,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				if (iter.hasNext()) {
 					IPlayerRating pr = iter.next();
 
-					finalizeRatingComponents(pr, playerScoreMap.get(pr.getPlayerId()));  // the stuff we are going to display to the endusers
+					//finalizeRatingComponents(pr, playerScoreMap.get(pr.getPlayerId()));  // the stuff we are going to display to the endusers
 
 					StringBuilder sb = new StringBuilder();
 					sb.append(playerScoreMap.get(pr.getPlayerId()).get(0).getPlayerMatchStats().getName() + "\nMatch\tScore\tUnscaled\tScaled\tMatch Aged\tStandings\tCompetition\n-----------------------------------------------------------\n");
@@ -866,6 +868,12 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 			// mark query complete
 			query.setStatus(Status.COMPLETE);
+			
+			// also pull out any rounds that didn't have any stats
+			for (Long rid : roundPruneList) {
+				query.getRoundIds().remove(rid);
+			}
+			
 			rqf.put(query);
 		} catch (Exception e) {
 			// mark query errored out
@@ -877,27 +885,29 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 	}
 
-	private void finalizeRatingComponents(IPlayerRating pr, List<IPlayerStatShares> list) {
-		for (RatingComponent rc: pr.getRatingComponents()) {
-			PlayerStatShares c = null;
-			for (IPlayerStatShares share : list) {
-				if (rc.getPlayerMatchStatsId().equals(share.getPlayerMatchStats().getId())) {
-					c = (PlayerStatShares)share;
-					break;
-				}
-			}
-
-			if (c != null) {
-				rc.setOffence(c.tries + c.tryAssists + c.points + c.runs + c.passes + c.kicks + c.metersRun + c.cleanBreaks + c.defendersBeaten + c.offloads + c.turnovers);
-				rc.setDefence(c.tacklesMade + c.tacklesMissed);
-				rc.setSetPlay(c.scrumShare + c.scrumLost + c.scrumStolen + c.lineoutLost + c.lineoutShare + c.lineoutsStolenOnOppThrow + c.lineoutStolen + c.lineoutsWonOnThrow);
-				rc.setLoosePlay(c.ruckLost + c.ruckShare + c.ruckShare + c.maulLost + c.maulShare + c.maulStolen);
-				rc.setDiscipline(c.penaltiesConceded + c.yellowCards + c.redCards);
-				rc.setMatchResult(c.win + c.pointDifferential + c.minutesShare);
-			}
-		}
-
-	}
+	// *** THIS DOESN'T WORK BECAUSE THE PSS ISN'T POPULATED ONCE A RAWRATING IS CREATED FOR IT - PROBABLY WANT TO JUST CREATE A getPlayerMatchStats() FOR THE
+	// ***		ENDUSER CLIENTS TO MAP TO CHARTS WHEN THEY LOOK AT MATCH-LEVEL DETAIL
+//	private void finalizeRatingComponents(IPlayerRating pr, List<IPlayerStatShares> list) {
+//		for (RatingComponent rc: pr.getRatingComponents()) {
+//			PlayerStatShares c = null;
+//			for (IPlayerStatShares share : list) {
+//				if (rc.getPlayerMatchStatsId().equals(share.getPlayerMatchStats().getId())) {
+//					c = (PlayerStatShares)share;
+//					break;
+//				}
+//			}
+//
+//			if (c != null) {
+//				rc.setOffence(c.tries + c.tryAssists + c.points + c.runs + c.passes + c.kicks + c.metersRun + c.cleanBreaks + c.defendersBeaten + c.offloads + c.turnovers);
+//				rc.setDefence(c.tacklesMade + c.tacklesMissed);
+//				rc.setSetPlay(c.scrumShare + c.scrumLost + c.scrumStolen + c.lineoutLost + c.lineoutShare + c.lineoutsStolenOnOppThrow + c.lineoutStolen + c.lineoutsWonOnThrow);
+//				rc.setLoosePlay(c.ruckLost + c.ruckShare + c.ruckShare + c.maulLost + c.maulShare + c.maulStolen);
+//				rc.setDiscipline(c.penaltiesConceded + c.yellowCards + c.redCards);
+//				rc.setMatchResult(c.win + c.pointDifferential + c.minutesShare);
+//			}
+//		}
+//
+//	}
 
 	protected void getStandingFactorForMatch(IMatchGroup m) {
 		IRound r = rf.get(m.getRoundId());
@@ -919,7 +929,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		Float standingsFactor = 1F;
 		if (found) {
-			standingsFactor =  1F / (float)(Math.sqrt(sTot-2F)) + .43F;
+			//standingsFactor =  1F / (float)(Math.sqrt(sTot-2F)) + .43F;
+			standingsFactor =  1F / (float)(Math.sqrt(sTot)) + .5F;  // updated based on conversations of 12/29/2014 to be flatter at the top end
 		}
 
 		standingsFactorMap.put(m.getId(), standingsFactor);
@@ -961,6 +972,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			} else {
 				tmsVisitMap.put(ts.getMatchId(), ts);
 			}
+			
 		}
 
 		return true;
@@ -1132,6 +1144,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	public boolean setQuery(IRatingQuery q) {
 		this.query = q;
 		boolean retval = false;
+		roundPruneList.addAll(q.getRoundIds()); // we will knock these off as we find stats from them, then at the end, update the query to take out any empty rounds
 		List<IPlayerMatchStats> pmsl = pmsf.query(q);
 		if (pmsl != null && !pmsl.isEmpty()) {
 			retval = addPlayerStats(pmsl);
@@ -1147,6 +1160,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		if (!matchLabelMap.containsKey(pms.getMatchId())) {
 			IMatchGroup m = mf.get(pms.getMatchId());
 			IRound r = rf.get(m.getRoundId());
+			// we need to prune our round list as well
+			if (roundPruneList.contains(r.getId())) {
+				roundPruneList.remove(r.getId());
+			}
 			ICompetition c = cf.get(r.getCompId());
 			int hScore = 0;
 			int vScore = 0;
@@ -1190,8 +1207,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		if (rq.getCompIds() != null && !rq.getCompIds().isEmpty()) {
 			retval += "Comps: ";
 			for (Long compId : rq.getCompIds()) {
-				ICompetition c = cf.get(compId);
-				retval += c.getAbbr() + " ";
+				if (compId != -1) {
+					ICompetition c = cf.get(compId);
+					retval += c.getAbbr() + " ";
+				}
 			}
 		}
 

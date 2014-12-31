@@ -66,7 +66,7 @@ public class EditTTLInfo extends DialogBox {
 	@UiField Button cancel;
 	@UiField TextArea description;
 	@UiField TextBox title;
-	@UiField ListBox playersPerTeam;
+//	@UiField ListBox playersPerTeam;
 	@UiField HTMLPanel twitterHandles;
 	
 	Map<IPlayer,TextBox> twitterDictionary = new HashMap<IPlayer,TextBox>();
@@ -78,7 +78,7 @@ public class EditTTLInfo extends DialogBox {
 	void onClickSave(ClickEvent e) {
 		v.setTitle(title.getText());
 		v.setDescription(description.getText());
-		numPlayersPerTeam = playersPerTeam.getSelectedIndex()+1;
+		numPlayersPerTeam = 10;// playersPerTeam.getSelectedIndex()+1;
 		v.setPlayersPerTeam(numPlayersPerTeam);
 		listener.saveTTIText(v);
 	}

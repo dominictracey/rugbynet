@@ -67,23 +67,24 @@
 
 				<g:ListBox ui:field="team" multipleSelect="true" />
 			</g:HTMLPanel>
-			<g:VerticalPanel>
-				<g:HorizontalPanel>
+<!-- 			<g:VerticalPanel> -->
+<!-- 				<g:HorizontalPanel> -->
 					<b:ButtonGroup dataToggle="BUTTONS">
-						<b:CheckBoxButton ui:field="timeSeries">Time Series</b:CheckBoxButton>
+						<b:CheckBoxButton ui:field="timeSeries"/>
 					</b:ButtonGroup>
+
 					<b:Button ui:field="query">Query</b:Button>
 					<b:Button ui:field="clear">Clear</b:Button>
 					<b:Button ui:field="delete">Delete</b:Button>
 					<b:Button ui:field="topTen">Create Top Ten List</b:Button>
-				</g:HorizontalPanel>
+<!-- 				</g:HorizontalPanel> -->
 				<g:VerticalPanel>
 					<b:CheckBox ui:field="scaleTime">Scale for Match Age</b:CheckBox>
 					<b:CheckBox ui:field="scaleComp">Scale for Comp Weight</b:CheckBox>
 					<b:CheckBox ui:field="scaleStanding">Scale for Standings</b:CheckBox>
 				</g:VerticalPanel>
 
-			</g:VerticalPanel>
+<!-- 			</g:VerticalPanel> -->
 		</g:HorizontalPanel>
 
 		<g:SimplePanel styleName="{style.jobArea}" ui:field="jobArea">

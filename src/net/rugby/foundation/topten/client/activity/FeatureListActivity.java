@@ -87,19 +87,21 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 									}
 									Core.getCore().setCurrentRoundOrdinal(ttl.getRoundOrdinal(), false);
 									
+									refreshButtons(login, ttl);
+									
+									_panel.setWidget(view.asWidget());
+
+									setURL();
+
+									// show facebook comments				
+									clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + ttl.getGuid() + "/");
+									
 								} else {
 									Window.alert("Failed to fetch top ten list.");
 									view.setList(null,"");
 								}
 
-								refreshButtons(login, ttl);
-								
-								_panel.setWidget(view.asWidget());
 
-								setURL();
-
-								// show facebook comments				
-								clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + ttl.getGuid() + "/");
 							}
 
 						});

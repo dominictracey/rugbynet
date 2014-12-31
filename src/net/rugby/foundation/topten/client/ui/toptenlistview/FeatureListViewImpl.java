@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
@@ -20,6 +21,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -72,6 +74,8 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	@UiField Button publish;
 	@UiField Button promote;
 	
+	@UiField Div redittLink;
+	
 	ITopTenList list = null;
 
 	
@@ -101,7 +105,8 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 		
 		sponsorRow.addStyleName("sponsor");
 		
-		compCol.addStyleName("comp-logo");
+		compCol.setStylePrimaryName("comp-logo");
+		compCol.addStyleName("col-xs-3");
 		sponsorCol.addStyleName("sponsor-logo");
 		compSpacer.setHeight("38px");
 		sponsorSpacer.setHeight("38px");
@@ -111,6 +116,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 
 	private ClientFactory clientFactory;
 	private FeatureListViewPresenter presenter;
+	protected String currentCompStyle = "";
 	
 	@Override
 	public void setList(ITopTenList result, String baseUrl) {
@@ -131,7 +137,49 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 			featureBody.add(body);
 			
 			featuredTTL.add(clientFactory.getSimpleView());
-			listTitle.setHTML("<center><h5>"+list.getTitle()+"</h5></center>");			
+			listTitle.setHTML("<center><h5>"+list.getTitle()+"</h5></center>");	
+			
+			if (list.getCompId() != null) {
+				Core.getCore().getComp(list.getCompId(), new AsyncCallback<ICompetition>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						if (!currentCompStyle.isEmpty()) {
+							compCol.setStyleDependentName(currentCompStyle, false);
+						}
+						compCol.setStyleDependentName("NON", true);
+						currentCompStyle = "NON";
+					}
+
+					@Override
+					public void onSuccess(ICompetition result) {
+						// remove any style we already have before adding the new one
+						if (!currentCompStyle.isEmpty()) {
+							compCol.setStyleDependentName(currentCompStyle, false);
+						}
+						if (result.getAbbr() == null || result.getAbbr().isEmpty()) {
+							compCol.setStyleDependentName("NON", true);
+							currentCompStyle = "NON";
+						} else {
+							compCol.setStyleDependentName(result.getAbbr(), true);
+							currentCompStyle = result.getAbbr();
+						}
+					}
+
+				});
+			}
+			
+			// from  http://www.reddit.com/buttons/
+			// couldn't get the script to fire in the minute or so I played with it.
+//			redittLink.clear();
+//			redittLink.add(new HTML("<script type=\"text/javascript\">" +
+//			  "reddit_url = \"//www.reddit.com/buttons\"; " +
+//			  "reddit_title = \"Buttons!\"; " +
+//			  "reddit_bgcolor = \"FF3\"; " +
+//			  "reddit_bordercolor = \"00F\"; " +
+//			  "reddit_target=\"/r/rugbyunion\"; " +
+//			  "</script>" +
+//			  "<script type=\"text/javascript\" src=\"//www.redditstatic.com/button/button3.js\"></script>"));
 			if (list.getLive()) {
 				publish.setText("Unpublish");
 			} else {

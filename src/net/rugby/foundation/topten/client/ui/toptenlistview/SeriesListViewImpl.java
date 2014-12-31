@@ -3,10 +3,13 @@ package net.rugby.foundation.topten.client.ui.toptenlistview;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
@@ -30,6 +33,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -134,15 +138,14 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 		criteriaGroup.setVisible(false);
 		seriesHeader.setPaddingBottom(5);
-//		seriesHeader.addStyleName("center");
 		
-		sponsorTag.setHTML("<center>delivered by DHL</center>");
-		sponsorTag.addStyleName("font-size:.5em");
-		
+		sponsorTag.addStyleName("font-size:.5em");	
 		sponsorRow.addStyleName("sponsor");
 		
-		compCol.addStyleName("comp-logo");
-		sponsorCol.addStyleName("sponsor-logo");
+		compCol.setStylePrimaryName("comp-logo");
+		compCol.addStyleName("col-xs-3");
+		sponsorCol.setStylePrimaryName("sponsor-logo");
+		sponsorCol.addStyleName("col-xs-3");
 		compSpacer.setHeight("38px");
 		sponsorSpacer.setHeight("38px");
 		dropdownCol.addStyleName("sponsor-buttons");
@@ -358,12 +361,40 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		return compId;
 	}
 
+	protected String currentCompStyle = "";
 	@Override
 	public void setCompId(Long compId) {
 		if (compId != this.compId) {
 			this.compId = compId;
 			ratingModesSet = false;
 			// @REX clear everything else?
+			Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					if (!currentCompStyle.isEmpty()) {
+						compCol.setStyleDependentName(currentCompStyle, false);
+					}
+					compCol.setStyleDependentName("NON", true);
+					currentCompStyle = "NON";
+				}
+
+				@Override
+				public void onSuccess(ICompetition result) {
+					// remove any style we already have before adding the new one
+					if (!currentCompStyle.isEmpty()) {
+						compCol.setStyleDependentName(currentCompStyle, false);
+					}
+					if (result.getAbbr() == null || result.getAbbr().isEmpty()) {
+						compCol.setStyleDependentName("NON", true);
+						currentCompStyle = "NON";
+					} else {
+						compCol.setStyleDependentName(result.getAbbr(), true);
+						currentCompStyle = result.getAbbr();
+					}
+				}
+				
+			});
 			presenter.process(getPlace());
 		}
 	}
@@ -403,6 +434,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		return list;
 	}
 
+	private String currentSponsorStyle = "";
 	@Override
 	public void setList(ITopTenList list) {
 		this.list = list;
@@ -421,6 +453,37 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			} else {
 				createFeature.setText("Create Feature");
 			}
+			
+			clientFactory.getSponsorForList(list, new AsyncCallback<ISponsor>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess(ISponsor result) {
+					
+					
+					// remove any style we already have before adding the new one
+					if (!currentSponsorStyle.isEmpty()) {
+						sponsorCol.setStyleDependentName(currentSponsorStyle, false);
+					}
+					if (result == null || result.getAbbr() == null || result.getAbbr().isEmpty()) {
+						sponsorCol.setStyleDependentName("NON", true);
+						currentSponsorStyle = "NON";
+						sponsorTag.setHTML("");
+					} else {
+						sponsorCol.setStyleDependentName(result.getAbbr(), true);
+						currentSponsorStyle = result.getAbbr();
+						sponsorTag.setHTML("<center>"+ result.getTagline() + "</center>");
+					}
+					
+				}
+				
+			});
+			
 		}
 	}
 

@@ -55,6 +55,13 @@ public class Competition implements Serializable, ICompetition {
 	List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
 	private CompetitionType compType;
 	
+	private Long sponsorId;
+	@Transient
+	private Sponsor sponsor;
+	
+	@Transient
+	private List<Long> componentCompIds = new ArrayList<Long>();
+	
 	public Long getCompClubhouse() {
 		return compClubhouse;
 	}
@@ -429,6 +436,30 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setTTLTitleDesc(String tTLTitleDesc) {
 		this.tTLTitleDesc = tTLTitleDesc;
+	}
+	@Override
+	public Long getSponsorId() {
+		return sponsorId;
+	}
+	@Override
+	public void setSponsorId(Long sponsorId) {
+		this.sponsorId = sponsorId;
+	}
+	@Override
+	public Sponsor getSponsor() {
+		return sponsor;
+	}
+	@Override
+	public void setSponsor(Sponsor sponsor) {
+		this.sponsor = sponsor;
+	}
+	@Override
+	public List<Long> getComponentCompIds() {
+		return componentCompIds;
+	}
+	@Override
+	public void setComponentCompIds(List<Long> componentCompIds) {
+		this.componentCompIds = componentCompIds;
 	}
 
 

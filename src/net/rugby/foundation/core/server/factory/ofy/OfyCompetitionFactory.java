@@ -116,6 +116,15 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 		// populate the seriesMap
 		c.setSeriesMap(rsf.getModesForComp(id));
 		
+		// and the component competitions for virtual comps
+		for (Long sid : c.getSeriesMap().values()) {
+			IRatingSeries rs = rsf.get(sid);
+			for (Long cid : rs.getCompIds())	
+			if (!c.getComponentCompIds().contains(cid)) {
+				c.getComponentCompIds().add(cid);
+			}
+		}
+		
 		return c;
 	}
 

@@ -104,6 +104,8 @@ public class TacklesNotesCreator implements INotesCreator {
 				} else {
 					note.setTemplateSelector("TTP2");
 				}
+				
+				note.setTeamId(stats.get(0).getTeamId());
 
 				ITopTenList ttl = ttlf.get(rq.getTopTenListId());
 				if (ttl != null) {

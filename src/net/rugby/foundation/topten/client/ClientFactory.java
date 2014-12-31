@@ -9,6 +9,7 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.ui.content.ContentView;
 import net.rugby.foundation.topten.client.ui.content.EditContent;
@@ -92,4 +93,8 @@ public interface ClientFactory {
 	void setTTLName(Long nextId, Anchor nextLabel);
 
 	void showFacebookComments(String url);
+
+	String getTeamLogoStyle(Long teamId);
+	
+	void getSponsorForList(ITopTenList list, AsyncCallback<ISponsor> cb);
 }

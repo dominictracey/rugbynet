@@ -19,6 +19,7 @@ import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -59,6 +60,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private IPlaceFactory spf;
 	private INoteFactory nf;
 	private IPlayerFactory pf;
+	private ITeamGroupFactory tgf;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -69,7 +71,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	@Inject
 	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf,
 			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IPlaceFactory spf,
-			INoteFactory nf, IPlayerFactory pf) {
+			INoteFactory nf, IPlayerFactory pf, ITeamGroupFactory tgf) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
@@ -82,6 +84,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			this.spf = spf;
 			this.nf = nf;
 			this.pf = pf;
+			this.tgf = tgf;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 		}
@@ -516,6 +519,16 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	public List<Feature> getLatestFeatures() {
 		try {
 			return ttlf.getLatestFeatures();
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public HashMap<Long, String> getTeamLogoStyleMap() {
+		try {
+			return tgf.getTeamLogoStyleMap();
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

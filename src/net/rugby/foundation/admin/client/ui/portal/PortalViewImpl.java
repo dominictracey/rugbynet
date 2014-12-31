@@ -23,6 +23,8 @@ import net.rugby.foundation.model.shared.Position.position;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.CheckBoxButton;
+import org.gwtbootstrap3.client.ui.constants.Toggle;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -114,7 +116,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 		scaleComp.setValue(true);
 		scaleTime.setValue(true);
 		scaleStanding.setValue(true);
-
+		timeSeries.setText("Multi Round");
 	}
 
 
@@ -261,6 +263,8 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 	@Override
 	public void setPositions(List<position> result) {
+		pos.clear();
+		
 		for (position posi: result) {
 			pos.addItem(posi.toString());
 		}
@@ -269,6 +273,8 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 	@Override
 	public void setCountries(List<ICountry> result) {
+		country.clear();
+		
 		for (ICountry c: result) {
 			country.addItem(c.getName(), c.getId().toString());
 		}
@@ -351,7 +357,8 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 			compId = compIds.get(0);
 		}
 
-		TopTenSeedData data = new TopTenSeedData(rq.getId(), "", "", compId, roundIds, playersPerTeam);
+		// @REX sponsorId is null for now. Need to add in Sponsor UI
+		TopTenSeedData data = new TopTenSeedData(rq.getId(), "", "", compId, roundIds, playersPerTeam, null);
 
 		listener.createTopTenList(data);
 
@@ -503,7 +510,10 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 	@UiHandler("timeSeries")
 	void onTimeSeriesClick(ClickEvent e) {
-		setTimeSeries(!timeSeries.isActive()); 
+
+		timeSeries.setActive(!timeSeries.isActive());
+
+		setTimeSeries(timeSeries.isActive()); 
 	}
 	
 	private void setTimeSeries(boolean timeSeriesOn) {

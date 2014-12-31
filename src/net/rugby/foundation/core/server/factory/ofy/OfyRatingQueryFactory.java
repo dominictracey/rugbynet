@@ -20,15 +20,19 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingQuery;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRatingQueryFactory {
 
 	private IPlayerRatingFactory prf;
+	private ITopTenListFactory ttlf;
 
 	@Inject 
-	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf, IRatingSeriesFactory rsf) {
+	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf, IRatingSeriesFactory rsf, ITopTenListFactory ttlf) {
 		super(rsf);
 		this.prf = pmrf;
+		this.ttlf = ttlf;
 	}
 	
 	@Override
@@ -81,12 +85,21 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 	protected boolean deleteFromPersistentDatastore(IRatingQuery rq) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			ofy.delete(rq);
+
 			
-			// don't delete the TTLs in here so we don't drop the feature TTLs when we delete a series.
+			// delete any TTLs associated with the RQ
+			if (rq.getTopTenListId() != null) {
+				ITopTenList ttl = ttlf.get(rq.getTopTenListId());
+				if (ttl != null) {
+					ttlf.delete(ttl);
+				}
+			}
 			
 			// also delete all the PMRs associated with this query
 			prf.deleteForQuery(rq);
+			
+			ofy.delete(rq);
+			
 			return true;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);

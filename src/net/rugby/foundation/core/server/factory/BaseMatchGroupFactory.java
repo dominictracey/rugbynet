@@ -32,10 +32,11 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 	protected ITeamMatchStatsFactory tmsf;
 	protected IPlayerMatchStatsFactory pmsf;
 	protected IPlayerRatingFactory prf;
-	
+	protected ICompetitionFactory cf;
+
 	@Inject
 	protected void setFactories(IMatchResultFactory mrf, ITeamGroupFactory tf, IRoundFactory rf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf,
-			IPlayerRatingFactory prf) {
+			IPlayerRatingFactory prf, ICompetitionFactory cf) {
 
 		this.tf = tf;
 		this.mrf = mrf;
@@ -43,6 +44,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 		this.tmsf = tmsf;
 		this.pmsf = pmsf;
 		this.prf = prf;
+		this.cf = cf;
 	}
 
 	@Override
@@ -52,7 +54,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Don't call put(null), call create()");
 				return null;  
 			}
-			
+
 			if (g.getHomeTeam() == null || g.getVisitingTeam() == null) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Illegal call to put() with teams not set properly");
 				return null; 			}
@@ -60,21 +62,21 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 			if (g.getHomeTeam().getId() == null) {
 				tf.put(g.getHomeTeam());
 			}
-			
+
 			if (g.getVisitingTeam().getId() == null) {
 				tf.put(g.getVisitingTeam());
 			}
 
 			((MatchGroup)g).setHomeTeamId(g.getHomeTeam().getId());
 			((MatchGroup)g).setVisitingTeamId(g.getVisitingTeam().getId());
-			
+
 			// need to retroactively set these 
 			if (g.getWorkflowStatus() == null) {
 				g.setWorkflowStatus(WorkflowStatus.FETCHED);
 			}
-			
+
 			g = super.put(g);
-			
+
 			// force top-level reload
 			if (g.getRoundId() != null) {
 				rf.invalidate(g.getRoundId());
@@ -86,7 +88,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 			return null;
 		}
 	}
-	
+
 	@Override
 	public List<IMatchGroup> getMatchesForRound(Long roundId) {
 		IRound r = rf.get(roundId); 
@@ -97,7 +99,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 			return null;
 		}
 	}
-	
+
 	@Override
 	public boolean delete(IMatchGroup m) {
 		try {
@@ -152,4 +154,30 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 			return false;
 		}
 	}
+
+	final protected String vCompPrefix = "MGF-VCOMP-";
+
+	@Override
+	public List<IMatchGroup> getMatchesForVirualComp(int ordinal, Long virtualCompId) {
+		try {
+			String key = getCacheKey(ordinal,virtualCompId);
+			List<IMatchGroup> matches = super.getList(key);
+
+			if (matches == null) {
+				matches = getMatchesForVirualCompFromPersistentDatastore(ordinal, virtualCompId);
+				super.putList(key, matches);
+			}
+
+			return matches;
+		} 	catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getMatchesForVirualComp", ex);
+			return null;
+		}
+	}
+
+	private String getCacheKey(int ordinal, Long virtualCompId) {
+		return vCompPrefix+virtualCompId+"-"+ordinal;
+	}
+
+	protected abstract List<IMatchGroup> getMatchesForVirualCompFromPersistentDatastore(int ordinal, Long virtualCompId);
 }

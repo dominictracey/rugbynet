@@ -11,6 +11,7 @@ import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
@@ -47,10 +48,11 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	private IUniversalRoundFactory urf;
 	private IRoundFactory rf;
 	private ISeriesConfigurationFactory scf;
+	private ICompetitionFactory cf;
 
 	@Inject
 	public RatingSeriesManager(ISeriesConfigurationFactory scf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IRatingQueryFactory rqf, 
-			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory rsef, IUniversalRoundFactory urf, IRoundFactory rf) {
+			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory rsef, IUniversalRoundFactory urf, IRoundFactory rf, ICompetitionFactory cf) {
 		this.scf = scf;
 		this.rsf = rsf;
 		this.rgf = rgf;
@@ -60,6 +62,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		this.mresf = rsef;
 		this.urf = urf;
 		this.rf = rf;
+		this.cf = cf;
 	}
 
 
@@ -218,7 +221,8 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		try {
 			IRatingSeries rs = rm.getRatingGroup().getRatingSeries();
 
-			for (ICompetition comp : rs.getComps()) {
+			for (Long compId : rs.getCompIds()) {
+				ICompetition comp = cf.get(compId);
 				UniversalRound ur = sc.getTargetRound();
 				if (rm.getCriteria() == Criteria.ROUND) {
 					// we only want the target round

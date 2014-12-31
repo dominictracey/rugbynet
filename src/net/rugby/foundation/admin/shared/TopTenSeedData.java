@@ -18,13 +18,14 @@ public class TopTenSeedData implements Serializable {
 	protected int playersPerTeam = 10;
 	protected List<Long> roundIds;
 	private Long queryId;
+	protected Long sponsorId;
 	
 	public TopTenSeedData() {
 		
 	}
 	
 	public TopTenSeedData(Long queryId, String title,
-			String description, Long compId, List<Long> roundIds, int playersPerTeam) {
+			String description, Long compId, List<Long> roundIds, int playersPerTeam, Long sponsorId) {
 		super();
 		this.setQueryId(queryId);
 		this.title = title;
@@ -32,6 +33,7 @@ public class TopTenSeedData implements Serializable {
 		this.compId = compId;
 		this.playersPerTeam = playersPerTeam;
 		this.roundIds = roundIds;
+		this.sponsorId = sponsorId;
 	}
 
 	public List<IPlayerRating> getPmiList() {
@@ -89,5 +91,13 @@ public class TopTenSeedData implements Serializable {
 
 	public void setContext(String context) {
 		this.context = context;
+	}
+
+	public Long getSponsorId() {
+		return sponsorId;
+	}
+
+	public void setSponsorId(Long sponsorId) {
+		this.sponsorId = sponsorId;
 	}
 }

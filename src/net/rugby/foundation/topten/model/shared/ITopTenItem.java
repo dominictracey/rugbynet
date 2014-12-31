@@ -87,4 +87,8 @@ public interface ITopTenItem {
 
 	String getTweet();
 
+	String getFeatureGuid();
+
+	void setFeatureGuid(String featureGuid);
+
 }

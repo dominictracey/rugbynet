@@ -66,6 +66,7 @@ public class TopTenNotesCreator implements INotesCreator {
 						note.setPlayer1Id(i.getPlayerId());
 						note.setTemplateSelector("TT");
 						note.setLink(i.getPlaceGuid());  // note that we don't use the TTL GUID here
+						note.setTeamId(i.getTeamId());
 						if (mode.equals(RatingMode.BY_COMP)) {
 							note.setType(LinkType.Comp);
 						} else if (mode.equals(RatingMode.BY_COUNTRY)) {

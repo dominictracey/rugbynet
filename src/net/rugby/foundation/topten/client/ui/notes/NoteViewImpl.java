@@ -38,11 +38,11 @@ public class NoteViewImpl<T extends INote> extends Composite implements NoteView
 	@UiField FlexTable noteTable;
 
 	private NoteViewColumnDefinitions<T> columnDefinitions;
-	private List<T> noteList;
+	//private List<T> noteList;
 	private NoteViewPresenter<T> listener;
 
 
-	private ClientFactory clientFactory;
+	//private ClientFactory clientFactory;
 	
 	public NoteViewImpl()
 	{
@@ -50,7 +50,8 @@ public class NoteViewImpl<T extends INote> extends Composite implements NoteView
 		noteTable.getRowFormatter().addStyleName(0, "groupListHeader");
 		noteTable.addStyleName("groupList");
 		noteTable.getCellFormatter().addStyleName(0, 1, "groupListNumericColumn");
-		header.setText("Notes");
+		HTML head = new HTML("<strong>Notes</strong>");
+		header.add(head);
 	}
 
 	@Override
@@ -63,9 +64,10 @@ public class NoteViewImpl<T extends INote> extends Composite implements NoteView
 	@Override
 	public void setNotes(List<T> NoteList) {
 		if (NoteList != null) {
+			//noteList = NoteList;
 			noteTable.removeAllRows();
-			this.noteList = NoteList;
-			String style = "leaderboardRow-odd";
+			//this.noteList = NoteList;
+			String style = "notesRow";
 
 			for (int i = 1; i < NoteList.size()+1; ++i) {
 				T t = NoteList.get(i-1);
@@ -76,11 +78,6 @@ public class NoteViewImpl<T extends INote> extends Composite implements NoteView
 					noteTable.getRowFormatter().setStyleName(i, style);
 
 				}
-				if (style == "leaderboardRow-odd")
-					style = "leaderboardRow-even";
-				else
-					style = "leaderboardRow-odd";
-
 			}
 		}
 	}
@@ -138,7 +135,7 @@ public class NoteViewImpl<T extends INote> extends Composite implements NoteView
 //
 	@Override
 	public void setClientFactory(ClientFactory clientFactory) {
-		this.clientFactory = clientFactory;
+		//this.clientFactory = clientFactory;
 	}
 
 

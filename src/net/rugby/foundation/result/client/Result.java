@@ -1,5 +1,6 @@
 package net.rugby.foundation.result.client;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.gwtbootstrap3.client.ui.Anchor;
@@ -39,11 +40,12 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 	//DateTimeFormat format = DateTimeFormat.getFormat(PredefinedFormat.DATE_SHORT); //"EEE MM-dd hh:mm");   
 	DateTimeFormat format = DateTimeFormat.getFormat("EEE MMM d");   
 
-	private IRound currentRound;
+	private ArrayList<IMatchGroup> currentRound;
 	private int roundIndex;
 	private ICompetition comp;
 	private ResultPanel resultPanel;
 	private boolean drawn = false;
+	private boolean isVirtualComp;
 	
 	public void onModuleLoad() {
 		
@@ -59,35 +61,11 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 	public void compChanged(final Long compId) {
 		rootPanel.clear();
 		
-		resultPanel = new ResultPanel();
-		
-		resultPanel.getLeft_arrow().addClickHandler(new ClickHandler() {
 
-				@Override
-				public void onClick(ClickEvent event) {
-					// scroll everything away to the right with animations!
-					if (roundIndex > 0) {  // don't run off the front
-						Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex-1).getOrdinal(), true);
-					}
-					
-				}
-				
-			});
-		
-		resultPanel.getRight_arrow().addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				// scroll everything away to the left with animations!
-				if (roundIndex < comp.getRounds().size()) {  // don't run off the front
-					Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex+1).getOrdinal(), true);
-				}
-				
-			}
-			
-		});
 		
 		Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
+
+
 
 
 			@Override
@@ -98,7 +76,42 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 
 			@Override
 			public void onSuccess(final ICompetition result) {
+				
 				comp = result;
+				
+				isVirtualComp = comp.getRoundIds().size() < 1;
+				
+				resultPanel = new ResultPanel();
+				
+				resultPanel.getLeft_arrow().addClickHandler(new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent event) {
+							// scroll everything away to the right with animations!
+							if (isVirtualComp) {
+								Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal()-1, true);
+							} else if (roundIndex > 0) {  // don't run off the front
+								Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex-1).getOrdinal(), true);
+							}
+							
+						}
+						
+					});
+				
+				resultPanel.getRight_arrow().addClickHandler(new ClickHandler() {
+
+					@Override
+					public void onClick(ClickEvent event) {
+						// scroll everything away to the left with animations!
+						if (isVirtualComp) {
+							Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal()+1, true);
+						} else if (roundIndex < comp.getRounds().size()) {  // don't run off the front
+							Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex+1).getOrdinal(), true);
+						}
+						
+					}
+					
+				});
 				
 				if (!drawn && Core.getCore().getCurrentRoundOrdinal() != -1) {
 					roundChanged(Core.getCore().getCurrentRoundOrdinal());
@@ -116,34 +129,59 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 
 	@Override
 	public void roundChanged(int ordinal) {
+		String name = "";
 		if (resultPanel.scores != null) {
 			resultPanel.scores.clear();
 			currentRound = null;
-			if (comp != null) {
+			if (comp != null && !isVirtualComp) {
 				Iterator<IRound> it = comp.getRounds().iterator();
 				roundIndex = 0;
 				while (it.hasNext()) {
 					IRound r = it.next();
 					if (r.getUrOrdinal() >= ordinal) {
-						currentRound = r;
+						currentRound = r.getMatches();
+						name = r.getName();
 						break;
 					}
 					roundIndex++;
 				}
+				if (currentRound != null) {
+					addPanels();
+					resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + " " + name + " Results</strong>");
+							
+				}
+			} else {
+				// virtual comp
+				Core.getCore().getResultsForOrdinal(ordinal, comp.getId(), new AsyncCallback<ArrayList<IMatchGroup>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onSuccess(ArrayList<IMatchGroup> result) {
+						currentRound = result;
+						if (currentRound != null) {
+							addPanels();
+							resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + " Results</strong>");
+									
+						}
+						
+					}
+					
+				});
 			}
 		}
 		
-		if (currentRound != null) {
-			addPanels();
-			resultPanel.header.setInnerHTML("<strong>" + comp.getShortName() + " " + currentRound.getName() + " Results</strong>");
-					
-		}
+		
 		
 	}
 	
 	protected void addPanels() {
 		if (currentRound != null) {
-			for (IMatchGroup m : currentRound.getMatches()) {
+			for (IMatchGroup m : currentRound) {
 				String homeScore = "";
 				String visitScore = "";
 				if (m.getSimpleScoreMatchResult() != null) {

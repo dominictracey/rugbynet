@@ -88,7 +88,7 @@ public class RatingSeriesTester {
 		assertTrue(rs != null);
 		assertTrue(rs.getCreated() != null);
 		assertTrue(rs.getUpdated() == null);
-		assertTrue(rs.getComps() != null);
+		//assertTrue(rs.getComps() != null);
 		assertTrue(rs.getCompIds() != null);
 		assertTrue(rs.getCountries() != null);
 		assertTrue(rs.getCountryIds() != null);

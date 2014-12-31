@@ -17,12 +17,14 @@ import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.Round;
 
 public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Serializable,IMatchGroupFactory {
 
@@ -103,18 +105,25 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 
 	@Override
 	public List<? extends IMatchGroup> getMatchesWithPipelines() {
-		Objectify ofy = DataStoreFactory.getOfy();
-		// @REX should we just check the match - don't we need to also cross-check against comp as well?
-		Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("fetchMatchStatsPipelineId !=", null);
-		List<IMatchGroup> list = new ArrayList<IMatchGroup>();
-		Iterator<MatchGroup> it = qg.list().iterator();
-		while (it.hasNext()) {
-			IMatchGroup g = (IMatchGroup)it.next();
-			g.setHomeTeam(tf.get(g.getHomeTeamId()));
-			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
-			list.add(g);
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			// @REX should we just check the match - don't we need to also cross-check against comp as well?
+			Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("fetchMatchStatsPipelineId !=", null);
+			List<IMatchGroup> list = new ArrayList<IMatchGroup>();
+			Iterator<MatchGroup> it = qg.list().iterator();
+			while (it.hasNext()) {
+				IMatchGroup g = (IMatchGroup)it.next();
+				g.setHomeTeam(tf.get(g.getHomeTeamId()));
+				g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
+				list.add(g);
+			}
+			return list;
+		} catch (Throwable ex) {
+
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getMatchesWithPipelines", ex);
+			return null;
 		}
-		return list;
+
 	}
 
 	@Override
@@ -166,6 +175,37 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 				id = m.getId().toString();
 			}
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error saving match " + id + ex.getLocalizedMessage(), ex);
+			return null;
+		}
+	}
+
+
+
+	@Override
+	protected List<IMatchGroup> getMatchesForVirualCompFromPersistentDatastore(int ordinal, Long virtualCompId) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			List<IMatchGroup> retval = new ArrayList<IMatchGroup>();
+			
+			// look at the component competitions for their matches
+			ICompetition hostComp = cf.get(virtualCompId);
+			for (Long cid : hostComp.getComponentCompIds()) {
+				//ICompetition compComp = cf.get(cid);
+				Query<Round> roundQ = ofy.query(Round.class).filter("compId", cid).filter("urOrdinal", ordinal);
+				for (Round r : roundQ.list()) {
+					// should be 0 or 1
+					for (Long mid : r.getMatchIDs()) {
+						retval.add(get(mid));
+					}
+				}
+						
+			}
+			
+			return retval;
+			
+		} catch (Throwable ex) {
+
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getMatchesForVirualCompFromPersistentDatastore", ex);
 			return null;
 		}
 	}

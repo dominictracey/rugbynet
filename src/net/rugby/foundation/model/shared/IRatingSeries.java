@@ -42,7 +42,7 @@ public interface IRatingSeries extends IHasId {
 
 	public abstract List<Long> getCompIds();
 
-	public abstract List<ICompetition> getComps();
+	//public abstract List<ICompetition> getComps();
 
 	public abstract Boolean isGlobal();
 
@@ -68,5 +68,9 @@ public interface IRatingSeries extends IHasId {
 
 	ICompetition getHostComp();
 	
+	void setSponsor(Sponsor sponsor);
+	Sponsor getSponsor();
+	void setSponsorId(Long sponsorId);
+	Long getSponsorId();
 
 }

@@ -50,9 +50,16 @@ public class MatchNotesCreator implements INotesCreator {
 	@Override
 	public List<INote> createNotes(IRatingQuery rq) {
 
-		// first add any notes we already have for this round to the current list
-		int uro = rq.getRatingMatrix().getRatingGroup().getUniversalRound().ordinal;
 		ITopTenList ttl = ttlf.get(rq.getTopTenListId());
+		
+		// first add any notes we already have for this round to the current list
+		int uro = 0;
+		if (rq.getRatingMatrixId() != null) {
+			uro = rq.getRatingMatrix().getRatingGroup().getUniversalRound().ordinal;
+		} else {
+			uro = ttl.getRoundOrdinal();
+		}
+		
 
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "******* Creating notes for " + ttl.getTitle());
 

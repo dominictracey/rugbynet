@@ -19,6 +19,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.client.resources.noteTemplates.NoteTemplates;
@@ -91,7 +92,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	private static ICoreConfiguration coreConfig = null;
 	private static List<IContent> contentList = null;
 	private static RatingPopupViewImpl<IPlayerRating> ratingPopup = null;
-
+	private static HashMap<Long, String> teamLogoStyleMap = null;
+	
 	// Here are our note rendering caches
 	private static Map<Long, String> playerNames = new HashMap<Long, String>();
 	private static Map<Long, String> ttlNames = new HashMap<Long, String>();
@@ -279,13 +281,33 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 											if (result != null) {
 												getLatestFeatureView().setRecentFeatures(result);
 											}
+											
+											// and the teamLogoMap
+											getRpcService().getTeamLogoStyleMap( new AsyncCallback<HashMap<Long, String>>() {
 
-											Core.getCore().registerCompChangeListener(_compListener);
-											Core.getCore().registerRoundChangeListener(_roundListener);
-											Core.getCore().registerGuidChangeListener(_guidListener);
+												@Override
+												public void onFailure(
+														Throwable caught) {
+													// TODO Auto-generated method stub
+													
+												}
 
-											//Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
-											cb.onSuccess(coreConfig);	
+												@Override
+												public void onSuccess( HashMap<Long, String> result) {
+													teamLogoStyleMap = result;
+													
+													Core.getCore().registerCompChangeListener(_compListener);
+													Core.getCore().registerRoundChangeListener(_roundListener);
+													Core.getCore().registerGuidChangeListener(_guidListener);
+
+													//Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
+													cb.onSuccess(coreConfig);
+													
+												}
+												
+											});
+
+	
 										}
 
 
@@ -740,7 +762,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 		if (fbDiv == null) {
 			fbDiv = DOM.getElementById("fbComments");
-			initFacebook();
+			//initFacebook();
 		}
 		
 		if (fbDiv != null) {
@@ -791,6 +813,18 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		});
 
 	}-*/;
+	@Override
+	public String getTeamLogoStyle(Long teamId) {
+		if (teamLogoStyleMap.containsKey(teamId)) {
+			return teamLogoStyleMap.get(teamId);
+		} else {
+			return "NoTeam";
+		}
+	}
+	@Override
+	public void getSponsorForList(ITopTenList list, AsyncCallback<ISponsor> asyncCallback) {
+		Core.getCore().getSponsor(list.getSponsorId(), asyncCallback);
+	}
 
 
 }

@@ -38,10 +38,13 @@ public class DesktopSeriesListView extends SeriesListViewImpl {
 	public DesktopSeriesListView() {
 		tabPanel = new TabPanel();
 		tabPanel.setTabPosition(TabPosition.LEFT);
+		tabPanel.addStyleName("overflowAuto");
 		
 		navTabs = new NavTabs();
 		navTabs.setId("tabPanelWidget");
 		tabContent = new TabContent();
+		tabContent.setId("tabbedContent");
+		//tabContent.addStyleName("overflowHidden");
 		
 		tabPanel.add(navTabs);
 		tabPanel.add(tabContent);

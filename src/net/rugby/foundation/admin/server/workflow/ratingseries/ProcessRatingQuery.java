@@ -220,7 +220,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					}
 				} else {
 					// comp specific
-					ICompetition comp = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getComps().get(0);
+					Long compId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getCompIds().get(0);
+					ICompetition comp = cf.get(compId);
 					
 					for (IRound r : comp.getRounds()) {
 						UniversalRound urs = urf.get(r);
@@ -236,8 +237,14 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				
 			}
 			
+			Long sponsorId = null;
+			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getSponsorId() != null) {
+				sponsorId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getSponsorId();
+			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostComp() != null && rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostComp().getSponsorId() != null) {
+				sponsorId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostComp().getSponsorId();
+			}
 			
-			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", null, rq.getRoundIds(), 10);
+			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", null, rq.getRoundIds(), 10, sponsorId);
 			data.setContext(context);
 			ITopTenList ttl = ttlf.create(data);
 			

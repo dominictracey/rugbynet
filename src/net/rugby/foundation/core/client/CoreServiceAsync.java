@@ -3,6 +3,7 @@
  */
 package net.rugby.foundation.core.client;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -11,7 +12,9 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 
 /**
@@ -73,4 +76,6 @@ public interface CoreServiceAsync {
 	void saveContent(IContent content, AsyncCallback<IContent> asyncCallback);
 	
 //	void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
+	void getSponsor(Long id, AsyncCallback<ISponsor> asyncCallback);
+	void getResultsForOrdinal(int ordinal, Long virtualCompId, AsyncCallback<ArrayList<IMatchGroup>> asyncCallback);
 }

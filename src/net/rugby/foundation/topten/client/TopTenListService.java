@@ -1,5 +1,6 @@
 package net.rugby.foundation.topten.client;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +17,9 @@ import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+
 @RemoteServiceRelativePath("TopTenService")
 public interface TopTenListService extends RemoteService {
 	public ITopTenList getTopTenList(Long id);
@@ -47,4 +48,5 @@ public interface TopTenListService extends RemoteService {
 	public Map<Long, String> getTTLContexts(List<Long> needTTLContexts);
 	public IServerPlace createFeature(Long compId, Long queryId);
 	public List<Feature> getLatestFeatures();
+	public HashMap<Long, String> getTeamLogoStyleMap();
 }

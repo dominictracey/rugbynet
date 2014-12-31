@@ -3,9 +3,11 @@ package net.rugby.foundation.topten.client.mvp;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.activity.ContentActivity;
 import net.rugby.foundation.topten.client.activity.FeatureListActivity;
+import net.rugby.foundation.topten.client.activity.LegacyListActivity;
 import net.rugby.foundation.topten.client.activity.SeriesActivity;
 import net.rugby.foundation.topten.client.place.ContentPlace;
 import net.rugby.foundation.topten.client.place.FeatureListPlace;
+import net.rugby.foundation.topten.client.place.LegacyListPlace;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
@@ -35,6 +37,9 @@ public class AppActivityMapper implements ActivityMapper {
 			return new ContentActivity((ContentPlace) place, clientFactory);
 		if (place instanceof SeriesPlace)
 			return new SeriesActivity((SeriesPlace) place, clientFactory);
+		if (place instanceof LegacyListPlace) {
+			return new LegacyListActivity((LegacyListPlace) place, clientFactory);
+		}
 		return null;
 	}
 

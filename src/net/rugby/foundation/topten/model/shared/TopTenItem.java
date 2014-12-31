@@ -50,6 +50,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Unindexed
 	protected int rating;
 	protected String placeGuid;
+	protected String featureGuid;
 	@Unindexed
 	protected String tweet;
 	
@@ -299,6 +300,14 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setTweet(String tweet) {
 		this.tweet = tweet;
+	}
+	@Override
+	public String getFeatureGuid() {
+		return featureGuid;
+	}
+	@Override
+	public void setFeatureGuid(String featureGuid) {
+		this.featureGuid = featureGuid;
 	}
 
 }

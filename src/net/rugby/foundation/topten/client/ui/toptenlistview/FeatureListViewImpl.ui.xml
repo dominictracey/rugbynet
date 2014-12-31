@@ -89,6 +89,8 @@
 					</b.html:Div>
 					<b.html:Div ui:field="featureBody" >
 					</b.html:Div>
+					<b.html:Div ui:field="redittLink" >
+					</b.html:Div>
 					<!-- </b:Row> -->
 				</b:Column>
 			</b:Row>

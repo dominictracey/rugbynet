@@ -332,9 +332,9 @@ public class AccountManager implements IAccountManager {
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
 			String url = "";
 			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+				url = "/s/?gwt.codesvr=127.0.0.1:9997#Profile:";
 			else
-				url = "/topten.html?#Profile:";
+				url = "/s/?#Profile:";
 
 			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
 				destination = Base64Helper.decode(destination);
@@ -356,9 +356,9 @@ public class AccountManager implements IAccountManager {
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
 			String url = "";
 			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+				url = "/s/?gwt.codesvr=127.0.0.1:9997#Profile:";
 			else
-				url = "/topten.html?#Profile:";
+				url = "/s/?#Profile:";
 
 			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
 				destination = Base64Helper.decode(destination);

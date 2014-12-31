@@ -3,6 +3,8 @@ package net.rugby.foundation.topten.client.ui.notes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.html.Div;
+
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -20,6 +22,29 @@ public class NoteViewColumnDefinitions<T extends INote> {
 	public NoteViewColumnDefinitions() {
 		if (columnDefinitions.isEmpty()) {
 
+			columnDefinitions.add(new ColumnDefinition<T>() {
+				//id
+				public Widget render(final T c) {
+					
+					Div w = new Div();
+					
+					w.addStyleName("teamlogo-small");
+					w.addStyleName(listener.getClientFactory().getTeamLogoStyle(c.getTeamId()));
+					
+					return w;
+				}     
+
+				public boolean isClickable() {
+					return false;
+				}
+
+				@Override
+				public Column<T, ?> getColumn() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			});
+			
 			columnDefinitions.add(new ColumnDefinition<T>() {
 				//id
 				public Widget render(final T c) {

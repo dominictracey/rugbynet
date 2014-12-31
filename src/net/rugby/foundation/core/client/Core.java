@@ -17,7 +17,10 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.Sponsor;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -96,6 +99,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	
 	private int currentRoundOrdinal = -1; 
 	
+	// sponsor map
+	private Map<Long, ISponsor> sponsorMap = null;
+	ISponsor noSponsor = new Sponsor();
+	
 	/**
 	 * Use the static getInstance factory method
 	 */
@@ -103,6 +110,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	{
 		//CssBundle.INSTANCE.bootstrapOverridesCss().ensureInjected();
 		//CssBundle.INSTANCE.defaultCss().ensureInjected();
+		noSponsor.setAbbr("NON");
+		noSponsor.setActive(true);
+		noSponsor.setName("None");
+		noSponsor.setTagline("");
 	}
 	
 	/** Singleton 
@@ -664,6 +675,81 @@ public class Core implements CoreServiceAsync, EntryPoint {
 				l.guidChanged(currentGuid);
 			}
 		}
+	}
+
+
+	@Override
+	public void getSponsor(final Long id, final AsyncCallback<ISponsor> asyncCallback) {
+		if (id == null) {
+			// return empty sponsor
+			asyncCallback.onSuccess(noSponsor);
+			return;
+		}
+		
+		if (sponsorMap == null) {
+			sponsorMap = new HashMap<Long, ISponsor>();
+		}
+		
+		if (sponsorMap.containsKey(id)) {
+			asyncCallback.onSuccess(sponsorMap.get(id));
+		} else {
+			clientFactory.getRpcService().getSponsor(id, new AsyncCallback<ISponsor>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					asyncCallback.onFailure(caught);
+				}
+
+				@Override
+				public void onSuccess(ISponsor result) {
+					sponsorMap.put(id, result);
+					asyncCallback.onSuccess(result);					
+				}
+				
+			});
+		}
+		
+	}
+	
+	HashMap<Long, HashMap<Integer, ArrayList<IMatchGroup>>> virtualCompResultMap = new HashMap<Long, HashMap<Integer, ArrayList<IMatchGroup>>>();
+
+	@Override
+	public void getResultsForOrdinal(final int ordinal, final Long virtualCompId, final AsyncCallback<ArrayList<IMatchGroup>> asyncCallback) {
+		HashMap<Integer, ArrayList<IMatchGroup>> vCompMap = null;
+		
+		// get the map related to the virtual comp in question
+		if (virtualCompResultMap.containsKey(virtualCompId)) {
+			vCompMap = virtualCompResultMap.get(virtualCompId);
+		} else {
+			vCompMap = new HashMap<Integer, ArrayList<IMatchGroup>>();
+			virtualCompResultMap.put(virtualCompId, vCompMap);
+		}
+		
+		// do we have the match set we want already?
+		if (vCompMap.containsKey(ordinal)) {
+			asyncCallback.onSuccess(vCompMap.get(ordinal));
+		} else {
+			// fetch and cache
+			clientFactory.getRpcService().getResultsForOrdinal(ordinal, virtualCompId, new AsyncCallback<ArrayList<IMatchGroup>>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					asyncCallback.onFailure(caught);
+					
+				}
+
+				@Override
+				public void onSuccess(ArrayList<IMatchGroup> result) {
+					virtualCompResultMap.get(virtualCompId).put(ordinal, result);
+					
+					asyncCallback.onSuccess(result);
+					
+				}
+				
+			});
+		}
+		
+		
 	}
 
 }

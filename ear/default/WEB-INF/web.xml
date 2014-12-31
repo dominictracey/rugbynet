@@ -73,7 +73,7 @@
 
 <!-- Default page to serve -->
 <welcome-file-list>
-	<welcome-file>s/</welcome-file>
+	<welcome-file>index.jsp</welcome-file>
 </welcome-file-list>
 
 <security-constraint>

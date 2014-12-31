@@ -109,6 +109,12 @@ public interface ICompetition extends IHasId {
 	HashMap<RatingMode, Long> getSeriesMap();
 	public abstract String getTTLTitleDesc();
 	void setTTLTitleDesc(String tTLTitleDesc);
+	void setSponsor(Sponsor sponsor);
+	Sponsor getSponsor();
+	void setSponsorId(Long sponsorId);
+	Long getSponsorId();
+	List<Long> getComponentCompIds();
+	void setComponentCompIds(List<Long> componentCompIds);
 	
 	// don't put getNextRound and getPrevRound in here, see note at bottom of Competition.java
 	//public abstract void setNextAndPrevRound();

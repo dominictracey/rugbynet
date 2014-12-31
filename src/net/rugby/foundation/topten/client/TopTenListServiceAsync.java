@@ -1,5 +1,6 @@
 package net.rugby.foundation.topten.client;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,4 +65,5 @@ public interface TopTenListServiceAsync {
 	public void createFeature(Long compId, Long queryId,
 			AsyncCallback<IServerPlace> asyncCallback);
 	public void getLatestFeatures(AsyncCallback<List<Feature>> asyncCallback);
+	public void getTeamLogoStyleMap(AsyncCallback<HashMap<Long, String>> asyncCallback);
 }

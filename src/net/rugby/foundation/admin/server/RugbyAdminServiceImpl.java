@@ -2125,18 +2125,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				ISeriesConfiguration sc = scf.get(sConfigId);
-				IRatingSeries series = null;
+				//IRatingSeries series = null;
 				if (sc != null) {
-					if (sc.getSeriesId() != null) {
-						series = rsf.get(sc.getSeriesId());
-						if (series != null) {
-							// first delete TTLs associated
-							for (Long rgid : series.getRatingGroupIds()) {
-								IRatingGroup rg = rgf.get(rgid);
-								rgf.deleteTTLs(rg);
-							}
-						}
-					}
+//					if (sc.getSeriesId() != null) {
+//						series = rsf.get(sc.getSeriesId());
+//						if (series != null) {
+//							// first delete TTLs associated
+//							for (Long rgid : series.getRatingGroupIds()) {
+//								IRatingGroup rg = rgf.get(rgid);
+//								rgf.deleteTTLs(rg);
+//							}
+//						}
+//					}
 
 					if (sc.getPipelineId() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();

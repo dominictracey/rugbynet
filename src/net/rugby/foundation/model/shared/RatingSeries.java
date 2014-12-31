@@ -34,8 +34,8 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	protected List<Criteria> activeCriteria;
 
 	private List<Long> compIds;
-	@Transient
-	private List<ICompetition> comps;
+//	@Transient
+//	private List<ICompetition> comps;
 	
 	private Long hostCompId;
 	@Transient
@@ -47,12 +47,16 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	private List<IRatingGroup> ratingGroups;
 	private List<Long> ratingGroupIds;
 	
+	private Long sponsorId;
+	@Transient
+	private Sponsor sponsor;
+	
 	public RatingSeries()
 	{
 		setCountryIds(new ArrayList<Long>());
 		setCompIds(new ArrayList<Long>());
 		setCountries(new ArrayList<ICountry>());
-		setComps(new ArrayList<ICompetition>());	
+//		setComps(new ArrayList<ICompetition>());	
 		setActiveCriteria(new ArrayList<Criteria>());
 		setRatingGroupIds(new ArrayList<Long>());
 		setRatingGroups(new ArrayList<IRatingGroup>());
@@ -197,15 +201,15 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	protected void setCompIds(ArrayList<Long> arrayList) {
 		compIds = arrayList;
 	}
-	@Override
-	public List<ICompetition> getComps() {
-		return comps;
-	}
-
-	protected void setComps(ArrayList<ICompetition> arrayList) {
-		comps = arrayList;
-	}
-
+//	@Override
+//	public List<ICompetition> getComps() {
+//		return comps;
+//	}
+//
+//	protected void setComps(ArrayList<ICompetition> arrayList) {
+//		comps = arrayList;
+//	}
+//
 	@Override
 	public Boolean isGlobal() {
 		return isGlobal;
@@ -265,5 +269,22 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	@Override
 	public void setHostCompId(Long hostCompId) {
 		this.hostCompId = hostCompId;
+	}
+	
+	@Override
+	public Long getSponsorId() {
+		return sponsorId;
+	}
+	@Override
+	public void setSponsorId(Long sponsorId) {
+		this.sponsorId = sponsorId;
+	}
+	@Override
+	public Sponsor getSponsor() {
+		return sponsor;
+	}
+	@Override
+	public void setSponsor(Sponsor sponsor) {
+		this.sponsor = sponsor;
 	}
 }

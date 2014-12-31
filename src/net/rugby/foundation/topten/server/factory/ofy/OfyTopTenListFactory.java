@@ -25,6 +25,8 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
 import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
@@ -67,12 +69,31 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 					list.getList().add(getItem(it.next(), list, ordinal++));
 				}
 
-//				if (list.getNotesId() != null) {
-//					Notes notes = ofy.get(Notes.class, list.getNotesId());
-//					if (notes != null) {
-//						list.setNotes(notes.getNotes());
-//					}
-//				}
+				if (list.getGuid() == null && (list.getFeatureGuid() == null || list.getFeatureGuid().isEmpty())) {
+					// we need to upgrade pre-v8 lists to have a server place
+					// and create a feature guid
+					IServerPlace p = spf.create();
+					p.setCompId(list.getCompId());
+					p.setListId(list.getId());
+					p.setItemId(null);
+					p.setType(PlaceType.FEATURE);
+					spf.put(p);  
+					list.setFeatureGuid(p.getGuid());
+					ofy.put(list);  //super.put infinitely recurses probably
+					
+					// now add the per-item guids to point to the feature as well
+					for (ITopTenItem item : list.getList()) {
+						
+						IServerPlace ip = spf.create();
+						ip.setCompId(list.getCompId());
+						ip.setListId(list.getId());
+						ip.setItemId(item.getId());
+						ip.setType(PlaceType.FEATURE);
+						spf.put(ip); 
+						item.setFeatureGuid(ip.getGuid());
+						ofy.put(item);
+					}
+				}
 			}
 
 			return list;
@@ -88,9 +109,12 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 		try {
 			ITopTenItem item = ofy.get(TopTenItem.class,id);
 			item.setPlayer(pf.get(item.getPlayerId()));
-			//item.setOrdinal(ordinal);
+
+			if (item.getPlaceGuid() == null || item.getPlaceGuid().isEmpty()) {
+			
+			}
 			assert(parent.getId().equals(item.getParentId()));
-			//item.setParent(parent);
+
 			return item;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getItem()" + e.getLocalizedMessage(), e);
@@ -122,19 +146,19 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 		try {
 			ofy.put(list);
 
-//			// and store the notes
-//			if (list.getNotesId() != null) {
-//				// already exists so update
-//				Notes notes = ofy.get(Notes.class, list.getNotesId());
-//				notes.setNotesText(new Text(list.getNotes()));
-//				ofy.put(notes);
-//			} else if (list.getNotes() != null && !list.getNotes().isEmpty()) {
-//				// new
-//				Text notesText = new Text(list.getNotes());
-//				Notes notes = new Notes();
-//				notes.setNotesText(notesText);
-//				ofy.put(notes);
-//			}
+			//			// and store the notes
+			//			if (list.getNotesId() != null) {
+			//				// already exists so update
+			//				Notes notes = ofy.get(Notes.class, list.getNotesId());
+			//				notes.setNotesText(new Text(list.getNotes()));
+			//				ofy.put(notes);
+			//			} else if (list.getNotes() != null && !list.getNotes().isEmpty()) {
+			//				// new
+			//				Text notesText = new Text(list.getNotes());
+			//				Notes notes = new Notes();
+			//				notes.setNotesText(notesText);
+			//				ofy.put(notes);
+			//			}
 
 			return list;
 		} catch (Throwable e) {
@@ -219,19 +243,23 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 						if (item.getPlaceGuid() != null && !item.getPlaceGuid().isEmpty()) {
 							spf.delete(spf.getForGuid(item.getPlaceGuid()));
 						}
+						if (item.getFeatureGuid() != null && !item.getFeatureGuid().isEmpty()) {
+							spf.delete(spf.getForGuid(item.getFeatureGuid()));
+						}
 					}
-
-//					// delete notes
-//					if (list.getNotesId() != null) {
-//						ofy.delete(new Key<Notes>(Notes.class,list.getNotesId()));
-//					}
 
 					// and the list itself
 					ofy.delete(list.getList());
 				}
 
+				// the series place
 				if (list.getGuid() != null && !list.getGuid().isEmpty()) {
 					spf.delete(spf.getForGuid(list.getGuid()));
+				}
+				
+				// the feature place
+				if (list.getGuid() != null && !list.getGuid().isEmpty()) {
+					spf.delete(spf.getForGuid(list.getFeatureGuid()));
 				}
 
 				ofy.delete(list);
@@ -248,17 +276,17 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	protected List<Feature> getLatestFeaturesFromPeristentDatastore() {
 		try {
 			List<Feature> retval = new ArrayList<Feature>();
-			
+
 			// find 10 lists that have the latest published dates
 			Query<TopTenList> ttlq = ofy.query(TopTenList.class).filter("live",true).order("-published");
-			
+
 			int count = 0;
 			for (TopTenList ttl : ttlq.list()) {
 				if (count == NUM_FEATURES) 
 					break;
-								
+
 				retval.add(new Feature(spf.getForGuid(ttl.getFeatureGuid()),ttl.getPublished(),ttl.getTitle()));
-				
+
 				count++;
 			}
 

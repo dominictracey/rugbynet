@@ -60,7 +60,9 @@ public class RecentFeaturesViewImpl extends Composite {
 //		RecentFeatureTable.getRowFormatter().addStyleName(0, "groupListHeader");
 //		RecentFeatureTable.addStyleName("groupList");
 //		RecentFeatureTable.getCellFormatter().addStyleName(0, 1, "groupListNumericColumn");
-		header.setText("Recent Features");
+		HTML head = new HTML("<strong>Recent Features</strong>");
+		header.add(head);
+		//header.setText("Recent Features");
 	}
 
 //	@Override

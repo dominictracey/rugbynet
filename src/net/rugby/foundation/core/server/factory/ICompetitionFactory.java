@@ -24,4 +24,5 @@ public interface ICompetitionFactory extends ICachingFactory<ICompetition>{
 	ICompetition repair(ICompetition comp);
 	
 	ICompetition getGlobalComp();
+
 }

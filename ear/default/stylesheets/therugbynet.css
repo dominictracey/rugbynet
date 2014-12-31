@@ -1,39 +1,51 @@
 .comp-logo {
 		padding-left: 5px;
-		padding-right: 5px;
-		background-image: url("/resources/comps/ap/200R.png");
+		padding-right: 5px;	
     	background-repeat: no-repeat;
     	background-size: contain;
+}
+
+.comp-logo-none {
+	background-image: url("/resources/comps/NON/200R.png");
+}
+
+.comp-logo-AP14 {
+	background-image: url("/resources/comps/AP/200R.png");
+}
+
+.comp-logo-GLOBAL {
+	background-image: url("/resources/comps/GLOBAL/200R.png");
+}
+
+.comp-logo-EU {
+	background-image: url("/resources/comps/EU/200R.png");
+}
+
+.comp-logo-PRO12 {
+	background-image: url("/resources/comps/PRO12/200R.png");
 }
 
 .sponsor-logo {
 		padding-left: 5px;
 		padding-right: 5px;
-		background-image: url("/resources/sponsors/dhl/200.png");
     	background-repeat: no-repeat;
     	background-size: contain;
     	float: right;
 }
 
-.usa  {
-		padding-left: 5px;
-		padding-right: 5px;
-		background: url("/resources/19/200.png") no-repeat center center;
-    	background-size: contain;
-    	min-width: 30px;
+.sponsor-logo-NON {
+	background-image: url("/resources/sponsors/NON/200R.png");
+}
+
+.sponsor-logo-AQU {
+	background-image: url("/resources/sponsors/AQU/200R.png");
+}
+
+.sponsor-logo-DHL {
+	background-image: url("/resources/sponsors/DHL/200R.png");
 }
 
 .compactTTL {
-/* 	padding: 4px; */
-/* 	overflow: hidden; */
-/* 	font-size: 16px; */
-/* 	background-color: #eee; */
-/* 	color: #444; */
-/* 	border: 0px; */
-/* 	padding-left: 20px; */
-/* 	font-weight: bold; */
-/* 	border-bottom: 2px solid #dedede; */
-/* 	border-bottom-style: groove; */
 	vertical-align: middle;
 }
 
@@ -76,6 +88,23 @@
 	background-color: black;
 	opacity: 0.5;
 }
+
+.overflowAuto {
+	overflow: auto;
+	width: 100%;
+}
+
+#tabbedContent {
+	overflow: hidden;
+	float: none;
+}
+
+.notesRow {
+ 	padding:5px; 
+ 	min-height: 20px;
+ 	width:100%;
+}
+
 /* ######## RESPONSIVE #########  */ 
 @media (min-width: 1200px) {  
 
@@ -92,6 +121,7 @@
 @media(min-width: 992px) and (max-width: 1199px) {
 
 	.sponsor {
+	}
 	
 	.tagline {
 		font-size: .9em;
@@ -102,6 +132,7 @@
 @media(min-width: 768px) and (max-width: 991px) {
 
 	.sponsor {
+	}
 	
 	.tagline {
 		font-size: 1em;
@@ -226,3 +257,257 @@ input.accountInput {
 input.joinLink {
 	width:250px;
 }
+
+/* Team logos */
+
+.team-logo  {
+		padding-left: 5px;
+		padding-right: 5px;
+		background-repeat: no-repeat;
+		background-position: center center;
+    	background-size: contain;
+    	min-width: 30px;
+}
+
+.teamlogo-small  {
+/* 		padding-left: 5px; */
+/* 		padding-right: 5px; */
+		background-repeat: no-repeat;
+		background-position: center center;
+    	background-size: contain;
+    	min-width: 20px;
+    	min-height: 20px;
+    	margin-right: 15px;
+}
+
+.AB {
+	background-image: url("/resources/teams/AB/200.png");
+}
+
+.ARG {
+	background-image: url("/resources/teams/ARG/200.png");
+}
+.ASM {
+	background-image: url("/resources/teams/ASM/200.png");
+}
+.ASR {
+	background-image: url("/resources/teams/ASR/200.png");
+}
+.AUS {
+	background-image: url("/resources/teams/AUS/200.png");
+}
+.BAT {
+	background-image: url("/resources/teams/BAT/200.png");
+}
+.BLU {
+	background-image: url("/resources/teams/BLU/200.png");
+}
+.BRU {
+	background-image: url("/resources/teams/BRU/200.png");
+}
+.BUL {
+	background-image: url("/resources/teams/BUL/200.png");
+}
+.CAB {
+	background-image: url("/resources/teams/CAB/200.png");
+}
+.CAN {
+	background-image: url("/resources/teams/CAN/200.png");
+}
+.CAR {
+	background-image: url("/resources/teams/CAR/200.png");
+}
+.CHE {
+	background-image: url("/resources/teams/CHE/200.png");
+}
+.CHF {
+	background-image: url("/resources/teams/CHF/200.png");
+}
+.CO {
+	background-image: url("/resources/teams/CO/200.png");
+}
+.CONN {
+	background-image: url("/resources/teams/CONN/200.png");
+}
+.CRU {
+	background-image: url("/resources/teams/CRU/200.png");
+}
+.EDI {
+	background-image: url("/resources/teams/EDI/200.png");
+}
+.ENG {
+	background-image: url("/resources/teams/ENG/200.png");
+}
+.EXE {
+	background-image: url("/resources/teams/EXE/200.png");
+}
+.FCE {
+	background-image: url("/resources/teams/FCE/200.png");
+}
+.FCG {
+	background-image: url("/resources/teams/FCG/200.png");
+}
+.FJI {
+	background-image: url("/resources/teams/FJI/200.png");
+}
+.FRA {
+	background-image: url("/resources/teams/FRA/200.png");
+}
+.GEO {
+	background-image: url("/resources/teams/GEO/200.png");
+}
+.GLA {
+	background-image: url("/resources/teams/GLA/200.png");
+}
+.GLO {
+	background-image: url("/resources/teams/GLO/200.png");
+}
+.HAR {
+	background-image: url("/resources/teams/HAR/200.png");
+}
+.HGH {
+	background-image: url("/resources/teams/HGH/200.png");
+}
+.HUR {
+	background-image: url("/resources/teams/HUR/200.png");
+}
+.IRE {
+	background-image: url("/resources/teams/IRE/200.png");
+}
+.ITA {
+	background-image: url("/resources/teams/ITA/200.png");
+}
+.JPN {
+	background-image: url("/resources/teams/JPN/200.png");
+}
+.LEI {
+	background-image: url("/resources/teams/LEI/200.png");
+}
+.LIR {
+	background-image: url("/resources/teams/LIR/200.png");
+}
+.LNS {
+	background-image: url("/resources/teams/LNS/200.png");
+}
+.LOU {
+	background-image: url("/resources/teams/LOU/200.png");
+}
+.MHR {
+	background-image: url("/resources/teams/MHR/200.png");
+}
+.MUN {
+	background-image: url("/resources/teams/MUN/200.png");
+}
+.NAM {
+	background-image: url("/resources/teams/NAM/200.png");
+}
+.NEW {
+	background-image: url("/resources/teams/NEW/200.png");
+}
+.NGD {
+	background-image: url("/resources/teams/NGD/200.png");
+}
+.NOR {
+	background-image: url("/resources/teams/NOR/200.png");
+}
+.NoTeam {
+	background-image: url("/resources/teams/NoTeam/200.png");
+}
+.NZL {
+	background-image: url("/resources/teams/NZL/200.png");
+}
+.OSP {
+	background-image: url("/resources/teams/OSP/200.png");
+}
+.RCT {
+	background-image: url("/resources/teams/RCT/200.png");
+}
+.REB {
+	background-image: url("/resources/teams/REB/200.png");
+}
+.RED {
+	background-image: url("/resources/teams/RED/200.png");
+}
+.RM92 {
+	background-image: url("/resources/teams/RM92/200.png");
+}
+.ROM {
+	background-image: url("/resources/teams/ROM/200.png");
+}
+.RSA {
+	background-image: url("/resources/teams/RSA/200.png");
+}
+.RUS {
+	background-image: url("/resources/teams/RUS/200.png");
+}
+.SAM {
+	background-image: url("/resources/teams/SAM/200.png");
+}
+.SAR {
+	background-image: url("/resources/teams/SAR/200.png");
+}
+.SCA {
+	background-image: url("/resources/teams/SCA/200.png");
+}
+.SCO {
+	background-image: url("/resources/teams/SCO/200.png");
+}
+.SFP {
+	background-image: url("/resources/teams/SFP/200.png");
+}
+.SHA {
+	background-image: url("/resources/teams/SHA/200.png");
+}
+.SHK {
+	background-image: url("/resources/teams/SHK/200.png");
+}
+.ST {
+	background-image: url("/resources/teams/ST/200.png");
+}
+.STM {
+	background-image: url("/resources/teams/STM/200.png");
+}
+.TGA {
+	background-image: url("/resources/teams/TGA/200.png");
+}
+.TIG {
+	background-image: url("/resources/teams/TIG/200.png");
+}
+.TRE {
+	background-image: url("/resources/teams/TRE/200.png");
+}
+.UBB {
+	background-image: url("/resources/teams/UBB/200.png");
+}
+.ULS {
+	background-image: url("/resources/teams/ULS/200.png");
+}
+.USA {
+	background-image: url("/resources/teams/USA/200.png");
+}
+.USAP {
+	background-image: url("/resources/teams/USAP/200.png");
+}
+.USO {
+	background-image: url("/resources/teams/USO/200.png");
+}
+.WAL {
+	background-image: url("/resources/teams/WAL/200.png");
+}
+.WAR {
+	background-image: url("/resources/teams/WAR/200.png");
+}
+.WAS {
+	background-image: url("/resources/teams/WAS/200.png");
+}
+.WEL {
+	background-image: url("/resources/teams/WEL/200.png");
+}
+.WOR {
+	background-image: url("/resources/teams/WOR/200.png");
+}
+.ZEB {
+	background-image: url("/resources/teams/ZEB/200.png");
+}
+
+

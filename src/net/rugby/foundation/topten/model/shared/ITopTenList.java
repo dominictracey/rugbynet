@@ -82,5 +82,7 @@ public interface ITopTenList {
 	void setContext(String context);
 	String getFeatureGuid();
 	void setFeatureGuid(String featureGuid);
+	public abstract Long getSponsorId();
+	public abstract void setSponsorId(Long id);
 
 }

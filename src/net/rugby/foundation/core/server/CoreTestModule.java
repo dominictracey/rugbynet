@@ -20,6 +20,7 @@ import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.ISponsorFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
@@ -39,6 +40,7 @@ import net.rugby.foundation.core.server.factory.test.TestRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.test.TestRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.test.TestRawScoreFactory;
 import net.rugby.foundation.core.server.factory.test.TestRoundFactory;
+import net.rugby.foundation.core.server.factory.test.TestSponsorFactory;
 import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamMatchStatsFactory;
@@ -74,7 +76,7 @@ public class CoreTestModule extends AbstractModule {
 		bind(IRatingGroupFactory.class).to(TestRatingGroupFactory.class);
 		bind(IRatingMatrixFactory.class).to(TestRatingMatrixFactory.class);
 		bind(IRatingSeriesManager.class).to(RatingSeriesManager.class);
-	
+		bind(ISponsorFactory.class).to(TestSponsorFactory.class);
 	}
 }
 
