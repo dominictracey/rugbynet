@@ -1,5 +1,8 @@
 package net.rugby.foundation.topten.client.ui;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import net.rugby.foundation.model.shared.IContent;
@@ -85,58 +88,30 @@ public class HeaderViewImpl extends Composite implements HeaderView
 	 * @see net.rugby.foundation.topten.client.ui.NavBarView#setContent(java.util.List)
 	 */
 	@Override
-	public void setContent(List<IContent> list, boolean isEditor) {
+	public void setContent(final HashMap<String,Long> map, boolean isEditor) {
 		this.isEditor = isEditor;
-		if (list != null) {
-			Iterator<IContent> it = list.iterator();
-			if (it != null) {
-				contentDropdownMenu.clear();
 
-				while (it.hasNext()) {
-					final IContent content = it.next();
-					if (content != null && content.isShowInMenu()) {
-						AnchorListItem nl = new AnchorListItem(content.getTitle());
-						nl.addClickHandler( new ClickHandler() {
+		if (map != null) {
+			List<String> list = new ArrayList<String>();
+			list.addAll(map.keySet());
+			Collections.sort(list);
+			contentDropdownMenu.clear();
+			for (String s: list) {
 
-							@Override
-							public void onClick(ClickEvent event) {
-								ContentPlace newPlace = new ContentPlace(content.getId());
-								assert (clientFactory != null);
-								clientFactory.getPlaceController().goTo(newPlace);
-							}
-						});
+				final String _s = s;
+				AnchorListItem nl = new AnchorListItem(s.substring(3));
+				nl.addClickHandler( new ClickHandler() {
 
-						contentDropdownMenu.add(nl);
-
-					} else if (content.getDiv() != null && !content.getDiv().isEmpty()) {
-						setDivContent(content);
+					@Override
+					public void onClick(ClickEvent event) {
+						ContentPlace newPlace = new ContentPlace(map.get(_s));
+						assert (clientFactory != null);
+						clientFactory.getPlaceController().goTo(newPlace);
 					}
-					//					if (isEditor) {
-					//						Element div = DOM.getElementById(content.getDiv());
-					//						String id = DOM.createUniqueId();
-					//						HTMLPanel panel = new HTMLPanel("<div id=\"" + id + "><span>" + c + "</span></div>");
-					////						if (panel..hasChildNodes()) {
-					////							panel.removeChild(div.getFirstChild());
-					////						}
-					//						
-					//						panel.add(new HTML(c));
-					//						Button edit = new Button("Edit");
-					//						panel.add(edit);
-					//						div.
-					//						edit.addClickHandler(new ClickHandler() {
-					//
-					//							@Override
-					//							public void onClick(ClickEvent event) {
-					//								EditContent ec = clientFactory.getEditContentDialog();
-					//								ec.setContent(content, contentPresenter);
-					//								ec.center();
-					//							}
-					//							
-					//						});
-					//					} else {
+				});
 
-					//}
-				}
+				contentDropdownMenu.add(nl);
+				
 			}	
 		}
 	}
@@ -172,17 +147,6 @@ public class HeaderViewImpl extends Composite implements HeaderView
 //		DOM.getElementById(content.getDiv()).setInnerHTML(c);
 	}
 
-//	@Override
-//	public void collapseHero(boolean collapse) {
-////		if (collapse) {
-////			hero.removeClassName("hero-unit");
-////			hero.addClassName("collapse");
-////		} else {
-////			hero.removeClassName("collapse");
-////			hero.addClassName("hero-unit");
-////		}
-//
-//	}
 
 	
 	protected void AddContentMenuItem(final IContent c, ListGroupItem p) {

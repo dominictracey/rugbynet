@@ -115,6 +115,8 @@ public interface ICompetition extends IHasId {
 	Long getSponsorId();
 	List<Long> getComponentCompIds();
 	void setComponentCompIds(List<Long> componentCompIds);
+	void setShowToClient(Boolean showToClient);
+	Boolean getShowToClient();
 	
 	// don't put getNextRound and getPrevRound in here, see note at bottom of Competition.java
 	//public abstract void setNextAndPrevRound();

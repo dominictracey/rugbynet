@@ -50,7 +50,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 
 	private IAppUserFactory auf;
 	private ITopTenListFactory ttlf;
-	private ICachingFactory<IContent> ctf;
+	private IContentFactory ctf;
 
 	private IPlayerRatingFactory prf;
 	private IRatingSeriesFactory rsf;
@@ -69,7 +69,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Inject
-	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf,
+	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, IContentFactory ctf, IPlayerRatingFactory prf,
 			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IPlaceFactory spf,
 			INoteFactory nf, IPlayerFactory pf, ITeamGroupFactory tgf) {
 		try {
@@ -272,11 +272,11 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Override
-	public List<IContent> getContentItems() {
+	public HashMap<String,Long> getContentItems() {
 		try {
 
 			if (ctf instanceof IContentFactory) {
-				return ((IContentFactory)ctf).getAll(true);
+				return ctf.getMenuMap(true);
 			}
 			return null;
 		}  catch (Throwable e) {
@@ -494,12 +494,12 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 				if (queryId != null) {
 					ITopTenList list = getTopTenListForRatingQuery(queryId);
 					IServerPlace place = ttlf.makeFeature(list);
-					
+
 					return place;
 				}
-				
+
 				return null;
-				
+
 			} else {
 				String user = "a not logged on user ";
 				if (u != null) {
@@ -529,6 +529,32 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	public HashMap<Long, String> getTeamLogoStyleMap() {
 		try {
 			return tgf.getTeamLogoStyleMap();
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Boolean deleteNote(Long noteId) {
+		try {
+			IAppUser u = getAppUser();
+			if (u instanceof ITopTenUser && (((ITopTenUser)u).isTopTenContentContributor() || ((ITopTenUser)u).isTopTenContentEditor())) {
+
+				INote note = nf.get(noteId);
+				if (note != null) {
+					return nf.delete(note);
+				} else {
+					return false;
+				}
+			} else {
+				String user = "a not logged on user ";
+				if (u != null) {
+					user = "The user " + u.getEmailAddress() + " (" + u.getId() + ")";
+				}
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, user + " is trying to delete a note " + noteId);
+				return null;
+			}
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

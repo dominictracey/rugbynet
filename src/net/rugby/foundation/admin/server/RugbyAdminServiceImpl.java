@@ -148,7 +148,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IPlayerMatchStatsFetcherFactory pmsff;
 	private IMatchRatingEngineSchemaFactory mresf;
 	private ITopTenListFactory ttlf;
-	private ICachingFactory<IContent> ctf;
+	private IContentFactory ctf;
 	private IStandingFactory sf;
 	private IStandingsFetcherFactory sff;
 	private IUrlCacher uc;
@@ -179,7 +179,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff,  
 			IAdminTaskFactory atf, IMatchResultFactory mrf, 
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
-			ICachingFactory<IContent> ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
+			IContentFactory ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
 			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
 			IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
 		try {
@@ -811,6 +811,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					cc.addCompUnderway(comp.getId());
 				} else {
 					cc.removeCompUnderway(comp.getId());
+				}
+				
+				if (comp.getShowToClient()) {
+					cc.addCompForClient(comp.getId());
+				} else {
+					cc.removeCompForClient(comp.getId());
 				}
 
 				ccf.put(cc);
@@ -2289,6 +2295,35 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			//throw ex;	 // rethrow to client?
 			return null;
 		}	
+	}
+
+	@Override
+	public IRatingQuery rerunRatingQuery(Long id) {
+		try {
+			if (checkAdmin()) {
+
+				IRatingQuery rq = rqf.get(id);
+
+				if (rq != null) {
+					String url2 = ccf.get().getEngineUrl() +
+							"/orchestration/IRatingQuery";
+	
+					QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(300000).
+							param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.RERUN.toString()).
+							param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+							param("id",rq.getId().toString()).
+							param("extraKey", "0L"));
+	
+					return rq;
+				}
+			} 
+			
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+
 	}
 
 

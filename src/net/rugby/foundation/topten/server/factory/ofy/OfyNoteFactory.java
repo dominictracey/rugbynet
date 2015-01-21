@@ -44,6 +44,7 @@ public class OfyNoteFactory extends BaseNoteFactory implements INoteFactory {
 	protected INote getFromPersistentDatastore(Long id) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
+
 			return ofy.get(Note.class, id);
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getFromPersistentDatastore" + e.getLocalizedMessage(), e);
@@ -74,6 +75,7 @@ public class OfyNoteFactory extends BaseNoteFactory implements INoteFactory {
 			Objectify ofy = DataStoreFactory.getOfy();
 			List<INoteRef> list = nrf.getForNote(t);
 			for (INoteRef ref : list) {
+				dropMemcacheForList(ref.getContextId());
 				nrf.delete(ref);
 			}
 			

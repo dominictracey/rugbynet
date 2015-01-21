@@ -3,11 +3,16 @@ package net.rugby.foundation.topten.client.ui.notes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.Widget;
 
+import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.ui.ColumnDefinition;
 import net.rugby.foundation.topten.client.ui.notes.NoteView.NoteViewPresenter;
 import net.rugby.foundation.topten.model.shared.INote;
@@ -18,8 +23,10 @@ public class NoteViewColumnDefinitions<T extends INote> {
 			new ArrayList<ColumnDefinition<T>>();
 
 	private NoteViewPresenter<T> listener;
+	private ClientFactory clientFactory;
 
-	public NoteViewColumnDefinitions() {
+	public NoteViewColumnDefinitions(ClientFactory clientFactory) {
+		this.clientFactory = clientFactory;
 		if (columnDefinitions.isEmpty()) {
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
@@ -64,6 +71,37 @@ public class NoteViewColumnDefinitions<T extends INote> {
 					return null;
 				}
 			});
+			
+			if (clientFactory.getLoginInfo() != null && (clientFactory.getLoginInfo().isTopTenContentContributor() || clientFactory.getLoginInfo().isTopTenContentEditor())) {
+				columnDefinitions.add(new ColumnDefinition<T>() {
+					//id
+					public Widget render(final T c) {
+						
+						Button w = new Button();
+						w.setIcon(IconType.TIMES_CIRCLE);
+						w.addClickHandler(new ClickHandler() {
+
+							@Override
+							public void onClick(ClickEvent event) {
+								listener.deleteNote(c.getId());								
+							}
+							
+						});
+						
+						return (Widget)w;
+					}     
+
+					public boolean isClickable() {
+						return true;
+					}
+
+					@Override
+					public Column<T, ?> getColumn() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+				});
+			}
 			
 
 //			columnDefinitions.add(new ColumnDefinition<T>() {
@@ -132,6 +170,14 @@ public class NoteViewColumnDefinitions<T extends INote> {
 
 	public void setListener(NoteViewPresenter<T> listener2) {
 		this.listener =  listener2;
+	}
+
+	public ClientFactory getClientFactory() {
+		return clientFactory;
+	}
+
+	public void setClientFactory(ClientFactory clientFactory) {
+		this.clientFactory = clientFactory;
 	}
 	
 

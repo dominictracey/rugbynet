@@ -1,7 +1,12 @@
 package net.rugby.foundation.core.server.factory.test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.googlecode.objectify.NotFoundException;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
@@ -54,6 +59,34 @@ public class TestContentFactory extends BaseCachingFactory<IContent>  implements
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	protected HashMap<String, Long> menuMap = null;
 
+	@Override
+	public HashMap<String, Long> getMenuMap(boolean b) {
+		try {
+			if (menuMap == null) {
+				menuMap = new HashMap<String, Long>();
+				
+				List<IContent> list = getAll(true);
+				for (IContent c : list) {
+					// we put the sort order as the first three chars of the name so the client can sort by this, then strip them off.
+					String name = String.format("%03d", c.getMenuOrder()) + c.getTitle();
+					menuMap.put(name, c.getId());
+				}
+			}
+			
+			return menuMap;
+		} catch (NotFoundException ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			return null;
+		}
+	}
+
+	@Override
+	public IContent get(String title) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

@@ -51,6 +51,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 /**
  * @author home
@@ -80,6 +81,7 @@ IOrchestrationFactory {
 	private IAdminTaskFactory atf;
 	private IPlayerRatingFactory prf;
 	private ISeriesConfigurationFactory scf;
+	private ITopTenListFactory ttlf;
 
 	//@REX this is probably horrendously inefficient
 	@Inject
@@ -92,7 +94,7 @@ IOrchestrationFactory {
 			//			IClubhouseLeagueMapFactory chlmf, IMatchEntryFactory mef, IRoundEntryFactory ref, 
 			IMatchRatingEngineSchemaFactory mresf, IQueryRatingEngineFactory qref,
 			IRatingQueryFactory rqf, IAdminTaskFactory atf, IPlayerRatingFactory prf,
-			ISeriesConfigurationFactory scf) {
+			ISeriesConfigurationFactory scf, ITopTenListFactory ttlf) {
 		this.cf = cf;
 		this.mf = mf;
 		//this.mf.setFactories(rf, tf);
@@ -114,6 +116,7 @@ IOrchestrationFactory {
 		this.atf = atf;
 		this.prf = prf;
 		this.scf = scf;
+		this.ttlf = ttlf;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.factory.IOrchestrationFactory#get(net.rugby.foundation.model.shared.IMatchGroup, net.rugby.foundation.admin.server.factory.IOrchestrationActions)
@@ -258,11 +261,15 @@ IOrchestrationFactory {
 	public IOrchestration<IRatingQuery> get(IRatingQuery target,
 			RatingActions action) {
 		if (action.equals(AdminOrchestrationActions.RatingActions.GENERATE)) {
-			IOrchestration<IRatingQuery> o = new GenerateRatingsOrchestration(ocf, mresf, qref, rqf);
+			IOrchestration<IRatingQuery> o = new GenerateRatingsOrchestration(ocf, mresf, qref, rqf, prf, ttlf);
 			o.setTarget(target);
 			return o;
 		} else if (action.equals(AdminOrchestrationActions.RatingActions.CLEANUP)) {
 			IOrchestration<IRatingQuery> o = new AdminCleanupOrchestration(ocf, rqf, prf, mf);
+			o.setTarget(target);
+			return o;
+		}  else if (action.equals(AdminOrchestrationActions.RatingActions.RERUN)) {
+			IOrchestration<IRatingQuery> o = new RerunRatingOrchestration();
 			o.setTarget(target);
 			return o;
 		} 

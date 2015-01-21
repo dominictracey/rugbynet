@@ -69,7 +69,7 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 				}
 			}
 			if (place != null) {
-					putItem(getGuidCacheId(guid), place);
+				putItem(getGuidCacheId(guid), place);
 			} else {
 				return null;
 			} 
@@ -83,8 +83,14 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 	private IServerPlace buildDefaultSPlace() {
 		IServerPlace p = new ServerPlace();
 		p.setCompId(ccf.get().getDefaultCompId());
-		p.setSeriesId(rsf.getDefaultSeriesId(p.getCompId()));
-		p.setType(PlaceType.SERIES);
+		ITopTenList feature = ttlf.getLatestForComp(p.getCompId());
+		if (feature == null) {
+			p.setSeriesId(rsf.getDefaultSeriesId(p.getCompId()));
+			p.setType(PlaceType.SERIES);
+		} else {
+			p.setListId(feature.getId());
+			p.setType(PlaceType.FEATURE);
+		}
 		return p;
 	}
 

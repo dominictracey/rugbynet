@@ -79,7 +79,8 @@ public class AdminOrchestrationActions {
 	public enum RatingActions implements IOrchestrationActions<IRatingQuery> { 
 
 		GENERATE ("Generate Ratings"),
-		CLEANUP ("Clean Up");
+		CLEANUP ("Clean Up"), 
+		RERUN ("Rerun");
 
 		private String value;
 		private final static String actionKey = "Action";

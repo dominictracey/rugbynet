@@ -11,6 +11,7 @@ import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.Listener;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
@@ -33,6 +34,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -68,8 +70,9 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@UiField Button query;
 	@UiField Button clear;
 	@UiField Button delete;
+	@UiField Button rerun;
 	@UiField Button topTen;
-	
+
 	@UiField CheckBox scaleTime;
 	@UiField CheckBox scaleComp;
 	@UiField CheckBox scaleStanding;
@@ -185,7 +188,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 		});
 		//} else {
-			// populate the comp/round multi-pick list
+		// populate the comp/round multi-pick list
 		compAndRound.clear();
 		for (Long id: result.getCompetitionMap().keySet()) {
 			listener.portalViewCompPopulate(id);
@@ -264,7 +267,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@Override
 	public void setPositions(List<position> result) {
 		pos.clear();
-		
+
 		for (position posi: result) {
 			pos.addItem(posi.toString());
 		}
@@ -274,7 +277,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@Override
 	public void setCountries(List<ICountry> result) {
 		country.clear();
-		
+
 		for (ICountry c: result) {
 			country.addItem(c.getName(), c.getId().toString());
 		}
@@ -351,16 +354,20 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 		if (rq != null) {
 			rqId = rq.getId();
 		}
-		
+
 		Long compId = null;
 		if (compIds != null && compIds.size() > 0) {
 			compId = compIds.get(0);
 		}
 
+
+
 		// @REX sponsorId is null for now. Need to add in Sponsor UI
 		TopTenSeedData data = new TopTenSeedData(rq.getId(), "", "", compId, roundIds, playersPerTeam, null);
 
 		listener.createTopTenList(data);
+
+
 
 	}
 
@@ -397,7 +404,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 			clientFactory.getRatingListView().setListener((Listener<IPlayerRating>) listener);
 		}
 		clientFactory.getPlayerListView().asWidget().setVisible(true);	}
-	
+
 	@Override
 	public ICompetition getCurrentComp() {
 		return currentComp;
@@ -440,7 +447,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 				listener.portalViewCompSelected(rq.getCompIds().get(0));
 				// this will call setComp, where we can select the comp(s), round(s) and teams.
 			}
-			
+
 			// do the positions and countries
 			for (int i=0; i<position.values().length; i++) {
 				if (rq.getPositions().contains(position.values()[i])) {
@@ -461,12 +468,12 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 					country.setItemSelected(i, false);
 				}
 			}
-			
+
 			// and the scaling flags
 			scaleTime.setValue(rq.getScaleTime());
 			scaleComp.setValue(rq.getScaleComp());
 			scaleStanding.setValue(rq.getScaleStanding());
-			
+
 		} else {
 			Window.alert("The query you are accessing no longer exists or is invalid.");
 		}
@@ -489,6 +496,11 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 		listener.deleteQuery(rq);
 	}
 
+	@UiHandler("rerun")
+	void onRerunClick(ClickEvent e) {
+		listener.rerunQuery(rq);
+	}
+	
 	@Override
 	public boolean clear() {
 		clientFactory.getPlayerListView().clear();
@@ -515,7 +527,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 		setTimeSeries(timeSeries.isActive()); 
 	}
-	
+
 	private void setTimeSeries(boolean timeSeriesOn) {
 		if (timeSeriesOn) {
 			comp.setVisible(false);
@@ -530,7 +542,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 			compLabel.setText("Competition");
 			roundLabel.setVisible(true);
 		}
-		
+
 		listener.setTimeSeries(timeSeriesOn);
 	}
 

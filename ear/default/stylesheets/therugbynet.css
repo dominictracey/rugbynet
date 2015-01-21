@@ -5,25 +5,126 @@
     	background-size: contain;
 }
 
+.comp-logo-sq {
+		padding-left: 5px;
+		padding-right: 5px;	
+    	background-repeat: no-repeat;
+    	background-size: contain;
+    	float: right;
+}
+
 .comp-logo-none {
 	background-image: url("/resources/comps/NON/200R.png");
 }
 
-.comp-logo-AP14 {
+.comp-logo-sq-none {
+	background-image: url("/resources/comps/NON/200.png");
+}
+
+.comp-logo-AP {
 	background-image: url("/resources/comps/AP/200R.png");
+}
+
+.comp-logo-sq-AP {
+	background-image: url("/resources/comps/AP/200.png");
 }
 
 .comp-logo-GLOBAL {
 	background-image: url("/resources/comps/GLOBAL/200R.png");
 }
+.comp-logo-sq-GLOBAL {
+	background-image: url("/resources/comps/GLOBAL/200.png");
+}
 
 .comp-logo-EU {
 	background-image: url("/resources/comps/EU/200R.png");
+}
+.comp-logo-sq-EU {
+	background-image: url("/resources/comps/EU/200.png");
+}
+
+.comp-logo-SH {
+	background-image: url("/resources/comps/SH/200R.png");
+}
+.comp-logo-sq-SH {
+	background-image: url("/resources/comps/SH/200.png");
+}
+
+.comp-logo-NOV {
+	background-image: url("/resources/comps/NOV/200R.png");
+}
+.comp-logo-sq-NOV {
+	background-image: url("/resources/comps/NOV/200.png");
 }
 
 .comp-logo-PRO12 {
 	background-image: url("/resources/comps/PRO12/200R.png");
 }
+.comp-logo-sq-PRO12 {
+	background-image: url("/resources/comps/PRO12/200.png");
+}
+
+.comp-logo-6N {
+	background-image: url("/resources/comps/6N/200R.png");
+}
+.comp-logo-sq-6N {
+	background-image: url("/resources/comps/6N/200.png");
+}
+
+.comp-logo-ECC {
+	background-image: url("/resources/comps/ECC/200R.png");
+}
+.comp-logo-sq-ECC {
+	background-image: url("/resources/comps/ECC/200.png");
+}
+
+.comp-logo-ERCC {
+	background-image: url("/resources/comps/ERCC/200R.png");
+}
+.comp-logo-sq-ERCC {
+	background-image: url("/resources/comps/ERCC/200.png");
+}
+
+.comp-logo-HNK {
+	background-image: url("/resources/comps/HNK/200R.png");
+}
+.comp-logo-sq-HNK {
+	background-image: url("/resources/comps/HNK/200.png");
+}
+
+.comp-logo-RABO {
+	background-image: url("/resources/comps/RABO/200R.png");
+}
+.comp-logo-sq-RABO {
+	background-image: url("/resources/comps/RABO/200.png");
+}
+
+.comp-logo-SXV {
+	background-image: url("/resources/comps/SXV/200R.png");
+}
+.comp-logo-sq-SXV {
+	background-image: url("/resources/comps/SXV/200.png");
+}
+
+.comp-logo-T14 {
+	background-image: url("/resources/comps/T14/200R.png");
+}
+.comp-logo-sq-T14 {
+	background-image: url("/resources/comps/T14/200.png");
+}
+
+.comp-logo-TRC {
+	background-image: url("/resources/comps/TRC/200R.png");
+}
+.comp-logo-sq-TRC {
+	background-image: url("/resources/comps/TRC/200.png");
+}
+
+
+
+
+
+
 
 .sponsor-logo {
 		padding-left: 5px;
@@ -45,7 +146,7 @@
 	background-image: url("/resources/sponsors/DHL/200R.png");
 }
 
-.compactTTL {
+.table > tbody > tr > td {
 	vertical-align: middle;
 }
 
@@ -58,8 +159,12 @@
 	width: 70%; /* solves jumping */
 }
 
+
+
 #tabPanelWidget {
 	margin-right: 0px;
+	float: none;
+	display: table-cell;
 }
 
 .popupCaption {
@@ -97,6 +202,7 @@
 #tabbedContent {
 	overflow: hidden;
 	float: none;
+	display: table-cell;
 }
 
 .notesRow {
@@ -116,6 +222,10 @@
 		font-size: 1.2em;
 	}
 	
+	.rugbyNetAddThis {
+		margin-left: 100px;
+	}
+	
 }
 
 @media(min-width: 992px) and (max-width: 1199px) {
@@ -125,6 +235,10 @@
 	
 	.tagline {
 		font-size: .9em;
+	}
+	
+	.rugbyNetAddThis {
+		margin-left: 25px;
 	}
 	
 }
@@ -137,6 +251,8 @@
 	.tagline {
 		font-size: 1em;
 	}
+	
+
 	
 }
 
@@ -275,9 +391,17 @@ input.joinLink {
 		background-repeat: no-repeat;
 		background-position: center center;
     	background-size: contain;
-    	min-width: 20px;
-    	min-height: 20px;
-    	margin-right: 15px;
+    	min-width: 40px;
+    	min-height: 40Px;
+/*     	margin-right: 15px; */
+}
+
+.team-logo {
+		padding-left: 5px;
+		padding-right: 5px;
+    	background-repeat: no-repeat;
+    	background-size: contain;
+    	float: right;
 }
 
 .AB {

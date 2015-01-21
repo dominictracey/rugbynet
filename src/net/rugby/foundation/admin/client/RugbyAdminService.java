@@ -130,6 +130,7 @@ public interface RugbyAdminService extends RemoteService {
 	List<IPlayerRating> getRatingQueryResults(long parseLong);
 	//List<IPlayerRating> getTimeSeriesRatingQueryResults(long parseLong);
 	Boolean deleteRatingQuery(IRatingQuery query);
+	IRatingQuery rerunRatingQuery(Long id);
 	String checkPipelineStatus(String id, Long matchId);
 	IMatchGroup AddMatchToRound(IRound round);
 	String cleanUp();

@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 public class TopTen implements EntryPoint {
 
 	private SimplePanel appWidget = new SimplePanel();
-	private final Place defaultPlace = new SeriesPlace("TX:c=1");
+	private final Place defaultPlace = new FeatureListPlace();
 	private ClientFactory clientFactory = null;
 
 	@SuppressWarnings("deprecation")
@@ -43,34 +43,29 @@ public class TopTen implements EntryPoint {
 		// Start PlaceHistoryHandler with our PlaceHistoryMapper
 		AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
 		final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
-		// Get rid of the dynamically generated page as quick as we can, it just causes problems when the hash fragment changes.
 		String guid = clientFactory.getPlaceFromURL();
-//		if (guid != null && !guid.isEmpty()) {
-//			UrlBuilder builder = Location.createUrlBuilder().removeParameter("listId").removeParameter("compId").removeParameter("playerId").setPath("topten.html");
-//			Window.Location.replace(builder.buildString());
-			clientFactory.getRpcService().getPlace(guid, new AsyncCallback<IServerPlace>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					historyHandler.register(placeController, eventBus, defaultPlace);					
-				}
 
-				@Override
-				public void onSuccess(IServerPlace result) {
-					Place sp = null;
-					if (result.getType().equals(PlaceType.SERIES)) {
-						sp = new SeriesPlace(result.getCompId(), result.getSeriesId(), result.getGroupId(), result.getMatrixId(), result.getQueryId(), result.getItemId());
-					} else {
-						sp = new FeatureListPlace(result.getCompId(), result.getQueryId(), result.getItemId());
-					}
-					historyHandler.register(placeController, eventBus, sp);	
-					historyHandler.handleCurrentHistory();
-				}
+		clientFactory.getRpcService().getPlace(guid, new AsyncCallback<IServerPlace>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				historyHandler.register(placeController, eventBus, defaultPlace);					
+			}
 
-			});
-//		} else {
-//			historyHandler.register(placeController, eventBus, defaultPlace);
-//			historyHandler.handleCurrentHistory();
-//		}
+			@Override
+			public void onSuccess(IServerPlace result) {
+				clientFactory.console("getPlace.onSuccess " + result.toString());
+				Place sp = null;
+				if (result.getType().equals(PlaceType.SERIES)) {
+					sp = new SeriesPlace(result.getCompId(), result.getSeriesId(), result.getGroupId(), result.getMatrixId(), result.getQueryId(), result.getItemId());
+				} else {
+					sp = new FeatureListPlace(result.getCompId(), result.getQueryId(), result.getItemId());
+				}
+				historyHandler.register(placeController, eventBus, sp);	
+				historyHandler.handleCurrentHistory();
+			}
+
+		});
+
 
 
 		RootPanel.get("app").add(appWidget);

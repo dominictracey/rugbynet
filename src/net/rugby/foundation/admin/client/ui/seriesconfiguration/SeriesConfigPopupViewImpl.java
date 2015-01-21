@@ -78,7 +78,7 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 							
 							fieldDefinitions.setCompList(compList);
 
-							clientFactory.getUniversalRoundsListAsync(20, new GetUniversalRoundsListCallback() {
+							clientFactory.getUniversalRoundsListAsync(52, new GetUniversalRoundsListCallback() {
 
 								@Override
 								public void onUniversalRoundListFetched(List<UniversalRound> urs) {
@@ -156,7 +156,7 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 							
 							fieldDefinitions.setCompList(comps);
 							
-							clientFactory.getUniversalRoundsListAsync(20, new GetUniversalRoundsListCallback() {
+							clientFactory.getUniversalRoundsListAsync(52, new GetUniversalRoundsListCallback() {
 
 								@Override
 								public void onUniversalRoundListFetched(List<UniversalRound> urs) {
@@ -179,7 +179,7 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 				public void onCompListFetched(List<ICompetition> comps) {
 					
 					fieldDefinitions.setCompList(comps);
-					clientFactory.getUniversalRoundsListAsync(20, new GetUniversalRoundsListCallback() {
+					clientFactory.getUniversalRoundsListAsync(52, new GetUniversalRoundsListCallback() {
 
 						@Override
 						public void onUniversalRoundListFetched(List<UniversalRound> urs) {
@@ -194,7 +194,7 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 				}
 			});
 		} else if (fieldDefinitions.getUrList() == null) {
-			clientFactory.getUniversalRoundsListAsync(20, new GetUniversalRoundsListCallback() {
+			clientFactory.getUniversalRoundsListAsync(52, new GetUniversalRoundsListCallback() {
 
 				@Override
 				public void onUniversalRoundListFetched(List<UniversalRound> urs) {

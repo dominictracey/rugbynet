@@ -49,6 +49,8 @@ public interface ITeamGroup extends IGroup {
 	 */
 	public void setColor(String color);
 
+	public abstract String getTwitterChannel();
+	public abstract String setTwitterChannel(String twitterChannel);
 	
 	
 }

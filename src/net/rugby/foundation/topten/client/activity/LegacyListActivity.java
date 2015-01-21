@@ -25,7 +25,11 @@ public class LegacyListActivity extends AbstractActivity {
 		FeatureListPlace newPlace = new FeatureListPlace();
 		
 		newPlace.setListId(place.getListId());
-		newPlace.setCompId(place.getCompId());
+//		if (place.getCompId() == null) {
+//			newPlace.setCompId(compId);
+//		} else {
+			newPlace.setCompId(place.getCompId());
+		//}
 		
 		clientFactory.getPlaceController().goTo(newPlace);
 		

@@ -32,6 +32,8 @@ public class Competition implements Serializable, ICompetition {
 	private Date begin;
 	private Date end;
 	private Boolean underway;
+	private Boolean showToClient;
+	
 	private Long foreignID;
 	private String foreignURL;
 	private Long compClubhouse;
@@ -460,6 +462,14 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setComponentCompIds(List<Long> componentCompIds) {
 		this.componentCompIds = componentCompIds;
+	}
+	@Override
+	public Boolean getShowToClient() {
+		return showToClient;
+	}
+	@Override
+	public void setShowToClient(Boolean showToClient) {
+		this.showToClient = showToClient;
 	}
 
 

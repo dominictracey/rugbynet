@@ -34,7 +34,7 @@ public class MetaTagGenerator extends HttpServlet {
 
 	private ITopTenListFactory ttlf;
 	private IPlayerFactory pf;
-	private ICachingFactory<IContent> ctf;
+	private IContentFactory ctf;
 
 
 	private IContent details2Content;
@@ -43,7 +43,7 @@ public class MetaTagGenerator extends HttpServlet {
 	private String details2Div;
 
 	@Inject
-	public MetaTagGenerator(ITopTenListFactory ttlf, IPlayerFactory pf, ITeamGroupFactory tf, ICachingFactory<IContent> ctf) {
+	public MetaTagGenerator(ITopTenListFactory ttlf, IPlayerFactory pf, ITeamGroupFactory tf, IContentFactory ctf) {
 		this.ttlf = ttlf;
 		this.pf = pf;
 		this.ctf = ctf;

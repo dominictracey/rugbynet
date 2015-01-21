@@ -2,6 +2,7 @@ package net.rugby.foundation.core.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +19,11 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.Sponsor;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -32,7 +35,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	}
 	
 	public interface RoundChangeListener {
-		void roundChanged(int roundOrdinal);
+		void roundChanged(UniversalRound roundOrdinal);
 	}
 	
 	public interface GuidChangeListener {
@@ -102,6 +105,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	// sponsor map
 	private Map<Long, ISponsor> sponsorMap = null;
 	ISponsor noSponsor = new Sponsor();
+	private Map<Integer, UniversalRound> universalRoundMap = new HashMap<Integer, UniversalRound>();
 	
 	/**
 	 * Use the static getInstance factory method
@@ -274,7 +278,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	public void setCurrentCompId(final Long currentCompId) {
 		if (!this.currentCompId.equals(currentCompId)) {
 			this.currentCompId = currentCompId;
-
+			currentRoundOrdinal = config.getCurrentUROrdinal();
 			for (CompChangeListener l : compChangeListeners) {
 				l.compChanged(currentCompId);
 			}
@@ -645,12 +649,45 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	}
 
 	public void setCurrentRoundOrdinal(int i, boolean force) {
+		// first off, does this round make sense for this comp? Is it within the time bounds of the comp? If it is before the first, set it to the first round; if it is after the last set it to the last
+		ICompetition comp = getCurrentComp();
+
+		if (comp != null && comp.getRounds() != null && !comp.getRounds().isEmpty()) {
+			if (i < comp.getRounds().get(0).getUrOrdinal()) {
+				i = comp.getRounds().get(0).getUrOrdinal();
+			} else if (i > comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal()) {
+				i = comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal();
+			}
+		} 
+		
 		if (this.currentRoundOrdinal != i || force) {
 			this.currentRoundOrdinal = i;
+			final int ord = i;
+			if (!universalRoundMap.containsKey(i)) {
+				clientFactory.getRpcService().getUniversalRound(i, new AsyncCallback<UniversalRound>() {
 
-			for (RoundChangeListener l : roundChangeListeners) {
-				l.roundChanged(i);
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onSuccess(UniversalRound result) {
+						universalRoundMap.put(ord,result);
+						for (RoundChangeListener l : roundChangeListeners) {
+							l.roundChanged(result);
+						}
+					}
+					
+				});
+			} else {
+				for (RoundChangeListener l : roundChangeListeners) {
+					l.roundChanged(universalRoundMap.get(i));
+				}
 			}
+
+
 		}
 		
 	}
@@ -749,6 +786,54 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			});
 		}
 		
+		
+	}
+
+	@Override
+	public void getUniversalRound(final int ordinal,
+			AsyncCallback<UniversalRound> asyncCallback) {
+		if (!universalRoundMap.containsKey(ordinal)) {
+			clientFactory.getRpcService().getUniversalRound(ordinal, new AsyncCallback<UniversalRound>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess(UniversalRound result) {
+					universalRoundMap.put(ordinal,result);
+					for (RoundChangeListener l : roundChangeListeners) {
+						l.roundChanged(result);
+					}
+				}
+				
+			});
+		} else {
+			for (RoundChangeListener l : roundChangeListeners) {
+				l.roundChanged(universalRoundMap.get(ordinal));
+			}
+		}
+		
+	}
+
+	@Override
+	public void getContent(String string, final AsyncCallback<IContent> cb) {
+		clientFactory.getRpcService().getContent(string, new AsyncCallback<IContent>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(IContent result) {
+				cb.onSuccess(result); // don't bother caching? @REX
+				
+			}
+			
+		});
 		
 	}
 

@@ -57,8 +57,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		view.setPresenter(this);
 		listView = clientFactory.getSimpleView();
 		listView.setPresenter(this);
-		noteView = clientFactory.getNoteView();
-		noteView.setPresenter(this);
+
 		view.setListView(listView);
 		sidebarView = clientFactory.getSidebarView();
 		
@@ -69,9 +68,12 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
+		final NoteViewPresenter<INote> _this = this;
+		
+		clientFactory.console("SeriesActivity.start");
 		
 		clientFactory.RegisterIdentityPresenter(this);
-		
+
 		panel.setWidget(view.asWidget());
 
 		clientFactory.doSetup(new AsyncCallback<ICoreConfiguration>() {
@@ -82,6 +84,11 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 			@Override
 			public void onSuccess(final ICoreConfiguration coreConfig) {
+				noteView = clientFactory.getNoteView();
+				noteView.setPresenter(_this);
+				noteView.asWidget().setVisible(false);
+				
+				clientFactory.console("SeriesActivity doSetup complete");
 				_coreConfig = coreConfig;
 //				if (sPlace != null) {
 //					view.copyPlace(sPlace);
@@ -153,6 +160,9 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 //			}
 //			starting = false;
 			Logger.getLogger("SeriesActivity").log(Level.INFO, "Happy");
+			
+			if (view.getSeries() != null && view.getSeries().getSponsor() != null && view.getSeries().getSponsor().getAbbr() != null)
+				recordAnalyticsEvent("sponsor", "show", view.getSeries().getSponsor().getAbbr(), 1);
 			
 			refreshButtons();
 		}
@@ -360,7 +370,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			public void onSuccess(ITopTenList result) {		
 				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getList");
 				view.setList(result);
-				listView.setList(result, _coreConfig.getBaseToptenUrlForFacebook());
+				listView.setList(result, _coreConfig.getBaseToptenUrl());
 				getNotes(result);
 				refreshButtons();
 				Core.getCore().setCurrentRoundOrdinal(result.getRoundOrdinal(), false);
@@ -397,6 +407,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 					public void onSuccess(List<INote> notes) {
 
 						noteView.setNotes(notes);
+						clientFactory.getNoteView().asWidget().setVisible(true);
 					}
 
 				});
@@ -479,8 +490,23 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 	@Override
 	public Boolean deleteNote(Long noteId) {
-		// TODO Auto-generated method stub
-		return null;
+		clientFactory.getRpcService().deleteNote(noteId, new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				getNotes(listView.getList());	
+				
+			}
+			
+		}); 
+			
+		return true;
 	}
 
 	@Override

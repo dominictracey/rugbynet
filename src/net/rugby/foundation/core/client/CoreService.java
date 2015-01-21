@@ -15,6 +15,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -113,6 +114,7 @@ public interface CoreService extends RemoteService {
 	
 	IContent getContent(Long contentId);
 	IContent saveContent(IContent content);
+	IContent getContent(String string);
 
 	/**
 	 * 
@@ -124,4 +126,6 @@ public interface CoreService extends RemoteService {
 	ISponsor getSponsor(Long id);
 	
 	ArrayList<IMatchGroup> getResultsForOrdinal(int ordinal, Long virtualCompId);
+	
+	UniversalRound getUniversalRound(int ordinal);
 }

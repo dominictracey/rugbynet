@@ -32,6 +32,8 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 		
 		void setTimeSeries(boolean isTrue);
 
+		void rerunQuery(IRatingQuery rq);
+
 	} 
 
 

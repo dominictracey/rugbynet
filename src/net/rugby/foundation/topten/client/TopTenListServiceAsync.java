@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
@@ -35,7 +34,7 @@ public interface TopTenListServiceAsync {
 	public void getLatestForComp(Long compId, AsyncCallback<ITopTenList> asyncCallback);
 	public void getLatestListIdForComp(Long compId,
 			AsyncCallback<Long> asyncCallback);
-	public void getContentItems(AsyncCallback<List<IContent>> asyncCallback);
+	public void getContentItems(AsyncCallback<HashMap<String,Long>> asyncCallback);
 	public void saveTopTenList(ITopTenList list,
 			AsyncCallback<ITopTenList> asyncCallback);
 	public void getPlayerRating(Long playerRatingId,
@@ -66,4 +65,5 @@ public interface TopTenListServiceAsync {
 			AsyncCallback<IServerPlace> asyncCallback);
 	public void getLatestFeatures(AsyncCallback<List<Feature>> asyncCallback);
 	public void getTeamLogoStyleMap(AsyncCallback<HashMap<Long, String>> asyncCallback);
+	public void deleteNote(Long noteId, AsyncCallback<Boolean> asyncCallback);
 }

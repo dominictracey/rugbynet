@@ -48,7 +48,8 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 		view.setPresenter(this);
 		//final Identity.Presenter identityPresenter = this;
 		clientFactory.RegisterIdentityPresenter(this);
-
+		clientFactory.console("FeatureActivity.start");
+		clientFactory.getNoteView().asWidget().setVisible(false);
 		clientFactory.doSetup(new AsyncCallback<ICoreConfiguration>() {
 
 
@@ -59,6 +60,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 
 			@Override
 			public void onSuccess(final ICoreConfiguration coreConfig) {
+				clientFactory.console("FeatureActivity.start doSetup complete with place " + place.getToken());
 				_coreConfig = coreConfig;
 				if (place != null) {
 					if (place.getListId() != null) {
@@ -79,13 +81,20 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 								
 
 								if (ttl != null) {
-									view.setList(ttl, coreConfig.getBaseToptenUrlForFacebook());
+									view.setList(ttl, coreConfig.getBaseToptenUrl());
 									// allow other elements to display this comp/round
 									Long compId = ttl.getCompId();
-									if (!Core.getCore().getCurrentCompId().equals(compId)) {
-										Core.getCore().setCurrentCompId(compId);
-									}
-									Core.getCore().setCurrentRoundOrdinal(ttl.getRoundOrdinal(), false);
+									//if (!Core.getCore().getCurrentCompId().equals(compId)) {
+									Core.getCore().setCurrentCompId(compId);
+									//}
+									
+									//if (ttl.getRoundOrdinal() != null) {
+									//clientFactory.console("FeatureActivity.start calling setCurrentRoundOrdinal with " + ttl.getRoundOrdinal());
+										Core.getCore().setCurrentRoundOrdinal(ttl.getRoundOrdinal(), false);
+									//} else {
+										// show either the latest or last results
+									//	setRoundForLegacyComp(ttl);
+									//}
 									
 									refreshButtons(login, ttl);
 									
@@ -94,7 +103,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 									setURL();
 
 									// show facebook comments				
-									clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + ttl.getGuid() + "/");
+									clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + ttl.getFeatureGuid() + "/");
 									
 								} else {
 									Window.alert("Failed to fetch top ten list.");
@@ -108,6 +117,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 					} else { // no listId
 						// do we have a comp?
 						if (place.getCompId() == null) {
+							clientFactory.console("FeatureActivity.start for no ListId");
 							FeatureListPlace newPlace = new FeatureListPlace();
 							newPlace.setCompId(coreConfig.getDefaultCompId());
 							if (coreConfig.getDefaultCompId() == null) {
@@ -134,7 +144,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 					clientFactory.setTTLName(ttl.getNextId(), view.getNextLabel());
 				}
 				if (ttl.getPrevId() != null) {
-					clientFactory.setTTLName(ttl.getNextId(), view.getPrevLabel());
+					clientFactory.setTTLName(ttl.getPrevId(), view.getPrevLabel());
 				}
 				view.hasNext(ttl.getNextId() != null);
 				view.hasPrev(ttl.getPrevId() != null);
@@ -143,7 +153,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 					clientFactory.setTTLName(ttl.getNextId(), view.getNextLabel());
 				}
 				if (ttl.getPrevPublishedId() != null) {
-					clientFactory.setTTLName(ttl.getNextId(), view.getPrevLabel());
+					clientFactory.setTTLName(ttl.getPrevId(), view.getPrevLabel());
 				}
 			}
 		} else {
@@ -169,6 +179,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 			Core.getCore().setCurrentCompId(compId);
 		}
 		
+		clientFactory.console("Looking for a list for compId " + compId);
 		clientFactory.getRpcService().getLatestListIdForComp(compId, new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -179,6 +190,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 			@Override
 			public void onSuccess(Long result) {
 
+				clientFactory.console("Got this listId as latest for compId " + result);
 				if (result != null) {
 					FeatureListPlace newPlace = new FeatureListPlace();
 					newPlace.setCompId(compId);

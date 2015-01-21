@@ -107,7 +107,7 @@ public class SidebarViewImpl extends Composite
 	}
 
 	public void setup(ICoreConfiguration coreConfig) {
-		for (Long compId : coreConfig.getCompsUnderway()) {
+		for (Long compId : coreConfig.getCompsForClient()) {
 			addCompMenu(compId, coreConfig.getCompetitionMap().get(compId), coreConfig.getSeriesMap().get(compId));
 		}
 
@@ -241,6 +241,11 @@ public class SidebarViewImpl extends Composite
 		ListGroupItem li = liMap.get(comp.getId());
 		// apply active class to li
 		li.setStyleName("active");
+		
+		ListGroup subMenu = submenuMap.get(comp.getId());
+		// open the submenu
+		subMenu.getElement().getStyle().setProperty("display", "block");
+		
 		
 		// remove the carat if it is somewhere else
 		if (caratParent != null && carat != null) {

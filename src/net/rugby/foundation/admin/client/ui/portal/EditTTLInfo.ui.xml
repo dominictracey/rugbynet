@@ -31,6 +31,8 @@
 <!-- 				number in the top ten of the queried list, only the first N will -->
 <!-- 				make the list and players from other teams will be moved up in the -->
 <!-- 				order they appear. The default is 10: no limit.</b:HelpBlock> -->
+			<b:Label>Host Comp</b:Label>
+			<b:ListBox ui:field='hostComp'></b:ListBox>
 			<b:Label>Twitter Handles</b:Label>
 			<g:HTMLPanel ui:field="twitterHandles" />
 			<b:Nav>

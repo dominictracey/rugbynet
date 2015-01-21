@@ -28,7 +28,7 @@ public class ContentActivity extends AbstractActivity implements ContentPresente
 	private ContentPlace place;
 	private ContentView view;
 	private ClientFactory clientFactory;
-	
+
 	public ContentActivity(ContentPlace place, ClientFactory clientFactory) {
 
 		this.clientFactory = clientFactory;
@@ -51,50 +51,52 @@ public class ContentActivity extends AbstractActivity implements ContentPresente
 
 			@Override
 			public void onSuccess(final ICoreConfiguration coreConfig) {
-		
-//		Core.getCore().getContent(place.getContentId(), new AsyncCallback<IContent>() {
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				// fail silently
-//				//Window.alert("Failed to fetch top ten list.");
-//			}
-//
-//			@Override
-//			public void onSuccess(final IContent result) {
-				//linear search ick
-				Iterator<IContent> it =  clientFactory.getContentList().iterator();
-				boolean found = false;
-				IContent result = null;
-				while (it.hasNext()) {
-					result = it.next();
-					if (result.getId().equals(place.getContentId())) {
-						found = true;
-						break;
-					}
-				}
-				
-				if (found) {
-					view.setContent(result);
-				}
-				
-				LoginInfo login = clientFactory.getLoginInfo();
 
-				if (login != null && login.isTopTenContentEditor()) {
-					view.showFooter(true);
-				} else {
-					view.showFooter(false);
-				}
-			}	
+				Core.getCore().getContent(place.getContentId(), new AsyncCallback<IContent>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						// fail silently
+						//Window.alert("Failed to fetch top ten list.");
+					}
+
+					@Override
+					public void onSuccess(final IContent result) {
+						//				//linear search ick
+						//				Iterator<IContent> it =  clientFactory.getContentList().iterator();
+						//				boolean found = false;
+						//				IContent result = null;
+						//				while (it.hasNext()) {
+						//					result = it.next();
+						//					if (result.getId().equals(place.getContentId())) {
+						//						found = true;
+						//						break;
+						//					}
+						//				}
+
+						//				if (found) {
+						view.setContent(result);
+						//				}
+
+						LoginInfo login = clientFactory.getLoginInfo();
+
+						if (login != null && login.isTopTenContentEditor()) {
+							view.showFooter(true);
+						} else {
+							view.showFooter(false);
+						}
+					}	
+				});
+			}
 		});
-		
+
 	}
-	
+
 	@Override
 	public void editContent(IContent result) {
 		EditContent ec = clientFactory.getEditContentDialog();
 		ec.setContent(result, this);
 		ec.center();
-		
+
 	}
 
 	@Override
@@ -117,7 +119,7 @@ public class ContentActivity extends AbstractActivity implements ContentPresente
 	@Override
 	public void cancelEditContent() {
 		clientFactory.getEditContentDialog().hide();
-		
+
 	}
 
 	/* (non-Javadoc)

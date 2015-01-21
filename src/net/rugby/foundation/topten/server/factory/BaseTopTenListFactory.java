@@ -87,7 +87,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	private ISocialMediaDirector smd;
 	private INotesCreator nc;
 	private IRatingSeriesFactory rsf;
-	private IUniversalRoundFactory urf;
+	protected IUniversalRoundFactory urf;
 	private INoteFactory nf;
 	private IRatingMatrixFactory rmf;
 	private IRatingGroupFactory rgf;
@@ -417,6 +417,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 		// if this is a series generated query we set it up a little differently since it doesn't participate in the publish chain
 		IRatingQuery rq = rqf.get(tti.getQueryId());
+		
+		if (rq.getRatingMatrix() == null && rq.getRatingMatrixId() != null) {
+			rq = rqf.buildUplinksForQuery(rq);
+		}
+		
 		if (rq.getRatingMatrix() != null) {
 			list.setSeries(true);
 			list.setRoundOrdinal(rq.getRatingMatrix().getRatingGroup().getUniversalRoundOrdinal());
@@ -466,13 +471,23 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			Map<Long,Integer> numFromTeam = new HashMap<Long, Integer>();
 			Iterator<IPlayerRating> it = set.iterator();
 			int count = 0;
+			String twitterMatch = null;
 			if (!list.getSeries())
 				list.setContent("<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n");
+			else {
+				// is this a match list?
+				if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH)) {
+					twitterMatch = " ";
+				}
+			}
 
 			while (it.hasNext() && count < 10) {
 				IPlayerRating pmr = it.next();
 				IPlayerMatchStats pms = pmsf.get(pmr.getMatchStatIds().get(0));
 				IMatchGroup match = mf.get(pms.getMatchId());
+				if (twitterMatch != null) { // will be " ", not null
+					twitterMatch = "#" + match.getHomeTeam().getAbbr() + "v" + match.getVisitingTeam().getAbbr();
+				}
 				ITeamGroup team = tf.get(pms.getTeamId());
 
 				// keep track of players per team
@@ -511,7 +526,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 			// update the line item tweets
 			TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf);
-			twitterPromoter.process(list);
+			twitterPromoter.process(list, twitterMatch);
 		}
 
 
@@ -571,8 +586,36 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		}
 
 		// and create a feature guid
-		// create the place guid
 		IServerPlace p = spf.create();
+		createFeatureGuid(list, p);
+
+		// now add the per-item guids to point to the feature as well
+		createFeatureItemGuids(list);
+		
+		return p;
+	}
+
+	private void createFeatureItemGuids(ITopTenList list) {
+		for (ITopTenItem item : list.getList()) {
+			
+			IServerPlace ip = spf.create();
+			ip.setCompId(list.getCompId());
+			ip.setListId(list.getId());
+			ip.setItemId(item.getId());
+			ip.setType(PlaceType.FEATURE);
+			spf.put(ip); 
+			item.setFeatureGuid(ip.getGuid());
+			
+			put(item);
+		}	
+		
+		// update the line item tweets
+		TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf);
+		twitterPromoter.process(list);
+	}
+
+	private void createFeatureGuid(ITopTenList list, IServerPlace p) {
+
 		p.setCompId(list.getCompId());
 		p.setListId(list.getId());
 		p.setItemId(null);
@@ -583,20 +626,6 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		list.setFeatureGuid(p.getGuid());
 		put(list);
 		
-		// now add the per-item guids to point to the feature as well
-		for (ITopTenItem item : list.getList()) {
-			
-			IServerPlace ip = spf.create();
-			ip.setCompId(list.getCompId());
-			ip.setListId(list.getId());
-			ip.setItemId(item.getId());
-			ip.setType(PlaceType.FEATURE);
-			spf.put(ip); 
-			item.setFeatureGuid(ip.getGuid());
-			put(item);
-		}
-		
-		return p;
 	}
 
 	private void buildTwitterDescription(ITopTenList list, IRatingQuery rq) {
@@ -728,6 +757,17 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			if (value == null) {
 				mr = getFromPeristentDatastore(id);
 
+				// upgrade server places if needed
+				if (mr.getContent() != null && !mr.getContent().isEmpty() && mr.getFeatureGuid() == null) {
+					// and create a feature guid
+					IServerPlace p = spf.create();
+					createFeatureGuid(mr, p);
+
+					// now add the per-item guids to point to the feature as well
+					createFeatureItemGuids(mr);
+
+				}
+				
 				if (mr != null) {
 					ByteArrayOutputStream bos = new ByteArrayOutputStream();
 					ObjectOutput out = new ObjectOutputStream(bos);   

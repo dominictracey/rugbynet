@@ -14,6 +14,7 @@ public class TeamGroup extends Group implements ITeamGroup {
 	private String abbr;
 	private String shortName;
 	private String twitter;
+	private String twitterChannel;
 	private String color;
 	
 	public TeamGroup() {
@@ -157,6 +158,17 @@ public class TeamGroup extends Group implements ITeamGroup {
 	public void setColor(String color) {
 		this.color = color;
 		
+	}
+
+	@Override
+	public String getTwitterChannel() {
+		return twitterChannel;
+	}
+
+	@Override
+	public String setTwitterChannel(String twitterChannel) {
+		this.twitterChannel = twitterChannel;
+		return this.twitterChannel;
 	}
 
 //	@Override

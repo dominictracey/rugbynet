@@ -100,7 +100,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 		prev.addStyleName("col-xs-5");
 		next.addStyleName("col-xs-5");
 		
-		sponsorTag.setHTML("<center>delivered by DHL</center>");
+		//sponsorTag.setHTML("<center>delivered by DHL</center>");
 		sponsorTag.addStyleName("font-size:.5em");
 		
 		sponsorRow.addStyleName("sponsor");

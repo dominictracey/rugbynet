@@ -184,6 +184,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				// add item to date dropdown
 				final AnchorListItem nl = new AnchorListItem(rg.getLabel());
 				final Long gid = rg.getId();
+				final String label = rg.getLabel();
 				nl.setText(rg.getLabel());
 				nl.addClickHandler(new ClickHandler() {
 
@@ -198,6 +199,8 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						setItemId(null);
 						//Core.getCore().setCurrentRoundId(rid);
 						presenter.gotoPlace(getPlace());
+						
+						weekButton.setText(label);
 					}
 
 				});

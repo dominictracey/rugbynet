@@ -39,6 +39,7 @@ public class SocialMediaDirector implements ISocialMediaDirector {
 		for (ITopTenItem i: ttl.getList()) {
 			body += j++ + ". " + i.getPlayer().getDisplayName() + " (" + i.getRating() + ")<br/>";
 		}
+		body += "<hr>" + ttl.getContent();
 		body += "</body></html>";
 		AdminEmailer emailer = new AdminEmailer();
 		emailer.setMessage(body);

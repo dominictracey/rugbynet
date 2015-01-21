@@ -40,21 +40,13 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	private static Injector injector = null;
 
 	private IRatingQueryFactory rqf;
-
 	private IMatchRatingEngineSchemaFactory mresf;
-
 	private IQueryRatingEngineFactory qref;
-
 	private IPlayerRatingFactory prf;
-
 	private ITopTenListFactory ttlf;
-
 	private IRoundFactory rf;
-
 	private IUniversalRoundFactory urf;
-
 	private IMatchGroupFactory mgf;
-
 	private ICompetitionFactory cf;
 
 
@@ -80,10 +72,19 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		this.urf = injector.getInstance(IUniversalRoundFactory.class);
 		this.mgf = injector.getInstance(IMatchGroupFactory.class);
 		this.cf = injector.getInstance(ICompetitionFactory.class);
+
 		
 		// first see if we are re-running, in which case clear out any ratings already in place
 		if (!rq.getStatus().equals(Status.NEW)) {
 			prf.deleteForQuery(rq);
+			
+			if (rq.getTopTenListId() != null) {
+				ITopTenList list = ttlf.get(rq.getTopTenListId());
+				if (list != null) {
+					ttlf.delete(list);
+				}
+				rq.setTopTenListId(null);
+			}
 		}
 
 		rq.setStatus(Status.RUNNING);
@@ -117,10 +118,15 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		if (ok) {
 			// the engine will set the status to complete if successful
 			IRatingQuery procked = rqf.get(rq.getId());
-	
+
 			// now create the TTL
 			String title = "Top Ten ";
 			String context = "";
+			
+			if (rq.getRatingMatrix() == null && rq.getRatingMatrixId() != null) {
+				rq = rqf.buildUplinksForQuery(rq);
+			}
+			
 			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH)) {
 				title += "Players from ";
 				IRound r = rf.get(rq.getRoundIds().get(0));
@@ -244,7 +250,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				sponsorId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostComp().getSponsorId();
 			}
 			
-			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", null, rq.getRoundIds(), 10, sponsorId);
+			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId(), rq.getRoundIds(), 10, sponsorId);
 			data.setContext(context);
 			ITopTenList ttl = ttlf.create(data);
 			
@@ -263,5 +269,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		return new ImmediateValue<Boolean>(false);
 
 	}
+
+	
 
 }

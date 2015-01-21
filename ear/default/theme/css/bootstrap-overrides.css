@@ -308,7 +308,7 @@ textarea::-webkit-input-placeholder {
 		}
 
 	.navbar-brand img.logo{
-		width: 288px;
+		width: 300px;   // changed DPT 1/6/2015
 		height: 36px;
 		}	
 

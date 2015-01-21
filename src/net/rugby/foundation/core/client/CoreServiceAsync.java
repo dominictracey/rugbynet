@@ -16,6 +16,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 /**
  * @author home
@@ -78,4 +79,7 @@ public interface CoreServiceAsync {
 //	void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
 	void getSponsor(Long id, AsyncCallback<ISponsor> asyncCallback);
 	void getResultsForOrdinal(int ordinal, Long virtualCompId, AsyncCallback<ArrayList<IMatchGroup>> asyncCallback);
+	
+	void getUniversalRound(int ordinal, AsyncCallback<UniversalRound> asyncCallback);
+	void getContent(String string, AsyncCallback<IContent> cb);
 }

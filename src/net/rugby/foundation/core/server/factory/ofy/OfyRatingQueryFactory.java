@@ -13,6 +13,8 @@ import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.BaseRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
@@ -29,8 +31,9 @@ public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRa
 	private ITopTenListFactory ttlf;
 
 	@Inject 
-	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf, IRatingSeriesFactory rsf, ITopTenListFactory ttlf) {
-		super(rsf);
+	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf, IRatingSeriesFactory rsf, ITopTenListFactory ttlf,
+			IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
+		super(rsf,rgf,rmf);
 		this.prf = pmrf;
 		this.ttlf = ttlf;
 	}

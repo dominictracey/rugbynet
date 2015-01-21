@@ -208,8 +208,17 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 
 		rgf.put(rg);
-		rs.getRatingGroupIds().add(rg.getId());
-		rs.getRatingGroups().add(rg);
+		// put it at the right place (sort by UR ordinal)
+		int index = 0;
+		for (IRatingGroup cursor : rs.getRatingGroups()) {
+			if (cursor.getUniversalRoundOrdinal() < rg.getUniversalRoundOrdinal()) {
+				break;
+			}
+			index++;
+		}
+		
+		rs.getRatingGroupIds().add(index, rg.getId());
+		rs.getRatingGroups().add(index, rg);
 		rsf.put(rs);
 
 		return rg;
@@ -286,6 +295,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rq.getPositions().add(pos);
 					rq.setLabel(pos.getName());
 					rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
+					rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
 					rq.setScaleStanding(true);
 					rq.setScaleComp(false);
 					rq.setScaleTime(scaleTime);
@@ -332,7 +342,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 				rq.setScaleTime(scaleTime);
 
 				rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
-
+				rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
 				rq.setRoundIds(rids);
 				rq.setRatingMatrixId(rm.getId());
 				rq.setLabel(rm.getRatingGroup().getUniversalRound().longDesc);

@@ -21,6 +21,7 @@ import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.client.resources.noteTemplates.NoteTemplates;
 import net.rugby.foundation.topten.client.ui.HeaderView;
@@ -49,6 +50,7 @@ import net.rugby.foundation.topten.model.shared.Note;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -90,10 +92,10 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	private static Presenter identityPresenter = null;
 	private static LoginInfo loginInfo = null;
 	private static ICoreConfiguration coreConfig = null;
-	private static List<IContent> contentList = null;
+	private static HashMap<String,Long> contentNameMap = null;
 	private static RatingPopupViewImpl<IPlayerRating> ratingPopup = null;
 	private static HashMap<Long, String> teamLogoStyleMap = null;
-	
+
 	// Here are our note rendering caches
 	private static Map<Long, String> playerNames = new HashMap<Long, String>();
 	private static Map<Long, String> ttlNames = new HashMap<Long, String>();
@@ -181,7 +183,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	public EditTTLInfo getEditTTLInfo() {
 		if (editTTLInfo == null) {
 			editTTLInfo = new EditTTLInfo();
-			loadWYSIWYGEditor("edit..");
+			//loadWYSIWYGEditor("edit..");
 		}
 		return editTTLInfo;
 	}
@@ -215,7 +217,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		final CompChangeListener _compListener = this;
 		final RoundChangeListener _roundListener = this;
 		final GuidChangeListener _guidListener = this;
-
+		console("doSetup");
 		if (coreConfig == null) {
 			Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 
@@ -226,6 +228,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 				@Override
 				public void onSuccess(final ICoreConfiguration config) {
+					console("getConfiguration.onSuccess");
 					final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
 					// where we keep the sign in/sign out
 					if (i.getParent() == null) {
@@ -248,71 +251,55 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 						@Override
 						public void onSuccess(LoginInfo result) {
 
+							console("login.onSuccess");
 							loginInfo = result;
 							coreConfig = config;
-							// set up content 
-							getRpcService().getContentItems( new AsyncCallback<List<IContent>>() {
 
 
+							getSidebarView().setup(coreConfig);
+
+							getRpcService().getLatestFeatures(new AsyncCallback<List<Feature>>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									cb.onFailure(caught);
+									// TODO Auto-generated method stub
+
 								}
 
 								@Override
-								public void onSuccess(List<IContent> contentList) {
-									ClientFactoryImpl.contentList = contentList;
+								public void onSuccess(List<Feature> result) {
+									console("getLatestFeatures.onSuccess");
+									if (result != null) {
+										getLatestFeatureView().setRecentFeatures(result);
+									}
 
-									getHeaderView().setContent(contentList, loginInfo.isTopTenContentEditor());	
-
-									getSidebarView().setup(coreConfig);
-
-									getRpcService().getLatestFeatures(new AsyncCallback<List<Feature>>() {
+									// and the teamLogoMap
+									getRpcService().getTeamLogoStyleMap( new AsyncCallback<HashMap<Long, String>>() {
 
 										@Override
-										public void onFailure(Throwable caught) {
+										public void onFailure(
+												Throwable caught) {
 											// TODO Auto-generated method stub
 
 										}
 
 										@Override
-										public void onSuccess(List<Feature> result) {
-											if (result != null) {
-												getLatestFeatureView().setRecentFeatures(result);
-											}
-											
-											// and the teamLogoMap
-											getRpcService().getTeamLogoStyleMap( new AsyncCallback<HashMap<Long, String>>() {
+										public void onSuccess( HashMap<Long, String> result) {
+											console("getTeamLogoStyleMap.onSuccess");
+											teamLogoStyleMap = result;
 
-												@Override
-												public void onFailure(
-														Throwable caught) {
-													// TODO Auto-generated method stub
-													
-												}
+											Core.getCore().registerCompChangeListener(_compListener);
+											Core.getCore().registerRoundChangeListener(_roundListener);
+											Core.getCore().registerGuidChangeListener(_guidListener);
 
-												@Override
-												public void onSuccess( HashMap<Long, String> result) {
-													teamLogoStyleMap = result;
-													
-													Core.getCore().registerCompChangeListener(_compListener);
-													Core.getCore().registerRoundChangeListener(_roundListener);
-													Core.getCore().registerGuidChangeListener(_guidListener);
+											//Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
+											cb.onSuccess(coreConfig);
 
-													//Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
-													cb.onSuccess(coreConfig);
-													
-												}
-												
-											});
-
-	
+											setupContent();
 										}
 
-
-
 									});
+
 								}
 
 							});
@@ -324,6 +311,53 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		} else {
 			cb.onSuccess(coreConfig);
 		}
+	}
+
+	private void setupContent() {
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			public void execute() {
+				// set up content 
+				getRpcService().getContentItems( new AsyncCallback<HashMap<String,Long>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						//cb.onFailure(caught);
+					}
+
+					@Override
+					public void onSuccess(HashMap<String,Long> contentNameMap) {
+						console("getContentItems.onSuccess");
+						ClientFactoryImpl.contentNameMap = contentNameMap;
+
+						getHeaderView().setContent(contentNameMap, loginInfo.isTopTenContentEditor());	
+						
+						//*** RATING DETAIL POPUP SETUP
+						if (ratingPopup == null) {
+							ratingPopup = new RatingPopupViewImpl<IPlayerRating>();
+
+							// do we have the contentId yet?
+							if (popupDetails.isEmpty()) {
+									Core.getCore().getContent("rating popup details", new AsyncCallback<IContent>() {
+
+										@Override
+										public void onFailure(Throwable caught) {
+											// TODO Auto-generated method stub
+
+										}
+
+										@Override
+										public void onSuccess(IContent result) {
+											popupDetails = result.getBody();
+											ratingPopup.setContent(popupDetails);
+										}
+
+									});
+								}
+						}
+						//****/
+					}
+				});
+			}
+		});
 	}
 
 	private RecentFeaturesViewImpl getLatestFeatureView() {
@@ -353,8 +387,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		return coreConfig;
 	}
 	@Override
-	public List<IContent> getContentList() {
-		return contentList;
+	public HashMap<String,Long> getContentList() {
+		return contentNameMap;
 	}
 	@Override
 	public LoginInfo getLoginInfo() {
@@ -368,26 +402,10 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 		return simpleView;
 	}
+
+	String popupDetails = "";
 	@Override
 	public RatingPopupViewImpl<IPlayerRating> getRatingPopup() {
-		if (ratingPopup == null) {
-			ratingPopup = new RatingPopupViewImpl<IPlayerRating>();
-
-			Iterator<IContent> it = getContentList().iterator();
-			IContent content = null;
-			boolean found = false;
-			while (it.hasNext()) {
-				content = it.next();
-				if (content.getTitle().equals("rating popup details")) {
-					found = true;
-					break;
-				}
-			}
-
-			if (found) {
-				ratingPopup.setContent(content.getBody());
-			}
-		}
 		return ratingPopup;
 	}
 	@Override
@@ -422,8 +440,9 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 			noteView.setClientFactory(this);
 			RootPanel.get("notes").add(noteView);
 
-			if (noteViewColumnDefinitions == null) {
-				noteViewColumnDefinitions = new NoteViewColumnDefinitions<INote>();
+			if (noteViewColumnDefinitions == null) {				
+				noteViewColumnDefinitions = new NoteViewColumnDefinitions<INote>(this);
+				noteViewColumnDefinitions.setClientFactory(this);
 			}
 
 			noteView.setColumnDefinitions(noteViewColumnDefinitions);
@@ -687,7 +706,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	}
 
 	@Override
-	public void roundChanged(int ordinal) {
+	public void roundChanged(UniversalRound round) {
 
 
 	}
@@ -754,29 +773,29 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 
 	}
-	
+
 	private Element fbDiv = null;
 	@Override
 	public void showFacebookComments(String url) {
 		//<div class="fb-comments" data-href="**FACEBOOKDATAREF**" data-width="500" data-numposts="5" data-colorscheme="light"></div>
-
+		console("Facebook comments for url " + url);
 		if (fbDiv == null) {
 			fbDiv = DOM.getElementById("fbComments");
 			//initFacebook();
 		}
-		
+
 		if (fbDiv != null) {
 			//data-href="**FACEBOOKDATAREF**"
-			fbDiv.setAttribute("data-href", url);
+			fbDiv.setAttribute("href", url);
 			// trigger fb parse
 			parseFacebook();
 		}
 	}
-	
+
 	public static native void initFacebook() /*-{
 		$wnd.FB.init()
 	}-*/;
-	
+
 	public static native void parseFacebook() /*-{
 		$wnd.FB.XFBML.parse();
 	}-*/;
@@ -825,6 +844,12 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	public void getSponsorForList(ITopTenList list, AsyncCallback<ISponsor> asyncCallback) {
 		Core.getCore().getSponsor(list.getSponsorId(), asyncCallback);
 	}
+	@Override
+	public native void console(String text)
+	/*-{
+	    console.log(text);
+	}-*/;
+
 
 
 }

@@ -1,9 +1,6 @@
 package net.rugby.foundation.topten.client.ui;
 
-import java.util.List;
-import java.util.Map;
-
-import net.rugby.foundation.model.shared.IContent;
+import java.util.HashMap;
 import net.rugby.foundation.topten.client.ClientFactory;
 
 import org.gwtbootstrap3.client.ui.ListGroupItem;
@@ -14,6 +11,6 @@ public interface HeaderView {
 
 	public abstract void setClientFactory(ClientFactory clientFactory);
 
-	void setContent(List<IContent> list, boolean isEditor);
+	void setContent(HashMap<String,Long> contentNameMap, boolean isEditor);
 
 }

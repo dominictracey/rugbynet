@@ -68,6 +68,10 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 				while (it.hasNext()) {
 					list.getList().add(getItem(it.next(), list, ordinal++));
 				}
+				
+				if (list.getRoundOrdinal() == 0) {
+					list.setRoundOrdinal(urf.getCurrent().ordinal);
+				}
 
 				if (list.getGuid() == null && (list.getFeatureGuid() == null || list.getFeatureGuid().isEmpty())) {
 					// we need to upgrade pre-v8 lists to have a server place
@@ -215,7 +219,7 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 			if (ttl != null) {
 				return ttl;
 			} else {
-				Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("nextId", null).filter("series", false);
+				Query<TopTenList> q = ofy.query(TopTenList.class).filter("compId", compId).filter("nextId", null).filter("series !=", true);
 				if (q.count() == 0) {
 					return null;
 				} else if (q.count() == 1 || q.count() == 2) {
@@ -258,8 +262,11 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 				}
 				
 				// the feature place
-				if (list.getGuid() != null && !list.getGuid().isEmpty()) {
-					spf.delete(spf.getForGuid(list.getFeatureGuid()));
+				if (list.getFeatureGuid() != null && !list.getFeatureGuid().isEmpty()) {
+					IServerPlace sp = spf.getForGuid(list.getFeatureGuid());
+					if (sp != null) {
+						spf.delete(sp);
+					}
 				}
 
 				ofy.delete(list);

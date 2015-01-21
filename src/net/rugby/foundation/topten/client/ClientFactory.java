@@ -1,5 +1,6 @@
 package net.rugby.foundation.topten.client;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Anchor;
@@ -61,7 +62,7 @@ public interface ClientFactory {
 
 	ICoreConfiguration getCoreConfig();
 
-	List<IContent> getContentList();
+	HashMap<String, Long> getContentList();
 
 	LoginInfo getLoginInfo();
 
@@ -97,4 +98,6 @@ public interface ClientFactory {
 	String getTeamLogoStyle(Long teamId);
 	
 	void getSponsorForList(ITopTenList list, AsyncCallback<ISponsor> cb);
+
+	void console(String text);
 }

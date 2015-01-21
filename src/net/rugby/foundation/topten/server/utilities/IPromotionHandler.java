@@ -5,4 +5,6 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 public interface IPromotionHandler {
 String process(ITopTenList ttl);
 
+String process(ITopTenList ttl, String channel);
+
 }

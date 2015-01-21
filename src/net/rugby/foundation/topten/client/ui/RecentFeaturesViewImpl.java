@@ -5,6 +5,7 @@ package net.rugby.foundation.topten.client.ui;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.ImageAnchor;
 import org.gwtbootstrap3.client.ui.ListItem;
@@ -15,6 +16,8 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 
+import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.FeatureListPlace;
 import net.rugby.foundation.topten.client.ui.ColumnDefinition;
@@ -26,6 +29,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
@@ -71,12 +75,18 @@ public class RecentFeaturesViewImpl extends Composite {
 //		defs.setListener(listener);
 //	}
 
-
+	final int MAX_NUM_FEATURES = 4;
 
 	public void setRecentFeatures(List<Feature> recentFeatureList) {
 		if (recentFeatureList != null) {
+			int count = 0;
 			for (Feature f: recentFeatureList) {
-				features.add(render(f));
+				if (count < MAX_NUM_FEATURES) {
+					features.add(render(f));
+					++count;
+				} else {
+					break;
+				}
 			}
 		}
 	}
@@ -90,10 +100,30 @@ public class RecentFeaturesViewImpl extends Composite {
 //	<!-- 					</b:ListItem> -->
 	protected ListItem render(final Feature f) {
 		ListItem li = new ListItem();
-		ImageAnchor ia = new ImageAnchor();
+		final ImageAnchor ia = new ImageAnchor();
 		ia.setAsMediaObject(true);
 		ia.setPull(Pull.LEFT);
-		ia.setUrl("/icons/favicon-32x32.png");
+		if (f.getsPlace().getCompId() != null) {
+			Core.getCore().getComp(f.getsPlace().getCompId(), new AsyncCallback<ICompetition>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess(ICompetition result) {
+					ia.setUrl("/resources/comps/" + result.getAbbr() + "/200.png");		
+					ia.setHeight("32px");
+					ia.setWidth("32px");
+				}				
+			});
+			
+		} else {
+			ia.setUrl("/icons/favicon-32x32.png");
+		}
+		
 		ia.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -111,7 +141,19 @@ public class RecentFeaturesViewImpl extends Composite {
 		
 		p.setText(f.getPublished().toLocaleString());
 		
-		mb.add(h);
+		Anchor a = new Anchor();
+		a.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				FeatureListPlace flp = new FeatureListPlace(f.getsPlace().getCompId(),f.getsPlace().getListId(),null);
+				clientFactory.getPlaceController().goTo(flp);
+			}
+			
+		});
+		
+		a.add(h);
+		mb.add(a);
 		mb.add(p);
 		li.add(mb);
 		

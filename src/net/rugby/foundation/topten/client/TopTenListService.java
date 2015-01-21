@@ -30,7 +30,7 @@ public interface TopTenListService extends RemoteService {
 	public ITopTenItem submitTopTenItem(ITopTenItem item);
 	public ITopTenList getLatestForComp(Long compId);
 	public Long getLatestListIdForComp(Long compId);
-	public List<IContent> getContentItems();
+	public HashMap<String,Long> getContentItems();
 	public ITopTenList saveTopTenList(ITopTenList list);
 	public IPlayerRating getPlayerRating(Long playerRatingId);
 	public IRatingSeries getRatingSeries(Long seriesId);
@@ -49,4 +49,5 @@ public interface TopTenListService extends RemoteService {
 	public IServerPlace createFeature(Long compId, Long queryId);
 	public List<Feature> getLatestFeatures();
 	public HashMap<Long, String> getTeamLogoStyleMap();
+	public Boolean deleteNote(Long noteId);
 }

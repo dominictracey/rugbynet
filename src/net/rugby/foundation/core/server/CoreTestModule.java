@@ -5,11 +5,11 @@ import net.rugby.foundation.admin.server.model.RatingSeriesManager;
 import net.rugby.foundation.admin.server.rules.CoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
-import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
@@ -44,10 +44,7 @@ import net.rugby.foundation.core.server.factory.test.TestSponsorFactory;
 import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamMatchStatsFactory;
-import net.rugby.foundation.model.shared.IContent;
-
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
 
 public class CoreTestModule extends AbstractModule {
 	@Override
@@ -69,7 +66,7 @@ public class CoreTestModule extends AbstractModule {
 		bind(ITeamMatchStatsFactory.class).to(TestTeamMatchStatsFactory.class);
 		bind(IPlayerMatchStatsFactory.class).to(TestPlayerMatchStatsFactory.class);
 		bind(ICountryFactory.class).to(TestCountryFactory.class);
-		bind(new TypeLiteral<ICachingFactory<IContent>>(){}).to(new TypeLiteral<TestContentFactory>(){});
+		//bind(new TypeLiteral<ICachingFactory<IContent>>(){}).to(new TypeLiteral<TestContentFactory>(){});
 		bind(IStandingFactory.class).to(TestStandingFactory.class);
 		bind(IRawScoreFactory.class).to(TestRawScoreFactory.class);
 		bind(IRatingSeriesFactory.class).to(TestRatingSeriesFactory.class);
@@ -77,6 +74,7 @@ public class CoreTestModule extends AbstractModule {
 		bind(IRatingMatrixFactory.class).to(TestRatingMatrixFactory.class);
 		bind(IRatingSeriesManager.class).to(RatingSeriesManager.class);
 		bind(ISponsorFactory.class).to(TestSponsorFactory.class);
+		bind(IContentFactory.class).to(TestContentFactory.class);
 	}
 }
 

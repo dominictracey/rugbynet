@@ -15,14 +15,15 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import net.rugby.foundation.core.client.CoreService;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
-import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.ISponsorFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
@@ -33,6 +34,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -56,16 +58,17 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	private IClubhouseMembershipFactory chmf;
 	private IAccountManager am;
 	private IExternalAuthticatorProviderFactory eapf;
-	private ICachingFactory<IContent> ctf;
+	private IContentFactory ctf;
 	private IPlaceFactory plf;
 	private ISponsorFactory spf;
 	private IMatchGroupFactory mf;
+	private IUniversalRoundFactory urf;
 
 
 	@Inject
 	public CoreServiceImpl(ICompetitionFactory cf, IAppUserFactory auf, IClubhouseFactory chf,  IClubhouseMembershipFactory chmf, 
-			IConfigurationFactory configF, IAccountManager am, IExternalAuthticatorProviderFactory eapf, ICachingFactory<IContent> ctf,
-			IPlaceFactory plf, ISponsorFactory spf, IMatchGroupFactory mf) {
+			IConfigurationFactory configF, IAccountManager am, IExternalAuthticatorProviderFactory eapf, IContentFactory ctf,
+			IPlaceFactory plf, ISponsorFactory spf, IMatchGroupFactory mf, IUniversalRoundFactory urf) {
 		this.cf = cf;
 		this.auf = auf;
 		this.chf = chf;
@@ -77,6 +80,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 		this.plf = plf;
 		this.spf = spf;
 		this.mf = mf;
+		this.urf = urf;
 	}
 
 	/* (non-Javadoc)
@@ -538,6 +542,16 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	}
 
 	@Override
+	public IContent getContent(String title) {
+		try {
+			return ctf.get(title);
+		}  catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+	
+	@Override
 	public IContent saveContent(IContent content) {
 		try {
 			content = ctf.put(content);
@@ -562,6 +576,16 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	public ArrayList<IMatchGroup> getResultsForOrdinal(int ordinal, Long virtualCompId) {
 		try {
 			return (ArrayList<IMatchGroup>) mf.getMatchesForVirualComp(ordinal, virtualCompId);
+		}  catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	@Override
+	public UniversalRound getUniversalRound(int ordinal) {
+		try {
+			return urf.get(ordinal);
 		}  catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;

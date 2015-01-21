@@ -3,16 +3,19 @@ package net.rugby.foundation.core.server.factory;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import net.rugby.foundation.model.shared.IRatingQuery;
 
 public abstract class BaseRatingQueryFactory extends BaseCachingFactory<IRatingQuery> implements IRatingQueryFactory {
 	
 	private final String prefix = "RQ-Mid";
 	private IRatingSeriesFactory rsf;
+	private IRatingGroupFactory rgf;
+	private IRatingMatrixFactory rmf;
 	
-	public BaseRatingQueryFactory(IRatingSeriesFactory rsf) {
+	public BaseRatingQueryFactory(IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
 		this.rsf = rsf;
+		this.rgf = rgf; 
+		this.rmf = rmf;
 	}
 	
 	
@@ -59,5 +62,21 @@ public abstract class BaseRatingQueryFactory extends BaseCachingFactory<IRatingQ
 		}
 		
 		return t;
+	}
+	
+	@Override
+	public IRatingQuery buildUplinksForQuery(IRatingQuery rq) {
+		// need to set the upside chain
+		if (rq != null && rq.getRatingMatrixId() != null && rq.getRatingMatrix() == null) {
+			rq.setRatingMatrix(rmf.get(rq.getRatingMatrixId()));
+			if (rq.getRatingMatrix() != null && rq.getRatingMatrix().getRatingGroupId() != null && rq.getRatingMatrix().getRatingGroup() == null) {
+				rq.getRatingMatrix().setRatingGroup(rgf.get(rq.getRatingMatrix().getRatingGroupId()));
+				if (rq.getRatingMatrix().getRatingGroup() != null && rq.getRatingMatrix().getRatingGroup().getRatingSeriesId() != null && rq.getRatingMatrix().getRatingGroup().getRatingSeries() == null) {
+					rq.getRatingMatrix().getRatingGroup().setRatingSeries(rsf.get(rq.getRatingMatrix().getRatingGroup().getRatingSeriesId()));
+				}
+			}
+		}
+		
+		return rq;
 	}
 }

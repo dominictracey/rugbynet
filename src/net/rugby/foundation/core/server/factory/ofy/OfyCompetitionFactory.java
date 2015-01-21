@@ -381,5 +381,25 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 
 	}
 
+	@Override
+	public List<ICompetition> getClientComps() {
+		try {
+			List<ICompetition> list = new ArrayList<ICompetition>();
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Competition> cq = ofy.query(Competition.class).filter("underway", true).filter("showInClient", true).order("-weightingFactor");
+			for (Competition c : cq) {
+
+				// never let a competition out the door that you get back from Objectify. Always call get() or 
+				// Bad Things (tm) will happen.
+				list.add(get(c.getId()));
+			}
+
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
 
 }

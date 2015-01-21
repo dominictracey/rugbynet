@@ -34,6 +34,11 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	// environments
 	public enum Environment { LOCAL, DEV, BETA, PROD }
 	private Environment environment;
+
+	private List<Long> compsForClient = new ArrayList<Long>();
+	
+	@Transient
+	protected int currentUROrdinal = -1;
 	
 	public enum selectionType { POOLROSTER, POOLROUND, KNOCKOUTROSTER, KNOCKOUTROUND }
 	
@@ -494,6 +499,10 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 		return CREATEACCT_OK;
 	}
 
+	
+	public static String getCreateacctErrorNicknameCantBeNull() {
+		return CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL;
+	}
 
 //	public static String getDefaultCompetitionShortName() {
 //		
@@ -584,8 +593,26 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 			compsUnderway.remove(compId);
 	}
 	
-	public static String getCreateacctErrorNicknameCantBeNull() {
-		return CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL;
+	@Override
+	public List<Long> getCompsForClient() {
+		return compsForClient;
+	}
+	
+	@Override
+	public void setCompsForClient(List<Long> compsUnderway) {
+		this.compsForClient = compsUnderway;
+	}
+	
+	@Override
+	public void addCompForClient(Long compId) {
+		if (!compsForClient.contains(compId))
+			compsForClient.add(compId);
+	}
+
+	@Override
+	public void removeCompForClient(Long compId) {
+		if (compsForClient.contains(compId))
+			compsForClient.remove(compId);
 	}
 
 	@Override
@@ -595,6 +622,9 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 			if (defaultCompId.equals(compId)) {
 				defaultCompId = null;
 			}
+			
+			compsForClient.remove(compId);
+			
 			return true;
 		}
 		
@@ -668,6 +698,16 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	@Override
 	public void setSeriesMap(HashMap<Long, HashMap<RatingMode, Long>> seriesMap) {
 		this.seriesMap = seriesMap;
+	}
+
+	@Override
+	public int getCurrentUROrdinal() {
+		return currentUROrdinal;
+	}
+
+	@Override
+	public void setCurrentUROrdinal(int currentUROrdinal) {
+		this.currentUROrdinal = currentUROrdinal;
 	}
 
 

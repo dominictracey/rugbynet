@@ -14,6 +14,7 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -120,35 +121,6 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 		});
 
-		//		ImageCell ratingDetailsCell = new ImageCell() {
-		//			@Override
-		//			public void render(Context context, String value, SafeHtmlBuilder sb) {
-		//				if (((ITopTenItem)context.getKey()).getRating() != 0) {
-		//					String imagePath = "/resources/info35.png";
-		//					sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '30px' width = '30px' title=\"click for details\"/>");
-		//				}
-		//			}
-		//
-		//			public Set<String> getConsumedEvents() {
-		//				HashSet<String> events = new HashSet<String>();
-		//				events.add("click");
-		//				return events;
-		//			}
-		//		};
-		//
-		//		items.addColumn(new Column<ITopTenItem,String>(ratingDetailsCell) {
-		//			@Override
-		//			public String getValue(ITopTenItem s)
-		//			{ //
-		//				return "";
-		//			}
-		//			@Override
-		//			public String getCellStyleNames(Context context, ITopTenItem value) {
-		//				return "compactTTL";
-		//			}
-		//
-		//		});
-
 		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)
@@ -178,40 +150,42 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {				
-				return clientFactory.getTeamLogoStyle(value.getTeamId()) + " team-logo";
+				return clientFactory.getTeamLogoStyle(value.getTeamId()) + " teamlogo-small";
 			}
 		});
 
-		//		ImageCell imageCell = new ImageCell() {
-		//			@Override
-		//			public void render(Context context, String value, SafeHtmlBuilder sb) {
-		//				if (((ITopTenItem)context.getKey()).getTeamId() != null) {
-		//					
-		//					String imagePath = "/resources/" + ((ITopTenItem)context.getKey()).getTeamId() + "/200.png";
-		//					sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '40px' width = '40px' title=\"" + ((ITopTenItem)context.getKey()).getTeamName()  + "\"/>");
-		//				}
-		//
-		//			}
-		//		};
-
-		//		items.addColumn(new TextColumn<ITopTenItem>(){
-		//			@Override
-		//			public String getValue(ITopTenItem s)
-		//			{ //
-		//				return "";
-		//			}
-		//			@Override
-		//			public String getCellStyleNames(Context context, ITopTenItem value) {
-		//				return ""; //return "compactTTL";
-		//			}
-		//		});
 
 		items.addColumn(new Column<ITopTenItem, SafeHtml>(new SafeHtmlCell()){
 			@Override
 			public SafeHtml getValue(ITopTenItem s)
 			{
 				SafeHtmlBuilder sb = new SafeHtmlBuilder();
-				sb.appendHtmlConstant("<div class=\"addthis_toolbox addthis_default_style\" addthis:url=\"" + clientFactory.getCoreConfig().getBaseToptenUrl() + "/s/" + s.getPlaceGuid() + "/\" addthis:title=\"" + s.getTweet() + "\">"
+				String guid = "";
+				if (list.getSeries() != null && list.getSeries() != false) {
+					guid = s.getPlaceGuid();
+				} else {
+					guid = s.getFeatureGuid();
+				}
+				
+				String tweet = s.getTweet();
+				if (tweet == null || tweet.isEmpty()) {
+					
+					tweet = "Congrats to ";
+					if (s.getPlayer().getTwitterHandle() == null || s.getPlayer().getTwitterHandle().isEmpty()) {
+						tweet += s.getPlayer().getDisplayName();
+					} else {
+						tweet += s.getPlayer().getTwitterHandle();
+					}
+					
+					if (list.getTwitterDescription() != null && !list.getTwitterDescription().isEmpty()) {
+						tweet += " on " + list.getTwitterDescription();
+					} else {
+						tweet += " on " + list.getTitle();
+					}
+						
+				}
+				
+				sb.appendHtmlConstant("<div class=\"addthis_toolbox addthis_default_style addthis_32x32_style rugbyNetAddThis\" addthis:url=\"" + clientFactory.getCoreConfig().getBaseToptenUrl() + guid + "\" addthis:title=\"" + tweet + "\">"
 						//						+ "<a class=\"addthis_button_email\"></a>"
 						+ "<a class=\"addthis_button_facebook\"></a>"
 						+ "<a class=\"addthis_button_twitter\"></a>"
@@ -234,11 +208,15 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 				if (event.getColumn() != 5) {
 					boolean isClick = "click".equals(event.getNativeEvent().getType());
 					if (isClick) {
-						presenter.showRatingDetails(event.getValue());
+						if (presenter != null && event != null) {
+							presenter.showRatingDetails(event.getValue());
+						}
 					}
 				}
 			}
 		});
+		
+		items.getElement().getStyle().setCursor(Cursor.POINTER); 
 
 		//		tableCol.add(items);
 
@@ -263,7 +241,14 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		list = result;
 		//setVisible(false);
 		if (result != null) {
-			recordAnalyticsHit(baseUrl + "#listId=" + result.getId(), result.getTitle());
+			String guid = "";
+			if (result.getSeries() == null || result.getSeries() == false) {
+				guid = result.getFeatureGuid();
+			} else {
+				guid = result.getGuid();
+			}
+			
+			recordAnalyticsHit(Window.Location.getPath(), result.getTitle());
 
 			items.setRowData(result.getList());
 			generated.setHTML("<i>generated: " + result.getCreated().toGMTString() + "</i>");

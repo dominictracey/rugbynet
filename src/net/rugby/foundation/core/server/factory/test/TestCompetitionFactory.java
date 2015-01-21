@@ -375,5 +375,16 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 		return new Competition();
 	}
 
+	@Override
+	public List<ICompetition> getClientComps() {
+		List<ICompetition> list = new ArrayList<ICompetition>();
+
+		list.add(get(1L));
+
+		list.add(get(2L));
+
+		return list;
+	}
+
 
 }

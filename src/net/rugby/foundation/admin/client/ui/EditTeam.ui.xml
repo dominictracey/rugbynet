@@ -16,7 +16,8 @@
 				</td></tr></table>
 				Short Name:  <g:TextBox ui:field='shortName'></g:TextBox><br/>
 				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
-				Twitter: <g:TextBox ui:field='twitter'></g:TextBox><br/>
+				Twitter handle (@): <g:TextBox ui:field='twitter'></g:TextBox><br/>
+				Twitter channel (#): <g:TextBox ui:field='twitterChannel'></g:TextBox><br/>
 				Color (#RRGGBB): <g:TextBox ui:field='color'></g:TextBox><br/>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 	</g:HTMLPanel>

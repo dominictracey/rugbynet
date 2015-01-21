@@ -47,4 +47,10 @@ public interface ICoreConfiguration extends IHasId {
 	public abstract void setGlobalCompId(Long globalCompId);
 	HashMap<Long, HashMap<RatingMode, Long>> getSeriesMap();
 	void setSeriesMap(HashMap<Long, HashMap<RatingMode, Long>> seriesMap);
+	List<Long> getCompsForClient();
+	void setCompsForClient(List<Long> compsUnderway);
+	void addCompForClient(Long compId);
+	void removeCompForClient(Long compId);
+	void setCurrentUROrdinal(int currentUROrdinal);
+	int getCurrentUROrdinal();
 }

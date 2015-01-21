@@ -19,4 +19,5 @@ public interface IRatingQueryFactory extends ICachingFactory<IRatingQuery> {
 	void deleteAll();
 
 	List<IRatingQuery> getForMatrix(Long ratingMatrixId);
+	IRatingQuery buildUplinksForQuery(IRatingQuery rq);
 }
