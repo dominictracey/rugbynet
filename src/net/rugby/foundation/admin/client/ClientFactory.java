@@ -98,4 +98,6 @@ public interface ClientFactory extends EditContentPresenter {
 	SeriesConfigurationView<ISeriesConfiguration> getSeriesView();
 
 	void getUniversalRoundsListAsync(int count,	GetUniversalRoundsListCallback getUniversalRounds20ListCallback);
+
+	void console(String text);
 }

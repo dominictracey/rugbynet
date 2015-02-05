@@ -161,30 +161,41 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			{
 				SafeHtmlBuilder sb = new SafeHtmlBuilder();
 				String guid = "";
-				if (list.getSeries() != null && list.getSeries() != false) {
+				if (s.getFeatureGuid() == null) {
 					guid = s.getPlaceGuid();
 				} else {
 					guid = s.getFeatureGuid();
 				}
 				
-				String tweet = s.getTweet();
-				if (tweet == null || tweet.isEmpty()) {
-					
-					tweet = "Congrats to ";
-					if (s.getPlayer().getTwitterHandle() == null || s.getPlayer().getTwitterHandle().isEmpty()) {
-						tweet += s.getPlayer().getDisplayName();
-					} else {
-						tweet += s.getPlayer().getTwitterHandle();
-					}
-					
-					if (list.getTwitterDescription() != null && !list.getTwitterDescription().isEmpty()) {
-						tweet += " on " + list.getTwitterDescription();
-					} else {
-						tweet += " on " + list.getTitle();
-					}
-						
+				String listDesc = list.getTwitterDescription();
+				if (listDesc == null || listDesc.isEmpty()) {
+					listDesc = list.getTitle();
 				}
-				
+
+				String tweet = s.getTweet();  // @player of @team
+				if (clientFactory.getLoginInfo() != null && (clientFactory.getLoginInfo().isTopTenContentContributor() || clientFactory.getLoginInfo().isTopTenContentEditor())) {
+					if (tweet != null && !tweet.isEmpty()) {						
+						//assert(tweet.charAt(0) == '@');	
+						tweet += " is #" + s.getOrdinal() + " on @TheRugbyNet " + listDesc;
+						if (s.getTwitterChannel() != null && !s.getTwitterChannel().isEmpty() && tweet.length() < 115 - s.getTwitterChannel().length()) {
+							 tweet += " " + s.getTwitterChannel();
+						}
+					}
+				} else {
+					// just a regular user					
+					if (tweet != null && !tweet.isEmpty()) {
+
+						tweet = "Congrats to " + s.getTweet();
+
+						tweet += " for being #" + s.getOrdinal() + " on @TheRugbyNet " + listDesc;
+						
+						if (s.getTwitterChannel() != null && !s.getTwitterChannel().isEmpty() && tweet.length() < 115 - s.getTwitterChannel().length()) {
+							 tweet += " " + s.getTwitterChannel();
+						}
+
+					}
+				}
+
 				sb.appendHtmlConstant("<div class=\"addthis_toolbox addthis_default_style addthis_32x32_style rugbyNetAddThis\" addthis:url=\"" + clientFactory.getCoreConfig().getBaseToptenUrl() + guid + "\" addthis:title=\"" + tweet + "\">"
 						//						+ "<a class=\"addthis_button_email\"></a>"
 						+ "<a class=\"addthis_button_facebook\"></a>"
@@ -215,7 +226,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 				}
 			}
 		});
-		
+
 		items.getElement().getStyle().setCursor(Cursor.POINTER); 
 
 		//		tableCol.add(items);
@@ -247,7 +258,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			} else {
 				guid = result.getGuid();
 			}
-			
+
 			recordAnalyticsHit(Window.Location.getPath(), result.getTitle());
 
 			items.setRowData(result.getList());

@@ -6,7 +6,6 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.Position;
 
 import com.googlecode.objectify.annotation.Entity;
@@ -53,6 +52,8 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected String featureGuid;
 	@Unindexed
 	protected String tweet;
+	@Unindexed
+	protected String twitterChannel;
 	
 	public TopTenItem()
 	{
@@ -308,6 +309,14 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setFeatureGuid(String featureGuid) {
 		this.featureGuid = featureGuid;
+	}
+	@Override
+	public String getTwitterChannel() {
+		return twitterChannel;
+	}
+	@Override
+	public void setTwitterChannel(String twitterChannel) {
+		this.twitterChannel = twitterChannel;
 	}
 
 }

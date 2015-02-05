@@ -144,7 +144,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 				String weekOf = "";
 				while (it.hasNext()) {
 					IRound r = it.next();
-					if (r.getUrOrdinal() == ur.ordinal) {
+					if (r.getUrOrdinal() >= ur.ordinal) {
 						currentRound = r.getMatches();
 						name = r.getName();
 						weekOf = format.format(r.getBegin());
@@ -295,7 +295,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 	
 	public native void console(String text)
 	/*-{
-	   // console.log(text);
+	    console.log(text);
 	}-*/;
 
 }

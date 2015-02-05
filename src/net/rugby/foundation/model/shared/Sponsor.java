@@ -26,6 +26,9 @@ public class Sponsor implements IHasId, Serializable, ISponsor {
 	@Unindexed
 	protected String contactName;
 	protected boolean active;
+	protected String url;
+	protected int height;
+	protected int width;
 	
 	@Override
 	public boolean isActive() {
@@ -125,6 +128,30 @@ public class Sponsor implements IHasId, Serializable, ISponsor {
 	@Override
 	public Long getId() {
 		return id;
+	}
+	@Override
+	public String getUrl() {
+		return url;
+	}
+	@Override
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	@Override
+	public int getHeight() {
+		return height;
+	}
+	@Override
+	public void setHeight(int height) {
+		this.height = height;
+	}
+	@Override
+	public int getWidth() {
+		return width;
+	}
+	@Override
+	public void setWidth(int width) {
+		this.width = width;
 	}
 	
 	

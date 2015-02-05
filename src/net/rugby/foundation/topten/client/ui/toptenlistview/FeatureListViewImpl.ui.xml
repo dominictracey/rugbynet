@@ -116,6 +116,7 @@
 					<b:Button ui:field="edit" type="PRIMARY">Edit</b:Button>
 					<b:Button ui:field="publish" type="DANGER">Publish</b:Button>
 					<b:Button ui:field="promote" type="PRIMARY">Promote</b:Button>
+					<b:Button ui:field="delete" type="PRIMARY">Delete</b:Button>
 				</b.html:Div>
 			</b:Row>
 			<!-- </b:Container> -->

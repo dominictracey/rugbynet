@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.ISponsorFactory;
@@ -14,6 +15,29 @@ import net.rugby.foundation.model.shared.Sponsor;
 
 public class OfySponsorFactory extends BaseCachingFactory<ISponsor> implements ISponsorFactory {
 
+	public OfySponsorFactory() {
+		// make sure we have one so we can hack in more in prod
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Sponsor> qs = ofy.query(Sponsor.class);
+			if (qs.count() == 0) {
+				ISponsor s = create();
+				s.setAbbr("NON");
+				s.setContactName("Dominic Tracey");
+				s.setName("None");
+				s.setTagline(" ");
+				s.setEmail("dominic.tracey@rugby.net");
+				s.setUrl(" ");
+				s.setHeight(40);
+				s.setWidth(200);
+				put(s);
+				
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+		}		
+	}
+	
 	@Override
 	public ISponsor create() {
 		try {

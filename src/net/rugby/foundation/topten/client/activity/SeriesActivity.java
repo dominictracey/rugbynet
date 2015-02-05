@@ -162,7 +162,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			Logger.getLogger("SeriesActivity").log(Level.INFO, "Happy");
 			
 			if (view.getSeries() != null && view.getSeries().getSponsor() != null && view.getSeries().getSponsor().getAbbr() != null)
-				recordAnalyticsEvent("sponsor", "show", view.getSeries().getSponsor().getAbbr(), 1);
+				clientFactory.recordAnalyticsEvent("sponsor", "show", view.getSeries().getSponsor().getAbbr(), 1);
 			
 			refreshButtons();
 		}
@@ -521,10 +521,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 	}
 
-	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
 
-		$wnd.ganew('send', 'event', cat, action, label, val);
-	}-*/;
 
 	@Override
 	public void onLoginComplete(String destination) {
@@ -566,7 +563,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			public void onSuccess(IPlayerRating result) {
 				clientFactory.getRatingPopup().setRating(result);
 				clientFactory.getRatingPopup().center();
-				recordAnalyticsEvent("ratingDetails", "click", result.getPlayer().getShortName(), 1);
+				clientFactory.recordAnalyticsEvent("ratingDetails", "click", result.getPlayer().getShortName(), 1);
 			}
 		});	
 
@@ -577,7 +574,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	public String mayStop()
 	{
 		if (view != null && view.getList() != null && view.getList().getTitle() != null) {
-			recordAnalyticsEvent("ratingDetailsCount", "click", view.getList().getTitle(), detailCount);
+			clientFactory.recordAnalyticsEvent("ratingDetailsCount", "click", view.getList().getTitle(), detailCount);
 		}
 		return null;
 	}

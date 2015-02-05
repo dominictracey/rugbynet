@@ -800,8 +800,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		$wnd.FB.XFBML.parse();
 	}-*/;
 
-	public static native void recordAnalyticsEvent(String cat, String action, String label, int val) /*-{
-
+	@Override
+	public void recordAnalyticsEvent(String cat, String action, String label, int val) {
+		recordAnalyticsEvent_(cat,action,label,val);
+		
+	}
+	
+	public static native void recordAnalyticsEvent_(String cat, String action, String label, int val) /*-{
 		$wnd.ganew('send', 'event', cat, action, label, val);
 	}-*/;
 
@@ -841,14 +846,33 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 	}
 	@Override
-	public void getSponsorForList(ITopTenList list, AsyncCallback<ISponsor> asyncCallback) {
-		Core.getCore().getSponsor(list.getSponsorId(), asyncCallback);
+	public void getSponsorForList(ITopTenList list, final AsyncCallback<ISponsor> asyncCallback) {
+		if (list.getSponsorId() != null) {
+			Core.getCore().getSponsor(list.getSponsorId(), asyncCallback);
+		} else {
+			Core.getCore().getComp(list.getCompId(), new AsyncCallback<ICompetition>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					asyncCallback.onFailure(caught);
+				}
+
+				@Override
+				public void onSuccess(ICompetition result) {
+					Core.getCore().getSponsor(result.getSponsorId(), asyncCallback);
+					
+				}
+				
+			});
+			
+		}
 	}
 	@Override
 	public native void console(String text)
 	/*-{
 	    console.log(text);
 	}-*/;
+
 
 
 

@@ -26,4 +26,16 @@ public interface ISponsor extends IHasId {
 
 	void setActive(boolean active);
 
+	void setWidth(int width);
+
+	int getWidth();
+
+	void setHeight(int height);
+
+	int getHeight();
+
+	void setUrl(String url);
+
+	String getUrl();
+
 }

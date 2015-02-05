@@ -472,7 +472,14 @@ public class ClientFactoryImpl implements ClientFactory {
 			seriesConfigPopupView.setFieldDefinitions(seriesConfigPopupViewFieldDefinitions, this);
         }
 
-		return seriesConfigPopupView;	}
+		return seriesConfigPopupView;	
+	}
+	
+	@Override
+	public native void console(String text)
+	/*-{
+	    console.log(text);
+	}-*/;
 
 
 

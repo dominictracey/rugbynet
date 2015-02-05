@@ -86,6 +86,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(RatingGroup.class);
 			
 			ObjectifyService.register(ServerPlace.class);
+			ObjectifyService.register(Sponsor.class);
 			
 			//ObjectifyService.register(Feature.class);
 		}

@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
@@ -73,6 +74,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	@UiField Button edit;
 	@UiField Button publish;
 	@UiField Button promote;
+	@UiField Button delete;
 	
 	@UiField Div redittLink;
 	
@@ -107,7 +109,9 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 		
 		compCol.setStylePrimaryName("comp-logo");
 		compCol.addStyleName("col-xs-3");
-		sponsorCol.addStyleName("sponsor-logo");
+		sponsorCol.setStylePrimaryName("sponsor-logo");
+		sponsorCol.addStyleName("col-xs-3");
+
 		compSpacer.setHeight("38px");
 		sponsorSpacer.setHeight("38px");
 
@@ -117,7 +121,8 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	private ClientFactory clientFactory;
 	private FeatureListViewPresenter presenter;
 	protected String currentCompStyle = "";
-	
+	protected String currentSponsorStyle = "";
+
 	@Override
 	public void setList(ITopTenList result, String baseUrl) {
 		list = result;
@@ -164,6 +169,37 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 							compCol.setStyleDependentName(result.getAbbr(), true);
 							currentCompStyle = result.getAbbr();
 						}
+						
+						clientFactory.getSponsorForList(list, new AsyncCallback<ISponsor>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+								
+							}
+
+							@Override
+							public void onSuccess(ISponsor result) {
+								
+								
+								// remove any style we already have before adding the new one
+								if (!currentSponsorStyle.isEmpty()) {
+									sponsorCol.setStyleDependentName(currentSponsorStyle, false);
+								}
+								if (result == null || result.getAbbr() == null || result.getAbbr().isEmpty()) {
+									sponsorCol.setStyleDependentName("NON", true);
+									currentSponsorStyle = "NON";
+									sponsorTag.setHTML("");
+								} else {
+									sponsorCol.setStyleDependentName(result.getAbbr(), true);
+									currentSponsorStyle = result.getAbbr();
+									sponsorTag.setHTML("<center>"+ result.getTagline() + "</center>");
+									clientFactory.recordAnalyticsEvent("sponsor", "show", result.getName(), 1);
+								}
+								
+							}
+							
+						});
 					}
 
 				});
@@ -331,6 +367,11 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 		presenter.promote(list);
 	}
 	
+	@UiHandler("delete")
+	void onDeleteButtonClicked(ClickEvent event) {	
+		presenter.delete(list);
+	}
+	
 	private boolean added=false;
 	@Override
 	public void editList(ITopTenList list) {
@@ -351,6 +392,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	@Override
 	public void showEditorButtons(boolean show) {
 		publish.setVisible(show);
+		delete.setVisible(show);
 		
 	}
 

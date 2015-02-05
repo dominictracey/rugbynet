@@ -91,4 +91,7 @@ public interface ITopTenItem {
 
 	void setFeatureGuid(String featureGuid);
 
+	public abstract void setTwitterChannel(String twitterChannel);
+	public abstract String getTwitterChannel();
+
 }

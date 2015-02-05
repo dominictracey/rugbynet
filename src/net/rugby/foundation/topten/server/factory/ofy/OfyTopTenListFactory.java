@@ -27,6 +27,7 @@ import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
+import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
@@ -95,9 +96,41 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 						ip.setType(PlaceType.FEATURE);
 						spf.put(ip); 
 						item.setFeatureGuid(ip.getGuid());
+						
 						ofy.put(item);
 					}
 				}
+				
+				// also we have changed tactics on the item tweet storage as of 1/27/15 to only store the 
+				// @player of @team portion of the tweet
+				// @REX can take this out after awhile
+				for (ITopTenItem item : list.getList()) {
+					if (item.getTweet() == null || item.getTweet().isEmpty() || item.getTweet().startsWith("Congrats")) {
+						String tweet = "";
+						if (item.getPlayer().getTwitterHandle() != null && !item.getPlayer().getTwitterHandle().isEmpty()) {
+							tweet = item.getPlayer().getTwitterHandle();
+						} else {
+							tweet = item.getPlayer().getDisplayName();
+						}
+						
+						ITeamGroup t = tf.get(item.getTeamId());
+						
+						if (t.getTwitter() != null && !t.getTwitter().isEmpty()) {
+							tweet += " of " + t.getTwitter();
+						} else {
+							tweet += " of " + t.getShortName();
+						}
+							
+						item.setTweet(tweet);
+						
+						if (t.getTwitterChannel() != null && !t.getTwitterChannel().isEmpty()) {
+							item.setTwitterChannel(t.getTwitterChannel());
+						}
+						
+						ofy.put(item);
+					}
+				}
+
 			}
 
 			return list;

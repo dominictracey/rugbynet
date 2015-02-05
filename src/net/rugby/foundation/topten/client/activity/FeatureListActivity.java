@@ -309,7 +309,21 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 
 	@Override
 	public void delete(ITopTenList list) {
-		// TODO Auto-generated method stub
+		clientFactory.getRpcService().deleteTopTenList(list, new AsyncCallback<ITopTenList>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Publish failed. See server log for details.");
+
+			}
+
+			@Override
+			public void onSuccess(ITopTenList result) {
+				view.setList(result, _coreConfig.getBaseToptenUrl());				
+			}
+
+
+		});
 
 	}
 

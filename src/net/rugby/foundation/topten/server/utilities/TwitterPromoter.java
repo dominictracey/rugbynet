@@ -49,6 +49,12 @@ public class TwitterPromoter implements IPromotionHandler {
 			String player = i.getPlayer().getDisplayName();
 			String tweet = buildTweet(i, ttl, channel); //i.getPlayer().getTwitterHandle() + " you've made @TheRugbyNet " + ttl.getTitle() + "! ";
 			i.setTweet(tweet);
+			
+			ITeamGroup t = tgf.get(i.getTeamId());
+			if (t != null) {
+				i.setTwitterChannel(t.getTwitterChannel());
+			}
+			
 			ttlf.put(i);
 			String URL ="http://twitter.com/home?status="+ URLEncoder.encode(tweet + shortURL);
 			retval += "<p><a href=\"" + URL +"\">"+ player +"</a></p>\n" + "\n";
@@ -115,7 +121,7 @@ public class TwitterPromoter implements IPromotionHandler {
 	}
 
 	String buildTweet(ITopTenItem i, ITopTenList l, String channel) {
-		String tweet = "Congrats to ";
+		String tweet = ""; //"Congrats to ";
 		// start with player twitter handle or display name
 		if (i.getPlayer().getTwitterHandle() == null || i.getPlayer().getTwitterHandle().isEmpty()) {
 			tweet += i.getPlayer().getDisplayName() + " ";
@@ -133,9 +139,13 @@ public class TwitterPromoter implements IPromotionHandler {
 			}
 		}
 
-		// you didn't need to pass in the channel, it already is put in the match tweet
-		tweet += " on @TheRugbyNet " + l.getTwitterDescription(); // + " " + channel;
-		
+//		// you didn't need to pass in the channel, it already is put in the match tweet
+//		tweet += " on @TheRugbyNet " + l.getTwitterDescription(); // + " " + channel;
+//		
+//		// add on any team channels
+//		if (team.getTwitterChannel() != null && !team.getTwitterChannel().isEmpty()) {
+//			tweet += " " + team.getTwitterChannel();
+//		}
 
 		return tweet; 
 	}

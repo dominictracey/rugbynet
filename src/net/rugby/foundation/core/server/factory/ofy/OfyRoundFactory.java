@@ -40,51 +40,59 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 		this.cf = cf;
 		this.sf = sf;
 		this.urf = urf;
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	@Override
 	protected IRound getFromPersistentDatastore(Long id) {
-		if (id == null) {
-			return new Round();
-		}
-		Objectify ofy = DataStoreFactory.getOfy();
-
-		Round r = ofy.get(new Key<Round>(Round.class,id));
-
-		if (r != null) {
-			r.setMatches(new ArrayList<IMatchGroup>());
-			for (Long gid : r.getMatchIDs()) {
-				IMatchGroup g = gf.get(gid);
-				r.getMatches().add(g);
+		try {
+			if (id == null) {
+				return new Round();
 			}
-		} else {
-			r = new Round();
-		}
+			Objectify ofy = DataStoreFactory.getOfy();
 
-		// self cleaning oven for workflowStatus
-		if (r.getWorkflowStatus() == null) {
-			// check it's matches to see if they are all fetched
-			r.setWorkflowStatus(WorkflowStatus.FETCHED);
-			for (IMatchGroup m : r.getMatches()) {
-				if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
-					r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
-					break;
-				} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
-					r.setWorkflowStatus(WorkflowStatus.PENDING);
-					// don't break in case there are tasks pending
+			Round r = ofy.get(new Key<Round>(Round.class,id));
+
+			if (r != null) {
+				r.setMatches(new ArrayList<IMatchGroup>());
+				for (Long gid : r.getMatchIDs()) {
+					IMatchGroup g = gf.get(gid);
+					r.getMatches().add(g);
 				}
-				// ignore if match is NO_STATS - the round can still be in FETCHED state
+			} else {
+				r = new Round();
 			}
-			ofy.put(r); 	
+
+			// self cleaning oven for workflowStatus
+			if (r.getWorkflowStatus() == null) {
+				// check it's matches to see if they are all fetched
+				r.setWorkflowStatus(WorkflowStatus.FETCHED);
+				for (IMatchGroup m : r.getMatches()) {
+					if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
+						r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+						break;
+					} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
+						r.setWorkflowStatus(WorkflowStatus.PENDING);
+						// don't break in case there are tasks pending
+					}
+					// ignore if match is NO_STATS - the round can still be in FETCHED state
+				}
+				ofy.put(r); 	
+			}
+
+			// self cleaning oven for urOrdinal
+			if (r.getUrOrdinal() < 1) {
+				r.setUrOrdinal(urf.get(r).ordinal);
+				ofy.put(r);
+			}
+
+			return r;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
 		}
-		
-		// self cleaning oven for urOrdinal
-		if (r.getUrOrdinal() < 1) {
-			r.setUrOrdinal(urf.get(r).ordinal);
-			ofy.put(r);
-		}
-		
-		return r;
+
 	}
 
 	@Override

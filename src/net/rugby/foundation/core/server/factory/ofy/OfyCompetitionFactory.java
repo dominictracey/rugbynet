@@ -83,49 +83,55 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 	@Override
 	protected ICompetition getFromPersistentDatastore(Long id) {
 
-		Objectify ofy = DataStoreFactory.getOfy();
-		Competition c = ofy.get(new Key<Competition>(Competition.class,id));
-		UniversalRound now = urf.get(new DateTime());
-		
-		if (c != null) {
-			c.setRounds(new ArrayList<IRound>());
-			int count = 0;
-			c.setPrevRoundIndex(-1);
-			c.setNextRoundIndex(-1);
-			for (Long rid : c.getRoundIds()) {
-				IRound r = rf.get(rid);
-				c.getRounds().add(r);
-				if (r.getUrOrdinal() > now.ordinal && c.getPrevRoundIndex() == -1) {
-					c.setPrevRoundIndex(count-1);
-				} else if (r.getUrOrdinal() > now.ordinal + 1 && c.getNextRoundIndex() == -1) {
-					c.setNextRoundIndex(count);
-				}			
-				count++;
-			}
-			
 
-			c.setTeams(new ArrayList<ITeamGroup>());
-			for (Long tid : c.getTeamIds()) {
-				ITeamGroup t = tf.get(tid);
-				c.getTeams().add(t);
-			}
-		} else {
-			c = new Competition();
-		}
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Competition c = ofy.get(new Key<Competition>(Competition.class,id));
+			UniversalRound now = urf.get(new DateTime());
 
-		// populate the seriesMap
-		c.setSeriesMap(rsf.getModesForComp(id));
-		
-		// and the component competitions for virtual comps
-		for (Long sid : c.getSeriesMap().values()) {
-			IRatingSeries rs = rsf.get(sid);
-			for (Long cid : rs.getCompIds())	
-			if (!c.getComponentCompIds().contains(cid)) {
-				c.getComponentCompIds().add(cid);
+			if (c != null) {
+				c.setRounds(new ArrayList<IRound>());
+				int count = 0;
+				c.setPrevRoundIndex(-1);
+				c.setNextRoundIndex(-1);
+				for (Long rid : c.getRoundIds()) {
+					IRound r = rf.get(rid);
+					c.getRounds().add(r);
+					if (r.getUrOrdinal() > now.ordinal && c.getPrevRoundIndex() == -1) {
+						c.setPrevRoundIndex(count-1);
+					} else if (r.getUrOrdinal() > now.ordinal + 1 && c.getNextRoundIndex() == -1) {
+						c.setNextRoundIndex(count);
+					}			
+					count++;
+				}
+
+
+				c.setTeams(new ArrayList<ITeamGroup>());
+				for (Long tid : c.getTeamIds()) {
+					ITeamGroup t = tf.get(tid);
+					c.getTeams().add(t);
+				}
+			} else {
+				c = new Competition();
 			}
+
+			// populate the seriesMap
+			c.setSeriesMap(rsf.getModesForComp(id));
+
+			// and the component competitions for virtual comps
+			for (Long sid : c.getSeriesMap().values()) {
+				IRatingSeries rs = rsf.get(sid);
+				for (Long cid : rs.getCompIds())	
+					if (!c.getComponentCompIds().contains(cid)) {
+						c.getComponentCompIds().add(cid);
+					}
+			}
+
+			return c;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
 		}
-		
-		return c;
 	}
 
 	@Override

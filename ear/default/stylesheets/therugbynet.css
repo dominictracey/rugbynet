@@ -146,6 +146,10 @@
 	background-image: url("/resources/sponsors/DHL/200R.png");
 }
 
+.sponsor-logo-FR {
+	background-image: url("/resources/sponsors/FR/200R.png");
+}
+
 .table > tbody > tr > td {
 	vertical-align: middle;
 }

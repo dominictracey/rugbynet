@@ -100,4 +100,6 @@ public interface ClientFactory {
 	void getSponsorForList(ITopTenList list, AsyncCallback<ISponsor> cb);
 
 	void console(String text);
+
+	void recordAnalyticsEvent(String cat, String action, String label, int val);
 }
