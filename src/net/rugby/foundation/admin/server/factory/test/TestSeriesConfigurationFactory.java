@@ -52,7 +52,7 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 			ISeriesConfiguration sc = new BaseSeriesConfiguration();
 			sc.setId(id);
 			sc.getCompIds().add(1L);
-			sc.getComps().add(cf.get(1L));
+//			sc.getComps().add(cf.get(1L));
 			//sc.getCompNames().add(cf.get(1L).getShortName());
 			sc.setStatus(Status.PENDING);
 			sc.setLastRound(urf.get(cf.get(1L).getRounds().get(0)));
@@ -67,7 +67,7 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 			ISeriesConfiguration sc = new BaseSeriesConfiguration();
 			sc.setId(id);
 			sc.getCompIds().add(1L);
-			sc.getComps().add(cf.get(1L));
+//			sc.getComps().add(cf.get(1L));
 			//sc.getCompNames().add(cf.get(1L).getShortName());
 			sc.setStatus(Status.PENDING);
 			sc.setLastRound(urf.get(cf.get(1L).getRounds().get(0)));
@@ -82,7 +82,7 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 			ISeriesConfiguration sc = new BaseSeriesConfiguration();
 			sc.setId(id);
 			sc.getCompIds().add(1L);
-			sc.getComps().add(cf.get(1L));
+//			sc.getComps().add(cf.get(1L));
 			//sc.getCompNames().add(cf.get(1L).getShortName());
 			sc.setStatus(Status.PENDING);
 			sc.setLastRound(urf.get(cf.get(1L).getRounds().get(0)));
@@ -105,10 +105,10 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 			ISeriesConfiguration sc) {
 		sc.setId(count ++);
 		// repopulate the comps list
-		sc.setComps(new ArrayList<ICompetition>());
-		for (Long compId : sc.getCompIds()) {
-			sc.getComps().add(cf.get(compId));
-		}
+//		sc.setComps(new ArrayList<ICompetition>());
+//		for (Long compId : sc.getCompIds()) {
+//			sc.getComps().add(cf.get(compId));
+//		}
 		return sc;
 	}
 

@@ -61,8 +61,8 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	protected List<Criteria> activeCriteria;
 
 	private List<Long> compIds;
-	@Transient
-	private List<ICompetition> comps;
+//	@Transient
+//	private List<ICompetition> comps;
 	
 	private Long hostCompId;
 	@Transient
@@ -78,7 +78,7 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 		countryIds = new ArrayList<Long>();
 		countries = new ArrayList<ICountry>();
 		compIds = new ArrayList<Long>();
-		comps = new ArrayList<ICompetition>();
+//		comps = new ArrayList<ICompetition>();
 		countryIds = new ArrayList<Long>();
 		live = false;
 	}
@@ -212,15 +212,15 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 		this.compIds = compIds;
 	}
 
-	@Override
-	public List<ICompetition> getComps() {
-		return comps;
-	}
-
-	@Override
-	public void setComps(List<ICompetition> comps) {
-		this.comps = comps;
-	}
+//	@Override
+//	public List<ICompetition> getComps() {
+//		return comps;
+//	}
+//
+//	@Override
+//	public void setComps(List<ICompetition> comps) {
+//		this.comps = comps;
+//	}
 
 	@Override
 	public List<String> getCompNames() {

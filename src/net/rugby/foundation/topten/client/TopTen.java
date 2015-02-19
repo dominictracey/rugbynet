@@ -58,7 +58,7 @@ public class TopTen implements EntryPoint {
 				if (result.getType().equals(PlaceType.SERIES)) {
 					sp = new SeriesPlace(result.getCompId(), result.getSeriesId(), result.getGroupId(), result.getMatrixId(), result.getQueryId(), result.getItemId());
 				} else {
-					sp = new FeatureListPlace(result.getCompId(), result.getQueryId(), result.getItemId());
+					sp = new FeatureListPlace(result.getCompId(), result.getListId(), result.getItemId());
 				}
 				historyHandler.register(placeController, eventBus, sp);	
 				historyHandler.handleCurrentHistory();

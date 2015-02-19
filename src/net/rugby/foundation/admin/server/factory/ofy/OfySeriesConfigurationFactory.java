@@ -42,9 +42,9 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 		sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
 		sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
 		sc.setSeries(sf.get(sc.getSeriesId()));
-		for (Long compId : sc.getCompIds()) {
-			sc.getComps().add(cf.get(compId));
-		}
+//		for (Long compId : sc.getCompIds()) {
+//			sc.getComps().add(cf.get(compId));
+//		}
 		if (sc.getHostCompId() != null) {
 			sc.setHostComp(cf.get(sc.getHostCompId()));
 		}
@@ -62,9 +62,24 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 			}
 			
 			// repopulate the comps list
-			sc.setComps(new ArrayList<ICompetition>());
-			for (Long compId : sc.getCompIds()) {
-				sc.getComps().add(cf.get(compId));
+//			sc.setComps(new ArrayList<ICompetition>());
+//			for (Long compId : sc.getCompIds()) {
+//				sc.getComps().add(cf.get(compId));
+//			}
+			
+			// if the series already exists, we may need to add or remove comps
+			if (sc.getSeriesId() != null) {
+				IRatingSeries rs = sf.get(sc.getSeriesId());
+				if (rs.getCompIds() != null) {
+					rs.getCompIds().clear();
+					rs.getCompIds().addAll(sc.getCompIds());
+				}
+				if (rs.getCountryIds() != null) {
+					rs.getCountryIds().clear();
+					rs.getCountryIds().addAll(sc.getCountryIds());
+				}
+				ofy.put(rs);
+				sf.dropFromCache(rs.getId());
 			}
 
 		} catch (Throwable ex) {
@@ -93,7 +108,7 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 
 	@Override
 	public List<ISeriesConfiguration> getAll(Boolean active) {
-		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class);
+		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).order("displayName");
 		if (active) {
 			qs = qs.filter("live",active);
 		}

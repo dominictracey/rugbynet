@@ -90,6 +90,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 		edit.setVisible(false);
 		publish.setVisible(false);
 		promote.setVisible(false);
+		delete.setVisible(false);
 		
 		left_arrow.setIcon(IconType.CHEVRON_LEFT);
 		left.addStyleName("col-xs-1");

@@ -481,6 +481,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						sponsorCol.setStyleDependentName(result.getAbbr(), true);
 						currentSponsorStyle = result.getAbbr();
 						sponsorTag.setHTML("<center>"+ result.getTagline() + "</center>");
+						clientFactory.recordAnalyticsEvent("sponsor", "show", result.getName(), 1);
 					}
 					
 				}

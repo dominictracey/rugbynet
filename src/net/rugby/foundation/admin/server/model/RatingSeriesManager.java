@@ -138,7 +138,8 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		// it is ok if the comp doesn't have a round for the target UR.
 		// note this isn't true for when we are doing match review
 		if (!config.getMode().equals(RatingMode.BY_MATCH) && !config.getMode().equals(RatingMode.BY_POSITION) && !config.getMode().equals(RatingMode.BY_COMP)) {
-			for (ICompetition c : config.getComps()) {
+			for (Long cid : config.getCompIds()) {
+				ICompetition c = cf.get(cid);
 				// get the round for the target UniversalRound
 				for (IRound r : c.getRounds()) {
 					if (urf.get(r).ordinal == targetURordinal) {

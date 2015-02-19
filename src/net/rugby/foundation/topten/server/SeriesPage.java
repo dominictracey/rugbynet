@@ -35,6 +35,7 @@ import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
@@ -131,7 +132,7 @@ public class SeriesPage extends HttpServlet {
 			details2Content = ((IContentFactory)ctf).getForDiv("details2");
 
 			if (details2Content != null) {
-				details2Div = "<noscrip>" + details2Content.getBody().replaceFirst("<% players %>", players) + "</noscript>\n<div id=\"details2\">";
+				details2Div = "<noscript>" + details2Content.getBody().replaceFirst("<% players %>", players) + "</noscript>\n<div id=\"details2\">";
 			} else {
 				details2Div = "<noscript>" + description + "</noscript>\n<div id=\"details2\">";
 			}
@@ -166,7 +167,7 @@ public class SeriesPage extends HttpServlet {
 				String[] chunks = everything.split("(<!-- split -->|<div id=\"split\"></div>)");
 				first = chunks[0];
 				third = chunks[2];
-				//				fifth = chunks[4];
+				fifth = chunks[3];
 
 				inputStream.close();
 			} catch (Throwable ex) {
@@ -293,12 +294,12 @@ public class SeriesPage extends HttpServlet {
 			
 			description = "\n... \n";
 			for (int i = 4; i < 7; ++i) {
-				if (list.getList().get(i) != null) {
+				if (list != null && list.getList() != null && list.getList().get(i) != null) {
 					description += "#" + i + " " + list.getList().get(i).getPlayer().getDisplayName() + " (" + list.getList().get(i).getTeamName() + ")\n";
 				}
 			}
 			
-			description = "\n...";
+			description += "\n...";
 		}
 
 
@@ -310,6 +311,9 @@ public class SeriesPage extends HttpServlet {
 			ITopTenItem target;
 			while (it.hasNext()) {
 				target = it.next();
+				if (!keywords.endsWith(", ")) {
+					keywords += ", ";
+				}
 				keywords += target.getPlayer().getDisplayName();
 				players += target.getPlayer().getDisplayName();
 				if (it.hasNext()) {
@@ -317,7 +321,10 @@ public class SeriesPage extends HttpServlet {
 					keywords += ", ";
 				} 
 				if (!keywords.contains(target.getTeamName())) {
-					keywords += target.getTeamName() + ", ";
+					if (!keywords.endsWith(", ")) {
+						keywords += ", ";
+					}
+					keywords += target.getTeamName();
 				}
 			}
 		}
@@ -330,11 +337,11 @@ public class SeriesPage extends HttpServlet {
 
 		page.append(first);
 
-		page.append("<meta name=\"keywords\" content=\"" + keywords + "\" />");
+		page.append("<meta name=\"keywords\" content=\"" + keywords + "\" />\n");
 
 
-		page.append("<meta name=\"description\" content=\"" + description + "\" />");
-		page.append("<meta property=\"og:description\" content=\"" + description + "\" />");
+		page.append("<meta name=\"description\" content=\"" + description.trim() + "\" />\n");
+		page.append("<meta property=\"og:description\" content=\"" + description.trim() + "\" />\n");
 
 
 		if (item != null) {
@@ -343,21 +350,49 @@ public class SeriesPage extends HttpServlet {
 			if (t != null) {
 				abbr = t.getAbbr();
 			}
-			page.append("<meta property=\"og:image\" content=\"" + scheme + "://" + server + "/resources/teams/" + abbr + "/200.png" + "\" />");
+			page.append("<meta property=\"og:image\" content=\"" + scheme + "://" + server + "/resources/teams/" + abbr + "/200.png" + "\" />\n");
 		} else {
-			page.append("<meta property=\"og:image\" content=\"http://www.rugby.net/resources/logo200_crop.png\" />");				
+			if (comp != null) {
+				page.append("<meta property=\"og:image\" content=\"http://www.rugby.net/resources/comps/" + comp.getAbbr() + "/200.png\" />\n");
+			} else {
+				page.append("<meta property=\"og:image\" content=\"http://www.rugby.net/resources/logo200_crop.png\" />\n");	
+			}
 		}
 
 
 
-		page.append("<meta property=\"og:title\" content=\"" + title + "\" />");
-		page.append("<title>" + title + "</title>");
+		page.append("<meta property=\"og:title\" content=\"The Rugby Net: " + title + "\" />\n");
+		page.append("<title>The Rugby Net: " + title + "</title>\n");
+		page.append("<meta property=\"og:url\" content=\"http://www.rugby.net/s/" + place.getGuid() +"\" />\n");
 
-
-		String details2Div = getContent(players, description);
 
 		page.append(third);
+		
+		// at the end
+		String details2Div = getContent(players, description);
 		page.append(details2Div);
+		
+		// the entry event
+		String action = "none";
+		String label = title;
+		if (place.getCompId() == null) {
+			action = "home";
+		} else if (place.getType().equals(PlaceType.FEATURE)) {
+			if (place.getItemId() == null) {
+				action = "feature";
+			} else {
+				action = "fPlayer";
+			}
+		} else { // series
+			if (place.getItemId() == null) {
+				action = "series";
+			} else {
+				action = "sPlayer";
+			}
+		}
+		
+		page.append("\n<script>ganew('send', 'event', 'entry', '" + action + "', '" + label + "', 1);</script>\n");
+		
 		page.append(fifth);
 
 		return page.toString();

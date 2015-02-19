@@ -62,8 +62,8 @@ public interface ISeriesConfiguration  extends IHasId {
 	void setSeries(IRatingSeries ratingSeries);
 	String getPipelineId();
 	void setPipelineId(String pipelineId);
-	void setComps(List<ICompetition> comps);
-	List<ICompetition> getComps();
+	//void setComps(List<ICompetition> comps);
+	//List<ICompetition> getComps();
 	void setCompIds(List<Long> compIds);
 	List<Long> getCompIds();
 	void setActiveCriteria(List<Criteria> activeCriteria);
