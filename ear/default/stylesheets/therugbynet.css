@@ -1,3 +1,9 @@
+.trn-comp-link {
+		display: block;
+		height: 100%;
+		width: 100%;
+}
+
 .comp-logo {
 		padding-left: 5px;
 		padding-right: 5px;	
@@ -123,7 +129,11 @@
 
 
 
-
+.trn-sponsor-link {
+		display: block;
+		height: 100%;
+		width: 100%;
+}
 
 
 .sponsor-logo {
@@ -148,6 +158,28 @@
 
 .sponsor-logo-FR {
 	background-image: url("/resources/sponsors/FR/200R.png");
+}
+
+.movement {
+		background-position: center center;
+    	min-width: 39px;   	
+    	background-repeat: no-repeat;
+}
+
+.movement-up {
+	background-image: url("/icons/arrow_Up_Green.gif");
+}
+
+.movement-down {
+	background-image: url("/icons/arrow_Down_Red.gif");
+}
+
+.movement-unchanged {
+	background-image: url("/icons/unchanged_Blue.gif");
+}
+
+.movement-none {
+	background-image: url("/icons/menu_bg.png");
 }
 
 .table > tbody > tr > td {

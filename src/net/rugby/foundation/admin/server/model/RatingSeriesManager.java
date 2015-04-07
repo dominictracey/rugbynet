@@ -248,15 +248,29 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					if (found) {
 						rids.add(targetRound.getId());
 					}
-				} else if (rm.getCriteria() == Criteria.BEST_YEAR || rm.getCriteria() == Criteria.IN_FORM) {
+				} else if (rm.getCriteria() == Criteria.BEST_YEAR) {
 					// get the rounds for the comps that happened in the last year.
-					List<IRound> rounds = getRoundsFromLastYear(comp);
+					List<IRound> rounds = getRoundsFromLastXMonths(comp, 12);
 					for (IRound r : rounds) {
 						if (urf.get(r).ordinal <= ur.ordinal) {
 							rids.add(r.getId());
 						}
 					}
-				} 
+				} else if (rm.getCriteria() == Criteria.IN_FORM) {
+					// get the rounds for the comps that happened in the last six months if its a virtual comp
+					List<IRound> rounds = null;
+					if (rs.getCompIds().size() > 1) {
+						rounds = getRoundsFromLastXMonths(comp, 12);  ///?
+					} else {
+						rounds = getRoundsFromLastXMonths(comp, 12); // for a single comp, just get all the data
+					}
+					
+					for (IRound r : rounds) {
+						if (urf.get(r).ordinal <= ur.ordinal) {
+							rids.add(r.getId());
+						}
+					}
+				}
 			}
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage(), e);
@@ -266,10 +280,10 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		return rids;
 	}
 
-	private List<IRound> getRoundsFromLastYear(ICompetition comp) {
+	private List<IRound> getRoundsFromLastXMonths(ICompetition comp, int xMonths) {
 
 
-		DateTime yearAgo = DateTime.now().minusYears(1);
+		DateTime yearAgo = DateTime.now().minusMonths(xMonths);
 		List<IRound> yearRounds = new ArrayList<IRound>();
 		for (IRound rd: comp.getRounds()) {
 			DateTime dtb = new DateTime(rd.getBegin());
@@ -298,7 +312,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
 					rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
 					rq.setScaleStanding(true);
-					rq.setScaleComp(false);
+					rq.setScaleComp(rm.getRatingGroup().getRatingSeries().getCompIds().size() > 1);
 					rq.setScaleTime(scaleTime);
 					rq.setStatus(Status.NEW);
 					rq.setRoundIds(rids);

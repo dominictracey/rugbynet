@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.topten.model.shared.Feature;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
@@ -40,7 +41,7 @@ public interface ITopTenListFactory {
 	 * @return returns true if no errors are logged. Check log if false returned.
 	 */
 	public boolean scan(Long compId);
-	ITopTenList create(TopTenSeedData tti, ITopTenList lastTTL);
+	ITopTenList create(TopTenSeedData tti, IRatingQuery preQuery);
 	public String getGuidForMatch(IMatchGroup m);
 	IServerPlace makeFeature(ITopTenList list);
 	

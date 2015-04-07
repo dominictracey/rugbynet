@@ -1338,8 +1338,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	@Override
 	public IRatingQuery createRatingQuery(List<Long> compIds,
-			List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds,
-			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding) {
+			List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds, Long schemaId,
+			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean instrument) {
 		try {
 			if (checkAdmin()) {
 
@@ -1353,6 +1353,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				rq.setScaleTime(scaleTime);
 				rq.setScaleComp(scaleComp);
 				rq.setScaleStanding(scaleStanding);
+				rq.setInstrument(instrument);
+				rq.setSchemaId(schemaId);
 
 				// check that we have all the comps for the rounds specified, in multi-comp queries this info is missing
 				for (Long rid : rq.getRoundIds()) {
@@ -1518,6 +1520,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				IRatingEngineSchema schema = mresf.get(schemaId);
+				if (schema instanceof ScrumMatchRatingEngineSchema) {
+					return (ScrumMatchRatingEngineSchema) schema;
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+	
+	@Override
+	public ScrumMatchRatingEngineSchema createMatchRatingEngineSchema() {
+		try {
+			if (checkAdmin()) {
+				IRatingEngineSchema schema = mresf.create();
 				if (schema instanceof ScrumMatchRatingEngineSchema) {
 					return (ScrumMatchRatingEngineSchema) schema;
 				} else {
@@ -2325,6 +2346,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 
 	}
+
+
 
 
 

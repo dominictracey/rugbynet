@@ -67,6 +67,13 @@
 
 				<g:ListBox ui:field="team" multipleSelect="true" />
 			</g:HTMLPanel>
+			<g:HTMLPanel>
+				Schema:
+
+				<br />
+
+				<g:ListBox ui:field="schema" multipleSelect="false" />
+			</g:HTMLPanel>
 <!-- 			<g:VerticalPanel> -->
 <!-- 				<g:HorizontalPanel> -->
 					<b:ButtonGroup dataToggle="BUTTONS">
@@ -83,6 +90,7 @@
 					<b:CheckBox ui:field="scaleTime">Scale for Match Age</b:CheckBox>
 					<b:CheckBox ui:field="scaleComp">Scale for Comp Weight</b:CheckBox>
 					<b:CheckBox ui:field="scaleStanding">Scale for Standings</b:CheckBox>
+					<b:CheckBox ui:field="instrument">Send Statistical Report</b:CheckBox>
 				</g:VerticalPanel>
 
 <!-- 			</g:VerticalPanel> -->

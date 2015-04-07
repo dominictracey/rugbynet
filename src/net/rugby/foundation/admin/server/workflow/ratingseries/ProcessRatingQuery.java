@@ -58,6 +58,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	public Value<Boolean> run(IRatingQuery rq) {
 
 		IMatchGroup match = null;  // to support delayed guid linking
+		IRatingQuery preQuery = null; // for tracking player movement
 		
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();
@@ -93,11 +94,16 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 
 		// get the engine
 		IRatingEngineSchema mres = mresf.getDefault();
+		if (rq.getSchemaId() != null) {
+			mres = mresf.get(rq.getSchemaId());
+		}
+		
 		assert (mres != null);
 		IQueryRatingEngine mre = qref.get(mres, rq);
 		assert (mre != null);
 
 		boolean ok = false;
+		boolean inForm = false;
 		
 		try {
 			ok = mre.setQuery(rq);
@@ -147,7 +153,6 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				}
 			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_POSITION)) {
 				// is this In Form or Last Round?
-				boolean inForm = false;
 				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
 					title += "In Form ";
 					inForm = true;
@@ -195,6 +200,25 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					}
 				}
 				
+				if (inForm) {
+					// figure out the last list for this position
+					//rq.getRatingMatrix().getRatingQueries().indexOf(rq); // << This breaks on rerun, need to code by hand
+					int queryIndex = -1;
+					int j = 0;
+					for (IRatingQuery q : rq.getRatingMatrix().getRatingQueries()) {
+						if (q.getId().equals(rq.getId())) {
+							queryIndex = j;
+							break;
+						}
+						++j;
+					}
+					
+					if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().size() > 1 && queryIndex != -1) {
+						// we want to look back one ratingGroup - since new ones are added to the front of the list we look at index=1
+						preQuery = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().get(1).getRatingMatrices().get(0).getRatingQueries().get(queryIndex);
+					}
+				}
+				
 			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_COMP)) {
 				// BY_COMP can be either:
 				//			a Round List "Top Ten Performances in Round 8 of the Aviva Premiership"
@@ -206,7 +230,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			
 				
 				// is this In Form or Last Round?
-				boolean inForm = false;
+				inForm = false;
 				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
 					title += "In Form Players ";
 					inForm = true;
@@ -243,6 +267,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				
 			}
 			
+
+			
 			Long sponsorId = null;
 			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getSponsorId() != null) {
 				sponsorId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getSponsorId();
@@ -252,7 +278,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			
 			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId(), rq.getRoundIds(), 10, sponsorId);
 			data.setContext(context);
-			ITopTenList ttl = ttlf.create(data);
+			ITopTenList ttl = ttlf.create(data, preQuery);
 			
 			
 			ttlf.put(ttl);

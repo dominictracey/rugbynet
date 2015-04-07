@@ -11,21 +11,20 @@ import net.rugby.foundation.admin.client.ui.SmartBar;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView.Listener;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
-import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.CheckBoxButton;
-import org.gwtbootstrap3.client.ui.constants.Toggle;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -34,7 +33,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -65,6 +63,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@UiField ListBox pos;
 	@UiField ListBox country;
 	@UiField ListBox team;
+	@UiField ListBox schema;
 
 	@UiField CheckBoxButton timeSeries;
 	@UiField Button query;
@@ -76,6 +75,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@UiField CheckBox scaleTime;
 	@UiField CheckBox scaleComp;
 	@UiField CheckBox scaleStanding;
+	@UiField CheckBox instrument;
 
 	@UiField SimplePanel jobArea;
 
@@ -97,6 +97,8 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	private List<Long> roundIds;
 
 	private List<Long> compIds;
+	
+	private Long schemaId;
 
 	private ICompetition currentComp;
 
@@ -111,6 +113,8 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	private boolean isSetup = false;
 
 	private List<IPlayerRating> ratingList;
+
+	private int defaultSchemaIndex;
 
 	public PortalViewImpl()
 	{
@@ -283,15 +287,32 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 		}
 
 		// this is the last thing
-		isSetup = true;
+		//isSetup = true;
 	}
 
+	@Override
+	public void setSchemas(List<ScrumMatchRatingEngineSchema> result) {
+		schema.clear();
+		int i=0;
+		for (IRatingEngineSchema s: result) {
+			schema.addItem(s.getName(), s.getId().toString());
+			if (s.getIsDefault()) {
+				defaultSchemaIndex = i;
+				schema.setItemSelected(i, true);
+			}
+			i++;
+		}
+
+		// this is the last thing
+		isSetup = true;
+	}
+	
 	@UiHandler("query")
 	void onQueryClick(ClickEvent e) {
 
 		populateVals();
 
-		listener.submitPortalQuery(compIds, roundIds, posis, countryIds, teamIds, scaleTime.getValue(), scaleComp.getValue(), scaleStanding.getValue());
+		listener.submitPortalQuery(compIds, roundIds, posis, countryIds, teamIds, schemaId, scaleTime.getValue(), scaleComp.getValue(), scaleStanding.getValue(), instrument.getValue());
 	}
 
 
@@ -341,6 +362,13 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 				teamIds.add(Long.parseLong(team.getValue(i)));
 			}
 		}	
+		
+		schemaId = null;
+		for (int i = 0; i < schema.getItemCount(); i++) {
+			if (schema.isItemSelected(i)) {
+				schemaId = Long.parseLong(schema.getValue(i));
+			}
+		}
 
 	}
 
@@ -468,6 +496,17 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 					country.setItemSelected(i, false);
 				}
 			}
+			
+			// and the schema
+			for (int i=0; i<schema.getItemCount(); i++) {
+				if (rq.getSchemaId() != null && rq.getSchemaId().equals(Long.parseLong(schema.getValue(i)))) {
+					schema.setItemSelected(i, true);
+				} else if (rq.getSchemaId() == null && defaultSchemaIndex == i) {
+					schema.setItemSelected(i, true);
+				} else {
+					schema.setItemSelected(i, false);
+				}
+			}
 
 			// and the scaling flags
 			scaleTime.setValue(rq.getScaleTime());
@@ -515,6 +554,14 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 		for (int i=0; i<pos.getItemCount(); i++) {
 			pos.setItemSelected(i, false);
+		}
+		
+		for (int i=0; i<schema.getItemCount(); i++) {
+			if (defaultSchemaIndex != i) {
+				schema.setItemSelected(i, false);
+			} else {
+				schema.setItemSelected(i, true);
+			}
 		}
 
 		return true;

@@ -102,4 +102,6 @@ public interface ClientFactory {
 	void console(String text);
 
 	void recordAnalyticsEvent(String cat, String action, String label, int val);
+
+	void showExternalLink(String string);
 }

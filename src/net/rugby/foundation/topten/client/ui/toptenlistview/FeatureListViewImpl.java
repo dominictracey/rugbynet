@@ -49,12 +49,16 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	protected Column sponsorCol;
 	@UiField
 	protected Div compSpacer;
+	@UiField
+	protected Anchor compLink;
 	@UiField 
 	Div sponsorDiv;
 	@UiField
 	protected Div sponsorSpacer;
 	@UiField
 	protected HTML sponsorTag;
+	@UiField
+	protected Anchor sponsorLink;
 	@UiField 
 	protected HTML listTitle;
 	
@@ -115,6 +119,10 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 
 		compSpacer.setHeight("38px");
 		sponsorSpacer.setHeight("38px");
+		
+		// style="display: block"
+		compLink.addStyleName("trn-comp-link");
+		sponsorLink.addStyleName("trn-sponsor-link");
 
 	}
 	
@@ -155,6 +163,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 						}
 						compCol.setStyleDependentName("NON", true);
 						currentCompStyle = "NON";
+						compLink.setHref("#");
 					}
 
 					@Override
@@ -171,6 +180,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 							currentCompStyle = result.getAbbr();
 						}
 						
+						compLink.setHref("#Fx:c=" + result.getId());
 						clientFactory.getSponsorForList(list, new AsyncCallback<ISponsor>() {
 
 							@Override
@@ -191,11 +201,13 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 									sponsorCol.setStyleDependentName("NON", true);
 									currentSponsorStyle = "NON";
 									sponsorTag.setHTML("");
+									sponsorLink.setHref("#");
 								} else {
 									sponsorCol.setStyleDependentName(result.getAbbr(), true);
 									currentSponsorStyle = result.getAbbr();
 									sponsorTag.setHTML("<center>"+ result.getTagline() + "</center>");
 									clientFactory.recordAnalyticsEvent("sponsor", "show", result.getName(), 1);
+									sponsorLink.setHref(result.getUrl());
 								}
 								
 							}

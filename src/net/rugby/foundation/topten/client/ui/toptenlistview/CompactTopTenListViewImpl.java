@@ -154,7 +154,56 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 		});
 
+		// movement icon
+		items.addColumn(new TextColumn<ITopTenItem>(){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				return " ";
+			}
 
+
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {	
+				String style = "movement ";
+				if (value.getLastOrdinal() == 0) {
+					style += "movement-none";
+				} else {
+					if (value.getLastOrdinal() == value.getOrdinal()) {
+						style += "movement-unchanged";
+					} else if (value.getLastOrdinal() > value.getOrdinal()) {
+						style += "movement-up";
+					} else {
+						style += "movement-down";
+					}
+				}
+				return style;
+			}
+		});
+		
+		items.addColumn(new TextColumn<ITopTenItem>(){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				if (s.getLastOrdinal() == 0) {
+					return "";
+				}
+				
+				if (s.getLastOrdinal() > s.getOrdinal()) {
+					return "(" + s.getLastOrdinal() + ")";
+				} else if (s.getLastOrdinal() < s.getOrdinal()) {
+					return "(" + s.getLastOrdinal() + ")";
+				} else {
+					return "(" + s.getLastOrdinal() + ")";
+				}
+			}
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return "text-right compactTTL position";
+
+			}
+		});
+		
 		items.addColumn(new Column<ITopTenItem, SafeHtml>(new SafeHtmlCell()){
 			@Override
 			public SafeHtml getValue(ITopTenItem s)

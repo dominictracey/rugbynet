@@ -53,6 +53,8 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		 * 
 		 */
 		private static final long serialVersionUID = 3979300783273508712L;
+
+		private Long scrumId;
 		
 
 		public RatingComponent() {
@@ -60,7 +62,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		}
 		
 		public RatingComponent(String statsDetails, float backScore, float forwardScore, 
-				float rawScore, Long playerMatchStatsId, String matchLabel, Integer scaledRating, Integer unscaledRating) {
+				float rawScore, Long playerMatchStatsId, String matchLabel, Integer scaledRating, Integer unscaledRating, Long scrumId) {
 			this.backScore = backScore;
 			this.forwardScore = forwardScore;
 			this.rawScore = rawScore;
@@ -69,6 +71,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 			this.setMatchLabel(matchLabel);
 			this.scaledRating = scaledRating;
 			this.unscaledRating = unscaledRating;
+			this.setScrumId(scrumId);
 		}
 		
 		public void addRatingsDetails(String details) {
@@ -267,6 +270,14 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 
 		public void setRatingDetails(String ratingDetails) {
 			this.ratingDetails = ratingDetails;
+		}
+
+		public Long getScrumId() {
+			return scrumId;
+		}
+
+		public void setScrumId(Long scrumId) {
+			this.scrumId = scrumId;
 		}
 		
 		

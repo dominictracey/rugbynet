@@ -41,6 +41,7 @@ import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRawScore;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
@@ -323,6 +324,17 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			lineoutStolen *= timeScale;
 			ruckStolen *= timeScale;
 			maulStolen *= timeScale;
+			
+			// reduce playing time for cards
+			if (yellowCards > 0) {
+				minutesShare -= yellowCards * 10;
+			}
+			
+			// don't parse out the times for these atm, so just mark it zero!
+			if (redCards > 0) {
+				minutesShare = 0;
+			}
+			
 			return pms;
 		}
 
@@ -339,16 +351,21 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 			} else if (pms2.getPosition().equals(position.PROP)) {
 				scrumShare = (scrumShare*1.5F);
-
+				scrumLost = (scrumLost*1.5F);
+				scrumStolen = (scrumStolen*1.5F);
 			}  else if (pms2.getPosition().equals(position.HOOKER)) {
 				scrumShare = (scrumShare*1.3F);
-
+				scrumLost = (scrumLost*1.3F);
+				scrumStolen = (scrumStolen*1.3F);
+				lineoutStolen = 0; // defensively hookers don't do much in a steal
 			} else if (pms2.getPosition().equals(position.LOCK)) {
 				lineoutStolen = 0; // no double dip
 			} else if (pms2.getPosition().equals(position.FLANKER) || pms2.getPosition().equals(position.NUMBER8)) {
 				scrumShare = (scrumShare*.5F);
+				scrumLost = (scrumLost*.5F);
+				scrumStolen = (scrumStolen*.5F);
 				lineoutShare = (lineoutShare*.3f);
-
+				lineoutStolen = 0; // no double dip
 			}
 
 			return pms2;
@@ -568,7 +585,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			//String statsDetails, float backScore, float forwardScore, float rawScore, Long playerMatchStatsId, String matchLabel
 			Integer scaledRating = Math.round(playerScore*scalingFactorMap.get(ALL_SCALE_KEY)/scaleTotalMap.get(ALL_SCALE_KEY)*scaleTotalNumMap.get(ALL_SCALE_KEY)*500);
 			Integer unscaledRating = Math.round(playerScore*scalingFactorMap.get(NO_SCALE_KEY)/scaleTotalMap.get(NO_SCALE_KEY)*scaleTotalNumMap.get(NO_SCALE_KEY)*500);
-			RatingComponent rc = new RatingComponent(toString(),backScore,forwardScore,playerScore,pms.getId(),matchLabel, scaledRating, unscaledRating);
+			RatingComponent rc = new RatingComponent(toString(),backScore,forwardScore,playerScore,pms.getId(),matchLabel, scaledRating, unscaledRating, match.getForeignId());
 
 			rc.addRatingsDetails("Scaling\tValue\tScore\tRating\n----------------------------------------------------\n");
 			for (String key: scalingFactorMap.keySet()) {
@@ -1055,15 +1072,17 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		}
 
 		body += sb.toString();
+		
+		if (query.getInstrument()) {
 		//		
-		//		body += "<hr> Overall" + "</p><pre>";
-		//
-		//		StatisticalSummary ss = new SummaryStatistics();
-		//		for (IPlayerRating r : mrl) {
-		//			((SummaryStatistics)ss).addValue(r.getRating());
-		//		}
-		//
-		//		body += ss.toString();
+				body += "<hr> Overall" + "</p><pre>";
+		
+				StatisticalSummary ss = new SummaryStatistics();
+				for (IPlayerRating r : mrl) {
+					((SummaryStatistics)ss).addValue(r.getRating());
+				}
+		
+				body += ss.toString();
 
 		//		// backs vs. forwards
 		//		body += sep + "Backs vs. Forwards" + sep + "\n" + sep + sep + "\n";
@@ -1082,33 +1101,30 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		//		body += sep + "Forwards" + "\n";
 		//		body += forwards.toString();
 		//
-		//		body += sep + "Positions" + sep + "\n" + sep + sep + "\n";
-		//
-		//		//		for (int i=1; i<position.values().length-1; ++i) {
-		//		for (position pos : position.values()) {
-		//			if (query.getPositions().contains(pos)) {
-		//				body += sep + pos + "\n";
-		//				ss = new SummaryStatistics();
-		//				for (IPlayerRating r : mrl) {
-		//					//				if (r instanceof IPlayerMatchRating) {
-		//					//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getPosition().equals(position.getAt(i))) {
-		//					//						((SummaryStatistics)ss).addValue(r.getRating());
-		//					//					}
-		//					//				} else 
-		//					if (r instanceof PlayerRating) {
-		//						for (RatingComponent rc : r.getRatingComponents()) {
-		//							IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
-		//							if (pms != null && pms.getPosition().equals(pos)) {
-		//								((SummaryStatistics)ss).addValue(rc.getScaledRating());
-		//							}
-		//						}
-		//					}
-		//				}
-		//				if (ss.getN() > 0)
-		//					body += ss.toString();
-		//			}
-		//
-		//		}
+				String sep = "<hr>";
+				body += sep + "Positions" + sep + "\n" + sep + sep + "\n";
+		
+				//		for (int i=1; i<position.values().length-1; ++i) {
+				for (position pos : position.values()) {
+					if (query.getPositions().size() == 0 || query.getPositions().contains(pos)) {
+						body += sep + pos + "\n";
+						ss = new SummaryStatistics();
+						for (IPlayerRating r : mrl) {
+							if (r instanceof PlayerRating) {
+								for (RatingComponent rc : r.getRatingComponents()) {
+									IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
+									if (pms != null && pms.getPosition().equals(pos)) {
+										((SummaryStatistics)ss).addValue(rc.getUnscaledRating());
+									}
+								}
+							}
+						}
+						if (ss.getN() > 0)
+							body += ss.toString();
+					}
+		
+				}
+		}
 
 		//		body += sep + "Matches" + sep + "\n" + sep + sep + "\n";
 		//		Iterator<ITeamMatchStats> it = tmsHomeMap.values().iterator();
@@ -1136,6 +1152,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		//				body += ss.toString();
 		//		}
 
+		body += "--";
 		return body;
 
 	}

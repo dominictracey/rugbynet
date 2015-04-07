@@ -398,7 +398,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	}
 
 	@Override
-	public ITopTenList create(TopTenSeedData tti, ITopTenList lastTTL) {
+	public ITopTenList create(TopTenSeedData tti, IRatingQuery lastQuery) {
 		ITopTenList list = new TopTenList();
 		// a times series TTL won't have a compId set, so we need to get one
 		list.setCompId(getCompId(tti));
@@ -443,7 +443,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			list.setRoundOrdinal(uro);
 		}
 
-		Long hostCompId = list.getCompId();;
+		Long hostCompId = list.getCompId();
 		if (hostCompId == null && rq.getRatingMatrix() != null) {
 			hostCompId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId();
 		}
@@ -538,8 +538,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 
 		// now figure out where the last TTL we need to compare to lives
-		if (lastTTL != null) {
-			compareListToLast(list,lastTTL);
+		if (lastQuery != null) {
+			compareListToLast(list,lastQuery);
 		}
 
 
@@ -703,45 +703,20 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		list.setTwitterDescription(desc);
 	}
 
-	private ITopTenList compareListToLast(ITopTenList list, ITopTenList last) {
+	private ITopTenList compareListToLast(ITopTenList list, IRatingQuery lastQuery) {
 
-		// key playerId, value position in last list
-		Map<Long, Integer> oldPosMap = new HashMap<Long, Integer>();
 		for (ITopTenItem newItem : list.getList()) {
 			int pos = 1;
-			for (ITopTenItem oldItem : last.getList()) {
+			List<IPlayerRating> ratings = prf.query(lastQuery);
+			for (IPlayerRating oldItem : ratings) {
 				if (newItem.getPlayerId().equals(oldItem.getPlayerId())) {
-					oldPosMap.put(newItem.getPlayerId(), pos);
+					newItem.setLastOrdinal(pos);
 					break;
 				}
 				pos++;
 			}
 		}
-
-		int count = 1;
-		String listDescription = "Notes:<br/>";
-		for (ITopTenItem newItem : list.getList()) {
-			newItem.setLastOrdinal(oldPosMap.get(newItem.getPlayerId()));
-			ITopTenItem oldItem = last.getList().get(newItem.getLastOrdinal());
-			String dir = "up";
-			if (newItem.getOrdinal() > newItem.getLastOrdinal()) {
-				dir = "down";
-			}
-
-			IPlayerRating newPr = prf.get(newItem.getPlayerRatingId());
-			IPlayerRating oldPr = prf.get(oldItem.getPlayerRatingId());
-			String lastAction = " being idle.";
-			IPlayerMatchStats newPms = newPr.getMatchStats().get(newPr.getMatchStats().size());
-			IPlayerMatchStats oldPms = oldPr.getMatchStats().get(oldPr.getMatchStats().size());
-			if (!newPms.getMatchId().equals(oldPms.getMatchId())) {
-				IMatchGroup m = mf.get(newPms.getMatchId());
-				lastAction = " match " + m.getSimpleScoreMatchResult().toString();
-			}
-
-			listDescription += "<p>" + newItem.getPlayer().getDisplayName() + " moves " + dir + " to #" + newItem.getOrdinal() + " after " + lastAction + ".</p>\n";
-
-			count++;
-		}
+		
 		return list;
 	}
 
@@ -749,21 +724,21 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		if (tti.getCompId() != null && !tti.getCompId().equals(-1L)) {
 			return tti.getCompId();
 		} else {
-			// time series
-			Long compId = null;
-			for (Long rid : tti.getRoundIds()) {
-				IRound r = rf.get(rid);
-				// for now, all the selected rounds need to have the same compId
-				if (compId == null) {
-					compId = r.getCompId();
-				} else {
-					if (!r.getCompId().equals(compId)) {
-						//throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
+//			// time series
+//			Long compId = null;
+//			for (Long rid : tti.getRoundIds()) {
+//				IRound r = rf.get(rid);
+//				// for now, all the selected rounds need to have the same compId
+//				if (compId == null) {
+//					compId = r.getCompId();
+//				} else {
+//					if (!r.getCompId().equals(compId)) {
+//						//throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
 						return ccf.get().getGlobalCompId();
-					}
-				}
-			}
-			return compId;
+//					}
+//				}
+//			}
+//			return compId;
 		}
 
 	}

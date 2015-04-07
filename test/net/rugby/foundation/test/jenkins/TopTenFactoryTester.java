@@ -223,10 +223,10 @@ public class TopTenFactoryTester {
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
 		TopTenSeedData ttsd = new TopTenSeedData(7710001L, "Top Ten Props - Round 1", desc,1L, null, 10, null);
-		ITopTenList last =  ttf.create(ttsd);
+		//ITopTenList last =  ttf.create(ttsd);
 		
-		ttsd = new TopTenSeedData(7700001L, "Top Ten Props - Round 2", desc, 1L, null, 10, null);
-		return ttf.create(ttsd, last);
+		//ttsd = new TopTenSeedData(7700001L, "Top Ten Props - Round 2", desc, 1L, null, 10, null);
+		return ttf.create(ttsd, null); //last);
 	}
 
 	@Test 

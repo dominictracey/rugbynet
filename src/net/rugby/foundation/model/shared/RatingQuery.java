@@ -35,12 +35,17 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	protected boolean scaleComp = true;
 	@Unindexed
 	protected boolean scaleStanding = true;
+	@Unindexed
+	protected boolean instrument = false;
+	
 	@Transient
 	protected IRatingMatrix ratingMatrix;
 	protected Long ratingMatrixId;
 	
 	protected Long topTenListId;
 
+	protected Long schemaId;
+	
 	public RatingQuery() {
 		compIds = new ArrayList<Long>();
 		roundIds = new ArrayList<Long>();
@@ -248,6 +253,22 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	@Override
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	@Override
+	public Long getSchemaId() {
+		return schemaId;
+	}
+	@Override
+	public void setSchemaId(Long schemaId) {
+		this.schemaId = schemaId;
+	}
+	@Override
+	public Boolean getInstrument() {
+		return instrument;
+	}
+	@Override
+	public void setInstrument(Boolean instrument) {
+		this.instrument = instrument;
 	}
 
 }

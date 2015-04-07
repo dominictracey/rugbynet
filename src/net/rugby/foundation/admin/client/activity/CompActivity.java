@@ -1097,7 +1097,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	@Override
 	public void createSchema() {
 		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
-		clientFactory.getRpcService().getMatchRatingEngineSchema(null, new AsyncCallback<ScrumMatchRatingEngineSchema>() {
+		clientFactory.getRpcService().createMatchRatingEngineSchema(new AsyncCallback<ScrumMatchRatingEngineSchema>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed to save match rating engine schema, see logs for details");

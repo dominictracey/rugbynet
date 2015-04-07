@@ -314,6 +314,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	}
 
 	private void setupContent() {
+		final ClientFactory _this = this;
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			public void execute() {
 				// set up content 
@@ -333,7 +334,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 						//*** RATING DETAIL POPUP SETUP
 						if (ratingPopup == null) {
 							ratingPopup = new RatingPopupViewImpl<IPlayerRating>();
-
+							ratingPopup.setClientFactory(_this);
 							// do we have the contentId yet?
 							if (popupDetails.isEmpty()) {
 									Core.getCore().getContent("rating popup details", new AsyncCallback<IContent>() {
@@ -872,6 +873,12 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	/*-{
 	    console.log(text);
 	}-*/;
+	
+	@Override
+	public void showExternalLink(String url) {
+		Window.open(url, "_blank", "");
+		
+	}
 
 
 

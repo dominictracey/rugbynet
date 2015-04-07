@@ -60,4 +60,10 @@ public interface IRatingQuery extends IHasId {
 
 	public abstract String getLabel();
 	public abstract void setLabel(String name);
+
+	Long getSchemaId();
+
+	void setSchemaId(Long schemaId);
+	public abstract Boolean getInstrument();
+	public abstract void setInstrument(Boolean instrument);
 }

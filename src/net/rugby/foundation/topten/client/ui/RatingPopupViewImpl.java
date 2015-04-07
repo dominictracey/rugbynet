@@ -9,9 +9,12 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.topten.client.ClientFactory;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
+
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -22,7 +25,9 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.CellPreviewEvent.Handler;
 
 
 public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox implements RatingPopupView<T> 
@@ -86,11 +91,6 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 			{
 				return r.getMatchLabel() == null ? "" : r.getMatchLabel();
 			}
-//			@Override
-//			public String getCellStyleNames(Context context, RatingComponent value) {
-//				return "compactTTL";
-//
-//			}
 		}, "Match");
 		
 		ratingInfo.addColumn(new com.google.gwt.user.cellview.client.Column<RatingComponent,String>(new TextCell()){
@@ -118,6 +118,22 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 //
 //			}
 		}, "Raw Rating");
+		
+		ratingInfo.addCellPreviewHandler( new Handler<RatingComponent>() {
+
+			@Override
+			public void onCellPreview(CellPreviewEvent<RatingComponent> event) {
+				boolean isClick = "click".equals(event.getNativeEvent().getType());
+				if (isClick) {
+					if (event.getValue() != null && event.getValue().getScrumId() != null) {
+						clientFactory.showExternalLink("http://www.espn.co.uk/scrum/rugby/match/" + event.getValue().getScrumId() + ".html");
+					}
+					
+				}
+			}
+		});
+
+		ratingInfo.getElement().getStyle().setCursor(Cursor.POINTER); 
 	}
 
 

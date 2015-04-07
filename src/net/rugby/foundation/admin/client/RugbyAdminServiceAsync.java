@@ -116,7 +116,7 @@ public interface RugbyAdminServiceAsync {
 	public void refetchPlayerMatchStats(IPlayerMatchStats pms, AsyncCallback<IPlayerMatchStats> asyncCallback);
 	public void createRatingQuery(List<Long> compId,
 			List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId,
-			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, AsyncCallback<IRatingQuery> asyncCallback);
+			Long schemaId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean instrument, AsyncCallback<IRatingQuery> asyncCallback);
 	public void  getTeamMatchStats(Long matchId, Long teamId, AsyncCallback<ITeamMatchStats> asyncCallback);
 	public void refetchTeamMatchStats(ITeamMatchStats target,
 			AsyncCallback<ITeamMatchStats> asyncCallback);
@@ -127,6 +127,7 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
 	public void getMatchRatingEngineSchema(Long schemaId,
 			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
+	public void createMatchRatingEngineSchema(AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
 	public void saveMatchRatingEngineSchemaAsCopy(
 			ScrumMatchRatingEngineSchema schema,
 			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);

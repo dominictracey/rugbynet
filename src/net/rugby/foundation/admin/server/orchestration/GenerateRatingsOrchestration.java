@@ -87,7 +87,13 @@ public class GenerateRatingsOrchestration extends OrchestrationCore<IRatingQuery
 
 
 			// get the engine
-			IRatingEngineSchema mres = mresf.getDefault();
+			IRatingEngineSchema mres = null; // 
+			if (target.getSchemaId() != null) {
+				mres = mresf.get(target.getSchemaId());
+			} else {
+				mresf.getDefault();
+			}
+			
 			assert (mres != null);
 			IQueryRatingEngine mre = qref.get(mres, target);
 			assert (mre != null);

@@ -563,6 +563,9 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			public void onSuccess(IPlayerRating result) {
 				clientFactory.getRatingPopup().setRating(result);
 				clientFactory.getRatingPopup().center();
+				if (clientFactory.getRatingPopup().getAbsoluteTop() < 100) {
+					clientFactory.getRatingPopup().setPopupPosition(clientFactory.getRatingPopup().getAbsoluteLeft(), 100);
+				}
 				clientFactory.recordAnalyticsEvent("ratingDetails", "click", result.getPlayer().getShortName(), 1);
 			}
 		});	
