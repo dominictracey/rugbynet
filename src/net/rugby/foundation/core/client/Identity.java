@@ -24,6 +24,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.gwtfb.sdk.FBCore;
 
 public class Identity implements ManageProfile.Presenter, Login.Presenter, ExternalAuthenticatorPanel.Presenter, ChangePasswordPanel.Presenter {
 
@@ -122,7 +123,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		
 		// if they are showing logged in via Facebook we need to check they are still logged in to facebook
 		// using the FB.getLoginStatus JS call.
-//		loginStatusCallback = new LoginStatusCallback();
+		//loginStatusCallback = new LoginStatusCallback();
 	}
 
 	protected ManageProfile getManageProfileDialog() {
@@ -151,6 +152,9 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 		@Override
 		public void onClick(ClickEvent event) {
+			if (getLoginDialog().getAbsoluteTop() < 100) {
+				getLoginDialog().setPopupPosition(getLoginDialog().getAbsoluteTop(), 100);
+			}
 			getLoginDialog().init();			
 		}	
 	};
@@ -348,6 +352,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	public void startProfileProcess(Actions action, LoginInfo.ProviderType providerType, LoginInfo.Selector selector) {
 		if (action == Actions.updateScreenName) {
 
+			console("Start Profile Process: Update Screen name");
+
 			// this is where we get sent after we sign up with a non-native ID
 			// because that process uses the non-RPC servlet we don't have a client-side copy of 
 			// the LoginInfo instance yet. Is is in our session so we have to make a call to get it.
@@ -359,6 +365,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 						//showLoggedIn();
 						//getManageProfileDialog().setNative(false);
 						getManageProfileDialog().init(result);
+					} else {
+						console("Not logged in so can't update profile");
 					}
 				}
 
@@ -515,7 +523,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		LoginInfo loginInfo = clientFactory.getLoginInfo();
 
 		if (!loginInfo.isLoggedIn()) {
-			clientFactory.getRpcService().createAccount(email, nickName, password, false, false, new AsyncCallback<LoginInfo>() {
+			clientFactory.getRpcService().createAccount(email, nickName, password, false, false, false, new AsyncCallback<LoginInfo>() {
 				public void onSuccess(LoginInfo result) {
 					if (!result.isLoggedIn()) {
 						getManageProfileDialog().showError(result.getStatus());
@@ -652,6 +660,30 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		
 	}
 
+	@Override
+	public void doOAuth2Login() {
+		// we want to preserve the url string in case they are trying to do something like join a clubhouse
+			clientFactory.getRpcService().getOAuth2Url(destination, new AsyncCallback<String>() {
+
+				@Override
+				public void onFailure(Throwable caught) {				
+					getLoginDialog().showError("Something went wrong. Try a different login method.");
+				}
+
+				@Override
+				public void onSuccess(String result) {
+					redirect(result);
+
+				}
+
+			});	
+			
+	}
+
+	public native void console(String text)
+	/*-{
+	    console.log(text);
+	}-*/;
 	
 //	private void showLoggedInMobile()
 //	{

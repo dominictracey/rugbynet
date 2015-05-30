@@ -7,7 +7,9 @@ public class IdentityTypes {
 	public enum Keys { action, selector, destination, providerType }
 
 	public static LoginInfo.ProviderType getProviderType(String string) {
-		if (string.toLowerCase().equals("openid")) {
+		if (string.toLowerCase().equals("oauth2")) {
+			return LoginInfo.ProviderType.oauth2;
+		} else if (string.toLowerCase().equals("openid")) {
 			return LoginInfo.ProviderType.openid;
 		} else if (string.toLowerCase().equals("facebook")) {
 			return LoginInfo.ProviderType.facebook;

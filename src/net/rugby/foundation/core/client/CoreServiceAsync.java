@@ -35,7 +35,7 @@ public interface CoreServiceAsync {
 	void logOff(LoginInfo info, AsyncCallback<LoginInfo> asyncCallback);
 	void nativeLogin(String emailAddress, String password, AsyncCallback<LoginInfo> asyncCallback);
 	void createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook, AsyncCallback<LoginInfo> asyncCallback);
+			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2, AsyncCallback<LoginInfo> asyncCallback);
 
 	void updatePreferences(LoginInfo loginInfo, AsyncCallback<LoginInfo> cb);
 	void createClubhouse(String name, String description, Boolean publicClubhouse, AsyncCallback<IClubhouse> cb);
@@ -82,4 +82,5 @@ public interface CoreServiceAsync {
 	
 	void getUniversalRound(int ordinal, AsyncCallback<UniversalRound> asyncCallback);
 	void getContent(String string, AsyncCallback<IContent> cb);
+	void getOAuth2Url(String destination, AsyncCallback<String> asyncCallback);
 }

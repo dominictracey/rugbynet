@@ -789,6 +789,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 			//data-href="**FACEBOOKDATAREF**"
 			fbDiv.setAttribute("href", url);
 			// trigger fb parse
+			
 			parseFacebook();
 		}
 	}

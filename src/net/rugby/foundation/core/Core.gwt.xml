@@ -2,6 +2,7 @@
 	<inherits name="com.google.gwt.user.User"/>
 	<inherits name="com.google.gwt.http.HTTP"/>
 	<inherits name="net.rugby.foundation.model.Model"/>
+
 <!-- 	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
 	<inherits name="org.gwtbootstrap3.GwtBootstrap3NoTheme"/>
 

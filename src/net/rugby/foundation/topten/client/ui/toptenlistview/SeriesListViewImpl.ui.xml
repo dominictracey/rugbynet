@@ -8,7 +8,9 @@
 			<b:Container fluid="true">
 				<b:Row ui:field="sponsorRow">
 					<b:Column size="XS_3" ui:field="compCol">
-						<b.html:Div ui:field="compSpacer"></b.html:Div>
+						<b.html:Div ui:field="compSpacer">
+						    <b:Anchor ui:field="compLink"></b:Anchor>						       
+						</b.html:Div>
 					</b:Column>
 					<b:Column size="XS_6" ui:field="dropdownCol">
 						<g:HTMLPanel>
@@ -46,7 +48,9 @@
 					</b:Column>
 					<b:Column size="XS_3" ui:field="sponsorCol">
 						<b.html:Div ui:field="sponsorDiv">
-							<b.html:Div ui:field="sponsorSpacer"></b.html:Div>
+							<b.html:Div ui:field="sponsorSpacer">
+								<b:Anchor ui:field="sponsorLink"></b:Anchor>
+							</b.html:Div>
 						</b.html:Div>
 					</b:Column>
 				</b:Row>

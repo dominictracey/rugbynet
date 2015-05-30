@@ -360,12 +360,21 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				lineoutStolen = 0; // defensively hookers don't do much in a steal
 			} else if (pms2.getPosition().equals(position.LOCK)) {
 				lineoutStolen = 0; // no double dip
-			} else if (pms2.getPosition().equals(position.FLANKER) || pms2.getPosition().equals(position.NUMBER8)) {
+			} else if (pms2.getPosition().equals(position.FLANKER)) {
 				scrumShare = (scrumShare*.5F);
 				scrumLost = (scrumLost*.5F);
 				scrumStolen = (scrumStolen*.5F);
 				lineoutShare = (lineoutShare*.3f);
 				lineoutStolen = 0; // no double dip
+			} else if (pms2.getPosition().equals(position.NUMBER8)) {
+				scrumShare = (scrumShare*.5F);
+				scrumLost = (scrumLost*.5F);
+				scrumStolen = (scrumStolen*.5F);
+				lineoutShare = (lineoutShare*.3f);
+				lineoutStolen = 0; // no double dip
+				
+				// knock down their metres gained
+				metersRun *= .5;
 			}
 
 			return pms2;

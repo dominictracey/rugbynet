@@ -254,10 +254,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook,
+			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2,
 			final AsyncCallback<LoginInfo> cb) {
 		clientFactory.getRpcService().createAccount(emailAddress,  nickName,
-				 password,  isGoogle,  isFacebook, new AsyncCallback<LoginInfo> () {
+				 password,  isGoogle,  isFacebook, isOAuth2, new AsyncCallback<LoginInfo> () {
 			@Override
 			public void onFailure(Throwable caught) {
 				cb.onFailure(caught);
@@ -278,11 +278,21 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	public void setCurrentCompId(final Long currentCompId) {
 		if (!this.currentCompId.equals(currentCompId)) {
 			this.currentCompId = currentCompId;
-			currentRoundOrdinal = config.getCurrentUROrdinal();
-			for (CompChangeListener l : compChangeListeners) {
-				l.compChanged(currentCompId);
-			}
+			getComp(currentCompId, new AsyncCallback<ICompetition>() {
+				public void onFailure(Throwable caught) {
+					//ignore
+					//cb.onFailure(caught);
+				}
+				
+				public void onSuccess(ICompetition comp) {
+					currentRoundOrdinal = config.getCurrentUROrdinal();
+					for (CompChangeListener l : compChangeListeners) {
+						l.compChanged(currentCompId);
+					}
+				}
+			});
 		}
+			
 
 	}
 	
@@ -834,6 +844,23 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 			
 		});
+		
+	}
+
+	@Override
+	public void getOAuth2Url(String destination, final AsyncCallback<String> cb) {
+		clientFactory.getRpcService().getOAuth2Url(destination, new AsyncCallback<String> () {
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(String result) {	
+				cb.onSuccess(result);
+			}
+
+		});	
 		
 	}
 

@@ -210,6 +210,8 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			{
 				SafeHtmlBuilder sb = new SafeHtmlBuilder();
 				String guid = "";
+				
+				// this will always drive users to the feature, even if they share the series link (a good thing?)
 				if (s.getFeatureGuid() == null) {
 					guid = s.getPlaceGuid();
 				} else {
@@ -265,7 +267,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 			@Override
 			public void onCellPreview(CellPreviewEvent<ITopTenItem> event) {
-				if (event.getColumn() != 5) {
+				if (event.getColumn() != 7) {
 					boolean isClick = "click".equals(event.getNativeEvent().getType());
 					if (isClick) {
 						if (presenter != null && event != null) {

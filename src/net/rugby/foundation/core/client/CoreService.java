@@ -53,7 +53,7 @@ public interface CoreService extends RemoteService {
 	 * @return
 	 */
 	LoginInfo createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook);
+			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2);
 
 	/**
 	 * @param loginInfo - Only will update lastEntryId, lastClubhouseId and lastCompetitionId
@@ -97,7 +97,7 @@ public interface CoreService extends RemoteService {
 	 * @return the URL to redirect the browser to
 	 */
 	String getOpenIdUrl(LoginInfo.Selector selector, String destination);
-	
+	String getOAuth2Url(String destination);
 	LoginInfo updateAccount(String email, String screenName);
 	
 	String getFacebookLoginUrl(String destination);

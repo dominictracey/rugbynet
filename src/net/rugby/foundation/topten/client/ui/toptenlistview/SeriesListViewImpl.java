@@ -16,6 +16,7 @@ import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
@@ -82,13 +83,16 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	
 	@UiField
 	protected Div compSpacer;
+	@UiField
+	protected Anchor compLink;
 	@UiField 
 	Div sponsorDiv;
 	@UiField
 	protected Div sponsorSpacer;
 	@UiField
 	protected HTML sponsorTag;
-	
+	@UiField
+	protected Anchor sponsorLink;
 	@UiField 
 	protected HTML listTitle;
 
@@ -149,6 +153,10 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		compSpacer.setHeight("38px");
 		sponsorSpacer.setHeight("38px");
 		dropdownCol.addStyleName("sponsor-buttons");
+		
+		sponsorLink.addStyleName("trn-sponsor-link");
+		compLink.addStyleName("trn-comp-link");
+
 	}
 
 
@@ -477,11 +485,13 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						sponsorCol.setStyleDependentName("NON", true);
 						currentSponsorStyle = "NON";
 						sponsorTag.setHTML("");
+						sponsorLink.setHref("#");
 					} else {
 						sponsorCol.setStyleDependentName(result.getAbbr(), true);
 						currentSponsorStyle = result.getAbbr();
 						sponsorTag.setHTML("<center>"+ result.getTagline() + "</center>");
 						clientFactory.recordAnalyticsEvent("sponsor", "show", result.getName(), 1);
+						sponsorLink.setHref(result.getUrl());
 					}
 					
 				}

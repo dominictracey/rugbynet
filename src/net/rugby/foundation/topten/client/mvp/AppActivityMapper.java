@@ -1,5 +1,7 @@
 package net.rugby.foundation.topten.client.mvp;
 
+import net.rugby.foundation.topten.client.activity.ProfileActivity;
+import net.rugby.foundation.topten.client.place.Profile;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.activity.ContentActivity;
 import net.rugby.foundation.topten.client.activity.FeatureListActivity;
@@ -39,7 +41,8 @@ public class AppActivityMapper implements ActivityMapper {
 			return new SeriesActivity((SeriesPlace) place, clientFactory);
 		if (place instanceof LegacyListPlace) {
 			return new LegacyListActivity((LegacyListPlace) place, clientFactory);
-		}
+		} else if (place instanceof Profile)
+			return new ProfileActivity((Profile) place, clientFactory);
 		return null;
 	}
 

@@ -201,6 +201,9 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			for (ITopTenItem item : list.getList()) {
 				if (item != null && item.getPlaceGuid() != null) {
 					spf.delete(spf.getForGuid(item.getPlaceGuid()));
+				}				
+				if (item != null && item.getFeatureGuid() != null) {
+					spf.delete(spf.getForGuid(item.getFeatureGuid()));
 				}
 			}
 
@@ -361,29 +364,39 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					// the very first one!
 					put(list);
 				} 
+
 			}
-			//			// is this now the latest published?
-			//			if (list.getNextPublishedId() == null) {
-			//				// this is the latest published, reset the special memcache object
-			//				setLatestPublishedForComp(list,list.getCompId());
-			//			}
-			//			
-			//			// is this now the last created?
-			//			if (list.getNextId() == null) {
-			//				// this is the latest published, reset the special memcache object
-			//				setLastCreatedForComp(list,list.getCompId());
-			//			}
+			
+			// add featureGuids for all of the list items, if needed
+			createFeatureItemGuids(list);
 
 			// dump the memcached versions of last and latest and let them reconstitute
 			clearMemCacheLastAndLatest(list.getCompId());
-			
+
 			// flush the latest features from memcache to force a re-read
 			MemcacheServiceFactory.getMemcacheService().delete(latestFeatureMemcacheKey);
 
+			// flush the feature landing pages for the list guid
+			dropPageFromCache(list.getFeatureGuid());
 
 			smd.PromoteTopTenList(list);
 		}
 		return list;
+	}
+
+	protected final String SERIES_PAGE_CACHE_PREFIX = "SPCP-";
+	
+	private void dropPageFromCache(String featureGuid) {
+
+		try {
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			syncCache.delete(SERIES_PAGE_CACHE_PREFIX+featureGuid);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+		}
+
+
+
 	}
 
 	private void clearMemCacheLastAndLatest(Long compId) {
@@ -418,11 +431,11 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 
 		// if this is a series generated query we set it up a little differently since it doesn't participate in the publish chain
 		IRatingQuery rq = rqf.get(tti.getQueryId());
-		
+
 		if (rq.getRatingMatrix() == null && rq.getRatingMatrixId() != null) {
 			rq = rqf.buildUplinksForQuery(rq);
 		}
-		
+
 		if (rq.getRatingMatrix() != null) {
 			list.setSeries(true);
 			list.setRoundOrdinal(rq.getRatingMatrix().getRatingGroup().getUniversalRoundOrdinal());
@@ -510,18 +523,23 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 							"", null, null, true, null, team.getDisplayName(), team.getId(), pms.getPosition(), list,
 							pmr.getId(), pmr.getRating(), null);
 					put(item);  // get id for guid hashing
+					
+					// now the ServerPlace for the item
 					IServerPlace p = spf.create();
-					item.setPlaceGuid(p.getGuid());
+					
 					if (list.getSeries()) {
 						spf.buildItem(p,item);
+						item.setPlaceGuid(p.getGuid());
 					} else {
 						p.setCompId(list.getCompId());
 						p.setListId(list.getId());
-						p.setItemId(null);
+						p.setItemId(item.getId());
 						p.setType(PlaceType.FEATURE);
 						spf.put(p);  
 						list.setContent(list.getContent()+"<b>"+pmr.getPlayer().getDisplayName()+"</b>\n");
+						item.setFeatureGuid(p.getGuid());
 					}
+					
 					put(item);
 					list.getList().add(item);
 					list.getItemIds().add(item.getId());
@@ -591,30 +609,40 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			setLastCreatedForComp(list,list.getCompId());
 		}
 
+		String str = "<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n<p>\n</p>\n";
+		for (ITopTenItem i : list.getList()) {
+			str += "<b>"+i.getPlayer().getDisplayName()+"</b>\n";
+		}
+
+		list.setContent(str);
+
 		// and create a feature guid
 		IServerPlace p = spf.create();
 		createFeatureGuid(list, p);
 
+		// THE ITEMS DON'T EXIST YET - ALSO, ONLY CREATE THEM ON PUBLISH
 		// now add the per-item guids to point to the feature as well
-		createFeatureItemGuids(list);
-		
+		// createFeatureItemGuids(list);
+
 		return p;
 	}
 
 	private void createFeatureItemGuids(ITopTenList list) {
 		for (ITopTenItem item : list.getList()) {
-			
-			IServerPlace ip = spf.create();
-			ip.setCompId(list.getCompId());
-			ip.setListId(list.getId());
-			ip.setItemId(item.getId());
-			ip.setType(PlaceType.FEATURE);
-			spf.put(ip); 
-			item.setFeatureGuid(ip.getGuid());
-			
-			put(item);
+
+			if (item.getFeatureGuid() == null) {
+				IServerPlace ip = spf.create();
+				ip.setCompId(list.getCompId());
+				ip.setListId(list.getId());
+				ip.setItemId(item.getId());
+				ip.setType(PlaceType.FEATURE);
+				spf.put(ip); 
+				item.setFeatureGuid(ip.getGuid());
+	
+				put(item);
+			}
 		}	
-		
+
 		// update the line item tweets
 		TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf);
 		twitterPromoter.process(list);
@@ -631,18 +659,18 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		list.setSeries(false);
 		list.setFeatureGuid(p.getGuid());
 		put(list);
-		
+
 	}
 
 	private void buildTwitterDescription(ITopTenList list, IRatingQuery rq, ICompetition hostComp) {
 		String desc = "Top Ten ";
 
 		RatingMode mode = null;
-		
+
 		if (rq.getRatingMatrix() != null) {
 			mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
 		}
-		
+
 
 		if (mode == null) {
 			// ad hoc will be created by hand
@@ -673,16 +701,16 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			//	Top Ten Flankers (in the last year)
 			//	Top Ten Flankers in Round 2 of @premRugby
 			desc += "In Form " + rq.getPositions().get(0).getPlural() + " in " + hostComp.getTTLTitleDesc(); 
-//			if (rq.getCompIds().size() > 1) {
-//				desc += " in the World";
-//			} else {
-//				if (rq.getCompIds().size() == 1) {
-//					Long compId = rq.getCompIds().get(0);
-//					if (compId != null) {
-//						desc += " of " + cf.get(compId).getTwitter();
-//					}
-//				}
-//			}
+			//			if (rq.getCompIds().size() > 1) {
+			//				desc += " in the World";
+			//			} else {
+			//				if (rq.getCompIds().size() == 1) {
+			//					Long compId = rq.getCompIds().get(0);
+			//					if (compId != null) {
+			//						desc += " of " + cf.get(compId).getTwitter();
+			//					}
+			//				}
+			//			}
 		} else if (mode.equals(RatingMode.BY_COMP)) {
 			// round list
 			// Top Ten Performances of @premRugby Rd 12
@@ -716,7 +744,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				pos++;
 			}
 		}
-		
+
 		return list;
 	}
 
@@ -724,21 +752,21 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		if (tti.getCompId() != null && !tti.getCompId().equals(-1L)) {
 			return tti.getCompId();
 		} else {
-//			// time series
-//			Long compId = null;
-//			for (Long rid : tti.getRoundIds()) {
-//				IRound r = rf.get(rid);
-//				// for now, all the selected rounds need to have the same compId
-//				if (compId == null) {
-//					compId = r.getCompId();
-//				} else {
-//					if (!r.getCompId().equals(compId)) {
-//						//throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
-						return ccf.get().getGlobalCompId();
-//					}
-//				}
-//			}
-//			return compId;
+			//			// time series
+			//			Long compId = null;
+			//			for (Long rid : tti.getRoundIds()) {
+			//				IRound r = rf.get(rid);
+			//				// for now, all the selected rounds need to have the same compId
+			//				if (compId == null) {
+			//					compId = r.getCompId();
+			//				} else {
+			//					if (!r.getCompId().equals(compId)) {
+			//						//throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
+			return ccf.get().getGlobalCompId();
+			//					}
+			//				}
+			//			}
+			//			return compId;
 		}
 
 	}
@@ -769,7 +797,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					createFeatureItemGuids(mr);
 
 				}
-				
+
 				if (mr != null) {
 					ByteArrayOutputStream bos = new ByteArrayOutputStream();
 					ObjectOutput out = new ObjectOutputStream(bos);   
@@ -1128,7 +1156,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	@Override
 	public List<Feature> getLatestFeatures() {
 		List<Feature> retval = new ArrayList<Feature>();
-		
+
 		try {
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
@@ -1165,6 +1193,6 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			return null;
 		}
 	}
-	
+
 	protected abstract List<Feature> getLatestFeaturesFromPeristentDatastore(); 
 }

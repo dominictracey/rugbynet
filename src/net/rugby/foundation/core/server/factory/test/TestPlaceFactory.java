@@ -1,6 +1,13 @@
 package net.rugby.foundation.core.server.factory.test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.inject.Inject;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.BasePlaceFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
@@ -9,6 +16,7 @@ import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
+import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ServerPlace;
 import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
@@ -19,7 +27,7 @@ public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory 
 	@Inject
 	public TestPlaceFactory(ITopTenListFactory ttlf, IRatingQueryFactory rqf, IConfigurationFactory ccf, IRatingSeriesFactory rsf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
 		super(ttlf, rqf, ccf, rsf, rmf, rgf);
-		
+
 	}
 
 	private Long count = 33900L;
@@ -42,7 +50,7 @@ public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory 
 		p.setGuid(generate(id));
 		return p;
 	}
-	
+
 	@Override
 	protected IServerPlace getForNameFromPersistentDatastore(String name) {
 		// TODO Auto-generated method stub
@@ -51,9 +59,9 @@ public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory 
 
 	@Override
 	protected IServerPlace getFromPersistentDatastore(Long id) {
-//		for (Long l = 33000L; l < 33009L; l++) {
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, l + "=>" + generate(l));
-//		}
+		//		for (Long l = 33000L; l < 33009L; l++) {
+		//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, l + "=>" + generate(l));
+		//		}
 		if (id == 33000L) { // PeaJ
 			// default series for comp
 			return build(33000L, PlaceType.SERIES, 1L, null, null, null, null, null, null, null);
@@ -94,4 +102,22 @@ public class TestPlaceFactory extends BasePlaceFactory implements IPlaceFactory 
 		return false;
 	}
 
+	@Override
+	public List<IServerPlace> getForCompId(Long id) {
+		try {
+			List<IServerPlace> list = new ArrayList<IServerPlace>();
+			Objectify ofy = DataStoreFactory.getOfy();
+
+			Query<ServerPlace> qsp = ofy.query(ServerPlace.class).filter("compId",id);
+
+			for (ServerPlace sp : qsp.list()) {
+				list.add(sp);
+			}
+			return list;
+		} catch (Exception e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "generate" + e.getMessage(), e);
+			return null;
+		}
+
+	}
 }

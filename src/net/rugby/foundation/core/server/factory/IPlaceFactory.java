@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server.factory;
 
+import java.util.List;
+
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -18,5 +20,6 @@ public interface IPlaceFactory extends ICachingFactory<IServerPlace>{
 	public abstract void buildGroup(IServerPlace p, IRatingGroup rg);
 	public abstract void buildSeries(IServerPlace p, IRatingSeries rs);
 	public abstract void buildComp(IServerPlace p, Long compId);
+	public abstract List<IServerPlace> getForCompId(Long id);
 
 }

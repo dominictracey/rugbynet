@@ -149,9 +149,9 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 
 
 	@Override
-	public LoginInfo createAccount(String emailAddress, String nickName, String password, boolean isGoogle, boolean isFacebook) {
+	public LoginInfo createAccount(String emailAddress, String nickName, String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2) {
 		try {
-			IAppUser u = am.createAccount(emailAddress, nickName, password, null, isGoogle, isFacebook, this.getThreadLocalRequest());
+			IAppUser u = am.createAccount(emailAddress, nickName, password, null, isGoogle, isFacebook, isOAuth2, this.getThreadLocalRequest());
 			if (u != null) {
 				HttpServletRequest request = this.getThreadLocalRequest();
 				HttpSession session = request.getSession();
@@ -550,7 +550,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			return null;
 		}
 	}
-	
+
 	@Override
 	public IContent saveContent(IContent content) {
 		try {
@@ -586,6 +586,16 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	public UniversalRound getUniversalRound(int ordinal) {
 		try {
 			return urf.get(ordinal);
+		}  catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	@Override
+	public String getOAuth2Url(String destination) {
+		try {
+			return eapf.get(LoginInfo.ProviderType.oauth2,null, destination).getLocalURL();
 		}  catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;

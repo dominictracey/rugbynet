@@ -299,7 +299,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 
 	private void generateRatingQueries(IRatingMatrix rm) {
-		boolean scaleTime = rm.getCriteria() == Criteria.IN_FORM;
+		boolean scaleTime = rm.getCriteria() == Criteria.IN_FORM;  // can also be BEST_YEAR
 		List<Long> rids = findRoundsForRatingMatrices(rm);
 		if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_POSITION) {
 

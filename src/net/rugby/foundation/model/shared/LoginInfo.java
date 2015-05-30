@@ -7,9 +7,9 @@ import java.util.List;
 
 public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
-	public static enum ProviderType { openid, facebook }
+	public static enum ProviderType { openid, facebook, oauth2 }
 
-	public static enum Selector { google, yahoo, myspace, aol, myopenid_com }
+	public static enum Selector { google, googlePlus, yahoo, myspace, aol, myopenid_com }
 
 	/**
 	 * 

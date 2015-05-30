@@ -1,8 +1,10 @@
 package net.rugby.foundation.core.client.ui;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.base.modal.ModalDialog;
+import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.TextBox;
 
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.gwt.core.client.GWT;
@@ -12,12 +14,9 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Login extends DialogBox implements net.rugby.foundation.core.client.ui.ExternalAuthenticatorPanel.Presenter
@@ -29,6 +28,7 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	}
 
 	public interface Presenter {
+
 		void doOpenIdLogin(LoginInfo.Selector selector);
 		void doLogin(String emailAddress, String password);
 		void onCancelLogin();
@@ -40,15 +40,19 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 		 * 
 		 */
 		void forgotPassword(String email);
+		void doOAuth2Login();
 	}
 	
+	@UiField Panel topPanel;
+	@UiField Panel nativePanel;
 	@UiField TextBox emailAddress;
-	@UiField PasswordTextBox password1;
+	@UiField Input password1;
 	@UiField Button submit;
 	@UiField Button cancel;
 	@UiField Label error;
 	@UiField ExternalAuthenticatorPanel nonNativeLogins;
 	@UiField Anchor forgotPassword;
+	@UiField Label orLabel;
 	
 	Presenter presenter;
 	boolean resettingPassword = false;
@@ -60,10 +64,31 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	public Login()
 	{
 		setWidget(uiBinder.createAndBindUi(this));
+		
+		super.setGlassEnabled(true);
+		super.setGlassStyleName("dialogGlass");
+		super.setAnimationEnabled(true);
+		
+		topPanel.addStyleName("col-md-8"); 
+		topPanel.addStyleName("col-sm-10");
+		topPanel.addStyleName("col-xs-12");
+		topPanel.addStyleName("col-md-offset-2");
+		topPanel.addStyleName("col-xs-offset-1");
+		
+		
 		error.setVisible(false);
 		nonNativeLogins.setPresenter(this);
 		
-		this.addStyleName("padding:20px;");
+		//this.setWidth("1150px");
+		nativePanel.setPaddingBottom(20);
+		nativePanel.setPaddingTop(20);
+		nativePanel.setPaddingLeft(20);
+		nativePanel.setPaddingRight(20);
+		this.setTitle("Login");
+		
+		orLabel.addStyleName("popupCaption");
+		orLabel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
 	}
 	
 	@UiHandler("password1")
@@ -122,7 +147,7 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 		error.setVisible(true);
 		emailAddress.setText("");
 		password1.setText("");
-		emailAddress.setFocus(true);
+		//emailAddress.setFocus(true);
 	}
 
 	/* (non-Javadoc)
@@ -140,6 +165,12 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	@Override
 	public void doFacebookLogin() {
 		presenter.doFacebookLogin();
+		
+	}
+
+	@Override
+	public void doOAuth2Login() {
+		presenter.doOAuth2Login();
 		
 	}
 	

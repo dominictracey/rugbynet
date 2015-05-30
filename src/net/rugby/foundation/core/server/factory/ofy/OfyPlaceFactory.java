@@ -1,11 +1,14 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.BasePlaceFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
@@ -16,6 +19,7 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.model.shared.ServerPlace;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
@@ -103,6 +107,24 @@ public class OfyPlaceFactory extends BasePlaceFactory implements IPlaceFactory {
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public List<IServerPlace> getForCompId(Long id) {
+		try {
+			List<IServerPlace> list = new ArrayList<IServerPlace>();
+			Objectify ofy = DataStoreFactory.getOfy();
+			
+			Query<ServerPlace> qsp = ofy.query(ServerPlace.class).filter("compId",id);
+			
+			for (ServerPlace sp : qsp.list()) {
+				list.add(sp);
+			}
+			return list;
+		} catch (Exception e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "generate" + e.getMessage(), e);
+			return null;
+		}	
 	}
 
 }

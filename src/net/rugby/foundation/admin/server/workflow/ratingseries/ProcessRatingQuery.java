@@ -104,6 +104,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 
 		boolean ok = false;
 		boolean inForm = false;
+		boolean bestYear = false;
 		
 		try {
 			ok = mre.setQuery(rq);
@@ -156,6 +157,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
 					title += "In Form ";
 					inForm = true;
+				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.BEST_YEAR)) {
+					bestYear = true;
 				}
 				
 				title += rq.getPositions().get(0).getPlural();
@@ -168,7 +171,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					}
 				}
 				
-				if (inForm) {
+				if (inForm || bestYear) {
 					title += " Through ";
 				} else {
 					title += " From ";

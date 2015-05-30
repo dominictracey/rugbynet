@@ -242,7 +242,8 @@ public class SeriesPage extends HttpServlet {
 		ITopTenItem item = null;
 
 
-		if (place.getType().equals(IServerPlace.PlaceType.SERIES) || place.getType().equals(IServerPlace.PlaceType.FEATURE)) {
+		if (place != null) {
+		//if (place.getType().equals(IServerPlace.PlaceType.SERIES) || place.getType().equals(IServerPlace.PlaceType.FEATURE)) {
 			parseHTML();
 			// populate
 			if (place.getCompId() != null) {
@@ -265,8 +266,9 @@ public class SeriesPage extends HttpServlet {
 					}
 				}
 			}
+	//	}
 		}
-
+//
 		String players = "";
 		String description = ""; //"The Rugby Net Top Ten Lists \n";
 		String title = ""; //"The Rugby Net Top Ten Lists \n";
@@ -377,7 +379,7 @@ public class SeriesPage extends HttpServlet {
 		String label = title;
 		if (place.getCompId() == null) {
 			action = "home";
-		} else if (place.getType().equals(PlaceType.FEATURE)) {
+		} else if (place.getType() == null || place.getType().equals(PlaceType.FEATURE)) {
 			if (place.getItemId() == null) {
 				action = "feature";
 			} else {

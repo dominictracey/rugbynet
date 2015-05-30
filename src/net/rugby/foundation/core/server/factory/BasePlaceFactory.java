@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.server.factory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,6 +75,12 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 			} else {
 				return null;
 			} 
+			
+			// repair - type should never be null
+			if (place.getType() == null) {
+				place.setType(PlaceType.SERIES);
+			}
+			
 			return place;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getForGuid" + ex.getMessage(), ex);
@@ -116,6 +124,12 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 					return null;
 				}
 			} 
+			
+			// repair - type should never be null
+			if (place.getType() == null) {
+				place.setType(PlaceType.SERIES);
+			}
+			
 			return place;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getForName" + ex.getMessage(), ex);
@@ -193,5 +207,7 @@ public abstract class BasePlaceFactory extends BaseCachingFactory<IServerPlace> 
 		p.setType(PlaceType.SERIES);
 		put(p);
 	}
+	
+
 
 }

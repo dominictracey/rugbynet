@@ -2192,7 +2192,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				//	1) Mode == BY_MATCH and Criteria == ROUND
 				//	2) Mode == BY_POSITION and Criteria == IN_FORM
 				//	3) Mode == BY_COMP and Criteria == ROUND
-				if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT) || sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME) || sConfig.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
+				if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT) || sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME)) {
 					throwUnsupportedSeriesConfigException();
 				}
 
@@ -2207,6 +2207,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				}
 
 				if (sConfig.getActiveCriteria().contains(Criteria.IN_FORM)) {
+					if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
+						throwUnsupportedSeriesConfigException();
+					}
+				}
+				
+				if (sConfig.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
 					if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
 						throwUnsupportedSeriesConfigException();
 					}
@@ -2284,7 +2290,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 								}
 							}
 							// So we need to delete the latest RatingGroup and set the status to OK
-							Long rgid = series.getRatingGroupIds().get(series.getRatingGroupIds().size()-1);
+							Long rgid = series.getRatingGroupIds().get(0);
 							IRatingGroup rg = rgf.get(rgid);
 							rgf.deleteTTLs(rg);
 							rgf.delete(rg);

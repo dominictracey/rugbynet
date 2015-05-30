@@ -1,9 +1,66 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:core='urn:import:net.rugby.foundation.core.client.ui'
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:core='urn:import:net.rugby.foundation.core.client.ui'
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
-	<g:FlowPanel ui:field="topLevel">
+	<!-- <b:Panel ui:field="topPanel"> -->
+	<!-- <b:Row> -->
+	<!-- <b:Column size="MD_12"> -->
+	<!-- <g:HTMLPanel> -->
+	<!-- Choose one of your accounts with which to sign in: -->
+	<!-- <core:ExternalAuthenticatorPanel -->
+	<!-- ui:field="nonNativeLogins" /> -->
+	<!-- <g:Anchor ui:field="showNativeLink" href="javascript:;">Help me sign up with an email address</g:Anchor> -->
+	<!-- </g:HTMLPanel> -->
+	<!-- </b:Column> -->
+	<!-- <b:Column size="XS_2,SM_2,MD_1,LG_1"> -->
+	<!-- <b:Column size="MD_12"> -->
+	<!-- <g:Label ui:field="orLabel">Or</g:Label> -->
+	<!-- </b:Column> -->
+	<!-- <b:Column size="XS_12,SM_10,MD_8,LG_7"> -->
+	<!-- <b:Column size="MD_12"> -->
+	<!-- <b:Panel ui:field="nativePanel"> -->
+	<!-- <b:Form> -->
+	<!-- <b:FieldSet> -->
+	<!-- <b:FormGroup> -->
+	<!-- <b:FormLabel for="formEmail">Email</b:FormLabel> -->
+	<!-- <b:TextBox b:id="formEmail" ui:field="emailAddress" -->
+	<!-- placeholder="email@example.com"></b:TextBox> -->
+
+	<!-- </b:FormGroup> -->
+	<!-- <b:FormGroup> -->
+	<!-- <b:FormLabel for="formPassword">Password</b:FormLabel> -->
+	<!-- <b:Input type="PASSWORD" b:id="formPassword" ui:field="password1" /> -->
+	<!-- </b:FormGroup> -->
+	<!-- <b:FormGroup> -->
+	<!-- <b:FormLabel for="formPassword2">Password (again)</b:FormLabel> -->
+	<!-- <b:Input type="PASSWORD" b:id="formPassword2" ui:field="password2" /> -->
+	<!-- </b:FormGroup> -->
+	<!-- <b:FormGroup> -->
+	<!-- <b:FormLabel for="nickName">Screen Name</b:Label> -->
+	<!-- <b:TextBox placeholder="nickname" b:id="nickName" ui:field="nickName"></b:TextBox> -->
+	<!-- </b:FormGroup> -->
+	<!-- <b:Button ui:field="submit" type="PRIMARY">Login</b:Button> -->
+	<!-- <b:Button ui:field="cancel" type="DEFAULT">Cancel</b:Button> -->
+	<!-- <b:Anchor ui:field="forgotPassword" href="javascript:;">Forgot -->
+	<!-- Password?</b:Anchor> -->
+
+	<!-- </b:FieldSet> -->
+	<!-- </b:Form> -->
+	<!-- </b:Panel> -->
+	<!-- </b:Column> -->
+
+	<!-- </b:Row> -->
+	<!-- <b:Row> -->
+	<!-- <b:Column size="MD_8"> -->
+	<!-- <g:Label ui:field="error" styleName="serverResponseLabelError"></g:Label> -->
+	<!-- </b:Column> -->
+	<!-- </b:Row> -->
+	<!-- </b:Panel> -->
+
+
+	<b:Panel ui:field="topLevel">
 		<g:LayoutPanel styleName="accountPanel" ui:field="nonNativeLayer">
 			<g:layer>
 				<g:HTMLPanel>
@@ -58,5 +115,5 @@
 			</g:layer>
 		</g:LayoutPanel>
 		<b:Label ui:field="error" styleName="serverResponseLabelError"></b:Label>
-	</g:FlowPanel>
+	</b:Panel>
 </ui:UiBinder>
