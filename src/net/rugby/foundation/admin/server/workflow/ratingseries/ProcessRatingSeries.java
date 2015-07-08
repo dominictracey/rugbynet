@@ -97,9 +97,10 @@ public class ProcessRatingSeries extends Job1<ProcessRatingSeriesResult, ISeries
 			}
 
 			IRatingGroup group = null;
+			int i = 1;
 			// do we need a new rating group or is there one in place we need to continue processing?
 			if (rm.readyForNewGroup(seriesConfig)) {
-				group = rm.addRatingGroup(series, seriesConfig.getTargetRound());
+				group = rm.doRatingGroup(series, seriesConfig.getTargetRound());
 			} else {
 				for (IRatingGroup rg : series.getRatingGroups()) {
 					if (rg.getUniversalRoundOrdinal() == seriesConfig.getTargetRoundOrdinal()) {
@@ -109,11 +110,15 @@ public class ProcessRatingSeries extends Job1<ProcessRatingSeriesResult, ISeries
 							break;
 						} else { 
 							// otherwise delete the existing group and create another
-							series.getRatingGroupIds().remove(rg.getId());
-							rsf.put(series);
-							rgf.deleteTTLs(rg);
-							rgf.delete(rg);
-							group = rm.addRatingGroup(series, seriesConfig.getTargetRound());
+//							series.getRatingGroupIds().remove(rg.getId());
+//							rsf.put(series);
+//							rgf.deleteTTLs(rg);
+//							rgf.delete(rg);
+//							group = rm.doRatingGroup(series, seriesConfig.getTargetRound());
+							
+							// What does it mean to get here?
+							// Maybe there are some queries that need to be retried or something?
+							assert(false);
 							break;
 						}
 					}

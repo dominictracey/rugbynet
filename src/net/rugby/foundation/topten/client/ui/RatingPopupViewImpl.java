@@ -110,14 +110,19 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 			@Override
 			public String getValue(RatingComponent r)
 			{
-				return Float.toString(r.getUnscaledRating());
+				//return String.format("%.2f", r.getRawScore());
+				String retval = Float.toString(r.getRawScore()); 
+				int dot = retval.indexOf('.');
+				dot += 2; // two places after the decimal
+				return retval.substring(0, dot);
+				//return r.getUnscaledRating());
 			}
 //			@Override
 //			public String getCellStyleNames(Context context, RatingComponent value) {
 //				return "compactTTL";
 //
 //			}
-		}, "Raw Rating");
+		}, "Raw Score");
 		
 		ratingInfo.addCellPreviewHandler( new Handler<RatingComponent>() {
 

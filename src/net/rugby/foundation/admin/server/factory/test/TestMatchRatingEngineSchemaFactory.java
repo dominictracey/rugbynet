@@ -3,8 +3,11 @@ package net.rugby.foundation.admin.server.factory.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
+
 import net.rugby.foundation.admin.server.factory.BaseMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
+import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
@@ -12,6 +15,11 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 public class TestMatchRatingEngineSchemaFactory extends BaseMatchRatingEngineSchemaFactory implements
 		IMatchRatingEngineSchemaFactory {
 
+	@Inject
+	public TestMatchRatingEngineSchemaFactory(IRawScoreFactory rsf)  {
+		super(rsf);
+	}
+	
 	@Override
 	public IRatingEngineSchema getFromPersistentDatastore(Long id) {
 		if (id == 1000L) {

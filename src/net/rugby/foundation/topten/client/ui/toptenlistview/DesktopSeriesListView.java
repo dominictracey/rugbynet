@@ -102,6 +102,7 @@ public class DesktopSeriesListView extends SeriesListViewImpl {
 				}
 			
 			}
+			criteriaButton.setText(matrix.getCriteria().getMenuName());
 			presenter.process(getPlace());
 		} else {
 			matrixId = null;

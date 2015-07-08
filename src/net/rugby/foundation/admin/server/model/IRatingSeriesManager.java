@@ -25,6 +25,6 @@ public interface IRatingSeriesManager {
 
 	Boolean readyForNewGroup(ISeriesConfiguration config);
 
-	public abstract IRatingGroup addRatingGroup(IRatingSeries series, UniversalRound time);
+	public abstract IRatingGroup doRatingGroup(IRatingSeries series, UniversalRound time);
 
 }

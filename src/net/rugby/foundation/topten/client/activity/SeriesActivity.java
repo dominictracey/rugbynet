@@ -121,11 +121,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			view.setCompId(sPlace.getCompId());
 		} else if (!view.isRatingModesSet()) {
 			getAvailableSeries(sPlace.getCompId());
-		} 
-//		else if (sPlace.getCompId() == null) {
-//			setCompId(_coreConfig.getDefaultCompId());
-//		} 
-		else if (sPlace.getSeriesId() == null) {
+		} else if (sPlace.getSeriesId() == null) {
 			// the service knows what the default series is
 			getDefaultRatingSeries(sPlace.getCompId());
 		}  else if (view.getSeries() == null) { 
@@ -274,15 +270,19 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		IRatingSeries s = view.getSeries();
 		assert (s != null);
 		Criteria defaultCriteria = null;
-		if (s.getActiveCriteria() != null && !s.getActiveCriteria().isEmpty()) {
+		
+		// if we are changing RatingGroup (week) while looking at position, we should try to maintain the criteria
+		if (view.getLastCriteria() != null && s.getMode() == RatingMode.BY_POSITION) {
+			defaultCriteria = view.getLastCriteria();
+		} else if (s.getActiveCriteria() != null && !s.getActiveCriteria().isEmpty()) {
 			if (s.getActiveCriteria().contains(Criteria.ROUND)) {
 				defaultCriteria = Criteria.ROUND;
+			} else if (s.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
+				defaultCriteria = Criteria.BEST_YEAR;
 			} else if (s.getActiveCriteria().contains(Criteria.IN_FORM)) {
 				defaultCriteria = Criteria.IN_FORM;
 			} else if (s.getActiveCriteria().contains(Criteria.BEST_ALLTIME)) {
 				defaultCriteria = Criteria.BEST_ALLTIME;
-			} else if (s.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
-				defaultCriteria = Criteria.BEST_YEAR;
 			} else if (s.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT)) {
 				defaultCriteria = Criteria.AVERAGE_IMPACT;
 			}
@@ -345,14 +345,20 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		// default query is first populated one
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "selectDefaultQuery");
 		IRatingQuery rq = null;
-		for (IRatingQuery rql: ratingQueries) {
-			if (rql.getTopTenListId() != null) {
-				rq = rql;
-				break;
+		// prefer to have the same position selected if we change from one position view to another
+		if (view.getLastPosition() != -1) {
+			view.setQuery(ratingQueries.get(view.getLastPosition()));
+		} else {
+
+			for (IRatingQuery rql: ratingQueries) {
+				if (rql.getTopTenListId() != null) {
+					rq = rql;
+					break;
+				}
 			}
-		}
-		if (rq != null) {
-			view.setQuery(rq);
+			if (rq != null) {
+				view.setQuery(rq);
+			}
 		}
 	}
 

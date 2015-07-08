@@ -196,7 +196,6 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("schemaId", schema.getId());
 				ofy.delete(qpmr);
 
-
 			} else {
 				return false; // null query
 			}

@@ -112,6 +112,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		//	2) Series has a target UniversalRound specified
 		//	3) target UR is not in future
 		//	4) The comps configured for this series have all of the stats all fetched for the target UR
+		//  5) The group exists for the target round, but the matrices aren't right
 		assert config.getPipelineId() != null;
 		IRatingSeries series = config.getSeries();
 		if (series == null) {
@@ -123,7 +124,32 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		// does the group already exist?
 		for (IRatingGroup g : series.getRatingGroups()) {
 			if (g.getUniversalRoundOrdinal() == targetURordinal) {
-				return false;
+				// make sure we aren't adding a new matrix to the target group
+				if (g.getRatingMatrixIds().size() != series.getActiveCriteria().size())
+					return true;
+				else {
+					
+					// need to create any matrices?
+					List<Criteria> missing = new ArrayList<Criteria>();
+					missing.addAll(rs.getActiveCriteria());
+					for (IRatingMatrix rm : g.getRatingMatrices()) {
+						missing.remove(rm.getCriteria());
+					}
+					if (missing.size() > 0)
+						return true;
+					
+					// need to remove any matrices?
+					List<Criteria> extra = new ArrayList<Criteria>();
+					for (IRatingMatrix rm : g.getRatingMatrices()) {
+						extra.add(rm.getCriteria());
+					}
+					
+					extra.removeAll(rs.getActiveCriteria());
+					if (extra.size() > 0)
+						return true;
+
+					
+				}
 			}
 		}
 
@@ -158,70 +184,124 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	}
 
 
-//
-//	@Override
-//	public String process(IRatingSeries rs) {
-//		//	
-//		//		// start a workflow
-//		//		IRatingGroup rg = addRatingGroup(rs, DateTime.now());		
-//		//		rs.getRatingGroups().add(rg);
-//		//		rs.getRatingGroupIds().add(rg.getId());
-//		//
-//		//		rsf.put(rs);
-//
-//		generateRatings(rs);
-//
-//		return null;
-//	}
+	//
+	//	@Override
+	//	public String process(IRatingSeries rs) {
+	//		//	
+	//		//		// start a workflow
+	//		//		IRatingGroup rg = addRatingGroup(rs, DateTime.now());		
+	//		//		rs.getRatingGroups().add(rg);
+	//		//		rs.getRatingGroupIds().add(rg.getId());
+	//		//
+	//		//		rsf.put(rs);
+	//
+	//		generateRatings(rs);
+	//
+	//		return null;
+	//	}
 
 
 
 	/*
 	 * Important note: when the RatingSeries graph is changed, we should drop the entire graph from memcache to keep it synched with what we are saving to the persistent datastore.
 	 * Unfortunately this might hose up the Test versions of the factories?
+	 * *
+	 * * NB: The name of this method is a bit of a misnomer as sometimes we already have the group and just need to graft a new RatingMatrix into it
 	 * (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.model.IRatingSeriesManager#addRatingGroup(net.rugby.foundation.model.shared.IRatingSeries, net.rugby.foundation.model.shared.UniversalRound)
 	 */
-	public IRatingGroup addRatingGroup(IRatingSeries rs, UniversalRound time ) {
-		IRatingGroup rg = rgf.create();
-		rg.setRatingSeries(rs);
-		assert(rs.getId() != null);
-		rg.setRatingSeriesId(rs.getId());
-		rg.setUniversalRound(time);
-		rg.setUniversalRoundOrdinal(time.ordinal);
-		rg.setRatingSeries(rs);
-		rgf.put(rg); // get id for ratingGroup
+	public IRatingGroup doRatingGroup(IRatingSeries rs, UniversalRound time ) {
 
-		// now create the Rating Matrices for the group
-		// the criteria are the drop down box ("in form", "best over last year", "average impact", "best all time")
-		for (Criteria criteria : rs.getActiveCriteria()) {
-			IRatingMatrix rm = rmf.create();
-			rm.setCriteria(criteria);
-			rm.setRatingGroup(rg);
-			rm.setRatingGroupId(rg.getId());
-			rm.setGenerated(DateTime.now().toDate());
-			rmf.put(rm);
-			rg.getRatingMatrices().add(rm);
-			rg.getRatingMatrixIds().add(rm.getId());
-
-			generateRatingQueries(rm);
-		}
-
-
-		rgf.put(rg);
-		// put it at the right place (sort by UR ordinal)
-		int index = 0;
-		for (IRatingGroup cursor : rs.getRatingGroups()) {
-			if (cursor.getUniversalRoundOrdinal() < rg.getUniversalRoundOrdinal()) {
+		IRatingGroup rg = null;
+		// graft new Matrix or create new Group?
+		for (IRatingGroup g : rs.getRatingGroups()) {
+			if (g.getUniversalRoundOrdinal() == time.ordinal) {
+				rg = g;
+				//assert g.getRatingMatrixIds().size() != rs.getActiveCriteria().size();
 				break;
 			}
-			index++;
 		}
-		
-		rs.getRatingGroupIds().add(index, rg.getId());
-		rs.getRatingGroups().add(index, rg);
-		rsf.put(rs);
 
+		if (rg == null) {
+			rg = rgf.create();
+			rg.setRatingSeries(rs);
+			assert(rs.getId() != null);
+			rg.setRatingSeriesId(rs.getId());
+			rg.setUniversalRound(time);
+			rg.setUniversalRoundOrdinal(time.ordinal);
+			rg.setRatingSeries(rs);
+			rgf.put(rg); // get id for ratingGroup
+
+			// now create the Rating Matrices for the group
+			// the criteria are the drop down box ("in form", "best over last year", "average impact", "best all time")
+			for (Criteria criteria : rs.getActiveCriteria()) {
+				IRatingMatrix rm = rmf.create();
+				rm.setCriteria(criteria);
+				rm.setRatingGroup(rg);
+				rm.setRatingGroupId(rg.getId());
+				rm.setGenerated(DateTime.now().toDate());
+				rmf.put(rm);
+				rg.getRatingMatrices().add(rm);
+				rg.getRatingMatrixIds().add(rm.getId());
+
+				generateRatingQueries(rm);
+			}
+
+
+			rgf.put(rg);
+			// put it at the right place (sort by UR ordinal)
+			int index = 0;
+			for (IRatingGroup cursor : rs.getRatingGroups()) {
+				if (cursor.getUniversalRoundOrdinal() < rg.getUniversalRoundOrdinal()) {
+					break;
+				}
+				index++;
+			}
+
+			rs.getRatingGroupIds().add(index, rg.getId());
+			rs.getRatingGroups().add(index, rg);
+			rsf.put(rs);
+		} else { // graft new matrix(ices) and prune dead ones
+			
+			List<Criteria> missing = new ArrayList<Criteria>();
+			missing.addAll(rs.getActiveCriteria());
+			for (IRatingMatrix rm : rg.getRatingMatrices()) {
+				missing.remove(rm.getCriteria());
+			}
+			
+			for (Criteria criteria : missing) {
+				IRatingMatrix rm = rmf.create();
+				rm.setCriteria(criteria);
+				rm.setRatingGroup(rg);
+				rm.setRatingGroupId(rg.getId());
+				rm.setGenerated(DateTime.now().toDate());
+				rmf.put(rm);
+				rg.getRatingMatrices().add(rm);
+				rg.getRatingMatrixIds().add(rm.getId());
+				rgf.put(rg);
+				generateRatingQueries(rm);
+			}
+			
+			List<Criteria> extra = new ArrayList<Criteria>();
+			for (IRatingMatrix rm : rg.getRatingMatrices()) {
+				extra.add(rm.getCriteria());
+			}
+			
+			extra.removeAll(rs.getActiveCriteria());
+			
+			// can't do concurrent mods in for loop
+			List<IRatingMatrix> shadow = new ArrayList<IRatingMatrix>();
+			shadow.addAll(rg.getRatingMatrices());
+			
+			for (IRatingMatrix rm : shadow) {
+				if (extra.contains(rm.getCriteria())) {
+					rg.getRatingMatrices().remove(rm);
+					rg.getRatingMatrixIds().remove(rm.getId());
+					rgf.put(rg);
+					rmf.delete(rm);
+				}
+			}
+		}
 		return rg;
 	}
 
@@ -248,7 +328,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					if (found) {
 						rids.add(targetRound.getId());
 					}
-				} else if (rm.getCriteria() == Criteria.BEST_YEAR) {
+				} else if (rm.getCriteria() == Criteria.BEST_YEAR || rm.getCriteria() == Criteria.AVERAGE_IMPACT) {
 					// get the rounds for the comps that happened in the last year.
 					List<IRound> rounds = getRoundsFromLastXMonths(comp, 12);
 					for (IRound r : rounds) {
@@ -264,7 +344,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					} else {
 						rounds = getRoundsFromLastXMonths(comp, 12); // for a single comp, just get all the data
 					}
-					
+
 					for (IRound r : rounds) {
 						if (urf.get(r).ordinal <= ur.ordinal) {
 							rids.add(r.getId());
@@ -300,6 +380,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 	private void generateRatingQueries(IRatingMatrix rm) {
 		boolean scaleTime = rm.getCriteria() == Criteria.IN_FORM;  // can also be BEST_YEAR
+		boolean scaleMinutesPlayed = rm.getCriteria() == Criteria.AVERAGE_IMPACT;
 		List<Long> rids = findRoundsForRatingMatrices(rm);
 		if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_POSITION) {
 
@@ -314,6 +395,11 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rq.setScaleStanding(true);
 					rq.setScaleComp(rm.getRatingGroup().getRatingSeries().getCompIds().size() > 1);
 					rq.setScaleTime(scaleTime);
+					rq.setScaleMinutesPlayed(scaleMinutesPlayed);
+					if (scaleMinutesPlayed) {
+						rq.setMinMinutes(sc.getMinMinutes());
+						rq.setMinMinutesType(sc.getMinMinuteType());
+					}
 					rq.setStatus(Status.NEW);
 					rq.setRoundIds(rids);
 					rq.setRatingMatrixId(rm.getId());
@@ -349,22 +435,22 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		}  else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_COMP) {
 
 			//for (Long rid : rids) {
-				//IRound targetRound = rf.get(rid);
-				IRatingQuery rq = createRatingQuery(rm);
+			//IRound targetRound = rf.get(rid);
+			IRatingQuery rq = createRatingQuery(rm);
 
-				rq.setScaleStanding(true);
-				rq.setScaleComp(true);
-				rq.setScaleTime(scaleTime);
+			rq.setScaleStanding(true);
+			rq.setScaleComp(true);
+			rq.setScaleTime(scaleTime);
 
-				rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
-				rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
-				rq.setRoundIds(rids);
-				rq.setRatingMatrixId(rm.getId());
-				rq.setLabel(rm.getRatingGroup().getUniversalRound().longDesc);
-				rqf.put(rq);
-				rm.getRatingQueries().add(rq);
-				rm.getRatingQueryIds().add(rq.getId());
-				rmf.put(rm);
+			rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
+			rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
+			rq.setRoundIds(rids);
+			rq.setRatingMatrixId(rm.getId());
+			rq.setLabel(rm.getRatingGroup().getUniversalRound().longDesc);
+			rqf.put(rq);
+			rm.getRatingQueries().add(rq);
+			rm.getRatingQueryIds().add(rq.getId());
+			rmf.put(rm);
 			//}
 		}
 
@@ -382,20 +468,21 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	}
 
 
-//	public void generateRatings(IRatingSeries rs)
-//	{
-//		for (IRatingGroup rg : rs.getRatingGroups())
-//		{
-//			for (IRatingMatrix rm : rg.getRatingMatrices()) {
-//				for (IRatingQuery rq : rm.getRatingQueries()) {
-//					IQueryRatingEngine qre = qref.get(mresf.getDefault());
-//					qre.setQuery(rq);
-//					qre.generate(mresf.getDefault(), true, true, true, false);
-//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,qre.getMetrics());
-//				}
-//			}
-//		}
-//	}
+
+	//	public void generateRatings(IRatingSeries rs)
+	//	{
+	//		for (IRatingGroup rg : rs.getRatingGroups())
+	//		{
+	//			for (IRatingMatrix rm : rg.getRatingMatrices()) {
+	//				for (IRatingQuery rq : rm.getRatingQueries()) {
+	//					IQueryRatingEngine qre = qref.get(mresf.getDefault());
+	//					qre.setQuery(rq);
+	//					qre.generate(mresf.getDefault(), true, true, true, false);
+	//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,qre.getMetrics());
+	//				}
+	//			}
+	//		}
+	//	}
 
 
 

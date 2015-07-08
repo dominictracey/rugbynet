@@ -45,10 +45,11 @@ body.menu {
   overflow-x: hidden; 
   }
 
+/*  DPT removed these two lines 6/2/15 for mobile */
 body.menu .content {
-  margin-left: 178px;
+/*   margin-left: 178px; */
   position: relative;
-  width: 850px; 
+/*   width: 850px;  */
   }
 
 body.menu #sidebar-nav {

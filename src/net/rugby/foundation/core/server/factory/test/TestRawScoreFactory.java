@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRawScore;
 import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.model.shared.RawScore;
@@ -82,6 +83,12 @@ public class TestRawScoreFactory extends BaseCachingFactory<IRawScore> implement
 	@Override
 	public boolean deleteForPMSid(Long pmsId) {
 		return true;
+	}
+
+	@Override
+	public boolean delete(IRatingEngineSchema schema) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

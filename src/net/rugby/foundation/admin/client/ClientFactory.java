@@ -1,6 +1,8 @@
 package net.rugby.foundation.admin.client;
 
 import java.util.List;
+
+import net.rugby.foundation.admin.client.ui.AddRoundPopup;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditContent;
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
@@ -100,4 +102,6 @@ public interface ClientFactory extends EditContentPresenter {
 	void getUniversalRoundsListAsync(int count,	GetUniversalRoundsListCallback getUniversalRounds20ListCallback);
 
 	void console(String text);
+
+	AddRoundPopup getAddRoundPopup();
 }

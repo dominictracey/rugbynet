@@ -49,6 +49,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	private IMatchGroupFactory mgf;
 	private ICompetitionFactory cf;
 
+	private boolean impact;
+
 
 	public ProcessRatingQuery() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -108,8 +110,9 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		
 		try {
 			ok = mre.setQuery(rq);
+
 			if (ok) {
-				mre.generate(mres,rq.getScaleStanding(),rq.getScaleComp(),rq.getScaleTime(), false);
+				mre.generate(mres,rq.getScaleStanding(),rq.getScaleComp(),rq.getScaleTime(), rq.getScaleMinutesPlayed(), false);
 			} else {
 				// stats aren't ready
 				rq.setStatus(Status.NEW);
@@ -159,6 +162,9 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					inForm = true;
 				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.BEST_YEAR)) {
 					bestYear = true;
+				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.AVERAGE_IMPACT)) {
+					title += "Impact ";
+					impact = true;
 				}
 				
 				title += rq.getPositions().get(0).getPlural();
@@ -171,14 +177,16 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					}
 				}
 				
-				if (inForm || bestYear) {
+				if (inForm || bestYear || impact) {
 					title += " Through ";
 				} else {
 					title += " From ";
 				}
 				
 				// now we need the last round
-				if (rq.getRoundIds().size() == 1) {
+				if (rq.getRoundIds().size() == 0) {
+					title += "NO MATCHING DATA"; // this is not a great place to be, no players make the list...
+				} else if (rq.getRoundIds().size() == 1) {
 					IRound r = rf.get(rq.getRoundIds().get(0));
 					title += r.getName();
 				} else {

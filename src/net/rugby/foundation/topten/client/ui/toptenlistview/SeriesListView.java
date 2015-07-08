@@ -3,6 +3,7 @@ package net.rugby.foundation.topten.client.ui.toptenlistview;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -87,5 +88,7 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 	 * @param show - whether the create feature, promote, etc. buttons should be displayed.
 	 */
 	void showButtons(boolean show);
+	int getLastPosition();
+	Criteria getLastCriteria();
 	
 }

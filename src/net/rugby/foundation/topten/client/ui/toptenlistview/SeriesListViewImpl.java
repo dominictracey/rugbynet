@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
@@ -46,14 +47,14 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 	@UiField
 	protected Row sponsorRow;
-	
+
 	@UiField 
 	protected Column compCol;
 	@UiField 
 	protected Column dropdownCol;
 	@UiField 
 	protected Column sponsorCol;
-	
+
 	@UiField 
 	protected ButtonGroup matrixGroup;
 	@UiField 
@@ -80,7 +81,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 	@UiField 
 	protected PanelHeader seriesHeader;
-	
+
 	@UiField
 	protected Div compSpacer;
 	@UiField
@@ -126,6 +127,9 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 
 	protected boolean ratingModesSet;
+	protected int lastPosition;
+
+	private Criteria lastCriteria;
 
 	@UiTemplate("SeriesListViewImpl.ui.xml")
 
@@ -139,13 +143,13 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		initWidget(uiBinder.createAndBindUi(this));
 		showButtons(false);
 		ratingModesSet = false;
-
+		lastPosition = -1;
 		criteriaGroup.setVisible(false);
 		seriesHeader.setPaddingBottom(5);
-		
+
 		sponsorTag.addStyleName("font-size:.5em");	
 		sponsorRow.addStyleName("sponsor");
-		
+
 		compCol.setStylePrimaryName("comp-logo");
 		compCol.addStyleName("col-xs-3");
 		sponsorCol.setStylePrimaryName("sponsor-logo");
@@ -153,7 +157,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		compSpacer.setHeight("38px");
 		sponsorSpacer.setHeight("38px");
 		dropdownCol.addStyleName("sponsor-buttons");
-		
+
 		sponsorLink.addStyleName("trn-sponsor-link");
 		compLink.addStyleName("trn-comp-link");
 
@@ -185,8 +189,8 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				matrixButton.setText(result.getMode().getPlural());
 			}
 
-			
-			
+
+
 
 			for (IRatingGroup rg : series.getRatingGroups()) {
 				// add item to date dropdown
@@ -207,8 +211,8 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						setItemId(null);
 						//Core.getCore().setCurrentRoundId(rid);
 						presenter.gotoPlace(getPlace());
-						
-						weekButton.setText(label);
+
+						//weekButton.setText(label);
 					}
 
 				});
@@ -265,6 +269,36 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			setQuery(null);
 			setItemId(null);
 		}
+		
+		weekButton.setText(group.getLabel());
+
+		criteriaGroup.setVisible(false);
+		criteriaDropDown.clear();
+		if (group.getRatingMatrices().size() > 1) {
+			criteriaGroup.setVisible(true);
+			for (IRatingMatrix m : group.getRatingMatrices()) {
+				final AnchorListItem nl = new AnchorListItem(m.getCriteria().getMenuName());
+				final IRatingMatrix _m = m;
+				nl.addClickHandler(new ClickHandler() {
+
+					@Override
+					public void onClick(ClickEvent event) {
+						// go to the new series
+						//setMatrix(_m);
+						lastCriteria = _m.getCriteria();
+						matrixId = _m.getId();
+						matrix = null;
+						setQuery(null);
+						setList(null);
+						setItemId(null);
+
+						presenter.gotoPlace(getPlace());
+					}
+
+				});
+				criteriaDropDown.add(nl);
+			}
+		}
 
 		presenter.process(getPlace());
 	}
@@ -272,31 +306,32 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@Override
 	public void setAvailableModes(final Map<RatingMode, Long> modeMap) {
 		criteriaDropDown.clear();
-		// populate Rate by drop down
-		for (RatingMode mode : modeMap.keySet()) {
+		//		// populate Rate by drop down
+		//		for (RatingMode mode : modeMap.keySet()) {
+		//
+		//			final AnchorListItem nl = new AnchorListItem(mode.name());
+		//			final Long _seriesId = modeMap.get(mode);
+		//			nl.addClickHandler(new ClickHandler() {
+		//
+		//				@Override
+		//				public void onClick(ClickEvent event) {
+		//					// go to the new series
+		//					series = null;
+		//					seriesId = _seriesId;
+		//					group = null;
+		//					groupId = null;
+		//					setMatrix(null);
+		//					setQuery(null);
+		//					setList(null);
+		//					setItemId(null);
+		//
+		//					presenter.gotoPlace(getPlace());
+		//				}
+		//
+		//			});
+		//			criteriaDropDown.add(nl);
+		//		}
 
-			final AnchorListItem nl = new AnchorListItem(mode.name());
-			final Long _seriesId = modeMap.get(mode);
-			nl.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					// go to the new series
-					series = null;
-					seriesId = _seriesId;
-					group = null;
-					groupId = null;
-					setMatrix(null);
-					setQuery(null);
-					setList(null);
-					setItemId(null);
-
-					presenter.gotoPlace(getPlace());
-				}
-
-			});
-			criteriaDropDown.add(nl);
-		}
 		ratingModesSet = true;
 		presenter.process(getPlace());
 	}
@@ -312,6 +347,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			this.matrix = matrix;
 			matrixId = matrix.getId();
 			matrixDropDown.clear();
+			lastCriteria = matrix.getCriteria();
 			for (IRatingQuery q : matrix.getRatingQueries()) {
 				AnchorListItem nl = new AnchorListItem(q.getLabel());
 				final IRatingQuery _query = q;
@@ -332,6 +368,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				matrixDropDown.add(nl);
 			}
 
+			criteriaButton.setText(matrix.getCriteria().getMenuName());
 			presenter.process(getPlace());
 		} else {
 			matrixId = null;
@@ -349,7 +386,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		this.query = query;
 		if (query != null) {
 			queryId = query.getId();
-
+			
 			presenter.process(getPlace());
 		} else {
 			queryId = null;
@@ -404,7 +441,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						currentCompStyle = result.getAbbr();
 					}
 				}
-				
+
 			});
 			presenter.process(getPlace());
 		}
@@ -465,18 +502,22 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				createFeature.setText("Create Feature");
 			}
 			
+			if (series != null && series.getMode() == RatingMode.BY_POSITION) {
+				lastPosition = query.getRatingMatrix().getRatingQueries().indexOf(query);
+			}
+
 			clientFactory.getSponsorForList(list, new AsyncCallback<ISponsor>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void onSuccess(ISponsor result) {
-					
-					
+
+
 					// remove any style we already have before adding the new one
 					if (!currentSponsorStyle.isEmpty()) {
 						sponsorCol.setStyleDependentName(currentSponsorStyle, false);
@@ -493,11 +534,11 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						clientFactory.recordAnalyticsEvent("sponsor", "show", result.getName(), 1);
 						sponsorLink.setHref(result.getUrl());
 					}
-					
+
 				}
-				
+
 			});
-			
+
 		}
 	}
 
@@ -580,6 +621,19 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@UiHandler("createFeature")
 	void onFeatureClicked(ClickEvent event) {	
 		presenter.clickFeature(getPlace());
+	}
+
+
+
+	@Override
+	public int getLastPosition() {
+		return lastPosition;
+	}
+
+
+	@Override
+	public Criteria getLastCriteria() {
+		return lastCriteria;
 	}
 
 }

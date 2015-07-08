@@ -9,6 +9,7 @@ import javax.persistence.Transient;
 
 import com.google.appengine.datanucleus.annotations.Unindexed;
 import com.googlecode.objectify.annotation.Entity;
+
 import net.rugby.foundation.model.shared.Position.position;
 
 @Entity
@@ -36,7 +37,13 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	@Unindexed
 	protected boolean scaleStanding = true;
 	@Unindexed
+	protected boolean scaleMinutesPlayed = false;
+	@Unindexed
 	protected boolean instrument = false;
+	@Unindexed	
+	protected MinMinutes minMinutesType;
+	@Unindexed
+	protected int minMinutes;
 	
 	@Transient
 	protected IRatingMatrix ratingMatrix;
@@ -269,6 +276,30 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	@Override
 	public void setInstrument(Boolean instrument) {
 		this.instrument = instrument;
+	}
+	@Override
+	public Boolean getScaleMinutesPlayed() {
+		return scaleMinutesPlayed;
+	}
+	@Override
+	public void setScaleMinutesPlayed(Boolean scaleMinutesPlayed) {
+		this.scaleMinutesPlayed = scaleMinutesPlayed;
+	}
+	@Override
+	public MinMinutes getMinMinutesType() {
+		return minMinutesType;
+	}
+	@Override
+	public void setMinMinutesType(MinMinutes minMinutesType) {
+		this.minMinutesType = minMinutesType;
+	}
+	@Override
+	public int getMinMinutes() {
+		return minMinutes;
+	}
+	@Override
+	public void setMinMinutes(int minMinutes) {
+		this.minMinutes = minMinutes;
 	}
 
 }

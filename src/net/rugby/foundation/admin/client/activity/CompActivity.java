@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
+import net.rugby.foundation.admin.client.ui.AddRoundPopup.AddRoundPopupPresenter;
 import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditComp;
@@ -45,6 +46,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.PopupListener;
 
 /**
  * Activities are started and stopped by an ActivityManager associated with a container Widget.
@@ -53,7 +55,8 @@ public class CompActivity extends AbstractActivity implements
 CompetitionView.Presenter, EditTeam.Presenter, EditComp.Presenter, 
 EditMatch.Presenter, PlayerListView.Listener<IPlayerRating>, PlayerPopupView.Presenter<IPlayer>,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, 
-SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>, RoundPresenter {
+SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>, 
+RoundPresenter, AddRoundPopupPresenter {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -1042,6 +1045,26 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			}
 		});
 	}
+	
+	@Override
+	public void onFlushRawScoresButtonClicked(ScrumMatchRatingEngineSchema20130713 schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
+		clientFactory.getRpcService().deleteRawScoresForMatchRatingEngineSchema(schema, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to delete eaw scores for match rating engine schema. Details:" + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Window.alert("Raw scores successfully flushed");
+				} else {
+					Window.alert("Raw scores not flushed.");
+				}
+			}
+		});
+	}
 
 
 
@@ -1456,5 +1479,53 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 		});
 		
 	}
+
+
+
+	@Override
+	public void addRound(ICompetition comp) {
+		clientFactory.getAddRoundPopup().setComp(comp);
+		clientFactory.getAddRoundPopup().setPresenter((AddRoundPopupPresenter) this);
+		clientFactory.getAddRoundPopup().center();
+		
+	}
+
+
+
+	@Override
+	public void addRound(ICompetition comp, int uri, String name) {
+		clientFactory.getRpcService().addRound(comp.getId(), uri, name, new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Problems adding round");
+				
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Window.alert("Success adding round");
+					clientFactory.getAddRoundPopup().hide();
+				} else {
+					Window.alert("No good. Check the logs or try again. Maybe that round already exists? Try reloading maybe?");
+				}
+			}
+			
+		});
+		
+	}
+
+
+
+	@Override
+	public void cancelAddRound() {
+		clientFactory.getAddRoundPopup().hide();
+		
+	}
+
+
+
+
 	
 }

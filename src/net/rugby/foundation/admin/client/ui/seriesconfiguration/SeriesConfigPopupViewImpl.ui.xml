@@ -114,11 +114,41 @@
 					Criteria:
 				</td>
 				<td>
-				    <b:CheckBox ui:field="round">Round</b:CheckBox>
+					<b:CheckBox ui:field="round">Round</b:CheckBox>
 					<b:CheckBox ui:field="inForm">In Form</b:CheckBox>
 					<b:CheckBox ui:field="bestYear">Best Last Year</b:CheckBox>
 					<b:CheckBox ui:field="bestAllTime">Best All Time</b:CheckBox>
 					<b:CheckBox ui:field="average">Average Impact</b:CheckBox>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Minimum minutes (impact only):
+				</td>
+
+				<td>
+
+					<b:FormGroup>
+						<g:FlowPanel addStyleNames="col-lg-offset-2 col-lg-10">
+							<b:InlineRadio ui:field="roundMinMinutes" name="minMinutes"
+								text="Per Round" />
+							<b:InlineRadio ui:field="totalMinMinutes" name="minMinutes"
+								text="Total" />
+						</g:FlowPanel>
+					</b:FormGroup>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Minutes (impact):
+				</td>
+
+				<td>
+
+					<b:TextBox ui:field="minMinutes">
+					</b:TextBox>
 				</td>
 			</tr>
 			<tr>

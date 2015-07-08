@@ -13,7 +13,8 @@
 		margin: 5px 0px 0x 5px;
 		}
 		.playersViewPlayersFlexTable {
-		margin: 5px 0px 5px 0px;
+		margin: 5px 0px
+		5px 0px;
 		}
 		.jobArea {
 		width:100%;
@@ -74,26 +75,31 @@
 
 				<g:ListBox ui:field="schema" multipleSelect="false" />
 			</g:HTMLPanel>
-<!-- 			<g:VerticalPanel> -->
-<!-- 				<g:HorizontalPanel> -->
-					<b:ButtonGroup dataToggle="BUTTONS">
-						<b:CheckBoxButton ui:field="timeSeries"/>
-					</b:ButtonGroup>
+			<!-- <g:VerticalPanel> -->
+			<!-- <g:HorizontalPanel> -->
+			<b:ButtonGroup dataToggle="BUTTONS">
+				<b:CheckBoxButton ui:field="timeSeries" />
+			</b:ButtonGroup>
 
-					<b:Button ui:field="query">Query</b:Button>
-					<b:Button ui:field="clear">Clear</b:Button>
-					<b:Button ui:field="delete">Delete</b:Button>
-					<b:Button ui:field="rerun">Rerun</b:Button>
-					<b:Button ui:field="topTen">Create Top Ten List</b:Button>
-<!-- 				</g:HorizontalPanel> -->
-				<g:VerticalPanel>
-					<b:CheckBox ui:field="scaleTime">Scale for Match Age</b:CheckBox>
-					<b:CheckBox ui:field="scaleComp">Scale for Comp Weight</b:CheckBox>
-					<b:CheckBox ui:field="scaleStanding">Scale for Standings</b:CheckBox>
-					<b:CheckBox ui:field="instrument">Send Statistical Report</b:CheckBox>
-				</g:VerticalPanel>
+			<b:Button ui:field="query">Query</b:Button>
+			<b:Button ui:field="clear">Clear</b:Button>
+			<b:Button ui:field="delete">Delete</b:Button>
+			<b:Button ui:field="rerun">Rerun</b:Button>
+			<b:Button ui:field="topTen">Create Top Ten List</b:Button>
+			<!-- </g:HorizontalPanel> -->
+			<g:VerticalPanel>
+				<b:CheckBox ui:field="scaleTime">Scale for Match Age</b:CheckBox>
+				<b:CheckBox ui:field="scaleComp">Scale for Comp Weight</b:CheckBox>
+			</g:VerticalPanel>
+			<g:VerticalPanel>
+				<b:CheckBox ui:field="scaleStanding">Scale for Standings</b:CheckBox>
+				<b:CheckBox ui:field="scaleMinutesPlayed">Scale for Minutes Played</b:CheckBox>
+			</g:VerticalPanel>
+			<g:VerticalPanel>
+				<b:CheckBox ui:field="instrument">Send Statistical Report</b:CheckBox>
+			</g:VerticalPanel>
 
-<!-- 			</g:VerticalPanel> -->
+			<!-- </g:VerticalPanel> -->
 		</g:HorizontalPanel>
 
 		<g:SimplePanel styleName="{style.jobArea}" ui:field="jobArea">

@@ -5,6 +5,16 @@ import java.util.List;
 import net.rugby.foundation.model.shared.Position.position;
 
 public interface IRatingQuery extends IHasId {
+	/**
+	 * ROUND - getMinMinutes returns the number of minutes the player has to have played on average, per round
+	 * TOTAL - getMinMinutes returns the number of minutes the player has to have played over the period of the query (usually 12 months)
+	 * @author home
+	 *
+	 */
+	public enum MinMinutes {  
+		ROUND,
+		TOTAL }
+	
 
 	public abstract List<Long> getCompIds();
 
@@ -66,4 +76,15 @@ public interface IRatingQuery extends IHasId {
 	void setSchemaId(Long schemaId);
 	public abstract Boolean getInstrument();
 	public abstract void setInstrument(Boolean instrument);
+
+	public abstract void setScaleMinutesPlayed(Boolean scaleMinutesPlayed);
+	public abstract Boolean getScaleMinutesPlayed();
+
+	void setMinMinutes(int minMinutes);
+
+	int getMinMinutes();
+
+	void setMinMinutesType(MinMinutes minMinutesType);
+
+	MinMinutes getMinMinutesType();
 }

@@ -12,7 +12,11 @@ interface IPlayerStatShares {
 
 	public abstract float getUnscaledScore();
 	public abstract float getScaledScore();
-	
+	/**
+	 * 
+	 * @return The sum of (stat * weight) * all scaling factors other than minutes played
+	 */
+	public abstract float getNoMinutesScaledScore();
 	
 	public abstract IPlayerMatchStats getPlayerMatchStats();
 
@@ -55,6 +59,7 @@ interface IPlayerStatShares {
 	String getSummaryRow(Map<String, Float> scaleTotalNumMap, Map<String, Float> scaleTotalMap);
 
 	String getEmailSummaryRow(Map<String, Float> scaleTotalNumMap, Map<String, Float> scaleTotalMap);
+
 
 
 }

@@ -99,7 +99,7 @@ public interface RugbyAdminService extends RemoteService {
 	IPlayerRating savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
 	ICompetition repairComp(ICompetition comp);
 	IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms);
-	IRatingQuery createRatingQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId, Long schemaId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean instrument);
+	IRatingQuery createRatingQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId, Long schemaId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed, Boolean instrument);
 //	List<IPlayerMatchInfo> reRateMatch(Long matchId);
 	IMatchGroup SaveScore(Long matchId, int hS, int vS, Status status);
 	ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId);
@@ -114,6 +114,7 @@ public interface RugbyAdminService extends RemoteService {
 	Boolean deleteMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
 	Boolean deleteRatingsForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
 	ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(ScrumMatchRatingEngineSchema20130713 schema);
+	boolean deleteRawScoresForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
 	List<ScrumMatchRatingEngineSchema> getScrumSchemaList();
 	Boolean flushAllPipelineJobs();
 	
@@ -145,4 +146,5 @@ public interface RugbyAdminService extends RemoteService {
 	List<UniversalRound> getUniversalRounds(int size);
 	ICompetition addVirtualComp();
 	ISeriesConfiguration rollBackSeriesConfiguration(Long id);
+	Boolean addRound(Long compId, int uri, String name);
 }

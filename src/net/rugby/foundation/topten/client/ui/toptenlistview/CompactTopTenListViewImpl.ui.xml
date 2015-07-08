@@ -8,6 +8,7 @@
 		<b.gwt:CellTable ui:field="items" width="100%" />
 		<center>
 			<g:HTML ui:field="generated"></g:HTML>
+			<g:HTML ui:field="algorithm"></g:HTML>
 		</center>
 	</g:HTMLPanel>
 

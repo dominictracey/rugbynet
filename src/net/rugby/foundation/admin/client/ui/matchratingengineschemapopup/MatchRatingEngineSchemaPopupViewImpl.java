@@ -70,6 +70,7 @@ public class MatchRatingEngineSchemaPopupViewImpl extends DialogBox implements M
 	@UiField Button saveButton;
 	@UiField Button saveAsCopyButton;
 	@UiField Button deleteRatingsButton;
+	@UiField Button flushRawScoresButton;
 	@UiField Button deleteButton;
 	@UiField Button setAsDefaultButton;
 	@UiField Button cancelButton;
@@ -179,6 +180,13 @@ public class MatchRatingEngineSchemaPopupViewImpl extends DialogBox implements M
 	void onDeleteRatingsButtonClicked(ClickEvent event) {	
 		if (presenter != null) {
 			presenter.onDeleteRatingsForMatchRatingEngineSchemaClicked(target);
+		}
+	}
+	
+	@UiHandler("flushRawScoresButton")
+	void onFlushRawScoresButtonClicked(ClickEvent event) {	
+		if (presenter != null) {
+			presenter.onFlushRawScoresButtonClicked(target);
 		}
 	}
 	

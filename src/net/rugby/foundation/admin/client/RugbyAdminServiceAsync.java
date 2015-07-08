@@ -116,7 +116,7 @@ public interface RugbyAdminServiceAsync {
 	public void refetchPlayerMatchStats(IPlayerMatchStats pms, AsyncCallback<IPlayerMatchStats> asyncCallback);
 	public void createRatingQuery(List<Long> compId,
 			List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId,
-			Long schemaId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean instrument, AsyncCallback<IRatingQuery> asyncCallback);
+			Long schemaId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed, Boolean instrument, AsyncCallback<IRatingQuery> asyncCallback);
 	public void  getTeamMatchStats(Long matchId, Long teamId, AsyncCallback<ITeamMatchStats> asyncCallback);
 	public void refetchTeamMatchStats(ITeamMatchStats target,
 			AsyncCallback<ITeamMatchStats> asyncCallback);
@@ -135,6 +135,9 @@ public interface RugbyAdminServiceAsync {
 			ScrumMatchRatingEngineSchema20130713 schema,
 			AsyncCallback<Boolean> asyncCallback);
 	public void deleteRatingsForMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema20130713 schema,
+			AsyncCallback<Boolean> asyncCallback);
+	public void deleteRawScoresForMatchRatingEngineSchema(
 			ScrumMatchRatingEngineSchema20130713 schema,
 			AsyncCallback<Boolean> asyncCallback);
 	public void setMatchRatingEngineSchemaAsDefault(
@@ -182,4 +185,6 @@ public interface RugbyAdminServiceAsync {
 	public void rollBackSeriesConfiguration(Long id, AsyncCallback<ISeriesConfiguration> asyncCallback);
 	public void rerunRatingQuery(Long id,
 			AsyncCallback<IRatingQuery> asyncCallback);
+	public void addRound(Long compId, int uri, String name,
+			AsyncCallback<Boolean> asyncCallback);
 }

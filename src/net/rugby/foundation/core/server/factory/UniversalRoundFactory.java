@@ -54,7 +54,7 @@ public class UniversalRoundFactory extends BaseCachingFactory<UniversalRound> im
 
 		time = time.plusWeeks(ordinal);
 
-		DateTimeFormatter fmtShort = DateTimeFormat.forStyle("S-");
+		DateTimeFormatter fmtShort = DateTimeFormat.forStyle("M-").withLocale(Locale.UK);
 		UniversalRound retval = new UniversalRound(ordinal, time.getYear() + "-" + time.getWeekOfWeekyear(), time.toString(fmtShort) + "", "Week starting " + time.toString(fmtShort), time.toDate());
 				
 
@@ -112,7 +112,7 @@ public class UniversalRoundFactory extends BaseCachingFactory<UniversalRound> im
 	
 	private List<UniversalRound> build(int i) {
 		List<UniversalRound> list = new ArrayList<UniversalRound>();
-		DateTime now = DateTime.now();
+		DateTime now = DateTime.now().plusMonths(1);
 		
 		for (int n = 0; n < i; n++) {
 			list.add(get(now));

@@ -23,7 +23,7 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 
 		void submitPortalQuery(List<Long> compId, List<Long> roundId, List<position> posi,
 				List<Long> countryId, List<Long> teamId, Long schemaId, 
-				Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean instrument);
+				Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed, Boolean instrument);
 		
 		void createTopTenList(TopTenSeedData data);
 

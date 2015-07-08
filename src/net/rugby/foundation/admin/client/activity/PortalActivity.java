@@ -581,11 +581,11 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 
 	@Override
 	public void submitPortalQuery(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds, Long schemaId,
-			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean instrument) {
+			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed ,Boolean instrument) {
 
 		//if (!isTimeSeries) {
 		clientFactory.getRpcService().createRatingQuery(compIds, roundIds, posis, countryIds, teamIds, schemaId,
-				scaleTime, scaleComp, scaleStanding, instrument, new AsyncCallback<IRatingQuery>() {
+				scaleTime, scaleComp, scaleStanding, scaleMinutesPlayed, instrument, new AsyncCallback<IRatingQuery>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

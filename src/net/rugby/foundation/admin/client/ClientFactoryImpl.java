@@ -3,6 +3,7 @@ package net.rugby.foundation.admin.client;
 import java.util.List;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
+import net.rugby.foundation.admin.client.ui.AddRoundPopup;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.CompetitionViewImpl;
@@ -62,6 +63,7 @@ import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.DialogBox;
 
 /**
  * Sample implementation of {@link ClientFactory}.
@@ -93,6 +95,8 @@ public class ClientFactoryImpl implements ClientFactory {
 	private List<ColumnDefinition<IPlayerRating>> playerListViewColumnDefinitions =  null; 
 	private PlayerListView<IPlayerRating> ratingListView = null;
 	private List<ColumnDefinition<IPlayerRating>> ratingListViewColumnDefinitions =  null;
+	
+	private AddRoundPopup addRoundPopup = null;
 	
 	private EditContent editContent = null;
 	
@@ -480,6 +484,15 @@ public class ClientFactoryImpl implements ClientFactory {
 	/*-{
 	    console.log(text);
 	}-*/;
+
+	@Override
+	public AddRoundPopup getAddRoundPopup() {
+		if (addRoundPopup == null) {
+			addRoundPopup = new AddRoundPopup();
+			addRoundPopup.setClientFactory(this);
+		}
+		return addRoundPopup;
+	}
 
 
 

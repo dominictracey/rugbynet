@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -14,6 +15,7 @@ import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
 
@@ -638,6 +640,123 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 					p.setLive(false);
 					if (w.getValue())
 						p.setLive(true);
+					return p;
+				}
+
+			});
+
+			fieldDefinitions.add(new FieldDefinition<ISeriesConfiguration>() {
+				//minMinuteRound
+				private InlineRadio w;
+
+				@Override
+				public void bind (Widget in)
+				{
+					w = (InlineRadio) in;
+				}
+
+				@Override
+				public Widget render(ISeriesConfiguration c) {
+					if (c.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT)) {
+						w.setEnabled(true);
+						if (c.getMinMinuteType() != null && c.getMinMinuteType().equals(MinMinutes.ROUND)) {
+							w.setValue(true);
+						} else {
+							w.setValue(false);
+						}
+					} else {
+						w.setValue(false);
+						w.setEnabled(false);
+					}
+
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					w.setValue(false);
+				}
+
+				@Override
+				public ISeriesConfiguration update(ISeriesConfiguration p) {
+					if (w.getValue()) {
+						p.setMinMinuteType(MinMinutes.ROUND);
+					}
+					
+					return p;
+				}
+
+			});
+			
+			fieldDefinitions.add(new FieldDefinition<ISeriesConfiguration>() {
+				//minMinuteTotal
+				private InlineRadio w;
+
+				@Override
+				public void bind (Widget in)
+				{
+					w = (InlineRadio) in;
+				}
+
+				@Override
+				public Widget render(ISeriesConfiguration c) {
+					if (c.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT)) {
+						w.setEnabled(true);
+						if (c.getMinMinuteType() != null && c.getMinMinuteType().equals(MinMinutes.TOTAL)) {
+							w.setValue(true);
+						} else {
+							w.setValue(false);
+						}
+					} else {
+						w.setValue(false);
+						w.setEnabled(false);
+					}
+
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					w.setValue(false);
+				}
+
+				@Override
+				public ISeriesConfiguration update(ISeriesConfiguration p) {
+					if (w.getValue()) {
+						p.setMinMinuteType(MinMinutes.TOTAL);
+					}
+					
+					return p;
+				}
+
+			});
+
+
+			fieldDefinitions.add(new FieldDefinition<ISeriesConfiguration>() {
+				//roundMinMinutes
+				private TextBox w;
+
+				@Override
+				public void bind (Widget in)
+				{
+					w = (TextBox) in;
+				}
+
+				@Override
+				public Widget render(ISeriesConfiguration c) {
+					w.setValue(String.valueOf(c.getMinMinutes()));
+
+					return w;
+				}
+
+				@Override
+				public void clear() {
+					w.setValue("0");
+				}
+
+				@Override
+				public ISeriesConfiguration update(ISeriesConfiguration p) {
+					p.setMinMinutes(Integer.parseInt(w.getValue()));
 					return p;
 				}
 

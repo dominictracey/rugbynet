@@ -14,8 +14,8 @@ import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.IRatingSeries;
-import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
 
@@ -70,7 +70,8 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	
 	private Boolean live;
 	
-
+	private int minMinutes;
+	private MinMinutes minMinuteType;
 
 	public BaseSeriesConfiguration() {
 		targets = new ArrayList<Long>();
@@ -305,10 +306,28 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	public void setHostComp(ICompetition hostComp) {
 		this.hostComp = hostComp;
 	}
+
+	@Override
+	public int getMinMinutes() {
+		return minMinutes;
+	}
+
+	@Override
+	public void setMinMinutes(int minMinutes) {
+		this.minMinutes = minMinutes;
+	}
+
+	@Override
+	public MinMinutes getMinMinuteType() {
+		return minMinuteType;
+	}
+
+	@Override
+	public void setMinMinuteType(MinMinutes minMinuteType) {
+		this.minMinuteType = minMinuteType;
+	}
+
+
 	
-//	@Override
-//	public void setTargets(List<Long> targets) {
-//		this.targets = targets;
-//	}
 
 }

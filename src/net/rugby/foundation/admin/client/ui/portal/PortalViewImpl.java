@@ -75,6 +75,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@UiField CheckBox scaleTime;
 	@UiField CheckBox scaleComp;
 	@UiField CheckBox scaleStanding;
+	@UiField CheckBox scaleMinutesPlayed;
 	@UiField CheckBox instrument;
 
 	@UiField SimplePanel jobArea;
@@ -312,7 +313,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 		populateVals();
 
-		listener.submitPortalQuery(compIds, roundIds, posis, countryIds, teamIds, schemaId, scaleTime.getValue(), scaleComp.getValue(), scaleStanding.getValue(), instrument.getValue());
+		listener.submitPortalQuery(compIds, roundIds, posis, countryIds, teamIds, schemaId, scaleTime.getValue(), scaleComp.getValue(), scaleStanding.getValue(), scaleMinutesPlayed.getValue(), instrument.getValue());
 	}
 
 
@@ -512,6 +513,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 			scaleTime.setValue(rq.getScaleTime());
 			scaleComp.setValue(rq.getScaleComp());
 			scaleStanding.setValue(rq.getScaleStanding());
+			scaleMinutesPlayed.setValue(rq.getScaleMinutesPlayed());
 
 		} else {
 			Window.alert("The query you are accessing no longer exists or is invalid.");

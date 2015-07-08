@@ -14,6 +14,7 @@ import net.rugby.foundation.model.shared.UniversalRound;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -43,6 +44,11 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 	@UiField ListBox comps;
 	@UiField ListBox hostComp;
 	@UiField ListBox mode;
+	
+	@UiField InlineRadio roundMinMinutes;
+	@UiField InlineRadio totalMinMinutes;
+	@UiField TextBox minMinutes;
+
 	
 	@UiField CheckBox round;
 	@UiField CheckBox inForm;
@@ -97,8 +103,9 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 									fieldDefinitions.getFieldDefinitions().get(i++).bind(bestAllTime); 
 									fieldDefinitions.getFieldDefinitions().get(i++).bind(average); 
 									fieldDefinitions.getFieldDefinitions().get(i++).bind(isLive); 
-
-
+									fieldDefinitions.getFieldDefinitions().get(i++).bind(roundMinMinutes);
+									fieldDefinitions.getFieldDefinitions().get(i++).bind(totalMinMinutes); 
+									fieldDefinitions.getFieldDefinitions().get(i++).bind(minMinutes);
 								}
 							});
 						}
@@ -134,7 +141,15 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 			presenter.onSaveConfigClicked(sConfig);
 		}
 	}
+	
+	@UiHandler("average")
+	void onAverageClicked(ClickEvent event) {	
 
+			roundMinMinutes.setEnabled(average.getValue());
+			totalMinMinutes.setEnabled(average.getValue());
+			minMinutes.setEnabled(average.getValue());
+	}
+	
 	@Override
 	public void setConfig(final T config)
 	{

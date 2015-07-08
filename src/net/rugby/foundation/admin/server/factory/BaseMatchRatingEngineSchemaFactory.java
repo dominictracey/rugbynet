@@ -11,14 +11,22 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.inject.Inject;
+
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
 public abstract class BaseMatchRatingEngineSchemaFactory extends BaseCachingFactory<IRatingEngineSchema> implements IMatchRatingEngineSchemaFactory {
 
 	private String memcacheDefaultKey = "MRES-Default";
+	private IRawScoreFactory rsf;
+	
+	protected BaseMatchRatingEngineSchemaFactory(IRawScoreFactory rsf) {
+		this.rsf = rsf;
+	}
 
 	@Override
 	public IRatingEngineSchema getDefault() {
@@ -102,6 +110,33 @@ public abstract class BaseMatchRatingEngineSchemaFactory extends BaseCachingFact
 		return schema;
 
 	}
+	
+	@Override
+	public boolean delete(IRatingEngineSchema schema) {
+		try {
+
+
+			
+			//also check if it has it's default flag set
+			if (schema.getIsDefault()) {
+				// can't delete default
+				throw new Exception("Can't delete default schema");
+			} else {
+				super.delete(schema);
+				
+				// delete any raw scores created with this schema
+				rsf.delete(schema);
+			}
+
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put" + ex.getMessage(), ex);
+			return false;
+		}
+		return true;
+
+	}
+
 
 	@Override
 	public IRatingEngineSchema setAsDefault(IRatingEngineSchema schema) {

@@ -56,23 +56,23 @@ public class SidebarViewImpl extends Composite
 
 	@UiField
 	protected ListGroup dashboardMenu;
-	
-	boolean ignore = false;
-//	@UiField
-//	protected ListGroup profileMenu;
 
-//	@UiField
-//	protected ListGroupItem sidebarProfile = null;
-	
+	boolean ignore = false;
+	//	@UiField
+	//	protected ListGroup profileMenu;
+
+	//	@UiField
+	//	protected ListGroupItem sidebarProfile = null;
+
 	ListGroupItem caratParent = null;
 
-	
+
 	final HTML carat = new HTML("<div class=\"arrow\"></div><div class=\"arrow_border\"></div>");
 
 	HashMap<Long,Anchor> anchorMap = new HashMap<Long,Anchor>();
 	HashMap<Long,ListGroupItem> liMap = new HashMap<Long,ListGroupItem>();
 	HashMap<Long,ListGroup> submenuMap = new HashMap<Long,ListGroup>();
-	
+
 	interface NavBarViewImplUiBinder extends UiBinder<Widget, SidebarViewImpl>
 	{
 	}
@@ -86,20 +86,20 @@ public class SidebarViewImpl extends Composite
 		RootPanel.get("sidebar-nav").add(this);
 		dashboardMenu.removeStyleName("list-group");
 		dashboardMenu.setId("dashboard-menu");
-//		profileMenu.removeStyleName("list-group");
-//		profileMenu.setId("profile-menu");
-//		profileMenu.setStyleName("show-xs");  
-//		profileMenu.addStyleName("hidden-*");
+		//		profileMenu.removeStyleName("list-group");
+		//		profileMenu.setId("profile-menu");
+		//		profileMenu.setStyleName("show-xs");  
+		//		profileMenu.addStyleName("hidden-*");
 		carat.setStyleName("pointer");
 	}
 
-//	public void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway) {
-//		ListIterator<Long> it = compsUnderway.listIterator(compsUnderway.size());
-//		if (it != null) {
-//
-//		}
-//
-//	}
+	//	public void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway) {
+	//		ListIterator<Long> it = compsUnderway.listIterator(compsUnderway.size());
+	//		if (it != null) {
+	//
+	//		}
+	//
+	//	}
 
 	public void setClientFactory(ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
@@ -114,7 +114,7 @@ public class SidebarViewImpl extends Composite
 
 		// this calls a function in /theme/theme.js
 		hookupTheme();
-		
+
 	}
 
 	protected void addCompMenu(final Long compId, String compName, final HashMap<RatingMode, Long>  modeMap) {
@@ -128,106 +128,106 @@ public class SidebarViewImpl extends Composite
 		li.add(a);
 		dashboardMenu.add(li);
 		li.removeStyleName("list-group-item");
-		
-//		if (modeMap.isEmpty()) {
-//			a.addClickHandler(new ClickHandler() {
-//
-//				@Override
-//				public void onClick(ClickEvent event) {
-//					// TODO Auto-generated method stub
-//
-//				}
-//
-//			});
-//		} else {
-			// first create submenu
-			ListGroup submenu = new ListGroup();
-			submenuMap.put(compId, submenu);
-			submenu.setStyleName("submenu");
-			
-			// add home link
-			ListGroupItem lgi = new ListGroupItem();
-			lgi.removeStyleName("list-group-item");
-			Anchor homeLink = new Anchor();
-			homeLink.setText("Home");
 
-			homeLink.addClickHandler(new ClickHandler() {
+		//		if (modeMap.isEmpty()) {
+		//			a.addClickHandler(new ClickHandler() {
+		//
+		//				@Override
+		//				public void onClick(ClickEvent event) {
+		//					// TODO Auto-generated method stub
+		//
+		//				}
+		//
+		//			});
+		//		} else {
+		// first create submenu
+		ListGroup submenu = new ListGroup();
+		submenuMap.put(compId, submenu);
+		submenu.setStyleName("submenu");
+
+		// add home link
+		ListGroupItem lgi = new ListGroupItem();
+		lgi.removeStyleName("list-group-item");
+		Anchor homeLink = new Anchor();
+		homeLink.setText("Home");
+
+		homeLink.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+
+				// allow other elements to display this comp
+				if (Core.getCore().getCurrentCompId() != compId) {
+					ignore = true;
+					Core.getCore().setCurrentCompId(compId);
+				}
+
+				FeatureListPlace place = new FeatureListPlace();
+				place.setCompId(compId);
+
+				// remove the carat if it is somewhere else
+				if (caratParent != null && carat != null && !caratParent.equals(li)) {
+					caratParent.remove(carat);
+					caratParent.removeStyleName("active");
+					caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
+				}
+
+				// add the carat
+				li.add(carat);
+				caratParent = li;
+
+				clientFactory.getPlaceController().goTo(place);
+			}
+
+		});
+		lgi.add(homeLink);
+		submenu.add(lgi);
+
+		for (RatingMode mode: modeMap.keySet()) {
+			lgi = new ListGroupItem();
+			lgi.removeStyleName("list-group-item");
+			Anchor modeLink = new Anchor();
+			modeLink.setText(mode.getMenuName());
+			final RatingMode _mode = mode;
+			modeLink.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
-									
+
 					// allow other elements to display this comp
-					if (Core.getCore().getCurrentCompId() != compId) {
+					if (!Core.getCore().getCurrentCompId().equals(compId)) {
 						ignore = true;
 						Core.getCore().setCurrentCompId(compId);
 					}
-					
-					FeatureListPlace place = new FeatureListPlace();
+
+					SeriesPlace place = new SeriesPlace();
 					place.setCompId(compId);
-					
+					place.setSeriesId(modeMap.get(_mode));
+
 					// remove the carat if it is somewhere else
 					if (caratParent != null && carat != null && !caratParent.equals(li)) {
 						caratParent.remove(carat);
 						caratParent.removeStyleName("active");
 						caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
+						//							li.setStyleName("active");
+						//							li.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "block");
 					}
-					
+
 					// add the carat
 					li.add(carat);
 					caratParent = li;
-					
+
 					clientFactory.getPlaceController().goTo(place);
 				}
-				
+
 			});
-			lgi.add(homeLink);
+			lgi.add(modeLink);
 			submenu.add(lgi);
-			
-			for (RatingMode mode: modeMap.keySet()) {
-				lgi = new ListGroupItem();
-				lgi.removeStyleName("list-group-item");
-				Anchor modeLink = new Anchor();
-				modeLink.setText(mode.getMenuName());
-				final RatingMode _mode = mode;
-				modeLink.addClickHandler(new ClickHandler() {
+		}
+		li.add(submenu);
+		a.setStyleName("dropdown-toggle");
 
-					@Override
-					public void onClick(ClickEvent event) {
-						
-						// allow other elements to display this comp
-						if (!Core.getCore().getCurrentCompId().equals(compId)) {
-							ignore = true;
-							Core.getCore().setCurrentCompId(compId);
-						}
-						
-						SeriesPlace place = new SeriesPlace();
-						place.setCompId(compId);
-						place.setSeriesId(modeMap.get(_mode));
-						
-						// remove the carat if it is somewhere else
-						if (caratParent != null && carat != null && !caratParent.equals(li)) {
-							caratParent.remove(carat);
-							caratParent.removeStyleName("active");
-							caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
-//							li.setStyleName("active");
-//							li.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "block");
-						}
-						
-						// add the carat
-						li.add(carat);
-						caratParent = li;
-						
-						clientFactory.getPlaceController().goTo(place);
-					}
-					
-				});
-				lgi.add(modeLink);
-				submenu.add(lgi);
-			}
-			li.add(submenu);
-			a.setStyleName("dropdown-toggle");
-
-//		}
+		//		}
 
 	}
 
@@ -236,31 +236,34 @@ public class SidebarViewImpl extends Composite
 	}-*/;
 
 	public void setComp(ICompetition comp) {
-		
+
 		if (!ignore) {
-		ListGroupItem li = liMap.get(comp.getId());
-		// apply active class to li
-		li.setStyleName("active");
-		
-		ListGroup subMenu = submenuMap.get(comp.getId());
-		// open the submenu
-		subMenu.getElement().getStyle().setProperty("display", "block");
-		
-		
-		// remove the carat if it is somewhere else
-		if (caratParent != null && carat != null) {
-			caratParent.remove(carat);
-			caratParent.removeStyleName("active");
-			caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
-		}
-		
-		// add the carat
-		li.add(carat);
-		caratParent = li;
-		} else {
-			ignore = false;
-		}
-		
+			ListGroupItem li = liMap.get(comp.getId());
+
+			//if (li != null) {
+				// apply active class to li
+				li.setStyleName("active");
+
+				ListGroup subMenu = submenuMap.get(comp.getId());
+				// open the submenu
+				subMenu.getElement().getStyle().setProperty("display", "block");
+
+
+				// remove the carat if it is somewhere else
+				if (caratParent != null && carat != null) {
+					caratParent.remove(carat);
+					caratParent.removeStyleName("active");
+					caratParent.getElement().getElementsByTagName("ul").getItem(0).getStyle().setProperty("display", "none");
+				}
+
+				// add the carat
+				li.add(carat);
+				caratParent = li;
+			} else {
+				ignore = false;
+			}
+		//}
+
 	}
 
 	public ListGroupItem getSidebarProfile() {

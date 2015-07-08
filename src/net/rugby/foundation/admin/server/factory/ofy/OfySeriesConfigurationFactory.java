@@ -78,7 +78,12 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 					rs.getCountryIds().clear();
 					rs.getCountryIds().addAll(sc.getCountryIds());
 				}
+				if (rs.getActiveCriteria() != null) {
+					rs.getActiveCriteria().clear();
+					rs.getActiveCriteria().addAll(sc.getActiveCriteria());
+				}
 				ofy.put(rs);
+				sc.setSeries(rs);
 				sf.dropFromCache(rs.getId());
 			}
 

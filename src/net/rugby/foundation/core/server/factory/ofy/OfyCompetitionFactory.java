@@ -27,6 +27,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.UniversalRound;
 
@@ -404,6 +405,57 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
+		}
+	}
+
+	@Override
+	public Boolean addRound(Long compId, int uri, String name) {
+		try {
+			ICompetition c = get(compId);
+			UniversalRound ur = urf.get(uri);
+
+			if (c != null) {
+				// do we already have this round? if not, find the insertion point
+				int insert = 0;
+				for (IRound r : c.getRounds()) {
+					if (r.getUrOrdinal() == uri) {
+						return false;
+					} else if (r.getUrOrdinal() > uri) {
+						break;
+					} else {
+						insert++;
+					}
+				}
+
+				IRound r = rf.create();
+				r.setAbbr(ur.shortDesc);
+				if (!name.isEmpty()) {
+					r.setName(name);
+				} else {
+					r.setName(ur.longDesc);
+				}
+				r.setBegin(ur.start);
+				//r.setEnd(ur.)
+				r.setCompId(compId);
+				r.setOrdinal(insert);
+				r.setUrOrdinal(uri);
+				r.setWorkflowStatus(WorkflowStatus.PENDING);
+				rf.put(r);
+
+				c.getRounds().add(insert, r);
+				c.getRoundIds().add(insert,r.getId());
+
+				put(c);
+
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Adding round " + name + " to comp " + c.getLongName());
+
+				return true;
+			} 
+
+			return false;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return false;
 		}
 	}
 

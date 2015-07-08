@@ -42,7 +42,6 @@ import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
-import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
@@ -56,6 +55,7 @@ import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
+import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -81,12 +81,12 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingGroup;
-import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
@@ -100,7 +100,6 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.UniversalRound;
-import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -159,6 +158,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IRatingSeriesFactory rsf;
 	private IRatingGroupFactory rgf;
 	private IRatingMatrixFactory rmf;
+	private IRawScoreFactory rwsf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -177,7 +177,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IConfigurationFactory ccf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerFactory pf,
 			ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf, ICountryFactory countryf,
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff,  
-			IAdminTaskFactory atf, IMatchResultFactory mrf, 
+			IAdminTaskFactory atf, IMatchResultFactory mrf, IRawScoreFactory rwsf,
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
 			IContentFactory ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
 			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
@@ -202,6 +202,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.srff = srff;
 			this.atf = atf;
 			this.mrf = mrf;
+			this.rwsf = rwsf;
 			this.pmsff = pmsff;
 			this.mresf = mresf;
 			this.ttlf = ttlf;
@@ -1339,7 +1340,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	@Override
 	public IRatingQuery createRatingQuery(List<Long> compIds,
 			List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds, Long schemaId,
-			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean instrument) {
+			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed, Boolean instrument) {
 		try {
 			if (checkAdmin()) {
 
@@ -1353,6 +1354,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				rq.setScaleTime(scaleTime);
 				rq.setScaleComp(scaleComp);
 				rq.setScaleStanding(scaleStanding);
+				rq.setScaleMinutesPlayed(scaleMinutesPlayed);
+				if (scaleMinutesPlayed) {
+					if (rq.getCompIds().size() > 1) {
+						rq.setMinMinutesType(MinMinutes.TOTAL);
+						rq.setMinMinutes(350);
+					} else {
+						rq.setMinMinutesType(MinMinutes.ROUND);
+						rq.setMinMinutes(30);					
+					}
+				}
 				rq.setInstrument(instrument);
 				rq.setSchemaId(schemaId);
 
@@ -1598,6 +1609,20 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;
 		}
 	}
+	
+	@Override
+	public boolean deleteRawScoresForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema) {
+		try {
+			if (checkAdmin()) {
+				rwsf.delete(schema);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return false;
+		}	}
 
 	@Override
 	public ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(ScrumMatchRatingEngineSchema20130713 schema) {
@@ -2190,9 +2215,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			if (checkAdmin()) {
 				// valid configs are:
 				//	1) Mode == BY_MATCH and Criteria == ROUND
-				//	2) Mode == BY_POSITION and Criteria == IN_FORM
+				//	2) Mode == BY_POSITION and (Criteria == IN_FORM || Criteria == IMPACT)
 				//	3) Mode == BY_COMP and Criteria == ROUND
-				if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT) || sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME)) {
+				if (sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME)) {
 					throwUnsupportedSeriesConfigException();
 				}
 
@@ -2217,6 +2242,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 						throwUnsupportedSeriesConfigException();
 					}
 				}
+				
+				if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT))  {
+					if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
+						throwUnsupportedSeriesConfigException();
+					}
+				}
+				
+				
 
 				return scf.put(sConfig);
 			} else {
@@ -2231,7 +2264,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private void throwUnsupportedSeriesConfigException() throws Exception {
 		throw new Exception("Invalid Mode/Criteria combo. Valid values are: \n" +
 				"1) Mode == BY_MATCH and Criteria == ROUND \n" +
-				"2) Mode == BY_POSITION and Criteria == IN_FORM \n" + 
+				"2) Mode == BY_POSITION and (Criteria == IN_FORM and/or Criteria == IMPACT)\n" + 
 				"3) Mode == BY_COMP and Criteria == ROUND");
 
 	}
@@ -2352,6 +2385,24 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 
 	}
+
+	@Override
+	public Boolean addRound(Long compId, int uri, String name) {
+		try {
+			if (checkAdmin()) {
+				return cf.addRound(compId, uri, name);
+			} 
+			
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+
+
+	}
+
+
 
 
 

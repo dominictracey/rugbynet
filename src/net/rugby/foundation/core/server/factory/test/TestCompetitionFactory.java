@@ -386,5 +386,11 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 		return list;
 	}
 
+	@Override
+	public Boolean addRound(Long compId, int uri, String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

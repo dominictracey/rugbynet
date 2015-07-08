@@ -131,7 +131,7 @@ public class RatingSeriesTester {
 		assertTrue(rs.getCompIds().contains(1L));
 //		assertTrue(rs.getComps().contains(cf.get(1L)));
 
-		rsm.addRatingGroup(rs, urf.get(DateTime.now()));
+		rsm.doRatingGroup(rs, urf.get(DateTime.now()));
 		
 		assertTrue(rs.getRatingGroupIds().size() == 1);
 		assertTrue(rs.getRatingGroups().size() == 1);

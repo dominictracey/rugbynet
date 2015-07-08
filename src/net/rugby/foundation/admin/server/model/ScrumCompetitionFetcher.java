@@ -57,6 +57,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams) {
 		ICompetition comp = new Competition();
 		comp.setForeignURL(homePage);
+		comp.setWeightingFactor(1f);
 		if (homePage.split("[/|.]").length > 7) {
 			int i = 0;
 			boolean found = false;
@@ -159,7 +160,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	@Override
 	public Map<String, ITeamGroup> getTeams() {
 		//first get the teams
-		String tableURL = homePage + "?template=pointstable";
+		String tableURL = homePage + "?noredir=1;template=pointstable";
 		try {
 			IUrlCacher urlCache = new UrlCacher(tableURL);
 			List<String> lines = urlCache.get();
@@ -339,7 +340,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 			IResultFetcher pastMatchFetcher = srff.getResultFetcher(null, null, ResultType.MATCHES);  //don't need any of the parameters
 			matchMap = pastMatchFetcher.getMatches(baseUrl, teams);
 
-			String tableURL = baseUrl + "?template=fixtures";
+			String tableURL = baseUrl + "?noredir=1;template=fixtures";
 			String month = "";
 			String year = "";
 			String day = "";

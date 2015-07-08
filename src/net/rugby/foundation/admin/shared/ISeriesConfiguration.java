@@ -7,6 +7,7 @@ import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IHasId;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
@@ -25,6 +26,8 @@ public interface ISeriesConfiguration  extends IHasId {
 						PENDING,
 						RUNNING,
 						ERROR }
+	
+
 	Long getId();
 	void setId(Long id);
 	List<Long> getTargets();
@@ -104,4 +107,8 @@ public interface ISeriesConfiguration  extends IHasId {
 	ICompetition getHostComp();
 	void setHostCompId(Long hostCompId);
 	void setHostComp(ICompetition hostComp);
+	void setMinMinutes(int val);
+	int getMinMinutes();
+	void setMinMinuteType(MinMinutes isAs);
+	MinMinutes getMinMinuteType();
 }

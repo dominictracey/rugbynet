@@ -35,6 +35,7 @@ public class EditComp extends Composite {
 		void repairComp(ICompetition comp);
 		void deleteComp(ICompetition comp);
 		void setCompAsDefault(ICompetition comp);
+		void addRound(ICompetition comp);
 	} 
 	
 	public EditComp() {
@@ -69,6 +70,8 @@ public class EditComp extends Composite {
 	ListBox compType;
 	@UiField
 	Button setAsDefault;
+	@UiField
+	Button addRound;
 	
 	ICompetition comp = null;
 	private Presenter listener;
@@ -108,6 +111,10 @@ public class EditComp extends Composite {
 		listener.deleteComp(comp);
 	}
 
+	@UiHandler("addRound")
+	void onClickAddRound(ClickEvent e) {
+		listener.addRound(comp);
+	}
 	
 	@UiHandler("setAsDefault")
 	void onClickSetAsDefault(ClickEvent e) {

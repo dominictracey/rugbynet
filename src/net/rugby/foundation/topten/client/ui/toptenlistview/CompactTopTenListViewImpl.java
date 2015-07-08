@@ -1,7 +1,9 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
 import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
@@ -42,7 +44,8 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	CellTable<ITopTenItem> items;
 
 	@UiField HTML generated;
-
+	@UiField HTML algorithm;
+	
 	private ITopTenList list;
 	private int itemCount;
 
@@ -303,18 +306,33 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 		list = result;
 		//setVisible(false);
 		if (result != null) {
-			String guid = "";
-			if (result.getSeries() == null || result.getSeries() == false) {
-				guid = result.getFeatureGuid();
-			} else {
-				guid = result.getGuid();
-			}
+//			String guid = "";
+//			if (result.getSeries() == null || result.getSeries() == false) {
+//				guid = result.getFeatureGuid();
+//			} else {
+//				guid = result.getGuid();
+//			}
 
 			recordAnalyticsHit(Window.Location.getPath(), result.getTitle());
 
 			items.setRowData(result.getList());
 			generated.setHTML("<i>generated: " + result.getCreated().toGMTString() + "</i>");
-
+			String algo = "";
+			if (result.getSeries() != null && result.getSeries() == true) {
+				algo = "This list was created using the <u>" + clientFactory.getSeriesView().getMatrix().getCriteria().getMenuName() + "</u> algorithm.<br/>";
+				if (clientFactory.getSeriesView().getMatrix().getCriteria() == Criteria.AVERAGE_IMPACT) {
+					
+					if (clientFactory.getSeriesView().getQuery().getMinMinutesType() == MinMinutes.ROUND) {
+						algo += "* Includes only players who have averaged at least " + clientFactory.getSeriesView().getQuery().getMinMinutes() + " minutes per round.<br/>";
+					} else if (clientFactory.getSeriesView().getQuery().getMinMinutesType() == MinMinutes.TOTAL) {
+						algo += "* Includes only players with at least " + clientFactory.getSeriesView().getQuery().getMinMinutes() + " minutes played in the last twelve months.<br/>";
+					} 
+						
+				}
+			} 
+			algo += " To learn about how these lists are crafted, click <a href=\"#Content:contentId=5171798064758784\">here.";
+			algorithm.setHTML(algo);
+			
 			Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
 				@Override
 				public void execute() {

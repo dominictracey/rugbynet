@@ -65,8 +65,7 @@
 <link rel="icon" type="image/png" href="/icons/favicon-16x16.png"
 	sizes="16x16">
 <meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-TileImage"
-	content="/icons/mstile-144x144.png">
+<meta name="msapplication-TileImage" content="/icons/mstile-144x144.png">
 
 <!-- Google Analytics -->
 
@@ -136,20 +135,42 @@
       <script src="/theme//theme/js/html5.js"></script>
     <![endif]-->
 
+<!-- SCHEMA.ORG -->
+<script type="application/ld+json">
+{ "@context" : "http://schema.org",
+  "@type" : "Organization",
+  "name" : "The Rugby Net",
+  "url" : "http://www.rugby.net",
+      "logo": "http://www.rugby.net/icons/favicon-196x196.png",
+  "sameAs" : [ "http://www.facebook.com/TheRugbyNet",
+    "http://www.twitter.com/TheRugbyNet"] 
+}
+    <script type="application/ld+json">
+    {  "@context" : "http://schema.org",
+       "@type" : "WebSite",
+       "name" : "The Rugby Net",
+       "url" : "http://www.rugby.net"
+    }
+    </script>
+</script>
 </head>
 <body>
 
 	<!-- FACEBOOK JS -->
 	<div id="fb-root"></div>
-	<script>(function(d, s, id) {
-	  var js, fjs = d.getElementsByTagName(s)[0];
-	  if (d.getElementById(id)) return;
-	  js = d.createElement(s); js.id = id;
-	  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=499268570161982&version=v2.0";
-	  fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));</script>
+	<script>
+		(function(d, s, id) {
+					var js, fjs = d.getElementsByTagName(s)[0];
+					if (d.getElementById(id))
+						return;
+					js = d.createElement(s);
+					js.id = id;
+					js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=499268570161982&version=v2.0";
+					fjs.parentNode.insertBefore(js, fjs);
+				}(document, 'script', 'facebook-jssdk'));
+	</script>
 	<!-- FACEBOOK JS -->
-	
+
 	<!-- navbar -->
 	<header class="navbar navbar-inverse navbar-fixed-top" role="banner"
 		id="header">
@@ -195,7 +216,9 @@
 			<!-- RESULTS -->
 			<div class="col-md-8">
 				<div class="panel panel-default">
-					<div class="panel-heading" id="resultHeader"><strong>Results</strong></div>
+					<div class="panel-heading" id="resultHeader">
+						<strong>Results</strong>
+					</div>
 					<div class="panel-body">
 						<div id="resultPanel"></div>
 					</div>
@@ -209,18 +232,17 @@
 						<strong>The Rugby Net</strong>
 					</div>
 					<div class="panel-body">
-						<div class= "col-md-8 tagline">Follow us for Player Ratings from Match Statistics</div>
+						<div class="col-md-8 tagline">Follow us for Player Ratings
+							from Match Statistics</div>
 						<div class="addthis_horizontal_follow_toolbox col-md-4"></div>
 					</div>
-					
+
 				</div>
 			</div>
 
 			<!-- TOPTEN -->
 			<!-- 			<div class="col-md-8 col-sm-12" id="toptenRoot" > -->
-			<div class="col-md-8 col-sm-12" id="app">
-
-			</div>
+			<div class="col-md-8 col-sm-12" id="app"></div>
 			<!-- END TOPTEN -->
 
 			<!-- HISTORY -->
@@ -257,13 +279,14 @@
 			<div class="clearfix"></div>
 
 
-			
+
 
 			<div class="clearfix"></div>
-			
+
 			<!-- FB COMMENTS -->
-			<div class="col-md-8 col-xs-12">			
-				<div id="fbComments" class="fb-comments" data-width="100%" data-numposts="5" data-colorscheme="light"></div>
+			<div class="col-md-8 col-xs-12">
+				<div id="fbComments" class="fb-comments" data-width="100%"
+					data-numposts="5" data-colorscheme="light"></div>
 			</div>
 			<!-- FB COMMENTS -->
 
@@ -273,10 +296,12 @@
 				<div class="text-center clearfix">
 					<p>
 						<small>&copy The Rugby Net 2014, Smart and Tough </small> <br />
-						<br /> <a href="http://twitter.com/TheRugbyNet" class="btn btn-xs btn-circle btn-twitter"><i
-							class="fa fa-twitter"></i></a> <a href="http://facebook.com/TheRugbyNet"
+						<br /> <a href="http://twitter.com/TheRugbyNet"
+							class="btn btn-xs btn-circle btn-twitter"><i
+							class="fa fa-twitter"></i></a> <a
+							href="http://facebook.com/TheRugbyNet"
 							class="btn btn-xs btn-circle btn-facebook"><i
-							class="fa fa-facebook"></i></a> 
+							class="fa fa-facebook"></i></a>
 					</p>
 				</div>
 			</footer>
@@ -298,7 +323,7 @@
 	<script src="/theme/js/notify/jquery.notify.js"></script>
 	<script src="/theme/js/jquery.slimscroll.js"></script>
 	<script src="/theme/js/LazyLoad/LazyLoad.min.js"></script>
-	
+
 	<!-- split -->
 
 </body>

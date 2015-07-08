@@ -12,6 +12,7 @@ import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.admin.server.factory.BaseMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
+import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
@@ -21,7 +22,8 @@ public class OfyMatchRatingEngineSchemaFactory extends BaseMatchRatingEngineSche
 	private Objectify ofy;
 
 	@Inject
-	public OfyMatchRatingEngineSchemaFactory() {
+	public OfyMatchRatingEngineSchemaFactory(IRawScoreFactory rsf)  {
+		super(rsf);
 		this.ofy = DataStoreFactory.getOfy();
 	}
 

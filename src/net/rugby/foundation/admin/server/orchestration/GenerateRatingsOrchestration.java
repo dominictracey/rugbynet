@@ -98,7 +98,7 @@ public class GenerateRatingsOrchestration extends OrchestrationCore<IRatingQuery
 			IQueryRatingEngine mre = qref.get(mres, target);
 			assert (mre != null);
 			mre.setQuery(target);
-			mre.generate(mres,target.getScaleStanding(),target.getScaleComp(),target.getScaleTime(),true);
+			mre.generate(mres,target.getScaleStanding(),target.getScaleComp(),target.getScaleTime(),target.getScaleMinutesPlayed(),true);
 			
 //			// now re-create the TTL if needed
 //			if (rerun) {

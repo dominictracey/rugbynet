@@ -164,6 +164,10 @@
 	background-image: url("http://s1.2mdn.net/viewad/3493872/Red-PlayerB10G20-216x36.gif");
 }
 
+.sponsor-logo-GRR {
+	background-image: url("/resources/sponsors/GRR/200R.png");
+}
+
 .movement {
 		background-position: center center;
     	min-width: 39px;   	
@@ -266,6 +270,10 @@
 		margin-left: 100px;
 	}
 	
+	.table > tbody > tr > td {
+		padding: 8px;
+	}
+	
 }
 
 @media(min-width: 992px) and (max-width: 1199px) {
@@ -292,7 +300,13 @@
 		font-size: 1em;
 	}
 	
-
+	.rugbyNetAddThis {
+		margin-left: 10px;
+	}
+	
+	.table > tbody > tr > td {
+		padding: 4px;
+	}
 	
 }
 
@@ -306,6 +320,14 @@
 	.sponsor-buttons {
 
 	}
+	
+	.rugbyNetAddThis {
+		margin-left: 5px;
+	}
+	
+	.table > tbody > tr > td {
+		padding: 2px;
+	}
 }
 
 @media(max-width:480px) { 
@@ -316,6 +338,14 @@
 	
 	.sponsor-buttons {
 
+	}
+	
+	.rugbyNetAddThis {
+		margin-left: 2px;
+	}
+		
+	.table > tbody > tr > td {
+		padding: 0px;
 	}
 }
 

@@ -27,6 +27,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 	private FeatureListView<ITopTenList> view;
 	protected ICoreConfiguration _coreConfig;
 	protected int detailCount=0;
+	private boolean editing = false;
 	public FeatureListActivity(FeatureListPlace place, ClientFactory clientFactory) {
 
 		this.clientFactory = clientFactory;
@@ -309,6 +310,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 		clientFactory.getEditTTLInfo().setPresenter(this);
 		clientFactory.getFeatureListView().expandView(true);
 		clientFactory.getFeatureListView().editList(list);
+		editing = true;
 		//		loadWYSIWYGEditor("BODY:" );
 		//		
 		//		Timer t = new Timer()  {
@@ -385,6 +387,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 			public void onSuccess(ITopTenList result) {
 				clientFactory.getFeatureListView().expandView(false);
 				view.setList(result, "");
+				editing = false;
 			}
 		});		
 	}
@@ -395,6 +398,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 	public void cancelEditTTLInfo(ITopTenList ttl) {
 		clientFactory.getFeatureListView().expandView(false);
 		view.setList(view.getList(), _coreConfig.getBaseToptenUrl());
+		editing = false;
 	}
 
 
@@ -409,6 +413,13 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 		$wnd.history.replaceState(token, title, newUrl);
 	}-*/;
 
-
+	@Override
+	public String mayStop() {
+		if (editing) {
+			return "Do you really want to leave this page? (you may have unsaved content!)";
+		} else {
+			return null;		
+		}
+	}
 
 }
