@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
+import net.rugby.foundation.admin.client.ui.AddMatchPopup.AddMatchPopupPresenter;
 import net.rugby.foundation.admin.client.ui.AddRoundPopup.AddRoundPopupPresenter;
 import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
@@ -33,6 +34,7 @@ import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.Round;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
@@ -56,7 +58,7 @@ CompetitionView.Presenter, EditTeam.Presenter, EditComp.Presenter,
 EditMatch.Presenter, PlayerListView.Listener<IPlayerRating>, PlayerPopupView.Presenter<IPlayer>,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, 
 SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>, 
-RoundPresenter, AddRoundPopupPresenter {
+RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -1415,26 +1417,10 @@ RoundPresenter, AddRoundPopupPresenter {
 
 	@Override
 	public void addMatch(IRound round) {
-		clientFactory.getRpcService().AddMatchToRound(round, new AsyncCallback<IMatchGroup>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
-
-			}
-
-			@Override
-			public void onSuccess(IMatchGroup result) {
-				if (result != null)
-				{
-					Window.alert("Match	Added");	
-					em.ShowMatch(result);
-				} else {
-					Window.alert("Match not added. See server log for details");
-				}
-			}
-
-		});		}
+		clientFactory.getAddMatchPopup().setPresenter(this);
+		clientFactory.getAddMatchPopup().setRound((Round)round);
+		clientFactory.getAddMatchPopup().center();
+	}
 
 
 
@@ -1521,6 +1507,41 @@ RoundPresenter, AddRoundPopupPresenter {
 	@Override
 	public void cancelAddRound() {
 		clientFactory.getAddRoundPopup().hide();
+		
+	}
+
+
+
+	@Override
+	public void addMatch(Round round, Long homeTeamId, Long visitingTeamId) {
+		clientFactory.getRpcService().AddMatchToRound(round, homeTeamId, visitingTeamId, new AsyncCallback<IMatchGroup>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles adding match: " + caught.getLocalizedMessage());
+
+			}
+
+			@Override
+			public void onSuccess(IMatchGroup result) {
+				if (result != null)
+				{
+					Window.alert("Match	Added");	
+//					em.ShowMatch(result);
+					clientFactory.getAddMatchPopup().hide();
+				} else {
+					Window.alert("Match not added. See server log for details");
+				}
+			}
+
+		});
+	}
+
+
+
+	@Override
+	public void cancelAddMatch() {
+		clientFactory.getAddMatchPopup().hide();
 		
 	}
 

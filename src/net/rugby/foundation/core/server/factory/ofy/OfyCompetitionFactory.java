@@ -97,13 +97,15 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 				c.setNextRoundIndex(-1);
 				for (Long rid : c.getRoundIds()) {
 					IRound r = rf.get(rid);
-					c.getRounds().add(r);
-					if (r.getUrOrdinal() > now.ordinal && c.getPrevRoundIndex() == -1) {
-						c.setPrevRoundIndex(count-1);
-					} else if (r.getUrOrdinal() > now.ordinal + 1 && c.getNextRoundIndex() == -1) {
-						c.setNextRoundIndex(count);
-					}			
-					count++;
+					if (r != null) {
+						c.getRounds().add(r);
+						if (r.getUrOrdinal() > now.ordinal && c.getPrevRoundIndex() == -1) {
+							c.setPrevRoundIndex(count-1);
+						} else if (r.getUrOrdinal() > now.ordinal + 1 && c.getNextRoundIndex() == -1) {
+							c.setNextRoundIndex(count);
+						}			
+						count++;
+					}
 				}
 
 
@@ -312,7 +314,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 				}
 
 				// the competition clubhouse
-				if (ok) {
+				if (ok && ccid != null) {
 					ok = chf.delete(ccid);
 				}
 
@@ -435,7 +437,12 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 					r.setName(ur.longDesc);
 				}
 				r.setBegin(ur.start);
-				//r.setEnd(ur.)
+				DateTime end = new DateTime(ur.start);
+				end.plusDays(2);
+				end.plusHours(23);
+				end.plusMinutes(59);
+				end.plusSeconds(59);
+				r.setEnd(end.toDate());
 				r.setCompId(compId);
 				r.setOrdinal(insert);
 				r.setUrOrdinal(uri);

@@ -134,7 +134,7 @@ public interface RugbyAdminService extends RemoteService {
 	Boolean deleteRatingQuery(IRatingQuery query);
 	IRatingQuery rerunRatingQuery(Long id);
 	String checkPipelineStatus(String id, Long matchId);
-	IMatchGroup AddMatchToRound(IRound round);
+	IMatchGroup AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId);
 	String cleanUp();
 	
 	// rating series

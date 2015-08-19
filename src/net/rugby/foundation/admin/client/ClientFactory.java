@@ -2,6 +2,7 @@ package net.rugby.foundation.admin.client;
 
 import java.util.List;
 
+import net.rugby.foundation.admin.client.ui.AddMatchPopup;
 import net.rugby.foundation.admin.client.ui.AddRoundPopup;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditContent;
@@ -104,4 +105,6 @@ public interface ClientFactory extends EditContentPresenter {
 	void console(String text);
 
 	AddRoundPopup getAddRoundPopup();
+	
+	AddMatchPopup getAddMatchPopup();
 }

@@ -200,98 +200,100 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 			@Override
 			public void onSelection(SelectionEvent<TreeItem> event) {
-				if (event.getSelectedItem().equals(teams)) {
-					//listener.teamsClicked();
-				} else if (event.getSelectedItem().equals(rounds)) {
-					//listener.roundsClicked();					
-				} else if (event.getSelectedItem().getParentItem().equals(rounds)) {
-					//listener.roundClicked(event.getSelectedItem().getText());
-				} else {
-					//see how far down we are
-					int depth = 0;
-					TreeItem cursor = event.getSelectedItem();
-					while (!cursor.equals(base)) {
-						depth++;
-						cursor = cursor.getParentItem();
+				if (event != null && event.getSelectedItem() != null) {
+					if (event.getSelectedItem().equals(teams)) {
+						//listener.teamsClicked();
+					} else if (event.getSelectedItem().equals(rounds)) {
+						//listener.roundsClicked();					
+					} else if (event.getSelectedItem().getParentItem().equals(rounds)) {
+						//listener.roundClicked(event.getSelectedItem().getText());
+					} else {
+						//see how far down we are
+						int depth = 0;
+						TreeItem cursor = event.getSelectedItem();
+						while (!cursor.equals(base)) {
+							depth++;
+							cursor = cursor.getParentItem();
+						}
+						if (depth == 1) {  //comp clicked
+							if (event.getSelectedItem().getText().equals("Competition")) {
+								// they clicked on the importer "Competition" - should say "Import" or something
+							}	else {
+								editArea.clear();
+								if (editComp == null) {
+									editComp = new EditComp();								
+								}
+
+								editArea.add(editComp);
+								editComp.setVisible(true);
+								listener.compClicked(editComp, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
+							}							
+						} else if (depth == 2) {  //teams or rounds clicked
+							//						if (event.getSelectedItem().getText().equals("teams")) {
+							//							listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+							//						}	else {
+							//							//listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+							//						}							
+						} else if (depth == 3) { // specific team or round clicked
+							if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
+								editArea.clear();
+								if (editTeam == null) {
+									editTeam = new EditTeam();
+								}
+								editArea.add(editTeam);
+								editTeam.setVisible(true);
+
+								Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]);
+								Long teamId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
+								listener.editTeamInit(editTeam, teamId, compId );
+							} else { // round, so show matches
+								// params are compId and roundId
+								editArea.clear();
+								if (editRound == null) {
+									editRound = new EditRound();
+								}
+								editArea.add(editRound);
+								editRound.setVisible(true);
+
+								listener.roundClicked(editRound, Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),
+										Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
+							}
+						} else if (depth == 4) { // match clicked
+							editArea.clear();
+
+							if (editMatch == null) {
+								editMatch = new EditMatch();
+							}
+							editArea.add(editMatch);
+							editMatch.setVisible(true);
+
+							if (editMatchStats == null) {
+								editMatchStats = new PlayerListViewImpl<IPlayerRating>();
+								if (playerListViewColumnDefinitions == null) {
+									PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerRating>();
+									playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
+								}
+
+								editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
+								editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
+
+								//							editMatchStats = clientFactory.getPlayerListView();
+
+								jobArea.add(editMatchStats);
+								editMatchStats.asWidget().setVisible(true);
+
+							}
+
+							editMatchStats.showWait();
+
+							// find roundId and compId
+							Long roundId = Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]);
+							Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]);
+							Long matchId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
+							listener.editMatchInit(editMatch, editMatchStats, matchId, roundId, compId);
+
+						} 
 					}
-					if (depth == 1) {  //comp clicked
-						if (event.getSelectedItem().getText().equals("Competition")) {
-							// they clicked on the importer "Competition" - should say "Import" or something
-						}	else {
-							editArea.clear();
-							if (editComp == null) {
-								editComp = new EditComp();								
-							}
-
-							editArea.add(editComp);
-							editComp.setVisible(true);
-							listener.compClicked(editComp, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
-						}							
-					} else if (depth == 2) {  //teams or rounds clicked
-						//						if (event.getSelectedItem().getText().equals("teams")) {
-						//							listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-						//						}	else {
-						//							//listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-						//						}							
-					} else if (depth == 3) { // specific team or round clicked
-						if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
-							editArea.clear();
-							if (editTeam == null) {
-								editTeam = new EditTeam();
-							}
-							editArea.add(editTeam);
-							editTeam.setVisible(true);
-
-							Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]);
-							Long teamId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
-							listener.editTeamInit(editTeam, teamId, compId );
-						} else { // round, so show matches
-							// params are compId and roundId
-							editArea.clear();
-							if (editRound == null) {
-								editRound = new EditRound();
-							}
-							editArea.add(editRound);
-							editRound.setVisible(true);
-
-							listener.roundClicked(editRound, Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),
-									Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
-						}
-					} else if (depth == 4) { // match clicked
-						editArea.clear();
-
-						if (editMatch == null) {
-							editMatch = new EditMatch();
-						}
-						editArea.add(editMatch);
-						editMatch.setVisible(true);
-
-						if (editMatchStats == null) {
-							editMatchStats = new PlayerListViewImpl<IPlayerRating>();
-							if (playerListViewColumnDefinitions == null) {
-								PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerRating>();
-								playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
-							}
-
-							editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
-							editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
-
-							//							editMatchStats = clientFactory.getPlayerListView();
-
-							jobArea.add(editMatchStats);
-							editMatchStats.asWidget().setVisible(true);
-
-						}
-
-						editMatchStats.showWait();
-
-						// find roundId and compId
-						Long roundId = Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]);
-						Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]);
-						Long matchId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
-						listener.editMatchInit(editMatch, editMatchStats, matchId, roundId, compId);
-
-					} 
 				}
 			}
 		});
@@ -355,7 +357,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public void showCompetition(ICompetition result) {
 		comp = result;
-		root.setText(result.getLongName() + "|" + result.getId());
+		String longName = result.getLongName() == null ? "Change me" : result.getLongName();
+		root.setText(longName + "|" + result.getId());
 
 		addRounds(result, result.getRounds());
 		for (IRound r: result.getRounds()) {

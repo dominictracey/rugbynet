@@ -189,7 +189,9 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 				// also delete standings
 				List<IStanding> standings = sf.getForRound(r);
 				for (IStanding s : standings) {
-					sf.delete(s);
+					if (s.getId() != null) {
+						sf.delete(s);
+					}
 				}
 
 				if (ok) {

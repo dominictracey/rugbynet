@@ -79,33 +79,38 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		comp.setTeams(teams);
 
 		try {
-			//            URL url = new URL(homePage);
-			//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			IUrlCacher urlCache = new UrlCacher(homePage);
-			List<String> lines = urlCache.get();
-			String line = "";
-			Iterator<String> it = lines.iterator();
-			if (it.hasNext()) {
-				line = it.next();
-			}
-			boolean longNameFound = false;
-			boolean shortNameFound = false;
+//			//            URL url = new URL(homePage);
+//			//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+//			homePage += "?noredir=1";
+//			IUrlCacher urlCache = new UrlCacher(homePage);
+//			List<String> lines = urlCache.get();
+//			String line = "";
+//			Iterator<String> it = lines.iterator();
+//			if (it.hasNext()) {
+//				line = it.next();
+//			}
+//			boolean longNameFound = false;
+//			boolean shortNameFound = false;
+//
+//			while (it.hasNext()) {
+//				line = it.next();
+//				if( line.contains("scrumTitle") && longNameFound == false) {
+//					comp.setLongName(line.split("<|>")[2]);
+//					longNameFound = true;
+//				} else if ( line.contains("ScrumSectionHeader\">About") && !shortNameFound) {
+//					line = it.next();
+//					line = it.next();
+//					if (line.split("<|>").length > 1) {
+//						comp.setShortName(line.split("<|>")[1]);
+//						shortNameFound = true;
+//					}
+//				}
+//			}
 
-			while (it.hasNext()) {
-				line = it.next();
-				if( line.contains("scrumTitle") && longNameFound == false) {
-					comp.setLongName(line.split("<|>")[2]);
-					longNameFound = true;
-				} else if ( line.contains("ScrumSectionHeader\">About") && !shortNameFound) {
-					line = it.next();
-					line = it.next();
-					if (line.split("<|>").length > 1) {
-						comp.setShortName(line.split("<|>")[1]);
-						shortNameFound = true;
-					}
-				}
-			}
-
+			comp.setShortName("change me");
+			comp.setLongName("change me");
+			comp.setAbbr("CHG_ME");
+			
 			// set the begin and end dates
 			DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 			Date first = null;

@@ -3,6 +3,7 @@ package net.rugby.foundation.admin.client;
 import java.util.List;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
+import net.rugby.foundation.admin.client.ui.AddMatchPopup;
 import net.rugby.foundation.admin.client.ui.AddRoundPopup;
 import net.rugby.foundation.admin.client.ui.ColumnDefinition;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
@@ -99,6 +100,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	private AddRoundPopup addRoundPopup = null;
 	
 	private EditContent editContent = null;
+	private AddMatchPopup addMatchPopup = null;
 	
 	@Override
 	public EventBus getEventBus() {
@@ -492,6 +494,15 @@ public class ClientFactoryImpl implements ClientFactory {
 			addRoundPopup.setClientFactory(this);
 		}
 		return addRoundPopup;
+	}
+
+	@Override
+	public AddMatchPopup getAddMatchPopup() {
+		if (addMatchPopup  == null) {
+			addMatchPopup = new AddMatchPopup();
+			addMatchPopup.setClientFactory(this);
+		}
+		return addMatchPopup;
 	}
 
 

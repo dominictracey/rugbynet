@@ -284,7 +284,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				List<ICompetition> comps = cf.getAllComps();
 				ICompetition compDB = null;
 				for (ICompetition dBComp : comps) {
-					if (dBComp.getLongName().equals(comp.getLongName())) {
+					if (dBComp.getLongName() != null && dBComp.getLongName().equals(comp.getLongName())) {
 						compDB = dBComp;			
 					}
 				}
@@ -2002,25 +2002,34 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public IMatchGroup AddMatchToRound(IRound round) {
+	public IMatchGroup AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId) {
 		try {
 			if (checkAdmin()) {
 				IRound r = rf.get(round.getId());
 				IMatchGroup mg = mf.create();
 				mg.setDate(DateTime.now().toDate());
-				mg.setDisplayName("Change me");
-				ITeamGroup t = tf.getTeamByName("TBD");
-				if (t == null)
-				{
-					t = tf.getTeamByName("TBC");
-					if (t == null)
-					{
-						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find team TBD to create new empty match. Giving up.");
-						return null;
-					}
+				//mg.setDisplayName("Change me");
+				mg.setHomeTeamId(homeTeamId);
+				mg.setVisitingTeamId(visitTeamId);
+				if (homeTeamId != null && visitTeamId != null) {
+					mg.setHomeTeam(tf.get(homeTeamId));
+					mg.setVisitingTeam(tf.get(visitTeamId));
+					mg.setDisplayName();
+				} else { // no teams provided. Shouldn't allow
+					return null;
+//					ITeamGroup t = tf.getTeamByName("TBD");
+//					if (t == null)
+//					{
+//						t = tf.getTeamByName("TBC");
+//						if (t == null)
+//						{
+//							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find team TBD to create new empty match. Giving up.");
+//							return null;
+//						}
+//					}
+//					mg.setHomeTeam(t);
+//					mg.setVisitingTeam(t);
 				}
-				mg.setHomeTeam(t);
-				mg.setVisitingTeam(t);
 				mf.put(mg);
 				r.addMatch(mg);
 				rf.put(r);
