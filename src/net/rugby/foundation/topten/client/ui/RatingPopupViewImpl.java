@@ -131,7 +131,7 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 				boolean isClick = "click".equals(event.getNativeEvent().getType());
 				if (isClick) {
 					if (event.getValue() != null && event.getValue().getScrumId() != null) {
-						clientFactory.showExternalLink("http://www.espn.co.uk/scrum/rugby/match/" + event.getValue().getScrumId() + ".html");
+						clientFactory.showExternalLink("http://www.espn.co.uk/rugby/playerstats?gameId=" + event.getValue().getScrumId());
 					}
 					
 				}

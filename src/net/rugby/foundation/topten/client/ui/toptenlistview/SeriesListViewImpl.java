@@ -349,23 +349,25 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			matrixDropDown.clear();
 			lastCriteria = matrix.getCriteria();
 			for (IRatingQuery q : matrix.getRatingQueries()) {
-				AnchorListItem nl = new AnchorListItem(q.getLabel());
-				final IRatingQuery _query = q;
-
-				nl.addClickHandler(new ClickHandler() {
-
-					@Override
-					public void onClick(ClickEvent event) {
-
-						setQuery(null);
-						queryId = _query.getId();
-						setList(null);
-						setItemId(null);
-						presenter.gotoPlace(getPlace());
-					}
-
-				});
-				matrixDropDown.add(nl);
+				if (q.getTopTenListId() != null) {
+					AnchorListItem nl = new AnchorListItem(q.getLabel());
+					final IRatingQuery _query = q;
+	
+					nl.addClickHandler(new ClickHandler() {
+	
+						@Override
+						public void onClick(ClickEvent event) {
+	
+							setQuery(null);
+							queryId = _query.getId();
+							setList(null);
+							setItemId(null);
+							presenter.gotoPlace(getPlace());
+						}
+	
+					});
+					matrixDropDown.add(nl);
+				}
 			}
 
 			criteriaButton.setText(matrix.getCriteria().getMenuName());

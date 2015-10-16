@@ -182,10 +182,24 @@ public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory impl
 
 		// @REX case of just specifying the comp and not the rounds (want all rounds)
 		List<Long> matchIds = new ArrayList<Long>();
-		for (Long rid : rq.getRoundIds()) {
-			IRound r = rf.get(rid);
-			for (Long mid : r.getMatchIDs()) {
-				matchIds.add(mid);
+		
+		// are we just looking for a single match?
+		if (rq.getRoundIds() != null && rq.getRoundIds().size() == 1 && rq.getTeamIds() != null && rq.getTeamIds().size() == 2) {
+			// single match
+			IRound r = rf.get(rq.getRoundIds().get(0));
+			for (IMatchGroup m : r.getMatches()) {
+				if (m.getHomeTeamId().equals(rq.getTeamIds().get(0)) || m.getVisitingTeamId().equals(rq.getTeamIds().get(0))) {
+					if (m.getHomeTeamId().equals(rq.getTeamIds().get(1)) || m.getVisitingTeamId().equals(rq.getTeamIds().get(1))) {
+						matchIds.add(m.getId());
+					}
+				}
+			}
+		} else {
+			for (Long rid : rq.getRoundIds()) {
+				IRound r = rf.get(rid);
+				for (Long mid : r.getMatchIDs()) {
+					matchIds.add(mid);
+				}
 			}
 		}
 

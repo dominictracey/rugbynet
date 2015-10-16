@@ -1194,6 +1194,25 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	public Boolean addPlayerStats(List<IPlayerMatchStats> playerStats) {
 		if (playerStats == null || playerStats.isEmpty()) return false;
 
+		// For the World Cup we come across teams that play two matches in a single round. This really hoses up
+		// the match series because we process queries for matches that haven't been played yet (because the players
+		// for one of the teams have stats from the first match in the round). To guard against this, we check that if
+		// a query specifies teams, that the stats contain entries for players from BOTH teams.
+		Map<Long,Boolean> teamchecker = null;
+		if (query != null && query.getTeamIds() != null && !query.getTeamIds().isEmpty()) {
+			teamchecker = new HashMap<Long,Boolean>();
+			for (Long teamId : query.getTeamIds()) {
+				teamchecker.put(teamId, false);
+			}
+		}
+		
+		// we also need to avoid the situation where we are doing a match series and there are two matches for a team in the weekend.
+		// in this case 
+		if (query != null && query.getRoundIds() != null && query.getRoundIds().size() == 1 && query.getTeamIds() != null && query.getTeamIds().size() == 2 && query.getRatingMatrixId() != null) {
+			// it's a match series query
+			// find the match ID
+		}
+
 		for (IPlayerMatchStats pms : playerStats) {
 			if (pms.getPosition() == position.RESERVE || pms.getTimePlayed() == null) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Trying to invoke engine with PlayerMatchStats for " + pms.getName() + " from team " + pms.getTeamAbbr() + " but his position in RESERVE or timePlayed not set. A task was probably missed. Match stats dropped.");
@@ -1202,9 +1221,23 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				// or even a RESTful thimgie
 				//return false;
 			} else if (pms.getPosition() != position.NONE) {
+				if (teamchecker != null) {
+					teamchecker.put(pms.getTeamId(), true);
+				}
 				pmsList.add(pms);
 			}
 		}
+		
+		// if we didn't find stats for one of the teams, return false
+		if (teamchecker != null) {
+			for (Boolean b : teamchecker.values()) {
+				if (!b) {
+					return false;
+				}
+			}
+		}
+		
+		
 		return true;
 	}
 
@@ -1372,6 +1405,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		}
 
 		List<IPlayerMatchStats> pmsl = pmsf.query(q);
+
 		if (pmsl != null && !pmsl.isEmpty()) {
 			retval = addPlayerStats(pmsl);
 			if (retval) {

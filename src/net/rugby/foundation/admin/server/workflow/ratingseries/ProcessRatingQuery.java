@@ -19,6 +19,7 @@ import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
+import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IRound;
@@ -211,7 +212,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					}
 				}
 				
-				if (inForm) {
+				if (inForm || bestYear || impact) {
 					// figure out the last list for this position
 					//rq.getRatingMatrix().getRatingQueries().indexOf(rq); // << This breaks on rerun, need to code by hand
 					int queryIndex = -1;
@@ -226,7 +227,14 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					
 					if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().size() > 1 && queryIndex != -1) {
 						// we want to look back one ratingGroup - since new ones are added to the front of the list we look at index=1
-						preQuery = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().get(1).getRatingMatrices().get(0).getRatingQueries().get(queryIndex);
+						Criteria criteria = rq.getRatingMatrix().getCriteria();
+						for (IRatingMatrix rm: rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().get(1).getRatingMatrices()) {
+							if (rm.getCriteria().equals(criteria)) {
+								preQuery = rm.getRatingQueries().get(queryIndex);
+								break;
+							}
+						}
+						
 					}
 				}
 				

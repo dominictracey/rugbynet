@@ -43,7 +43,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	private IQueryRatingEngineFactory qref;
 	private IMatchRatingEngineSchemaFactory mresf;
 
-	protected IRatingSeries rs;
+	//protected IRatingSeries rs;
 	protected ISeriesConfiguration sc;
 	private IUniversalRoundFactory urf;
 	private IRoundFactory rf;
@@ -131,7 +131,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					
 					// need to create any matrices?
 					List<Criteria> missing = new ArrayList<Criteria>();
-					missing.addAll(rs.getActiveCriteria());
+					missing.addAll(series.getActiveCriteria());
 					for (IRatingMatrix rm : g.getRatingMatrices()) {
 						missing.remove(rm.getCriteria());
 					}
@@ -144,7 +144,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 						extra.add(rm.getCriteria());
 					}
 					
-					extra.removeAll(rs.getActiveCriteria());
+					extra.removeAll(series.getActiveCriteria());
 					if (extra.size() > 0)
 						return true;
 

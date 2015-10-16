@@ -126,6 +126,12 @@
 	background-image: url("/resources/comps/TRC/200.png");
 }
 
+.comp-logo-RWC {
+	background-image: url("/resources/comps/RWC/200R.png");
+}
+.comp-logo-sq-RWC {
+	background-image: url("/resources/comps/RWC/200.png");
+}
 
 
 
@@ -477,7 +483,6 @@ input.joinLink {
 .AB {
 	background-image: url("/resources/teams/AB/200.png");
 }
-
 .ARG {
 	background-image: url("/resources/teams/ARG/200.png");
 }
@@ -625,6 +630,9 @@ input.joinLink {
 .RM92 {
 	background-image: url("/resources/teams/RM92/200.png");
 }
+.R92 {
+	background-image: url("/resources/teams/R92/200.png");
+}
 .ROM {
 	background-image: url("/resources/teams/ROM/200.png");
 }
@@ -655,11 +663,17 @@ input.joinLink {
 .SHK {
 	background-image: url("/resources/teams/SHK/200.png");
 }
+.SP {
+	background-image: url("/resources/teams/SP/200.png");
+}
 .ST {
 	background-image: url("/resources/teams/ST/200.png");
 }
 .STM {
 	background-image: url("/resources/teams/STM/200.png");
+}
+.SUA {
+	background-image: url("/resources/teams/SUA/200.png");
 }
 .TGA {
 	background-image: url("/resources/teams/TGA/200.png");
@@ -675,6 +689,9 @@ input.joinLink {
 }
 .ULS {
 	background-image: url("/resources/teams/ULS/200.png");
+}
+.URU {
+	background-image: url("/resources/teams/URU/200.png");
 }
 .USA {
 	background-image: url("/resources/teams/USA/200.png");
