@@ -2,9 +2,12 @@ package net.rugby.foundation.topten.server.utilities;
 
 import java.net.URLEncoder;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
@@ -15,15 +18,17 @@ public class TwitterPromoter implements IPromotionHandler {
 	private ITeamGroupFactory tgf;
 	private ITopTenListFactory ttlf;
 	private IConfigurationFactory ccf;
+	private IRatingQueryFactory rqf;
 
-	public TwitterPromoter(ITeamGroupFactory tgf, ITopTenListFactory ttlf, IConfigurationFactory ccf) {
+	public TwitterPromoter(ITeamGroupFactory tgf, ITopTenListFactory ttlf, IConfigurationFactory ccf, IRatingQueryFactory rqf) {
 		this.tgf = tgf;
 		this.ttlf = ttlf;
 		this.ccf = ccf;
+		this.rqf = rqf;
 	}
 
 	@Override
-	public String process(ITopTenList ttl, String channel) {
+	public String process(ITopTenList ttl, String channel, boolean showTeam) {
 
 		String retval = "<p>******** TWITTER *********</p>\n";
 		String longUrl = "http://rugby.net/s/" + ttl.getGuid(); // "http://www.rugby.net/fb/topten.html?listId="+ttl.getId()+"#List:listId="+ttl.getId();
@@ -47,7 +52,7 @@ public class TwitterPromoter implements IPromotionHandler {
 
 			//if (i.getPlayer().getTwitterHandle() != null && !i.getPlayer().getTwitterHandle().isEmpty()) {
 			String player = i.getPlayer().getDisplayName();
-			String tweet = buildTweet(i, ttl, channel); //i.getPlayer().getTwitterHandle() + " you've made @TheRugbyNet " + ttl.getTitle() + "! ";
+			String tweet = buildTweet(i, ttl, channel, showTeam); //i.getPlayer().getTwitterHandle() + " you've made @TheRugbyNet " + ttl.getTitle() + "! ";
 			i.setTweet(tweet);
 			
 			ITeamGroup t = tgf.get(i.getTeamId());
@@ -120,7 +125,7 @@ public class TwitterPromoter implements IPromotionHandler {
 //		}
 	}
 
-	String buildTweet(ITopTenItem i, ITopTenList l, String channel) {
+	String buildTweet(ITopTenItem i, ITopTenList l, String channel, boolean showTeam) {
 		String tweet = ""; //"Congrats to ";
 		// start with player twitter handle or display name
 		if (i.getPlayer().getTwitterHandle() == null || i.getPlayer().getTwitterHandle().isEmpty()) {
@@ -129,13 +134,21 @@ public class TwitterPromoter implements IPromotionHandler {
 			tweet += i.getPlayer().getTwitterHandle() + " ";
 		}
 
-		// add in team twitter handle if available
-		ITeamGroup team = tgf.get(i.getTeamId());
-		if (team != null) {
-			if (team.getTwitter() != null && !team.getTwitter().isEmpty()) {
-				tweet += "of " + team.getTwitter(); 
-			} else if (team.getShortName() != null && !team.getShortName().isEmpty()){
-				tweet += "of " + team.getShortName();
+		// add in team twitter handle if available and if this isn't a Team list
+//		if (l.getQueryId() != null) {
+//			IRatingQuery rq = rqf.get(l.getQueryId());
+//			if (rq != null) {
+//				IRatingMatrix rm = 
+//			}
+//			if (!rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_TEAM)) {
+		if (showTeam) {
+			ITeamGroup team = tgf.get(i.getTeamId());
+			if (team != null) {
+				if (team.getTwitter() != null && !team.getTwitter().isEmpty()) {
+					tweet += "of " + team.getTwitter(); 
+				} else if (team.getShortName() != null && !team.getShortName().isEmpty()){
+					tweet += "of " + team.getShortName();
+				}
 			}
 		}
 
@@ -153,5 +166,11 @@ public class TwitterPromoter implements IPromotionHandler {
 	@Override
 	public String process(ITopTenList ttl) {
 		return process(ttl, "");
+	}
+
+	@Override
+	public String process(ITopTenList ttl, String channel) {
+		// TODO Auto-generated method stub
+		return process(ttl, channel, true);
 	}
 }

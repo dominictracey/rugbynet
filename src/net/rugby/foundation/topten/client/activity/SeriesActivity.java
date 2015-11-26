@@ -28,7 +28,7 @@ import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.FeatureListPlace;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
-import net.rugby.foundation.topten.client.ui.SidebarViewImpl;
+//import net.rugby.foundation.topten.client.ui.SidebarViewImpl;
 import net.rugby.foundation.topten.client.ui.notes.NoteView;
 import net.rugby.foundation.topten.client.ui.notes.NoteView.NoteViewPresenter;
 import net.rugby.foundation.topten.client.ui.toptenlistview.SeriesListView;
@@ -47,7 +47,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	protected ClientFactory clientFactory;
 	protected ICoreConfiguration _coreConfig;
 	protected int detailCount=0;
-	private SidebarViewImpl sidebarView;
+	//private SidebarViewImpl sidebarView;
 
 
 	public SeriesActivity(SeriesPlace sPlace, ClientFactory clientFactory) {
@@ -59,7 +59,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		listView.setPresenter(this);
 
 		view.setListView(listView);
-		sidebarView = clientFactory.getSidebarView();
+		//sidebarView = clientFactory.getSidebarView();
 		
 		if (sPlace.getToken() != null) {
 			this.sPlace = sPlace;

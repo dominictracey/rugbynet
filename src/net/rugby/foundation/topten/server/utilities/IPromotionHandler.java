@@ -7,4 +7,6 @@ String process(ITopTenList ttl);
 
 String process(ITopTenList ttl, String channel);
 
+String process(ITopTenList ttl, String channel, boolean showTeam);
+
 }

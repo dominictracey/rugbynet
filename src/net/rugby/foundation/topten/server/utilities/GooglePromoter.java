@@ -28,4 +28,9 @@ public class GooglePromoter implements IPromotionHandler {
 	public String process(ITopTenList ttl) {
 		return process(ttl, "");
 	}
+
+	@Override
+	public String process(ITopTenList ttl, String channel, boolean showTeam) {
+		return process(ttl, channel, true);
+	}
 }

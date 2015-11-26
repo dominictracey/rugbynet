@@ -48,8 +48,8 @@ public class OfyTopTenListFactory extends BaseTopTenListFactory implements ITopT
 	@Inject
 	public OfyTopTenListFactory(IPlayerFactory pf, ICompetitionFactory cf, IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, IPlayerMatchStatsFactory pmsf, 
 			IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf, IPlaceFactory spf, ISocialMediaDirector smd, INotesCreator nc, 
-			IRatingSeriesFactory rsf, IUniversalRoundFactory urf, INoteFactory nf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
-		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd, nc, rsf, urf, nf, rmf, rgf);
+			IRatingSeriesFactory rsf, IUniversalRoundFactory urf, INoteFactory nf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf, ITeamGroupFactory tgf) {
+		super(mf,tf, rf, pmsf, rqf, prf, ccf, spf, cf, smd, nc, rsf, urf, nf, rmf, rgf, tgf);
 		this.pf = pf;
 
 		ofy = DataStoreFactory.getOfy();

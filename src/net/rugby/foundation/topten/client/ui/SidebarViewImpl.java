@@ -83,14 +83,16 @@ public class SidebarViewImpl extends Composite
 	public SidebarViewImpl()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		RootPanel.get("sidebar-nav").add(this);
-		dashboardMenu.removeStyleName("list-group");
-		dashboardMenu.setId("dashboard-menu");
-		//		profileMenu.removeStyleName("list-group");
-		//		profileMenu.setId("profile-menu");
-		//		profileMenu.setStyleName("show-xs");  
-		//		profileMenu.addStyleName("hidden-*");
-		carat.setStyleName("pointer");
+		if (RootPanel.get("sidebar-nav") != null) {
+			RootPanel.get("sidebar-nav").add(this);
+			dashboardMenu.removeStyleName("list-group");
+			dashboardMenu.setId("dashboard-menu");
+			//		profileMenu.removeStyleName("list-group");
+			//		profileMenu.setId("profile-menu");
+			//		profileMenu.setStyleName("show-xs");  
+			//		profileMenu.addStyleName("hidden-*");
+			carat.setStyleName("pointer");
+		}
 	}
 
 	//	public void setComps(Map<Long, String> competitionMap, List<Long> compsUnderway) {
@@ -147,7 +149,8 @@ public class SidebarViewImpl extends Composite
 
 		// add home link
 		ListGroupItem lgi = new ListGroupItem();
-		lgi.removeStyleName("list-group-item");
+		//lgi.removeStyleName("list-group-item");
+		lgi.setStyleName("null");
 		Anchor homeLink = new Anchor();
 		homeLink.setText("Home");
 
@@ -185,7 +188,8 @@ public class SidebarViewImpl extends Composite
 
 		for (RatingMode mode: modeMap.keySet()) {
 			lgi = new ListGroupItem();
-			lgi.removeStyleName("list-group-item");
+			//lgi.removeStyleName("list-group-item");
+			lgi.setStyleName("null");
 			Anchor modeLink = new Anchor();
 			modeLink.setText(mode.getMenuName());
 			final RatingMode _mode = mode;

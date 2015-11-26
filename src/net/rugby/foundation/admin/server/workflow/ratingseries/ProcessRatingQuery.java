@@ -14,6 +14,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -23,6 +24,7 @@ import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -50,7 +52,9 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	private IMatchGroupFactory mgf;
 	private ICompetitionFactory cf;
 
-	private boolean impact;
+
+
+	private ITeamGroupFactory tgf;
 
 
 	public ProcessRatingQuery() {
@@ -76,7 +80,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		this.urf = injector.getInstance(IUniversalRoundFactory.class);
 		this.mgf = injector.getInstance(IMatchGroupFactory.class);
 		this.cf = injector.getInstance(ICompetitionFactory.class);
-
+		this.tgf = injector.getInstance(ITeamGroupFactory.class);
 		
 		// first see if we are re-running, in which case clear out any ratings already in place
 		if (!rq.getStatus().equals(Status.NEW)) {
@@ -108,6 +112,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		boolean ok = false;
 		boolean inForm = false;
 		boolean bestYear = false;
+		boolean impact = false;
 		
 		try {
 			ok = mre.setQuery(rq);
@@ -175,6 +180,95 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					ICompetition hostComp = cf.get(hostId);
 					if (hostComp.getTTLTitleDesc() != null && !hostComp.getTTLTitleDesc().isEmpty()) {
 						title += " of " + hostComp.getTTLTitleDesc();
+					}
+				}
+				
+				if (inForm || bestYear || impact) {
+					title += " Through ";
+				} else {
+					title += " From ";
+				}
+				
+				// now we need the last round
+				if (rq.getRoundIds().size() == 0) {
+					title += "NO MATCHING DATA"; // this is not a great place to be, no players make the list...
+				} else if (rq.getRoundIds().size() == 1) {
+					IRound r = rf.get(rq.getRoundIds().get(0));
+					title += r.getName();
+				} else {
+					IRound last = null;
+					for (Long rid : rq.getRoundIds()) {
+						if (last == null) {
+							last = rf.get(rid);
+						} else {
+							IRound t = rf.get(rid);
+							if (t.getEnd().after(last.getEnd())) {
+								last = t;
+							}
+						}
+					}
+					if (rq.getCompIds().size() < 2) {
+						context = last.getName();
+						title += context;
+					} else {
+						// virtual comp
+						UniversalRound ur = urf.get(last);
+						title += ur.longDesc;
+					}
+				}
+				
+				if (inForm || bestYear || impact) {
+					// figure out the last list for this position
+					//rq.getRatingMatrix().getRatingQueries().indexOf(rq); // << This breaks on rerun, need to code by hand
+					int queryIndex = -1;
+					int j = 0;
+					for (IRatingQuery q : rq.getRatingMatrix().getRatingQueries()) {
+						if (q.getId().equals(rq.getId())) {
+							queryIndex = j;
+							break;
+						}
+						++j;
+					}
+					
+					if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().size() > 1 && queryIndex != -1) {
+						// we want to look back one ratingGroup - since new ones are added to the front of the list we look at index=1
+						Criteria criteria = rq.getRatingMatrix().getCriteria();
+						for (IRatingMatrix rm: rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().get(1).getRatingMatrices()) {
+							if (rm.getCriteria().equals(criteria)) {
+								preQuery = rm.getRatingQueries().get(queryIndex);
+								break;
+							}
+						}
+						
+					}
+				}
+				
+			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_TEAM)) {
+				assert(rq.getTeamIds().size() == 1);
+				
+				ITeamGroup team = tgf.get(rq.getTeamIds().get(0));
+				
+				// is this In Form, Best or Impact?
+				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
+					title += "In Form ";
+					inForm = true;
+				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.BEST_YEAR)) {
+					bestYear = true;
+				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.AVERAGE_IMPACT)) {
+					title += "Impact ";
+					impact = true;
+				}
+				
+				title += "Players for " + team.getDisplayName();
+				
+				if (rq.getCompIds().size() < 2) {
+					// only include the name of the host comp if it is not virtual
+					Long hostId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId();
+					if (hostId != null) {
+						ICompetition hostComp = cf.get(hostId);
+						if (hostComp.getTTLTitleDesc() != null && !hostComp.getTTLTitleDesc().isEmpty()) {
+							title += " in " + hostComp.getTTLTitleDesc();
+						}
 					}
 				}
 				

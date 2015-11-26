@@ -809,7 +809,7 @@ public class TopTenFactoryTester {
 				i.getPlayer().setTwitterHandle(null);
 			}
 		}
-		ISocialMediaDirector smd = new SocialMediaDirector(tgf, ttf, ccf);
+		ISocialMediaDirector smd = new SocialMediaDirector(tgf, ttf, ccf, rqf);
 
 		smd.PromoteTopTenList(ttl);
 //		assertTrue(ms.contains(ttl.getId()));

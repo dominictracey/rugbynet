@@ -54,7 +54,6 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 
 	private TopTenListViewPresenter presenter;
-	//private TopTenListView.Presenter listViewPresenter;
 	private ClientFactory clientFactory;
 
 
@@ -70,9 +69,6 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 	public CompactTopTenListViewImpl()
 	{
-		// add the login bar to the top
-		//		navbar = new NavBarViewImpl();
-		//		RootPanel.get("navbar").add(navbar);
 
 		initWidget(uiBinder.createAndBindUi(this));
 
@@ -283,20 +279,6 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 		items.getElement().getStyle().setCursor(Cursor.POINTER); 
 
-		//		tableCol.add(items);
-
-		//		 // Add a selection model to handle user selection.
-		//	    final SingleSelectionModel<ITopTenItem> selectionModel = new SingleSelectionModel<ITopTenItem>();
-		//	    items.setSelectionModel(selectionModel);
-		//	    selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-		//	      public void onSelectionChange(SelectionChangeEvent event) {
-		//	        ITopTenItem selected = selectionModel.getSelectedObject();
-		//	        if (selected != null) {
-		//	          presenter.showRatingDetails(selected);
-		//	        }
-		//	      }
-		//	    });
-
 		topTenPanel.addStyleName("compactTopTenPanel");
 	}
 
@@ -304,14 +286,8 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	@Override
 	public void setList(final ITopTenList result, final String baseUrl) {
 		list = result;
-		//setVisible(false);
+		
 		if (result != null) {
-//			String guid = "";
-//			if (result.getSeries() == null || result.getSeries() == false) {
-//				guid = result.getFeatureGuid();
-//			} else {
-//				guid = result.getGuid();
-//			}
 
 			recordAnalyticsHit(Window.Location.getPath(), result.getTitle());
 

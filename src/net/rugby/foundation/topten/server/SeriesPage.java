@@ -132,9 +132,9 @@ public class SeriesPage extends HttpServlet {
 			details2Content = ((IContentFactory)ctf).getForDiv("details2");
 
 			if (details2Content != null) {
-				details2Div = "<noscript>" + details2Content.getBody().replaceFirst("<% players %>", players) + "</noscript>\n<div id=\"details2\">";
+				details2Div = "<noscript>" + details2Content.getBody().replaceFirst("<% players %>", players) + "</noscript>\n<div id=\"details2\"></div>";
 			} else {
-				details2Div = "<noscript>" + description + "</noscript>\n<div id=\"details2\">";
+				details2Div = "<noscript>" + description + "</noscript>\n<div id=\"details2\"></div>";
 			}
 		}
 

@@ -62,80 +62,81 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 	 */
 	@Override
 	public void compChanged(final Long compId) {
-		rootPanel.clear();
-
-
-
-		Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
-
-
-
-
-			@Override
-			public void onFailure(Throwable caught) {
-				rootPanel.add(new HTML("Current scores unavailable"));
-
-			}
-
-			@Override
-			public void onSuccess(final ICompetition result) {
-
-				comp = result;
-
-				isVirtualComp = comp.getRoundIds().size() < 1;
-
-				resultPanel = new ResultPanel();
-
-				resultPanel.getLeft_arrow().addClickHandler(new ClickHandler() {
-
-					@Override
-					public void onClick(ClickEvent event) {
-						// scroll everything away to the right with animations!
-						if (isVirtualComp) {
-							Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal()-1, true);
-						} else if (roundIndex > 0) {  // don't run off the front
-							Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex-1).getUrOrdinal(), true);
-						}
-
-					}
-
-				});
-
-				resultPanel.getRight_arrow().addClickHandler(new ClickHandler() {
-
-					@Override
-					public void onClick(ClickEvent event) {
-						// scroll everything away to the left with animations!
-						if (isVirtualComp) {
-							Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal()+1, true);
-						} else if (roundIndex < comp.getRounds().size()) {  // don't run off the front
-							Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex+1).getUrOrdinal(), true);
-						}
-
-					}
-
-				});
-
-				if (!drawn && Core.getCore().getCurrentRoundOrdinal() != -1) {
-					//roundChanged(Core.getCore().getCurrentRoundOrdinal());
-					Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal(), true);
+		if (rootPanel != null) {
+			rootPanel.clear();
+	
+	
+	
+			Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
+	
+	
+	
+	
+				@Override
+				public void onFailure(Throwable caught) {
+					rootPanel.add(new HTML("Current scores unavailable"));
+	
 				}
+	
+				@Override
+				public void onSuccess(final ICompetition result) {
+	
+					comp = result;
+	
+					isVirtualComp = comp.getRoundIds().size() < 1;
+	
+					resultPanel = new ResultPanel();
+	
+					resultPanel.getLeft_arrow().addClickHandler(new ClickHandler() {
+	
+						@Override
+						public void onClick(ClickEvent event) {
+							// scroll everything away to the right with animations!
+							if (isVirtualComp) {
+								Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal()-1, true);
+							} else if (roundIndex > 0) {  // don't run off the front
+								Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex-1).getUrOrdinal(), true);
+							}
+	
+						}
+	
+					});
+	
+					resultPanel.getRight_arrow().addClickHandler(new ClickHandler() {
+	
+						@Override
+						public void onClick(ClickEvent event) {
+							// scroll everything away to the left with animations!
+							if (isVirtualComp) {
+								Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal()+1, true);
+							} else if (roundIndex < comp.getRounds().size()) {  // don't run off the front
+								Core.getCore().setCurrentRoundOrdinal(comp.getRounds().get(roundIndex+1).getUrOrdinal(), true);
+							}
+	
+						}
+	
+					});
+	
+					if (!drawn && Core.getCore().getCurrentRoundOrdinal() != -1) {
+						//roundChanged(Core.getCore().getCurrentRoundOrdinal());
+						Core.getCore().setCurrentRoundOrdinal(Core.getCore().getCurrentRoundOrdinal(), true);
+					}
+	
+					rootPanel.add(resultPanel);
+	
+				}
+	
+			});
 
-				rootPanel.add(resultPanel);
-
-			}
-
-		});
-
-
+		}
 
 	}
 
 	@Override
 	public void roundChanged(final UniversalRound ur) {
 		String name = "";
-		console("Result.roundChanged " + ur.longDesc + " " + ur.ordinal);
-		if (resultPanel.scores != null) {
+		if (resultPanel != null && resultPanel.scores != null) {
+			console("Result.roundChanged " + ur.longDesc + " " + ur.ordinal);
 			resultPanel.scores.clear();
 			currentRound = null;
 			if (comp != null && !isVirtualComp) {

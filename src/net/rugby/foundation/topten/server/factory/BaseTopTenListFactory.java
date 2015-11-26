@@ -92,11 +92,12 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 	private INoteFactory nf;
 	private IRatingMatrixFactory rmf;
 	private IRatingGroupFactory rgf;
+	private ITeamGroupFactory tgf;
 
 	public BaseTopTenListFactory(IMatchGroupFactory mf, ITeamGroupFactory tf, IRoundFactory rf, 
 			IPlayerMatchStatsFactory pmsf, IRatingQueryFactory rqf, IPlayerRatingFactory prf, IConfigurationFactory ccf,
 			IPlaceFactory spf, ICompetitionFactory cf, ISocialMediaDirector smd, INotesCreator nc, IRatingSeriesFactory rsf,
-			IUniversalRoundFactory urf, INoteFactory nf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf) {
+			IUniversalRoundFactory urf, INoteFactory nf, IRatingMatrixFactory rmf, IRatingGroupFactory rgf, ITeamGroupFactory tgf) {
 		this.mf = mf;
 		this.tf = tf;
 		this.rf = rf;
@@ -113,7 +114,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		this.nf = nf;
 		this.rmf = rmf;
 		this.rgf = rgf;
-
+		this.tgf = tgf;
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -549,8 +550,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			}
 
 			// update the line item tweets
-			TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf);
-			twitterPromoter.process(list, twitterMatch);
+			TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf, rqf);
+			twitterPromoter.process(list, twitterMatch, !rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_TEAM));
 		}
 
 
@@ -644,7 +645,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		}	
 
 		// update the line item tweets
-		TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf);
+		TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf, rqf);
 		twitterPromoter.process(list);
 	}
 
@@ -700,7 +701,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			//	*** Top Ten In Form Flankers in the World
 			//	Top Ten Flankers (in the last year)
 			//	Top Ten Flankers in Round 2 of @premRugby
-			desc += "In Form " + rq.getPositions().get(0).getPlural() + " in " + hostComp.getTTLTitleDesc(); 
+			desc += rq.getRatingMatrix().getCriteria().getMenuName() + " " + rq.getPositions().get(0).getPlural() + " in " + hostComp.getTTLTitleDesc(); 
 			//			if (rq.getCompIds().size() > 1) {
 			//				desc += " in the World";
 			//			} else {
@@ -711,6 +712,16 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			//					}
 			//				}
 			//			}
+		} else if (mode.equals(RatingMode.BY_TEAM)) {
+			// by team : (*** = currently supported)
+			//	*** Top Ten In Form Players for @teamName [in @comp]
+			assert(rq.getTeamIds().size() == 1);
+			ITeamGroup team = tgf.get(rq.getTeamIds().get(0));
+			desc += rq.getRatingMatrix().getCriteria().getMenuName() + " Players for " + team.getTwitter();
+			if (rq.getCompIds().size() < 2)
+			{
+				desc += " in " + hostComp.getTTLTitleDesc(); 
+			}
 		} else if (mode.equals(RatingMode.BY_COMP)) {
 			// round list
 			// Top Ten Performances of @premRugby Rd 12

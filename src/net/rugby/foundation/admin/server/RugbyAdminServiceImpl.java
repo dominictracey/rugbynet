@@ -2226,11 +2226,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				//	1) Mode == BY_MATCH and Criteria == ROUND
 				//	2) Mode == BY_POSITION and (Criteria == IN_FORM || Criteria == IMPACT)
 				//	3) Mode == BY_COMP and Criteria == ROUND
+				//	4) Mode == BY_TEAM and (Criteria == IN_FORM || Criteria == IMPACT)
 				if (sConfig.getActiveCriteria().contains(Criteria.BEST_ALLTIME)) {
 					throwUnsupportedSeriesConfigException();
 				}
 
-				if (sConfig.getMode().equals(RatingMode.BY_COUNTRY) || sConfig.getMode().equals(RatingMode.BY_TEAM)) {
+				if (sConfig.getMode().equals(RatingMode.BY_COUNTRY)) {
 					throwUnsupportedSeriesConfigException();
 				}
 
@@ -2241,7 +2242,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				}
 
 				if (sConfig.getActiveCriteria().contains(Criteria.IN_FORM)) {
-					if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
+					if (!(sConfig.getMode().equals(RatingMode.BY_POSITION) || sConfig.getMode().equals(RatingMode.BY_TEAM))) {
 						throwUnsupportedSeriesConfigException();
 					}
 				}
@@ -2253,7 +2254,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				}
 				
 				if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT))  {
-					if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
+					if (!(sConfig.getMode().equals(RatingMode.BY_POSITION) || sConfig.getMode().equals(RatingMode.BY_TEAM))) {
 						throwUnsupportedSeriesConfigException();
 					}
 				}
@@ -2274,7 +2275,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		throw new Exception("Invalid Mode/Criteria combo. Valid values are: \n" +
 				"1) Mode == BY_MATCH and Criteria == ROUND \n" +
 				"2) Mode == BY_POSITION and (Criteria == IN_FORM and/or Criteria == IMPACT)\n" + 
-				"3) Mode == BY_COMP and Criteria == ROUND");
+				"3) Mode == BY_TEAM and (Criteria == IN_FORM and/or Criteria == IMPACT)\n" + 
+				"4) Mode == BY_COMP and Criteria == ROUND");
 
 	}
 

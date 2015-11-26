@@ -439,7 +439,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		if (noteView == null) {
 			noteView = new NoteViewImpl<INote>();
 			noteView.setClientFactory(this);
-			RootPanel.get("notes").add(noteView);
+			if (RootPanel.get("notes") != null)
+				RootPanel.get("notes").add(noteView);
 
 			if (noteViewColumnDefinitions == null) {				
 				noteViewColumnDefinitions = new NoteViewColumnDefinitions<INote>(this);

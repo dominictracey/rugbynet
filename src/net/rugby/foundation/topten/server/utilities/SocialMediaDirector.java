@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
@@ -18,10 +19,10 @@ public class SocialMediaDirector implements ISocialMediaDirector {
 	List<IPromotionHandler> promoters = new ArrayList<IPromotionHandler>();
 	
 	@Inject
-	public SocialMediaDirector(ITeamGroupFactory tgf, ITopTenListFactory ttlf, IConfigurationFactory ccf){
+	public SocialMediaDirector(ITeamGroupFactory tgf, ITopTenListFactory ttlf, IConfigurationFactory ccf, IRatingQueryFactory rqf){
 		promoters.add(new FacebookPromoter());
 		promoters.add(new GooglePromoter());
-		promoters.add(new TwitterPromoter(tgf, ttlf, ccf));
+		promoters.add(new TwitterPromoter(tgf, ttlf, ccf, rqf));
 		
 	}
 	
