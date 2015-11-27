@@ -399,15 +399,23 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			
 			// first get a list of teams
 			List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
-			for (Long rid : rids) {
-				IRound targetRound = rf.get(rid);
-				for (IMatchGroup m: targetRound.getMatches()) {
-					if (!teams.contains(m.getHomeTeam())) {
-						teams.add(m.getHomeTeam());
-					}
-					if (!teams.contains(m.getVisitingTeam())) {
-						teams.add(m.getVisitingTeam());
-					}
+//			for (Long rid : rids) {
+//				IRound targetRound = rf.get(rid);
+//				for (IMatchGroup m: targetRound.getMatches()) {
+//					if (!teams.contains(m.getHomeTeam())) {
+//						teams.add(m.getHomeTeam());
+//					}
+//					if (!teams.contains(m.getVisitingTeam())) {
+//						teams.add(m.getVisitingTeam());
+//					}
+//				}
+//			}
+			
+			
+			for (ITeamGroup team : rm.getRatingGroup().getRatingSeries().getHostComp().getTeams()) {
+				// remove TBC and TBD
+				if (!team.getDisplayName().equals("TBC") && !team.getDisplayName().equals("TBD")) {
+					teams.add(team);
 				}
 			}
 			
