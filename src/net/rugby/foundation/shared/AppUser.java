@@ -38,6 +38,7 @@ public class AppUser implements IAppUser, Serializable {
   private boolean superadmin;
   private boolean isGoogle;
   private boolean isFacebook;
+  private boolean isOAuth2;
   private boolean optOut;
   private Long lastEntryId;
   private Long lastClubhouseId;
@@ -555,6 +556,18 @@ public class AppUser implements IAppUser, Serializable {
 	 */
 	@Override
 	public boolean isMustChangePassword() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setOath2(boolean isOath2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isOath2() {
 		// TODO Auto-generated method stub
 		return false;
 	}

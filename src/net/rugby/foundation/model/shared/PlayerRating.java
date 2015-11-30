@@ -53,6 +53,8 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		 * 
 		 */
 		private static final long serialVersionUID = 3979300783273508712L;
+
+		private Long scrumId;
 		
 
 		public RatingComponent() {
@@ -60,7 +62,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		}
 		
 		public RatingComponent(String statsDetails, float backScore, float forwardScore, 
-				float rawScore, Long playerMatchStatsId, String matchLabel, Integer scaledRating, Integer unscaledRating) {
+				float rawScore, Long playerMatchStatsId, String matchLabel, Integer scaledRating, Integer unscaledRating, Long scrumId) {
 			this.backScore = backScore;
 			this.forwardScore = forwardScore;
 			this.rawScore = rawScore;
@@ -69,6 +71,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 			this.setMatchLabel(matchLabel);
 			this.scaledRating = scaledRating;
 			this.unscaledRating = unscaledRating;
+			this.setScrumId(scrumId);
 		}
 		
 		public void addRatingsDetails(String details) {
@@ -84,8 +87,11 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		@Id
 		protected Long id;
 
+		@Unindexed
 		protected float backScore;
+		@Unindexed
 		protected float forwardScore;
+		@Unindexed
 		protected float rawScore; 
 		
 		private Long playerMatchStatsId;
@@ -96,7 +102,9 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		@Unindexed
 		protected String matchLabel;
 
+		@Unindexed
 		protected float scaledRating;
+		@Unindexed
 		protected float unscaledRating;
 
 		protected float offence;
@@ -263,6 +271,14 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		public void setRatingDetails(String ratingDetails) {
 			this.ratingDetails = ratingDetails;
 		}
+
+		public Long getScrumId() {
+			return scrumId;
+		}
+
+		public void setScrumId(Long scrumId) {
+			this.scrumId = scrumId;
+		}
 		
 		
 	}
@@ -271,6 +287,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long id;
 	protected Integer rating;
 	protected Long groupId;
+	@Unindexed
 	protected Date generated;
 	@Transient
 	protected IGroup group;
@@ -280,7 +297,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long playerId;
 	@Transient
 	protected IPlayer player;
-
+	@Unindexed
 	protected List<Long> playerMatchStatIds;
 	@Transient
 	private List<IPlayerMatchStats> playerMatchStats;
@@ -288,6 +305,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long queryId;
 	@Unindexed
 	protected String details;
+	@Unindexed
 	protected Float rawScore;
 	
 	@Embedded

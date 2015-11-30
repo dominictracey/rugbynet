@@ -6,6 +6,8 @@ import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
+import net.rugby.foundation.admin.client.ui.AddMatchPopup.AddMatchPopupPresenter;
+import net.rugby.foundation.admin.client.ui.AddRoundPopup.AddRoundPopupPresenter;
 import net.rugby.foundation.admin.client.ui.AdminView;
 import net.rugby.foundation.admin.client.ui.CompetitionView;
 import net.rugby.foundation.admin.client.ui.EditComp;
@@ -32,6 +34,7 @@ import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.Round;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
@@ -45,6 +48,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.PopupListener;
 
 /**
  * Activities are started and stopped by an ActivityManager associated with a container Widget.
@@ -53,7 +57,8 @@ public class CompActivity extends AbstractActivity implements
 CompetitionView.Presenter, EditTeam.Presenter, EditComp.Presenter, 
 EditMatch.Presenter, PlayerListView.Listener<IPlayerRating>, PlayerPopupView.Presenter<IPlayer>,
 PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPresenter<ITeamMatchStats>, 
-SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>, RoundPresenter {
+SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>, 
+RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	/**
 	 * Used to obtain views, eventBus, placeController.
 	 * Alternatively, could be injected via GIN.
@@ -1042,6 +1047,26 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 			}
 		});
 	}
+	
+	@Override
+	public void onFlushRawScoresButtonClicked(ScrumMatchRatingEngineSchema20130713 schema) {
+		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
+		clientFactory.getRpcService().deleteRawScoresForMatchRatingEngineSchema(schema, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to delete eaw scores for match rating engine schema. Details:" + caught.getLocalizedMessage());
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Window.alert("Raw scores successfully flushed");
+				} else {
+					Window.alert("Raw scores not flushed.");
+				}
+			}
+		});
+	}
 
 
 
@@ -1097,7 +1122,7 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 	@Override
 	public void createSchema() {
 		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
-		clientFactory.getRpcService().getMatchRatingEngineSchema(null, new AsyncCallback<ScrumMatchRatingEngineSchema>() {
+		clientFactory.getRpcService().createMatchRatingEngineSchema(new AsyncCallback<ScrumMatchRatingEngineSchema>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed to save match rating engine schema, see logs for details");
@@ -1392,26 +1417,10 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 
 	@Override
 	public void addMatch(IRound round) {
-		clientFactory.getRpcService().AddMatchToRound(round, new AsyncCallback<IMatchGroup>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
-
-			}
-
-			@Override
-			public void onSuccess(IMatchGroup result) {
-				if (result != null)
-				{
-					Window.alert("Match	Added");	
-					em.ShowMatch(result);
-				} else {
-					Window.alert("Match not added. See server log for details");
-				}
-			}
-
-		});		}
+		clientFactory.getAddMatchPopup().setPresenter(this);
+		clientFactory.getAddMatchPopup().setRound((Round)round);
+		clientFactory.getAddMatchPopup().center();
+	}
 
 
 
@@ -1428,5 +1437,116 @@ SmartBar.Presenter, SmartBar.SchemaPresenter, MatchRatingEngineSchemaPopupViewPr
 		
 		return menuItemDelegate;
 	}
+
+
+
+	@Override
+	public void virtualCompClicked() {
+		clientFactory.getRpcService().addVirtualComp(new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles creating virtual comp: " + caught.getLocalizedMessage());
+
+			}
+
+			@Override
+			public void onSuccess(ICompetition result) {
+				if (result != null)
+				{
+					Window.alert("Comp	Added");	
+					comps.add(result);
+					view.addComps(comps);
+				} else {
+					Window.alert("Comp not added. See server log for details");
+				}
+			}
+
+		});
+		
+	}
+
+
+
+	@Override
+	public void addRound(ICompetition comp) {
+		clientFactory.getAddRoundPopup().setComp(comp);
+		clientFactory.getAddRoundPopup().setPresenter((AddRoundPopupPresenter) this);
+		clientFactory.getAddRoundPopup().center();
+		
+	}
+
+
+
+	@Override
+	public void addRound(ICompetition comp, int uri, String name) {
+		clientFactory.getRpcService().addRound(comp.getId(), uri, name, new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Problems adding round");
+				
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Window.alert("Success adding round");
+					clientFactory.getAddRoundPopup().hide();
+				} else {
+					Window.alert("No good. Check the logs or try again. Maybe that round already exists? Try reloading maybe?");
+				}
+			}
+			
+		});
+		
+	}
+
+
+
+	@Override
+	public void cancelAddRound() {
+		clientFactory.getAddRoundPopup().hide();
+		
+	}
+
+
+
+	@Override
+	public void addMatch(Round round, Long homeTeamId, Long visitingTeamId) {
+		clientFactory.getRpcService().AddMatchToRound(round, homeTeamId, visitingTeamId, new AsyncCallback<IMatchGroup>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Troubles adding match: " + caught.getLocalizedMessage());
+
+			}
+
+			@Override
+			public void onSuccess(IMatchGroup result) {
+				if (result != null)
+				{
+					Window.alert("Match	Added");	
+//					em.ShowMatch(result);
+					clientFactory.getAddMatchPopup().hide();
+				} else {
+					Window.alert("Match not added. See server log for details");
+				}
+			}
+
+		});
+	}
+
+
+
+	@Override
+	public void cancelAddMatch() {
+		clientFactory.getAddMatchPopup().hide();
+		
+	}
+
+
+
+
 	
 }

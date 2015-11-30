@@ -23,6 +23,8 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	// competition name map
 	private Map<Long, String> compNameMap = null;
 	
+	@Transient
+	private HashMap<Long, HashMap<RatingMode,Long>> seriesMap = new HashMap<Long, HashMap<RatingMode,Long>>();
 	private List<Long> compsUnderway = new ArrayList<Long>();
 	
 	// default compId
@@ -32,6 +34,11 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	// environments
 	public enum Environment { LOCAL, DEV, BETA, PROD }
 	private Environment environment;
+
+	private List<Long> compsForClient = new ArrayList<Long>();
+	
+	@Transient
+	protected int currentUROrdinal = -1;
 	
 	public enum selectionType { POOLROSTER, POOLROUND, KNOCKOUTROSTER, KNOCKOUTROUND }
 	
@@ -128,10 +135,10 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 //	
 //	private static final String DEFAULT_COMPETITION_SHORT_NAME = "2011 RWC Knockout"; 
 	
-	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/topten.html?gwt.codesvr=127.0.0.1:9997";
-	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/topten.html";
-	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/topten.html";
-	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/topten.html";
+	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/s/?gwt.codesvr=127.0.0.1:9997";
+	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/s/";
+	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/s/";
+	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/s/";
 	
 	// Facebook
 	private final static String FB_LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/fb/topten.html?gwt.codesvr=127.0.0.1:9997";
@@ -492,6 +499,10 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 		return CREATEACCT_OK;
 	}
 
+	
+	public static String getCreateacctErrorNicknameCantBeNull() {
+		return CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL;
+	}
 
 //	public static String getDefaultCompetitionShortName() {
 //		
@@ -514,8 +525,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	 */
 	@Override
 	public void addCompetition(Long id, String name) {
-		compNameMap.put(id, name);
-		
+		compNameMap.put(id, name);		
 	}
 
 
@@ -523,8 +533,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	 * @see net.rugby.foundation.model.shared.IConfiguration#getCompetitionMap(java.lang.Long)
 	 */
 	@Override
-	public final Map<Long, String> getCompetitionMap() {
-		
+	public final Map<Long, String> getCompetitionMap() {		
 		return compNameMap;
 	}
 
@@ -584,8 +593,26 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 			compsUnderway.remove(compId);
 	}
 	
-	public static String getCreateacctErrorNicknameCantBeNull() {
-		return CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL;
+	@Override
+	public List<Long> getCompsForClient() {
+		return compsForClient;
+	}
+	
+	@Override
+	public void setCompsForClient(List<Long> compsUnderway) {
+		this.compsForClient = compsUnderway;
+	}
+	
+	@Override
+	public void addCompForClient(Long compId) {
+		if (!compsForClient.contains(compId))
+			compsForClient.add(compId);
+	}
+
+	@Override
+	public void removeCompForClient(Long compId) {
+		if (compsForClient.contains(compId))
+			compsForClient.remove(compId);
 	}
 
 	@Override
@@ -595,6 +622,9 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 			if (defaultCompId.equals(compId)) {
 				defaultCompId = null;
 			}
+			
+			compsForClient.remove(compId);
+			
 			return true;
 		}
 		
@@ -660,6 +690,24 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	@Override
 	public String getFacebookAppid() {
 		return FACEBOOK_APPID;
+	}
+	@Override
+	public HashMap<Long, HashMap<RatingMode, Long>> getSeriesMap() {
+		return seriesMap;
+	}
+	@Override
+	public void setSeriesMap(HashMap<Long, HashMap<RatingMode, Long>> seriesMap) {
+		this.seriesMap = seriesMap;
+	}
+
+	@Override
+	public int getCurrentUROrdinal() {
+		return currentUROrdinal;
+	}
+
+	@Override
+	public void setCurrentUROrdinal(int currentUROrdinal) {
+		this.currentUROrdinal = currentUROrdinal;
 	}
 
 

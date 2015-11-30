@@ -3,6 +3,7 @@
  */
 package net.rugby.foundation.model.shared;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,4 +45,12 @@ public interface ICoreConfiguration extends IHasId {
 	String getEngineUrl();
 	public abstract Long getGlobalCompId();
 	public abstract void setGlobalCompId(Long globalCompId);
+	HashMap<Long, HashMap<RatingMode, Long>> getSeriesMap();
+	void setSeriesMap(HashMap<Long, HashMap<RatingMode, Long>> seriesMap);
+	List<Long> getCompsForClient();
+	void setCompsForClient(List<Long> compsUnderway);
+	void addCompForClient(Long compId);
+	void removeCompForClient(Long compId);
+	void setCurrentUROrdinal(int currentUROrdinal);
+	int getCurrentUROrdinal();
 }

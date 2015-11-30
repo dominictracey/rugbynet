@@ -87,13 +87,13 @@ public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory impl
 			}
 
 			ofy.put(pms);
-			
+
 			// clear the memcache for this pms's match
 			super.flushByMatchId(pms.getMatchId());
-			
+
 			// @TODO need to also invalidate the memcache when ratingQueries have this PMS...
 			// 	in reality, the PlayerRatings are wrong a well so everything needs to go there.
-			
+
 			return pms;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put" + ex.getMessage(), ex);
@@ -106,10 +106,10 @@ public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory impl
 			if (val != null) {
 				// delete any dependencies first
 				rsf.deleteForPMSid(val.getId());
-				
+
 				Objectify ofy = DataStoreFactory.getOfy();
 				ofy.delete(val);
-				
+
 				return true;
 			} else {
 				return false;
@@ -147,19 +147,19 @@ public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory impl
 	public IPlayerMatchStats create() {
 		try {
 			return new ScrumPlayerMatchStats();
-			
+
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in create: " + ex.getLocalizedMessage());
 			return null;
 		}
-		
+
 	}
 
 	@Override
 	protected List<IPlayerMatchStats> getFromPersistentDatastoreByMatchId(Long id) {
 		try {
 			List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
-			
+
 			Objectify ofy = DataStoreFactory.getOfy();
 			// @REX should we just check the match - don't we need to also cross-check against comp as well?
 			Query<ScrumPlayerMatchStats> qg = ofy.query(ScrumPlayerMatchStats.class).filter("matchId", id).order("teamId").order("slot");;
@@ -168,51 +168,69 @@ public class OfyPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory impl
 			while (it.hasNext()) {
 				list.add((IPlayerMatchStats)it.next());
 			}
-			
+
 			return list;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in getFromPersistentDatastoreByMatchId: " + ex.getLocalizedMessage());
 			return null;
 		}
 	}
-	
+
 	@Override
 	protected List<IPlayerMatchStats> queryFromPersistentDatastore(IRatingQuery rq) {
 		Objectify ofy = DataStoreFactory.getOfy();
 
 		// @REX case of just specifying the comp and not the rounds (want all rounds)
 		List<Long> matchIds = new ArrayList<Long>();
-		for (Long rid : rq.getRoundIds()) {
-			IRound r = rf.get(rid);
-			for (Long mid : r.getMatchIDs()) {
-				matchIds.add(mid);
+		
+		// are we just looking for a single match?
+		if (rq.getRoundIds() != null && rq.getRoundIds().size() == 1 && rq.getTeamIds() != null && rq.getTeamIds().size() == 2) {
+			// single match
+			IRound r = rf.get(rq.getRoundIds().get(0));
+			for (IMatchGroup m : r.getMatches()) {
+				if (m.getHomeTeamId().equals(rq.getTeamIds().get(0)) || m.getVisitingTeamId().equals(rq.getTeamIds().get(0))) {
+					if (m.getHomeTeamId().equals(rq.getTeamIds().get(1)) || m.getVisitingTeamId().equals(rq.getTeamIds().get(1))) {
+						matchIds.add(m.getId());
+					}
+				}
+			}
+		} else {
+			for (Long rid : rq.getRoundIds()) {
+				IRound r = rf.get(rid);
+				for (Long mid : r.getMatchIDs()) {
+					matchIds.add(mid);
+				}
 			}
 		}
-		
-		Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId in",matchIds);
 
-		if (rq.getPositions() != null && !rq.getPositions().isEmpty()) {
-			qpms = qpms.filter("pos in",rq.getPositions());
+		if (matchIds != null && !matchIds.isEmpty()) {
+			Query<ScrumPlayerMatchStats> qpms = ofy.query(ScrumPlayerMatchStats.class).filter("matchId in",matchIds);
+
+			if (rq.getPositions() != null && !rq.getPositions().isEmpty()) {
+				qpms = qpms.filter("pos in",rq.getPositions());
+			}
+
+
+			if (rq.getCountryIds() != null && !rq.getCountryIds().isEmpty() && !rq.getCountryIds().contains(5000L)) {
+				qpms = qpms.filter("countryId in", rq.getCountryIds());
+			}
+
+
+			if (rq.getTeamIds() != null && !rq.getTeamIds().isEmpty() && !rq.getTeamIds().contains(-1L)) {
+				qpms = qpms.filter("teamId in", rq.getTeamIds());
+			}
+
+
+			List<ScrumPlayerMatchStats> toFlop = Lists.reverse(qpms.list());
+			List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
+
+			for (ScrumPlayerMatchStats spms : toFlop) {
+				list.add(spms);
+			}
+			return list;
+		} else {
+
+			return new ArrayList<IPlayerMatchStats>();
 		}
-
-
-		if (rq.getCountryIds() != null && !rq.getCountryIds().isEmpty() && !rq.getCountryIds().contains(5000L)) {
-			qpms = qpms.filter("countryId in", rq.getCountryIds());
-		}
-
-
-		if (rq.getTeamIds() != null && !rq.getTeamIds().isEmpty() && !rq.getTeamIds().contains(-1L)) {
-			qpms = qpms.filter("teamId in", rq.getTeamIds());
-		}
-
-
-		List<ScrumPlayerMatchStats> toFlop = Lists.reverse(qpms.list());
-		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
-
-		for (ScrumPlayerMatchStats spms : toFlop) {
-			list.add(spms);
-		}
-
-		return list;
 	}
 }

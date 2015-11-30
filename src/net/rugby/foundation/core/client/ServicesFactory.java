@@ -17,7 +17,10 @@ public class ServicesFactory {
 
 	static
 	{
-	((ServiceDefTarget) rpcService).setServiceEntryPoint(GWT.getHostPageBaseURL() + CoreServiceAsync.END_POINT);
+		// The core service should be in servername/Core/
+		// 
+		String serverPart = GWT.getHostPageBaseURL().substring(0, GWT.getHostPageBaseURL().indexOf("/", 9));
+		((ServiceDefTarget) rpcService).setServiceEntryPoint(serverPart + "/" + CoreServiceAsync.END_POINT);
 	}
 
 

@@ -1,6 +1,7 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,13 +38,13 @@ public class OfyContentFactory extends BaseCachingFactory<IContent> implements I
 			Objectify ofy = DataStoreFactory.getOfy();
 			ofy.put((Content)t);
 			dropAllList();
-			
+
 			// store in memcache by div if it is of that sort
 			if (t!= null && t.getDiv() != null && !t.getDiv().isEmpty()) {
 				String divKey = this.getClass().getCanonicalName() + t.getDiv();
 				super.putItem(divKey, t);
 			}
-			
+
 			return t;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,ex.getLocalizedMessage(),ex);
@@ -85,7 +86,7 @@ public class OfyContentFactory extends BaseCachingFactory<IContent> implements I
 	@Override
 	public List<IContent> getAll(Boolean onlyActive) {
 		List<IContent> list = super.getList(key);
-		
+
 		if (list == null) {
 			Objectify ofy = DataStoreFactory.getOfy();
 			Query<Content> qc = null;
@@ -94,17 +95,17 @@ public class OfyContentFactory extends BaseCachingFactory<IContent> implements I
 			} else {
 				qc = ofy.query(Content.class);
 			}
-			
+
 			//@REX hate this
 			list = new ArrayList<IContent>();
 			Iterator<Content> it = qc.iterator();
 			while (it.hasNext()) {
 				list.add(it.next());
 			}
-			
+
 			super.putList(key, list);
 		}
-		
+
 		return list;
 	}
 
@@ -112,7 +113,7 @@ public class OfyContentFactory extends BaseCachingFactory<IContent> implements I
 	public IContent getForDiv(String div) {
 		String divKey = this.getClass().getCanonicalName() + div;
 		IContent content = super.getItem(divKey);
-		
+
 		if (content == null) {
 			Objectify ofy = DataStoreFactory.getOfy();
 			Query<Content> qc = ofy.query(Content.class).filter("div", div);
@@ -123,10 +124,47 @@ public class OfyContentFactory extends BaseCachingFactory<IContent> implements I
 		}
 		return content;
 	}
-	
+
 	private void dropAllList() {
 		super.putList(key, null);
-		
+
+	}
+
+	protected HashMap<String, Long> menuMap = null;
+
+	@Override
+	public HashMap<String, Long> getMenuMap(boolean b) {
+		try {
+			if (menuMap == null) {
+				menuMap = new HashMap<String, Long>();
+
+				List<IContent> list = getAll(true);
+				for (IContent c : list) {
+					if (c.isShowInMenu()) {
+						// we put the sort order as the first three chars of the name so the client can sort by this, then strip them off.
+						String name = String.format("%03d", c.getMenuOrder()) + c.getTitle();
+						menuMap.put(name, c.getId());
+					}
+				}
+			}
+
+			return menuMap;
+		} catch (NotFoundException ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			return null;
+		}
+	}
+
+	@Override
+	public IContent get(String title) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Content> qc = ofy.query(Content.class).filter("title", title);			
+			return qc.get();
+		} catch (NotFoundException ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			return null;
+		}
 	}
 
 }

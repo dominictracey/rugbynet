@@ -1,91 +1,78 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.Criteria;
+import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.constants.IconSize;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.gwt.CellTable;
+
 import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.ImageCell;
-import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 public class CompactTopTenListViewImpl extends Composite implements TopTenListView<ITopTenItem>
 {
-	private static TopTenListViewImplUiBinder uiBinder = GWT.create(TopTenListViewImplUiBinder.class);
+	private static CompactTopTenListViewImplUiBinder uiBinder = GWT.create(CompactTopTenListViewImplUiBinder.class);
 
 
 	@UiField HTMLPanel topTenPanel;
 
+	@UiField 
+	CellTable<ITopTenItem> items;
 
-	@UiField CellTable<ITopTenItem> items;
-	@UiField Heading title;
-	@UiField HTML details1;
-	@UiField com.github.gwtbootstrap.client.ui.Row contentPanel;
-	@UiField VerticalPanel contentArea;
-	@UiField Button prevButton;
-	@UiField Button nextButton;
-
-	List<TopTenItemView> itemList;
+	@UiField HTML generated;
+	@UiField HTML algorithm;
+	
 	private ITopTenList list;
 	private int itemCount;
 
 
 
 
-	private TopTenListView.TopTenListViewPresenter presenter;
 
-
+	private TopTenListViewPresenter presenter;
 	private ClientFactory clientFactory;
+
+
+	private boolean showContent;
 
 
 	@UiTemplate("CompactTopTenListViewImpl.ui.xml")
 
-	interface TopTenListViewImplUiBinder extends UiBinder<Widget, CompactTopTenListViewImpl>
+	interface CompactTopTenListViewImplUiBinder extends UiBinder<Widget, CompactTopTenListViewImpl>
 	{
 	}
 
 
 	public CompactTopTenListViewImpl()
 	{
-		// add the login bar to the top
-		//		navbar = new NavBarViewImpl();
-		//		RootPanel.get("navbar").add(navbar);
 
 		initWidget(uiBinder.createAndBindUi(this));
-		prevButton.setIconSize(IconSize.LARGE);
-		prevButton.setIcon(IconType.CHEVRON_LEFT);
-		nextButton.setIconSize(IconSize.LARGE);
-		nextButton.setIcon(IconType.CHEVRON_RIGHT);
-		prevButton.setVisible(false);
-		nextButton.setVisible(false);
-		contentPanel.addStyleName("contentPanel");
-		contentArea.addStyleName("contentArea");
-		
-		
-		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+
+		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)
 			{
@@ -98,25 +85,33 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 		});
 
-		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-				return s.getPlayer() == null ? "" : s.getPlayer().getDisplayName();
+				SafeHtmlBuilder sb = new SafeHtmlBuilder();
+				String name = s.getPlayer() == null ? "" : s.getPlayer().getDisplayName();
+				sb.appendHtmlConstant(name);
+				return sb.toSafeHtml().asString();
 			}
+
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
 				return "lead text-center compactTTL";
 
 			}
+
 		});
-		
-		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+
+		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-				
-				return s.getRating() == 0 ? "" : "(" + Integer.toString(s.getRating()) + ")";
+				if (Window.getClientWidth() > 479) {
+					return s.getRating() == 0 ? "" : "(" + Integer.toString(s.getRating()) + ")";
+				} else {
+					return s.getPosition().getAbbr() + " (" + Integer.toString(s.getRating()) + ")";
+				}
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
@@ -125,68 +120,145 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 			}
 		});
 
-		ImageCell ratingDetailsCell = new ImageCell() {
-			@Override
-			public void render(Context context, String value, SafeHtmlBuilder sb) {
-				if (((ITopTenItem)context.getKey()).getRating() != 0) {
-					String imagePath = "/resources/info35.png";
-					sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '30px' width = '30px' title=\"click for details\"/>");
-				}
-			}
-			
-			public Set<String> getConsumedEvents() {
-	            HashSet<String> events = new HashSet<String>();
-	            events.add("click");
-	            return events;
-	        }
-		};
-		
-		items.addColumn(new Column<ITopTenItem,String>(ratingDetailsCell) {
-			@Override
-			public String getValue(ITopTenItem s)
-			{ //
-				return "";
-			}
-			@Override
-			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return "compactTTL";
-			}
-
-		});
-		
-		items.addColumn(new Column<ITopTenItem,String>(new TextCell()){
+		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)
 			{
-				return s.getPosition() == null ? "" : s.getPosition().getName();
+				if (Window.getClientWidth() > 991) {
+					return s.getPosition() == null ? "" : s.getPosition().getName();
+				} else if (Window.getClientWidth() > 479) {
+					return s.getPosition() == null ? "" : s.getPosition().getAbbr();
+				} else {
+					return "";  // stack up with rating
+				}
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return "text-center compactTTL position";
-
+				return "compactTTL"; //return "text-center compactTTL position";
 			}
 		});
 
-		ImageCell imageCell = new ImageCell() {
-			@Override
-			public void render(Context context, String value, SafeHtmlBuilder sb) {
-				if (((ITopTenItem)context.getKey()).getTeamId() != null) {
-					String imagePath = "/resources/" + ((ITopTenItem)context.getKey()).getTeamId() + "/200.png";
-					sb.appendHtmlConstant("<img src = '"+imagePath+"' height = '40px' width = '40px' title=\"" + ((ITopTenItem)context.getKey()).getTeamName()  + "\"/>");
-				}
-
-			}
-		};
-
-		items.addColumn(new Column<ITopTenItem,String>(imageCell){
+		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)
-			{ //
-				return "";
+			{
+
+				return " ";
+			}
+
+
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {				
+				return clientFactory.getTeamLogoStyle(value.getTeamId()) + " teamlogo-small";
+			}
+		});
+
+		// movement icon
+		items.addColumn(new TextColumn<ITopTenItem>(){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				return " ";
+			}
+
+
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {	
+				String style = "movement ";
+				if (value.getLastOrdinal() == 0) {
+					style += "movement-none";
+				} else {
+					if (value.getLastOrdinal() == value.getOrdinal()) {
+						style += "movement-unchanged";
+					} else if (value.getLastOrdinal() > value.getOrdinal()) {
+						style += "movement-up";
+					} else {
+						style += "movement-down";
+					}
+				}
+				return style;
+			}
+		});
+		
+		items.addColumn(new TextColumn<ITopTenItem>(){
+			@Override
+			public String getValue(ITopTenItem s)
+			{
+				if (s.getLastOrdinal() == 0) {
+					return "";
+				}
+				
+				if (s.getLastOrdinal() > s.getOrdinal()) {
+					return "(" + s.getLastOrdinal() + ")";
+				} else if (s.getLastOrdinal() < s.getOrdinal()) {
+					return "(" + s.getLastOrdinal() + ")";
+				} else {
+					return "(" + s.getLastOrdinal() + ")";
+				}
 			}
 			@Override
 			public String getCellStyleNames(Context context, ITopTenItem value) {
-				return "compactTTL";
+				return "text-right compactTTL position";
+
+			}
+		});
+		
+		items.addColumn(new Column<ITopTenItem, SafeHtml>(new SafeHtmlCell()){
+			@Override
+			public SafeHtml getValue(ITopTenItem s)
+			{
+				SafeHtmlBuilder sb = new SafeHtmlBuilder();
+				String guid = "";
+				
+				// this will always drive users to the feature, even if they share the series link (a good thing?)
+				if (s.getFeatureGuid() == null) {
+					guid = s.getPlaceGuid();
+				} else {
+					guid = s.getFeatureGuid();
+				}
+				
+				String listDesc = list.getTwitterDescription();
+				if (listDesc == null || listDesc.isEmpty()) {
+					listDesc = list.getTitle();
+				}
+
+				String tweet = s.getTweet();  // @player of @team
+				if (clientFactory.getLoginInfo() != null && (clientFactory.getLoginInfo().isTopTenContentContributor() || clientFactory.getLoginInfo().isTopTenContentEditor())) {
+					if (tweet != null && !tweet.isEmpty()) {						
+						//assert(tweet.charAt(0) == '@');	
+						tweet += " is #" + s.getOrdinal() + " on @TheRugbyNet " + listDesc;
+						if (s.getTwitterChannel() != null && !s.getTwitterChannel().isEmpty() && tweet.length() < 115 - s.getTwitterChannel().length()) {
+							 tweet += " " + s.getTwitterChannel();
+						}
+					}
+				} else {
+					// just a regular user					
+					if (tweet != null && !tweet.isEmpty()) {
+
+						tweet = "Congrats to " + s.getTweet();
+
+						tweet += " for being #" + s.getOrdinal() + " on @TheRugbyNet " + listDesc;
+						
+						if (s.getTwitterChannel() != null && !s.getTwitterChannel().isEmpty() && tweet.length() < 115 - s.getTwitterChannel().length()) {
+							 tweet += " " + s.getTwitterChannel();
+						}
+
+					}
+				}
+
+				sb.appendHtmlConstant("<div class=\"addthis_toolbox addthis_default_style addthis_32x32_style rugbyNetAddThis\" addthis:url=\"" + clientFactory.getCoreConfig().getBaseToptenUrl() + guid + "\" addthis:title=\"" + tweet + "\">"
+						//						+ "<a class=\"addthis_button_email\"></a>"
+						+ "<a class=\"addthis_button_facebook\"></a>"
+						+ "<a class=\"addthis_button_twitter\"></a>"
+						//						+ "<a class=\"addthis_button_reddit\"></a>"
+						+ "<a class=\"addthis_button_compact\">Share</a>"
+						+ "</div>");
+				return sb.toSafeHtml();
+			}
+			@Override
+			public String getCellStyleNames(Context context, ITopTenItem value) {
+				return ""; //return "text-right compactTTL position";
+
 			}
 		});
 
@@ -194,80 +266,58 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 			@Override
 			public void onCellPreview(CellPreviewEvent<ITopTenItem> event) {
-				boolean isClick = "click".equals(event.getNativeEvent().getType());
-				if (isClick) {
-					if (event.getColumn() == 3) {
-						presenter.showRatingDetails(event.getValue());
+				if (event.getColumn() != 7) {
+					boolean isClick = "click".equals(event.getNativeEvent().getType());
+					if (isClick) {
+						if (presenter != null && event != null) {
+							presenter.showRatingDetails(event.getValue());
+						}
 					}
 				}
 			}
 		});
+
+		items.getElement().getStyle().setCursor(Cursor.POINTER); 
+
+		topTenPanel.addStyleName("compactTopTenPanel");
 	}
 
 
 	@Override
 	public void setList(final ITopTenList result, final String baseUrl) {
 		list = result;
-		//setVisible(false);
+		
 		if (result != null) {
-			recordAnalyticsHit(baseUrl + "#listId=" + result.getId(), result.getTitle());
 
-			clientFactory.getHeaderView().setHeroListInfo(result.getTitle(),result.getContent());
-			clientFactory.getHeaderView().setDetails("");
-			clientFactory.getHeaderView().setHeroTextBig(false);
-			
-			if (list.getPrevPublishedId() != null) {
-				prevButton.setVisible(true);
-			} else {
-				prevButton.setVisible(false);
-			}
+			recordAnalyticsHit(Window.Location.getPath(), result.getTitle());
 
-			if (list.getNextPublishedId() != null) {
-				nextButton.setVisible(true);
-			} else {
-				nextButton.setVisible(false);
-			}
-			
-			title.setText(result.getTitle());
-			details1.setHTML(result.getContent() + "<div id=\"fbListLike\"/>");
 			items.setRowData(result.getList());
-			//			Iterator<ITopTenItem> it = result.getList().iterator();
-			//			int count = 0;
-			//			if (it != null) {
-			//				itemList = new ArrayList<TopTenItemView>();
-			//
-			//				while (it.hasNext()) {
-			//					final ITopTenItem item = it.next();
-			//
-			//					final int fCount = count++;
-			//					Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
-			//						@Override
-			//						public void execute() {
-			//
-			//							TopTenItemView itemView = new TopTenItemView(item, fCount, result.getId(), item.getPlayerId(), baseUrl);
-			//							itemList.add(itemView);
-			//							items.add(itemView);
-			//							presenter.setTTIButtons(itemView);
-			//						}
-			//					});
-			//				}
-			//			}
-
-//			Element loadPanel = DOM.getElementById("loadPanel");
-//			if (loadPanel != null && loadPanel.hasParentElement()) {
-//				loadPanel.removeFromParent();
-//			}
-			//setVisible(true);
+			generated.setHTML("<i>generated: " + result.getCreated().toGMTString() + "</i>");
+			String algo = "";
+			if (result.getSeries() != null && result.getSeries() == true) {
+				algo = "This list was created using the <u>" + clientFactory.getSeriesView().getMatrix().getCriteria().getMenuName() + "</u> algorithm.<br/>";
+				if (clientFactory.getSeriesView().getMatrix().getCriteria() == Criteria.AVERAGE_IMPACT) {
+					
+					if (clientFactory.getSeriesView().getQuery().getMinMinutesType() == MinMinutes.ROUND) {
+						algo += "* Includes only players who have averaged at least " + clientFactory.getSeriesView().getQuery().getMinMinutes() + " minutes per round.<br/>";
+					} else if (clientFactory.getSeriesView().getQuery().getMinMinutesType() == MinMinutes.TOTAL) {
+						algo += "* Includes only players with at least " + clientFactory.getSeriesView().getQuery().getMinMinutes() + " minutes played in the last twelve months.<br/>";
+					} 
+						
+				}
+			} 
+			algo += " To learn about how these lists are crafted, click <a href=\"#Content:contentId=5171798064758784\">here.";
+			algorithm.setHTML(algo);
 			
-			presenter.setFBListLike(result, baseUrl);
+			Scheduler.get().scheduleDeferred(new ScheduledCommand() {    
+				@Override
+				public void execute() {
+					renderAddThis();
+				}
+			});
 		} else {
 			items.setVisible(false);
-			clientFactory.getHeaderView().setHeroListInfo("Top Rugby Performances","Choose from the Competition menu above to view the latest picks for Top Ten Performances");
-			//clientFactory.getNavBarView().setDetails("Check back every Monday for top ten performances from competitions.");
-			prevButton.setVisible(false);
-			nextButton.setVisible(false);
 		}
-
 
 	}
 
@@ -278,41 +328,9 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 
 	@Override
-	public List<TopTenItemView> getItemViews() {
-		return null;
-	}
-
-	@UiHandler("prevButton")
-	void onPrevButtonClicked(ClickEvent event) {	
-		presenter.showPrev();
-	}
-
-	@UiHandler("nextButton")
-	void onNextButtonClicked(ClickEvent event) {	
-		presenter.showNext();
-	}
-
-
-	@Override
 	public void setPresenter(TopTenListViewPresenter presenter) {
 		this.presenter = presenter;
 	}
-
-
-	@Override
-	public void hasNext(boolean has) {
-		nextButton.setEnabled(has);
-		nextButton.setVisible(has);
-	}
-
-
-	@Override
-	public void hasPrev(boolean has) {
-		prevButton.setEnabled(has);	
-		prevButton.setVisible(has);
-
-	}
-
 
 	@Override
 	public void setClientFactory(ClientFactory clientFactory) {
@@ -333,9 +351,35 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	// per http://stackoverflow.com/questions/2457794/integrating-google-analytics-into-gwt-application
 	// ??       $wnd.ganew.push(['_trackPageview(' + title + ')']);
 	public static native void recordAnalyticsHit(String url, String title) /*-{
- 
-    $wnd.ganew('send', 'pageview', {'page': url,'title': title});
+    	$wnd.ganew('send', 'pageview', {'page': url,'title': title});
 	}-*/;
+
+	public static native void renderAddThis() /*-{
+		$wnd.addthis.update('config', 'pubid', 'ra-5425a2ac6bdc588a');
+		$wnd.addthis.update('config', 'data_ga_property', 'UA-2626751-1');
+		$wnd.addthis.update('config', 'data_ga_social', true);
+		$wnd.addthis.toolbox(".addthis_toolbox");
+	}-*/;
+
+	@Override
+	public void showContent(boolean show) {
+		this.showContent = show;
+
+	}
+
+
+	@Override
+	public void hasNext(boolean has) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	@Override
+	public void hasPrev(boolean has) {
+		// TODO Auto-generated method stub
+
+	}
 
 
 }

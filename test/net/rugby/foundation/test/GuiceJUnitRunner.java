@@ -67,3 +67,4 @@ public class GuiceJUnitRunner extends BlockJUnit4ClassRunner {
         return annotation.value();
     }
 }
+

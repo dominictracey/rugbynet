@@ -31,9 +31,10 @@
 			</g:MenuBar>
 		</g:MenuItem>
 		<g:MenuItem ui:field="PortalMenuItem">
-			Portal
+			Analysis
 			<g:MenuBar ui:field="portalBar" vertical="true">
-			    <g:MenuItem ui:field="portalMenuShow">Show</g:MenuItem>
+			    <g:MenuItem ui:field="portalMenuShow">Ad hoc</g:MenuItem>
+			    <g:MenuItem ui:field="seriesMenuShow">Series</g:MenuItem>
 			</g:MenuBar>
 		</g:MenuItem>
 		<g:MenuItem ui:field="schemaMenuItem">

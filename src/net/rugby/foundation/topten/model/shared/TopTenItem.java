@@ -26,9 +26,7 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected String text;
 	@Unindexed
 	protected String imageUrl;
-	@Unindexed
 	protected Long contributorId;
-	@Unindexed
 	protected Long editorId;
 	@Unindexed
 	protected boolean isSubmitted;
@@ -42,21 +40,33 @@ public class TopTenItem implements Serializable, ITopTenItem
 	protected Long teamId;
 	@Unindexed
 	protected Position.position position;
+	@Unindexed
 	protected int ordinal;
 	@Unindexed
+	protected int lastOrdinal;
+	@Unindexed
 	protected Long playerRatingId;
+	@Unindexed
 	protected int rating;
+	protected String placeGuid;
+	protected String featureGuid;
+	@Unindexed
+	protected String tweet;
+	@Unindexed
+	protected String twitterChannel;
 	
-	public TopTenItem() {
+	public TopTenItem()
+	{
 		
 	}
 	
-	public TopTenItem(Long id, Long playerId, IPlayer player, String text,
+	public TopTenItem(int ordinal, Long id, Long playerId, IPlayer player, String text,
 			String image, Long contributorId, Long editorId, boolean isSubmitted, 
 			String matchReportLink, String teamName, Long teamId, Position.position position, 
-			ITopTenList list, Long playerRatingId, int rating) {
-		super();
+			ITopTenList list, Long playerRatingId, int rating, String placeGuid) {
+		//super();
 		this.id = id;
+		this.ordinal = ordinal;
 		this.playerId = playerId;
 		this.player = player;
 		this.text = text;
@@ -69,10 +79,11 @@ public class TopTenItem implements Serializable, ITopTenItem
 		this.teamId = teamId;
 		this.parentId = list.getId();
 		//this.parent = list;
-		this.parentId = list.getId();
+
 		this.position = position;
 		this.playerRatingId = playerRatingId;
 		this.rating = rating;
+		this.placeGuid = placeGuid;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.ITopTenItem#getId()
@@ -251,6 +262,15 @@ public class TopTenItem implements Serializable, ITopTenItem
 		return ordinal;
 	}
 	@Override
+	public int getLastOrdinal() {
+		return lastOrdinal;
+	}
+	@Override
+	public void setLastOrdinal(int lastOrdinal) {
+		this.lastOrdinal = lastOrdinal;
+	}
+
+	@Override
 	public Long getPlayerRatingId() {
 		return playerRatingId;
 	}
@@ -265,6 +285,38 @@ public class TopTenItem implements Serializable, ITopTenItem
 	@Override
 	public void setRating(int rating) {
 		this.rating = rating;
+	}
+	@Override
+	public String getPlaceGuid() {
+		return placeGuid;
+	}
+	@Override
+	public void setPlaceGuid(String placeGuid) {
+		this.placeGuid = placeGuid;
+	}
+	@Override
+	public String getTweet() {
+		return tweet;
+	}
+	@Override
+	public void setTweet(String tweet) {
+		this.tweet = tweet;
+	}
+	@Override
+	public String getFeatureGuid() {
+		return featureGuid;
+	}
+	@Override
+	public void setFeatureGuid(String featureGuid) {
+		this.featureGuid = featureGuid;
+	}
+	@Override
+	public String getTwitterChannel() {
+		return twitterChannel;
+	}
+	@Override
+	public void setTwitterChannel(String twitterChannel) {
+		this.twitterChannel = twitterChannel;
 	}
 
 }

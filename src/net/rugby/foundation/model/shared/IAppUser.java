@@ -224,4 +224,8 @@ public interface IAppUser {
 	 */
 	boolean isMustChangePassword();
 
+	void setOath2(boolean isOath2);
+
+	boolean isOath2();
+
 }

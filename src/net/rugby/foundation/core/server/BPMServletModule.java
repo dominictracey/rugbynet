@@ -2,6 +2,8 @@ package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
 import net.rugby.foundation.topten.server.MetaTagGenerator;
+import net.rugby.foundation.topten.server.SeriesPage;
+import net.rugby.foundation.topten.server.SiteMap;
 import net.rugby.foundation.topten.server.TopTenServiceImpl;
 
 import com.google.inject.servlet.ServletModule;
@@ -25,6 +27,8 @@ public class BPMServletModule extends ServletModule {
 		serve("/fb/topten/TopTenService").with(TopTenServiceImpl.class);
 		serve("/fb/topten.html").with(MetaTagGenerator.class);
 		serve("/_ah/login_required").with(LoginRequiredServlet.class);
+		serve("/s/*").with(SeriesPage.class);
+		serve("/sitemap/*").with(SiteMap.class);
 //		serve("/_ah/pipeline/*").with(PipelineServlet.class); // not @Singleton
 	}
 }

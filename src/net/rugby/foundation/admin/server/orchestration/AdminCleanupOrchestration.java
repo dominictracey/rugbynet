@@ -11,16 +11,11 @@ import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 
-import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
-import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
-import net.rugby.foundation.admin.server.model.IQueryRatingEngine;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
-import net.rugby.foundation.model.shared.IRatingQuery.Status;
 
 /**
  * @author home

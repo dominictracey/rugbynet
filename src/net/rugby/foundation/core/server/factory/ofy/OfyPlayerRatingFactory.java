@@ -74,6 +74,15 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 		try {
 			if (rq != null) {
 				Objectify ofy = DataStoreFactory.getOfy();
+				
+				// don't let them double up
+				Query<PlayerRating> prq = ofy.query(PlayerRating.class).filter("playerId", rq.getPlayerId()).filter("queryId", rq.getQueryId());
+				if (prq.count() > 0) {
+					// log and delete the existing one before saving
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Duplicate player rating found for " + rq.getPlayer().getDisplayName() + ". Probably a engine instance shift. Deleting existing one...");
+					ofy.delete(prq.list());
+				}
+				
 				ofy.put(rq);
 
 				return rq;
@@ -186,7 +195,6 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 
 				Query<PlayerRating> qpmr = ofy.query(PlayerRating.class).filter("schemaId", schema.getId());
 				ofy.delete(qpmr);
-
 
 			} else {
 				return false; // null query

@@ -22,11 +22,14 @@ import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestCo
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.CoreTestModule;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -54,13 +57,20 @@ public class TopTenFactoryTester {
 	private IPlayerFactory pf;
 	private IPlayerRatingFactory prf;
 	private IRatingQueryFactory rqf;
+	private ITeamGroupFactory tgf;
+	private IMatchRatingEngineSchemaFactory resf;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	public void setFactory(ITopTenListFactory ttf, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf) {
+	public void setFactory(ITopTenListFactory ttf, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf, 
+			ITeamGroupFactory tgf, IMatchRatingEngineSchemaFactory resf, IConfigurationFactory ccf) {
 		this.ttf = ttf;
 		this.pf = pf;
 		this.prf = prf;
 		this.rqf = rqf;
+		this.tgf = tgf;
+		this.resf = resf;
+		this.ccf = ccf;
 	}
 
 	@Before
@@ -204,8 +214,19 @@ public class TopTenFactoryTester {
 //		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc,1L, null, 10, null);
 		return ttf.create(ttsd);
+	}
+	
+	private ITopTenList createLinkedTTL() {
+//		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
+		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
+
+		TopTenSeedData ttsd = new TopTenSeedData(7710001L, "Top Ten Props - Round 1", desc,1L, null, 10, null);
+		//ITopTenList last =  ttf.create(ttsd);
+		
+		//ttsd = new TopTenSeedData(7700001L, "Top Ten Props - Round 2", desc, 1L, null, 10, null);
+		return ttf.create(ttsd, null); //last);
 	}
 
 	@Test 
@@ -406,9 +427,9 @@ public class TopTenFactoryTester {
 	@Test
 	public void createInNewComp() {
 
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
+		//List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -429,7 +450,7 @@ public class TopTenFactoryTester {
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 		//List<IPlayerRating> 700L = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -458,7 +479,7 @@ public class TopTenFactoryTester {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl1 = ttf.create(ttsd);
 
 		assertTrue(ttl1 != null);
@@ -534,9 +555,9 @@ public class TopTenFactoryTester {
 		// publish 2
 		// delete 1
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
+		//List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, "uno", "one", 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, "uno", "one", 2L, null, 10, null);
 		ITopTenList ttl1 = ttf.create(ttsd); //create 1
 		assertTrue(ttl1 != null);
 		assertFalse(ttl1.getLive());
@@ -545,7 +566,7 @@ public class TopTenFactoryTester {
 		ITopTenList latest = ttf.getLatestForComp(2L);
 		assertTrue(latest == null);
 		
-		ttsd = new TopTenSeedData(700L, "dos", "two", 2L, null, 12L, 10);
+		ttsd = new TopTenSeedData(700L, "dos", "two", 2L, null, 10, null);
 		ITopTenList ttl2 = ttf.create(ttsd); //create 2
 		assertTrue(ttl2 != null);
 		assertFalse(ttl2.getLive());
@@ -557,7 +578,7 @@ public class TopTenFactoryTester {
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest == null);
 		
-		ttsd = new TopTenSeedData(700L, "tres", "three", 2L, null, 12L, 10);
+		ttsd = new TopTenSeedData(700L, "tres", "three", 2L, null, 10, null);
 		ITopTenList ttl3 = ttf.create(ttsd); //create 3
 		assertTrue(ttl3 != null);
 		assertFalse(ttl3.getLive());
@@ -671,7 +692,7 @@ public class TopTenFactoryTester {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -744,7 +765,7 @@ public class TopTenFactoryTester {
 
 		int max = 5;
 	
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, max);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, max, null);
 		ITopTenList ttl = ttf.create(ttsd);
 		
 		assert (ttl != null);
@@ -773,9 +794,11 @@ public class TopTenFactoryTester {
 		//		  (List<IPlayerMatchInfo> pmiList, String title,
 		//					String description, Long compId, Long roundId, position pos,
 		//					Long countryId, Long teamId)
-		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+		//MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
+		prf.getForMatch(5L, resf.getDefault());
+		prf.getForMatch(6L, resf.getDefault());
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc,1L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 		assert (ttl != null);
@@ -786,7 +809,7 @@ public class TopTenFactoryTester {
 				i.getPlayer().setTwitterHandle(null);
 			}
 		}
-		ISocialMediaDirector smd = new SocialMediaDirector();
+		ISocialMediaDirector smd = new SocialMediaDirector(tgf, ttf, ccf, rqf);
 
 		smd.PromoteTopTenList(ttl);
 //		assertTrue(ms.contains(ttl.getId()));
@@ -801,5 +824,12 @@ public class TopTenFactoryTester {
 		deleteAll();
 
 
+	}
+	
+	@Test
+	public void checkNotes() {
+		ITopTenList ttl = createLinkedTTL();
+		assert ttl.getContent() != null;
+		
 	}
 }

@@ -15,13 +15,17 @@
 				Long Name: <g:TextBox ui:field='longName'></g:TextBox><br/>
 				Short Name:  <g:TextBox ui:field='shortName'></g:TextBox><br/>
 				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
+				TTL Desc: <g:TextBox ui:field='ttlDesc'></g:TextBox><span class="small">Top Ten In Form Flankers in XXXXX for Round 7</span><br/>
+				Twitter: <g:TextBox ui:field='twitter'></g:TextBox><br/>
 				CompClubhouse Id: <g:TextBox ui:field='ccid'></g:TextBox><br/>
-				Underway: <g:CheckBox ui:field="underway"/><br/>
+				Underway: <g:CheckBox ui:field="underway"/><span class="small">Available in queries</span><br/>
+				Show in Client: <g:CheckBox ui:field="showInClient"/><span class="small">Show in left nav of TTL client</span><br/>
 				Weighting: <g:TextBox ui:field="weightingFactor"></g:TextBox><br/>
 				Type: <g:ListBox ui:field="compType"></g:ListBox>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 		<g:Button styleName="{style.important}" ui:field="repair">Repair</g:Button>
 		<g:Button styleName="{style.important}" ui:field="setAsDefault">Set as Default</g:Button>
+		<g:Button styleName="{style.important}" ui:field="addRound">Add Round</g:Button>
 		<g:Button styleName="{style.important}" ui:field="delete">Delete</g:Button>
 				
 	</g:HTMLPanel>

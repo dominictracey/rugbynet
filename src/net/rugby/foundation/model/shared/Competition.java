@@ -3,6 +3,7 @@ package net.rugby.foundation.model.shared;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.Id;
@@ -19,19 +20,34 @@ public class Competition implements Serializable, ICompetition {
 	private String longName;
 	private String shortName;
 	private String abbr;
+	
+	private String twitter;
+	private String twitterChannel1;
+	private String twitterChannel2;
+	
+	public void setSeriesMap(HashMap<RatingMode, Long> seriesMap) {
+		this.seriesMap = seriesMap;
+	}
+
 	private Date begin;
 	private Date end;
 	private Boolean underway;
+	private Boolean showToClient;
+	
 	private Long foreignID;
 	private String foreignURL;
 	private Long compClubhouse;
 	private Date lastSaved;
 	private Float weightingFactor;
+	protected String tTLTitleDesc;
 	
 	private int nextRoundIndex;
 	private int prevRoundIndex;
 
-	
+	@Transient
+	protected HashMap<RatingMode,Long> seriesMap = new HashMap<RatingMode,Long>();
+	protected String imageUrl;
+
 	List<Long> roundIDs = new ArrayList<Long>();
 	@Transient
 	List<IRound> rounds = new ArrayList<IRound>();
@@ -40,6 +56,13 @@ public class Competition implements Serializable, ICompetition {
 	@Transient 
 	List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
 	private CompetitionType compType;
+	
+	private Long sponsorId;
+	@Transient
+	private Sponsor sponsor;
+	
+	@Transient
+	private List<Long> componentCompIds = new ArrayList<Long>();
 	
 	public Long getCompClubhouse() {
 		return compClubhouse;
@@ -179,6 +202,14 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setAbbr(String abbr) {
 		this.abbr = abbr;
+	}
+	@Override
+	public String getTwitter() {
+		return twitter;
+	}
+	@Override
+	public void setTwitter(String twitter) {
+		this.twitter = twitter;
 	}
 
 	/* (non-Javadoc)
@@ -369,8 +400,77 @@ public class Competition implements Serializable, ICompetition {
 	public void setWeightingFactor(Float weightingFactor) {
 		this.weightingFactor = weightingFactor;
 	}
+	@Override
+	public String getImageUrl() {
+		return imageUrl;
+	}
+	@Override
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+	@Override
+	public String getTwitterChannel1() {
+		return twitterChannel1;
+	}
+	@Override
+	public void setTwitterChannel1(String twitterChannel1) {
+		this.twitterChannel1 = twitterChannel1;
+	}
+	@Override
+	public String getTwitterChannel2() {
+		return twitterChannel2;
+	}
+	@Override
+	public void setTwitterChannel2(String twitterChannel2) {
+		this.twitterChannel2 = twitterChannel2;
+	}
 
+	@Override
+	public HashMap<RatingMode, Long> getSeriesMap() {
+		return seriesMap;
+	}
 
+	@Override
+	public String getTTLTitleDesc() {
+		return tTLTitleDesc;
+	}
+
+	@Override
+	public void setTTLTitleDesc(String tTLTitleDesc) {
+		this.tTLTitleDesc = tTLTitleDesc;
+	}
+	@Override
+	public Long getSponsorId() {
+		return sponsorId;
+	}
+	@Override
+	public void setSponsorId(Long sponsorId) {
+		this.sponsorId = sponsorId;
+	}
+	@Override
+	public Sponsor getSponsor() {
+		return sponsor;
+	}
+	@Override
+	public void setSponsor(Sponsor sponsor) {
+		this.sponsor = sponsor;
+	}
+	@Override
+	public List<Long> getComponentCompIds() {
+		return componentCompIds;
+	}
+	@Override
+	public void setComponentCompIds(List<Long> componentCompIds) {
+		this.componentCompIds = componentCompIds;
+	}
+	@Override
+	public Boolean getShowToClient() {
+		return showToClient;
+	}
+	@Override
+	public void setShowToClient(Boolean showToClient) {
+		this.showToClient = showToClient;
+	}
 
 
 	/*

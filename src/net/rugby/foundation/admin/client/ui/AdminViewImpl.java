@@ -3,11 +3,15 @@ package net.rugby.foundation.admin.client.ui;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresenter;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewColumnDefinitions;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationViewImpl;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.task.TaskView.TaskViewPresenter;
 import net.rugby.foundation.admin.client.ui.task.TaskViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.task.TaskViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import org.cobogw.gwt.user.client.CSS;
 
@@ -31,6 +35,7 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 	TabPanel tabs;
 	private ClientFactory clientFactory;
 	private PortalView<IPlayerRating> pv;
+	private SeriesConfigurationView<ISeriesConfiguration> scv;
 
 	public AdminViewImpl() {
 
@@ -52,9 +57,15 @@ public class AdminViewImpl extends Composite implements AdminView , SelectionHan
 		TaskViewColumnDefinitions<IAdminTask> taskCols = new TaskViewColumnDefinitions<IAdminTask>();
 		taskv.setColumnDefinitions(taskCols);
 
+		scv = new SeriesConfigurationViewImpl<ISeriesConfiguration>();
+		SeriesConfigurationViewColumnDefinitions<ISeriesConfiguration> scCols = new SeriesConfigurationViewColumnDefinitions<ISeriesConfiguration>();
+		scv.setColumnDefinitions(scCols);
+		
 		tabs.add(cv, "Competitions");
 		tabs.add(ocv, "Orchestration Config");
 		tabs.add(taskv, "Admin Tasks");
+		tabs.add(scv, "Series Config");
+		
 		tabs.addSelectionHandler(this);
 	}
 	

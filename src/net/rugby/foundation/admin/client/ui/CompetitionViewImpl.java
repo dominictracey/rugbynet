@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
@@ -60,14 +62,16 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@UiField SimplePanel jobArea;
 	@UiField Button createAdmin;
 	@UiField Button sanityCheck;
+	@UiField Button virtualComp;
 	@UiField SimplePanel menuBarPanel;
 
 	Presenter listener = null;
 	TreeItem base = null;
 	TreeItem root = null;
-	TreeItem teams = new TreeItem("Teams");
-	TreeItem matches = new TreeItem("Matches");
-	TreeItem rounds = new TreeItem("Rounds");
+	TreeItem teams = new TreeItem();
+
+	TreeItem matches = new TreeItem();
+	TreeItem rounds = new TreeItem();
 
 	Map<String, ITeamGroup> teamMap = null;
 	List<IRound> roundMap = null;
@@ -90,15 +94,19 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
 		url.setText("http://www.espnscrum.com/premiership-2012-13/rugby/series/166258.html");
-		
+
 		resultType.clear();
 		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {
 			resultType.addItem(ICompetition.CompetitionType.values()[i].toString());
-//			if (comp.getCompType() == ICompetition.CompetitionType.values()[i]) {
-//				resultType.setSelectedIndex(i);
-//			}
+			//			if (comp.getCompType() == ICompetition.CompetitionType.values()[i]) {
+			//				resultType.setSelectedIndex(i);
+			//			}
 		}
-		
+
+		teams.setText("Teams");
+		matches.setText("Matches");
+		rounds.setText("Rounds");
+
 		save.setVisible(false);
 		fetch.setText("Fetch teams");
 		step = Step.TEAMS;
@@ -158,6 +166,12 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		listener.sanityCheckClicked();
 	}
 
+	@UiHandler("virtualComp")
+	void onVirtualCompClick(ClickEvent e) {
+
+		listener.virtualCompClicked();
+	}
+
 	@Override
 	public void setPresenter(final Presenter listener) {
 		this.listener = listener;
@@ -186,98 +200,100 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 			@Override
 			public void onSelection(SelectionEvent<TreeItem> event) {
-				if (event.getSelectedItem().equals(teams)) {
-					//listener.teamsClicked();
-				} else if (event.getSelectedItem().equals(rounds)) {
-					//listener.roundsClicked();					
-				} else if (event.getSelectedItem().getParentItem().equals(rounds)) {
-					//listener.roundClicked(event.getSelectedItem().getText());
-				} else {
-					//see how far down we are
-					int depth = 0;
-					TreeItem cursor = event.getSelectedItem();
-					while (!cursor.equals(base)) {
-						depth++;
-						cursor = cursor.getParentItem();
+				if (event != null && event.getSelectedItem() != null) {
+					if (event.getSelectedItem().equals(teams)) {
+						//listener.teamsClicked();
+					} else if (event.getSelectedItem().equals(rounds)) {
+						//listener.roundsClicked();					
+					} else if (event.getSelectedItem().getParentItem().equals(rounds)) {
+						//listener.roundClicked(event.getSelectedItem().getText());
+					} else {
+						//see how far down we are
+						int depth = 0;
+						TreeItem cursor = event.getSelectedItem();
+						while (!cursor.equals(base)) {
+							depth++;
+							cursor = cursor.getParentItem();
+						}
+						if (depth == 1) {  //comp clicked
+							if (event.getSelectedItem().getText().equals("Competition")) {
+								// they clicked on the importer "Competition" - should say "Import" or something
+							}	else {
+								editArea.clear();
+								if (editComp == null) {
+									editComp = new EditComp();								
+								}
+
+								editArea.add(editComp);
+								editComp.setVisible(true);
+								listener.compClicked(editComp, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
+							}							
+						} else if (depth == 2) {  //teams or rounds clicked
+							//						if (event.getSelectedItem().getText().equals("teams")) {
+							//							listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+							//						}	else {
+							//							//listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+							//						}							
+						} else if (depth == 3) { // specific team or round clicked
+							if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
+								editArea.clear();
+								if (editTeam == null) {
+									editTeam = new EditTeam();
+								}
+								editArea.add(editTeam);
+								editTeam.setVisible(true);
+
+								Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]);
+								Long teamId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
+								listener.editTeamInit(editTeam, teamId, compId );
+							} else { // round, so show matches
+								// params are compId and roundId
+								editArea.clear();
+								if (editRound == null) {
+									editRound = new EditRound();
+								}
+								editArea.add(editRound);
+								editRound.setVisible(true);
+
+								listener.roundClicked(editRound, Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),
+										Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
+							}
+						} else if (depth == 4) { // match clicked
+							editArea.clear();
+
+							if (editMatch == null) {
+								editMatch = new EditMatch();
+							}
+							editArea.add(editMatch);
+							editMatch.setVisible(true);
+
+							if (editMatchStats == null) {
+								editMatchStats = new PlayerListViewImpl<IPlayerRating>();
+								if (playerListViewColumnDefinitions == null) {
+									PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerRating>();
+									playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
+								}
+
+								editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
+								editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
+
+								//							editMatchStats = clientFactory.getPlayerListView();
+
+								jobArea.add(editMatchStats);
+								editMatchStats.asWidget().setVisible(true);
+
+							}
+
+							editMatchStats.showWait();
+
+							// find roundId and compId
+							Long roundId = Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]);
+							Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]);
+							Long matchId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
+							listener.editMatchInit(editMatch, editMatchStats, matchId, roundId, compId);
+
+						} 
 					}
-					if (depth == 1) {  //comp clicked
-						if (event.getSelectedItem().getText().equals("Competition")) {
-							// they clicked on the importer "Competition" - should say "Import" or something
-						}	else {
-							editArea.clear();
-							if (editComp == null) {
-								editComp = new EditComp();								
-							}
-
-							editArea.add(editComp);
-							editComp.setVisible(true);
-							listener.compClicked(editComp, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
-						}							
-					} else if (depth == 2) {  //teams or rounds clicked
-//						if (event.getSelectedItem().getText().equals("teams")) {
-//							listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-//						}	else {
-//							//listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-//						}							
-					} else if (depth == 3) { // specific team or round clicked
-						if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
-							editArea.clear();
-							if (editTeam == null) {
-								editTeam = new EditTeam();
-							}
-							editArea.add(editTeam);
-							editTeam.setVisible(true);
-
-							Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]);
-							Long teamId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
-							listener.editTeamInit(editTeam, teamId, compId );
-						} else { // round, so show matches
-							// params are compId and roundId
-							editArea.clear();
-							if (editRound == null) {
-								editRound = new EditRound();
-							}
-							editArea.add(editRound);
-							editRound.setVisible(true);
-							
-							listener.roundClicked(editRound, Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getText().split("\\|")[1]),
-									Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
-						}
-					} else if (depth == 4) { // match clicked
-						editArea.clear();
-
-						if (editMatch == null) {
-							editMatch = new EditMatch();
-						}
-						editArea.add(editMatch);
-						editMatch.setVisible(true);
-
-						if (editMatchStats == null) {
-							editMatchStats = new PlayerListViewImpl<IPlayerRating>();
-							if (playerListViewColumnDefinitions == null) {
-								PlayerListViewColumnDefinitions<?> plvcd =  new PlayerListViewColumnDefinitions<IPlayerRating>();
-								playerListViewColumnDefinitions = plvcd.getColumnDefinitions();
-							}
-
-							editMatchStats.setColumnDefinitions(playerListViewColumnDefinitions);
-							editMatchStats.setColumnHeaders(PlayerListViewColumnDefinitions.getHeaders());
-							
-//							editMatchStats = clientFactory.getPlayerListView();
-
-							jobArea.add(editMatchStats);
-							editMatchStats.asWidget().setVisible(true);
-
-						}
-
-						editMatchStats.showWait();
-
-						// find roundId and compId
-						Long roundId = Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]);
-						Long compId = Long.parseLong(event.getSelectedItem().getParentItem().getParentItem().getParentItem().getText().split("\\|")[1]);
-						Long matchId = Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]);
-						listener.editMatchInit(editMatch, editMatchStats, matchId, roundId, compId);
-
-					} 
 				}
 			}
 		});
@@ -291,7 +307,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		teamMap = tgs;
 		teams.removeItems();
 		for (String tg : tgs.keySet()) {
-			teams.addItem(tg);
+			teams.addTextItem(tg);
 			if (tgs.get(tg).getId() == null) {
 				teams.getChild(teams.getChildCount()-1).getElement().addClassName("gnu");
 			}
@@ -324,7 +340,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			matchMap = mgs;
 			matches.removeItems();
 			for (IMatchGroup m : mgs.values()) {
-				matches.addItem(m.getDisplayName());
+				matches.addTextItem(m.getDisplayName());
 				if (m.getId() == null) {
 					matches.getChild(matches.getChildCount()-1).getElement().addClassName("gnu");
 				}
@@ -341,7 +357,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public void showCompetition(ICompetition result) {
 		comp = result;
-		root.setText(result.getLongName() + "|" + result.getId());
+		String longName = result.getLongName() == null ? "Change me" : result.getLongName();
+		root.setText(longName + "|" + result.getId());
 
 		addRounds(result, result.getRounds());
 		for (IRound r: result.getRounds()) {
@@ -356,39 +373,53 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	@Override
 	public void addComps(List<ICompetition> result) {
 
-		compTree.removeItems();
-		base = new TreeItem("Competitions");
-		root = new TreeItem("Competition");
-		compTree.addItem(base);
-		base.addItem(root);
-		root.addItem(teams);
-		root.addItem(rounds);	
-		root.addItem(matches);
+		try {
+			compTree.removeItems();
+			base = new TreeItem();
+			base.setText("Competitions");
+			root = new TreeItem();
+			root.setText("Competition");
+			compTree.addItem(base);
+			base.addItem(root);
+			root.addItem(teams);
+			root.addItem(rounds);	
+			root.addItem(matches);
 
-		if (compMap == null) {
-			compMap = new HashMap<String,ICompetition>();
-		}
-		for (ICompetition c : result) {
-			compMap.put(c.getId().toString(),c);
+			if (compMap == null) {
+				compMap = new HashMap<String,ICompetition>();
+			}
+			for (ICompetition c : result) {
+				compMap.put(c.getId().toString(),c);
 
-			TreeItem ti = base.addItem(c.getLongName() + "|" + c.getId());
-			ti.addItem("teams");
-			addTeams(c.getId(), c.getTeams());
-			ti.addItem("rounds");
-			addRounds(c,c.getRounds());
-			for (IRound r : c.getRounds()) {
-				addRound(c.getId(),r.getId(),r.getMatches());
-				for (IMatchGroup m: r.getMatches()) {
-					List<IMatchResult> results = new ArrayList<IMatchResult>();
-					ISimpleScoreMatchResult score = m.getSimpleScoreMatchResult();
-					if (score != null) {
-						results.add((IMatchResult) m.getSimpleScoreMatchResult());
-					}
-					if (!results.isEmpty()) {
-						addResults(c.getId(), r, m, results);
+				TreeItem ti = base.addTextItem(c.getLongName() + "|" + c.getId());
+				ti.addTextItem("teams");
+				addTeams(c.getId(), c.getTeams());
+				ti.addTextItem("rounds");
+				addRounds(c,c.getRounds());
+				for (IRound r : c.getRounds()) {
+					try {
+						addRound(c.getId(),r.getId(),r.getMatches());
+						for (IMatchGroup m: r.getMatches()) {
+							try {
+								List<IMatchResult> results = new ArrayList<IMatchResult>();
+								ISimpleScoreMatchResult score = m.getSimpleScoreMatchResult();
+								if (score != null) {
+									results.add((IMatchResult) m.getSimpleScoreMatchResult());
+								}
+								if (!results.isEmpty()) {
+									addResults(c.getId(), r, m, results);
+								}
+							} catch (Throwable ex) {
+								clientFactory.console("Problem with match " + m.getDisplayName());		
+							}
+						}
+					} catch (Throwable ex) {
+						clientFactory.console("Problem with Round " + r.getName());		
 					}
 				}
 			}
+		} catch (Throwable ex) {
+			clientFactory.console("CompViewImpl:AddComps " + ex.getMessage());		
 		}
 		showWait(false);
 		isInitialized = true;
@@ -402,14 +433,18 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		int i = 0;
 		while (i < base.getChildCount()) {
 
-			if (base.getChild(i).getText().contains(comp.getLongName())) {
+			if (base.getChild(i).getText().split("\\|")[0].equals(comp.getLongName())) {
 				base.getChild(i).getChild(1).removeItems();
 				for (IRound r : result) {
 					final IRound rd = r;
 					final int id = i;
 					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 						public void execute() {
-							base.getChild(id).getChild(1).addItem(rd.getName() + " (" + rd.getBegin().toString() +") |" + rd.getId());
+							try {
+								base.getChild(id).getChild(1).addTextItem(rd.getName() + " (" + rd.getBegin().toString() +") |" + rd.getId());
+							} catch (Throwable ex) {
+								clientFactory.console("CompViewImpl:AddRounds " + ex.getMessage());		
+							}
 						}
 					});
 				}
@@ -430,7 +465,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 			if (base.getChild(i).getText().contains(compId.toString())) {
 				base.getChild(i).getChild(0).removeItems();
 				for (ITeamGroup tg : result) {
-					base.getChild(i).getChild(0).addItem(tg.getDisplayName() + "|" + tg.getId());
+					base.getChild(i).getChild(0).addTextItem(tg.getDisplayName() + "|" + tg.getId());
 				}
 				break;
 			}
@@ -449,38 +484,41 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		if (compId != null) {
 			cid = compId.toString();
 		}
-		while (i < base.getChildCount()) {
-			if (base.getChild(i).getText().contains(cid)) {
-				while (j < base.getChild(i).getChild(1).getChildCount()) {
-					String rid = "null";
-					if (roundId != null)
-						rid = roundId.toString().toString();
-					TreeItem round = base.getChild(i).getChild(1).getChild(j);
-					if (round.getText().contains(rid)) {
-						round.removeItems();
-						for (IMatchGroup mg : result) {
-							TreeItem ti = round.addItem(mg.getDisplayName() + "|" + mg.getId());
-							ti.addItem(mg.getDate().toString());
-							if (mg.getLocked() != null) {
-								if (mg.getLocked()) {
-									ti.addItem("Locked");
-								} else {
-									ti.addItem("Not Locked");									
-								}
-							} else 
-								ti.addItem("Not Locked");
-							ti.addItem("results");
+		try {
+			while (i < base.getChildCount()) {
+				if (base.getChild(i).getText().contains(cid)) {
+					while (j < base.getChild(i).getChild(1).getChildCount()) {
+						String rid = "null";
+						if (roundId != null)
+							rid = roundId.toString().toString();
+						TreeItem round = base.getChild(i).getChild(1).getChild(j);
+						if (round.getText().contains(rid)) {
+							round.removeItems();
+							for (IMatchGroup mg : result) {
+								TreeItem ti = round.addTextItem(mg.getDisplayName() + "|" + mg.getId());
+								ti.addTextItem(mg.getDate().toString());
+								if (mg.getLocked() != null) {
+									if (mg.getLocked()) {
+										ti.addTextItem("Locked");
+									} else {
+										ti.addTextItem("Not Locked");									
+									}
+								} else 
+									ti.addTextItem("Not Locked");
+								ti.addTextItem("results");
+							}
+							break;
 						}
-						break;
+						++j;
 					}
-					++j;
+					break;
 				}
-				break;
+				++i;
 			}
-			++i;
+
+		} catch (Throwable ex) {
+			clientFactory.console("CompViewImpl:AddRound " + ex.getMessage());		
 		}
-
-
 	}
 
 	/* (non-Javadoc)
@@ -498,9 +536,9 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						while (k < base.getChild(i).getChild(1).getChild(j).getChildCount()) {
 							if (base.getChild(i).getChild(1).getChild(j).getChild(k).getText().contains(match.getId().toString()) && base.getChild(i).getChild(1).getChild(j).getChild(k).getText().contains(match.getDisplayName())) {
 								for (IMatchResult mr: result) {
-									TreeItem ti = base.getChild(i).getChild(1).getChild(j).getChild(k).getChild(2).addItem(mr.getRecordedDate().toString());
+									TreeItem ti = base.getChild(i).getChild(1).getChild(j).getChild(k).getChild(2).addTextItem(mr.getRecordedDate().toString());
 									if (mr instanceof SimpleScoreMatchResult) {
-										ti.addItem(((ISimpleScoreMatchResult)mr).getHomeScore() + " - " + ((ISimpleScoreMatchResult)mr).getVisitScore());
+										ti.addTextItem(((ISimpleScoreMatchResult)mr).getHomeScore() + " - " + ((ISimpleScoreMatchResult)mr).getVisitScore());
 									}
 								}
 								break;

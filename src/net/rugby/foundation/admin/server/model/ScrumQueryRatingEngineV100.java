@@ -31,6 +31,7 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -39,8 +40,10 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.IRawScore;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
@@ -52,6 +55,7 @@ import net.rugby.foundation.model.shared.Position.position;
 
 public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
+
 	protected Map<Long,ITeamMatchStats> tmsHomeMap = new HashMap<Long,ITeamMatchStats>();
 	protected Map<Long,ITeamMatchStats> tmsVisitMap = new HashMap<Long,ITeamMatchStats>();
 	protected List<IPlayerMatchStats> pmsList = new ArrayList<IPlayerMatchStats>();
@@ -60,6 +64,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	protected Map<Long,Float> matchCompWeights = new HashMap<Long,Float>(); // maps a matchId to a competition weightingFactor
 	// Key: playerId; Value: List of PlayerStatShares for that player in the current query context
 	Map<Long, List<IPlayerStatShares>> playerScoreMap = new HashMap<Long, List<IPlayerStatShares>>();
+	// Key: playerId; Value: Total minutes played
+	Map<Long, Integer> playerTimeMap = new HashMap<Long, Integer>();
 	// Key: matchId; Value: match label
 	protected final Map<Long, String> matchLabelMap = new HashMap<Long, String>();
 	// Key: matchId; Value: scaling factor for that match based on how long ago it occurred
@@ -97,6 +103,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	private float numStatsCompScaled;
 	// sum of the time scaling factors used for the PMSs. (D10)
 	private float numStatsTimeScaled;
+
+	private float numStatsMinutesPlayedScaled;
+	private Float numStatsNotMinuteScaled;
+	
 	// sum of the all scaling factors used for the PMSs. (D32)
 	private float numStatsTotalScaled;
 	// and we keep them in here to make an attempt at scalability
@@ -105,16 +115,28 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	//this is the totals in (yellow) column F of the simulator
 	protected Map<String, Float> scaleTotalMap = new HashMap<String,Float>();
 
+	// a list of PlayerIds who should be excluded from the query for whatever reason (e.g. they haven't played enough minutes)
+	protected List<Long> killList = new ArrayList<Long>();
+
 	protected final String COMP_SCALE_KEY="Competition";
 	protected final String AGE_SCALE_KEY="MatchAge";
 	protected final String STANDINGS_SCALE_KEY="Standings";
+	protected final String TIME_PLAYED_SCALE_KEY="TimePlayed";
+	protected final String NO_MINUTE_SCALE_KEY = "NoMinuteScaling";
 	protected final String NO_SCALE_KEY="Unscaled";
 	protected final String ALL_SCALE_KEY="ActualScaled";
 
 	protected final int NUM_TO_STORE = 30;
+	
 	private IRawScoreFactory rsf;
 	private ICountryFactory cnf;
 	private ITeamGroupFactory tgf;
+
+	protected List<Long> roundPruneList = new ArrayList<Long>();
+	protected List<Integer>uRoundOrdList = null;
+//	private float numStatsNoMinutesTotalScaled;
+//	private float totalNoMinutesScaledScore = 0f;
+
 
 	public ScrumQueryRatingEngineV100() {
 
@@ -144,6 +166,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		scaleTotalMap.put(AGE_SCALE_KEY, 0f);
 		scaleTotalMap.put(COMP_SCALE_KEY, 0f);
 		scaleTotalMap.put(STANDINGS_SCALE_KEY, 0f);
+		scaleTotalMap.put(TIME_PLAYED_SCALE_KEY, 0f);
+		scaleTotalMap.put(NO_MINUTE_SCALE_KEY, 0f);
 	}
 
 
@@ -283,16 +307,16 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			ruckStolen = (float) (otms.getRucks() - otms.getRucksWon());
 			maulStolen = (float) (otms.getMauls() - otms.getMaulsWon());
 
+			CalculatePointDifferential(match);
+			
 			pms = adjustStatsByPosition(pms);
 			pms = adjustStatsByTimePlayed(pms);
 
-			//this.numStats = numStats;
 			this.match = match;
-
-			CalculatePointDifferential(match);
 
 			Normalize();
 			scalingFactorMap.put(NO_SCALE_KEY, 1f);
+			scalingFactorMap.put(ALL_SCALE_KEY, 1f);
 		}
 
 		public PlayerStatShares(IV1EngineWeightValues schema, IRawScore raw,
@@ -302,6 +326,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			match = m;
 			this.pms = pms;
 			scalingFactorMap.put(NO_SCALE_KEY, 1f);
+			scalingFactorMap.put(ALL_SCALE_KEY, 1f);
 		}
 
 		private IPlayerMatchStats adjustStatsByTimePlayed(IPlayerMatchStats pms) {
@@ -321,6 +346,21 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			lineoutStolen *= timeScale;
 			ruckStolen *= timeScale;
 			maulStolen *= timeScale;
+
+			// reduce playing time for cards
+			if (yellowCards > 0) {
+				minutesShare -= yellowCards * 10;
+			}
+
+			// don't parse out the times for these atm, so just mark it zero!
+			if (redCards > 0) {
+				minutesShare = 0;
+			}
+
+			// 6/12/2015 nerfing subs!
+			win *= timeScale;
+			pointDifferential *= timeScale;
+
 			return pms;
 		}
 
@@ -337,16 +377,30 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 			} else if (pms2.getPosition().equals(position.PROP)) {
 				scrumShare = (scrumShare*1.5F);
-
+				scrumLost = (scrumLost*1.5F);
+				scrumStolen = (scrumStolen*1.5F);
 			}  else if (pms2.getPosition().equals(position.HOOKER)) {
 				scrumShare = (scrumShare*1.3F);
-
+				scrumLost = (scrumLost*1.3F);
+				scrumStolen = (scrumStolen*1.3F);
+				lineoutStolen = 0; // defensively hookers don't do much in a steal
 			} else if (pms2.getPosition().equals(position.LOCK)) {
 				lineoutStolen = 0; // no double dip
-			} else if (pms2.getPosition().equals(position.FLANKER) || pms2.getPosition().equals(position.NUMBER8)) {
+			} else if (pms2.getPosition().equals(position.FLANKER)) {
 				scrumShare = (scrumShare*.5F);
+				scrumLost = (scrumLost*.5F);
+				scrumStolen = (scrumStolen*.5F);
 				lineoutShare = (lineoutShare*.3f);
+				lineoutStolen = 0; // no double dip
+			} else if (pms2.getPosition().equals(position.NUMBER8)) {
+				scrumShare = (scrumShare*.5F);
+				scrumLost = (scrumLost*.5F);
+				scrumStolen = (scrumStolen*.5F);
+				lineoutShare = (lineoutShare*.3f);
+				lineoutStolen = 0; // no double dip
 
+				// knock down their metres gained
+				metersRun *= .5;
 			}
 
 			return pms2;
@@ -417,19 +471,19 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			pointDifferential = pointDifferential * weights.getPointsDifferentialWeight();
 			win = win * weights.getWin();
 
-			details = pms.getName() + "\tTeam: " + pms.getTeamAbbr() +"\n"+
+			details = pms.getName() + "\t " + pms.getTeamAbbr() + "\t " + pms.getPosition().getAbbr() +"\n" + 
 					"Tr: "+String.format("%.2f",tries)+" (" +pms.getTries() + ")\tTA: "+String.format("%.2f",tryAssists)+"\t("+pms.getTryAssists()+")\tPts: "+String.format("%.2f",points)+" ("+ pms.getPoints()+")\n"+
-					"K: "+kicks+" ("+pms.getKicks()+")\tR: "+runs+" ("+pms.getRuns()+")\tP: "+passes+" ("+pms.getPasses()+")\n"+
-					"MR: "+metersRun+" ("+pms.getMetersRun()+")\tCB: "+cleanBreaks+" ("+pms.getCleanBreaks()+")\tDB: "+defendersBeaten+" ("+pms.getDefendersBeaten()+")\n"+
-					"OL: "+offloads+" ("+pms.getOffloads()+")\tTO: "+turnovers+" ("+pms.getTurnovers()+")\tT: "+tacklesMade+" ("+pms.getTacklesMade()+")\tTM: "+tacklesMissed+" ("+pms.getTacklesMissed()+")\n"+
-					"LO:"+lineoutsWonOnThrow+" ("+pms.getLineoutsWonOnThrow()+")\tLOS: "+lineoutsStolenOnOppThrow+" ("+pms.getLineoutsStolenOnOppThrow()+")\n"+
-					"P: "+penaltiesConceded+" ("+pms.getPenaltiesConceded()+")\tYC: "+yellowCards+" ("+pms.getYellowCards()+")\tRC: "+redCards+" ("+pms.getRedCards()+")\n"+
-					"ScW: "+scrumShare+" ("+tms.getScrumsWonOnOwnPut()+")\tScL:"+scrumLost+" ("+(tms.getScrumsPutIn()-tms.getScrumsWonOnOwnPut())+")\tScrS:"+scrumStolen+"("+(otms.getScrumsPutIn()-otms.getScrumsWonOnOwnPut())+")\n"+
-					"LOW: "+lineoutShare+" ("+tms.getLineoutsWonOnOwnThrow()+")\tLOL: "+lineoutLost+" ("+(tms.getLineoutsThrownIn() - tms.getLineoutsWonOnOwnThrow())+")\tLOS: "+lineoutStolen+" ("+(otms.getLineoutsThrownIn() - otms.getLineoutsWonOnOwnThrow())+")\n"+
-					"RuW: "+ruckShare+" ("+tms.getRucksWon()+")\tRuL: "+ruckLost+" ("+(tms.getRucks()-tms.getRucksWon())+")\tRuS: "+ruckStolen+" ("+(otms.getRucks() - otms.getRucksWon())+")\n"+
-					"MaW: "+ maulShare+" ("+tms.getMaulsWon()+")\tMaL: "+ maulLost+" ("+(tms.getMauls()-tms.getMaulsWon())+")\tMaS: "+maulStolen+" ("+(otms.getMauls() - otms.getMaulsWon())+")\n"+ 
-					"Min: "+ minutesShare+" ("+pms.getTimePlayed()+")\tPtDiff: "+ pointDifferential+" ("+(pointDifferential/weights.getPointsDifferentialWeight())+")\tWin: " + win + "\n"+
-					"Back: " + getBackScore() + "\tFwd:" + getForwardScore();
+					"K: "+String.format("%.2f",kicks)+" ("+pms.getKicks()+")\tR: "+String.format("%.2f",runs)+" ("+pms.getRuns()+")\tP: "+String.format("%.2f",passes)+" ("+pms.getPasses()+")\n"+
+					"MR: "+String.format("%.2f",metersRun)+" ("+pms.getMetersRun()+")\tCB: "+String.format("%.2f",cleanBreaks)+" ("+pms.getCleanBreaks()+")\tDB: "+String.format("%.2f",defendersBeaten)+" ("+pms.getDefendersBeaten()+")\n"+
+					"OL: "+String.format("%.2f",offloads)+" ("+pms.getOffloads()+")\tTO: "+String.format("%.2f",turnovers)+" ("+pms.getTurnovers()+")\tT: "+String.format("%.2f",tacklesMade)+" ("+pms.getTacklesMade()+")\tTM: "+String.format("%.2f",tacklesMissed)+" ("+pms.getTacklesMissed()+")\n"+
+					"LO:"+String.format("%.2f",lineoutsWonOnThrow)+" ("+pms.getLineoutsWonOnThrow()+")\tLOS: "+String.format("%.2f",lineoutsStolenOnOppThrow)+" ("+pms.getLineoutsStolenOnOppThrow()+")\n"+
+					"P: "+String.format("%.2f",penaltiesConceded)+" ("+pms.getPenaltiesConceded()+")\tYC: "+String.format("%.2f",yellowCards)+" ("+pms.getYellowCards()+")\tRC: "+String.format("%.2f",redCards)+" ("+pms.getRedCards()+")\n"+
+					"ScW: "+String.format("%.2f",scrumShare)+" ("+tms.getScrumsWonOnOwnPut()+")\tScL:"+String.format("%.2f",scrumLost)+" ("+(tms.getScrumsPutIn()-tms.getScrumsWonOnOwnPut())+")\tScrS:"+String.format("%.2f",scrumStolen)+"("+(otms.getScrumsPutIn()-otms.getScrumsWonOnOwnPut())+")\n"+
+					"LOW: "+String.format("%.2f",lineoutShare)+" ("+tms.getLineoutsWonOnOwnThrow()+")\tLOL: "+String.format("%.2f",lineoutLost)+" ("+(tms.getLineoutsThrownIn() - tms.getLineoutsWonOnOwnThrow())+")\tLOS: "+String.format("%.2f",lineoutStolen)+" ("+(otms.getLineoutsThrownIn() - otms.getLineoutsWonOnOwnThrow())+")\n"+
+					"RuW: "+String.format("%.2f",ruckShare)+" ("+tms.getRucksWon()+")\tRuL: "+String.format("%.2f",ruckLost)+" ("+(tms.getRucks()-tms.getRucksWon())+")\tRuS: "+String.format("%.2f",ruckStolen)+" ("+(otms.getRucks() - otms.getRucksWon())+")\n"+
+					"MaW: "+ String.format("%.2f",maulShare)+" ("+tms.getMaulsWon()+")\tMaL: "+ String.format("%.2f",maulLost)+" ("+(tms.getMauls()-tms.getMaulsWon())+")\tMaS: "+String.format("%.2f",maulStolen)+" ("+(otms.getMauls() - otms.getMaulsWon())+")\n"+ 
+					"Min: "+ String.format("%.2f",minutesShare)+" ("+pms.getTimePlayed()+")\tPtDiff: "+ String.format("%.2f",pointDifferential)+" ("+(pointDifferential/weights.getPointsDifferentialWeight())+")\tWin: " + String.format("%.2f",win) + "\n"+
+					"Back: " + String.format("%.2f",getBackScore()) + "\tFwd:" + String.format("%.2f",getForwardScore());
 			//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINEST, pms.getName() + toString());
 
 		}
@@ -538,6 +592,12 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			return getUnscaledScore() * scalingFactor;
 		}
 
+
+		@Override
+		public float getNoMinutesScaledScore() {
+			return getUnscaledScore() * scalingFactorMap.get(TIME_PLAYED_SCALE_KEY);
+		}
+		
 		@Override
 		public Float getScalingFactor(String type) {
 			if (scalingFactorMap.containsKey(type)) {
@@ -566,7 +626,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			//String statsDetails, float backScore, float forwardScore, float rawScore, Long playerMatchStatsId, String matchLabel
 			Integer scaledRating = Math.round(playerScore*scalingFactorMap.get(ALL_SCALE_KEY)/scaleTotalMap.get(ALL_SCALE_KEY)*scaleTotalNumMap.get(ALL_SCALE_KEY)*500);
 			Integer unscaledRating = Math.round(playerScore*scalingFactorMap.get(NO_SCALE_KEY)/scaleTotalMap.get(NO_SCALE_KEY)*scaleTotalNumMap.get(NO_SCALE_KEY)*500);
-			RatingComponent rc = new RatingComponent(toString(),backScore,forwardScore,playerScore,pms.getId(),matchLabel, scaledRating, unscaledRating);
+			RatingComponent rc = new RatingComponent(toString(),backScore,forwardScore,playerScore,pms.getId(),matchLabel, scaledRating, unscaledRating, match.getForeignId());
 
 			rc.addRatingsDetails("Scaling\tValue\tScore\tRating\n----------------------------------------------------\n");
 			for (String key: scalingFactorMap.keySet()) {
@@ -610,6 +670,11 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			} else {
 				summary  += "\t --";
 			}
+			if (scalingFactorMap.containsKey(TIME_PLAYED_SCALE_KEY)) {
+				summary  += "\t" + String.format("%.2f",playerScore*scalingFactorMap.get(TIME_PLAYED_SCALE_KEY)/scaleTotalMap.get(TIME_PLAYED_SCALE_KEY)*scaleTotalNumMap.get(TIME_PLAYED_SCALE_KEY)*500)+"\n";
+			} else {
+				summary  += "\t --";
+			}
 			return summary ;
 		}
 
@@ -645,6 +710,11 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				} else {
 					summary.append("<td> -- </td>\n");
 				}
+				if (scalingFactorMap.containsKey(TIME_PLAYED_SCALE_KEY) && !scalingFactorMap.get(TIME_PLAYED_SCALE_KEY).equals(0f)) {
+					summary.append("<td>" + String.format("%.2f",playerScore*scalingFactorMap.get(TIME_PLAYED_SCALE_KEY)/scaleTotalMap.get(TIME_PLAYED_SCALE_KEY)*scaleTotalNumMap.get(TIME_PLAYED_SCALE_KEY)*500) + "</td>\n");
+				} else {
+					summary.append("<td> -- </td>\n");
+				}
 				summary.append("</tr>\n");
 				return summary.toString();
 			} catch (Throwable e) {
@@ -652,6 +722,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				throw e;
 			}
 		}
+
 	}
 
 	/**
@@ -661,7 +732,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	 * @param pss
 	 * @return
 	 */
-	protected List<IPlayerStatShares> populate(IRatingEngineSchema schema, List<IPlayerStatShares> pss, boolean scaleStandings, boolean scaleCompetition, boolean scaleMatchAge) {
+	protected List<IPlayerStatShares> populate(IRatingEngineSchema schema, List<IPlayerStatShares> pss, boolean scaleStandings, boolean scaleCompetition, boolean scaleMatchAge, boolean scaleMinutesPlayed) {
 		String playerName = "nobody yet";
 		String matchName = "no match yet";
 		// Have to have these weight values available in the schema to work
@@ -669,76 +740,97 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		DateTime now = DateTime.now();
 		for (IPlayerMatchStats pms : pmsList) {
 			try {
-				playerName = pms.getName();
-				IMatchGroup m = mf.get(pms.getMatchId());
-				matchName = m.getDisplayName();
-				if (!standingsFactorMap.containsKey(pms.getMatchId())) {
-					getStandingFactorForMatch(m);
-				}
-				if (!matchCompWeights.containsKey(pms.getMatchId())) {
-					getCompWeightingFactorForMatch(m);
-				}
-				if (!pms.getPosition().equals(position.NONE)) {
-					ITeamMatchStats tms = null;
-					ITeamMatchStats otms = null;
-					if (pms.getTeamId().equals(m.getHomeTeamId())) {
-						tms = tmsHomeMap.get(m.getId());
-						otms =  tmsVisitMap.get(m.getId());
-					} else {
-						tms = tmsVisitMap.get(m.getId());
-						otms = tmsHomeMap.get(m.getId());
-					}
+				if (killList == null || !killList.contains(pms.getPlayerId())) {
+					playerName = pms.getName();
 
-					float totalScales = 1f;
+					IMatchGroup m = mf.get(pms.getMatchId());
+					matchName = m.getDisplayName();
+					if (!standingsFactorMap.containsKey(pms.getMatchId())) {
+						getStandingFactorForMatch(m);
+					}
+					if (!matchCompWeights.containsKey(pms.getMatchId())) {
+						getCompWeightingFactorForMatch(m);
+					}
+					if (!pms.getPosition().equals(position.NONE)) {
+						ITeamMatchStats tms = null;
+						ITeamMatchStats otms = null;
+						if (pms.getTeamId().equals(m.getHomeTeamId())) {
+							tms = tmsHomeMap.get(m.getId());
+							otms =  tmsVisitMap.get(m.getId());
+						} else {
+							tms = tmsVisitMap.get(m.getId());
+							otms = tmsHomeMap.get(m.getId());
+						}
 
-					// see if we have already crunched the numbers on the stats and reuse if so
-					IRawScore raw = rsf.getForPMSid(pms.getId(), schema.getId());
-					IPlayerStatShares score = null;					
-					if (raw == null) {
-						score = getNewStatShares((IV1EngineWeightValues)schema, tms, otms, pms, m);
-						// save it off so we don't have to recalc
-						raw = rsf.create();
-						raw.setPlayerId(pms.getPlayerId());
-						raw.setPlayerMatchStatsId(pms.getId());
-						raw.setSchemaId(schema.getId());
-						raw.setDetails(score.toString());
-						raw.setRawScore(score.getUnscaledScore());
-						rsf.put(raw);
-					} else {
-						score = getNewStatShares((IV1EngineWeightValues)schema, raw, pms, m);
-					}
+						float totalScales = 1f;
+						float totalNoMinutesScales = 1f;
+						
+						// see if we have already crunched the numbers on the stats and reuse if so
+						IRawScore raw = rsf.getForPMSid(pms.getId(), schema.getId());
+						IPlayerStatShares score = null;					
+						if (raw == null) {
+							score = getNewStatShares((IV1EngineWeightValues)schema, tms, otms, pms, m);
+							// save it off so we don't have to recalc
+							raw = rsf.create();
+							raw.setPlayerId(pms.getPlayerId());
+							raw.setPlayerMatchStatsId(pms.getId());
+							raw.setSchemaId(schema.getId());
+							raw.setDetails(score.toString());
+							raw.setRawScore(score.getUnscaledScore());
+							rsf.put(raw);
+						} else {
+							score = getNewStatShares((IV1EngineWeightValues)schema, raw, pms, m);
+						}
 
-					score.setMatchLabel(getMatchLabel(pms));
-					// scale the rating by the match's standingsFactor
-					if (scaleStandings) {
-						float scaleAmount = standingsFactorMap.get(score.getPlayerMatchStats().getMatchId());
-						score.scale(scaleAmount,STANDINGS_SCALE_KEY);
-						numStatsStandingsScaled += scaleAmount;
-						scaleTotalMap.put(STANDINGS_SCALE_KEY,scaleTotalMap.get(STANDINGS_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
-						totalScales *= scaleAmount;
+						score.setMatchLabel(getMatchLabel(pms));
+						// scale the rating by the match's standingsFactor
+						if (scaleStandings) {
+							float scaleAmount = standingsFactorMap.get(score.getPlayerMatchStats().getMatchId());
+							score.scale(scaleAmount,STANDINGS_SCALE_KEY);
+							numStatsStandingsScaled += scaleAmount;
+							scaleTotalMap.put(STANDINGS_SCALE_KEY,scaleTotalMap.get(STANDINGS_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
+							scaleTotalMap.put(NO_MINUTE_SCALE_KEY,scaleTotalMap.get(NO_MINUTE_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
+							totalScales *= scaleAmount;
+							totalNoMinutesScales *= scaleAmount;
+						}
+						// scale by the competition's weight
+						if (scaleCompetition) {
+							float scaleAmount = matchCompWeights.get(score.getPlayerMatchStats().getMatchId());
+							score.scale(scaleAmount,COMP_SCALE_KEY);
+							numStatsCompScaled += scaleAmount;
+							scaleTotalMap.put(COMP_SCALE_KEY,scaleTotalMap.get(COMP_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
+							scaleTotalMap.put(NO_MINUTE_SCALE_KEY,scaleTotalMap.get(NO_MINUTE_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
+							totalScales *= scaleAmount; 
+							totalNoMinutesScales *= scaleAmount;
+						}
+						// scale by the match age
+						if (scaleMatchAge) {
+							float scaleAmount = getTimeScale(now,score);
+							score.scale(scaleAmount, AGE_SCALE_KEY);
+							numStatsTimeScaled += scaleAmount;
+							scaleTotalMap.put(AGE_SCALE_KEY,scaleTotalMap.get(AGE_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
+							scaleTotalMap.put(NO_MINUTE_SCALE_KEY,scaleTotalMap.get(NO_MINUTE_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
+							totalScales *= scaleAmount;
+							totalNoMinutesScales *= scaleAmount;
+						}
+						// scale by minutes played
+						if (scaleMinutesPlayed) {
+							float scaleAmount = getMinutesPlayedScale(score);
+							score.scale(scaleAmount, TIME_PLAYED_SCALE_KEY);
+							numStatsMinutesPlayedScaled += scaleAmount;
+							scaleTotalMap.put(TIME_PLAYED_SCALE_KEY,scaleTotalMap.get(TIME_PLAYED_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
+							totalScales *= scaleAmount;
+						}
+						pss.add(score);
+						numStatsTotalScaled += totalScales;
+	//					numStatsNoMinutesTotalScaled += totalNoMinutesScales;
+						
+						scaleTotalMap.put(ALL_SCALE_KEY,scaleTotalMap.get(ALL_SCALE_KEY) + score.getUnscaledScore()*totalScales);
+						scaleTotalMap.put(NO_MINUTE_SCALE_KEY, scaleTotalMap.get(NO_MINUTE_SCALE_KEY) + score.getUnscaledScore()*totalNoMinutesScales);
+						scaleTotalMap.put(NO_SCALE_KEY,scaleTotalMap.get(NO_SCALE_KEY) + score.getUnscaledScore());
+						numStats++;
+						accumulateScores(score);
 					}
-					// scale by the competition's weight
-					if (scaleCompetition) {
-						float scaleAmount = matchCompWeights.get(score.getPlayerMatchStats().getMatchId());
-						score.scale(scaleAmount,COMP_SCALE_KEY);
-						numStatsCompScaled += scaleAmount;
-						scaleTotalMap.put(COMP_SCALE_KEY,scaleTotalMap.get(COMP_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
-						totalScales *= scaleAmount; 
-					}
-					// scale by the match age
-					if (scaleMatchAge) {
-						float scaleAmount = getTimeScale(now,score);
-						score.scale(scaleAmount, AGE_SCALE_KEY);
-						numStatsTimeScaled += scaleAmount;
-						scaleTotalMap.put(AGE_SCALE_KEY,scaleTotalMap.get(AGE_SCALE_KEY) + score.getUnscaledScore()*scaleAmount);
-						totalScales *= scaleAmount;
-					}
-					pss.add(score);
-					numStatsTotalScaled += totalScales;
-					scaleTotalMap.put(ALL_SCALE_KEY,scaleTotalMap.get(ALL_SCALE_KEY) + score.getUnscaledScore()*totalScales);
-					scaleTotalMap.put(NO_SCALE_KEY,scaleTotalMap.get(NO_SCALE_KEY) + score.getUnscaledScore());
-					numStats++;
-					accumulateScores(score);
 				} 
 			} catch (Throwable e) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Engine threw a rod on player " + playerName + " from match " + matchName, e);
@@ -749,7 +841,18 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 	}
 
+	//	private void accumulateTimePlayed(IPlayerStatShares score) {
+	//		IPlayerMatchStats stats = score.getPlayerMatchStats();
+	//		if (!playerTimeMap.containsKey(stats.getPlayerId())) {
+	//			playerTimeMap.put(stats.getPlayerId(), stats.getTimePlayed());
+	//		} else {
+	//			int t = playerTimeMap.get(stats.getPlayerId());
+	//			playerTimeMap.put(stats.getPlayerId(), t + stats.getTimePlayed());			
+	//		}
+	//	}
+
 	protected void accumulateScores(IPlayerStatShares pss) {
+	//	totalNoMinutesScaledScore += pss.getNoMinutesScaledScore();
 		//totalUnscaledScore += pss.getUnscaledScore();	
 		totalScaledScore += pss.getScaledScore();
 	}
@@ -763,19 +866,28 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	}
 
 	@Override
-	public List<IPlayerRating> generate(IRatingEngineSchema schema, boolean scaleStandings, boolean scaleCompetition, boolean scaleMatchAge, boolean sendReport) {
+	public List<IPlayerRating> generate(IRatingEngineSchema schema, boolean scaleStandings, boolean scaleCompetition, boolean scaleMatchAge, boolean scaleMinutesPlayed, boolean sendReport) {
 
 
 		List<IPlayerStatShares> pss = new ArrayList<IPlayerStatShares>();
 		mrl = new ArrayList<IPlayerRating>();
 		try {
-			pss = populate(schema, pss, scaleStandings, scaleCompetition, scaleMatchAge);
+
+
+			// we need to do a pass through to remove people who haven't played the minimum if we are scaling on time played
+			if (scaleMinutesPlayed) {
+				dropPlayersWithoutMinimumTimePlayed();
+			}
+
+			pss = populate(schema, pss, scaleStandings, scaleCompetition, scaleMatchAge, scaleMinutesPlayed);
 
 			//set up our scaled total map
 			scaleTotalNumMap.put(NO_SCALE_KEY, (float) numStats);
 			scaleTotalNumMap.put(AGE_SCALE_KEY, numStatsTimeScaled);
 			scaleTotalNumMap.put(COMP_SCALE_KEY, numStatsCompScaled);
 			scaleTotalNumMap.put(STANDINGS_SCALE_KEY, numStatsStandingsScaled);
+			scaleTotalNumMap.put(NO_MINUTE_SCALE_KEY, numStatsNotMinuteScaled);
+			scaleTotalNumMap.put(TIME_PLAYED_SCALE_KEY, numStatsMinutesPlayedScaled);
 			scaleTotalNumMap.put(ALL_SCALE_KEY, numStatsTotalScaled);
 
 			// now group the PlayerStatShares by player (since in a time series one player may have multiple matches)
@@ -785,9 +897,26 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				}
 				playerScoreMap.get(score.getPlayerMatchStats().getPlayerId()).add(score);
 			}
+			
+			// need to accumulate the total timescaled
+
+			if (scaleMinutesPlayed) {
+				totalScaledScore = 0f;
+				for (Long p : playerScoreMap.keySet()) {
+					float score = 0f;
+					float time = 0f;
+					for (IPlayerStatShares s : playerScoreMap.get(p)) {
+						score += s.getNoMinutesScaledScore();
+						time += s.getPlayerMatchStats().getTimePlayed();
+					}
+					totalScaledScore += score/time;
+				}
+			}
+
 
 			// go through the players and create a PlayerRating for them
 			for (Long p : playerScoreMap.keySet()) {
+
 				IPlayerRating pr = prf.create();
 				pr.setGenerated(DateTime.now().toDate());
 				pr.setPlayerId(playerScoreMap.get(p).get(0).getPlayerMatchStats().getPlayerId());
@@ -795,18 +924,28 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				pr.setSchemaId(schema.getId());
 
 				float scores = 0f;
-				//List<IPlayerStatShares> statList = new ArrayList<IPlayerStatShares>();
+				float time = 0;
 
 				for (IPlayerStatShares s : playerScoreMap.get(p)) {
-					scores += s.getScaledScore();
+					if (scaleMinutesPlayed) {
+						time += s.getPlayerMatchStats().getTimePlayed();
+						scores += s.getNoMinutesScaledScore();
+					} else {
+						scores += s.getScaledScore();
+					}
 					pr.addMatchStatId(s.getPlayerMatchStats().getId());
 					pr.addMatchStats(s.getPlayerMatchStats());	
 					pr.addRatingComponent(s.getRatingComponent(scaleTotalNumMap, scaleTotalMap));
 				}
 
-				pr.setRating(Math.round((scores/totalScaledScore)*500*playerScoreMap.keySet().size())); //numStats)); //TotalScaled));
-				mrl.add(pr);
 
+				if (scaleMinutesPlayed) {
+					scores = scores/time; 
+				}
+
+				pr.setRating(Math.round((scores/totalScaledScore)*500*playerScoreMap.keySet().size())); //numStats)); //TotalScaled));
+
+				mrl.add(pr);
 			}
 
 			// sort by rating
@@ -824,7 +963,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				if (iter.hasNext()) {
 					IPlayerRating pr = iter.next();
 
-					finalizeRatingComponents(pr, playerScoreMap.get(pr.getPlayerId()));  // the stuff we are going to display to the endusers
+					//finalizeRatingComponents(pr, playerScoreMap.get(pr.getPlayerId()));  // the stuff we are going to display to the endusers
 
 					StringBuilder sb = new StringBuilder();
 					sb.append(playerScoreMap.get(pr.getPlayerId()).get(0).getPlayerMatchStats().getName() + "\nMatch\tScore\tUnscaled\tScaled\tMatch Aged\tStandings\tCompetition\n-----------------------------------------------------------\n");
@@ -866,37 +1005,98 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 			// mark query complete
 			query.setStatus(Status.COMPLETE);
+
+			// also pull out any rounds that didn't have any stats
+			for (Long rid : roundPruneList) {
+				query.getRoundIds().remove(rid);
+			}
+
 			rqf.put(query);
 		} catch (Exception e) {
 			// mark query errored out
 			query.setStatus(Status.ERROR);
 			rqf.put(query);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Error in Rating Engine generate() function", e);
 			// we don't flush the ratings completed thus far. They may be handy and will get flushed on the re-run.
 		}
 		return mrl;
 
 	}
 
-	private void finalizeRatingComponents(IPlayerRating pr, List<IPlayerStatShares> list) {
-		for (RatingComponent rc: pr.getRatingComponents()) {
-			PlayerStatShares c = null;
-			for (IPlayerStatShares share : list) {
-				if (rc.getPlayerMatchStatsId().equals(share.getPlayerMatchStats().getId())) {
-					c = (PlayerStatShares)share;
-					break;
-				}
-			}
+	// *** THIS DOESN'T WORK BECAUSE THE PSS ISN'T POPULATED ONCE A RAWRATING IS CREATED FOR IT - PROBABLY WANT TO JUST CREATE A getPlayerMatchStats() FOR THE
+	// ***		ENDUSER CLIENTS TO MAP TO CHARTS WHEN THEY LOOK AT MATCH-LEVEL DETAIL
+	//	private void finalizeRatingComponents(IPlayerRating pr, List<IPlayerStatShares> list) {
+	//		for (RatingComponent rc: pr.getRatingComponents()) {
+	//			PlayerStatShares c = null;
+	//			for (IPlayerStatShares share : list) {
+	//				if (rc.getPlayerMatchStatsId().equals(share.getPlayerMatchStats().getId())) {
+	//					c = (PlayerStatShares)share;
+	//					break;
+	//				}
+	//			}
+	//
+	//			if (c != null) {
+	//				rc.setOffence(c.tries + c.tryAssists + c.points + c.runs + c.passes + c.kicks + c.metersRun + c.cleanBreaks + c.defendersBeaten + c.offloads + c.turnovers);
+	//				rc.setDefence(c.tacklesMade + c.tacklesMissed);
+	//				rc.setSetPlay(c.scrumShare + c.scrumLost + c.scrumStolen + c.lineoutLost + c.lineoutShare + c.lineoutsStolenOnOppThrow + c.lineoutStolen + c.lineoutsWonOnThrow);
+	//				rc.setLoosePlay(c.ruckLost + c.ruckShare + c.ruckShare + c.maulLost + c.maulShare + c.maulStolen);
+	//				rc.setDiscipline(c.penaltiesConceded + c.yellowCards + c.redCards);
+	//				rc.setMatchResult(c.win + c.pointDifferential + c.minutesShare);
+	//			}
+	//		}
+	//
+	//	}
 
-			if (c != null) {
-				rc.setOffence(c.tries + c.tryAssists + c.points + c.runs + c.passes + c.kicks + c.metersRun + c.cleanBreaks + c.defendersBeaten + c.offloads + c.turnovers);
-				rc.setDefence(c.tacklesMade + c.tacklesMissed);
-				rc.setSetPlay(c.scrumShare + c.scrumLost + c.scrumStolen + c.lineoutLost + c.lineoutShare + c.lineoutsStolenOnOppThrow + c.lineoutStolen + c.lineoutsWonOnThrow);
-				rc.setLoosePlay(c.ruckLost + c.ruckShare + c.ruckShare + c.maulLost + c.maulShare + c.maulStolen);
-				rc.setDiscipline(c.penaltiesConceded + c.yellowCards + c.redCards);
-				rc.setMatchResult(c.win + c.pointDifferential + c.minutesShare);
+	protected void dropPlayersWithoutMinimumTimePlayed() {
+		Map<Long,Integer> playerTimes = new HashMap<Long,Integer>();
+		int minimumMinutes = getMinimumMinutes(); 
+
+		// if people don't have enough time, pull them out altogether so they don't mess up the total players count
+		killList = new ArrayList<Long>();
+		for (IPlayerMatchStats pms : pmsList) {
+			if (!playerTimes.containsKey(pms.getPlayerId())) {
+				playerTimes.put(pms.getPlayerId(), pms.getTimePlayed());
+			} else {
+				int t = playerTimes.get(pms.getPlayerId());
+				playerTimes.put(pms.getPlayerId(), t + pms.getTimePlayed());
 			}
 		}
 
+		for (Long pid : playerTimes.keySet()) {
+			if (playerTimes.get(pid) < minimumMinutes) {
+				killList.add(pid);
+			}
+		}
+	}
+
+	// Determine the minimum minutes someone needs to have played to participate in a query that is scaled by minutes.
+	protected int getMinimumMinutes() {
+
+		assert (query.getRatingMatrix().getCriteria() == Criteria.AVERAGE_IMPACT);
+
+		if (query.getMinMinutesType().equals(MinMinutes.ROUND)) {
+			return uRoundOrdList.size() * query.getMinMinutes();
+		} else {
+			return query.getMinMinutes();
+		}
+//		// if this is a real comp just use the number of rounds played so far
+//		int minimumMinutes = uRoundOrdList.size() * roundMinMinutes;
+//		
+//		// if it is a virtual comp that uses club rugby and test rugby there is an 800 minute min
+//		// if it is a virtual comp that uses only test rugby there is a 350 minute min
+////		if (query.getCompIds().size() > 1) {
+////			boolean isTest = true;
+////			for (Long cid : query.getCompIds()) {
+////				ICompetition c = cf.get(cid);
+////				if (c.getWeightingFactor() < 2f) {
+////					isTest = false;
+////				}
+////			}
+////			minimumMinutes = isTest ? 350 : 800;
+////		}
+//
+//		
+//		return minimumMinutes;
 	}
 
 	protected void getStandingFactorForMatch(IMatchGroup m) {
@@ -919,7 +1119,8 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		Float standingsFactor = 1F;
 		if (found) {
-			standingsFactor =  1F / (float)(Math.sqrt(sTot-2F)) + .43F;
+			//standingsFactor =  1F / (float)(Math.sqrt(sTot-2F)) + .43F;
+			standingsFactor =  1F / (float)(Math.sqrt(sTot)) + .5F;  // updated based on conversations of 12/29/2014 to be flatter at the top end
 		}
 
 		standingsFactorMap.put(m.getId(), standingsFactor);
@@ -941,6 +1142,28 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		}
 	}
 
+
+	// This give a number between 1 and 4. 80m => 1, 40M => 2, 20m => 4, 10m => 4 (don't want the people who run on for a minute and score a try to blow it up
+	protected float getMinutesPlayedScale(IPlayerStatShares score) {
+
+		if (score != null && score.getPlayerMatchStats() != null && score.getPlayerMatchStats().getTimePlayed() > 0) {
+			// want a number between 20 and 80, inclusive
+			int minutesPlayed = (80 < score.getPlayerMatchStats().getTimePlayed()) ? 80 : score.getPlayerMatchStats().getTimePlayed();
+			minutesPlayed = (20 > score.getPlayerMatchStats().getTimePlayed()) ? 20 : score.getPlayerMatchStats().getTimePlayed();
+			return 80f/(float)minutesPlayed; //(float) Math.log(80 - minutesPlayed + 1) + 1;
+		} else {
+			return 0;
+		}
+	}
+
+	//	protected float getMinutesPlayedScale(IPlayerStatShares score) {
+	//		if (score.getPlayerMatchStats().getTimePlayed() > 0) {
+	//			return 80f/(float)score.getPlayerMatchStats().getTimePlayed() ;
+	//		} else {
+	//			return 0f;
+	//		}
+	//	}
+
 	//@Override
 	public boolean addTeamStats(List<ITeamMatchStats> teamStats) {
 		for (ITeamMatchStats ts : teamStats) {
@@ -961,6 +1184,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			} else {
 				tmsVisitMap.put(ts.getMatchId(), ts);
 			}
+
 		}
 
 		return true;
@@ -970,6 +1194,25 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 	public Boolean addPlayerStats(List<IPlayerMatchStats> playerStats) {
 		if (playerStats == null || playerStats.isEmpty()) return false;
 
+		// For the World Cup we come across teams that play two matches in a single round. This really hoses up
+		// the match series because we process queries for matches that haven't been played yet (because the players
+		// for one of the teams have stats from the first match in the round). To guard against this, we check that if
+		// a query specifies teams, that the stats contain entries for players from BOTH teams.
+		Map<Long,Boolean> teamchecker = null;
+		if (query != null && query.getTeamIds() != null && !query.getTeamIds().isEmpty()) {
+			teamchecker = new HashMap<Long,Boolean>();
+			for (Long teamId : query.getTeamIds()) {
+				teamchecker.put(teamId, false);
+			}
+		}
+		
+		// we also need to avoid the situation where we are doing a match series and there are two matches for a team in the weekend.
+		// in this case 
+		if (query != null && query.getRoundIds() != null && query.getRoundIds().size() == 1 && query.getTeamIds() != null && query.getTeamIds().size() == 2 && query.getRatingMatrixId() != null) {
+			// it's a match series query
+			// find the match ID
+		}
+
 		for (IPlayerMatchStats pms : playerStats) {
 			if (pms.getPosition() == position.RESERVE || pms.getTimePlayed() == null) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Trying to invoke engine with PlayerMatchStats for " + pms.getName() + " from team " + pms.getTeamAbbr() + " but his position in RESERVE or timePlayed not set. A task was probably missed. Match stats dropped.");
@@ -978,9 +1221,23 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 				// or even a RESTful thimgie
 				//return false;
 			} else if (pms.getPosition() != position.NONE) {
+				if (teamchecker != null) {
+					teamchecker.put(pms.getTeamId(), true);
+				}
 				pmsList.add(pms);
 			}
 		}
+		
+		// if we didn't find stats for one of the teams, return false
+		if (teamchecker != null) {
+			for (Boolean b : teamchecker.values()) {
+				if (!b) {
+					return false;
+				}
+			}
+		}
+		
+		
 		return true;
 	}
 
@@ -1043,60 +1300,59 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		}
 
 		body += sb.toString();
-		//		
-		//		body += "<hr> Overall" + "</p><pre>";
-		//
-		//		StatisticalSummary ss = new SummaryStatistics();
-		//		for (IPlayerRating r : mrl) {
-		//			((SummaryStatistics)ss).addValue(r.getRating());
-		//		}
-		//
-		//		body += ss.toString();
 
-		//		// backs vs. forwards
-		//		body += sep + "Backs vs. Forwards" + sep + "\n" + sep + sep + "\n";
-		//		StatisticalSummary forwards  = new SummaryStatistics();
-		//		StatisticalSummary backs = new SummaryStatistics();
-		//		for (IPlayerRating r : mrl) {
-		//			if (r.getMatchStats().get(0).isForward()>0) {
-		//				((SummaryStatistics)forwards).addValue(r.getRating());
-		//			}	else {
-		//				((SummaryStatistics)backs).addValue(r.getRating());
-		//			}	
-		//		}
-		//		body += sep + "Backs" + "\n";
-		//		body += backs.toString();
-		//
-		//		body += sep + "Forwards" + "\n";
-		//		body += forwards.toString();
-		//
-		//		body += sep + "Positions" + sep + "\n" + sep + sep + "\n";
-		//
-		//		//		for (int i=1; i<position.values().length-1; ++i) {
-		//		for (position pos : position.values()) {
-		//			if (query.getPositions().contains(pos)) {
-		//				body += sep + pos + "\n";
-		//				ss = new SummaryStatistics();
-		//				for (IPlayerRating r : mrl) {
-		//					//				if (r instanceof IPlayerMatchRating) {
-		//					//					if (((IPlayerMatchRating)r).getPlayerMatchStats().getPosition().equals(position.getAt(i))) {
-		//					//						((SummaryStatistics)ss).addValue(r.getRating());
-		//					//					}
-		//					//				} else 
-		//					if (r instanceof PlayerRating) {
-		//						for (RatingComponent rc : r.getRatingComponents()) {
-		//							IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
-		//							if (pms != null && pms.getPosition().equals(pos)) {
-		//								((SummaryStatistics)ss).addValue(rc.getScaledRating());
-		//							}
-		//						}
-		//					}
-		//				}
-		//				if (ss.getN() > 0)
-		//					body += ss.toString();
-		//			}
-		//
-		//		}
+		if (query.getInstrument()) {
+			//		
+			body += "<hr> Overall" + "</p><pre>";
+
+			StatisticalSummary ss = new SummaryStatistics();
+			for (IPlayerRating r : mrl) {
+				((SummaryStatistics)ss).addValue(r.getRating());
+			}
+
+			body += ss.toString();
+
+			//		// backs vs. forwards
+			//		body += sep + "Backs vs. Forwards" + sep + "\n" + sep + sep + "\n";
+			//		StatisticalSummary forwards  = new SummaryStatistics();
+			//		StatisticalSummary backs = new SummaryStatistics();
+			//		for (IPlayerRating r : mrl) {
+			//			if (r.getMatchStats().get(0).isForward()>0) {
+			//				((SummaryStatistics)forwards).addValue(r.getRating());
+			//			}	else {
+			//				((SummaryStatistics)backs).addValue(r.getRating());
+			//			}	
+			//		}
+			//		body += sep + "Backs" + "\n";
+			//		body += backs.toString();
+			//
+			//		body += sep + "Forwards" + "\n";
+			//		body += forwards.toString();
+			//
+			String sep = "<hr>";
+			body += sep + "Positions" + sep + "\n" + sep + sep + "\n";
+
+			//		for (int i=1; i<position.values().length-1; ++i) {
+			for (position pos : position.values()) {
+				if (query.getPositions().size() == 0 || query.getPositions().contains(pos)) {
+					body += sep + pos + "\n";
+					ss = new SummaryStatistics();
+					for (IPlayerRating r : mrl) {
+						if (r instanceof PlayerRating) {
+							for (RatingComponent rc : r.getRatingComponents()) {
+								IPlayerMatchStats pms = pmsf.get(rc.getPlayerMatchStatsId());
+								if (pms != null && pms.getPosition().equals(pos)) {
+									((SummaryStatistics)ss).addValue(rc.getUnscaledRating());
+								}
+							}
+						}
+					}
+					if (ss.getN() > 0)
+						body += ss.toString();
+				}
+
+			}
+		}
 
 		//		body += sep + "Matches" + sep + "\n" + sep + sep + "\n";
 		//		Iterator<ITeamMatchStats> it = tmsHomeMap.values().iterator();
@@ -1124,15 +1380,32 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		//				body += ss.toString();
 		//		}
 
+		body += "--";
 		return body;
 
 	}
+
+
 
 	@Override
 	public boolean setQuery(IRatingQuery q) {
 		this.query = q;
 		boolean retval = false;
+		roundPruneList.addAll(q.getRoundIds()); // we will knock these off as we find stats from them, then at the end, update the query to take out any empty rounds
+
+		// if this is an IMPACT query we need to know how many weekends we are looking at to set our minimum participation minutes.
+		if (q.getScaleMinutesPlayed()) {
+			uRoundOrdList = new ArrayList<Integer>();
+			for (Long rid : q.getRoundIds()) {
+				IRound r = rf.get(rid);
+				if (!uRoundOrdList.contains(r.getUrOrdinal())) {
+					uRoundOrdList.add(r.getUrOrdinal());
+				}
+			}
+		}
+
 		List<IPlayerMatchStats> pmsl = pmsf.query(q);
+
 		if (pmsl != null && !pmsl.isEmpty()) {
 			retval = addPlayerStats(pmsl);
 			if (retval) {
@@ -1147,6 +1420,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		if (!matchLabelMap.containsKey(pms.getMatchId())) {
 			IMatchGroup m = mf.get(pms.getMatchId());
 			IRound r = rf.get(m.getRoundId());
+			// we need to prune our round list as well
+			if (roundPruneList.contains(r.getId())) {
+				roundPruneList.remove(r.getId());
+			}
 			ICompetition c = cf.get(r.getCompId());
 			int hScore = 0;
 			int vScore = 0;
@@ -1190,8 +1467,10 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		if (rq.getCompIds() != null && !rq.getCompIds().isEmpty()) {
 			retval += "Comps: ";
 			for (Long compId : rq.getCompIds()) {
-				ICompetition c = cf.get(compId);
-				retval += c.getAbbr() + " ";
+				if (compId != -1) {
+					ICompetition c = cf.get(compId);
+					retval += c.getAbbr() + " ";
+				}
 			}
 		}
 
@@ -1233,4 +1512,6 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		return retval;
 
 	}
+
+
 }

@@ -50,5 +50,39 @@ public interface ITopTenList {
 	void setCompId(Long compId);
 	void setItemIds(List<Long> itemIds);
 	List<Long> getItemIds();
+	void setSeries(Boolean series);
+	Boolean getSeries();
+	void setTwitterDescription(String twitterDescription);
+	String getTwitterDescription();
+	public abstract void setGuid(String guid);
+	String getGuid();
+//	void setNotes(String notes);
+//	String getNotes();
+//	void setNotesId(Long notesId);
+//	Long getNotesId();
+	/**
+	 * 
+	 * @return ordinal of Universal Round the list was created for
+	 */
+	int getRoundOrdinal();
+	/**
+	 * 
+	 * @param roundOrdinal - ordinal of Universal Round the list was created for
+	 */
+	void setRoundOrdinal(int roundOrdinal);
+	/**
+	 * 
+	 * @return for a match, will be "Gloucester vs. Newcastle"; for a round will be "Round 2"
+	 */
+	String getContext();
+	/**
+	 * 
+	 * @param context - for a match, should be "Gloucester vs. Newcastle"; for a round should be "Round 2"
+	 */
+	void setContext(String context);
+	String getFeatureGuid();
+	void setFeatureGuid(String featureGuid);
+	public abstract Long getSponsorId();
+	public abstract void setSponsorId(Long id);
 
 }

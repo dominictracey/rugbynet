@@ -30,6 +30,7 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	private boolean isNative;
 	private boolean isOpenId;
 	private boolean isFacebook;
+	private boolean isOath2;
 	private boolean optOut;
 	private Long lastEntryId;
 	private Long lastClubhouseId;
@@ -429,6 +430,16 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	@Override
 	public void setTopTenContentEditor(boolean isTopTenContentEditor) {
 		this.isTopTenContentEditor = isTopTenContentEditor;
+	}
+	
+	@Override
+	public boolean isOath2() {
+		return isOath2;
+	}
+	
+	@Override
+	public void setOath2(boolean isOath2) {
+		this.isOath2 = isOath2;
 	}
 
 }

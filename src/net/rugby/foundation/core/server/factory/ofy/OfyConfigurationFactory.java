@@ -10,10 +10,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.inject.Inject;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
 import net.rugby.foundation.core.server.factory.BaseConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -30,13 +33,13 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ICompetitionFactory cf;
+
 
 	
 	@Inject
-	OfyConfigurationFactory(ICompetitionFactory cf) {
-		
-		this.cf = cf;
+	public OfyConfigurationFactory(ICompetitionFactory cf, IUniversalRoundFactory urf) {
+		super(cf, urf);
+
 	}
 
 	/* (non-Javadoc)
@@ -56,13 +59,35 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		copyOf.addAll(c.getCompsUnderway());
 		boolean dirty = false;
 		for (Long compId : copyOf) {
-			ICompetition comp = cf.get(compId);
+			ICompetition comp =  (ICompetition)ofy.get(new Key<Competition>(Competition.class,compId));  //cf.get(compId);  // << this should speed it up as we don't build all comps
 			if (comp != null) {
 				c.addCompetition(compId, comp.getLongName());
+				//c.getSeriesMap().put(compId, comp.getSeriesMap());
 			} else {
 				// remove orphan
 				c.getCompsUnderway().remove(compId);
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Removing compId from active comp list in core config: " + compId);
+				dirty = true;
+			}
+		}
+		
+		if (dirty) {
+			put(c);
+		}
+		
+		// and the comps for the client self-cleaning oven
+		copyOf.clear();
+		copyOf.addAll(c.getCompsForClient());
+		dirty = false;
+		for (Long compId : copyOf) {
+			ICompetition comp = cf.get(compId);
+			if (comp != null) {
+				c.addCompForClient(compId);
+				c.getSeriesMap().put(compId, comp.getSeriesMap());
+			} else {
+				// remove orphan
+				c.getCompsForClient().remove(compId);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Removing compId from client comp list in core config: " + compId);
 				dirty = true;
 			}
 		}
@@ -89,6 +114,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		
 		return c;
 	}
+
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IConfigurationFactory#put(net.rugby.foundation.model.shared.ICoreConfiguration)

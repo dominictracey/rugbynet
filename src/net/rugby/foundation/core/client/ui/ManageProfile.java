@@ -3,10 +3,11 @@ package net.rugby.foundation.core.client.ui;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.PasswordTextBox;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -17,28 +18,28 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ManageProfile extends DialogBox implements ExternalAuthenticatorPanel.Presenter, FacebookRegistrationPanel.Presenter
 {
-	private static CreateAccountUiBinder uiBinder = GWT.create(CreateAccountUiBinder.class);
+	private static ManageProfileUiBinder uiBinder = GWT.create(ManageProfileUiBinder.class);
 
-	interface CreateAccountUiBinder extends UiBinder<Widget, ManageProfile>
+	interface ManageProfileUiBinder extends UiBinder<Widget, ManageProfile>
 	{
 	}
 
 	@UiField TextBox emailAddress;
 	@UiField TextBox nickName;
-	@UiField PasswordTextBox password1;
-	@UiField PasswordTextBox password2;
-	@UiField ControlLabel password1Label;
-	@UiField ControlLabel password2Label;
+	@UiField Input password1;
+	@UiField Input password2;
+	@UiField Label password1Label;
+	@UiField Label password2Label;
+	
 	@UiField Button submit;
 	@UiField Button cancel;
 	@UiField Label error;
-	@UiField FlowPanel topLevel;
+	@UiField Panel topLevel;
 	@UiField LayoutPanel nonNativeLayer;
 	@UiField LayoutPanel nativeLayer;
 	@UiField LayoutPanel facebookLayer;
@@ -60,21 +61,37 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	
 	public ManageProfile()
 	{
-//		setModal(true);
-//		setAutoHideEnabled(true);
+		super.setGlassEnabled(true);
+		super.setGlassStyleName("dialogGlass");
+		super.setAnimationEnabled(true);
 
 		setWidget(uiBinder.createAndBindUi(this));
 		error.setVisible(false);
-		setText("Create Rugby Network Account");
-//		String style = DOM.getElementAttribute(this.getElement(), "style");
-//		style += " width:550px;";
-//		DOM.setElementAttribute(this.getElement(), "style", style);
+		//setText("Account");
+
 		
 
 		nonNativeLogins.setPresenter(this);
 		showPanels(true,false, false, false);
-		//nativeLayer.setWidgetTopHeight(nativeSon, 0, Style.Unit.EM, 200, Style.Unit.EM);	
-		//nativeLayer.forceLayout();
+
+		topLevel.addStyleName("col-md-12"); 
+//		topLevel.addStyleName("col-sm-10");
+//		topLevel.addStyleName("col-xs-12");
+//		topLevel.addStyleName("col-md-offset-2");
+//		topLevel.addStyleName("col-xs-offset-1");
+		
+		
+		error.setVisible(false);
+		nonNativeLogins.setPresenter(this);
+		
+		//this.setWidth("1150px");
+//		nativeLayer.addStyleName("toptentext");  //padding: 15px; 
+		
+		nativeLayer.addStyleName("col-md-8"); 
+//		nativeLayer.addStyleName("col-sm-10");
+//		nativeLayer.addStyleName("col-xs-12");
+//		nativeLayer.addStyleName("col-md-offset-2");
+//		nativeLayer.addStyleName("col-xs-offset-1");
 	}
 
 	@UiHandler("showNativeLink")
@@ -145,6 +162,7 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 			} else  {
 				showPanels(true, false, false, false);
 				submit.setText("Sign Up");
+				emailAddress.setEnabled(true);
 				emailAddress.setFocus(true);
 			}
 		}	else {
@@ -274,6 +292,13 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	public String getAppId() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void doOAuth2Login() {
+		if (presenter instanceof ExternalAuthenticatorPanel.Presenter)
+			((ExternalAuthenticatorPanel.Presenter)presenter).doOAuth2Login();
+		
 	}
 
 

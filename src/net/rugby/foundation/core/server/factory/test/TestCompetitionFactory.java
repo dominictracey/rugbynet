@@ -96,7 +96,12 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 		setBeginAndEnd(c);
 
 		c.setCompClubhouseId(70L);
-
+		c.setForeignID(999L);
+		c.setForeignURL("testData\\191757-round2-results.htm");
+		c.setLongName("The Rugby Net Championships");
+		c.setShortName("TRN Championships");
+		c.setAbbr("TRNC");
+		
 		for (Long l = 9001L; l < 9007L; ++l)
 			c.getTeamIds().add(l);
 
@@ -368,6 +373,23 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 	public ICompetition create() {
 		// TODO Auto-generated method stub
 		return new Competition();
+	}
+
+	@Override
+	public List<ICompetition> getClientComps() {
+		List<ICompetition> list = new ArrayList<ICompetition>();
+
+		list.add(get(1L));
+
+		list.add(get(2L));
+
+		return list;
+	}
+
+	@Override
+	public Boolean addRound(Long compId, int uri, String name) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

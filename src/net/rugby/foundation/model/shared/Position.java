@@ -52,26 +52,28 @@ public abstract class Position implements Serializable {
 	//			SCRUMHALF, FLYHALF, LEFTWING, INSIDECENTER, OUTSIDECENTER, RIGHTWING, FULLBACK }
 
 	public enum position { 
-		NONE ("None", "---"), 
-		PROP ("Prop", "PRP"), 
-		HOOKER ("Hooker", "HKR"), 
-		LOCK ("Lock", "LCK"), 
-		FLANKER ("Flanker", "FLK"), 
-		NUMBER8 ("Number 8", "NO8"), 
-		SCRUMHALF ("Scrum Half", "SCR"), 
-		FLYHALF ("Fly Half", "FLY"), 
-		CENTER ("Centre", "CTR"), 
-		WING ("Wing", "WNG"), 
-		FULLBACK ("Fullback", "FUL"), 
-		RESERVE ("Reserve", "RES");
+		NONE ("None", "---", "Unused"), 
+		PROP ("Prop", "PRP", "Props"), 
+		HOOKER ("Hooker", "HKR", "Hookers"), 
+		LOCK ("Lock", "LCK", "Locks"), 
+		FLANKER ("Flanker", "FLK", "Flankers"), 
+		NUMBER8 ("Number 8", "NO8", "No.8s"), 
+		SCRUMHALF ("Scrumhalf", "SCR", "Scrumhalves"), 
+		FLYHALF ("Flyhalf", "FLY", "Flyhalves"), 
+		CENTER ("Centre", "CTR", "Centres"), 
+		WING ("Wing", "WNG", "Wings"), 
+		FULLBACK ("Fullback", "FUL", "Fullbacks"), 
+		RESERVE ("Reserve", "RES", "Reserves");
 		
 		private String enUsName;
 		private String abbr;
+		private String plural;
 
-		private position(String enUSname, String abbr)
+		private position(String enUSname, String abbr, String plural)
 		{
 			this.enUsName = enUSname;
 			this.abbr = abbr;
+			this.plural = plural;
 		}
 
 		public position getNext() {
@@ -91,6 +93,10 @@ public abstract class Position implements Serializable {
 
 		public String getAbbr() {
 			return abbr;
+		}
+		
+		public String getPlural() {
+			return plural;
 		}
 
 //		public int getNumberRequired(Stage.stageType stage, int round)  { 

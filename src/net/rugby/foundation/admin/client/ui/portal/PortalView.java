@@ -10,9 +10,11 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 public interface PortalView<T extends IPlayerRating> extends IsWidget {
 	public interface PortalViewPresenter<T> {
@@ -20,7 +22,8 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 		ClientFactory getClientFactory();
 
 		void submitPortalQuery(List<Long> compId, List<Long> roundId, List<position> posi,
-				List<Long> countryId, List<Long> teamId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding);
+				List<Long> countryId, List<Long> teamId, Long schemaId, 
+				Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed, Boolean instrument);
 		
 		void createTopTenList(TopTenSeedData data);
 
@@ -31,6 +34,8 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 		void portalViewCompPopulate(Long id);
 		
 		void setTimeSeries(boolean isTrue);
+
+		void rerunQuery(IRatingQuery rq);
 
 	} 
 
@@ -66,5 +71,7 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 	public abstract void showTimeWeightedMatchInfo(List<IPlayerRating> result);
 
 	public abstract List<IPlayerRating> getCurrentList();
+
+	void setSchemas(List<ScrumMatchRatingEngineSchema> result);
 
 }

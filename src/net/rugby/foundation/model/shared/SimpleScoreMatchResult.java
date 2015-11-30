@@ -71,5 +71,10 @@ public class SimpleScoreMatchResult extends MatchResult implements ISimpleScoreM
 		this.visitScore = visitScore;
 	}
 	
+	@Override
+	public String toString() {
+		assert getMatch() != null;
+		return getMatch().getHomeTeam().getDisplayName() + " " + homeScore + " - " + getMatch().getVisitingTeam().getDisplayName() + " " + visitScore;
+	}
 	
 }

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
@@ -15,12 +17,17 @@ import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
+import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
+import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.Round;
 
 public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Serializable,IMatchGroupFactory {
-	
+
 
 	/**
 	 * 
@@ -30,6 +37,9 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 
 	@Override
 	protected IMatchGroup getFromPersistentDatastore(Long id) {
+		if (id == null) {
+			throw new RuntimeException("Error in MatchGroupFactory.getFromPersistentDatastore - don't pass in null please.");
+		}
 		MatchGroup g = null;
 		if (id != null) {
 			Objectify ofy = DataStoreFactory.getOfy();
@@ -38,11 +48,27 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 
 			if (g.getSimpleScoreMatchResultId() != null) {
-				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult) mrf.get(g.getSimpleScoreMatchResultId()));  // @REX need to sort this out before other types of results are added
+				IMatchResult mr = mrf.get(g.getSimpleScoreMatchResultId());
+				mr.setMatch(g);
+				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);  // @REX need to sort this out before other types of results are added
+
 			}
-		} else { // create new
-			// @REX cast
-			g = (MatchGroup) put(null);
+
+			// self cleaning oven for workflowStatus			
+			if (g.getWorkflowStatus() == null) {
+				g.setWorkflowStatus(WorkflowStatus.PENDING);
+				// if the match happened more than two weeks ago we either got stats or didn't
+				DateTime mTime = new DateTime(g.getDate());
+				if (mTime.isBefore(DateTime.now().minusWeeks(2))) {
+					if (pmsf.getByMatchId(id).isEmpty()) {
+						g.setWorkflowStatus(WorkflowStatus.NO_STATS);
+
+					} else {
+						g.setWorkflowStatus(WorkflowStatus.FETCHED);
+					}
+				}
+				ofy.put(g); 
+			}
 		}
 		return g;
 	}
@@ -79,18 +105,25 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 
 	@Override
 	public List<? extends IMatchGroup> getMatchesWithPipelines() {
-		Objectify ofy = DataStoreFactory.getOfy();
-		// @REX should we just check the match - don't we need to also cross-check against comp as well?
-		Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("fetchMatchStatsPipelineId !=", null);
-		List<IMatchGroup> list = new ArrayList<IMatchGroup>();
-		Iterator<MatchGroup> it = qg.list().iterator();
-		while (it.hasNext()) {
-			IMatchGroup g = (IMatchGroup)it.next();
-			g.setHomeTeam(tf.get(g.getHomeTeamId()));
-			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
-			list.add(g);
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			// @REX should we just check the match - don't we need to also cross-check against comp as well?
+			Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("fetchMatchStatsPipelineId !=", null);
+			List<IMatchGroup> list = new ArrayList<IMatchGroup>();
+			Iterator<MatchGroup> it = qg.list().iterator();
+			while (it.hasNext()) {
+				IMatchGroup g = (IMatchGroup)it.next();
+				g.setHomeTeam(tf.get(g.getHomeTeamId()));
+				g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
+				list.add(g);
+			}
+			return list;
+		} catch (Throwable ex) {
+
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getMatchesWithPipelines", ex);
+			return null;
 		}
-		return list;
+
 	}
 
 	@Override
@@ -116,9 +149,11 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 	@Override
 	public IMatchGroup create() {
 		try {
-		IMatchGroup m =  new MatchGroup();
-		//m.setCreatedDate(new Date());
-		return m;
+			IMatchGroup m =  new MatchGroup();
+			m.setStatus(Status.SCHEDULED);
+			m.setWorkflowStatus(WorkflowStatus.PENDING);
+			//m.setCreatedDate(new Date());
+			return m;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error creating match " + ex.getLocalizedMessage(), ex);
 			return null;
@@ -140,6 +175,37 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 				id = m.getId().toString();
 			}
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error saving match " + id + ex.getLocalizedMessage(), ex);
+			return null;
+		}
+	}
+
+
+
+	@Override
+	protected List<IMatchGroup> getMatchesForVirualCompFromPersistentDatastore(int ordinal, Long virtualCompId) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			List<IMatchGroup> retval = new ArrayList<IMatchGroup>();
+			
+			// look at the component competitions for their matches
+			ICompetition hostComp = cf.get(virtualCompId);
+			for (Long cid : hostComp.getComponentCompIds()) {
+				//ICompetition compComp = cf.get(cid);
+				Query<Round> roundQ = ofy.query(Round.class).filter("compId", cid).filter("urOrdinal", ordinal);
+				for (Round r : roundQ.list()) {
+					// should be 0 or 1
+					for (Long mid : r.getMatchIDs()) {
+						retval.add(get(mid));
+					}
+				}
+						
+			}
+			
+			return retval;
+			
+		} catch (Throwable ex) {
+
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getMatchesForVirualCompFromPersistentDatastore", ex);
 			return null;
 		}
 	}

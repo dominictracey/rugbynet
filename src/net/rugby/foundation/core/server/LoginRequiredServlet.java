@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +23,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
 
 /**
  * Handles OpenId/OAuth and FacebookConnect interactions
@@ -69,6 +73,7 @@ public class LoginRequiredServlet extends HttpServlet {
 		if (user != null) {
 			LoginInfo loginInfo = new LoginInfo();
 
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Log in attempt from " + user.getEmail() + " -- " + user.toString());
 			auf.setEmail(user.getEmail().toLowerCase());
 			IAppUser u = auf.get();
 

@@ -7,17 +7,17 @@
 <!-- 				<g:Anchor ui:field="facebook" /> -->
 <!-- 			</li> -->
 			<li id="google" class="">
-				<g:Anchor ui:field="google" />
+				<g:Anchor ui:field="googlePlus" />
 			</li>
-			<li id="aol" class="">
-				<g:Anchor ui:field="aol" />
-			</li>
-			<li id="openid" class="">
-				<g:Anchor ui:field="openid_com" />
-			</li>
-			<li id="yahoo" class="">
-				<g:Anchor ui:field="yahoo" />
-			</li>
+<!-- 			<li id="aol" class=""> -->
+<!-- 				<g:Anchor ui:field="aol" /> -->
+<!-- 			</li> -->
+<!-- 			<li id="openid" class=""> -->
+<!-- 				<g:Anchor ui:field="openid_com" /> -->
+<!-- 			</li> -->
+<!-- 			<li id="yahoo" class=""> -->
+<!-- 				<g:Anchor ui:field="yahoo" /> -->
+<!-- 			</li> -->
 		</ul>
 
 	</g:HTMLPanel>

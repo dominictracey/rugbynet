@@ -22,17 +22,23 @@ public class TopTenList  implements Serializable, ITopTenList {
 
 	protected @Id Long id;
 	@Transient protected List<ITopTenItem> list;
+	@Unindexed
 	protected List<Long> itemIds;
 	protected Date created;
 	protected Date published;
 	protected Date expiration;
+	protected int roundOrdinal;
 	protected Boolean live;
+	protected Boolean series;
 	@Unindexed
 	protected String summary;
 	protected Long editorId;
-	@Unindexed
 	protected String pipeLineId;
+	@Unindexed
 	protected String title;
+	@Unindexed
+	protected String context;
+	
 	@Unindexed
 	protected String content;
 	protected Long nextId;
@@ -41,6 +47,17 @@ public class TopTenList  implements Serializable, ITopTenList {
 	protected Long prevPublishedId;
 	protected Long compId;
 	protected Long queryId;
+	@Unindexed
+	protected String twitterDescription;
+	protected String guid;
+	protected String featureGuid;
+	
+	protected Long sponsorId;
+	
+	// because these can be greater than 500 chars we keep them in a separate table
+//	protected Long notesId;
+//	@Transient
+//	protected String notes;
 	
 	public class TopTenListSummary implements ITopTenListSummary {
 		protected Long id;
@@ -130,7 +147,14 @@ public class TopTenList  implements Serializable, ITopTenList {
 	public void setExpiration(Date expiration) {
 		this.expiration = expiration;
 	}
-
+	@Override
+	public int getRoundOrdinal() {
+		return roundOrdinal;
+	}
+	@Override
+	public void setRoundOrdinal(int roundOrdinal) {
+		this.roundOrdinal = roundOrdinal;
+	}
 	@Override
 	public Boolean getLive() {
 		return live;
@@ -179,6 +203,15 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	@Override
+	public String getContext() {
+		return context;
+	}
+	@Override
+	public void setContext(String context) {
+		this.context = context;
 	}
 	
 	@Override
@@ -236,6 +269,46 @@ public class TopTenList  implements Serializable, ITopTenList {
 	@Override
 	public void setQueryId(Long id) {
 		this.queryId = id;
+	}
+	@Override
+	public Boolean getSeries() {
+		return series;
+	}
+	@Override
+	public void setSeries(Boolean series) {
+		this.series = series;
+	}
+	@Override
+	public String getTwitterDescription() {
+		return twitterDescription;
+	}
+	@Override
+	public void setTwitterDescription(String twitterDescription) {
+		this.twitterDescription = twitterDescription;
+	}
+	@Override
+	public String getGuid() {
+		return guid;
+	}
+	@Override
+	public void setGuid(String guid) {
+		this.guid = guid;
+	}
+	@Override
+	public String getFeatureGuid() {
+		return featureGuid;
+	}
+	@Override
+	public void setFeatureGuid(String featureGuid) {
+		this.featureGuid = featureGuid;
+	}
+	@Override
+	public Long getSponsorId() {
+		return sponsorId;
+	}
+	@Override
+	public void setSponsorId(Long sponsorId) {
+		this.sponsorId = sponsorId;
 	}
 
 }

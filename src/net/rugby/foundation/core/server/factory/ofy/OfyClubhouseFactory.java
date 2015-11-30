@@ -101,7 +101,7 @@ public class OfyClubhouseFactory implements IClubhouseFactory, Serializable {
 				setId(id);
 				IClubhouse c = get();
 
-				if (c != null) {
+				if (c != null && c.getId() != null) {
 					// delete all the memberships
 					chmf.deleteForClubhouse(id);
 

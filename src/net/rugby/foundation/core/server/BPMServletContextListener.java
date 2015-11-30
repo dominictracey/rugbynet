@@ -33,7 +33,6 @@ public class BPMServletContextListener extends GuiceServletContextListener {
 	public Injector getInjector() {
 		return Guice.createInjector(new BPMServletModule(), new Game1MainModule(), new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
 //		return Guice.createInjector(new BPMServletModule(), new Game1TestModule(), new CoreTestModule(), new AdminTestModule(), new TopTenTestModule());
-
 	}
 
 }

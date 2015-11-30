@@ -5,8 +5,8 @@ package net.rugby.foundation.topten.client.ui.content;
 
 import net.rugby.foundation.model.shared.IContent;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextArea;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,9 +27,10 @@ public class EditContent extends DialogBox {
 	interface EditContentUiBinder extends UiBinder<Widget, EditContent> {
 	}
 
-	public interface EditContentPresenter {
+	public interface ContentPresenter {
 		void saveContent(IContent content);
 		void cancelEditContent();
+		void editContent(IContent content);
 	} 
 	
 	public EditContent() {
@@ -45,7 +46,7 @@ public class EditContent extends DialogBox {
 	
 	
 	IContent content = null;
-	private EditContentPresenter listener;
+	private ContentPresenter listener;
 	
 	@UiHandler("save")
 	void onClickSave(ClickEvent e) {
@@ -60,14 +61,14 @@ public class EditContent extends DialogBox {
 	}
 
 
-	public void setContent(IContent content, EditContentPresenter listener) {
+	public void setContent(IContent content, ContentPresenter listener) {
 		this.content = content;
 		this.listener = listener;
 		text.setText(content.getBody());
 		this.setText(content.getId().toString());
 	}
 
-	public void setPresenter(EditContentPresenter p) {
+	public void setPresenter(ContentPresenter p) {
 		listener = p;
 	}
 

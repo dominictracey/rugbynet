@@ -57,6 +57,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams) {
 		ICompetition comp = new Competition();
 		comp.setForeignURL(homePage);
+		comp.setWeightingFactor(1f);
 		if (homePage.split("[/|.]").length > 7) {
 			int i = 0;
 			boolean found = false;
@@ -78,33 +79,38 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		comp.setTeams(teams);
 
 		try {
-			//            URL url = new URL(homePage);
-			//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			IUrlCacher urlCache = new UrlCacher(homePage);
-			List<String> lines = urlCache.get();
-			String line = "";
-			Iterator<String> it = lines.iterator();
-			if (it.hasNext()) {
-				line = it.next();
-			}
-			boolean longNameFound = false;
-			boolean shortNameFound = false;
+//			//            URL url = new URL(homePage);
+//			//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+//			homePage += "?noredir=1";
+//			IUrlCacher urlCache = new UrlCacher(homePage);
+//			List<String> lines = urlCache.get();
+//			String line = "";
+//			Iterator<String> it = lines.iterator();
+//			if (it.hasNext()) {
+//				line = it.next();
+//			}
+//			boolean longNameFound = false;
+//			boolean shortNameFound = false;
+//
+//			while (it.hasNext()) {
+//				line = it.next();
+//				if( line.contains("scrumTitle") && longNameFound == false) {
+//					comp.setLongName(line.split("<|>")[2]);
+//					longNameFound = true;
+//				} else if ( line.contains("ScrumSectionHeader\">About") && !shortNameFound) {
+//					line = it.next();
+//					line = it.next();
+//					if (line.split("<|>").length > 1) {
+//						comp.setShortName(line.split("<|>")[1]);
+//						shortNameFound = true;
+//					}
+//				}
+//			}
 
-			while (it.hasNext()) {
-				line = it.next();
-				if( line.contains("scrumTitle") && longNameFound == false) {
-					comp.setLongName(line.split("<|>")[2]);
-					longNameFound = true;
-				} else if ( line.contains("ScrumSectionHeader\">About") && !shortNameFound) {
-					line = it.next();
-					line = it.next();
-					if (line.split("<|>").length > 1) {
-						comp.setShortName(line.split("<|>")[1]);
-						shortNameFound = true;
-					}
-				}
-			}
-
+			comp.setShortName("change me");
+			comp.setLongName("change me");
+			comp.setAbbr("CHG_ME");
+			
 			// set the begin and end dates
 			DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 			Date first = null;
@@ -159,7 +165,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	@Override
 	public Map<String, ITeamGroup> getTeams() {
 		//first get the teams
-		String tableURL = homePage + "?template=pointstable";
+		String tableURL = homePage + "?noredir=1;template=pointstable";
 		try {
 			IUrlCacher urlCache = new UrlCacher(tableURL);
 			List<String> lines = urlCache.get();
@@ -339,7 +345,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 			IResultFetcher pastMatchFetcher = srff.getResultFetcher(null, null, ResultType.MATCHES);  //don't need any of the parameters
 			matchMap = pastMatchFetcher.getMatches(baseUrl, teams);
 
-			String tableURL = baseUrl + "?template=fixtures";
+			String tableURL = baseUrl + "?noredir=1;template=fixtures";
 			String month = "";
 			String year = "";
 			String day = "";
@@ -361,7 +367,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 			Boolean hasLink = false;
 			while (it.hasNext()) {
 				line = it.next();
-				if( line.contains("fixtureTblDateColHdr")) {
+				if( line.contains("fixtureTblDateColHdr") && !line.contains(".fixtureTblDateColHdr") ) {  // they added an inline styling thing to ignore
 					//            		if (firstIn) { // have to skip some stuff
 					//	            		for (int i=0; i<5;++i) {
 					//	            			line = it.next();
@@ -377,6 +383,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 					line = it.next();
 					String dayDate = line.trim().split("<|>")[0];
 					day = dayDate.trim().split(" ")[1];
+					line = it.next();
 					line = it.next();
 					line = it.next();
 					line = it.next();

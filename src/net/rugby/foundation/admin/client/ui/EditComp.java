@@ -35,6 +35,7 @@ public class EditComp extends Composite {
 		void repairComp(ICompetition comp);
 		void deleteComp(ICompetition comp);
 		void setCompAsDefault(ICompetition comp);
+		void addRound(ICompetition comp);
 	} 
 	
 	public EditComp() {
@@ -54,15 +55,23 @@ public class EditComp extends Composite {
 	@UiField
 	TextBox abbr;
 	@UiField
+	TextBox ttlDesc;
+	@UiField
+	TextBox twitter;
+	@UiField
 	TextBox ccid;
 	@UiField
 	CheckBox underway;
+	@UiField
+	CheckBox showInClient;
 	@UiField
 	TextBox weightingFactor;
 	@UiField
 	ListBox compType;
 	@UiField
 	Button setAsDefault;
+	@UiField
+	Button addRound;
 	
 	ICompetition comp = null;
 	private Presenter listener;
@@ -72,9 +81,12 @@ public class EditComp extends Composite {
 		comp.setLongName(longName.getText());
 		comp.setShortName(shortName.getText());
 		comp.setAbbr(abbr.getText());
+		comp.setTTLTitleDesc(ttlDesc.getText());
+		comp.setTwitter(twitter.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
 		comp.setWeightingFactor(Float.parseFloat(weightingFactor.getText()));
+		comp.setShowToClient(showInClient.getValue());
 //		if (!compType.isItemSelected(-1)) {
 			comp.setCompType(ICompetition.CompetitionType.values()[compType.getSelectedIndex()]);
 //		}
@@ -86,8 +98,11 @@ public class EditComp extends Composite {
 		comp.setLongName(longName.getText());
 		comp.setShortName(shortName.getText());
 		comp.setAbbr(abbr.getText());
+		comp.setTTLTitleDesc(ttlDesc.getText());
+		comp.setTwitter(twitter.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
+		comp.setShowToClient(showInClient.getValue());
 		listener.repairComp(comp);
 	}
 	
@@ -96,6 +111,10 @@ public class EditComp extends Composite {
 		listener.deleteComp(comp);
 	}
 
+	@UiHandler("addRound")
+	void onClickAddRound(ClickEvent e) {
+		listener.addRound(comp);
+	}
 	
 	@UiHandler("setAsDefault")
 	void onClickSetAsDefault(ClickEvent e) {
@@ -108,7 +127,10 @@ public class EditComp extends Composite {
 		shortName.setText(comp.getShortName());
 		ccid.setText(comp.getCompClubhouseId().toString());
 		abbr.setText(comp.getAbbr());
+		ttlDesc.setText(comp.getTTLTitleDesc());
+		twitter.setText(comp.getTwitter());
 		underway.setValue(comp.getUnderway());
+		showInClient.setValue(comp.getShowToClient());
 		if (comp.getWeightingFactor() != null) {
 			weightingFactor.setValue(comp.getWeightingFactor().toString());
 		} else {

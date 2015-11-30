@@ -45,6 +45,10 @@ public class EditTeam extends Composite {
 	@UiField
 	TextBox abbr;
 	@UiField
+	TextBox twitter;
+	@UiField
+	TextBox twitterChannel;
+	@UiField
 	TextBox color;
 
 	
@@ -56,6 +60,8 @@ public class EditTeam extends Composite {
 		((TeamGroup)teamGroup).setDisplayName(displayName.getText());
 		teamGroup.setShortName(shortName.getText());
 		teamGroup.setAbbr(abbr.getText());
+		teamGroup.setTwitter(twitter.getText());
+		teamGroup.setTwitterChannel(twitterChannel.getText());
 		teamGroup.setColor(color.getText());
 		listener.saveTeamInfo(teamGroup);
 	}
@@ -65,6 +71,8 @@ public class EditTeam extends Composite {
 		displayName.setText(result.getDisplayName());
 		shortName.setText(result.getShortName());
 		abbr.setText(result.getAbbr());
+		twitter.setText(result.getTwitter());
+		twitterChannel.setText(result.getTwitterChannel());
 		color.setText(result.getColor());
 	}
 

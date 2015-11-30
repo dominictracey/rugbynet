@@ -4,15 +4,34 @@
 	<inherits name="com.google.gwt.user.User"/>
 	<inherits name="com.google.gwt.place.Place"/>
 	<inherits name="com.google.gwt.activity.Activity"/>
-<!-- 	<inherits name="com.googlecode.objectify.Objectify" /> -->
 	<inherits name="net.rugby.foundation.model.Model" />
 <!-- 	<inherits name="com.google.gwt.logging.Logging"/> -->
 	<inherits name="net.rugby.foundation.core.Core" />
-<!-- 	<inherits name="net.rugby.foundation.result.Result" /> -->
+	<inherits name="net.rugby.foundation.result.Result" />
+    <inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/>
+<!-- 	<set-property name="bootstrap.responsiveDesign" value="true"/> -->
+
+<!-- 	<inherits name="org.gwtbootstrap3.GwtBootstrap3"/> -->
+<!-- 	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
+<!-- 	<inherits name="com.gwtfb.GwtFB"/> -->
+
+<!--     <public path='theme'> -->
+<!--         <include name='theme/css/*.css'/> -->
+<!--         <include name='theme/js/*.js'/> -->
+<!--     </public> -->
+
+<!--     <stylesheet src='/theme/css/bootstrap-overrides.css'/> -->
+<!--     <stylesheet src='/theme/css/theme/default.css'/> -->
+<!--     <script src='theme/js/theme.js'/> -->
+    
+
 	<entry-point class="net.rugby.foundation.topten.client.TopTen"/>
 	<replace-with class="net.rugby.foundation.topten.client.ClientFactoryImpl">
 		<when-type-is class="net.rugby.foundation.topten.client.ClientFactory"/>
 	</replace-with>
 	<source path='client'/>
     <source path='model/shared'/>
+    
+   
+    
 </module>

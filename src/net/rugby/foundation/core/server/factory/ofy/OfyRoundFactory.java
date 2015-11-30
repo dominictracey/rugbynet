@@ -1,19 +1,11 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
@@ -24,11 +16,13 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.Round;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 
 public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoundFactory, Serializable {
 	/**
@@ -38,90 +32,67 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 	private IMatchGroupFactory gf;
 	private ICompetitionFactory cf;
 	private IStandingFactory sf;
+	private IUniversalRoundFactory urf;
 
 	@Inject
-	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf, IStandingFactory sf) {
+	OfyRoundFactory(ICompetitionFactory cf, IMatchGroupFactory gf, IStandingFactory sf, IUniversalRoundFactory urf) {
 		this.gf = gf;
 		this.cf = cf;
 		this.sf = sf;
+		this.urf = urf;
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
-
-	//		public void setFactories(ICompetitionFactory cf, IMatchGroupFactory gf) {
-	//			this.gf = gf;
-	//			this.cf = cf;
-	//		}
-
-	//	@Override
-	//	public void setId(Long id) {
-	//		this.id = id;
-	//
-	//	}
-	//
-	//
-	//	@Override
-	//	public IRound getRound() {
-	//		try {
-	//
-	//			if (id == null) {
-	//				return new Round(); // put(null) actually saves it, which we don't want really?
-	//			}
-	//
-	//			byte[] value = null;
-	//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-	//			IRound r = null;
-	//
-	//			value = (byte[])syncCache.get(id);
-	//			if (value == null) {
-	//				setId(id);
-	//				r = getFromDB();
-	//
-	//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	//				ObjectOutput out = new ObjectOutputStream(bos);   
-	//				out.writeObject(r);
-	//				byte[] yourBytes = bos.toByteArray(); 
-	//
-	//				out.close();
-	//				bos.close();
-	//
-	//				syncCache.put(id, yourBytes);
-	//			} else {
-	//
-	//				// send back the cached version
-	//				ByteArrayInputStream bis = new ByteArrayInputStream(value);
-	//				ObjectInput in = new ObjectInputStream(bis);
-	//				r = (IRound)in.readObject();
-	//
-	//				bis.close();
-	//				in.close();
-	//
-	//			}
-	//			return r;
-	//
-	//		} catch (Throwable ex) {
-	//			Logger.getLogger("Core Service OfyRoundFactory.getRound").log(Level.SEVERE, ex.getMessage(), ex);
-	//			return null;
-	//		}
-	//	}
 
 	@Override
 	protected IRound getFromPersistentDatastore(Long id) {
-		if (id == null) {
-			return new Round();
-		}
-		Objectify ofy = DataStoreFactory.getOfy();
-
-		Round r = ofy.get(new Key<Round>(Round.class,id));
-
-		if (r != null) {
-			r.setMatches(new ArrayList<IMatchGroup>());
-			for (Long gid : r.getMatchIDs()) {
-				IMatchGroup g = gf.get(gid);
-				r.getMatches().add(g);
+		try {
+			if (id == null) {
+				return new Round();
 			}
-		} else {
-			r = new Round();
+			Objectify ofy = DataStoreFactory.getOfy();
+
+			Round r = ofy.get(new Key<Round>(Round.class,id));
+
+			if (r != null) {
+				r.setMatches(new ArrayList<IMatchGroup>());
+				for (Long gid : r.getMatchIDs()) {
+					IMatchGroup g = gf.get(gid);
+					r.getMatches().add(g);
+				}
+			} else {
+				r = new Round();
+			}
+
+			// self cleaning oven for workflowStatus
+			if (r.getWorkflowStatus() == null) {
+				// check it's matches to see if they are all fetched
+				r.setWorkflowStatus(WorkflowStatus.FETCHED);
+				for (IMatchGroup m : r.getMatches()) {
+					if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
+						r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+						break;
+					} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
+						r.setWorkflowStatus(WorkflowStatus.PENDING);
+						// don't break in case there are tasks pending
+					}
+					// ignore if match is NO_STATS - the round can still be in FETCHED state
+				}
+				ofy.put(r); 	
+			}
+
+			// self cleaning oven for urOrdinal
+			if (r.getUrOrdinal() < 1) {
+				r.setUrOrdinal(urf.get(r).ordinal);
+				ofy.put(r);
+			}
+
+			return r;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
 		}
-		return r;
+
 	}
 
 	@Override
@@ -151,19 +122,6 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 			}		
 
 			ofy.put(r);
-
-			//			// now update the memcache version
-			//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			//			syncCache.delete(r.getId());
-			//			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			//			ObjectOutput out = new ObjectOutputStream(bos);   
-			//			out.writeObject(r);
-			//			byte[] yourBytes = bos.toByteArray(); 
-			//
-			//			out.close();
-			//			bos.close();
-			//
-			//			syncCache.put(id, yourBytes);
 
 			// force top-level reload
 			cf.invalidate(r.getCompId());
@@ -231,7 +189,9 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 				// also delete standings
 				List<IStanding> standings = sf.getForRound(r);
 				for (IStanding s : standings) {
-					sf.delete(s);
+					if (s.getId() != null) {
+						sf.delete(s);
+					}
 				}
 
 				if (ok) {

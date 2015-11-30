@@ -24,4 +24,9 @@ public interface ICompetitionFactory extends ICachingFactory<ICompetition>{
 	ICompetition repair(ICompetition comp);
 	
 	ICompetition getGlobalComp();
+	
+	List<ICompetition> getClientComps();
+
+	Boolean addRound(Long compId, int uri, String name);
+
 }

@@ -3,21 +3,33 @@
  */
 package net.rugby.foundation.core.server.factory.test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import com.google.inject.Inject;
+
+import net.rugby.foundation.core.server.factory.BaseRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.RatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.Position.position;
 
 /**
  * @author home
  *
  */
-public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> implements IRatingQueryFactory {
+public class TestRatingQueryFactory extends BaseRatingQueryFactory implements IRatingQueryFactory {
+
+	@Inject
+	public TestRatingQueryFactory(IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
+		super(rsf, rgf, rmf);
+	}
 
 	private Long count = 750L;
 	/* (non-Javadoc)
@@ -30,17 +42,17 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 			return null;
 		} else {
 			IRatingQuery rq = new RatingQuery();
-			rq.setScaleComp(false);
-			rq.setScaleStanding(false);
-			rq.setScaleTime(false);
+			rq.setScaleComp(true);
+			rq.setScaleStanding(true);
+			rq.setScaleTime(true);
+			rq.setId(id);
 			if (id >= 700L && id <= 705L) {
-				rq.setId(id);
 				if (id == 700L) { // round 1
 					rq.getCompIds().add(1L);
-					rq.getRoundIds().add(2L);
+					rq.getRoundIds().add(6L);
 				} else if (id == 701L) {  // players FROM New Zealand
 					rq.getCompIds().add(1L);
-					rq.getRoundIds().add(2L);
+					rq.getRoundIds().add(6L);
 					rq.getCountryIds().add(5001L);
 				} else if (id == 702L) {  // flankers
 					rq.getCompIds().add(1L);
@@ -48,20 +60,46 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 					rq.getPositions().add(position.FLANKER);
 				}  else if (id == 703L) {  // players FOR New Zealand or Australia (teams)
 					rq.getCompIds().add(1L);
-					rq.getRoundIds().add(2L);
+					rq.getRoundIds().add(6L);
 					rq.getTeamIds().add(1L);
 					rq.getTeamIds().add(2L);
 				} else if (id == 704L) { // time series - round 1 and round 2
-					rq.getRoundIds().add(2L);
-					rq.getRoundIds().add(3L);
+					rq.getRoundIds().add(6L);
+					rq.getRoundIds().add(7L);
 				} else if (id == 705L) { // time series - round 1 and round 2 - unscaled
-					rq.getRoundIds().add(2L);
-					rq.getRoundIds().add(3L);
+					rq.getRoundIds().add(6L);
+					rq.getRoundIds().add(7L);
 					rq.setScaleComp(true);
 					rq.setScaleStanding(true);
 					rq.setScaleTime(true);
 				}
+			} else if (id > 7710000L && id < 7710100L) {
+				rq.getCompIds().add(1L);
+				rq.getRoundIds().add(7L);
+				rq.getRoundIds().add(6L);
+				rq.getPositions().add(position.getAt((int)((id-7710000))));
+				rq.setLabel(position.getAt((int)((id-7710000))).getName());
+				rq.setScaleTime(false);
+			} else if (id > 7710100L && id < 7710111L) {
+				rq.getCompIds().add(1L);
+				rq.getRoundIds().add(7L);
+				rq.getRoundIds().add(6L);
+				rq.getPositions().add(position.getAt((int)((id-7710100))));
+				rq.setLabel(position.getAt((int)((id-7710100))).getName());
+			} else if (id > 7700000L && id < 7700100L) {
+				rq.getCompIds().add(1L);
+				rq.getRoundIds().add(6L);
+				rq.setScaleTime(false);
+				rq.getPositions().add(position.getAt((int)((id-7700000))));
+				rq.setLabel(position.getAt((int)((id-7700000))).getName());
+			} else if (id > 7700100L && id < 7700111L) {
+				rq.getCompIds().add(1L);
+				rq.getRoundIds().add(6L);
+				rq.getPositions().add(position.getAt((int)((id-7700100))));
+				rq.setLabel(position.getAt((int)((id-7700100))).getName());
 			}
+			rq.setRatingMatrixId(id / 100);
+			rq.setTopTenListId(id + 10000000L);
 			return rq;
 		}
 	}
@@ -79,7 +117,9 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 
 	@Override
 	public IRatingQuery create() {
-		return new RatingQuery();
+		IRatingQuery rq = new RatingQuery();
+		rq.setStatus(Status.NEW);
+		return rq;
 	}
 
 	@Override
@@ -90,28 +130,50 @@ public class TestRatingQueryFactory extends BaseCachingFactory<IRatingQuery> imp
 	@Override
 	public IRatingQuery query(List<Long> compIds, List<Long> roundIds,
 			List<position> posis, List<Long> countryIds, List<Long> teamIds) {
-		if (compIds.contains(1L)) {
-			if (roundIds.contains(2L)) {
-				if (posis != null && posis.contains(position.FLANKER)) {
-					return getFromPersistentDatastore(702L);
-				} else if (countryIds != null && countryIds.contains(5001L)) {
-					return getFromPersistentDatastore(701L);
-				} else if (teamIds != null && (teamIds.contains(1L) || teamIds.contains(2L))) {
-					return getFromPersistentDatastore(703L);
-				} else {
-					if ((posis == null && countryIds == null && teamIds == null) || (posis.isEmpty() && countryIds.isEmpty() && teamIds.isEmpty())) {
-						return getFromPersistentDatastore(700L);
-					}
-				}
-			}
-		}
-		return null;
+		IRatingQuery rq = new RatingQuery();
+		rq.setScaleComp(false);
+		rq.setScaleStanding(false);
+		rq.setScaleTime(false);
+		rq.setId(count++);
+		rq.getCompIds().addAll(compIds);
+		rq.getRoundIds().addAll(roundIds);
+		rq.getPositions().addAll(posis);
+		rq.getCountryIds().addAll(countryIds);
+		rq.getTeamIds().addAll(teamIds);
+		
+		return rq;
+//		if (compIds.contains(1L)) {
+//			if (roundIds.contains(2L)) {
+//				if (posis != null && posis.contains(position.FLANKER)) {
+//					return getFromPersistentDatastore(702L);
+//				} else if (countryIds != null && countryIds.contains(5001L)) {
+//					return getFromPersistentDatastore(701L);
+//				} else if (teamIds != null && (teamIds.contains(1L) || teamIds.contains(2L))) {
+//					return getFromPersistentDatastore(703L);
+//				} else {
+//					if ((posis == null && countryIds == null && teamIds == null) || (posis.isEmpty() && countryIds.isEmpty() && teamIds.isEmpty())) {
+//						return getFromPersistentDatastore(700L);
+//					}
+//				}
+//			}
+//		}
+//		return null;
 	}
 
 	@Override
 	public void deleteAll() {
 		return;
 		
+	}
+
+	@Override
+	public List<IRatingQuery> getForMatrixFromPersistentDatastore(Long ratingMatrixId) {
+		List<IRatingQuery> list = new ArrayList<IRatingQuery>();
+		for (Long i=ratingMatrixId*100+1; i<ratingMatrixId*100+11; ++i ) {
+			list.add(get(i));
+		} 
+			
+		return list;
 	}
 
 }

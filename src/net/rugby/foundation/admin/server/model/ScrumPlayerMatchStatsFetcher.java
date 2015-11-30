@@ -702,6 +702,8 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						pos = position.NUMBER8;
 					} else if (playerMap.get(candidate).getPosition().equals(position.LOCK)) {
 						pos = position.LOCK;
+					}  else if (playerMap.get(candidate).getPosition().equals(position.SCRUMHALF)) {
+						pos = position.SCRUMHALF;
 					}
 				}
 			}
@@ -753,6 +755,8 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						pos = position.CENTER;
 					} else if (playerMap.get(candidate).getPosition().equals(position.FLYHALF)) {
 						pos = position.FLYHALF;
+					}  else if (playerMap.get(candidate).getPosition().equals(position.PROP)) {  // bloody french
+						pos = position.PROP;
 					}
 				}
 			}

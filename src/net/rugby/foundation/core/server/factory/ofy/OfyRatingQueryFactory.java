@@ -1,5 +1,6 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,27 +11,38 @@ import com.googlecode.objectify.Query;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.BaseRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingQuery;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
-public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> implements IRatingQueryFactory {
+public class OfyRatingQueryFactory extends BaseRatingQueryFactory implements IRatingQueryFactory {
 
 	private IPlayerRatingFactory prf;
+	private ITopTenListFactory ttlf;
 
 	@Inject 
-	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf) {
+	public OfyRatingQueryFactory(IPlayerRatingFactory pmrf, IRatingSeriesFactory rsf, ITopTenListFactory ttlf,
+			IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
+		super(rsf,rgf,rmf);
 		this.prf = pmrf;
+		this.ttlf = ttlf;
 	}
 	
 	@Override
 	public IRatingQuery create() {
 		try {
 			IRatingQuery rq = new RatingQuery();
+			rq.setStatus(Status.NEW);
 			return rq;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -44,6 +56,7 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 			Objectify ofy = DataStoreFactory.getOfy();
 			if (id != null) {
 				IRatingQuery rq = ofy.get(new Key<RatingQuery>(RatingQuery.class,id));
+				
 				return rq;
 			} else {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Don't try to get with null. Call create() instead!");
@@ -75,10 +88,21 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 	protected boolean deleteFromPersistentDatastore(IRatingQuery rq) {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			ofy.delete(rq);
+
+			
+			// delete any TTLs associated with the RQ
+			if (rq.getTopTenListId() != null) {
+				ITopTenList ttl = ttlf.get(rq.getTopTenListId());
+				if (ttl != null) {
+					ttlf.delete(ttl);
+				}
+			}
 			
 			// also delete all the PMRs associated with this query
 			prf.deleteForQuery(rq);
+			
+			ofy.delete(rq);
+			
 			return true;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -86,6 +110,7 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 		}
 	}
 
+	@Deprecated
 	@Override
 	public IRatingQuery query(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds) {
 		try {
@@ -153,7 +178,12 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 	public void deleteAll() {
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
-			QueryResultIterable<Key<RatingQuery>> keys = ofy.query(RatingQuery.class).fetchKeys();
+			
+//			QueryResultIterable<Key<RatingQuery>> keys = ofy.query(RatingQuery.class).fetchKeys();
+			
+			// with the new Series work, we should only delete RQs that are ad hoc - i.e. without a parent matrix
+			QueryResultIterable<Key<RatingQuery>> keys = ofy.query(RatingQuery.class).filter("ratingMatrixId", null).fetchKeys();
+
 			ofy.delete(keys);
 
 			// note the PMRs are left orphaned
@@ -162,6 +192,21 @@ public class OfyRatingQueryFactory extends BaseCachingFactory<IRatingQuery> impl
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}	
 		
+	}
+
+	@Override
+	protected List<IRatingQuery> getForMatrixFromPersistentDatastore(
+			Long matrixId) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		//@TODO confirm list is in ascending order?
+		Query<RatingQuery> qpms = ofy.query(RatingQuery.class).filter("matrixId", matrixId);
+		
+		List<IRatingQuery> list = new ArrayList<IRatingQuery>();
+		for (RatingQuery rq : qpms.list()) {
+			list.add(rq);
+		}
+		
+		return list;
 	}
 
 

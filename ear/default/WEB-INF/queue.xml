@@ -12,4 +12,15 @@
       <task-age-limit>2d</task-age-limit>
     </retry-parameters>
   </queue>
+    <queue>
+    <name>backup</name>
+    <rate>10/s</rate>
+    <bucket-size>40</bucket-size>
+    <max-concurrent-requests>10</max-concurrent-requests>
+    <target>ah-builtin-python-bundle</target>
+    <retry-parameters>
+      <task-retry-limit>3</task-retry-limit>
+      <task-age-limit>2d</task-age-limit>
+    </retry-parameters>
+  </queue>
 </queue-entries>
