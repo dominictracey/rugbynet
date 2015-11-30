@@ -3,4 +3,7 @@
 <module rename-to="shared">
 	<inherits name="com.google.gwt.user.User" />
 	<source path="shared"/>
+	
+	<!-- allow Super Dev Mode (not needed with 2.7.0 GWT installation) -->
+    <add-linker name="xsiframe"/>
 </module>

@@ -22,5 +22,8 @@
   <source path='client'/>
   <source path='shared'/>
   <source path='sdk' />
-    <set-property name="user.agent" value="gecko1_8, safari"/>
+  <set-property name="user.agent" value="gecko1_8, safari"/>
+    
+  <!-- allow Super Dev Mode (not needed with 2.7.0 GWT installation) -->
+  <add-linker name="xsiframe"/>
 </module>

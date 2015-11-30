@@ -3,4 +3,7 @@
 	<inherits name="net.rugby.foundation.core.Core" />
 	
 	<entry-point class="net.rugby.foundation.result.client.Result"/>
+	
+	<!-- allow Super Dev Mode (not needed with 2.7.0 GWT installation) -->
+    <add-linker name="xsiframe"/>
 </module>

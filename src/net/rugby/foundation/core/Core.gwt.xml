@@ -36,5 +36,8 @@
 	<entry-point class="net.rugby.foundation.core.client.Core"/>
 	<source path='client'/>
     <source path='shared'/>
-        <set-property name="user.agent" value="gecko1_8, safari, ie8, ie9"/>
+    <set-property name="user.agent" value="gecko1_8, safari, ie8, ie9"/>
+        
+  	<!-- allow Super Dev Mode (not needed with 2.7.0 GWT installation) -->
+  	<add-linker name="xsiframe"/>
 </module>
