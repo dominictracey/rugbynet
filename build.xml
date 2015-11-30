@@ -1,7 +1,7 @@
 <project>
   <property name="engine.dir" location="ear/engine/WEB-INF" />
   <property name="default.dir" location="ear/default/WEB-INF" />
-  <property name="sdk.dir" location="C:/Program Files/Google/appengine-java-sdk-1.9.2" />
+  <property name="sdk.dir" location="../../appengine-java-sdk-1.9.2" />
 
   <import file="${sdk.dir}/config/user/ant-macros.xml" />
   <target name="copyclasses"
