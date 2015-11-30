@@ -1,0 +1,2 @@
+serviceClass: net.rugby.foundation.admin.client.RugbyAdminService
+path: C744533541BB8F93DFD7554AE482DBEB.gwt.rpc

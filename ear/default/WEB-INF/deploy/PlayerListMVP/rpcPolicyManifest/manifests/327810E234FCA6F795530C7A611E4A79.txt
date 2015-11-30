@@ -1,0 +1,2 @@
+serviceClass: net.rugby.foundation.client.PlayersService
+path: C691043DDC5DA1C9F8068926E03EEDCC.gwt.rpc

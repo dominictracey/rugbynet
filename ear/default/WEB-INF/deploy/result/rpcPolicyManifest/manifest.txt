@@ -1,0 +1,3 @@
+# Module result
+# RPC service class, partial path of RPC policy file
+net.rugby.foundation.core.client.CoreService, 074482CDA80DB96E48CBC095C10E04EC.gwt.rpc

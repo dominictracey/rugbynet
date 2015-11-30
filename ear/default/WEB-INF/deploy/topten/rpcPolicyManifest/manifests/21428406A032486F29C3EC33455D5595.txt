@@ -1,0 +1,2 @@
+serviceClass: net.rugby.foundation.topten.client.TopTenListService
+path: 75EE1CEBC20FF04820B2E3C01407872A.gwt.rpc
