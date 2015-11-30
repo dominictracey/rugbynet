@@ -4,6 +4,8 @@ import java.util.List;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -26,5 +28,6 @@ public interface MatchRatingEngineSchemaPopupView<T> extends IsWidget
 		void onDeleteRatingsForMatchRatingEngineSchemaClicked(T schema);
 		void onDeleteMatchRatingEngineSchemaClicked(T schema);
 		void onSetMatchRatingEngineSchemaAsDefaultClicked(T schema);
+		void onFlushRawScoresButtonClicked(T schema);
 	}
 }

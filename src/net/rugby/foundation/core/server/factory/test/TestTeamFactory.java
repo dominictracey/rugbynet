@@ -3,24 +3,32 @@ package net.rugby.foundation.core.server.factory.test;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.BaseTeamFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Group.GroupType;
+import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
 
-public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements ITeamGroupFactory, Serializable {
+public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactory, Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4807160728169022839L;
 	private Map<Long, ITeamGroup> idMap = new HashMap<Long, ITeamGroup>(); 
 	private Map<String, ITeamGroup> nameMap = new HashMap<String, ITeamGroup>(); 
-	
+
 	private boolean populated = false;
-	
+
 	//@Inject
 	TestTeamFactory() {
 
@@ -54,7 +62,7 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 			return nameMap.get(name);
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.ITeamGroupFactory#find(net.rugby.foundation.model.shared.ITeamGroup)
 	 */
@@ -63,28 +71,28 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 		// hard to implement
 		return null;
 	}
-	
+
 	private void populate() {
 		if (!populated) {
 			for (Long l=9001L; l<9007L; l++) {
 				build(l);
 			}
-			
+
 			for (Long l=9201L; l<9210L; l++) {
 				build(l);
 			}
-			
+
 			for (Long l=9300L; l<9324L; l++) {
 				build(l);
 			}
-			
+
 			for (Long l=9400L; l<9416; l++)  {
 				build(l);
 			}
 			populated = true;
 		}
 	}
-	
+
 	ITeamGroup build(Long id) {
 		ITeamGroup t = new TeamGroup();
 		if (id == 9001) {
@@ -132,11 +140,11 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 			t.setShortName("Bath");
 			((IGroup)t).setDisplayName("Bath");
 			t.setColor("#004FA3");
-//		} else if (id == 9204) {
-//			t.setAbbr("BIA");
-//			t.setShortName("Biarritz");
-//			((Group)t).setDisplayName("Biarritz");
-//			t.setColor("#EA3E40");
+			//		} else if (id == 9204) {
+			//			t.setAbbr("BIA");
+			//			t.setShortName("Biarritz");
+			//			((Group)t).setDisplayName("Biarritz");
+			//			t.setColor("#EA3E40");
 		} else if (id == 9204) {
 			t.setAbbr("CAN");
 			t.setShortName("Crusaders");
@@ -187,7 +195,7 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 			t.setShortName("Saracens");
 			((IGroup)t).setDisplayName("Saracens");
 			t.setColor("#000000");
-			
+
 			// HEINEKEN CUP 2013-2014
 		} else if (id == 9300) {
 			t.setDisplayName("Leinster");
@@ -239,7 +247,7 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 			t.setDisplayName("Perpignan");
 		}
 		//SUPER RUGBY
-		  else if (id == 9400) {
+		else if (id == 9400) {
 			t.setDisplayName("Blues");
 		} else if (id == 9401) {
 			t.setDisplayName("Brumbies");
@@ -270,12 +278,12 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 		} else if (id == 9414) {
 			t.setDisplayName("Waratahs");
 		}
-		
+
 		((TeamGroup)t).setId(id);
 		((IGroup)t).setGroupType(GroupType.TEAM);
-		
+
 		put(t);
-		
+
 		return t;
 	}
 
@@ -290,6 +298,22 @@ public class TestTeamFactory extends BaseCachingFactory<ITeamGroup> implements I
 
 		return true;
 	}
-	
+
+	@Override
+	protected HashMap<Long, String> getTeamLogoStyleMapFromPersistentDatastore() {
+		try {
+			HashMap<Long, String> map = new HashMap<Long, String>();
+
+			for (Long id : idMap.keySet()) {
+				map.put(id,idMap.get(id).getAbbr());					
+			}
+
+			return map;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getTeamLogoStyleMapFromPersistentDatastore", ex);
+			return null;
+		}
+	}
+
 
 }

@@ -6,6 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -109,10 +110,21 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 		}	
 	}
 
-	private void deleteFromMemcache(T t) {
+	protected void deleteFromMemcache(T t) {
+		try {
+			if (t != null) {
+				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+				syncCache.delete(t.getId());
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+		}
+	}
+
+	protected void deleteItemFromMemcache(String s) {
 		try {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			syncCache.delete(t.getId());
+			syncCache.delete(s);
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}
@@ -164,12 +176,14 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 	 */
 	protected boolean putList(String key, List<T> list) {
 		try {
+			Serializable sList = (Serializable) list;
+
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(key);
-			if (list != null) {
+			if (sList != null) {
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				ObjectOutput out = new ObjectOutputStream(bos);   
-				out.writeObject(list);
+				out.writeObject(sList);
 				byte[] yourBytes = bos.toByteArray(); 
 
 				out.close();
@@ -243,6 +257,21 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return false;
+		}	
+	}
+
+	/**
+	 * 
+	 */
+	public void dropFromCache(Long id) {
+		try {
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			//T t = get(id);
+			if (syncCache.contains(id)) {
+				syncCache.delete(id);
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}	
 	}
 }

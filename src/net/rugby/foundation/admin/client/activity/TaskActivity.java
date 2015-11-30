@@ -40,6 +40,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 	int index; // the task line item number
 	private IAdminTask target;
 	private TaskView<IAdminTask> view;
+	private MenuItemDelegate menuItemDelegate;
 	
 	public TaskActivity(AdminTaskPlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IAdminTask>();
@@ -379,6 +380,21 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 	@Override
 	public void createContent() {
 		clientFactory.createContent();
+	}
+	
+
+	@Override
+	public void cleanUp() {
+		getMenuItemDelegate().cleanUp();
+		
+	}
+	
+	private MenuItemDelegate getMenuItemDelegate() {
+		if (menuItemDelegate == null) {
+			menuItemDelegate = new MenuItemDelegate(clientFactory);
+		}
+		
+		return menuItemDelegate;
 	}
 
 }

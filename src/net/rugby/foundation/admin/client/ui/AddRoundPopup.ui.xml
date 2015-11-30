@@ -1,0 +1,27 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+
+
+
+	<b:Well>
+		<!-- Add GWT widgets here. Enter < and hit Ctrl-Space to auto-complete 
+			widget names. The ui:field attribute binds an element to a field in the owner 
+			class. See the GWT docs on UI Binder for more details. -->
+		<b:Form>
+			
+			<b:ListBox ui:field="urList"></b:ListBox>
+			<b:Label>Name</b:Label>
+			<b:TextBox ui:field='name'></b:TextBox>
+			<b:Nav>
+				<b:ButtonGroup ui:field='buttonBar'>
+					<b:Button ui:field="save">Save</b:Button>
+					<b:Button ui:field="cancel">Cancel</b:Button>
+				</b:ButtonGroup>
+			</b:Nav>
+			
+		</b:Form>
+
+	</b:Well>
+</ui:UiBinder> 

@@ -3,6 +3,7 @@
  */
 package net.rugby.foundation.core.client;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -11,7 +12,11 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 /**
  * @author home
@@ -30,7 +35,7 @@ public interface CoreServiceAsync {
 	void logOff(LoginInfo info, AsyncCallback<LoginInfo> asyncCallback);
 	void nativeLogin(String emailAddress, String password, AsyncCallback<LoginInfo> asyncCallback);
 	void createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook, AsyncCallback<LoginInfo> asyncCallback);
+			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2, AsyncCallback<LoginInfo> asyncCallback);
 
 	void updatePreferences(LoginInfo loginInfo, AsyncCallback<LoginInfo> cb);
 	void createClubhouse(String name, String description, Boolean publicClubhouse, AsyncCallback<IClubhouse> cb);
@@ -70,4 +75,12 @@ public interface CoreServiceAsync {
 	void forgotPassword(String email, AsyncCallback<LoginInfo> asyncCallback);
 	void getContent(Long contentId, AsyncCallback<IContent> asyncCallback);
 	void saveContent(IContent content, AsyncCallback<IContent> asyncCallback);
+	
+//	void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
+	void getSponsor(Long id, AsyncCallback<ISponsor> asyncCallback);
+	void getResultsForOrdinal(int ordinal, Long virtualCompId, AsyncCallback<ArrayList<IMatchGroup>> asyncCallback);
+	
+	void getUniversalRound(int ordinal, AsyncCallback<UniversalRound> asyncCallback);
+	void getContent(String string, AsyncCallback<IContent> cb);
+	void getOAuth2Url(String destination, AsyncCallback<String> asyncCallback);
 }

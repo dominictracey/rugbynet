@@ -1,39 +1,39 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" >
 
 
-	<b:WellForm>
-	    <b:ControlLabel>Title</b:ControlLabel>
+	<b:FormGroup>
+	    <b:Label>Title</b:Label>
 	    <b:TextBox placeholder="menu name" ui:field="title"></b:TextBox>
 	    <b:HelpBlock>Shows up in menu drop down and in footer.</b:HelpBlock>
-	    <b:ControlLabel>Body</b:ControlLabel>
+	    <b:Label>Body</b:Label>
 	    <b:TextArea placeholder="content" ui:field="body"></b:TextArea>
 	    <b:HelpBlock>Displayed to end user.</b:HelpBlock>
-	    <b:ControlLabel>Active</b:ControlLabel>
+	    <b:Label>Active</b:Label>
 	    <b:CheckBox ui:field="active"></b:CheckBox>
 	    <b:HelpBlock>Uncheck to hide from site.</b:HelpBlock>
-	    <b:ControlLabel>Div</b:ControlLabel>
+	    <b:Label>Div</b:Label>
 	    <b:TextBox ui:field="div"></b:TextBox>
 	    <b:HelpBlock>HTML div to display content.</b:HelpBlock>
-	    <b:ControlLabel>Show in menu</b:ControlLabel>
+	    <b:Label>Show in menu</b:Label>
 	    <b:CheckBox ui:field="showInMenu"></b:CheckBox>
 	    <b:HelpBlock>Uncheck to remove from menu.</b:HelpBlock>
-	   	<b:ControlLabel>Show in footer</b:ControlLabel>
+	   	<b:Label>Show in footer</b:Label>
 	    <b:CheckBox ui:field="showInFooter"></b:CheckBox>
 	    <b:HelpBlock>Uncheck to remove from footer</b:HelpBlock>
-		<b:ControlLabel>Menu order</b:ControlLabel>
+		<b:Label>Menu order</b:Label>
 	    <b:TextBox ui:field="menuOrder"></b:TextBox>
 	    <b:HelpBlock>Smaller numbers display earlier</b:HelpBlock>
 	    
-        <b:Nav alignment="RIGHT">
-        	<b:NavWidget ui:field='buttonBar'>
+        <b:Nav>
+        	<b:Nav ui:field='buttonBar'>
         	    		<b:Button ui:field="save" type="PRIMARY">Save</b:Button>
 						<b:Button ui:field="cancel">Cancel</b:Button>	
-        	</b:NavWidget>
+        	</b:Nav>
         </b:Nav>
 			
-	</b:WellForm>
+	</b:FormGroup>
 
 </ui:UiBinder> 

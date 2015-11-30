@@ -7,6 +7,7 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -26,6 +27,7 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -97,7 +99,7 @@ public interface RugbyAdminService extends RemoteService {
 	IPlayerRating savePlayerMatchStats(IPlayerMatchStats pms, IAdminTask target);
 	ICompetition repairComp(ICompetition comp);
 	IPlayerMatchStats refetchPlayerMatchStats(IPlayerMatchStats pms);
-	IRatingQuery createRatingQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding);
+	IRatingQuery createRatingQuery(List<Long> compId, List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId, Long schemaId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed, Boolean instrument);
 //	List<IPlayerMatchInfo> reRateMatch(Long matchId);
 	IMatchGroup SaveScore(Long matchId, int hS, int vS, Status status);
 	ITeamMatchStats getTeamMatchStats(Long matchId, Long teamId);
@@ -107,15 +109,17 @@ public interface RugbyAdminService extends RemoteService {
 	// match rating engine schema
 	ScrumMatchRatingEngineSchema saveMatchRatingEngineSchema(ScrumMatchRatingEngineSchema schema);
 	ScrumMatchRatingEngineSchema getMatchRatingEngineSchema(Long schemaId);
+	ScrumMatchRatingEngineSchema createMatchRatingEngineSchema();
 	ScrumMatchRatingEngineSchema saveMatchRatingEngineSchemaAsCopy(ScrumMatchRatingEngineSchema schema);
 	Boolean deleteMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
 	Boolean deleteRatingsForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
 	ScrumMatchRatingEngineSchema setMatchRatingEngineSchemaAsDefault(ScrumMatchRatingEngineSchema20130713 schema);
+	boolean deleteRawScoresForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema);
 	List<ScrumMatchRatingEngineSchema> getScrumSchemaList();
 	Boolean flushAllPipelineJobs();
 	
 	// top ten list
-	TopTenSeedData createTopTenList(TopTenSeedData tti);
+	TopTenSeedData createTopTenList(TopTenSeedData tti, Map<IPlayer, String> twitterMap);
 	
 	IContent createContent(Long id, String content);
 	List<IContent> getContentList(boolean onlyActive);
@@ -128,6 +132,19 @@ public interface RugbyAdminService extends RemoteService {
 	List<IPlayerRating> getRatingQueryResults(long parseLong);
 	//List<IPlayerRating> getTimeSeriesRatingQueryResults(long parseLong);
 	Boolean deleteRatingQuery(IRatingQuery query);
+	IRatingQuery rerunRatingQuery(Long id);
 	String checkPipelineStatus(String id, Long matchId);
-	IMatchGroup AddMatchToRound(IRound round);
+	IMatchGroup AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId);
+	String cleanUp();
+	
+	// rating series
+	List<ISeriesConfiguration> getAllSeriesConfigurations(Boolean active);
+	ISeriesConfiguration getSeriesConfiguration(Long id);
+	String processSeriesConfiguration(Long sConfigId);
+	Boolean deleteSeriesConfiguration(Long sConfigId);
+	ISeriesConfiguration saveSeriesConfiguration(ISeriesConfiguration sConfig) throws Exception;
+	List<UniversalRound> getUniversalRounds(int size);
+	ICompetition addVirtualComp();
+	ISeriesConfiguration rollBackSeriesConfiguration(Long id);
+	Boolean addRound(Long compId, int uri, String name);
 }

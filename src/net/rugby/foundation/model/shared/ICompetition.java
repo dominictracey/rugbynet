@@ -4,13 +4,14 @@
 package net.rugby.foundation.model.shared;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * @author home
  *
  */
-public interface ICompetition {
+public interface ICompetition extends IHasId {
 
 	public enum CompetitionType {HEINEKEN_CUP, AVIVA_PREMIERSHIP, SUPER_RUGBY, AUTUMN_INTERNATIONALS, GLOBAL}
 
@@ -97,6 +98,25 @@ public interface ICompetition {
 	 */
 	public abstract Float getWeightingFactor();
 	public abstract void setWeightingFactor(Float weightingFactor);
+	public abstract void setTwitter(String twitter);
+	public abstract String getTwitter();
+	void setTwitterChannel2(String twitterChannel2);
+	String getTwitterChannel2();
+	void setTwitterChannel1(String twitterChannel1);
+	String getTwitterChannel1();
+	void setImageUrl(String imageUrl);
+	String getImageUrl();
+	HashMap<RatingMode, Long> getSeriesMap();
+	public abstract String getTTLTitleDesc();
+	void setTTLTitleDesc(String tTLTitleDesc);
+	void setSponsor(Sponsor sponsor);
+	Sponsor getSponsor();
+	void setSponsorId(Long sponsorId);
+	Long getSponsorId();
+	List<Long> getComponentCompIds();
+	void setComponentCompIds(List<Long> componentCompIds);
+	void setShowToClient(Boolean showToClient);
+	Boolean getShowToClient();
 	
 	// don't put getNextRound and getPrevRound in here, see note at bottom of Competition.java
 	//public abstract void setNextAndPrevRound();

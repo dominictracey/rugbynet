@@ -22,6 +22,7 @@ import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresenter;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView.TeamMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -32,6 +33,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 public class PortalActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
@@ -49,6 +51,8 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	private EditTTLInfo ttltext;
 
 	protected boolean isTimeSeries= false;
+	private MenuItemDelegate menuItemDelegate;
+
 
 	public PortalActivity(PortalPlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IPlayerRating>();
@@ -105,67 +109,82 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 								public void onSuccess(List<ICountry> result) {
 									view.setCountries(result);
 
-									// now see if we have a query to display
-									if (place != null && place.getqueryId() != null && !place.getqueryId().equals("null")) {
-										clientFactory.getRpcService().getRatingQuery(Long.parseLong(place.getqueryId()), new  AsyncCallback<IRatingQuery>() {
+									clientFactory.getRpcService().getScrumSchemaList(new AsyncCallback<List<ScrumMatchRatingEngineSchema>>() {
 
-											@Override
-											public void onFailure(Throwable caught) {
-												Window.alert("Problem finding the query with id " + place.getqueryId());
+										@Override
+										public void onFailure(Throwable caught) {
+											Window.alert("Failed to fetch schema list");
 
+										}
+
+										@Override
+										public void onSuccess(List<ScrumMatchRatingEngineSchema> result) {
+
+											view.setSchemas(result);
+											// now see if we have a query to display
+											if (place != null && place.getqueryId() != null && !place.getqueryId().equals("null")) {
+												clientFactory.getRpcService().getRatingQuery(Long.parseLong(place.getqueryId()), new  AsyncCallback<IRatingQuery>() {
+
+													@Override
+													public void onFailure(Throwable caught) {
+														Window.alert("Problem finding the query with id " + place.getqueryId());
+
+													}
+
+													@Override
+													public void onSuccess(IRatingQuery result) {
+														view.setRatingQuery(result);
+														if (result.getStatus() == Status.COMPLETE) {
+															final boolean isTimeSeries = result.isTimeSeries();
+															//if (!result.isTimeSeries()) {
+															clientFactory.getRpcService().getRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
+
+																private List<IPlayerRating> currentList;
+
+																@Override
+																public void onFailure(Throwable caught) {
+																	Window.alert("Problem finding the query results with id " + place.getqueryId());
+																}
+
+																@Override
+																public void onSuccess(List<IPlayerRating> result) {
+																	if (isTimeSeries)
+																		view.showTimeWeightedMatchInfo(result);
+																	else
+																		view.showAggregatedMatchInfo(result);
+																}
+
+															});
+															//} 
+															//													else {
+															//														clientFactory.getRpcService().getTimeSeriesRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
+															//
+															//															@Override
+															//															public void onFailure(Throwable caught) {
+															//																Window.alert("Problem finding the query results with id " + place.getqueryId());
+															//															}
+															//
+															//															@Override
+															//															public void onSuccess(List<IPlayerRating> result) {
+															//																view.showTimeWeightedMatchInfo(result);
+															//															}
+															//
+															//														});
+															//													}
+														} else if (result.getStatus() == Status.ERROR) {
+															Window.alert("The query has terminated without delivering results. Check the server log for details.");
+														} else if (result.getStatus() == Status.RUNNING || result.getStatus() == Status.NEW) {
+															// keep checking
+															goTo(new PortalPlace("queryId=" + place.getqueryId()));
+														}
+													}	
+												});
+											} else {
+												view.showAggregatedMatchInfo(null);
 											}
-
-											@Override
-											public void onSuccess(IRatingQuery result) {
-												view.setRatingQuery(result);
-												if (result.getStatus() == Status.COMPLETE) {
-													final boolean isTimeSeries = result.isTimeSeries();
-													//if (!result.isTimeSeries()) {
-														clientFactory.getRpcService().getRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
-
-															@Override
-															public void onFailure(Throwable caught) {
-																Window.alert("Problem finding the query results with id " + place.getqueryId());
-															}
-
-															@Override
-															public void onSuccess(List<IPlayerRating> result) {
-																if (isTimeSeries)
-																	view.showTimeWeightedMatchInfo(result);
-																else
-																	view.showAggregatedMatchInfo(result);
-															}
-
-														});
-													//} 
-//													else {
-//														clientFactory.getRpcService().getTimeSeriesRatingQueryResults(Long.parseLong(place.getqueryId()), new AsyncCallback<List<IPlayerRating>>() {
-//
-//															@Override
-//															public void onFailure(Throwable caught) {
-//																Window.alert("Problem finding the query results with id " + place.getqueryId());
-//															}
-//
-//															@Override
-//															public void onSuccess(List<IPlayerRating> result) {
-//																view.showTimeWeightedMatchInfo(result);
-//															}
-//
-//														});
-//													}
-												} else if (result.getStatus() == Status.ERROR) {
-													Window.alert("The query has terminated without delivering results. Check the server log for details.");
-												} else if (result.getStatus() == Status.RUNNING || result.getStatus() == Status.NEW) {
-													// keep checking
-													goTo(new PortalPlace("queryId=" + place.getqueryId()));
-												}
-											}	
-										});
-									} else {
-										view.showAggregatedMatchInfo(null);
-									}
+										}
+									});
 								}
-
 							});
 
 						}
@@ -395,21 +414,47 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	}
 
 	@Override
-	public void createTopTenList(TopTenSeedData data) {
+	public void createTopTenList(final TopTenSeedData data) {
 		if (ttltext == null) {
 			ttltext = new EditTTLInfo();
 		}
 
-		ttltext.setText("Top Ten List Properties");
-		data.setTitle("Top Ten Performances for ");
-		ttltext.setPresenter(this);
-		ttltext.showTTI(data);
+		final EditTTLInfoPresenter _this = this;
+
+		Core.getCore().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onSuccess(ICoreConfiguration result) {
+
+				ttltext.setText("Top Ten List Properties");
+				data.setTitle("Top Ten Performances for ");
+
+				ttltext.removePlayers();
+
+				for (int i=0; i<10; ++i)
+				{
+					if (view.getCurrentList() != null && view.getCurrentList().size() > i) {
+						IPlayer p = view.getCurrentList().get(i).getPlayer();
+						ttltext.addTwitterPlayer(p);				
+					}
+				}
+				ttltext.setComps(result);
+				ttltext.setPresenter(_this);
+				ttltext.showTTI(data);
+			}
+		});
 	}
 
 	@Override
 	public void saveTTIText(final TopTenSeedData tti) {
 		ttltext.hide();
-		clientFactory.getRpcService().createTopTenList(tti, new AsyncCallback<TopTenSeedData>() {
+		clientFactory.getRpcService().createTopTenList(tti, ttltext.getTwitterDictionary(), new AsyncCallback<TopTenSeedData>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -420,6 +465,7 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 			public void onSuccess(TopTenSeedData result) {
 				if (result != null) {
 					Window.alert("Top ten list created: " + result.getTitle());
+
 				} else {
 					Window.alert("Problem creating top ten list for " + tti.getTitle());
 				}
@@ -473,10 +519,10 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 				public void onFailure(Throwable caught) {
 					Window.alert("Failed to fetch team match stats to edit");
 				}
-	
+
 				@Override
 				public void onSuccess(ITeamMatchStats result) {
-	
+
 					clientFactory.getTeamMatchStatsPopupView().setTarget(result);
 					((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
 				}
@@ -534,12 +580,12 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	}
 
 	@Override
-	public void submitPortalQuery(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds,
-										Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding) {
+	public void submitPortalQuery(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds, Long schemaId,
+			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed ,Boolean instrument) {
 
 		//if (!isTimeSeries) {
-		clientFactory.getRpcService().createRatingQuery(compIds, roundIds, posis, countryIds, teamIds, 
-															scaleTime, scaleComp, scaleStanding, new AsyncCallback<IRatingQuery>() {
+		clientFactory.getRpcService().createRatingQuery(compIds, roundIds, posis, countryIds, teamIds, schemaId,
+				scaleTime, scaleComp, scaleStanding, scaleMinutesPlayed, instrument, new AsyncCallback<IRatingQuery>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -604,6 +650,42 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	}
 
 
+	@Override
+	public void cleanUp() {
+		getMenuItemDelegate().cleanUp();
 
+	}
+
+	private MenuItemDelegate getMenuItemDelegate() {
+		if (menuItemDelegate == null) {
+			menuItemDelegate = new MenuItemDelegate(clientFactory);
+		}
+
+		return menuItemDelegate;
+	}
+
+	@Override
+	public void rerunQuery(IRatingQuery rq) {
+		if (rq != null) {
+			if (rq.getRatingMatrixId() == null) {
+				Window.alert("Only Series Queries (not Ad Hoc) may be re-run");
+				return;
+			} else {
+				clientFactory.getRpcService().rerunRatingQuery(rq.getId(), new AsyncCallback<IRatingQuery>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert("Query re-run failed: " + caught.getLocalizedMessage());
+					}
+
+					@Override
+					public void onSuccess(IRatingQuery result) {
+						goTo(new PortalPlace("queryId=" + result.getId().toString()));
+					}
+				});
+			}
+		}
+
+	}
 
 }

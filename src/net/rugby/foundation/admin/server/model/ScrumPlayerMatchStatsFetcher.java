@@ -104,7 +104,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				//					// keep looking
 				boolean stillLooking = true;
 				while(stillLooking) {
-					IPlayerMatchStats cursor = pmsf.getById(null);
+					IPlayerMatchStats cursor = pmsf.create();
 					cursor = getPlayerStats(it,cursor);
 					if (cursor != null) {
 						playerMap.put(cursor.getName(),cursor);
@@ -182,14 +182,34 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	}
 	
 	private boolean isUpsideDown(List<String> eles) {
-		String tdClass = "liveTblTextBlk";
 		Iterator<String> iter = eles.iterator();
+		String line = iter.next();
+		// first get here:
+	   //   <div class="tabbertab">
+	   //    <h2>Timeline</h2>
+		while (iter.hasNext()) {
+			if (line.contains("tabbertab"))
+			{
+				line = iter.next();
+				if (line.contains("Timeline"))
+				{
+					break;
+				}
+			}
+			line = iter.next();
+		}
+		
+		String tdClass = "liveTblTextBlk";
 		int timeEle = 0;
 		while (iter.hasNext()) {
-			String line = iter.next();
+			line = iter.next();
 			if (line != null && line.length() > -1) {
 				if (line.contains(tdClass)) {
-					timeEle = Integer.parseInt(line.split("<|/|>")[2]);
+					if (!line.split("<|>")[2].contains("+")) {
+						timeEle = Integer.parseInt(line.split("<|>")[2]);
+					} else {
+						timeEle = Integer.parseInt(line.split("<|>")[2].split("[+]")[0]) + Integer.parseInt(line.split("<|>")[2].split("[+]")[1]);
+					}
 					if (timeEle > 0) {
 						return true;
 					} else if (timeEle == 0) {
@@ -346,7 +366,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	}
 	
 	private IPlayerMatchStats noRunOn() {
-		stats = pmsf.getById(null);
+		stats = pmsf.create();
 		stats.setMatchId(match.getId()); // native ID, not scrum's
 		stats.setPlayerId(player.getId());  // native ID, not scrum's
 		stats.setSlot(slot);
@@ -575,7 +595,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 			} catch (Exception e) {
 				if (pms != null) {
-					setErrorMessage("Problem getting playing time information for player " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + e.getLocalizedMessage());
+					setErrorMessage("Problem getting playing time information for player " + player.getDisplayName() + " in match " + match.getDisplayName() + " (" + match.getDate() + ") : " + e.getLocalizedMessage());
 				} 
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Parsing timeline issue: " + e.getMessage(), e);
 
@@ -682,6 +702,8 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						pos = position.NUMBER8;
 					} else if (playerMap.get(candidate).getPosition().equals(position.LOCK)) {
 						pos = position.LOCK;
+					}  else if (playerMap.get(candidate).getPosition().equals(position.SCRUMHALF)) {
+						pos = position.SCRUMHALF;
 					}
 				}
 			}
@@ -733,6 +755,8 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 						pos = position.CENTER;
 					} else if (playerMap.get(candidate).getPosition().equals(position.FLYHALF)) {
 						pos = position.FLYHALF;
+					}  else if (playerMap.get(candidate).getPosition().equals(position.PROP)) {  // bloody french
+						pos = position.PROP;
 					}
 				}
 			}

@@ -27,4 +27,5 @@ public interface IPlayerRatingFactory extends ICachingFactory<IPlayerRating> {
 	 */
 	List<IPlayerRating> getForMatch(Long matchId, IRatingEngineSchema schema);
 	Boolean deleteForSchema(IRatingEngineSchema schema);
+	void deleteAll();
 }

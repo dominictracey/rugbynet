@@ -2,30 +2,32 @@ package net.rugby.foundation.topten.client.ui;
 
 import java.util.List;
 
-import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.html.Span;
+
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.DOM;
+
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.CellPreviewEvent.Handler;
 
 
 public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox implements RatingPopupView<T> 
@@ -33,6 +35,8 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 	private static NavBarViewImplUiBinder uiBinder = GWT.create(NavBarViewImplUiBinder.class);
 
 	private ClientFactory clientFactory;
+	@UiField
+	protected Panel topPanel;
 	@UiField
 	protected Image image;
 	@UiField
@@ -42,9 +46,12 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 	@UiField
 	protected HTML content;
 	
-	Image close = new Image("/resources/closeButton25.png");
-	HTML title = new HTML("");
-	HorizontalPanel captionPanel = new HorizontalPanel();
+	@UiField
+	Image close; // = new Image("/resources/closeButton25.png");
+	@UiField
+	Span title; // = new HTML("");
+	@UiField
+	Column captionPanel; // = new HorizontalPanel();
 	 
 	private boolean columnsInitialized = false;
 	interface NavBarViewImplUiBinder extends UiBinder<Widget, RatingPopupViewImpl<?>>
@@ -57,34 +64,36 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 	{
 		setWidget(uiBinder.createAndBindUi(this));
 		
-		Element td = getCellElement(0, 1);
-		td.removeChild((Element) td.getFirstChildElement());
-		td.appendChild(captionPanel.getElement());
+//		Element td = getCellElement(0, 1);
+//		td.removeChild((Element) td.getFirstChildElement());
+//		td.appendChild(captionPanel.getElement());
+		topPanel.addStyleName("col-md-4"); 
+		topPanel.addStyleName("col-sm-8");
+		topPanel.addStyleName("col-xs-10");
+		topPanel.addStyleName("col-md-offset-2");
+		topPanel.addStyleName("col-xs-offset-1");
+
 		captionPanel.setStyleName("Caption");//width-100%
 		captionPanel.addStyleName("popupCaption");//padding
-		captionPanel.add(title);
+		//captionPanel.add(title);
 		title.addStyleName("popupCaption");//padding
 		close.addStyleName("popupCloseButton");//float:right
 		playerInfo.addStyleName("popupPlayerInfo");
-		captionPanel.add(close);
+		//captionPanel.add(close);
 		content.addStyleName("popupContent");
 		super.setGlassEnabled(true);
+		super.setGlassStyleName("dialogGlass");
 		super.setAnimationEnabled(true);
 		
-		ratingInfo.addColumn(new Column<RatingComponent,String>(new TextCell()){
+		ratingInfo.addColumn(new com.google.gwt.user.cellview.client.Column<RatingComponent,String>(new TextCell()){
 			@Override
 			public String getValue(RatingComponent r)
 			{
 				return r.getMatchLabel() == null ? "" : r.getMatchLabel();
 			}
-//			@Override
-//			public String getCellStyleNames(Context context, RatingComponent value) {
-//				return "compactTTL";
-//
-//			}
 		}, "Match");
 		
-		ratingInfo.addColumn(new Column<RatingComponent,String>(new TextCell()){
+		ratingInfo.addColumn(new com.google.gwt.user.cellview.client.Column<RatingComponent,String>(new TextCell()){
 			@Override
 			public String getValue(RatingComponent r)
 			{
@@ -97,18 +106,39 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 //			}
 		}, "Match Rating");
 		
-		ratingInfo.addColumn(new Column<RatingComponent,String>(new TextCell()){
+		ratingInfo.addColumn(new com.google.gwt.user.cellview.client.Column<RatingComponent,String>(new TextCell()){
 			@Override
 			public String getValue(RatingComponent r)
 			{
-				return Float.toString(r.getUnscaledRating());
+				//return String.format("%.2f", r.getRawScore());
+				String retval = Float.toString(r.getRawScore()); 
+				int dot = retval.indexOf('.');
+				dot += 2; // two places after the decimal
+				return retval.substring(0, dot);
+				//return r.getUnscaledRating());
 			}
 //			@Override
 //			public String getCellStyleNames(Context context, RatingComponent value) {
 //				return "compactTTL";
 //
 //			}
-		}, "Raw Rating");
+		}, "Raw Score");
+		
+		ratingInfo.addCellPreviewHandler( new Handler<RatingComponent>() {
+
+			@Override
+			public void onCellPreview(CellPreviewEvent<RatingComponent> event) {
+				boolean isClick = "click".equals(event.getNativeEvent().getType());
+				if (isClick) {
+					if (event.getValue() != null && event.getValue().getScrumId() != null) {
+						clientFactory.showExternalLink("http://www.espn.co.uk/rugby/playerstats?gameId=" + event.getValue().getScrumId());
+					}
+					
+				}
+			}
+		});
+
+		ratingInfo.getElement().getStyle().setCursor(Cursor.POINTER); 
 	}
 
 

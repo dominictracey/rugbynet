@@ -2,15 +2,13 @@ package net.rugby.foundation.core.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.core.client.ui.CreateClubhouse;
@@ -20,7 +18,12 @@ import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
+import net.rugby.foundation.model.shared.Sponsor;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -29,6 +32,14 @@ public class Core implements CoreServiceAsync, EntryPoint {
 
 	public interface CompChangeListener {
 		void compChanged(Long id);
+	}
+	
+	public interface RoundChangeListener {
+		void roundChanged(UniversalRound roundOrdinal);
+	}
+	
+	public interface GuidChangeListener {
+		void guidChanged(String guid);
 	}
 	
 	private CoreClientFactory clientFactory = new CoreClientFactoryImpl();
@@ -54,13 +65,17 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	//	Cleared to default without login
 	private Long currentCompId = 0L;
 	
+	private String currentGuid = "";
+	
 	// a map of all competitions (underway or not). key id, value ICompetition.
 	//	Login agnostic
 	private Map<Long, ICompetition> compMap = new HashMap<Long, ICompetition>();
 		
-	// components that are interested in getting notified when the currentCompId changes
+	// components that are interested in getting notified when the current CompId and roundId changes
 	//	Login agnostic
 	private ArrayList<CompChangeListener> compChangeListeners = new ArrayList<CompChangeListener>();
+	private ArrayList<RoundChangeListener> roundChangeListeners = new ArrayList<RoundChangeListener>();
+	private ArrayList<GuidChangeListener> guidChangeListeners = new ArrayList<GuidChangeListener>();
 	
 	// map that contains the last completed round for a comp. key compId, value IRound of previous round. 
 	//	Login agnostic
@@ -83,14 +98,26 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	private CreateClubhouse createClubhouse = null;
 	
 	// map that contains content
-	private Map<Long, IContent> contentMap = null; 
+	private Map<Long, IContent> contentMap = null;
+	
+	private int currentRoundOrdinal = -1; 
+	
+	// sponsor map
+	private Map<Long, ISponsor> sponsorMap = null;
+	ISponsor noSponsor = new Sponsor();
+	private Map<Integer, UniversalRound> universalRoundMap = new HashMap<Integer, UniversalRound>();
 	
 	/**
 	 * Use the static getInstance factory method
 	 */
 	private Core()
 	{
-		
+		//CssBundle.INSTANCE.bootstrapOverridesCss().ensureInjected();
+		//CssBundle.INSTANCE.defaultCss().ensureInjected();
+		noSponsor.setAbbr("NON");
+		noSponsor.setActive(true);
+		noSponsor.setName("None");
+		noSponsor.setTagline("");
 	}
 	
 	/** Singleton 
@@ -120,10 +147,13 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void onModuleLoad() {
-		Element element = DOM.getElementById("loadProgress");
-		if (element != null) {
-			element.getStyle().setWidth(60, Unit.PCT);
-		}
+//		GWT.setUncaughtExceptionHandler(new
+//		        GWT.UncaughtExceptionHandler() {
+//		        public void onUncaughtException(Throwable e) {
+//		          Window.
+//		      }
+//		});
+		
 		
 	}
 
@@ -224,10 +254,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook,
+			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2,
 			final AsyncCallback<LoginInfo> cb) {
 		clientFactory.getRpcService().createAccount(emailAddress,  nickName,
-				 password,  isGoogle,  isFacebook, new AsyncCallback<LoginInfo> () {
+				 password,  isGoogle,  isFacebook, isOAuth2, new AsyncCallback<LoginInfo> () {
 			@Override
 			public void onFailure(Throwable caught) {
 				cb.onFailure(caught);
@@ -241,21 +271,28 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		});
 	}
 
-	public Long getCurrentCompId() {
-		//if it is not set yet, we need to use the system default (which is a Core.Configuration value)
-		assert (currentCompId != 0L);
-			 
+	public Long getCurrentCompId() {			 
 		return currentCompId;
 	}
 
 	public void setCurrentCompId(final Long currentCompId) {
-		if (this.currentCompId != currentCompId) {
+		if (!this.currentCompId.equals(currentCompId)) {
 			this.currentCompId = currentCompId;
-
-			for (CompChangeListener l : compChangeListeners) {
-				l.compChanged(currentCompId);
-			}
+			getComp(currentCompId, new AsyncCallback<ICompetition>() {
+				public void onFailure(Throwable caught) {
+					//ignore
+					//cb.onFailure(caught);
+				}
+				
+				public void onSuccess(ICompetition comp) {
+					currentRoundOrdinal = config.getCurrentUROrdinal();
+					for (CompChangeListener l : compChangeListeners) {
+						l.compChanged(currentCompId);
+					}
+				}
+			});
 		}
+			
 
 	}
 	
@@ -589,7 +626,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			});
 		}	
 	}
-
+	@Override
 	public void saveContent(IContent content, final AsyncCallback<IContent> cb) {
 		clientFactory.getRpcService().saveContent(content, new AsyncCallback<IContent> () {
 			@Override
@@ -606,7 +643,6 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		});
 		
 	}
-	
 	private Map<Long, IContent> getContentMap() {
 		if (contentMap == null) {
 			contentMap = new HashMap<Long,IContent>();
@@ -620,6 +656,212 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		}
 		
 		return clubhouseMap;
+	}
+
+	public void setCurrentRoundOrdinal(int i, boolean force) {
+		// first off, does this round make sense for this comp? Is it within the time bounds of the comp? If it is before the first, set it to the first round; if it is after the last set it to the last
+		ICompetition comp = getCurrentComp();
+
+		if (comp != null && comp.getRounds() != null && !comp.getRounds().isEmpty()) {
+			if (i < comp.getRounds().get(0).getUrOrdinal()) {
+				i = comp.getRounds().get(0).getUrOrdinal();
+			} else if (i > comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal()) {
+				i = comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal();
+			}
+		} 
+		
+		if (this.currentRoundOrdinal != i || force) {
+			this.currentRoundOrdinal = i;
+			final int ord = i;
+			if (!universalRoundMap.containsKey(i)) {
+				clientFactory.getRpcService().getUniversalRound(i, new AsyncCallback<UniversalRound>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onSuccess(UniversalRound result) {
+						universalRoundMap.put(ord,result);
+						for (RoundChangeListener l : roundChangeListeners) {
+							l.roundChanged(result);
+						}
+					}
+					
+				});
+			} else {
+				for (RoundChangeListener l : roundChangeListeners) {
+					l.roundChanged(universalRoundMap.get(i));
+				}
+			}
+
+
+		}
+		
+	}
+	
+	public int getCurrentRoundOrdinal() {
+		return currentRoundOrdinal;
+	}
+
+	public void registerRoundChangeListener(RoundChangeListener l) {
+		roundChangeListeners.add(l);
+	}
+
+	public void registerGuidChangeListener(GuidChangeListener l) {
+		guidChangeListeners.add(l);
+	}
+	
+	public void changeGuid(String guid) {
+		if (this.currentGuid != guid) {
+			this.currentGuid = guid;
+
+			for (GuidChangeListener l : guidChangeListeners) {
+				l.guidChanged(currentGuid);
+			}
+		}
+	}
+
+
+	@Override
+	public void getSponsor(final Long id, final AsyncCallback<ISponsor> asyncCallback) {
+		if (id == null) {
+			// return empty sponsor
+			asyncCallback.onSuccess(noSponsor);
+			return;
+		}
+		
+		if (sponsorMap == null) {
+			sponsorMap = new HashMap<Long, ISponsor>();
+		}
+		
+		if (sponsorMap.containsKey(id)) {
+			asyncCallback.onSuccess(sponsorMap.get(id));
+		} else {
+			clientFactory.getRpcService().getSponsor(id, new AsyncCallback<ISponsor>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					asyncCallback.onFailure(caught);
+				}
+
+				@Override
+				public void onSuccess(ISponsor result) {
+					sponsorMap.put(id, result);
+					asyncCallback.onSuccess(result);					
+				}
+				
+			});
+		}
+		
+	}
+	
+	HashMap<Long, HashMap<Integer, ArrayList<IMatchGroup>>> virtualCompResultMap = new HashMap<Long, HashMap<Integer, ArrayList<IMatchGroup>>>();
+
+	@Override
+	public void getResultsForOrdinal(final int ordinal, final Long virtualCompId, final AsyncCallback<ArrayList<IMatchGroup>> asyncCallback) {
+		HashMap<Integer, ArrayList<IMatchGroup>> vCompMap = null;
+		
+		// get the map related to the virtual comp in question
+		if (virtualCompResultMap.containsKey(virtualCompId)) {
+			vCompMap = virtualCompResultMap.get(virtualCompId);
+		} else {
+			vCompMap = new HashMap<Integer, ArrayList<IMatchGroup>>();
+			virtualCompResultMap.put(virtualCompId, vCompMap);
+		}
+		
+		// do we have the match set we want already?
+		if (vCompMap.containsKey(ordinal)) {
+			asyncCallback.onSuccess(vCompMap.get(ordinal));
+		} else {
+			// fetch and cache
+			clientFactory.getRpcService().getResultsForOrdinal(ordinal, virtualCompId, new AsyncCallback<ArrayList<IMatchGroup>>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					asyncCallback.onFailure(caught);
+					
+				}
+
+				@Override
+				public void onSuccess(ArrayList<IMatchGroup> result) {
+					virtualCompResultMap.get(virtualCompId).put(ordinal, result);
+					
+					asyncCallback.onSuccess(result);
+					
+				}
+				
+			});
+		}
+		
+		
+	}
+
+	@Override
+	public void getUniversalRound(final int ordinal,
+			AsyncCallback<UniversalRound> asyncCallback) {
+		if (!universalRoundMap.containsKey(ordinal)) {
+			clientFactory.getRpcService().getUniversalRound(ordinal, new AsyncCallback<UniversalRound>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess(UniversalRound result) {
+					universalRoundMap.put(ordinal,result);
+					for (RoundChangeListener l : roundChangeListeners) {
+						l.roundChanged(result);
+					}
+				}
+				
+			});
+		} else {
+			for (RoundChangeListener l : roundChangeListeners) {
+				l.roundChanged(universalRoundMap.get(ordinal));
+			}
+		}
+		
+	}
+
+	@Override
+	public void getContent(String string, final AsyncCallback<IContent> cb) {
+		clientFactory.getRpcService().getContent(string, new AsyncCallback<IContent>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(IContent result) {
+				cb.onSuccess(result); // don't bother caching? @REX
+				
+			}
+			
+		});
+		
+	}
+
+	@Override
+	public void getOAuth2Url(String destination, final AsyncCallback<String> cb) {
+		clientFactory.getRpcService().getOAuth2Url(destination, new AsyncCallback<String> () {
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(String result) {	
+				cb.onSuccess(result);
+			}
+
+		});	
+		
 	}
 
 }

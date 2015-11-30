@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
+
+import com.google.appengine.datanucleus.annotations.Unindexed;
 import com.googlecode.objectify.annotation.Entity;
+
 import net.rugby.foundation.model.shared.Position.position;
 
 @Entity
@@ -22,11 +26,33 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	protected List<Long> teamIds;
 	protected List<Long> countryIds;
 	protected List<position> positions;
+	
 	protected Status status;
+	protected String label;
+	
+	@Unindexed
 	protected boolean scaleTime = true;
+	@Unindexed
 	protected boolean scaleComp = true;
+	@Unindexed
 	protected boolean scaleStanding = true;
+	@Unindexed
+	protected boolean scaleMinutesPlayed = false;
+	@Unindexed
+	protected boolean instrument = false;
+	@Unindexed	
+	protected MinMinutes minMinutesType;
+	@Unindexed
+	protected int minMinutes;
+	
+	@Transient
+	protected IRatingMatrix ratingMatrix;
+	protected Long ratingMatrixId;
+	
+	protected Long topTenListId;
 
+	protected Long schemaId;
+	
 	public RatingQuery() {
 		compIds = new ArrayList<Long>();
 		roundIds = new ArrayList<Long>();
@@ -196,6 +222,84 @@ public class RatingQuery implements IRatingQuery, Serializable {
 	@Override
 	public void setScaleStanding(boolean scaleStanding) {
 		this.scaleStanding = scaleStanding;
+	}
+
+	@Override
+	public void setRatingMatrix(IRatingMatrix ratingMatrix) {
+		this.ratingMatrix = ratingMatrix;
+		
+	}
+
+	@Override
+	public IRatingMatrix getRatingMatrix() {
+		return ratingMatrix;
+	}
+
+	@Override
+	public void setRatingMatrixId(Long ratingMatrixId) {
+		this.ratingMatrixId = ratingMatrixId;
+		
+	}
+
+	@Override
+	public Long getRatingMatrixId() {
+		return ratingMatrixId;
+	}
+	@Override
+	public Long getTopTenListId() {
+		return topTenListId;
+	}
+	@Override
+	public void setTopTenListId(Long topTenListId) {
+		this.topTenListId = topTenListId;
+	}
+	@Override
+	public String getLabel() {
+		return label;
+	}
+	@Override
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	@Override
+	public Long getSchemaId() {
+		return schemaId;
+	}
+	@Override
+	public void setSchemaId(Long schemaId) {
+		this.schemaId = schemaId;
+	}
+	@Override
+	public Boolean getInstrument() {
+		return instrument;
+	}
+	@Override
+	public void setInstrument(Boolean instrument) {
+		this.instrument = instrument;
+	}
+	@Override
+	public Boolean getScaleMinutesPlayed() {
+		return scaleMinutesPlayed;
+	}
+	@Override
+	public void setScaleMinutesPlayed(Boolean scaleMinutesPlayed) {
+		this.scaleMinutesPlayed = scaleMinutesPlayed;
+	}
+	@Override
+	public MinMinutes getMinMinutesType() {
+		return minMinutesType;
+	}
+	@Override
+	public void setMinMinutesType(MinMinutes minMinutesType) {
+		this.minMinutesType = minMinutesType;
+	}
+	@Override
+	public int getMinMinutes() {
+		return minMinutes;
+	}
+	@Override
+	public void setMinMinutes(int minMinutes) {
+		this.minMinutes = minMinutes;
 	}
 
 }

@@ -36,6 +36,8 @@ public interface SmartBar extends IsWidget {
 		void flushAllPipelineJobs();
 
 		void createContent();
+
+		void cleanUp();
 		
 
 	}

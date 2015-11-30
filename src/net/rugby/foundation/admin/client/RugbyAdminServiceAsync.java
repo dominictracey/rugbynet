@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -28,6 +29,7 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.UniversalRound;
 
 
 public interface RugbyAdminServiceAsync {
@@ -114,7 +116,7 @@ public interface RugbyAdminServiceAsync {
 	public void refetchPlayerMatchStats(IPlayerMatchStats pms, AsyncCallback<IPlayerMatchStats> asyncCallback);
 	public void createRatingQuery(List<Long> compId,
 			List<Long> roundId, List<position> posi, List<Long> countryId, List<Long> teamId,
-			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, AsyncCallback<IRatingQuery> asyncCallback);
+			Long schemaId, Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed, Boolean instrument, AsyncCallback<IRatingQuery> asyncCallback);
 	public void  getTeamMatchStats(Long matchId, Long teamId, AsyncCallback<ITeamMatchStats> asyncCallback);
 	public void refetchTeamMatchStats(ITeamMatchStats target,
 			AsyncCallback<ITeamMatchStats> asyncCallback);
@@ -125,6 +127,7 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
 	public void getMatchRatingEngineSchema(Long schemaId,
 			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
+	public void createMatchRatingEngineSchema(AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
 	public void saveMatchRatingEngineSchemaAsCopy(
 			ScrumMatchRatingEngineSchema schema,
 			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);
@@ -134,6 +137,9 @@ public interface RugbyAdminServiceAsync {
 	public void deleteRatingsForMatchRatingEngineSchema(
 			ScrumMatchRatingEngineSchema20130713 schema,
 			AsyncCallback<Boolean> asyncCallback);
+	public void deleteRawScoresForMatchRatingEngineSchema(
+			ScrumMatchRatingEngineSchema20130713 schema,
+			AsyncCallback<Boolean> asyncCallback);
 	public void setMatchRatingEngineSchemaAsDefault(
 			ScrumMatchRatingEngineSchema20130713 schema,
 			AsyncCallback<ScrumMatchRatingEngineSchema> asyncCallback);	
@@ -141,7 +147,7 @@ public interface RugbyAdminServiceAsync {
 	
 	public void flushAllPipelineJobs(AsyncCallback<Boolean> asyncCallback);
 	public void deleteComp(Long id, AsyncCallback<Boolean> asyncCallback);
-	public void createTopTenList(TopTenSeedData tti, AsyncCallback<TopTenSeedData> asyncCallback);
+	public void createTopTenList(TopTenSeedData tti, Map<IPlayer, String> twitterMap, AsyncCallback<TopTenSeedData> asyncCallback);
 	public void createContent(Long id, String content,
 			AsyncCallback<IContent> asyncCallback);
 	public void getContentList(boolean onlyActive, AsyncCallback<List<IContent>> asyncCallback);
@@ -158,6 +164,27 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<Boolean> asyncCallback);
 	public void checkPipelineStatus(String id, Long matchId,
 			AsyncCallback<String> asyncCallback);
-	public void AddMatchToRound(IRound round,
+	public void AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId,
 			AsyncCallback<IMatchGroup> asyncCallback);
+	public void cleanUp(AsyncCallback<String> asyncCallback);
+	
+	//RatingSeries
+	public void  getAllSeriesConfigurations(Boolean active,
+			AsyncCallback<List<ISeriesConfiguration>> asyncCallback);
+	public void  getSeriesConfiguration(Long id,
+			AsyncCallback<ISeriesConfiguration> asyncCallback);
+	public void  processSeriesConfiguration(Long sConfigId,
+			AsyncCallback<String> asyncCallback);
+	public void  deleteSeriesConfiguration(Long sConfigId,
+			AsyncCallback<Boolean> asyncCallback);
+	public void  saveSeriesConfiguration(ISeriesConfiguration sConfig,
+			AsyncCallback<ISeriesConfiguration> asyncCallback);
+	public void getUniversalRounds(int size,
+			AsyncCallback<List<UniversalRound>> asyncCallback);
+	public void addVirtualComp(AsyncCallback<ICompetition> asyncCallback);
+	public void rollBackSeriesConfiguration(Long id, AsyncCallback<ISeriesConfiguration> asyncCallback);
+	public void rerunRatingQuery(Long id,
+			AsyncCallback<IRatingQuery> asyncCallback);
+	public void addRound(Long compId, int uri, String name,
+			AsyncCallback<Boolean> asyncCallback);
 }

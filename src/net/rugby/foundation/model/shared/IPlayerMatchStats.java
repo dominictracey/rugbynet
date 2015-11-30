@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.rugby.foundation.model.shared.Position.position;
 
-public interface IPlayerMatchStats {
+public interface IPlayerMatchStats extends IHasId  {
 
 	public abstract Long getId();
 

@@ -59,12 +59,13 @@ public class AccountManager implements IAccountManager {
 	}
 
 	@Override
-	public IAppUser createAccount(String emailAddress, String nickName, String password, JSONObject attributes, boolean isOpenId, boolean isFacebook, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException {
+	public IAppUser createAccount(String emailAddress, String nickName, String password, JSONObject attributes, boolean isOpenId, boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException {
 
 		LoginInfo info = new LoginInfo();
 		info.setLoggedIn(false);
 		IAppUser u = null;
 		
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Creating account for " + emailAddress);
 		boolean error = false;
 		String hash = null;
 		//valid email address?
@@ -76,7 +77,7 @@ public class AccountManager implements IAccountManager {
 			// TODO this may be a merge
 			info.setStatus(CoreConfiguration.getCreateacctErrorInvalidEmail());
 		} else {
-			if (!isOpenId && !isFacebook) {
+			if (!isOpenId && !isFacebook && !isOAuth2) {
 				//password length
 				if (password.length() < 5) {
 					info.setStatus(CoreConfiguration.getCreateacctErrorPasswordTooShort());
@@ -113,6 +114,7 @@ public class AccountManager implements IAccountManager {
 					u.setSuperadmin(false);
 					u.setIsOpenId(isOpenId);
 					u.setFacebook(isFacebook);
+					u.setOath2(isOAuth2);
 					u.setNative(!isOpenId && !isFacebook);
 					
 					if (attributes != null)
@@ -124,8 +126,11 @@ public class AccountManager implements IAccountManager {
 						u = auf.put(u);
 					}
 
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Setting login info to user session: " + u.getNickname());
+
 					HttpSession session = request.getSession();
 					info = getLoginInfo(u);
+					assert(info.isLoggedIn());
 					session.setAttribute("loginInfo", info);
 				}
 			}
@@ -306,7 +311,7 @@ public class AccountManager implements IAccountManager {
 
 			try {
 				// create their AppUser account with a generic screen name, then send them to change it
-				u = createAccount(email.toLowerCase(), null, null, attributes, providerType.equals(LoginInfo.ProviderType.openid), providerType.equals(LoginInfo.ProviderType.facebook), req);
+				u = createAccount(email.toLowerCase(), null, null, attributes, providerType.equals(LoginInfo.ProviderType.openid), providerType.equals(LoginInfo.ProviderType.facebook), providerType.equals(LoginInfo.ProviderType.oauth2),req);
 
 			} catch (NumberFormatException e) {
 				Logger.getLogger("Login Servlet").log(Level.SEVERE,e.getLocalizedMessage(),e);
@@ -332,9 +337,9 @@ public class AccountManager implements IAccountManager {
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
 			String url = "";
 			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+				url = "/s/?gwt.codesvr=127.0.0.1:9997#Profile:";
 			else
-				url = "/topten.html?#Profile:";
+				url = "/s/?#Profile:";
 
 			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
 				destination = Base64Helper.decode(destination);
@@ -356,9 +361,9 @@ public class AccountManager implements IAccountManager {
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
 			String url = "";
 			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+				url = "/s/?gwt.codesvr=127.0.0.1:9997#Profile:";
 			else
-				url = "/topten.html?#Profile:";
+				url = "/s/?#Profile:";
 
 			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
 				destination = Base64Helper.decode(destination);
@@ -397,6 +402,7 @@ public class AccountManager implements IAccountManager {
 		} else if (providerType.equals(ProviderType.facebook)) {
 			if (!u.isFacebook()) {
 				u.setFacebook(true);
+				needSave = true;
 			}
 			if (u.getPwHash() != null || u.isNative()) {
 				u.setPwHash(null);
@@ -405,6 +411,16 @@ public class AccountManager implements IAccountManager {
 			}
 			if (u.getFbId() == null) {
 				u = addJSONAttributes(u,attributes);
+				needSave = true;
+			}
+		}  else if (providerType.equals(ProviderType.oauth2)) {
+			if (!u.isOath2()) {
+				u.setOath2(true);
+				needSave = true;
+			}
+			if (u.getPwHash() != null || u.isNative()) {
+				u.setPwHash(null);
+				u.setNative(false);
 				needSave = true;
 			}
 		}

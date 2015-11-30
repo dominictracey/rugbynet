@@ -93,14 +93,12 @@ public class BasicCompTester {
 	@Test
 	public void testNumRounds() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
+		ICompetition comp = cf.get(1L);
 
 
 		Assert.assertTrue(comp.getRounds().size() == 4);
 
-		cf.setId(2L);
-		comp = cf.getCompetition();
+		comp = cf.get(2L);
 
 
 		Assert.assertTrue(comp.getRounds().size() == 3);
@@ -109,14 +107,14 @@ public class BasicCompTester {
 	@Test
 	public void testNumTeams() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
+
+		ICompetition comp = cf.get(1L);
 
 
 		Assert.assertTrue(comp.getTeams().size() == 6);
 
-		cf.setId(2L);
-		comp = cf.getCompetition();
+
+		comp = cf.get(2L);
 
 
 		Assert.assertTrue(comp.getTeams().size() == 8);
@@ -125,16 +123,12 @@ public class BasicCompTester {
 	@Test
 	public void testNextAndPrevRounds() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
-
-
+		ICompetition comp = cf.get(1L);
 		Assert.assertTrue(comp.getNextRound().getAbbr().equals("3"));
 		Assert.assertTrue(comp.getPrevRound().getAbbr().equals("2"));
 
-		cf.setId(2L);
-		comp = cf.getCompetition();
 
+		comp = cf.get(2L);
 		Assert.assertTrue(comp.getNextRound().getAbbr().equals("2"));
 		Assert.assertTrue(comp.getPrevRound().getAbbr().equals("1"));
 
@@ -145,8 +139,7 @@ public class BasicCompTester {
 	@Test
 	public void testNumMatches() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
+		ICompetition comp = cf.get(1L);
 
 		int count = 0;
 		for (IRound r: comp.getRounds()) {
@@ -155,8 +148,7 @@ public class BasicCompTester {
 
 		Assert.assertTrue(count == 9);
 
-		cf.setId(2L);
-		comp = cf.getCompetition();
+		comp = cf.get(2L);
 
 		count = 0;
 		for (IRound r: comp.getRounds()) {
@@ -169,8 +161,7 @@ public class BasicCompTester {
 	@Test
 	public void testMatchResults() {
 
-		cf.setId(1L);
-		ICompetition comp = cf.getCompetition();
+		ICompetition comp = cf.get(1L);
 
 		int count = 0;
 		for (IRound r: comp.getRounds()) {
@@ -182,8 +173,8 @@ public class BasicCompTester {
 
 		Assert.assertTrue(count == 4);
 
-		cf.setId(2L);
-		comp = cf.getCompetition();
+
+		comp = cf.get(2L);
 
 		count = 0;
 		for (IRound r: comp.getRounds()) {

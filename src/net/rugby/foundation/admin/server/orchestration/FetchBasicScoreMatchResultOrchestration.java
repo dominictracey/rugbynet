@@ -72,8 +72,7 @@ public class FetchBasicScoreMatchResultOrchestration extends OrchestrationCore<I
 
 					// don't fetch until locked
 					if (target.getLocked()) {
-						cf.setId(compId);
-						ICompetition comp = cf.getCompetition();
+						ICompetition comp = cf.get(compId);
 	
 						IResultFetcher fetcher = rff.getResultFetcher(compId, comp.getNextRound(), IMatchResult.ResultType.MATCHES);
 	

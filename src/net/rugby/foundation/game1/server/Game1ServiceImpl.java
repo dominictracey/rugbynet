@@ -337,8 +337,7 @@ public class Game1ServiceImpl extends RemoteServiceServlet implements Game1Servi
 	@Override
 	public IConfiguration updateConfiguration(IConfiguration config, List<Long> compsToAdd, List<Long> compsToDrop) {
 		for (Long compId : compsToAdd) {
-			cf.setId(compId);
-			ICompetition comp = cf.getCompetition();
+			ICompetition comp = cf.get(compId);
 
 
 
@@ -381,8 +380,7 @@ public class Game1ServiceImpl extends RemoteServiceServlet implements Game1Servi
 				return null;
 			}
 
-			cf.setId(compId);
-			ICompetition comp = cf.getCompetition();
+			ICompetition comp = cf.get(compId);
 
 			ef.setNameAndComp(name, comp, u.getId());
 
@@ -443,8 +441,8 @@ public class Game1ServiceImpl extends RemoteServiceServlet implements Game1Servi
 	private ICompetition getComp(Long compId) {
 		try {
 
-			cf.setId(compId);
-			return cf.getCompetition();
+			return cf.get(compId);
+
 
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);

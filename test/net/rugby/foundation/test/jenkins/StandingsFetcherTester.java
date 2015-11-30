@@ -69,8 +69,7 @@ public class StandingsFetcherTester {
 	 @Test
 	 public void testHeinekenCupRoundOne() {
 
-		 cf.setId(4L);
-		 ICompetition c = cf.getCompetition();
+		 ICompetition c = cf.get(4L);
 
 		 sFetcher = sFetcherFactory.getFetcher(c.getRounds().get(0));
 			
@@ -117,8 +116,9 @@ public class StandingsFetcherTester {
 	 @Test
 	 public void testSuperRugby() {
 
-		 cf.setId(5L);
-		 ICompetition c = cf.getCompetition();
+
+		ICompetition c = cf.get(5L);
+
 		 assertTrue(c != null);
 		 assertTrue(c.getTeams().size() == 15);
 

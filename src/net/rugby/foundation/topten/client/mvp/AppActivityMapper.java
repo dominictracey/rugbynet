@@ -1,11 +1,16 @@
 package net.rugby.foundation.topten.client.mvp;
 
+import net.rugby.foundation.topten.client.activity.ProfileActivity;
+import net.rugby.foundation.topten.client.place.Profile;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.activity.ContentActivity;
-import net.rugby.foundation.topten.client.activity.TopTenListActivity;
+import net.rugby.foundation.topten.client.activity.FeatureListActivity;
+import net.rugby.foundation.topten.client.activity.LegacyListActivity;
+import net.rugby.foundation.topten.client.activity.SeriesActivity;
 import net.rugby.foundation.topten.client.place.ContentPlace;
-import net.rugby.foundation.topten.client.place.TopTenListPlace;
-
+import net.rugby.foundation.topten.client.place.FeatureListPlace;
+import net.rugby.foundation.topten.client.place.LegacyListPlace;
+import net.rugby.foundation.topten.client.place.SeriesPlace;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
@@ -28,11 +33,16 @@ public class AppActivityMapper implements ActivityMapper {
 	@Override
 	public Activity getActivity(Place place) {
 	  
-		if (place instanceof TopTenListPlace)
-			return new TopTenListActivity((TopTenListPlace) place, clientFactory);
+		if (place instanceof FeatureListPlace)
+			return new FeatureListActivity((FeatureListPlace) place, clientFactory);
 		if (place instanceof ContentPlace)
 			return new ContentActivity((ContentPlace) place, clientFactory);
-
+		if (place instanceof SeriesPlace)
+			return new SeriesActivity((SeriesPlace) place, clientFactory);
+		if (place instanceof LegacyListPlace) {
+			return new LegacyListActivity((LegacyListPlace) place, clientFactory);
+		} else if (place instanceof Profile)
+			return new ProfileActivity((Profile) place, clientFactory);
 		return null;
 	}
 

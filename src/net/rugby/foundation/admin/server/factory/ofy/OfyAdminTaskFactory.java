@@ -61,7 +61,7 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 
 	@Override
 	public List<? extends IAdminTask> getAllOpen() {
-		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("status", Status.OPEN);
+		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("status", Status.OPEN).order("created");
 		return qat.list();
 	}
 	

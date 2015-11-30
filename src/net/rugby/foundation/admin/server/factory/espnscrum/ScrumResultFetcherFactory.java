@@ -36,8 +36,7 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 	public IResultFetcher getResultFetcher(Long sourceCompID, IRound round, IMatchResult.ResultType resultType) {
 		ICompetition comp = null;
 		if (sourceCompID != null) {
-			cf.setId(sourceCompID);
-			comp = cf.getCompetition();
+			comp = cf.get(sourceCompID);
 		}
 
 		if (comp == null) {

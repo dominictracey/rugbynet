@@ -21,14 +21,16 @@ public class ExternalAuthenticatorPanel extends Composite
 	public interface Presenter {
 		void doOpenIdLogin(LoginInfo.Selector selector);
 		void doFacebookLogin();
+		void doOAuth2Login();
 	}
 	
 
 	//@UiField Anchor facebook;
-	@UiField Anchor google;
-	@UiField Anchor aol;
-	@UiField Anchor openid_com;
-	@UiField Anchor yahoo;
+	//@UiField Anchor google;
+	@UiField Anchor googlePlus;
+//	@UiField Anchor aol;
+//	@UiField Anchor openid_com;
+//	@UiField Anchor yahoo;
 
 	Presenter presenter;
 
@@ -42,26 +44,31 @@ public class ExternalAuthenticatorPanel extends Composite
 
 	}
 	
-
-	@UiHandler("google")
-	void onGoogleButtonClicked(ClickEvent event) {
-		presenter.doOpenIdLogin(LoginInfo.Selector.google);
-	}	 
+//
+//	@UiHandler("google")
+//	void onGoogleButtonClicked(ClickEvent event) {
+//		presenter.doOpenIdLogin(LoginInfo.Selector.google);
+//	}	
 	
-	@UiHandler("aol")
-	void onAOLButtonClicked(ClickEvent event) {
-		presenter.doOpenIdLogin(LoginInfo.Selector.aol);
+	@UiHandler("googlePlus")
+	void onGooglePlusButtonClicked(ClickEvent event) {
+		presenter.doOAuth2Login();
 	}	
 	
-	@UiHandler("openid_com")
-	void onOpenIdComButtonClicked(ClickEvent event) {
-		presenter.doOpenIdLogin(LoginInfo.Selector.myopenid_com);
-	}	
-	
-	@UiHandler("yahoo")
-	void onYahooButtonClicked(ClickEvent event) {
-		presenter.doOpenIdLogin(LoginInfo.Selector.yahoo);
-	}	
+//	@UiHandler("aol")
+//	void onAOLButtonClicked(ClickEvent event) {
+//		presenter.doOpenIdLogin(LoginInfo.Selector.aol);
+//	}	
+//	
+//	@UiHandler("openid_com")
+//	void onOpenIdComButtonClicked(ClickEvent event) {
+//		presenter.doOpenIdLogin(LoginInfo.Selector.myopenid_com);
+//	}	
+//	
+//	@UiHandler("yahoo")
+//	void onYahooButtonClicked(ClickEvent event) {
+//		presenter.doOpenIdLogin(LoginInfo.Selector.yahoo);
+//	}	
 	
 //	@UiHandler("facebook")
 //	void onFacebookButtonClicked(ClickEvent event) {

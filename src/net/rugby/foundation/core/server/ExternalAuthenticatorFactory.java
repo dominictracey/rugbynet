@@ -33,35 +33,35 @@ public class ExternalAuthenticatorFactory implements
 	}
 
 
-	public String getUrl(Actions action, LoginInfo.ProviderType providerType, LoginInfo.Selector selector, String destination) {
-		String retval = null; 
-		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-			retval = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
-		else
-			retval = "/topten.html?#Profile:";
-
-
-		
-		if (action != null)
-			retval += Keys.action.toString() + "=" + action.toString();	
-		
-		if (providerType != null) {
-			retval += "&" + Keys.providerType.toString() + "=" + providerType.toString();
-		}
-		
-		if (selector != null) {
-			retval += "&" + Keys.selector.toString() + "=" + selector.toString();					
-		}
-		if (destination != null) {
-//			try {
-				retval += "&" + Keys.destination.toString() + "=" + destination;// + URLEncoder.encode(destination, "UTF-8");
-//			} catch (UnsupportedEncodingException e) {
-//				Logger.getLogger("AccountManager").log(Level.SEVERE, e.getLocalizedMessage(), e);
-//			}			
-		}
-		return  retval;
-	}
-		
+//	public String getUrl(Actions action, LoginInfo.ProviderType providerType, LoginInfo.Selector selector, String destination) {
+//		String retval = null; 
+//		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
+//			retval = "/topten.html?gwt.codesvr=127.0.0.1:9997#Profile:";
+//		else
+//			retval = "/topten.html?#Profile:";
+//
+//
+//		
+//		if (action != null)
+//			retval += Keys.action.toString() + "=" + action.toString();	
+//		
+//		if (providerType != null) {
+//			retval += "&" + Keys.providerType.toString() + "=" + providerType.toString();
+//		}
+//		
+//		if (selector != null) {
+//			retval += "&" + Keys.selector.toString() + "=" + selector.toString();					
+//		}
+//		if (destination != null) {
+////			try {
+//				retval += "&" + Keys.destination.toString() + "=" + destination;// + URLEncoder.encode(destination, "UTF-8");
+////			} catch (UnsupportedEncodingException e) {
+////				Logger.getLogger("AccountManager").log(Level.SEVERE, e.getLocalizedMessage(), e);
+////			}			
+//		}
+//		return  retval;
+//	}
+//		
 	@Override
 	public IExternalAuthenticatorProvider get(HttpServletRequest req) {
 		
@@ -89,21 +89,24 @@ public class ExternalAuthenticatorFactory implements
 //		if (req.getParameter("destination").isEmpty())
 //			return null;
 		
-		assert (tok[4].toLowerCase().equals(LoginInfo.ProviderType.openid.toString()) || tok[4].toLowerCase().equals(LoginInfo.ProviderType.facebook.toString()));
+		assert (tok[4].toLowerCase().equals(LoginInfo.ProviderType.openid.toString()) || tok[4].toLowerCase().equals(LoginInfo.ProviderType.facebook.toString()) || tok[4].toLowerCase().equals(LoginInfo.ProviderType.oauth2.toString()));
 
 		String providerTypeS = tok[4];
 		LoginInfo.ProviderType providerType = IdentityTypes.getProviderType(providerTypeS);
-		
-		String selectorS = tok[5];
-		LoginInfo.Selector selector = IdentityTypes.getSelector(selectorS);
 
+		
 		String destination = req.getParameter("destination");
 
-		if (providerType.equals(LoginInfo.ProviderType.facebook)) {
+		if (providerType.equals(LoginInfo.ProviderType.oauth2)) {
+			return get(LoginInfo.ProviderType.oauth2, null, destination);
+		} else if (providerType.equals(LoginInfo.ProviderType.facebook)) {
 			if (destination != null)
 				destination = Base64Helper.decode(destination);
 			return get(LoginInfo.ProviderType.facebook, null, destination);
 		} else { //OpenId
+			assert (tok.length > 4);
+			String selectorS = tok[5];
+			LoginInfo.Selector selector = IdentityTypes.getSelector(selectorS);
 			return get(LoginInfo.ProviderType.openid, selector, destination);
 		}
 	}
@@ -114,6 +117,7 @@ public class ExternalAuthenticatorFactory implements
 	static {
 		openIdProviders = new HashMap<LoginInfo.Selector, String>();
 		openIdProviders.put(LoginInfo.Selector.google, "www.google.com/accounts/o8/id");
+		openIdProviders.put(LoginInfo.Selector.googlePlus, "accounts.google.com/o/oauth2/auth");
 		openIdProviders.put(LoginInfo.Selector.yahoo, "yahoo.com");
 		openIdProviders.put(LoginInfo.Selector.myspace, "myspace.com");
 		openIdProviders.put(LoginInfo.Selector.aol, "aol.com");
@@ -132,7 +136,9 @@ public class ExternalAuthenticatorFactory implements
 		} else if (type.equals(LoginInfo.ProviderType.openid)) {
 			if (openIdProviders.containsKey(selector))
 				return new OpenIdProvider(selector, am, destination);
-		} 
+		}  else if (type.equals(LoginInfo.ProviderType.oauth2)) {
+				return new OAuth2Provider(am, destination);
+		}
 		return null;
 	}
 

@@ -60,20 +60,19 @@ public class StandingTester {
 
 		IStanding s = sf.get(29001L);
 
-		assertTrue(s.getRoundId().equals(2L));
+		assertTrue(s.getRoundId().equals(6L));
 		assertTrue(s.getTeamId().equals(9001L));
 	}
 	
 	@Test
 	public void testGetStandingsByRound() {
 
-		rf.setId(2L);
-		IRound r = rf.getRound();
+		IRound r = rf.get(6L);
 		List<IStanding> list = sf.getForRound(r);
 		
-		assertTrue(list.get(0).getRoundId().equals(2L));
-		assertTrue(list.get(0).getTeamId().equals(9001L));
 		assertTrue(list.size() == 4);
+		assertTrue(list.get(0).getRoundId().equals(6L));
+		assertTrue(list.get(0).getStanding() == list.get(0).getTeamId()-9000L);
 	}
 
 }

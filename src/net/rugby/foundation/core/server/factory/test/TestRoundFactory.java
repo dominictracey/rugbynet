@@ -4,32 +4,36 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Random;
+
+import org.joda.time.DateTime;
+
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Round;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 
-public class TestRoundFactory implements IRoundFactory {
-	private Long roundId;
+public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRoundFactory {
+
 	private IMatchGroupFactory gf;
-	//private ICompetitionFactory cf;
+	private Random random = new Random();
+	private ITeamGroupFactory tf;
 	
 	@Inject
-	TestRoundFactory(IMatchGroupFactory gf) {
+	TestRoundFactory(IMatchGroupFactory gf, ITeamGroupFactory tf) {
 		this.gf = gf;
-	}
-	
-	@Override
-	public void setId(Long id) {
-		this.roundId = id;
-
+		this.tf = tf;
 	}
 
+
 	@Override
-	public IRound getRound() {
+	public IRound getFromPersistentDatastore(Long roundId) {
 		Round r = new Round();
 		r.setId(roundId);
 		r.setMatches(new ArrayList<IMatchGroup>());
@@ -39,21 +43,26 @@ public class TestRoundFactory implements IRoundFactory {
 		}
 		
 		// Begin COMP 1
-		if (roundId == 2L) {
+		if (roundId == 6L) {
+			r.setCompId(1L);
 			r.setAbbr("1");
 			r.setName("Round 1");
 			r.setOrdinal(1);
 			r.addMatchID(100L);
 			r.addMatchID(101L);
 			r.setCompId(1L);
-		} else if (roundId == 3L) {
+//			r.setWorkflowStatus(WorkflowStatus.FETCHED);
+		} else if (roundId == 7L) {
+			r.setCompId(1L);
 			r.setAbbr("2");
 			r.setName("Round 2");
 			r.setOrdinal(2);
 			r.addMatchID(102L);
 			r.addMatchID(103L);
 			r.setCompId(1L);
-		} else if (roundId == 4L) {
+//			r.setWorkflowStatus(WorkflowStatus.FETCHED);
+		} else if (roundId == 8L) {
+			r.setCompId(1L);
 			r.setAbbr("3");			
 			r.setName("Round 3");
 			r.setOrdinal(3);
@@ -61,15 +70,19 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(105L);
 			r.addMatchID(106L);
 			r.setCompId(1L);
-		} else  if (roundId == 5L) {
+//			r.setWorkflowStatus(WorkflowStatus.PENDING);
+		} else  if (roundId == 9L) {
+			r.setCompId(1L);
 			r.setAbbr("F");
 			r.setName("Finals");
 			r.setOrdinal(4);
 			r.addMatchID(107L);
 			r.addMatchID(108L);
 			r.setCompId(1L);
+	//		r.setWorkflowStatus(WorkflowStatus.PENDING);
 			/** BEGIN COMP 2 **/
 		} else if (roundId == 12L) {
+			r.setCompId(2L);
 			r.setAbbr("1");
 			r.setName("Round 1");
 			r.setOrdinal(1);
@@ -78,6 +91,7 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(202L);
 			r.setCompId(2L);
 		} else if (roundId == 13L) {
+			r.setCompId(2L);
 			r.setAbbr("2");			
 			r.setName("Round 2");
 			r.setOrdinal(2);
@@ -86,6 +100,7 @@ public class TestRoundFactory implements IRoundFactory {
 			r.addMatchID(205L);
 			r.setCompId(2L);
 		} else  if (roundId == 14L) {
+			r.setCompId(2L);
 			r.setAbbr("3");
 			r.setName("Round 3");
 			r.setOrdinal(3);
@@ -116,6 +131,17 @@ public class TestRoundFactory implements IRoundFactory {
 
 		for (Long gid : r.getMatchIDs()) {
 			IMatchGroup g = gf.get(gid);
+			g.setRoundId(r.getId());
+			Long homeTeamId = random.nextInt(6) + 9001L; // we want between 9001 and 9006
+			Long visitTeamId = random.nextInt(6) + 9001L;
+			while (homeTeamId.equals(visitTeamId)) {  // don't let a team play itself
+				visitTeamId = random.nextInt(6) + 9001L;
+			}
+			g.setHomeTeamId(homeTeamId);
+			g.setHomeTeam(tf.get(homeTeamId));
+			g.setVisitingTeamId(visitTeamId);
+			g.setVisitingTeam(tf.get(visitTeamId));
+			gf.put(g);
 			r.getMatches().add(g);
 			if (g.getDate().before(r.getBegin())) {
 				r.setBegin(g.getDate());
@@ -126,13 +152,27 @@ public class TestRoundFactory implements IRoundFactory {
 			}
 		}
 
+		// self cleaning oven for workflowStatus
+		if (r.getWorkflowStatus() == null) {
+			// check it's matches to see if they are all fetched
+			r.setWorkflowStatus(WorkflowStatus.FETCHED);
+
+			for (IMatchGroup m : r.getMatches()) {
+				if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
+					r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+					break;
+				} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
+					r.setWorkflowStatus(WorkflowStatus.PENDING);
+					// don't break in case there are tasks pending
+				}
+				// ignore if match is NO_STATS - the round can still be in FETCHED state
+			}
+			putToPersistentDatastore(r); 	
+		}
+		
 		return r;
 	}
 
-	@Override
-	public IRound put(IRound r) {
-		return r;
-	}
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IRoundFactory#find(net.rugby.foundation.model.shared.IRound)
@@ -147,25 +187,29 @@ public class TestRoundFactory implements IRoundFactory {
 	 * @see net.rugby.foundation.core.server.factory.IRoundFactory#build(java.lang.Long)
 	 */
 	@Override
-	public void build(Long roundId) {
+	public void invalidate(Long roundId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public boolean delete(Long roundId) {
+	public boolean deleteFromPersistentDatastore(IRound r) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.factory.IRoundFactory#setFactories(net.rugby.foundation.core.server.factory.ICompetitionFactory, net.rugby.foundation.core.server.factory.IMatchGroupFactory)
-	 */
-//	@Override
-//	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory mf) {
-//		this.cf = cf;
-////		this.mf = mf;
-//		this.gf = mf;
-//	}
+
+	@Override
+	public IRound create() {
+		return new Round();
+	}
+
+
+	@Override
+	protected IRound putToPersistentDatastore(IRound t) {
+		// TODO Auto-generated method stub
+		return t;
+	}
+
 
 }

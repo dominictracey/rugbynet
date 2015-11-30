@@ -95,7 +95,11 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 				} else { 
 					T task = taskList.get(cell.getRowIndex()-1);
 					if (shouldFireClickEvent(cell)) {
-						listener.onItemClicked(task, cell.getRowIndex()-1);
+						if (cell.getCellIndex() == 0) {
+							listener.onItemSelected(task);
+						} else {						
+							listener.onItemClicked(task, cell.getRowIndex()-1);
+						}
 					}
 
 //					if (shouldFireSelectEvent(cell)) { // only do it if we have a checkbox up
@@ -165,7 +169,8 @@ public class TaskViewImpl<T extends IAdminTask> extends Composite implements Tas
 					columnDefinitions.getColumnDefinitions().get(cell.getCellIndex());
 
 			if (columnDefinition != null) {
-				shouldFireClickEvent = columnDefinition.isClickable();
+				shouldFireClickEvent = columnDefinition.isSelectable() || columnDefinition.isClickable();
+				
 			}
 		}
 

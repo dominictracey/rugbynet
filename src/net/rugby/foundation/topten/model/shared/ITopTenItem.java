@@ -75,4 +75,23 @@ public interface ITopTenItem {
 
 	Long getPlayerRatingId();
 
+	void setLastOrdinal(int lastOrdinal);
+
+	int getLastOrdinal();
+
+	void setPlaceGuid(String placeGuid);
+
+	String getPlaceGuid();
+
+	void setTweet(String tweet);
+
+	String getTweet();
+
+	String getFeatureGuid();
+
+	void setFeatureGuid(String featureGuid);
+
+	public abstract void setTwitterChannel(String twitterChannel);
+	public abstract String getTwitterChannel();
+
 }

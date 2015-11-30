@@ -1,0 +1,179 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+
+	<ui:style>
+		.playersViewButtonHPanel {
+		margin: 5px 0px 0x 5px;
+		}
+		.playersViewPlayersFlexTable {
+		margin: 5px 0px 5px 0px;
+		}
+		.important {
+		font-weight: bold;
+		}
+	</ui:style>
+
+
+	<g:HTMLPanel>
+
+		<!-- Add GWT widgets here. Enter < and hit Ctrl-Space to auto-complete 
+			widget names. The ui:field attribute binds an element to a field in the owner 
+			class. See the GWT docs on UI Binder for more details. -->
+
+		<table>
+			<tr>
+
+				<td>
+					Id:
+				</td>
+
+				<td>
+
+					<b:Label ui:field="id">
+					</b:Label>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Display Name:
+				</td>
+
+				<td>
+
+					<b:TextBox ui:field="displayName">
+					</b:TextBox>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Comps:
+
+				</td>
+
+				<td>
+
+					<b:ListBox ui:field="comps" multipleSelect="true">
+					</b:ListBox>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Host Comp:
+				</td>
+
+				<td>
+
+					<b:ListBox ui:field="hostComp">
+					</b:ListBox>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Countries:
+				</td>
+
+				<td>
+
+					<b:ListBox ui:field="countries" multipleSelect="true">
+					</b:ListBox>
+				</td>
+			</tr>
+
+
+			<tr>
+				<td>
+					Target Round (start):
+				</td>
+				<td>
+
+					<b:ListBox ui:field="startDate">
+					</b:ListBox>
+				</td>
+			</tr>
+
+			<tr>
+
+				<td>
+					Mode:
+				</td>
+
+				<td>
+
+					<b:ListBox ui:field="mode">
+					</b:ListBox>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Criteria:
+				</td>
+				<td>
+					<b:CheckBox ui:field="round">Round</b:CheckBox>
+					<b:CheckBox ui:field="inForm">In Form</b:CheckBox>
+					<b:CheckBox ui:field="bestYear">Best Last Year</b:CheckBox>
+					<b:CheckBox ui:field="bestAllTime">Best All Time</b:CheckBox>
+					<b:CheckBox ui:field="average">Average Impact</b:CheckBox>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Minimum minutes (impact only):
+				</td>
+
+				<td>
+
+					<b:FormGroup>
+						<g:FlowPanel addStyleNames="col-lg-offset-2 col-lg-10">
+							<b:InlineRadio ui:field="roundMinMinutes" name="minMinutes"
+								text="Per Round" />
+							<b:InlineRadio ui:field="totalMinMinutes" name="minMinutes"
+								text="Total" />
+						</g:FlowPanel>
+					</b:FormGroup>
+				</td>
+			</tr>
+			<tr>
+
+				<td>
+					Minutes (impact):
+				</td>
+
+				<td>
+
+					<b:TextBox ui:field="minMinutes">
+					</b:TextBox>
+				</td>
+			</tr>
+			<tr>
+
+
+				<td>
+					Live:
+				</td>
+				<td>
+					<b:CheckBox ui:field="isLive">Live</b:CheckBox>
+				</td>
+			</tr>
+			<tr>
+
+				<td colspan="2">
+
+					<b:Button type="PRIMARY" ui:field="saveButton">
+						Save
+					</b:Button>
+					<b:Button ui:field="cancelButton">
+						Cancel
+
+					</b:Button>
+				</td>
+			</tr>
+		</table>
+	</g:HTMLPanel>
+</ui:UiBinder>

@@ -22,11 +22,14 @@ import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestCo
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
+import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.server.CoreTestModule;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -54,13 +57,20 @@ public class TopTenFactoryTester {
 	private IPlayerFactory pf;
 	private IPlayerRatingFactory prf;
 	private IRatingQueryFactory rqf;
+	private ITeamGroupFactory tgf;
+	private IMatchRatingEngineSchemaFactory resf;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	public void setFactory(ITopTenListFactory ttf, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf) {
+	public void setFactory(ITopTenListFactory ttf, IPlayerFactory pf, IPlayerRatingFactory prf, IRatingQueryFactory rqf, 
+			ITeamGroupFactory tgf, IMatchRatingEngineSchemaFactory resf, IConfigurationFactory ccf) {
 		this.ttf = ttf;
 		this.pf = pf;
 		this.prf = prf;
 		this.rqf = rqf;
+		this.tgf = tgf;
+		this.resf = resf;
+		this.ccf = ccf;
 	}
 
 	@Before
@@ -162,7 +172,7 @@ public class TopTenFactoryTester {
 
 		assertTrue(ttl.getPublished() == null);
 		assertTrue(ttl.getCompId().equals( 1L));
-		assertTrue(ttl.getContent() == desc);
+//		assertTrue(ttl.getContent() == desc);
 		assertTrue(ttl.getTitle() == title);
 		assertTrue(ttl.getItemIds().size() == 10);
 		assertTrue(ttl.getLive() == false);
@@ -204,8 +214,19 @@ public class TopTenFactoryTester {
 //		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc,1L, null, 10, null);
 		return ttf.create(ttsd);
+	}
+	
+	private ITopTenList createLinkedTTL() {
+//		List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,1L);
+		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
+
+		TopTenSeedData ttsd = new TopTenSeedData(7710001L, "Top Ten Props - Round 1", desc,1L, null, 10, null);
+		//ITopTenList last =  ttf.create(ttsd);
+		
+		//ttsd = new TopTenSeedData(7700001L, "Top Ten Props - Round 2", desc, 1L, null, 10, null);
+		return ttf.create(ttsd, null); //last);
 	}
 
 	@Test 
@@ -406,9 +427,9 @@ public class TopTenFactoryTester {
 	@Test
 	public void createInNewComp() {
 
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
+		//List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -429,7 +450,7 @@ public class TopTenFactoryTester {
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 		//List<IPlayerRating> 700L = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -458,7 +479,7 @@ public class TopTenFactoryTester {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl1 = ttf.create(ttsd);
 
 		assertTrue(ttl1 != null);
@@ -524,6 +545,9 @@ public class TopTenFactoryTester {
 	@Test
 	public void createThreePublishAllUnpublishMiddle() {
 
+		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+		ms.clearAll();
+
 		// create 3
 		// publish/unpublish 3
 		// publish 1 > 3 > 2
@@ -531,75 +555,92 @@ public class TopTenFactoryTester {
 		// publish 2
 		// delete 1
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
-		List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
+		//List<IPlayerRating> pmiList = prf.query(rqf.get(700L));
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
-		ITopTenList ttl1 = ttf.create(ttsd);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, "uno", "one", 2L, null, 10, null);
+		ITopTenList ttl1 = ttf.create(ttsd); //create 1
 		assertTrue(ttl1 != null);
 		assertFalse(ttl1.getLive());
-
-		ITopTenList ttl2 = ttf.create(ttsd);
-		assertTrue(ttl2 != null);
-		assertFalse(ttl2.getLive());
-		assertTrue(ttl2.getPrevId().equals(ttl1.getId()));
-		
-		ttl1 = ttf.get(ttl1.getId());
-		assertTrue(ttl1.getNextId().equals(ttl2.getId()));
-		
-		ITopTenList ttl3 = ttf.create(ttsd);
-		assertTrue(ttl3 != null);
-		assertFalse(ttl3.getLive());
-		assertTrue(ttl3.getPrevId().equals(ttl2.getId()));
-		
-		ttl2 = ttf.get(ttl2.getId());
-		assertTrue(ttl2.getNextId().equals(ttl3.getId()));
-		assertTrue(ttl2.getPrevId().equals(ttl1.getId()));
-		
+		ITopTenList last = ttf.getLastCreatedForComp(2L);
+		assertTrue(last.getId().equals(ttl1.getId()));
 		ITopTenList latest = ttf.getLatestForComp(2L);
 		assertTrue(latest == null);
 		
-		ttl3 = ttf.publish(ttl3);
+		ttsd = new TopTenSeedData(700L, "dos", "two", 2L, null, 10, null);
+		ITopTenList ttl2 = ttf.create(ttsd); //create 2
+		assertTrue(ttl2 != null);
+		assertFalse(ttl2.getLive());
+		assertTrue(ttl2.getPrevId().equals(ttl1.getId()));
+		ttl1 = ttf.get(ttl1.getId());
+		assertTrue(ttl1.getNextId().equals(ttl2.getId()));
+		last = ttf.getLastCreatedForComp(2L);
+		assertTrue(last.getId().equals(ttl2.getId()));
+		latest = ttf.getLatestForComp(2L);
+		assertTrue(latest == null);
+		
+		ttsd = new TopTenSeedData(700L, "tres", "three", 2L, null, 10, null);
+		ITopTenList ttl3 = ttf.create(ttsd); //create 3
+		assertTrue(ttl3 != null);
+		assertFalse(ttl3.getLive());
+		assertTrue(ttl3.getPrevId().equals(ttl2.getId()));
+		last = ttf.getLastCreatedForComp(2L);
+		assertTrue(last.getId().equals(ttl3.getId()));		
+		ttl2 = ttf.get(ttl2.getId());
+		assertTrue(ttl2.getNextId().equals(ttl3.getId()));
+		assertTrue(ttl2.getPrevId().equals(ttl1.getId()));		
+		latest = ttf.getLatestForComp(2L);
+		assertTrue(latest == null);
+		
+		ttl3 = ttf.publish(ttl3); //publish 3
 		assertTrue(ttl3.getLive());
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest != null);
 		assertTrue(latest.getId().equals(ttl3.getId()));
 		assertTrue(latest.getPrevId().equals(ttl2.getId()));
 		assertTrue(latest.getPrevPublishedId() == null);
-
-		ttl3 = ttf.publish(ttl3); // unpublish
+		last = ttf.getLastCreatedForComp(2L);
+		assertTrue(last.getId().equals(ttl3.getId()));
+		
+		ttl3 = ttf.publish(ttl3); // unpublish 3
 		assertTrue(!ttl3.getLive());
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest == null);
 		assertTrue(ttl3.getPrevPublishedId() == null);
-
-		ttl1 = ttf.publish(ttl1);
+		last = ttf.getLastCreatedForComp(2L);
+		assertTrue(last.getId().equals(ttl3.getId()));
+		
+		ttl1 = ttf.publish(ttl1);  // publish 1
 		assertTrue(ttl1.getLive());
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest != null);
 		assertTrue(latest.getId().equals(ttl1.getId()));
 		assertTrue(latest.getPrevId() == null);
 		assertTrue(latest.getPrevPublishedId() == null);
+		assertTrue(latest.getNextPublishedId() == null);
 		
-		ttl2 = ttf.publish(ttl2);
+		ttl2 = ttf.publish(ttl2);  // publish 2
 		assertTrue(ttl2.getLive());
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest != null);
 		assertTrue(latest.getId().equals(ttl2.getId()));
 		assertTrue(latest.getPrevId().equals(ttl1.getId()));
 		assertTrue(latest.getPrevPublishedId().equals(ttl1.getId()));
+		ttl1 = ttf.get(ttl1.getId());
+		assertTrue(ttl1.getNextId().equals(ttl2.getId()));
+		assertTrue(ttl1.getNextPublishedId().equals(ttl2.getId()));		
 		
-		ttl3 = ttf.publish(ttl3);
+		ttl3 = ttf.publish(ttl3);  // publish 3
 		assertTrue(ttl3.getLive());
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest != null);
 		assertTrue(latest.getId().equals(ttl3.getId()));
 		assertTrue(latest.getPrevId().equals(ttl2.getId()));
-		assertTrue(latest.getPrevPublishedId().equals(ttl2.getId()));
-		
-		ITopTenList last = ttf.getLastCreatedForComp(2L);
-		assertTrue(last.getPrevPublishedId().equals(ttl2.getId()));
+		assertTrue(latest.getPrevPublishedId().equals(ttl2.getId()));		
+		last = ttf.getLastCreatedForComp(2L);
+		assertTrue(last != null);
+		assertTrue(last.getId().equals(ttl3.getId()));
+		assertTrue(last.getPrevPublishedId().equals(ttl2.getId()));  // << prevPubId is null
 		assertTrue(last.getNextPublishedId() == null);
-		
 		ttl2 = ttf.get(ttl2.getId());
 		assertTrue(ttl2.getPrevPublishedId().equals(ttl1.getId()));
 		assertTrue(ttl2.getNextPublishedId().equals(ttl3.getId()));
@@ -607,6 +648,7 @@ public class TopTenFactoryTester {
 		ttl2 = ttf.publish(ttl2); // unpublish 2
 		assertTrue(!ttl2.getLive());
 		assertTrue(ttl2.getNextPublishedId() == null);
+		assertTrue(ttl2.getPrevPublishedId() == null);
 		latest = ttf.getLatestForComp(2L);
 		assertTrue(latest != null);
 		assertTrue(latest.getId().equals(ttl3.getId()));
@@ -650,7 +692,7 @@ public class TopTenFactoryTester {
 
 		//List<IPlayerMatchInfo> pmiList = pmif.getForComp(null,2L);
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 12L, 10);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 2L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 
@@ -723,13 +765,13 @@ public class TopTenFactoryTester {
 
 		int max = 5;
 	
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, max);
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, max, null);
 		ITopTenList ttl = ttf.create(ttsd);
 		
 		assert (ttl != null);
 
 		Iterator<ITopTenItem> it = ttl.getList().iterator();
-		assertTrue(ttl.getList().size() == 10);
+//		assertTrue(ttl.getList().size() == 10);
 		Map<Long, Integer> counter = new HashMap<Long,Integer>(); 
 		while (it.hasNext()) {
 			ITopTenItem tti = it.next();
@@ -752,9 +794,11 @@ public class TopTenFactoryTester {
 		//		  (List<IPlayerMatchInfo> pmiList, String title,
 		//					String description, Long compId, Long roundId, position pos,
 		//					Long countryId, Long teamId)
-		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+		//MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 
-		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc, 1L, null, 2L, 10);
+		prf.getForMatch(5L, resf.getDefault());
+		prf.getForMatch(6L, resf.getDefault());
+		TopTenSeedData ttsd = new TopTenSeedData(700L, title, desc,1L, null, 10, null);
 		ITopTenList ttl = ttf.create(ttsd);
 
 		assert (ttl != null);
@@ -765,9 +809,9 @@ public class TopTenFactoryTester {
 				i.getPlayer().setTwitterHandle(null);
 			}
 		}
-		ISocialMediaDirector smd = new SocialMediaDirector();
+		ISocialMediaDirector smd = new SocialMediaDirector(tgf, ttf, ccf, rqf);
 
-		smd.PromoteTopTenList(ttl, ttsd);
+		smd.PromoteTopTenList(ttl);
 //		assertTrue(ms.contains(ttl.getId()));
 //		assertTrue(ttl.getNextId() == null);
 //		assertTrue(ttl.getNextPublishedId() == null);
@@ -780,5 +824,12 @@ public class TopTenFactoryTester {
 		deleteAll();
 
 
+	}
+	
+	@Test
+	public void checkNotes() {
+		ITopTenList ttl = createLinkedTTL();
+		assert ttl.getContent() != null;
+		
 	}
 }

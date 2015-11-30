@@ -53,6 +53,8 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		 * 
 		 */
 		private static final long serialVersionUID = 3979300783273508712L;
+
+		private Long scrumId;
 		
 
 		public RatingComponent() {
@@ -60,7 +62,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		}
 		
 		public RatingComponent(String statsDetails, float backScore, float forwardScore, 
-				float rawScore, Long playerMatchStatsId, String matchLabel, Integer scaledRating, Integer unscaledRating) {
+				float rawScore, Long playerMatchStatsId, String matchLabel, Integer scaledRating, Integer unscaledRating, Long scrumId) {
 			this.backScore = backScore;
 			this.forwardScore = forwardScore;
 			this.rawScore = rawScore;
@@ -69,6 +71,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 			this.setMatchLabel(matchLabel);
 			this.scaledRating = scaledRating;
 			this.unscaledRating = unscaledRating;
+			this.setScrumId(scrumId);
 		}
 		
 		public void addRatingsDetails(String details) {
@@ -84,8 +87,11 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		@Id
 		protected Long id;
 
+		@Unindexed
 		protected float backScore;
+		@Unindexed
 		protected float forwardScore;
+		@Unindexed
 		protected float rawScore; 
 		
 		private Long playerMatchStatsId;
@@ -96,10 +102,18 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		@Unindexed
 		protected String matchLabel;
 
+		@Unindexed
 		protected float scaledRating;
+		@Unindexed
 		protected float unscaledRating;
 
-	
+		protected float offence;
+		protected float defence;
+		protected float setPlay;
+		protected float loosePlay;
+		protected float discipline;
+		protected float matchResult;
+		
 		public Long getId() {
 			return id;
 		}
@@ -205,6 +219,66 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		public String getStatsDetails() {
 			return statsDetails;
 		}
+
+		public float getOffence() {
+			return offence;
+		}
+
+		public void setOffence(float offence) {
+			this.offence = offence;
+		}
+
+		public float getDefence() {
+			return defence;
+		}
+
+		public void setDefence(float defence) {
+			this.defence = defence;
+		}
+
+		public float getSetPlay() {
+			return setPlay;
+		}
+
+		public void setSetPlay(float setPlay) {
+			this.setPlay = setPlay;
+		}
+
+		public float getLoosePlay() {
+			return loosePlay;
+		}
+
+		public void setLoosePlay(float loosePlay) {
+			this.loosePlay = loosePlay;
+		}
+
+		public float getDiscipline() {
+			return discipline;
+		}
+
+		public void setDiscipline(float discipline) {
+			this.discipline = discipline;
+		}
+
+		public float getMatchResult() {
+			return matchResult;
+		}
+
+		public void setMatchResult(float matchResult) {
+			this.matchResult = matchResult;
+		}
+
+		public void setRatingDetails(String ratingDetails) {
+			this.ratingDetails = ratingDetails;
+		}
+
+		public Long getScrumId() {
+			return scrumId;
+		}
+
+		public void setScrumId(Long scrumId) {
+			this.scrumId = scrumId;
+		}
 		
 		
 	}
@@ -213,6 +287,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long id;
 	protected Integer rating;
 	protected Long groupId;
+	@Unindexed
 	protected Date generated;
 	@Transient
 	protected IGroup group;
@@ -222,7 +297,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long playerId;
 	@Transient
 	protected IPlayer player;
-
+	@Unindexed
 	protected List<Long> playerMatchStatIds;
 	@Transient
 	private List<IPlayerMatchStats> playerMatchStats;
@@ -230,6 +305,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long queryId;
 	@Unindexed
 	protected String details;
+	@Unindexed
 	protected Float rawScore;
 	
 	@Embedded

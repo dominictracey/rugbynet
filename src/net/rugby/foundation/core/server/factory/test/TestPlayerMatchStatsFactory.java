@@ -8,6 +8,7 @@ import java.util.Random;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.BasePlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -18,7 +19,7 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 
-public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Serializable  {
+public class TestPlayerMatchStatsFactory extends BasePlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Serializable {
 	/**
 	 * 
 	 */
@@ -36,46 +37,32 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 	 * @see net.rugby.foundation.core.server.factory.test.IPlayerMatchFactory#getById(java.lang.Long)
 	 */
 	@Override
-	public IPlayerMatchStats getById(Long id) {
-		if (id == null) {
-			return new ScrumPlayerMatchStats();
+	public IPlayerMatchStats getFromPersistentDatastore(Long id) {
+
+		Long pid = -10000L;
+		if (id > 1000000000L) {
+			pid = id+1000000000L;  //
 		}
-		Long pid = id-10000L;
+		
 		Long teamId = 9002L; //AUS
 		int slot = (int) (pid-9002000);
 		if (id < 9001999) {
 			teamId = 9001L; //NZL
 			slot += 1000;
 		}
-		return createPMS(pf.get(pid), mf.get(100L), slot, teamId);
-	}
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.factory.test.IPlayerMatchFactory#put(net.rugby.foundation.model.shared.IPlayerMatchStats)
-	 */
-	@Override
-	public IPlayerMatchStats put(IPlayerMatchStats val) {
-		return val;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.server.factory.test.IPlayerMatchFactory#delete(net.rugby.foundation.model.shared.IPlayerMatchStats)
-	 */
-	@Override
-	public Boolean delete(IPlayerMatchStats val) {
-		return true;
+		return createPMS(pf.get(pid), 100L, slot, teamId);
 	}
 
 	@Override
-	public List<IPlayerMatchStats> getByMatchId(Long matchId) {
+	public List<IPlayerMatchStats> getFromPersistentDatastoreByMatchId(Long matchId) {
 		List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
-		IMatchGroup m = mf.get(matchId);
+		//IMatchGroup m = mf.get(matchId);
 
 		if (matchId.equals(400L)) {
 			//NZL
 			int slot = 0;
 			for (Long i=9001001L; i<9001023L; ++i) {
-				IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9001L);
+				IPlayerMatchStats pms = createPMS(pf.get(i), matchId, slot++, 9001L);
 				pms.setId(i+10000L);
 				list.add(pms);
 			}
@@ -83,7 +70,7 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 			//AUS
 			slot = 0;
 			for (Long i=9002001L; i<9002023L; ++i) {
-				IPlayerMatchStats pms = createPMS(pf.get(i), m, slot++, 9002L);
+				IPlayerMatchStats pms = createPMS(pf.get(i), matchId, slot++, 9002L);
 				pms.setId(i+10000L);
 				list.add(pms);
 			}
@@ -93,8 +80,9 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 			// create a bunch of random players
 			int slot = 0;
 			for (int i=0; i<23; ++i) {
-				IPlayer p = pf.get(m.getHomeTeamId() + 100000 + random.nextInt(5000));
-				IPlayerMatchStats pms = createPMS(p,m,slot++,m.getHomeTeamId());
+				Long hid = 9002L;
+				IPlayer p = pf.get(hid + 100000 + random.nextInt(5000));
+				IPlayerMatchStats pms = createPMS(p,matchId,slot++,hid);
 				pms.setPosition(position.getAt(random.nextInt(11))); // we do want NONE?
 				pms.setId(p.getId()+100000);
 				list.add(pms);
@@ -102,8 +90,9 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 			
 			slot = 0;
 			for (int i=0; i<23; ++i) {
-				IPlayer p = pf.get(m.getVisitingTeamId() + 100000 + random.nextInt(5000));
-				IPlayerMatchStats pms = createPMS(p,m,slot++,m.getVisitingTeamId());
+				Long vid = 9001L;
+				IPlayer p = pf.get(vid + 100000 + random.nextInt(5000));
+				IPlayerMatchStats pms = createPMS(p,matchId,slot++,vid);
 				pms.setPosition(position.getAt(random.nextInt(11)));  // we do want NONE?
 				pms.setId(p.getId()+100000);
 				list.add(pms);
@@ -112,14 +101,14 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 		return list;
 	}
 
-	private IPlayerMatchStats createPMS(IPlayer p, IMatchGroup m, Integer slot, Long teamId) {
+	private IPlayerMatchStats createPMS(IPlayer p, Long mid, Integer slot, Long teamId) {
 		IPlayerMatchStats pms = new ScrumPlayerMatchStats();
 		pms.setCleanBreaks(random.nextInt(5));
 		pms.setDefendersBeaten(random.nextInt(5));
 		pms.setKicks(random.nextInt(5));
 		pms.setLineoutsStolenOnOppThrow(random.nextInt(1));
 		pms.setLineoutsWonOnThrow(random.nextInt(2));
-		pms.setMatchId(m.getId());
+		pms.setMatchId(mid);
 		pms.setMetersRun(random.nextInt(50));
 		pms.setName(p.getDisplayName());
 		pms.setOffloads(random.nextInt(5));
@@ -131,7 +120,7 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 		pms.setRedCards(0);
 		pms.setRuns(random.nextInt(5));
 		pms.setSlot(slot);
-		pms.setTacklesMade(random.nextInt(5));
+		pms.setTacklesMade(random.nextInt(20));
 		pms.setTacklesMissed(random.nextInt(5));
 		pms.setTeamId(teamId);
 		pms.setTimePlayed(random.nextInt(80));
@@ -141,33 +130,43 @@ public class TestPlayerMatchStatsFactory implements IPlayerMatchStatsFactory, Se
 		pms.setYellowCards(0);
 		return pms;
 	}
-	@Override
-	public List<IPlayerMatchStats> query(List<Long> matchIds,
-			position posi, Long countryId, Long teamId) {
-		return getByMatchId(100L);
-	}
 
 	@Override
 	public boolean deleteForMatch(IMatchGroup m) {
 		return true;
 	}
 	@Override
-	public List<IPlayerMatchStats> query(IRatingQuery rq) {
-		if (rq.getId().equals(704L)) {
-			List<IPlayerMatchStats> list = new ArrayList<IPlayerMatchStats>();
-			list.addAll(getByMatchId(100L));
-			list.addAll(getByMatchId(101L));
-			list.addAll(getByMatchId(102L));
-			list.addAll(getByMatchId(103L));
-			return list;
-		} else if (rq.getPositions() != null && rq.getPositions().size() > 0) {
-			// if they want a position, just set everyone to be that position
-			List<IPlayerMatchStats> list = getByMatchId(100L);
-			for (IPlayerMatchStats pms : list) {
-				pms.setPosition(rq.getPositions().get(0));
-			}
-			list.addAll(list);
-		}
-		return getByMatchId(100L);
+	public IPlayerMatchStats create() {
+		return new ScrumPlayerMatchStats();
 	}
+	@Override
+	protected IPlayerMatchStats putToPersistentDatastore(IPlayerMatchStats t) {
+		return t;
+	}
+	@Override
+	protected boolean deleteFromPersistentDatastore(IPlayerMatchStats t) {
+		return true;
+	}
+	@Override
+	protected List<IPlayerMatchStats> queryFromPersistentDatastore(IRatingQuery rq) {
+		// get the matchIds we need, then slam all the PMSs together
+		List<IPlayerMatchStats> retval = new ArrayList<IPlayerMatchStats>();
+		for (Long rid : rq.getRoundIds()) {
+			for (IMatchGroup m : mf.getMatchesForRound(rid)) {				
+				retval.addAll(getByMatchId(m.getId()));
+			}
+		}
+		
+		if (rq.getPositions() != null && rq.getPositions().size() > 0) {
+			List<IPlayerMatchStats> wrongPos = new ArrayList<IPlayerMatchStats>();
+			for (IPlayerMatchStats pms : retval) {
+				if (!rq.getPositions().contains(pms.getPosition())) {
+					wrongPos.add(pms);
+				}
+			}
+			retval.removeAll(wrongPos);
+		}
+		return retval;
+	}
+
 }

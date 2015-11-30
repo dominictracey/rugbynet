@@ -6,6 +6,7 @@ import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumCompetitionFetcherFactory;
@@ -16,6 +17,7 @@ import net.rugby.foundation.admin.server.factory.espnscrum.StandingsFetcherFacto
 import net.rugby.foundation.admin.server.factory.espnscrum.TestUrlCacher;
 import net.rugby.foundation.admin.server.factory.test.TestAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.test.TestMatchRatingEngineSchemaFactory;
+import net.rugby.foundation.admin.server.factory.test.TestSeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationFactory;
@@ -28,8 +30,11 @@ import net.rugby.foundation.admin.server.workflow.TestWorkflowConfigurationFacto
 import net.rugby.foundation.admin.server.workflow.TestWorkflowFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.factory.UniversalRoundFactory;
 import net.rugby.foundation.core.server.factory.test.TestPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.test.TestRatingQueryFactory;
+
 import com.google.inject.AbstractModule;
 
 public class AdminTestModule extends AbstractModule {
@@ -51,7 +56,8 @@ public class AdminTestModule extends AbstractModule {
 		bind(IStandingsFetcherFactory.class).to(StandingsFetcherFactory.class);
 		bind(IRatingQueryFactory.class).to(TestRatingQueryFactory.class);
 		bind(IPlayerRatingFactory.class).to(TestPlayerRatingFactory.class);
-
+		bind(ISeriesConfigurationFactory.class).to(TestSeriesConfigurationFactory.class);
+		bind(IUniversalRoundFactory.class).to(UniversalRoundFactory.class);
 	}
 	
 }

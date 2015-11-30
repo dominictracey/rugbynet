@@ -20,6 +20,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 	private Date date;
 	private Boolean locked = false;
 	private Status status;
+	private WorkflowStatus workflowStatus;
 	
 	@Transient
 	private ISimpleScoreMatchResult simpleResult = null;
@@ -39,6 +40,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 	
 	protected String fetchMatchStatsPipelineId;
 	
+	protected String guid;
 
 	@Override
 	public boolean equals(Object o) {
@@ -280,6 +282,26 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public String getFetchMatchStatsPipelineId() {
 		return fetchMatchStatsPipelineId;
+	}
+
+	@Override
+	public WorkflowStatus getWorkflowStatus() {
+		return workflowStatus;
+	}
+
+	@Override
+	public void setWorkflowStatus(WorkflowStatus workflowStatus) {
+		this.workflowStatus = workflowStatus;	
+	}
+
+	@Override
+	public String getGuid() {
+		return guid;
+	}
+
+	@Override
+	public void setGuid(String guid) {
+		this.guid = guid;
 	}
 
 

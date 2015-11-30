@@ -1,7 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
 
 
@@ -9,31 +9,39 @@
 		<!-- Add GWT widgets here. Enter < and hit Ctrl-Space to auto-complete 
 			widget names. The ui:field attribute binds an element to a field in the owner 
 			class. See the GWT docs on UI Binder for more details. -->
-		<b:Form type="VERTICAL">
-		    <b:ControlLabel>Title</b:ControlLabel>
+		<b:Form>
+			<b:Label>Title</b:Label>
 			<b:TextBox ui:field='title'></b:TextBox>
-			<b:ControlLabel>Description</b:ControlLabel>
+			<b:Label>Description</b:Label>
 			<b:TextArea ui:field='description'></b:TextArea>
-			<b:DropdownButton ui:field='playersPerTeam' dropup="true" text="Players per team">
-			    <b:NavLink>1</b:NavLink>
-			    <b:NavLink>2</b:NavLink>
-			    <b:NavLink>3</b:NavLink>
-			    <b:NavLink>4</b:NavLink>
-			    <b:NavLink>5</b:NavLink>
-			    <b:NavLink>6</b:NavLink>
-			    <b:NavLink>7</b:NavLink>
-   			    <b:NavLink>8</b:NavLink>
-   			    <b:NavLink>9</b:NavLink>	
-   			    <b:NavLink>10</b:NavLink>		    
-			</b:DropdownButton>
-			<b:HelpBlock>This is the maximum number of players that will appear in the list from any given team. If a team has more than this number in the top ten of the queried list, only the first N will make the list and players from other teams will be moved up in the order they appear. The default is 10: no limit.</b:HelpBlock>
-	        <b:Nav>
-	        	<b:NavWidget ui:field='buttonBar'>
-	        	    <b:Button ui:field="save" type="PRIMARY">Save</b:Button>
-					<b:Button ui:field="cancel">Cancel</b:Button>	
-	        	</b:NavWidget>
-        	</b:Nav>
-        </b:Form>
-			
+<!-- 			<b:ListBox ui:field='playersPerTeam'> -->
+<!-- 						<g:item>1</g:item> -->
+<!-- 						<g:item>2</g:item> -->
+<!-- 						<g:item>3</g:item> -->
+<!-- 						<g:item>4</g:item> -->
+<!-- 						<g:item>5</g:item> -->
+<!-- 						<g:item>6</g:item> -->
+<!-- 						<g:item>7</g:item> -->
+<!-- 						<g:item>8</g:item> -->
+<!-- 						<g:item>9</g:item> -->
+<!-- 						<g:item>10</g:item> -->
+<!-- 			</b:ListBox> -->
+<!-- 			<b:HelpBlock>This is the maximum number of players that will appear -->
+<!-- 				in the list from any given team. If a team has more than this -->
+<!-- 				number in the top ten of the queried list, only the first N will -->
+<!-- 				make the list and players from other teams will be moved up in the -->
+<!-- 				order they appear. The default is 10: no limit.</b:HelpBlock> -->
+			<b:Label>Host Comp</b:Label>
+			<b:ListBox ui:field='hostComp'></b:ListBox>
+			<b:Label>Twitter Handles</b:Label>
+			<g:HTMLPanel ui:field="twitterHandles" />
+			<b:Nav>
+				<b:ButtonGroup ui:field='buttonBar'>
+					<b:Button ui:field="save">Save</b:Button>
+					<b:Button ui:field="cancel">Cancel</b:Button>
+				</b:ButtonGroup>
+			</b:Nav>
+		</b:Form>
+
 	</b:Well>
 </ui:UiBinder> 

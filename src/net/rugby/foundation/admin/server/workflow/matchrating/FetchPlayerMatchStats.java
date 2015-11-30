@@ -99,12 +99,12 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 
 	}
 	
-	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown getting player match stats for: " + e.getLocalizedMessage());
-		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
-		IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Problem getting player match stats: for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot, e.getLocalizedMessage(), player, match, hov, slot, fetcher.getStats(), true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
-		atf.put(task);
-		return x;
-	}
+//	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown getting player match stats for: " + e.getLocalizedMessage());
+//		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+//		IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Problem getting player match stats: for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot, e.getLocalizedMessage(), player, match, hov, slot, fetcher.getStats(), true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
+//		atf.put(task);
+//		return x;
+//	}
 
 }

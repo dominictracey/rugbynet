@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
@@ -19,17 +20,18 @@ public class OfyMatchResultFactory extends BaseCachingFactory<IMatchResult> impl
 	 * 
 	 */
 	private static final long serialVersionUID = -63026632234487370L;
-	private Long id;
 
-	//@Inject
+	@Inject
 	OfyMatchResultFactory() {
+
 	}
 
 	@Override
 	protected IMatchResult getFromPersistentDatastore(Long id) {
 		if (id != null) {
 			Objectify ofy = DataStoreFactory.getOfy();
-			return ofy.get(new Key<SimpleScoreMatchResult>(SimpleScoreMatchResult.class,id));
+			IMatchResult retval = ofy.get(new Key<SimpleScoreMatchResult>(SimpleScoreMatchResult.class,id));
+			return retval;
 		} else
 			return null;
 	}

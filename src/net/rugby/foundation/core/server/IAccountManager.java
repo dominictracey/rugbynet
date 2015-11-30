@@ -37,9 +37,9 @@ public interface IAccountManager {
 	 * @throws NumberFormatException 
 	 * @throws ParseException 
 	 */
-	IAppUser createAccount(String emailAddress, String nickName,
-			String password, JSONObject attributes, boolean isOpenId,
-			boolean isFacebook, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException;
+//	IAppUser createAccount(String emailAddress, String nickName,
+//			String password, JSONObject attributes, boolean isOpenId,
+//			boolean isFacebook, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException;
 
 	/**
 	 * @param email
@@ -75,4 +75,7 @@ public interface IAccountManager {
 	 * @return
 	 */
 	LoginInfo forgotPassword(String email);
+	IAppUser createAccount(String emailAddress, String nickName,
+			String password, JSONObject attributes, boolean isOpenId,
+			boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException;
 }

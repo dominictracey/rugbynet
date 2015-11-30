@@ -19,6 +19,9 @@ public interface ITeamGroup extends IGroup {
 
 	public abstract void setAbbr(String abbr);
 
+	public abstract void setTwitter(String twitter);
+	public abstract String getTwitter();
+	
 	/**
 	 * @return
 	 */
@@ -46,6 +49,8 @@ public interface ITeamGroup extends IGroup {
 	 */
 	public void setColor(String color);
 
+	public abstract String getTwitterChannel();
+	public abstract String setTwitterChannel(String twitterChannel);
 	
 	
 }

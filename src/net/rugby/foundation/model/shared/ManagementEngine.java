@@ -3,6 +3,7 @@ package net.rugby.foundation.model.shared;
 import java.util.ArrayList;
 
 import net.rugby.foundation.model.shared.Position.position;
+import net.rugby.foundation.model.shared.fantasy.Constraint;
 
 public interface ManagementEngine<T,S> {
 	

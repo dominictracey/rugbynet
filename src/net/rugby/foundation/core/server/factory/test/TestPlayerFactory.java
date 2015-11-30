@@ -178,6 +178,8 @@ public class TestPlayerFactory extends BasePlayerFactory implements IPlayerFacto
 		jimmyStevens();
 	}
 
+	// id scheme is:
+	//		id - 
 	private IPlayer joeMarler() {
 		IPlayer p = create();
 		p.setId(9211001L);

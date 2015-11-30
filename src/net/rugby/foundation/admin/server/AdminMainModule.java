@@ -6,6 +6,7 @@ import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumCompetitionFetcherFactory;
@@ -16,6 +17,8 @@ import net.rugby.foundation.admin.server.factory.espnscrum.StandingsFetcherFacto
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.factory.ofy.OfyAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfyMatchRatingEngineSchemaFactory;
+import net.rugby.foundation.admin.server.factory.ofy.OfySeriesConfigurationFactory;
+import net.rugby.foundation.admin.server.factory.test.TestSeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OfyOrchestrationConfigurationFactory;
@@ -28,8 +31,11 @@ import net.rugby.foundation.admin.server.workflow.OfyWorkflowConfigurationFactor
 import net.rugby.foundation.admin.server.workflow.OfyWorkflowFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.factory.UniversalRoundFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRatingQueryFactory;
+
 import com.google.inject.AbstractModule;
 
 public class AdminMainModule extends AbstractModule {
@@ -50,6 +56,8 @@ public class AdminMainModule extends AbstractModule {
 		bind(IStandingsFetcherFactory.class).to(StandingsFetcherFactory.class);
 		bind(IRatingQueryFactory.class).to(OfyRatingQueryFactory.class);
 		bind(IPlayerRatingFactory.class).to(OfyPlayerRatingFactory.class);
+		bind(ISeriesConfigurationFactory.class).to(OfySeriesConfigurationFactory.class);
+		bind(IUniversalRoundFactory.class).to(UniversalRoundFactory.class);
 	}
 	
 }

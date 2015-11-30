@@ -1,6 +1,8 @@
 package net.rugby.foundation.topten.server;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,16 +12,33 @@ import javax.servlet.http.HttpSession;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICachingFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
+import net.rugby.foundation.core.server.factory.IPlaceFactory;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
+import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IRatingGroup;
+import net.rugby.foundation.model.shared.IRatingMatrix;
+import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.client.TopTenListService;
+import net.rugby.foundation.topten.model.shared.Feature;
+import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenList.ITopTenListSummary;
+import net.rugby.foundation.topten.server.factory.INoteFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -31,8 +50,17 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 
 	private IAppUserFactory auf;
 	private ITopTenListFactory ttlf;
-	private ICachingFactory<IContent> ctf;
+	private IContentFactory ctf;
+
 	private IPlayerRatingFactory prf;
+	private IRatingSeriesFactory rsf;
+	private IRatingQueryFactory rqf;
+	private IRatingGroupFactory rgf;
+	private IRatingMatrixFactory rmf;
+	private IPlaceFactory spf;
+	private INoteFactory nf;
+	private IPlayerFactory pf;
+	private ITeamGroupFactory tgf;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -41,12 +69,22 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Inject
-	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, ICachingFactory<IContent> ctf, IPlayerRatingFactory prf) {
+	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, IContentFactory ctf, IPlayerRatingFactory prf,
+			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IPlaceFactory spf,
+			INoteFactory nf, IPlayerFactory pf, ITeamGroupFactory tgf) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
 			this.ctf = ctf;
 			this.prf = prf;
+			this.rsf = rsf;
+			this.rqf = rqf;
+			this.rgf = rgf;
+			this.rmf = rmf;
+			this.spf = spf;
+			this.nf = nf;
+			this.pf = pf;
+			this.tgf = tgf;
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 		}
@@ -234,11 +272,11 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	}
 
 	@Override
-	public List<IContent> getContentItems() {
+	public HashMap<String,Long> getContentItems() {
 		try {
 
 			if (ctf instanceof IContentFactory) {
-				return ((IContentFactory)ctf).getAll(true);
+				return ctf.getMenuMap(true);
 			}
 			return null;
 		}  catch (Throwable e) {
@@ -268,5 +306,260 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			return null;
 		}
 	}
+
+	@Override
+	public IRatingSeries getRatingSeries(Long seriesId) {
+		try {
+			return rsf.get(seriesId);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IRatingSeries getRatingSeries(Long compId, RatingMode mode) {
+		try {
+			return rsf.get(compId, mode);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public ITopTenList getTopTenListForRatingQuery(Long id) {
+		try {
+			IRatingQuery rq = rqf.get(id);
+			if (rq != null && rq.getTopTenListId() != null) {
+				return ttlf.get(rq.getTopTenListId());
+			} else {
+				return null;
+			}
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IRatingGroup getRatingGroup(Long ratingGroupId) {
+		try {
+			IRatingGroup rg = rgf.get(ratingGroupId);
+			return rg;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IRatingMatrix getRatingMatrix(Long ratingMatrixId) {
+		try {
+			IRatingMatrix rm = rmf.get(ratingMatrixId);
+			return rm;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public List<IRatingQuery> getRatingQueriesForMatrix(Long ratingMatrixId) {
+		try {
+			List<IRatingQuery> rqs = rqf.getForMatrix(ratingMatrixId);
+			return rqs;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Map<RatingMode, Long> getAvailableSeries(Long compId) {
+		try {
+			Map<RatingMode, Long> map = rsf.getModesForComp(compId);
+			return map;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+	//
+	//	@Override
+	//	public IServerPlace getPlace(String guid) {
+	//		try {
+	//			return spf.getForGuid(guid);
+	//		}  catch (Throwable e) {
+	//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+	//			return null;
+	//		}
+	//	}
+
+	@Override
+	public IRatingSeries getDefaultRatingSeries(Long compId) {
+		try {
+			return rsf.get(compId, RatingMode.BY_POSITION);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public List<INote> getNotesForList(Long id) {
+		try {
+			ITopTenList ttl = ttlf.get(id);
+			if (ttl != null) {
+				return nf.getForList(ttl, false);
+			} else {
+				return null;
+			}
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Map<Long, String> getPlayerNames(List<Long> needPlayerNames) {
+		try {
+			Map<Long, String> retval = new HashMap<Long, String>();
+
+			for (Long id : needPlayerNames) {
+				IPlayer p = pf.get(id);
+				if (p != null) {
+					retval.put(id, p.getDisplayName());
+				}
+			}
+			return retval;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Map<Long, String> getTTLNames(List<Long> needTTLNames) {
+		try {
+			Map<Long, String> retval = new HashMap<Long, String>();
+
+			for (Long id : needTTLNames) {
+				ITopTenList ttl = ttlf.get(id);
+				if (ttl != null) {
+					retval.put(id, ttl.getTitle());
+				}
+			}
+			return retval;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Map<Long, String> getTTLContexts(List<Long> needTTLContexts) {
+		try {
+			Map<Long, String> retval = new HashMap<Long, String>();
+
+			for (Long id : needTTLContexts) {
+				ITopTenList ttl = ttlf.get(id);
+				if (ttl != null) {
+					retval.put(id, ttl.getContext());
+				}
+			}
+			return retval;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+
+	@Override
+	public IServerPlace getPlace(String guid) {
+		try {
+			return spf.getForGuid(guid);
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public IServerPlace createFeature(Long compId, Long queryId) {
+		try {
+			IAppUser u = getAppUser();
+			if (u instanceof ITopTenUser && (((ITopTenUser)u).isTopTenContentContributor() || ((ITopTenUser)u).isTopTenContentEditor())) {
+				if (queryId != null) {
+					ITopTenList list = getTopTenListForRatingQuery(queryId);
+					IServerPlace place = ttlf.makeFeature(list);
+
+					return place;
+				}
+
+				return null;
+
+			} else {
+				String user = "a not logged on user ";
+				if (u != null) {
+					user = "The user " + u.getEmailAddress() + " (" + u.getId() + ")";
+				}
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, user + " is trying to create a feature from queryId" + queryId);
+				return null;
+			}
+		} catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+
+	}
+
+	@Override
+	public List<Feature> getLatestFeatures() {
+		try {
+			return ttlf.getLatestFeatures();
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public HashMap<Long, String> getTeamLogoStyleMap() {
+		try {
+			return tgf.getTeamLogoStyleMap();
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public Boolean deleteNote(Long noteId) {
+		try {
+			IAppUser u = getAppUser();
+			if (u instanceof ITopTenUser && (((ITopTenUser)u).isTopTenContentContributor() || ((ITopTenUser)u).isTopTenContentEditor())) {
+
+				INote note = nf.get(noteId);
+				if (note != null) {
+					return nf.delete(note);
+				} else {
+					return false;
+				}
+			} else {
+				String user = "a not logged on user ";
+				if (u != null) {
+					user = "The user " + u.getEmailAddress() + " (" + u.getId() + ")";
+				}
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, user + " is trying to delete a note " + noteId);
+				return null;
+			}
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
 
 }

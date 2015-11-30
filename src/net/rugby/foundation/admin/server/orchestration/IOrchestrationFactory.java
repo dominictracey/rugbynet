@@ -1,7 +1,9 @@
 package net.rugby.foundation.admin.server.orchestration;
 
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.SeriesActions;
 import net.rugby.foundation.admin.shared.IOrchestrationActions;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.game1.server.BPM.Game1OrchestrationActions.LeagueActions;
 import net.rugby.foundation.game1.server.BPM.Game1OrchestrationActions.MatchEntryActions;
 import net.rugby.foundation.game1.server.BPM.Game1OrchestrationActions.RoundEntryActions;
@@ -14,6 +16,7 @@ import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
 
 public interface IOrchestrationFactory {
@@ -51,5 +54,7 @@ public interface IOrchestrationFactory {
 	IOrchestration<IRoundEntry> get(IRoundEntry target, RoundEntryActions action);
 	
 	IOrchestration<IRatingQuery> get(IRatingQuery target, RatingActions action);
+
+	IOrchestration<ISeriesConfiguration> get(ISeriesConfiguration target, SeriesActions action);
 
 }

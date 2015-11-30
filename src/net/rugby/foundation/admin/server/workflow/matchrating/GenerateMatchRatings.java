@@ -17,6 +17,7 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
+import com.google.appengine.tools.pipeline.FutureList;
 import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.ImmediateValue;
 import com.google.appengine.tools.pipeline.Job1;
@@ -25,7 +26,7 @@ import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements Serializable {
+public class GenerateMatchRatings extends Job1<GenerateMatchRatingsResults, IMatchGroup> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
@@ -34,6 +35,7 @@ public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements S
 	private static Injector injector = null;
 	private IPlayerFactory pf;
 
+	
 	public GenerateMatchRatings() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
@@ -56,27 +58,27 @@ public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements S
 	 * 			Long adminID
 	 */		
 	@Override
-	public Value<String> run(IMatchGroup match) {
+	public Value<GenerateMatchRatingsResults> run(IMatchGroup match) {
 
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();
 		}
 
 		this.pf = injector.getInstance(IPlayerFactory.class);
-
+		
 		if (match.getForeignUrl() == null) {
 			// need to get score and find match details url before we do this
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Need to get scores and populate match URL before trying to get match stats for match " + match.getDisplayName());
 			return null;
 		}
 
-		String url = match.getForeignUrl()+"?view=scorecard";
+		String url = match.getForeignUrl(); //+"?view=scorecard";
 
 		Logger.getLogger("FetchedPlayer").log(Level.INFO,"Starting generate match ratings for url " + url);
 
 		FutureValue<ITeamMatchStats> homeTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getHomeTeam()), immediate(match), immediate(Home_or_Visitor.HOME), immediate(url));
 		FutureValue<ITeamMatchStats> visitorTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getVisitingTeam()), immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(url));
-
+		
 		List<NameAndId> homeIds = getIds(Home_or_Visitor.HOME, url);
 		List<NameAndId> visitIds = getIds(Home_or_Visitor.VISITOR, url);
 
@@ -117,15 +119,16 @@ public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements S
 		count = 0;
 		for (Value<IPlayer> fp : homePlayers) {
 			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
+			
 			homePlayerMatchStats.add(stats);
 
 		}
 
-		//FutureList<IPlayerMatchStats> hpms = new FutureList<IPlayerMatchStats>(homePlayerMatchStats);
 
 		count = 0;
 		for (Value<IPlayer> fp : visitorPlayers) {
 			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(count++), immediate(url));
+			waitFor(stats);
 			visitorPlayerMatchStats.add(stats);
 
 		}
@@ -133,8 +136,9 @@ public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements S
 
 		// now we can invoke the engine
 		//FutureValue<List<IPlayerMatchRating>> ratings = futureCall(new CreateMatchRatings(), immediate(match), hpms, vpms, homeTeamStats, visitorTeamStats);
-		Value<String> retVal = new ImmediateValue<String>(this.getPipelineKey().toString());
-		return retVal;
+		//Value<String> retVal = new ImmediateValue<String>(this.getPipelineKey().toString());
+		
+		return futureCall(new CompileMatchStats(), homeTeamStats, visitorTeamStats, futureList(homePlayerMatchStats), futureList(visitorPlayerMatchStats), new ImmediateValue<String>(this.getPipelineKey().toString()));
 
 	}
 
@@ -302,6 +306,14 @@ public class GenerateMatchRatings extends Job1<String, IMatchGroup> implements S
 			}
 		}
 
+		// there may be another card!
+		if (line.contains("<td")) {
+			//skip card
+			for (int i=0; i<4; ++i) {
+				line = it.next();
+			}
+		}
+		
 		// just read innermost </tr>
 		for (int i=0; i<3; ++i) {
 			line = it.next();

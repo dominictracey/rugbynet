@@ -195,8 +195,7 @@ public class ScrumInternationalCompetitionFetcher implements IForeignCompetition
             Integer e = 1;
             for (List<IMatchGroup> ral : roundLists) {
                 if (ral.size() > 0) {
-                    roundFactory.setId(null);
-                    IRound round = roundFactory.getRound();
+                    IRound round = roundFactory.create();
                     round.setName("Round " + e);
                     round.setOrdinal(e);
                     round.setAbbr(e.toString());

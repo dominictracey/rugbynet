@@ -19,15 +19,17 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	public interface TopTenListViewPresenter {
 		void showNext();
 		void showPrev();
-		void setTTIButtons(TopTenItemView itemView);
-		void parse(Widget widget);
+		//void setTTIButtons(TopTenItemView itemView);
+//		void parse(Widget widget);
 		void showRatingDetails(ITopTenItem value);
+//		void setFBListLike(ITopTenList list, String baseUrl);
 	}
 	void setPresenter(TopTenListViewPresenter presenter); 
 	void setList(ITopTenList result, String baseUrl);
 	void setClientFactory(ClientFactory clientFactory);
-	List<TopTenItemView> getItemViews();
+	//List<TopTenItemView> getItemViews();
 	ITopTenList getList();
+	void showContent(boolean show);
 
 	void hasNext(boolean has);
 	void hasPrev(boolean has);
@@ -35,4 +37,5 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	int getItemCount();
 	void setItemCount(int i);
 
+	
 }

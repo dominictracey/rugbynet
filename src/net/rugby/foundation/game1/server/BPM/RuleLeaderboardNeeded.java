@@ -34,8 +34,7 @@ public class RuleLeaderboardNeeded extends CoreRule<IClubhouseLeagueMap> {
 	public Boolean test() {
 		
 		// figure out what the round we need to see if we need to generate for (comp's prevRound)
-		compF.setId(target.getCompId());
-		IRound prevRound = compF.getCompetition().getPrevRound();
+		IRound prevRound = compF.get(target.getCompId()).getPrevRound();
 		
 		//has the first round finished yet?
 		if (prevRound == null) 

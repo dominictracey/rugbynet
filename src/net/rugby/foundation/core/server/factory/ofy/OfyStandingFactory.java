@@ -84,8 +84,7 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 			Objectify ofy = DataStoreFactory.getOfy();
 			if (id != null) {
 				IStanding t = ofy.get(new Key<Standing>(Standing.class,id));
-				rf.setId(t.getRoundId());
-				t.setRound(rf.getRound());
+				t.setRound(rf.get(t.getRoundId()));
 				t.setTeam(tf.get(t.getTeamId()));
 				return t;
 			} else {
@@ -129,8 +128,7 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 		Query<Standing> qs = ofy.query(Standing.class).filter("roundId", r.getId()).order("standing");
 		if (qs.count() != 0) {
 			for (Standing s : qs) {
-				rf.setId(s.getRoundId());
-				s.setRound(rf.getRound());
+				s.setRound(rf.get(s.getRoundId()));
 				s.setTeam(tf.get(s.getTeamId()));
 				list.add(s);
 			}
@@ -156,7 +154,7 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 		s.setRoundId(r.getId());
 		s.setTeam(t);
 		s.setTeamId(t.getId());
-		s.setStanding(1);
+		s.setStanding(2);
 		return s;
 	}
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.CompRule;
 import net.rugby.foundation.admin.server.rules.IRule;
+import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
@@ -32,7 +33,7 @@ import com.google.inject.Inject;
  *
  */
 
-public class TestCompetitionFactory implements ICompetitionFactory, Serializable {
+public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> implements ICompetitionFactory, Serializable {
 	/**
 	 * 
 	 */
@@ -57,13 +58,8 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	}
 
 	@Override
-	public void setId(Long id) {
-		this.id = id;
+	protected ICompetition getFromPersistentDatastore(Long id) {
 
-	}
-
-	@Override
-	public ICompetition getCompetition() {
 		if (id == 1L) {
 			return getTestComp1();
 		} else if (id == 2L) {
@@ -88,11 +84,11 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 * 	RuleMatchToFetch
 	 */
 	private ICompetition getTestComp1() {
-		ICompetition c = getEmptyComp();
-		c.getRoundIds().add(2L);
-		c.getRoundIds().add(3L);
-		c.getRoundIds().add(4L);
-		c.getRoundIds().add(5L);
+		ICompetition c = getEmptyComp(1L);
+		c.getRoundIds().add(6L);
+		c.getRoundIds().add(7L);
+		c.getRoundIds().add(8L);
+		c.getRoundIds().add(9L);
 
 		addRounds(c);
 
@@ -100,7 +96,12 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		setBeginAndEnd(c);
 
 		c.setCompClubhouseId(70L);
-
+		c.setForeignID(999L);
+		c.setForeignURL("testData\\191757-round2-results.htm");
+		c.setLongName("The Rugby Net Championships");
+		c.setShortName("TRN Championships");
+		c.setAbbr("TRNC");
+		
 		for (Long l = 9001L; l < 9007L; ++l)
 			c.getTeamIds().add(l);
 
@@ -115,7 +116,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 * @return
 	 */
 	private ICompetition getTestComp2() {
-		ICompetition c = getEmptyComp();
+		ICompetition c = getEmptyComp(2L);
 		c.getRoundIds().add(12L);
 		c.getRoundIds().add(13L);
 		c.getRoundIds().add(14L);
@@ -144,7 +145,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 * @return
 	 */
 	private ICompetition getTestComp3() {
-		ICompetition c = getEmptyComp();
+		ICompetition c = getEmptyComp(3L);
 		c.getRoundIds().add(31L);
 		addRounds(c);
 		//setNextAndPrevRound(c);
@@ -158,7 +159,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 * @return
 	 */
 	private ICompetition getTestComp4() {
-		ICompetition c = getEmptyComp();
+		ICompetition c = getEmptyComp(4L);
 		c.getRoundIds().add(15L);
 		addRounds(c);
 		for (Long i=9300L; i<9324L; ++i) {
@@ -178,7 +179,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 */
 	//SUPER RUGBY
 	private ICompetition getTestComp5() {
-		ICompetition c = getEmptyComp();
+		ICompetition c = getEmptyComp(5L);
 		c.getRoundIds().add(16L);
 		addRounds(c);
 		for (Long i=9400L; i<9415L; ++i) {
@@ -194,7 +195,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	}
 
 	@Override
-	public ICompetition put(ICompetition c) {	
+	protected ICompetition putToPersistentDatastore(ICompetition c) {
 
 		if (c.getCompClubhouseId() == null) {
 			chf.setId(null);
@@ -257,8 +258,9 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 		}
 	}
 
-	private ICompetition getEmptyComp() {
+	private ICompetition getEmptyComp(long id) {
 		Competition c = new Competition();
+		c.setId(id);
 		c.setAbbr("Rugby.net");
 
 		Calendar cal = new GregorianCalendar();
@@ -287,8 +289,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 */
 	private void addRounds(ICompetition c) {
 		for (Long rid : c.getRoundIds()) {
-			rf.setId(rid);
-			IRound g = rf.getRound();
+			IRound g = rf.get(rid);
 			c.getRounds().add(g);
 		}		
 	}
@@ -310,11 +311,9 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	public List<ICompetition> getUnderwayComps() {
 		List<ICompetition> list = new ArrayList<ICompetition>();
 
-		setId(1L);
-		list.add(getCompetition());
+		list.add(get(1L));
 
-		setId(2L);
-		list.add(getCompetition());
+		list.add(get(2L));
 
 		return list;
 	}
@@ -326,11 +325,9 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	public List<ICompetition> getAllComps() {
 		List<ICompetition> list = new ArrayList<ICompetition>();
 
-		setId(1L);
-		list.add(getCompetition());
+		list.add(get(1L));
 
-		setId(2L);
-		list.add(getCompetition());
+		list.add(get(2L));
 
 		return list;
 	}
@@ -339,8 +336,11 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	 * @see net.rugby.foundation.core.server.factory.ICompetitionFactory#build()
 	 */
 	@Override
-	public void build(Long compId) {
-		// TODO Auto-generated method stub
+	public void invalidate(Long compId) {
+		ICompetition c = get(compId);
+		if (c != null) {
+			deleteFromMemcache(c);
+		}
 
 	}
 
@@ -351,7 +351,7 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 	}
 
 	@Override
-	public boolean delete(Long compId) {
+	public boolean deleteFromPersistentDatastore(ICompetition compId) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -367,6 +367,29 @@ public class TestCompetitionFactory implements ICompetitionFactory, Serializable
 			globalComp.setId(10000L);
 		}
 		return globalComp;
+	}
+
+	@Override
+	public ICompetition create() {
+		// TODO Auto-generated method stub
+		return new Competition();
+	}
+
+	@Override
+	public List<ICompetition> getClientComps() {
+		List<ICompetition> list = new ArrayList<ICompetition>();
+
+		list.add(get(1L));
+
+		list.add(get(2L));
+
+		return list;
+	}
+
+	@Override
+	public Boolean addRound(Long compId, int uri, String name) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

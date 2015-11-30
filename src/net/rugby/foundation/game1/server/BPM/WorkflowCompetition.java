@@ -14,6 +14,7 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Builder;
+
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.rules.IRule;
 import net.rugby.foundation.admin.server.workflow.IWorkflow;
@@ -93,8 +94,7 @@ public class WorkflowCompetition implements IWorkflow {
 		
 		for (Long cid : wfc.getUnderwayCompetitions()) {
 			
-			cf.setId(cid);
-			ICompetition c = cf.getCompetition();
+			ICompetition c = cf.get(cid);
 			
 			// Check that the clubhouses are all ok (that they each have a valid CLM)
 			List<IClubhouse> clubhouses = chf.getAll();

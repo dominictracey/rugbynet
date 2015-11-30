@@ -1,0 +1,301 @@
+/* Sticky footer styles
+      -------------------------------------------------- */
+html,body {
+	height: 100%;
+	/* The html and body elements cannot have any padding or margin. */
+}
+
+
+/* Wrapper for page content to push down footer */
+#wrap {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	/* Negative indent footer by it's height */
+	margin: 0 auto -4em;
+}
+
+/* Set the fixed height of the footer here */
+#push,#footer {
+	height: 4em;
+}
+
+#footer {
+	background-color: #f5f5f5;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media ( max-width : 767px) {
+	#footer {
+		margin-left: -20px;
+		margin-right: -20px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+}
+
+/* Custom page CSS
+      -------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+#wrap>.container {
+	padding-top: 60px;
+}
+
+.p .copyright {
+	margin: 20px 0;
+}
+
+code {
+	font-size: 80%;
+}
+
+/* for top ten compact view */
+.bubble {
+	/*background-color: #0d2e5b;*/
+	/*margin: 3px;
+	padding: 25px 25px;*/
+	text-align: center;
+	color: #fefefe;
+	font-size: 1.3em;
+	font-weight: bold;
+	text-shadow:  0 -1px 0 rgba(0,0,0,0.25);
+	vertical-align: middle;
+	white-space: nowrap;
+	-webkit-border-radius: 10%;
+	-moz-border-radius: 10%;
+	border-radius: 10%;
+
+	overflow: hidden;
+/* 	background: -webkit-linear-gradient(left,rgba(13,46,91,1),rgba(13,46,91,0)); Safari */
+/* 	background: -o-linear-gradient(right,rgba(13,46,91,1),rgba(13,46,91,0)); Opera 11-12 */
+/* 	background: -moz-linear-gradient(right,rgba(13,46,91,1),rgba(13,46,91,0)); Fx 3.6-15 */
+/* 	background: linear-gradient(to right, rgba(13,46,91,1), rgba(13,46,91,0)); Standard */
+}
+
+.bubble div {
+	display: inline-block;
+	border: 1px solid  #0d2e5b;
+	border-radius: 100%;
+	padding: 5px;
+	color:  #fff;
+	width: 1em;
+	height: 1em;
+	background-color:  #999;
+	box-shadow: 5px 5px 3px #888888;
+}
+
+.hero-unit p.compactContent  {
+	font-size: 14px;
+	line-height: 20px;
+	text-rendering: optimizelegibility;
+	margin: 10px 0;
+	font-weight: normal;
+}
+
+/* OpenId navigation */
+.openId {
+    padding: 0;
+    margin: 10px 0 8px;
+    list-style: none;
+    overflow: hidden;
+}
+
+
+ul.openId li {
+    margin: 10px 0 8px;
+    padding: 0;
+}
+
+.openId li a {
+	height: 50px;
+	width: 150px;
+    display: block;
+	background-image: url(/images/login/login.png);
+}
+
+li#google a {
+    background-position: -0px -150px;
+}
+li#google a:hover  {
+    background-position: -150px -150px;
+}
+
+li#facebook a {
+    background-position: -0px -100px;
+}
+li#facebook a:hover  {
+    background-position: -150px -100px;
+}
+
+li#aol a {
+    background-position: -0px -0px;
+}
+li#aol a:hover  {
+    background-position: -150px -0px;
+}
+
+li#openid a {
+    background-position: -0px -250px;
+}
+li#openid a:hover  {
+    background-position: -150px -250px;
+}
+
+li#yahoo a {
+    background-position: -0px -400px;
+}
+li#yahoo a:hover  {
+    background-position: -150px -400px;
+}
+
+/*
+** Topten site specific styles
+*/
+
+#wrap {
+	background-color: #EFEEEF;
+}
+
+#banner {
+	background-image:url('/resources/banner_bg.jpg');
+	background-repeat:no-repeat;
+	background-color:#000;
+	height: 464px;
+}
+
+/* #header { */
+/* 	background-image:url('/resources/header_bg_withTag.png'); */
+/* 	background-repeat:no-repeat; */
+/* 	height: 464px; */
+/* 	width: 958px; */
+/* 	margin: 0 auto; */
+/* } */
+
+#banner .navbar-inner {
+	background: none;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	padding-top: 5px;
+}
+
+#app {
+	width: 958px;
+	margin: 0 auto;
+	background-color: white;
+}
+
+div.contentPanel {
+	margin-left: 20px;
+	margin-top: 20px;
+	padding-bottom: 20px;
+	padding-top: 20px;
+	padding-left: 10px;
+}
+
+div.contentPanel .contentArea {
+	margin-right: 0;
+}
+
+div.contentPanel [class*="span"] {
+	float: none;
+}
+
+div.contentPanel .span6, div.contentPanel .span5 {
+	display: table-cell;
+	vertical-align: top;
+}
+
+div.contentPanel > .span6 {
+	border: 4px solid lightgray;
+}
+
+div.contentPanel .span6 + .span5 {
+	margin-left: 0;
+}
+
+div.contentPanel .contentArea td {
+	padding: 20px;
+	padding-bottom: 3px;
+	color: #041f39;
+}
+
+
+td.compactTTL {
+	padding: 4px;
+	overflow: hidden;
+	font-size: 16px;
+	background-color: #eee;
+	color: #444;
+	border: 0px;
+	padding-left: 20px;
+	font-weight: bold;
+	border-bottom: 2px solid #dedede;
+	border-bottom-style: groove;
+}
+
+td.position {
+	text-align: right;
+	font-size: 11px;
+}
+
+.adBack {
+	background-color: #fff;
+	height: 100%;
+	margin: 0 auto;
+	width: 958px;
+	box-shadow: 0px 3px 2px 2px #dddddd;
+}
+
+.footerItem {
+	padding-top:10px;width:100%;text-align:center
+}
+
+a.btn-IdentityButton {
+  background-color: #041f39;
+  background-image: none;
+  color: #ddd !important;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.56);
+  -webkit-font-smoothing: antialiased;
+  font-variant: small-caps;
+}
+
+a.btn-IdentityButton:hover {
+ background-color: #152d4b;
+  background-image: none;
+}
+
+.transparentMenuBG .dropdown-menu {
+	background-image: url("/resources/menu_bg.png");
+	background-color: transparent;
+}
+
+.transparentMenuBG .dropdown-menu a {
+	color: white;
+}
+
+.navbar .transparentMenuBG .dropdown-menu:after {
+	border-bottom: none;
+}
+
+.popupCaption {
+	width: 100%;
+	padding: 4px;
+	font-weight: bold;
+	font-size: 2em;
+}
+
+.popupCloseButton {
+	float:right;
+}
+
+.popupPlayerInfo {
+	font-size: 1.5em;
+	font-weight: bold;
+	padding: 10px;
+}
+
+.popupContent {
+	width: 400px;
+	padding: 12px;
+}

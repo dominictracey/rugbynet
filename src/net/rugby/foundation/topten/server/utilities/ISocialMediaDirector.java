@@ -5,6 +5,6 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 public interface ISocialMediaDirector {
 
-	boolean PromoteTopTenList(ITopTenList ttl, TopTenSeedData tti);
+	boolean PromoteTopTenList(ITopTenList ttl);
 	
 }
