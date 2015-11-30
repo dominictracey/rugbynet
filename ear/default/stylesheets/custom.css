@@ -1,0 +1,110 @@
+@charset "utf-8";
+/* CSS Document */
+
+header{ background-color:#FFF}
+.toplink ul{ padding:0px; margin:0px 15px 0px 0px; list-style:none; float:right; line-height:50px;}
+.toplink ul li{ padding:0px; margin:0px; list-style:none; display:inline-block; font-size:16px;}
+
+.toplink ul li a { color:#202020; text-decoration:none}
+.toplink ul li a:hover { color:#000; text-decoration:none}
+
+.main{}
+
+.lftpannel{ background-color:#252d3a}
+
+.contpad{ padding:25px 30px; }
+.homeserch{ background-color:#FFF; margin-bottom:25px}
+.homeserch h2{ background-color:#f3f3f3; color:#252d3a; text-transform:uppercase; font-size:24px; text-align:center; padding:10px 0px; margin:0px; font-weight:bold }
+.homeserch h2 span{font-size:14px; display:block; font-weight:normal}
+.mainpan .col-sm-4{ padding:0px;}
+.mainpan .col-sm-20{ padding:0px;}
+.pd15{ padding:15px;}
+
+.srcsect{ margin-top:20px}
+.srcsect .col-sm-8{ border-right:1px solid #dedede; min-height:200px}
+
+.srcsect .col-sm-8:last-child{ border-right:0px solid #dedede;}
+.follo{ min-height:70px; margin-top:20px}
+
+.srcsect .col-sm-8 img{ margin-bottom:5px}
+
+.tabpd{ padding:15px 15px 5px 15px}
+.advert img{ margin-bottom:30px; }
+
+.rhtbox{ background-color:#FFF; margin-bottom:25px}
+.rhtbox h2{ background-color:#f3f3f3; color:#252d3a; font-size:13px; padding:10px; margin:0px; font-weight:normal }
+
+.pd10{ padding:10px; }
+.recent{ font-size:12px}
+.recent .row{ margin-bottom:5px}
+.recent span{ color:#999; font-size:11px}
+
+footer{ background-color:#FFF; padding:10px 0px}
+
+footer a{ color:#000}
+.ftlogo{ margin-top:6px}
+
+.lftpannel .navbar-default {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.lftpannel .navbar {
+    border-radius: 0px; margin-bottom:0px
+}
+
+.lftpannel .navbar-nav > li {
+    float: none; background-image:url(../icons/globe.png); background-repeat:no-repeat; background-position:left; padding-left:25px
+}
+
+.lftpannel .navbar-default .navbar-nav > li > a:hover, .lftpannel .navbar-default .navbar-nav > li > a:focus {
+    background-color: transparent;
+    color: #fff;
+}
+
+.toplink  button{ background-color:transparent; border:0px;}
+
+.logo{ margin-top:3px}
+
+.toplink ul li ul li{ display:block}
+
+.glyphicon { margin-right:10px; }
+.panel-body { padding:0px; }
+.panel-body table tr td { padding-left: 15px }
+.panel-body .table {margin-bottom: 0px; }
+
+.lftpannel .panel-default > .panel-heading {
+    background-color: transparent;
+    border-color: inherit
+}
+
+.lftpannel .panel {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 0px;
+    box-shadow: none;
+    margin-bottom: 20px; font-size:13px;
+}
+
+.lftpannel .panel-title > a, .lftpannel .panel-title > small, .lftpannel .panel-title > .small, .lftpannel .panel-title > small > a, .lftpannel .panel-title > .small > a {
+    color: #8d9cb5;
+}
+
+.lftpannel  .panel-title {
+    color: inherit;
+    font-size: 14px;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.lftpannel .panel-heading {
+    border-bottom: 0px solid transparent;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    padding: 10px 0px;
+}
+.lftpannel .panel-body{ padding:0px}
+.lftpannel .panel-body a{ color:#FFF}
+.lftpannel .panel-body td{border-bottom:1px solid #213350}
+
+.lst{ border-bottom:1px solid #CCC; margin-bottom:5px; padding-bottom:5px}
