@@ -30,5 +30,7 @@ public interface IGroup extends IHasId {
 	public abstract void setGroupInfo(String groupInfo);
 	
 	public abstract void add(IPlayer p);
-
+	
+	public abstract String getSnakeCaseDisplayName();
+	
 }

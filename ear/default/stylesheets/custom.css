@@ -108,3 +108,22 @@ footer a{ color:#000}
 .lftpannel .panel-body td{border-bottom:1px solid #213350}
 
 .lst{ border-bottom:1px solid #CCC; margin-bottom:5px; padding-bottom:5px}
+
+.mainpan .col-sm-2{ padding:0px;}
+.mainpan .col-sm-10{ padding:0px;}
+
+.bannimg{ background-image:url(../resources/header.png); height:325px; background-repeat:no-repeat; background-size:cover}
+
+.mainmenu a{background-image:url(../resources/uparrow.png); background-repeat:no-repeat; background-position: 98% 3px; display:block;}
+.mainmenu a.collapsed{background-image:url(../resources/down.png); background-repeat:no-repeat; background-position: 98% 3px; color:#595959 }
+
+.mainmenu .panel-body a{background-image: none}
+
+.srcsect .col-sm-4 {
+    border-right: 1px solid #dedede;
+    min-height: 200px;
+}
+
+.srcsect .col-sm-4:last-child {
+    border-right: 0 solid #dedede;
+}

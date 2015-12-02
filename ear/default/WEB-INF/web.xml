@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
-<web-app>
+
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee">
 <!-- <filter> -->
 <!-- <filter-name>appstats</filter-name> -->
 <!-- <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class> -->
@@ -35,10 +37,11 @@
 <!-- Data API -->
 <servlet>
 	<servlet-name>RemoteApiServlet</servlet-name>
-	<display-name>Remote API</display-name>
+<!-- 	<display-name>Remote API</display-name> -->
 	<servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
 	<load-on-startup>1</load-on-startup>
 </servlet>
+
 
 <!-- <servlet-mapping> -->
 <!-- <servlet-name>playersServiceServlet</servlet-name> -->
@@ -75,7 +78,7 @@
 <welcome-file-list>
 	<welcome-file>index.jsp</welcome-file>
 </welcome-file-list>
-
+ 	
 <security-constraint>
 	<web-resource-collection>
 		<url-pattern>/Admin.html</url-pattern>
@@ -84,7 +87,7 @@
 		<role-name>admin</role-name>
 	</auth-constraint>
 </security-constraint>
-
+<!--  -->
 <!-- <security-constraint> -->
 <!-- 	<web-resource-collection> -->
 <!-- 		<url-pattern>/topten.html</url-pattern> -->
@@ -94,6 +97,7 @@
 <!-- 	</auth-constraint> -->
 <!-- </security-constraint> -->
 
+<!-- 
 <security-constraint>
 	<web-resource-collection>
 		<url-pattern>/appstats/*</url-pattern>
@@ -111,7 +115,7 @@
 		<role-name>admin</role-name>
 	</auth-constraint>
 </security-constraint>
-
+ -->
 <session-config>
 	<session-timeout>25000</session-timeout>
 </session-config>
