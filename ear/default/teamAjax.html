@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Using Ajax to hit The Rugby Net REST service</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" />
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js" charset="utf-8"></script>
+
+
+<script>
+	$.ajax({
+	      url: "/_ah/api/topten/v1/competitions",
+
+	      success: function( data ) {
+
+	    	var content = "";
+    		for (i=0; i<data["items"].length; ++i) {
+  				content += "<div>" + (data["items"][i]['longName']) + "</div>\n";
+  			}
+    		
+    		$("#comps").html(content);
+
+
+	      }
+	    });
+</script>
+<script>
+	$.ajax({
+	      url: "/_ah/api/sidenav/v1/items",
+
+	      success: function( data ) { 
+
+	    	var content = "";
+    		for (i=0; i<data["items"].length; ++i) {
+    		    var thisItem = data["items"][i]
+  				content += "<div>\n" + (thisItem['name']) + "<br>\n&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"/s/#Fx:c="
+  				  + thisItem['id'] + "\">Home</a>";
+  				var rmodes = thisItem['ratingModes'];
+  				if(undefined != rmodes) {
+	  				for(j=0;j<rmodes.length; ++j) {
+	  				    var thisRating = rmodes[j];
+	  				    content += "<br>\n&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"/s/#Tx:c="
+	  				    	+ thisItem['id'] + "&s=" + thisRating['id'] + "\">"
+	  				    	+ thisRating['name'] + "</a>";
+	  				}
+	  			}
+	  			content += "</div>\n";
+  			}
+    		
+    		$("#sidenav").html(content);
+
+
+	      }
+	    });
+</script>
+<div id="comps"></div>
+<hr>
+<div id="sidenav"></div>
+</body>
+</html>
