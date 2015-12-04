@@ -3,6 +3,7 @@ package net.rugby.foundation.model.shared;
 import java.util.Date;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.googlecode.objectify.annotation.Subclass;
 
 @Subclass
@@ -205,6 +206,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IMatchGroup#getSimpleScoreMatchResult()
 	 */
+    @JsonManagedReference
 	@Override
 	public ISimpleScoreMatchResult getSimpleScoreMatchResult() {
 		return simpleResult;

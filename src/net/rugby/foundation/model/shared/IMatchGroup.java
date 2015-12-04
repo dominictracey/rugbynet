@@ -5,6 +5,10 @@ package net.rugby.foundation.model.shared;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+
+
 /**
  * @author home
  *
@@ -34,6 +38,7 @@ public interface IMatchGroup extends IGroup  {
 	public abstract Boolean getLocked();
 	public abstract void setLocked(Boolean locked);
 
+	 @JsonManagedReference
 	public abstract ISimpleScoreMatchResult getSimpleScoreMatchResult();
 	public abstract void setSimpleScoreMatchResult(ISimpleScoreMatchResult result);
 	public abstract Long getSimpleScoreMatchResultId();

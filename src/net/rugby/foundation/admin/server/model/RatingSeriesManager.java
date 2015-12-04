@@ -411,11 +411,18 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 //				}
 //			}
 			
+			ICompetition hostComp = rm.getRatingGroup().getRatingSeries().getHostComp();
+			if (hostComp == null && rm.getRatingGroup().getRatingSeries().getHostCompId() != null) {
+				hostComp = cf.get(rm.getRatingGroup().getRatingSeries().getHostCompId());
+			}
 			
-			for (ITeamGroup team : rm.getRatingGroup().getRatingSeries().getHostComp().getTeams()) {
-				// remove TBC and TBD
-				if (!team.getDisplayName().equals("TBC") && !team.getDisplayName().equals("TBD")) {
-					teams.add(team);
+			if (hostComp != null) {
+				for (ITeamGroup team : hostComp.getTeams()) {
+					// remove TBC and TBD
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Team series, adding team " + team.getDisplayName());
+					if (!team.getDisplayName().equals("TBC") && !team.getDisplayName().equals("TBD")) {
+						teams.add(team);
+					}
 				}
 			}
 			

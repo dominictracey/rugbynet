@@ -73,8 +73,8 @@ public class SimpleScoreMatchResult extends MatchResult implements ISimpleScoreM
 	
 	@Override
 	public String toString() {
-		assert getMatch() != null;
-		return getMatch().getHomeTeam().getDisplayName() + " " + homeScore + " - " + getMatch().getVisitingTeam().getDisplayName() + " " + visitScore;
+//		assert getMatch() != null;
+		return homeScore + " - " + visitScore; //getMatch().getHomeTeam().getDisplayName() + " " + homeScore + " - " + getMatch().getVisitingTeam().getDisplayName() + " " + visitScore;
 	}
 	
 }
