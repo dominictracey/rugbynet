@@ -44,6 +44,8 @@ import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+import net.rugby.foundation.topten.server.staticpages.SideNavGenerator;
+import net.rugby.foundation.topten.server.staticpages.TopNavGenerator;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
@@ -137,9 +139,9 @@ public class TeamPage extends HttpServlet {
 					+ ":" + req.getServerPort() //gmp Added to support running in Jetty in Eclipse
 					+ "/404.html");
 			
-			//gmp: This does not log, and masks, actual errors on the server side, not all due to
-			//invalid URLs as appropriate for 404 results.
-			//TODO: resolve this
+			//gmp: This does not log, and I think masks actual useful errors on the server side, not all due to
+			//invalid URLs as would only be appropriate for 404 results.
+			//TODO: Resolve this
 			
 			return;
 		}
@@ -153,24 +155,33 @@ public class TeamPage extends HttpServlet {
 	private void parseHTML() {
 		if (first.isEmpty()) {
 			FileInputStream inputStream = null;
-			//InputStream inputStream = null;
 			try {
-				//inputStream = new FileInputStream("teamTemplate.html"); //not reliable - current folder is unpredictable
+				//Workaround for unreliable current directory when getting this file
 				File f = new File("teamTemplate.html");
 				String absPath = f.getAbsolutePath(); ///Users/glennpicher/Desktop/rugby-dot-net/source/rugby/ear/default/teamTemplate.html
 				//top path is sibling to WEB-INF folder
 				
-				//URL f2 = this.getClass().getResource("teamTemplate.html"); //returns null
-				//String absPath2 = f2.getFile();
-				//inputStream = getServletContext().getResourceAsStream(absPath2); //returns null
 				inputStream = new FileInputStream(absPath);
-				
-				
 
 				String everything = IOUtils.toString(inputStream);
-				first = everything; //No splitting up of tags yet
-				
 				inputStream.close();
+				
+				//Cut out mobile and desktop nav
+				String htmlchunks1[] = everything.split("<!-- trn mobile nav -->");
+				String beginfirst = htmlchunks1[0];
+				String htmlchunks2[] = htmlchunks1[1].split("<!-- trn mobile nav end -->");
+				String htmlchunks3[] = htmlchunks2[1].split("<!-- trn desktop nav -->");
+				String middlefirst = htmlchunks3[0];
+				String htmlchunks4[] = htmlchunks3[1].split("<!-- trn desktop nav end -->");
+				String endfirst = htmlchunks4[1];
+				
+				TopNavGenerator tn = new TopNavGenerator();
+				String topNav = tn.getContent();
+				SideNavGenerator sn = new SideNavGenerator();
+				String sideNav = sn.getContent();
+				
+				first = beginfirst + topNav +  middlefirst + sideNav + endfirst;
+				
 			} catch (Throwable ex) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getLocalizedMessage(), ex);
 			} 

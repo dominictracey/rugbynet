@@ -33,14 +33,14 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-public class SideNavGenerator{
+public class TopNavGenerator{
 
 
 	private static final long serialVersionUID = 1L;
-	private static final String SIDE_NAV_CACHE_PREFIX = "SNCP-";
-	
+	private static final String TOP_NAV_CACHE_PREFIX = "TNCP-";
 
-	public SideNavGenerator() {
+
+	public TopNavGenerator() {
 	}
 
 	public String getContent()  throws IOException {
@@ -57,7 +57,7 @@ public class SideNavGenerator{
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			String page = null;
 
-			value = (byte[])syncCache.get(SIDE_NAV_CACHE_PREFIX); 
+			value = (byte[])syncCache.get(TOP_NAV_CACHE_PREFIX); 
 				//no suffix to be added here - same for all pages in site
 			if (value != null) {
 				// send back the cached version
@@ -94,7 +94,7 @@ public class SideNavGenerator{
 			out.close();
 			bos.close();
 
-			syncCache.put(SIDE_NAV_CACHE_PREFIX, yourBytes);
+			syncCache.put(TOP_NAV_CACHE_PREFIX, yourBytes);
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getLocalizedMessage(), ex);
 		}
@@ -105,20 +105,20 @@ public class SideNavGenerator{
 "<div class=\"panel panel-default\">" +
 "    <div class=\"panel-heading\">" +
 "        <h4 class=\"panel-title\">" +
-"            <a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#sidePlaceholder\"><span class=\"glyphicon glyphicon-globe\">" +
+"            <a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#topPlaceholder\"><span class=\"glyphicon glyphicon-globe\">" +
 "            </span>Global</a>" +
 "        </h4>" +
 "    </div>" +
-"    <div id=\"sidePlaceholder\" class=\"panel-collapse collapse in\">" +
+"    <div id=\"topPlaceholder\" class=\"panel-collapse collapse in\">" +
 "        <div class=\"panel-body\">" +
 "            <table class=\"table\">" +
 "                <tr>" +
 "                    <td>" +
-"                        <a href=\"#\">Home Side Placeholder</a>" +
+"                        <a href=\"#\">Home Top Placeholder</a>" +
 "                    </td>" +
 "                <tr>" +
 "                    <td>" +
-"                        <a href=\"#\">By Side Placeholder</a>" +
+"                        <a href=\"#\">By Top Placeholder</a>" +
 "                    </td>" +
 "                </tr>" +
 "                " +
@@ -132,7 +132,7 @@ public class SideNavGenerator{
 //Example HTML for menu from designer...
 //Only the div ids and hrefs seem to be different
 
-//Mobile or small desktop window... top nav
+//Mobile...
 /*
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -161,7 +161,7 @@ public class SideNavGenerator{
 </div>
 */
 
-//Desktop... side nav
+//Desktop...
 /*
 <div class="panel panel-default">
     <div class="panel-heading">
