@@ -59,8 +59,8 @@ public class Group implements Serializable, IGroup {
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IGroup#getMembers()
 	 */
-	@Override
-	public Iterator<IPlayer> getMembers() {	return members.iterator();	}
+	//@Override
+	//public Iterator<IPlayer> getMembers() {	return members.iterator();	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IGroup#setMembers(java.util.List)
 	 */
