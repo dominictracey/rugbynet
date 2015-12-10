@@ -153,7 +153,8 @@ public class Core implements CoreServiceAsync, EntryPoint {
 //		          Window.
 //		      }
 //		});
-		
+		Core.exportShowLoggedIn();
+		Core.exportSetIdentityParent();
 		
 	}
 
@@ -863,5 +864,22 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		});	
 		
 	}
+	
+	public static native void exportShowLoggedIn() /*-{
+	   $wnd.showLoggedIn =
+	      $entry(@net.rugby.foundation.core.client.Core::showLoggedIn());
+	}-*/;
 
+	public static native void exportSetIdentityParent() /*-{
+	   $wnd.setIdentityParent =
+	      $entry(@net.rugby.foundation.core.client.Core::findParent());
+	}-*/;
+
+	public static void showLoggedIn() {
+		getCore().getClientFactory().getIdentityManager().showLoggedIn();
+	}
+	
+	public static void findParent() {
+		getCore().getClientFactory().getIdentityManager().findParent();
+	}
 }

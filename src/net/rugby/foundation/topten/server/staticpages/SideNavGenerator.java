@@ -101,31 +101,33 @@ public class SideNavGenerator{
 	}
 
 	private String buildContent() {
-		return 
-"<div class=\"panel panel-default\">" +
-"    <div class=\"panel-heading\">" +
-"        <h4 class=\"panel-title\">" +
-"            <a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#sidePlaceholder\"><span class=\"glyphicon glyphicon-globe\">" +
-"            </span>Global</a>" +
-"        </h4>" +
-"    </div>" +
-"    <div id=\"sidePlaceholder\" class=\"panel-collapse collapse in\">" +
-"        <div class=\"panel-body\">" +
-"            <table class=\"table\">" +
-"                <tr>" +
-"                    <td>" +
-"                        <a href=\"#\">Home Side Placeholder</a>" +
-"                    </td>" +
-"                <tr>" +
-"                    <td>" +
-"                        <a href=\"#\">By Side Placeholder</a>" +
-"                    </td>" +
-"                </tr>" +
-"                " +
-"            </table>" +
-"        </div>" +
-"    </div>" +
-"</div>";
+//		return 
+//"<div class=\"panel panel-default\">" +
+//"    <div class=\"panel-heading\">" +
+//"        <h4 class=\"panel-title\">" +
+//"            <a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#sidePlaceholder\"><span class=\"glyphicon glyphicon-globe\">" +
+//"            </span>Global</a>" +
+//"        </h4>" +
+//"    </div>" +
+//"    <div id=\"sidePlaceholder\" class=\"panel-collapse collapse in\">" +
+//"        <div class=\"panel-body\">" +
+//"            <table class=\"table\">" +
+//"                <tr>" +
+//"                    <td>" +
+//"                        <a href=\"#\">Home Side Placeholder</a>" +
+//"                    </td>" +
+//"                <tr>" +
+//"                    <td>" +
+//"                        <a href=\"#\">By Side Placeholder</a>" +
+//"                    </td>" +
+//"                </tr>" +
+//"                " +
+//"            </table>" +
+//"        </div>" +
+//"    </div>" +
+//"</div>";
+		
+		return "<div id=\"sidebar-nav\"><div style=\"width: 100%;\"><ul class=\"\" id=\"dashboard-menu\"><li class=\"active\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Global</span><b class=\"caret\"></b></a><ul class=\"submenu\" style=\"display: block;\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul><div class=\"pointer\"><div class=\"arrow\"></div><div class=\"arrow_border\"></div></div></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Europe</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>S. Hemisphere</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Rugby World Cup</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Team</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Six Nations</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>2015 Friendlies</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Rugby Championship</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Super Rugby</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Top 14 Orange</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Champions Cup</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Guinness PRO12</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Team</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Aviva Premiership</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Team</a></li></ul></li><li class=\"\"><a href=\"javascript:;\" class=\"dropdown-toggle\"><i class=\"fa fa-globe\"></i><span>Challenge Cup</span><b class=\"caret\"></b></a><ul class=\"submenu\"><li class=\"null\"><span></span><a href=\"javascript:;\">Home</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Match</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Round</a></li><li class=\"null\"><span></span><a href=\"javascript:;\">By Position</a></li></ul></li></ul></div></div>";
 	}
 }
 
