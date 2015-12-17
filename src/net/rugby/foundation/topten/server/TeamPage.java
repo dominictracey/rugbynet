@@ -44,8 +44,6 @@ import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
-import net.rugby.foundation.topten.server.staticpages.SideNavGenerator;
-import net.rugby.foundation.topten.server.staticpages.TopNavGenerator;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
@@ -167,6 +165,7 @@ public class TeamPage extends HttpServlet {
 				inputStream.close();
 				
 				//Cut out mobile and desktop nav
+				/*
 				String htmlchunks1[] = everything.split("<!-- trn mobile nav -->");
 				String beginfirst = htmlchunks1[0];
 				String htmlchunks2[] = htmlchunks1[1].split("<!-- trn mobile nav end -->");
@@ -181,6 +180,10 @@ public class TeamPage extends HttpServlet {
 				String sideNav = sn.getContent();
 				
 				first = beginfirst + topNav +  middlefirst + sideNav + endfirst;
+				*/
+				
+				//No server side processing used after all, at least not yet.
+				first = everything;
 				
 			} catch (Throwable ex) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getLocalizedMessage(), ex);

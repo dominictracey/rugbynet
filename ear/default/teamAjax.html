@@ -53,36 +53,8 @@
 	      }
 	    });
 </script>
-<script>
-	$.ajax({
-	      url: "/_ah/api/sidenav/v1/items",
-
-	      success: function( data ) {
-	    	var content = "";
-    		for (i=0; i<data["items"].length; ++i) {
-    		    var thisItem = data["items"][i]
-  				content += "<div>\n" + (thisItem['name']) + "<br>\n&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"/s/#Fx:c="
-  				  + thisItem['id'] + "\">Home</a>";
-  				var rmodes = thisItem['ratingModes'];
-  				if(undefined != rmodes) {
-	  				for(j=0;j<rmodes.length; ++j) {
-	  				    var thisRating = rmodes[j];
-	  				    content += "<br>\n&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"/s/#Tx:c="
-	  				    	+ thisItem['id'] + "&s=" + thisRating['id'] + "\">"
-	  				    	+ thisRating['name'] + "</a>";
-	  				}
-	  			}
-	  			content += "</div>\n";
-  			}
-    		$("#sidenav").html(content);
-	      }
-	    });
-</script>
 <h2>Competitions:</h2>
 <div id="comps"></div>
-<hr>
-<h2>Side Nav (older):</h2>
-<div id="sidenav"></div>
 <hr>
 <h2>Side Nav:</h2>
 <div id="sidebar-nav">

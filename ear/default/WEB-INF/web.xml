@@ -79,8 +79,7 @@
     <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
     <init-param>
         <param-name>services</param-name>
-        <param-value>net.rugby.foundation.topten.server.rest.TopTenV1,
-            net.rugby.foundation.topten.server.rest.SideNavV1</param-value>
+        <param-value>net.rugby.foundation.topten.server.rest.TopTenV1</param-value>
     </init-param>
 </servlet>
 <servlet-mapping>
