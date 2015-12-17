@@ -16,7 +16,7 @@
 <meta name="description" content="" />
 <meta property="og:description" content="" />
 <meta property="og:image"
-	content="http://www.rugby.net/resources/comps/AP 14/200.png" />
+	content="http://www.rugby.net/resources/comps/ap/200.png" />
 <meta property="og:title"
 	content="The Rugby Net: Top Ten Players from Leister vs. Northampton" />
 <title>The Rugby Net: Top Ten Players from Leister vs.
@@ -176,14 +176,14 @@
 							</ul></li>
 						<li class="dropdown" id="identity">
 						
-<!-- 						<span></span><a href="javascript:;" -->
-<!-- 							data-toggle="dropdown">Account<b class="caret"></b></a> -->
-<!-- 							<ul class="dropdown-menu dropdown-menu-right" role="menu"> -->
-<!-- 								<li class="-IdentityButton"><a href="javascript:;"><i -->
-<!-- 										class="fa fa-key"></i> sign in</a></li> -->
-<!-- 								<li class="-IdentityButton"><a href="javascript:;"><i -->
-<!-- 										class="fa fa-lock"></i> sign up</a></li> -->
-<!-- 							</ul> -->
+						<span></span><a href="javascript:;"
+							data-toggle="dropdown">Account<b class="caret"></b></a>
+							<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								<li class="-IdentityButton"><a href="javascript:;"><i
+										class="fa fa-key"></i> sign in</a></li>
+								<li class="-IdentityButton"><a href="javascript:;"><i
+										class="fa fa-lock"></i> sign up</a></li>
+							</ul>
 						</li>
 					</ul>
 				</div>
@@ -529,9 +529,12 @@
 	</header>
 	<div class="clearfix"></div>
 	<div class="col-lg-2 col-sm-3 hidden-xs" id="sidePanelNav">
-		<!-- trn desktop nav -->
-
-		<!-- trn desktop nav end -->
+		<div id="sidebar-nav">
+			<div style="width: 100%;">
+				<ul class id="dashboard-menu">
+				</ul>
+			</div>
+		</div>
 	</div>
 
 
@@ -1075,6 +1078,7 @@
 
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script type="text/javascript" src="../theme/js/bootstrap.js"></script>
+		<script type="text/javascript" src="../theme/js/theme.js"></script>
 
 		<!-- Related to jcarousel -->
 		<script type="text/javascript" src="../theme/js/jquery_002.js"></script>
@@ -1103,6 +1107,71 @@
 				setTimeout('resizeequalheight()', 250)
 			});
 		</script>
+		<script type="text/javascript">
+			$.ajax({
+			      url: "/_ah/api/topten/v1/configuration",
+		
+			      success: function( data ) {
+			        var content = "<div style=\"width: 100%;\"><ul class id=\"dashboard-menu\">";
+					var compMap = data["competitionMap"];
+					var seriesMap = data["seriesMap"];
+					var ratingWording = {"BY_COMP": "By Round", "BY_POSITION": "By Position",
+						"BY_COUNTRY": "By Country", "BY_TEAM": "By Team", "BY_MATCH": "By Match"};
+					var secondOrLater = false;
+					var toggleId = 1;
+					for(var compId in compMap) {
+						var compName = compMap[compId];
+						content += "<li class";
+		  				if(secondOrLater == false) {
+		  					content += "=\"active\"";
+		  				}
+		  				content += "><a href=\"javascript:;\" class=\"dropdown-toggle\" id=\"trn-toggle-"
+		  					+ toggleId + "\">"
+		  					+ "<i class=\"fa fa-globe\"></i><span>"
+		  					+ compName + "</span><b class=\"caret\"></b></a><ul class=\"submenu\""
+		  					+ " style=\"display: ";
+		  				toggleId++;
+		  				if(secondOrLater == false) {	
+		  					content += "block";
+		  					} else {
+		  					content += "none";
+		  				}
+		  				content += ";\"><li class=\"null\"><span></span><a href=\"/s/#Fx:c=" + compId + "\">Home</a></li>";
+		  					
+		  				var thisSeriesMap = seriesMap[compId];
+		  				for(var rating in thisSeriesMap) {
+		  					content += "<li class=\"null\"><span></span><a href=\"/s/#Tx:c="
+			  				    	+ compId + "&s=" + thisSeriesMap[rating] + "\">"
+			  				    	+ ratingWording[rating] + "</a></li>";
+		  				}
+		  				content += "</ul>";
+		  				if(secondOrLater == false) {
+			  				content += "<div class=\"pointer\"><div class=\"arrow\"></div><div class=\"arrow_border\"></div></div>";
+			  				secondOrLater = true;
+			  			}
+			  			content += "</li>";
+					}
+		    		content += "</ul></div>";
+		    		$("#sidebar-nav").html(content);
+		    		<!--
+		    		for(var i=1;i<toggleId;i++) {
+		    			var toggleNode = "#trn-toggle-" + i;
+			    		$(toggleNode).on('click', function (e) {
+			    		    --><!-- does what theme.js dashboard-menu dropdown-toggle click handler does --><!--
+			    			e.preventDefault();
+						    var $item = $(this).parent();
+						    $item.toggleClass("active");
+						    if ($item.hasClass("active")) {
+						      $item.find(".submenu").slideDown("fast");
+						    } else {
+						      $item.find(".submenu").slideUp("fast");
+						    }
+						});
+			    	}
+		    		-->
+			      }
+			    });
+		</script>
 
 		<script type="text/javascript">
 			$('.collapse').on(
@@ -1113,7 +1182,8 @@
 						$('.collapse', $otherPanels).removeClass('in');
 					});
 		</script>
-
+		
+<!-- 
 <script type="text/javascript" defer>
 window.addEventListener("DOMContentLoaded", function() {
 	window.setIdentityParent();
@@ -1121,7 +1191,7 @@ window.addEventListener("DOMContentLoaded", function() {
 }, false);
 
 </script>
-
+-->
 		<!-- FACEBOOK JS -->
 		<div id="fb-root"></div>
 		<script>
