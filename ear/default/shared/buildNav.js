@@ -3,6 +3,7 @@ $.ajax({
 
       success: function( data ) {
         var content = "<div style=\"width: 100%;\"><ul class id=\"dashboard-menu\">";
+        var topContent = "";
 		var compMap = data["competitionMap"];
 		var seriesMap = data["seriesMap"];
 		var ratingWording = {"BY_COMP": "By Round", "BY_POSITION": "By Position",
@@ -20,19 +21,30 @@ $.ajax({
 				+ "<i class=\"fa fa-globe\"></i><span>"
 				+ compName + "</span><b class=\"caret\"></b></a><ul class=\"submenu\""
 				+ " style=\"display: ";
-			toggleId++;
+			
 			if(secondOrLater == false) {	
 				content += "block";
 				} else {
 				content += "none";
 			}
 			content += ";\"><li class=\"null\"><span></span><a href=\"/s/#Fx:c=" + compId + "\">Home</a></li>";
+			
+			topContent += "<div class=\"panel panel-default\"><div class=\"panel-heading\"><h4 class=\"panel-title\">"
+				+ "<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#trn-top-"
+				+ toggleId + "\"><span class=\"glyphicon glyphicon-globe\"></span>"
+				+ compName + "</a></h4></div><div id=\"" + toggleId + "\" class=\"panel-collapse collapse in\">"
+				+ "<div class=\"panel-body\"><table class=\"table\"><tr><td><a href=\"/s/#Fx:c=" 
+				+ compId + "\">Home</a></td></tr>";
+
+			toggleId++;
 				
 			var thisSeriesMap = seriesMap[compId];
 			for(var rating in thisSeriesMap) {
-				content += "<li class=\"null\"><span></span><a href=\"/s/#Tx:c="
-  				    	+ compId + "&s=" + thisSeriesMap[rating] + "\">"
+				var pageJump = "href=\"/s/#Tx:c=" + compId + "&s=" + thisSeriesMap[rating] + "\"";
+				content += "<li class=\"null\"><span></span><a " + pageJump + ">"
   				    	+ ratingWording[rating] + "</a></li>";
+				topContent += "<tr><td><a " + pageJump + ">"
+  				    	+ ratingWording[rating] + "</a></td></tr>";
 			}
 			content += "</ul>";
 			if(secondOrLater == false) {
@@ -40,9 +52,11 @@ $.ajax({
   				secondOrLater = true;
   			}
   			content += "</li>";
+  			topContent += "</table></div></div></div>";
 		}
 		content += "</ul></div>";
 		$("#sidebar-nav").html(content);
+		$("#accordion").html(topContent);
 		<!--
 		for(var i=1;i<toggleId;i++) {
 			var toggleNode = "#trn-toggle-" + i;
