@@ -9,15 +9,13 @@
 		<!-- navbar -->
 <!-- 		<header class="nav navbar-nav pull-right hidden-xs" role="banner"> -->
 			<b:Nav ui:field="nav">
-				<b:ListGroupItem ui:field="contentDropdown">
-					<b:Anchor dataToggle="DROPDOWN">WTF</b:Anchor>
-					<b:DropDownMenu ui:field="contentDropdownMenu">
-<!-- 						<b:AnchorListItem>Action 1</b:AnchorListItem> -->
-<!--     					<b:AnchorListItem icon="CAMERA">Action 2</b:AnchorListItem> -->
-					</b:DropDownMenu>
-				</b:ListGroupItem>
-				<b:ListGroupItem ui:field="loginDropdown">
-				</b:ListGroupItem>
+<!-- 				<b:ListGroupItem ui:field="contentDropdown"> -->
+<!-- 					<b:Anchor dataToggle="DROPDOWN">WTF</b:Anchor> -->
+<!-- 					<b:DropDownMenu ui:field="contentDropdownMenu"> -->
+<!-- 					</b:DropDownMenu> -->
+<!-- 				</b:ListGroupItem> -->
+<!-- 				<b:ListGroupItem ui:field="loginDropdown"> -->
+<!-- 				</b:ListGroupItem> -->
 			</b:Nav>
 
 <!-- 		</header> -->

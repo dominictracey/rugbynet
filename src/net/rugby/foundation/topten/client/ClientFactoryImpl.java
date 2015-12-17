@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Nav;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
@@ -22,6 +23,7 @@ import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.topten.client.place.ContentPlace;
 import net.rugby.foundation.topten.client.place.SeriesPlace;
 import net.rugby.foundation.topten.client.resources.noteTemplates.NoteTemplates;
 import net.rugby.foundation.topten.client.ui.HeaderView;
@@ -49,6 +51,9 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.Note;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity;
+import net.rugby.foundation.core.client.nav.INavManager;
+import net.rugby.foundation.core.client.nav.INavManager.IContentPresenter;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
@@ -69,7 +74,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Sample implementation of {@link ClientFactory}.
  */
-public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeListener, RoundChangeListener, GuidChangeListener {
+public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeListener, RoundChangeListener, GuidChangeListener, IContentPresenter {
 
 	private static final EventBus eventBus = new SimpleEventBus();
 
@@ -166,7 +171,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	public HeaderView getHeaderView() {
 		if (headerView == null) {
 			headerView = new HeaderViewImpl();
-			RootPanel.get("header").add((HeaderViewImpl)headerView);
+			RootPanel.get("menus").add((HeaderViewImpl)headerView);
 			headerView.setClientFactory(this);
 		}
 		return headerView; 
@@ -231,13 +236,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 					console("getConfiguration.onSuccess");
 					final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
 					// where we keep the sign in/sign out
-					if (i.getParent() == null) {
+					if (i.getNav() == null) {
 						// are we in a mobile screen?
 						if (Window.getClientWidth() < 768) {
 							// for now, no login from mobile devices
 							//i.setParentWidget(getSidebarView().getSidebarProfile());
 						} else {
-							i.setParent(getHeaderView().getLoginPanel());
+							i.setNav(getHeaderView().getNav());
 						}
 						i.setPresenter(iPresenter);
 					}
@@ -315,21 +320,21 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 	private void setupContent() {
 		final ClientFactory _this = this;
+		final LoginInfo _loginInfo = loginInfo;
+		final Nav _nav = headerView.getNav();
+		console("setupContent.schedule for " + _loginInfo.isLoggedIn());
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			public void execute() {
 				// set up content 
-				getRpcService().getContentItems( new AsyncCallback<HashMap<String,Long>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						//cb.onFailure(caught);
-					}
-
-					@Override
-					public void onSuccess(HashMap<String,Long> contentNameMap) {
-						console("getContentItems.onSuccess");
-						ClientFactoryImpl.contentNameMap = contentNameMap;
-
-						getHeaderView().setContent(contentNameMap, loginInfo.isTopTenContentEditor());	
+				console("setupContent.execute");
+				INavManager navMgr = Core.getCore().getClientFactory().getNavManager();
+				navMgr.registerContentPresenter((IContentPresenter)_this);
+				navMgr.setDesktopParent(_nav);
+				if (_loginInfo != null) {
+					console("setupContent.populate");
+					navMgr.populateContent(_loginInfo);
+				}
+				
 						
 						//*** RATING DETAIL POPUP SETUP
 						if (ratingPopup == null) {
@@ -356,8 +361,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 						}
 						//****/
 					}
-				});
-			}
+//				});
+//			}
 		});
 	}
 
@@ -879,6 +884,13 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	@Override
 	public void showExternalLink(String url) {
 		Window.open(url, "_blank", "");
+		
+	}
+	@Override
+	public void show(Long contentId) {
+		if (contentId != null) {
+			placeController.goTo(new ContentPlace(contentId));
+		}
 		
 	}
 

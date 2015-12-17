@@ -34,7 +34,7 @@ public interface TopTenListServiceAsync {
 	public void getLatestForComp(Long compId, AsyncCallback<ITopTenList> asyncCallback);
 	public void getLatestListIdForComp(Long compId,
 			AsyncCallback<Long> asyncCallback);
-	public void getContentItems(AsyncCallback<HashMap<String,Long>> asyncCallback);
+//	public void getContentItems(AsyncCallback<HashMap<String,Long>> asyncCallback);
 	public void saveTopTenList(ITopTenList list,
 			AsyncCallback<ITopTenList> asyncCallback);
 	public void getPlayerRating(Long playerRatingId,

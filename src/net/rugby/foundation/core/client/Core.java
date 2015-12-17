@@ -864,4 +864,19 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		
 	}
 
+	@Override
+	public void getContentItems(final AsyncCallback<HashMap<String, Long>> cb) {
+		clientFactory.getRpcService().getContentItems(new AsyncCallback<HashMap<String, Long>> () {
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(HashMap<String, Long> result) {	
+				cb.onSuccess(result);
+			}
+
+		});		}
+
 }

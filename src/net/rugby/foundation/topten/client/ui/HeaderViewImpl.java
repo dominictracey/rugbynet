@@ -1,22 +1,12 @@
 package net.rugby.foundation.topten.client.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.topten.client.ClientFactory;
-import net.rugby.foundation.topten.client.place.ContentPlace;
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.ListGroupItem;
 import org.gwtbootstrap3.client.ui.Nav;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -29,10 +19,10 @@ public class HeaderViewImpl extends Composite implements HeaderView
 	private static NavBarViewImplUiBinder uiBinder = GWT.create(NavBarViewImplUiBinder.class);
 
 	@UiField Nav nav;
-	@UiField ListGroupItem loginDropdown;
-	@UiField ListGroupItem contentDropdown;
-	
-	@UiField DropDownMenu contentDropdownMenu;
+//	@UiField ListGroupItem loginDropdown;
+//	@UiField ListGroupItem contentDropdown;
+//	
+//	@UiField DropDownMenu contentDropdownMenu;
 	
 
 	private ClientFactory clientFactory;
@@ -52,11 +42,11 @@ public class HeaderViewImpl extends Composite implements HeaderView
 	public HeaderViewImpl()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		
-		loginDropdown.setStyleName("dropdown");
-		contentDropdown.setStyleName("dropdown");
-		contentDropdownMenu.addStyleName("dropdown-menu-right");
-		
+//		
+//		loginDropdown.setStyleName("dropdown");
+//		contentDropdown.setStyleName("dropdown");
+//		contentDropdownMenu.addStyleName("dropdown-menu-right");
+//		
 		nav.addStyleName("navbar-nav");
 		nav.addStyleName("pull-right");
 		nav.addStyleName("hidden-xs");
@@ -69,7 +59,7 @@ public class HeaderViewImpl extends Composite implements HeaderView
 	 */
 	@Override
 	public ListGroupItem getLoginPanel() {
-		return loginDropdown;
+		return null; //loginDropdown;
 	}
 
 
@@ -89,31 +79,31 @@ public class HeaderViewImpl extends Composite implements HeaderView
 	 */
 	@Override
 	public void setContent(final HashMap<String,Long> map, boolean isEditor) {
-		this.isEditor = isEditor;
-
-		if (map != null) {
-			List<String> list = new ArrayList<String>();
-			list.addAll(map.keySet());
-			Collections.sort(list);
-			contentDropdownMenu.clear();
-			for (String s: list) {
-
-				final String _s = s;
-				AnchorListItem nl = new AnchorListItem(s.substring(3));
-				nl.addClickHandler( new ClickHandler() {
-
-					@Override
-					public void onClick(ClickEvent event) {
-						ContentPlace newPlace = new ContentPlace(map.get(_s));
-						assert (clientFactory != null);
-						clientFactory.getPlaceController().goTo(newPlace);
-					}
-				});
-
-				contentDropdownMenu.add(nl);
-				
-			}	
-		}
+//		this.isEditor = isEditor;
+//
+//		if (map != null) {
+//			List<String> list = new ArrayList<String>();
+//			list.addAll(map.keySet());
+//			Collections.sort(list);
+//			contentDropdownMenu.clear();
+//			for (String s: list) {
+//
+//				final String _s = s;
+//				AnchorListItem nl = new AnchorListItem(s.substring(3));
+//				nl.addClickHandler( new ClickHandler() {
+//
+//					@Override
+//					public void onClick(ClickEvent event) {
+//						ContentPlace newPlace = new ContentPlace(map.get(_s));
+//						assert (clientFactory != null);
+//						clientFactory.getPlaceController().goTo(newPlace);
+//					}
+//				});
+//
+//				contentDropdownMenu.add(nl);
+//				
+//			}	
+//		}
 	}
 
 	private void setDivContent(final IContent content) {
@@ -147,29 +137,34 @@ public class HeaderViewImpl extends Composite implements HeaderView
 //		DOM.getElementById(content.getDiv()).setInnerHTML(c);
 	}
 
+	@Override
+	public Nav getNav() {
+		return nav;
+	}
+
 
 	
-	protected void AddContentMenuItem(final IContent c, ListGroupItem p) {
-//		tog.setHTML(clientFactory.getLoginInfo().getNickname() + "<b class=\"caret\"></b>");
-		AnchorListItem linky = new AnchorListItem(c.getTitle());
-		linky.setIcon(IconType.UNLOCK);
-		linky.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				ContentPlace place =  new ContentPlace(c.getId());
-				clientFactory.getPlaceController().goTo(place);
-			}
-			
-		});
-		
-		linky.addStyleDependentName("IdentityButton");
-		
-		linky.setIcon(IconType.COG);
-		  		
-		p.add(linky);
-		linky.setVisible(true);
-
-	}
+//	protected void AddContentMenuItem(final IContent c, ListGroupItem p) {
+////		tog.setHTML(clientFactory.getLoginInfo().getNickname() + "<b class=\"caret\"></b>");
+//		AnchorListItem linky = new AnchorListItem(c.getTitle());
+//		linky.setIcon(IconType.UNLOCK);
+//		linky.addClickHandler(new ClickHandler() {
+//
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				ContentPlace place =  new ContentPlace(c.getId());
+//				clientFactory.getPlaceController().goTo(place);
+//			}
+//			
+//		});
+//		
+//		linky.addStyleDependentName("IdentityButton");
+//		
+//		linky.setIcon(IconType.COG);
+//		  		
+//		p.add(linky);
+//		linky.setVisible(true);
+//
+//	}
 
 }

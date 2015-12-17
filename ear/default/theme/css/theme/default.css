@@ -360,7 +360,7 @@ input.search {
 /* ######## Sidebar #########  */ 
 /** DPT moved from 180 -> 195px wide **/
 #sidebar-nav {
-  position: fixed;
+/*   position: fixed; */
   width: 195px;
   height: 100%;
   float: left;

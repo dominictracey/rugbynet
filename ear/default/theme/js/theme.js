@@ -66,6 +66,7 @@ $(function () {
   $("#menu-toggler").click(function (e) {
     e.stopPropagation();
     $("body").toggleClass("menu");
+    $(mobile_nav).toggleClass("collapse");
   });
   $(window).resize(function() { 
     $(this).width() > 769 && $("body.menu").removeClass("menu")
