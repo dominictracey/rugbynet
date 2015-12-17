@@ -29,10 +29,35 @@
 </script>
 <script>
 	$.ajax({
+	      url: "/_ah/api/topten/v1/configuration",
+
+	      success: function( data ) {
+	        var content = "<div style=\"width: 100%;\">\n<ul class id=\"dashboard-menu\">\n";
+			var compMap = data["competitionMap"];
+			var seriesMap = data["seriesMap"];
+			var ratingWording = {"BY_COMP": "By Round", "BY_POSITION": "By Position",
+				"BY_COUNTRY": "By Country", "BY_TEAM": "By Team", "BY_MATCH": "By Match"};
+			for(var compId in compMap) {
+				var compName = compMap[compId];
+				content += "<div>\n" + compName + "<br>\n&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"/s/#Fx:c="
+  				  + compId + "\">Home</a>";
+  				var thisSeriesMap = seriesMap[compId];
+  				for(var rating in thisSeriesMap) {
+  					content += "<br>\n&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"/s/#Tx:c="
+	  				    	+ compId + "&s=" + thisSeriesMap[rating] + "\">"
+	  				    	+ ratingWording[rating] + "</a>";
+  				}
+			}
+    		content += "\n</div></div>";
+    		$("#sidebar-nav").html(content);
+	      }
+	    });
+</script>
+<script>
+	$.ajax({
 	      url: "/_ah/api/sidenav/v1/items",
 
-	      success: function( data ) { 
-
+	      success: function( data ) {
 	    	var content = "";
     		for (i=0; i<data["items"].length; ++i) {
     		    var thisItem = data["items"][i]
@@ -49,15 +74,18 @@
 	  			}
 	  			content += "</div>\n";
   			}
-    		
     		$("#sidenav").html(content);
-
-
 	      }
 	    });
 </script>
+<h2>Competitions:</h2>
 <div id="comps"></div>
 <hr>
+<h2>Side Nav (older):</h2>
 <div id="sidenav"></div>
+<hr>
+<h2>Side Nav:</h2>
+<div id="sidebar-nav">
+</div>
 </body>
 </html>
