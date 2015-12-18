@@ -33,21 +33,21 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	public interface CompChangeListener {
 		void compChanged(Long id);
 	}
-	
+
 	public interface RoundChangeListener {
 		void roundChanged(UniversalRound roundOrdinal);
 	}
-	
+
 	public interface GuidChangeListener {
 		void guidChanged(String guid);
 	}
-	
+
 	private CoreClientFactory clientFactory = new CoreClientFactoryImpl();
 	private static Core _i = null;
-	
+
 	// we need to have Configuration, compMap with at least one ICompetition and a currentCompID before we are ready to go
 	private boolean initialized = false;
-	
+
 	/**
 	 * if (config != null && currentCompId != 0L && compMap.get(currentCompId) != null) return true
 	 */
@@ -64,49 +64,49 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	// the currently selected competition
 	//	Cleared to default without login
 	private Long currentCompId = 0L;
-	
+
 	private String currentGuid = "";
-	
+
 	// a map of all competitions (underway or not). key id, value ICompetition.
 	//	Login agnostic
 	private Map<Long, ICompetition> compMap = new HashMap<Long, ICompetition>();
-		
+
 	// components that are interested in getting notified when the current CompId and roundId changes
 	//	Login agnostic
 	private ArrayList<CompChangeListener> compChangeListeners = new ArrayList<CompChangeListener>();
 	private ArrayList<RoundChangeListener> roundChangeListeners = new ArrayList<RoundChangeListener>();
 	private ArrayList<GuidChangeListener> guidChangeListeners = new ArrayList<GuidChangeListener>();
-	
+
 	// map that contains the last completed round for a comp. key compId, value IRound of previous round. 
 	//	Login agnostic
 	//private Map<Long, IRound> prevRoundMap = new HashMap<Long, IRound>();
-	
+
 	// the currently selected clubhouse
 	//	Cleared to default without login
 	private Long currentClubhouseId = 0L;	
-	
+
 	// a list of the currently logged on user's IClubhouses
 	//	Cleared to default without login
 	private List<IClubhouse> clubhouseList = null;
-	
+
 	// a cache of IClubhouses. key clubhouseId, value IClubhouse.
 	//	Login agnostic
 	private Map<Long,IClubhouse> clubhouseMap = null;
-	
+
 	// the UI component for creating a new clubhouse
 	//	Login agnostic
 	private CreateClubhouse createClubhouse = null;
-	
+
 	// map that contains content
 	private Map<Long, IContent> contentMap = null;
-	
+
 	private int currentRoundOrdinal = -1; 
-	
+
 	// sponsor map
 	private Map<Long, ISponsor> sponsorMap = null;
 	ISponsor noSponsor = new Sponsor();
 	private Map<Integer, UniversalRound> universalRoundMap = new HashMap<Integer, UniversalRound>();
-	
+
 	/**
 	 * Use the static getInstance factory method
 	 */
@@ -119,7 +119,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		noSponsor.setName("None");
 		noSponsor.setTagline("");
 	}
-	
+
 	/** Singleton 
 	 * 
 	 */
@@ -141,21 +141,21 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		return _i;
 
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.google.gwt.core.client.EntryPoint#onModuleLoad()
 	 */
 	@Override
 	public void onModuleLoad() {
-//		GWT.setUncaughtExceptionHandler(new
-//		        GWT.UncaughtExceptionHandler() {
-//		        public void onUncaughtException(Throwable e) {
-//		          Window.
-//		      }
-//		});
+		//		GWT.setUncaughtExceptionHandler(new
+		//		        GWT.UncaughtExceptionHandler() {
+		//		        public void onUncaughtException(Throwable e) {
+		//		          Window.
+		//		      }
+		//		});
 		Core.exportShowLoggedIn();
 		Core.exportSetIdentityParent();
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -206,7 +206,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 
 		});
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -258,7 +258,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2,
 			final AsyncCallback<LoginInfo> cb) {
 		clientFactory.getRpcService().createAccount(emailAddress,  nickName,
-				 password,  isGoogle,  isFacebook, isOAuth2, new AsyncCallback<LoginInfo> () {
+				password,  isGoogle,  isFacebook, isOAuth2, new AsyncCallback<LoginInfo> () {
 			@Override
 			public void onFailure(Throwable caught) {
 				cb.onFailure(caught);
@@ -284,7 +284,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 					//ignore
 					//cb.onFailure(caught);
 				}
-				
+
 				public void onSuccess(ICompetition comp) {
 					currentRoundOrdinal = config.getCurrentUROrdinal();
 					for (CompChangeListener l : compChangeListeners) {
@@ -293,17 +293,17 @@ public class Core implements CoreServiceAsync, EntryPoint {
 				}
 			});
 		}
-			
+
 
 	}
-	
+
 	public void setCurrentClubhouseId(Long currentClubhouseId) {
 		if (this.currentClubhouseId != currentClubhouseId) {
 			this.currentClubhouseId  = currentClubhouseId;
 		}
-		
+
 		clientFactory.getLoginInfo().setLastClubhouseId(currentClubhouseId);
-		
+
 		clientFactory.getRpcService().updatePreferences(clientFactory.getLoginInfo(), new AsyncCallback<LoginInfo> () {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -318,7 +318,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 
 		});
-		
+
 	}
 	public void registerCompChangeListener(CompChangeListener l) {
 		compChangeListeners.add(l);
@@ -362,11 +362,11 @@ public class Core implements CoreServiceAsync, EntryPoint {
 				getClubhouseMap().put(result.getId(), result);
 				clubhouseList.add(result);
 				cb.onSuccess(result);
-				
+
 			}
 
 		});		
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -390,7 +390,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 
 		});
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -416,7 +416,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 
 			});
 		}
-		
+
 	}
 
 	/**
@@ -448,7 +448,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		} else {
 			cb.onSuccess(clubhouseList);
 		}
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -464,13 +464,13 @@ public class Core implements CoreServiceAsync, EntryPoint {
 				public void onFailure(Throwable caught) {
 					cb.onFailure(caught);
 				}
-	
+
 				@Override
 				public void onSuccess(IClubhouse result) {	
 					getClubhouseMap().put(clubhouseId, result);
 					cb.onSuccess(result);
 				}
-	
+
 			});		
 		}
 	}
@@ -479,7 +479,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 * @return
 	 */
 	public ClickHandler showCreateClubhouse(final Presenter presenter) {
-		
+
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -497,7 +497,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		assert (isInitialized());
 		return compMap.get(currentCompId);
 	}
-	
+
 	/**
 	 * @return Synchronously return the current IClubhouse. Core must be initialized before calling.
 	 */
@@ -524,7 +524,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 
 		});			
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -584,7 +584,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 
 		});	
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -594,7 +594,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	public void changePassword(String email, String oldPassword,
 			String newPassword, AsyncCallback<LoginInfo> asyncCallback) {
 		assert false;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -604,12 +604,12 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	public void forgotPassword(String email,
 			AsyncCallback<LoginInfo> asyncCallback) {
 		assert false;
-		
+
 	}
 
 	@Override
 	public void getContent(final Long contentId, final AsyncCallback<IContent> cb) {
-		
+
 		if (getContentMap().containsKey(contentId)) {
 			cb.onSuccess(getContentMap().get(contentId));
 		} else {
@@ -642,7 +642,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 
 		});
-		
+
 	}
 	private Map<Long, IContent> getContentMap() {
 		if (contentMap == null) {
@@ -650,12 +650,12 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		}
 		return contentMap;
 	}
-	
+
 	private Map<Long,IClubhouse> getClubhouseMap() {
 		if (clubhouseMap == null) {
 			clubhouseMap = new HashMap<Long,IClubhouse>();
 		}
-		
+
 		return clubhouseMap;
 	}
 
@@ -670,7 +670,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 				i = comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal();
 			}
 		} 
-		
+
 		if (this.currentRoundOrdinal != i || force) {
 			this.currentRoundOrdinal = i;
 			final int ord = i;
@@ -680,7 +680,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 					@Override
 					public void onFailure(Throwable caught) {
 						// TODO Auto-generated method stub
-						
+
 					}
 
 					@Override
@@ -690,7 +690,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 							l.roundChanged(result);
 						}
 					}
-					
+
 				});
 			} else {
 				for (RoundChangeListener l : roundChangeListeners) {
@@ -700,9 +700,9 @@ public class Core implements CoreServiceAsync, EntryPoint {
 
 
 		}
-		
+
 	}
-	
+
 	public int getCurrentRoundOrdinal() {
 		return currentRoundOrdinal;
 	}
@@ -714,7 +714,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	public void registerGuidChangeListener(GuidChangeListener l) {
 		guidChangeListeners.add(l);
 	}
-	
+
 	public void changeGuid(String guid) {
 		if (this.currentGuid != guid) {
 			this.currentGuid = guid;
@@ -733,11 +733,11 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			asyncCallback.onSuccess(noSponsor);
 			return;
 		}
-		
+
 		if (sponsorMap == null) {
 			sponsorMap = new HashMap<Long, ISponsor>();
 		}
-		
+
 		if (sponsorMap.containsKey(id)) {
 			asyncCallback.onSuccess(sponsorMap.get(id));
 		} else {
@@ -753,18 +753,18 @@ public class Core implements CoreServiceAsync, EntryPoint {
 					sponsorMap.put(id, result);
 					asyncCallback.onSuccess(result);					
 				}
-				
+
 			});
 		}
-		
+
 	}
-	
+
 	HashMap<Long, HashMap<Integer, ArrayList<IMatchGroup>>> virtualCompResultMap = new HashMap<Long, HashMap<Integer, ArrayList<IMatchGroup>>>();
 
 	@Override
 	public void getResultsForOrdinal(final int ordinal, final Long virtualCompId, final AsyncCallback<ArrayList<IMatchGroup>> asyncCallback) {
 		HashMap<Integer, ArrayList<IMatchGroup>> vCompMap = null;
-		
+
 		// get the map related to the virtual comp in question
 		if (virtualCompResultMap.containsKey(virtualCompId)) {
 			vCompMap = virtualCompResultMap.get(virtualCompId);
@@ -772,7 +772,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			vCompMap = new HashMap<Integer, ArrayList<IMatchGroup>>();
 			virtualCompResultMap.put(virtualCompId, vCompMap);
 		}
-		
+
 		// do we have the match set we want already?
 		if (vCompMap.containsKey(ordinal)) {
 			asyncCallback.onSuccess(vCompMap.get(ordinal));
@@ -783,21 +783,21 @@ public class Core implements CoreServiceAsync, EntryPoint {
 				@Override
 				public void onFailure(Throwable caught) {
 					asyncCallback.onFailure(caught);
-					
+
 				}
 
 				@Override
 				public void onSuccess(ArrayList<IMatchGroup> result) {
 					virtualCompResultMap.get(virtualCompId).put(ordinal, result);
-					
+
 					asyncCallback.onSuccess(result);
-					
+
 				}
-				
+
 			});
 		}
-		
-		
+
+
 	}
 
 	@Override
@@ -809,7 +809,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 				@Override
 				public void onFailure(Throwable caught) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
@@ -819,14 +819,14 @@ public class Core implements CoreServiceAsync, EntryPoint {
 						l.roundChanged(result);
 					}
 				}
-				
+
 			});
 		} else {
 			for (RoundChangeListener l : roundChangeListeners) {
 				l.roundChanged(universalRoundMap.get(ordinal));
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -841,11 +841,11 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			@Override
 			public void onSuccess(IContent result) {
 				cb.onSuccess(result); // don't bother caching? @REX
-				
+
 			}
-			
+
 		});
-		
+
 	}
 
 	@Override
@@ -862,24 +862,37 @@ public class Core implements CoreServiceAsync, EntryPoint {
 			}
 
 		});	
-		
+
 	}
-	
+
 	public static native void exportShowLoggedIn() /*-{
 	   $wnd.showLoggedIn =
 	      $entry(@net.rugby.foundation.core.client.Core::showLoggedIn());
 	}-*/;
 
 	public static native void exportSetIdentityParent() /*-{
-	   $wnd.setIdentityParent =
-	      $entry(@net.rugby.foundation.core.client.Core::findParent());
+	   //$wnd.setIdentityParent =
+	   //   $entry(@net.rugby.foundation.core.client.Core::findParent());
 	}-*/;
 
 	public static void showLoggedIn() {
 		getCore().getClientFactory().getIdentityManager().showLoggedIn();
 	}
-	
-	public static void findParent() {
-		getCore().getClientFactory().getIdentityManager().findParent();
+
+	@Override
+	public void getContentItems(final AsyncCallback<HashMap<String, Long>> cb) {
+		clientFactory.getRpcService().getContentItems(new AsyncCallback<HashMap<String, Long>> () {
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(HashMap<String, Long> result) {    
+				cb.onSuccess(result);
+			}
+
+		});        
+
 	}
 }
