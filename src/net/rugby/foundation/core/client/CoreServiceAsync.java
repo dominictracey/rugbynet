@@ -4,6 +4,7 @@
 package net.rugby.foundation.core.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -13,7 +14,6 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.UniversalRound;
@@ -76,11 +76,11 @@ public interface CoreServiceAsync {
 	void getContent(Long contentId, AsyncCallback<IContent> asyncCallback);
 	void saveContent(IContent content, AsyncCallback<IContent> asyncCallback);
 	
-//	void getPlace(String guid, AsyncCallback<IServerPlace> asyncCallback);
 	void getSponsor(Long id, AsyncCallback<ISponsor> asyncCallback);
 	void getResultsForOrdinal(int ordinal, Long virtualCompId, AsyncCallback<ArrayList<IMatchGroup>> asyncCallback);
 	
 	void getUniversalRound(int ordinal, AsyncCallback<UniversalRound> asyncCallback);
 	void getContent(String string, AsyncCallback<IContent> cb);
 	void getOAuth2Url(String destination, AsyncCallback<String> asyncCallback);
+	public void getContentItems(AsyncCallback<HashMap<String,Long>> asyncCallback);
 }

@@ -271,19 +271,19 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		}
 	}
 
-	@Override
-	public HashMap<String,Long> getContentItems() {
-		try {
-
-			if (ctf instanceof IContentFactory) {
-				return ctf.getMenuMap(true);
-			}
-			return null;
-		}  catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
-			return null;
-		}
-	}
+//	@Override
+//	public HashMap<String,Long> getContentItems() {
+//		try {
+//
+//			if (ctf instanceof IContentFactory) {
+//				return ctf.getMenuMap(true);
+//			}
+//			return null;
+//		}  catch (Throwable e) {
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+//			return null;
+//		}
+//	}
 
 	@Override
 	public ITopTenList saveTopTenList(ITopTenList list) {
