@@ -42,14 +42,7 @@ $(function () {
   
   // sidebar menu dropdown toggle
   $("#dashboard-menu .dropdown-toggle").click(function (e) {
-    e.preventDefault();
-    var $item = $(this).parent();
-    $item.toggleClass("active");
-    if ($item.hasClass("active")) {
-      $item.find(".submenu").slideDown("fast");
-    } else {
-      $item.find(".submenu").slideUp("fast");
-    }
+	  doDashboardMenuDropdownToggleClick(this, e);
   });
 
 
@@ -83,3 +76,16 @@ $(function () {
 });
 
 }
+
+//Split out to be callable from client side population of menus
+function  doDashboardMenuDropdownToggleClick(theNode, e) {   
+	e.preventDefault();
+	var $item = $(theNode).parent();
+	$item.toggleClass("active");
+	if ($item.hasClass("active")) {
+	  $item.find(".submenu").slideDown("fast");
+	} else {
+	  $item.find(".submenu").slideUp("fast");
+	}
+}
+	
