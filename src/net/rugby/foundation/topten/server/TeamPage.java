@@ -122,6 +122,10 @@ public class TeamPage extends HttpServlet {
 			}
 
 			page = getFromCache(teamSnakeCase);
+			
+			//Temp hack 1 of 2, to not need to restart Jetty on teamTemplate.html changes
+			//page = null;
+			
 			if (page == null || page.isEmpty()) {
 				page = buildPage(req.getScheme(), req.getServerName());
 				putToCache(teamSnakeCase,page);
@@ -151,6 +155,9 @@ public class TeamPage extends HttpServlet {
 	}
 
 	private void parseHTML() {
+		//Temp hack 2 of 2, to not have to restart Jetty on teamTempalte.html changes
+		//first = "";
+
 		if (first.isEmpty()) {
 			FileInputStream inputStream = null;
 			try {
