@@ -1,7 +1,7 @@
 var g_confgData = null;
 
 $.ajax({
-      url: "/_ah/api/topten/v1/configuration",
+      url: "https://9-dot-fantasyrugbyengine-hrd.appspot.com/_ah/api/configuration",
 
       success: function( data ) {
     	g_configData = data; //Preserve for later re-use
