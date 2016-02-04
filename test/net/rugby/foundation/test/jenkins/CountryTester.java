@@ -28,9 +28,10 @@ import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
+import net.rugby.foundation.topten.server.TopTenTestModule;
 
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, CoreTestModule.class, AdminTestModule.class })
+@GuiceModules({ Game1TestModule.class, TopTenTestModule.class, CoreTestModule.class, AdminTestModule.class })
 public class CountryTester {
 	private ICountryFactory cf;
 

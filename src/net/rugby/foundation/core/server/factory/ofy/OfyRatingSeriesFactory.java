@@ -97,7 +97,8 @@ public class OfyRatingSeriesFactory extends BaseRatingSeriesFactory implements I
 				return null;
 			}
 			for (RatingSeries qrs : qrm.list()) {
-				if (qrs.getCompIds().contains(compId)) 
+				if (qrs.getHostCompId().equals(compId))
+				//if (qrs.getCompIds().contains(compId)) 
 					return build(qrs);
 			}
 			return null;

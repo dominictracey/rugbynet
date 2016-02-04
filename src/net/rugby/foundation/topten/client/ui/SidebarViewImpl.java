@@ -52,7 +52,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class SidebarViewImpl extends Composite
 {
-	private static NavBarViewImplUiBinder uiBinder = GWT.create(NavBarViewImplUiBinder.class);
+	private static SidebarViewImplUiBinder uiBinder = GWT.create(SidebarViewImplUiBinder.class);
 
 	@UiField
 	protected ListGroup dashboardMenu;
@@ -73,7 +73,7 @@ public class SidebarViewImpl extends Composite
 	HashMap<Long,ListGroupItem> liMap = new HashMap<Long,ListGroupItem>();
 	HashMap<Long,ListGroup> submenuMap = new HashMap<Long,ListGroup>();
 
-	interface NavBarViewImplUiBinder extends UiBinder<Widget, SidebarViewImpl>
+	interface SidebarViewImplUiBinder extends UiBinder<Widget, SidebarViewImpl>
 	{
 	}
 
@@ -149,8 +149,8 @@ public class SidebarViewImpl extends Composite
 
 		// add home link
 		ListGroupItem lgi = new ListGroupItem();
-		//lgi.removeStyleName("list-group-item");
-		lgi.setStyleName("null");
+		lgi.removeStyleName("list-group-item");
+		//lgi.setStyleName("null");
 		Anchor homeLink = new Anchor();
 		homeLink.setText("Home");
 
@@ -188,8 +188,8 @@ public class SidebarViewImpl extends Composite
 
 		for (RatingMode mode: modeMap.keySet()) {
 			lgi = new ListGroupItem();
-			//lgi.removeStyleName("list-group-item");
-			lgi.setStyleName("null");
+			lgi.removeStyleName("list-group-item");
+			//lgi.setStyleName("null");
 			Anchor modeLink = new Anchor();
 			modeLink.setText(mode.getMenuName());
 			final RatingMode _mode = mode;

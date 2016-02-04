@@ -1,19 +1,22 @@
 package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Id;
 
-import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;
 
-@SuppressWarnings({ "serial", "unused" })
 @Entity
 public class Group implements Serializable, IGroup {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6061484797607887987L;
+	
 	@Id
 	private Long id;
 	protected String displayName;
