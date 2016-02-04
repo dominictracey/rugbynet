@@ -1,13 +1,13 @@
 {
   "extends" : "thirdParty.api",
   "abstract" : false,
-  "root" : "https://fantasyrugbyengine-hrd-prod.appspot.com/_ah/api",
+  "root" : "https://fantasyrugbyengine-hrd.appspot.com/_ah/api",
   "name" : "topten",
   "version" : "v1",
   "defaultVersion" : false,
   "discovery" : [ "PUBLIC" ],
   "adapter" : {
-    "bns" : "https://fantasyrugbyengine-hrd-prod.appspot.com/_ah/spi",
+    "bns" : "https://fantasyrugbyengine-hrd.appspot.com/_ah/spi",
     "deadline" : 65.0,
     "type" : "lily"
   },
