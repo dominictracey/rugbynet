@@ -31,6 +31,9 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 
 		Objectify ofy = DataStoreFactory.getOfy();
 		ITeamGroup t = (ITeamGroup)ofy.get(new Key<Group>(Group.class,id));
+		if (t.getSnakeCaseDisplayName() == null) {
+			ofy.put(t); //save newly updated snake case name to database
+		}
 		return t;
 	}
 
@@ -107,5 +110,16 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 			return null;
 		}
 	}
+	
+	@Override
+	public ITeamGroup getTeamBySnakeCaseDisplayName(String snakeCaseName) {
+		Objectify ofy = DataStoreFactory.getOfy();
+		Query<Group> team = ofy.query(Group.class).filter("snakeCaseDisplayName", snakeCaseName);
 
+		if (team.count() > 0) {
+			return (ITeamGroup)team.list().get(0);
+		}
+
+		return null;
+	}
 }

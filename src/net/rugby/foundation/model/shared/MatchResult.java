@@ -8,6 +8,10 @@ import javax.persistence.Transient;
 
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 import com.googlecode.objectify.annotation.Entity;
 
 @Entity
@@ -19,6 +23,7 @@ public class MatchResult implements Serializable, IMatchResult {
 	@Id
 	private Long id;
 	private Long matchID;
+	@JsonIgnore
 	@Transient
 	private IMatchGroup match;
 	
@@ -133,12 +138,16 @@ public class MatchResult implements Serializable, IMatchResult {
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-	@Override
-	public IMatchGroup getMatch() {
-		return match;
-	}
-	@Override
-	public void setMatch(IMatchGroup match) {
-		this.match = match;
-	}
+//	
+//	@JsonIgnore
+//	@Override
+//	public IMatchGroup getMatch() {
+//		return match;
+//	}
+//	
+//	@JsonIgnore
+//	@Override
+//	public void setMatch(IMatchGroup match) {
+//		this.match = match;
+//	}
 }

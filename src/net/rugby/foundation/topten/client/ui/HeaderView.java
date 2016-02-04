@@ -4,6 +4,7 @@ import java.util.HashMap;
 import net.rugby.foundation.topten.client.ClientFactory;
 
 import org.gwtbootstrap3.client.ui.ListGroupItem;
+import org.gwtbootstrap3.client.ui.Nav;
 
 public interface HeaderView {
 
@@ -13,4 +14,5 @@ public interface HeaderView {
 
 	void setContent(HashMap<String,Long> contentNameMap, boolean isEditor);
 
+	Nav getNav();
 }

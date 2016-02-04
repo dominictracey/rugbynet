@@ -15,7 +15,7 @@ public interface IGroup extends IHasId {
 
 	public abstract void setDisplayName(String displayName);
 
-	public abstract Iterator<IPlayer> getMembers();
+	//public abstract Iterator<IPlayer> getMembers();
 
 	public abstract void setMembers(List<IPlayer> members);
 
@@ -30,5 +30,7 @@ public interface IGroup extends IHasId {
 	public abstract void setGroupInfo(String groupInfo);
 	
 	public abstract void add(IPlayer p);
-
+	
+	public abstract String getSnakeCaseDisplayName();
+	
 }

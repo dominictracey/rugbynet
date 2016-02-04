@@ -38,7 +38,7 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.DATE, -12);
 			g.setSimpleScoreMatchResultId(8001L);
 			IMatchResult mr = mrf.get(8001L);
-			mr.setMatch(g);
+			//@JsonIgnore			mr.setMatch(g);
 			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);			
 			g.setStatus(Status.FINAL_HOME_WIN);
 		} else if (id == 101) {
@@ -48,7 +48,7 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.DATE, -11);
 			g.setSimpleScoreMatchResultId(8002L);
 			IMatchResult mr = mrf.get(8002L);
-			mr.setMatch(g);
+			//@JsonIgnore			mr.setMatch(g);
 			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_VISITOR_WIN);
 			//		g.setRoundId(2L);
@@ -59,7 +59,7 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.DATE, -4);
 			g.setSimpleScoreMatchResultId(8003L);
 			IMatchResult mr = mrf.get(8003L);
-			mr.setMatch(g);
+			//@JsonIgnore			mr.setMatch(g);
 			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_DRAW_OT);
 			//	g.setRoundId(3L);
@@ -70,7 +70,7 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.DATE, -3);
 			g.setSimpleScoreMatchResultId(8004L);
 			IMatchResult mr = mrf.get(8004L);
-			mr.setMatch(g);
+			//@JsonIgnore			mr.setMatch(g);
 			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_HOME_WIN);
 			//			g.setRoundId(3L);
@@ -117,7 +117,7 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.DATE, -7);
 			g.setSimpleScoreMatchResultId(8201L);
 			IMatchResult mr = mrf.get(8201L);
-			mr.setMatch(g);
+			//@JsonIgnore			mr.setMatch(g);
 			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_HOME_WIN);
 			//			g.setRoundId(12L);
@@ -128,7 +128,7 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.DATE, -8);
 			g.setSimpleScoreMatchResultId(8202L);
 			IMatchResult mr = mrf.get(8202L);
-			mr.setMatch(g);
+			//@JsonIgnore			mr.setMatch(g);
 			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_VISITOR_WIN);
 			//			g.setRoundId(12L);
@@ -139,7 +139,7 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 			cal.add(Calendar.DATE, -8);
 			g.setSimpleScoreMatchResultId(8203L);
 			IMatchResult mr = mrf.get(8203L);
-			mr.setMatch(g);
+			//@JsonIgnore			mr.setMatch(g);
 			g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);
 			g.setStatus(Status.FINAL_VISITOR_WIN);
 			//			g.setRoundId(12L);

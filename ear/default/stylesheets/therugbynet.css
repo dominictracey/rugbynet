@@ -249,11 +249,6 @@
 	width: 100%;
 }
 
-.null {
-	
-}
-
-
 #tabbedContent {
 	overflow: hidden;
 	float: none;
@@ -726,4 +721,18 @@ input.joinLink {
 	background-image: url("/resources/teams/ZEB/200.png");
 }
 
+header{ background-color:#FFF}
+.toplink ul{ padding:0px; margin:0px 15px 0px 0px; list-style:none; float:right; line-height:50px; font-family: "Open Sans",sans-serif; font-size: 12px;}
+.logo{ margin-top:3px}
+.competition-menu { 
+	background-color:#252d3a;
+	padding-top: 5px; 
+}
+.banner {
+	background-color:#000;
+}
+
+.banner-img {
+	float: right;
+}
 

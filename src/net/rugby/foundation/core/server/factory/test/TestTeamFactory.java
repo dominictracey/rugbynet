@@ -315,5 +315,11 @@ public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactor
 		}
 	}
 
+	@Override
+	public ITeamGroup getTeamBySnakeCaseDisplayName(String snakeCaseName) {
+		// TODO Write test cases here
+		return null;
+	}
+
 
 }

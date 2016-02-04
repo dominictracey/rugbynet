@@ -202,4 +202,5 @@ public class EditMatch extends Composite {
 		pipelineLink.setText(val);
 	}
 
+
 }

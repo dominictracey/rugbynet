@@ -49,7 +49,7 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 
 			if (g.getSimpleScoreMatchResultId() != null) {
 				IMatchResult mr = mrf.get(g.getSimpleScoreMatchResultId());
-				mr.setMatch(g);
+//@JsonIgnore				mr.setMatch(g);
 				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);  // @REX need to sort this out before other types of results are added
 
 			}

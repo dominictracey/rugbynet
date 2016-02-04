@@ -7,8 +7,9 @@ import java.util.List;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import com.google.appengine.datanucleus.annotations.Unindexed;
+//import com.google.appengine.datanucleus.annotations.Unindexed;
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 
 import net.rugby.foundation.model.shared.Position.position;
 

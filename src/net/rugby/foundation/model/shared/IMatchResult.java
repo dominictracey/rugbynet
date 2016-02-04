@@ -5,6 +5,8 @@ package net.rugby.foundation.model.shared;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 
 /**
@@ -39,8 +41,9 @@ public interface IMatchResult extends IHasId {
 
 	public abstract void setStatus(Status status);
 
-	void setMatch(IMatchGroup match);
-
-	IMatchGroup getMatch();
+//	void setMatch(IMatchGroup match);
+//
+//	@JsonIgnore
+//	IMatchGroup getMatch();
 
 }

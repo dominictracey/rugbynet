@@ -12,12 +12,12 @@ import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
-import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
+import net.rugby.foundation.topten.server.TopTenTestModule;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +29,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.inject.Inject;
 
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, AdminTestModule.class, CoreTestModule.class })
+@GuiceModules({ TopTenTestModule.class, AdminTestModule.class, CoreTestModule.class })
 public class StandingsFetcherTester {
 
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());

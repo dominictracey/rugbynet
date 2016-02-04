@@ -5,6 +5,7 @@ package net.rugby.foundation.core.server;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -603,5 +604,18 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	}
 
 
+	@Override
+	public HashMap<String,Long> getContentItems() {
+		try {
+
+			if (ctf instanceof IContentFactory) {
+				return ctf.getMenuMap(true);
+			}
+			return null;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
 
 }

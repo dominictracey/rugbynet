@@ -32,6 +32,7 @@
 	<source path='client'/>
     <source path='model/shared'/>
     
-   
+    <!-- allow Super Dev Mode (not needed with 2.7.0 GWT installation) -->
+    <add-linker name="xsiframe"/>
     
 </module>

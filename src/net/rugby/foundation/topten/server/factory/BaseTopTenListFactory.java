@@ -16,7 +16,6 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
@@ -50,7 +49,6 @@ import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.model.shared.IServerPlace.PlaceType;
 import net.rugby.foundation.topten.model.shared.Feature;
-import net.rugby.foundation.topten.model.shared.INote;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
@@ -549,10 +547,12 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				}
 			}
 
-			// update the line item tweets
-			TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf, rqf);
-			twitterPromoter.process(list, twitterMatch, !rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_TEAM));
-		}
+			// update the line item tweets iff this is a series list
+			if (rq.getRatingMatrix() != null) {
+				TwitterPromoter twitterPromoter = new TwitterPromoter(tf, this, ccf, rqf);
+				twitterPromoter.process(list, twitterMatch, !rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_TEAM));
+				}
+			}
 
 
 

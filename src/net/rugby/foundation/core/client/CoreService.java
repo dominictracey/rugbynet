@@ -4,6 +4,7 @@
 package net.rugby.foundation.core.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IClubhouse;
@@ -12,12 +13,10 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.UniversalRound;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -128,4 +127,7 @@ public interface CoreService extends RemoteService {
 	ArrayList<IMatchGroup> getResultsForOrdinal(int ordinal, Long virtualCompId);
 	
 	UniversalRound getUniversalRound(int ordinal);
+	
+	public HashMap<String,Long> getContentItems();
+	
 }

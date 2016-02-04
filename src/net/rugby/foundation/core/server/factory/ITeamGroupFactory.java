@@ -15,4 +15,6 @@ public interface ITeamGroupFactory extends ICachingFactory<ITeamGroup> {
 
 	HashMap<Long, String> getTeamLogoStyleMap();
 
+	ITeamGroup getTeamBySnakeCaseDisplayName(String snakeCaseName);
+
 }

@@ -30,7 +30,7 @@ public interface TopTenListService extends RemoteService {
 	public ITopTenItem submitTopTenItem(ITopTenItem item);
 	public ITopTenList getLatestForComp(Long compId);
 	public Long getLatestListIdForComp(Long compId);
-	public HashMap<String,Long> getContentItems();
+//	public HashMap<String,Long> getContentItems();
 	public ITopTenList saveTopTenList(ITopTenList list);
 	public IPlayerRating getPlayerRating(Long playerRatingId);
 	public IRatingSeries getRatingSeries(Long seriesId);
