@@ -20,6 +20,7 @@ import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 
@@ -52,7 +53,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		ICoreConfiguration c = ofy.query(CoreConfiguration.class).get();
 		
 		if (c == null) {
-			c = new CoreConfiguration();			
+			c = create();			
 		}
 		
 		List<Long> copyOf = new ArrayList<Long>();
@@ -112,6 +113,11 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 			put(c);
 		}
 		
+		if (c.getEnvironment() == null) {
+			c.setEnvironment(Environment.LOCAL);
+			put(c);
+		}
+		
 		return c;
 	}
 
@@ -139,7 +145,9 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 
 	@Override
 	public ICoreConfiguration create() {
-		return new CoreConfiguration();
+		ICoreConfiguration c = new CoreConfiguration();
+		c.setEnvironment(Environment.LOCAL);
+		return c;
 	}
 
 }

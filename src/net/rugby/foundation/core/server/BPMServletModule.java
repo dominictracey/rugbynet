@@ -1,6 +1,7 @@
 package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
+import net.rugby.foundation.topten.server.HomePage;
 import net.rugby.foundation.topten.server.MetaTagGenerator;
 import net.rugby.foundation.topten.server.SeriesPage;
 import net.rugby.foundation.topten.server.SiteMap;
@@ -31,6 +32,7 @@ public class BPMServletModule extends ServletModule {
 		serve("/s/*").with(SeriesPage.class);
 		serve("/teams/*").with(TeamPage.class);
 		serve("/sitemap/*").with(SiteMap.class);
+		serve("/").with(HomePage.class);
 //		serve("/_ah/pipeline/*").with(PipelineServlet.class); // not @Singleton
 	}
 }
