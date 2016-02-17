@@ -88,11 +88,12 @@ h1,h2,h3,h4,h5,h6{
 	border-color: none!important;
 	}
 
-.btn-primary {
-	color: #fff;
-	background-color: #a9b1bc!important;
-	border-color: #a9b1bc!important;
-	}
+/* DPT 2/12/16 - I like the blue primary buttons
+/* .btn-primary { */
+/* 	color: #fff; */
+/* 	background-color: #a9b1bc!important; */
+/* 	border-color: #a9b1bc!important; */
+/* 	} */
 
 .btn-primary:hover {
 	background-color: #969ca5!important;

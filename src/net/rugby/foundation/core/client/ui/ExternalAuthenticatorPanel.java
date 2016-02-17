@@ -25,12 +25,12 @@ public class ExternalAuthenticatorPanel extends Composite
 	}
 	
 
-	//@UiField Anchor facebook;
+	@UiField Anchor facebook;
 	//@UiField Anchor google;
 	@UiField Anchor googlePlus;
 //	@UiField Anchor aol;
 //	@UiField Anchor openid_com;
-//	@UiField Anchor yahoo;
+	@UiField Anchor yahoo;
 
 	Presenter presenter;
 
@@ -64,15 +64,15 @@ public class ExternalAuthenticatorPanel extends Composite
 //	void onOpenIdComButtonClicked(ClickEvent event) {
 //		presenter.doOpenIdLogin(LoginInfo.Selector.myopenid_com);
 //	}	
-//	
-//	@UiHandler("yahoo")
-//	void onYahooButtonClicked(ClickEvent event) {
-//		presenter.doOpenIdLogin(LoginInfo.Selector.yahoo);
-//	}	
 	
-//	@UiHandler("facebook")
-//	void onFacebookButtonClicked(ClickEvent event) {
-//		presenter.doFacebookLogin();
-//	}	
+	@UiHandler("yahoo")
+	void onYahooButtonClicked(ClickEvent event) {
+		presenter.doOpenIdLogin(LoginInfo.Selector.yahoo);
+	}	
+	
+	@UiHandler("facebook")
+	void onFacebookButtonClicked(ClickEvent event) {
+		presenter.doFacebookLogin();
+	}	
 	
 }

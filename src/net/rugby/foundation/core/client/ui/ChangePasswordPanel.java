@@ -1,5 +1,8 @@
 package net.rugby.foundation.core.client.ui;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Input;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -7,10 +10,8 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ChangePasswordPanel extends Composite
@@ -26,9 +27,9 @@ public class ChangePasswordPanel extends Composite
 		void onCancelChangePassword();
 	}
 	
-	@UiField PasswordTextBox oldPassword;
-	@UiField PasswordTextBox password1;
-	@UiField PasswordTextBox password2;
+	@UiField Input oldPassword;
+	@UiField Input password1;
+	@UiField Input password2;
 	@UiField Button submit;
 	@UiField Button cancel;
 	@UiField Label error;

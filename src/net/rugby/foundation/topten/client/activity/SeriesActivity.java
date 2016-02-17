@@ -645,6 +645,11 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void showFacebookComments(boolean show) {
+		clientFactory.showFacebookComments(show);		
+	}
 	
 
 }

@@ -59,12 +59,13 @@ public class AccountManager implements IAccountManager {
 	}
 
 	@Override
-	public IAppUser createAccount(String emailAddress, String nickName, String password, JSONObject attributes, boolean isOpenId, boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException {
+	public LoginInfo createAccount(String emailAddress, String nickName, String password, JSONObject attributes, boolean isOpenId, boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException {
 
 		LoginInfo info = new LoginInfo();
+		info.setEmailAddress(emailAddress);
 		info.setLoggedIn(false);
 		IAppUser u = null;
-		
+
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Creating account for " + emailAddress);
 		boolean error = false;
 		String hash = null;
@@ -83,7 +84,6 @@ public class AccountManager implements IAccountManager {
 					info.setStatus(CoreConfiguration.getCreateacctErrorPasswordTooShort());
 					error = true;
 				} else {
-
 					//create pw hash
 					hash = DigestUtils.md5Hex(password);
 				}
@@ -96,12 +96,15 @@ public class AccountManager implements IAccountManager {
 				if (au != null) {
 					// TODO this may be a merge
 					info.setStatus(CoreConfiguration.getCreateacctErrorExists());
+					return info;
 				} else {
 					if (nickName != null)  {  // it's ok if its null - means its just a non-native signup.
 						auf.setNickName(nickName);
 						au = auf.get();
-						if (au != null)
+						if (au != null) {
 							info.setStatus(CoreConfiguration.getCreateacctErrorNicknameExists());
+							return info;
+						}
 					}
 
 					auf.setId(null);  // get an empty one
@@ -116,36 +119,47 @@ public class AccountManager implements IAccountManager {
 					u.setFacebook(isFacebook);
 					u.setOath2(isOAuth2);
 					u.setNative(!isOpenId && !isFacebook);
-					
+
+					if (u.isNative()) {
+						u.setEmailValidated(false);
+						u.setEmailValidationCode(randomPassword());						
+					} else {
+						u.setEmailValidated(true);
+					}
+
+					//info.setEmailValidated(u.getEmailValidated());
+
 					if (attributes != null)
 						u = addJSONAttributes(u,attributes);
-					
+
 					u = auf.put(u);
 					if (u.getNickname() == null || u.getNickname().isEmpty()) {
 						u.setNickname("user"+u.getId().toString());
 						u = auf.put(u);
 					}
 
-					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Setting login info to user session: " + u.getNickname());
-
-					HttpSession session = request.getSession();
+					//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Setting login info to user session: " + u.getNickname());
+					//
+					//					HttpSession session = request.getSession();
 					info = getLoginInfo(u);
-					assert(info.isLoggedIn());
-					session.setAttribute("loginInfo", info);
+					//					assert(info.isLoggedIn());
+					//					session.setAttribute("loginInfo", info);
 				}
 			}
 		}
 
 
 		sendAdminEmail("New Fantasy Rugby user", info.getEmailAddress() + "\n" + info.getNickname());
-		return u;
+		return info;
 
 	}
 
 	@Override
 	public LoginInfo getLoginInfo(IAppUser u) {
 		LoginInfo loginInfo = new LoginInfo();
-		loginInfo.setLoggedIn(true);
+		//loginInfo.setLoggedIn(true);
+		loginInfo.setLoggedIn(false);
+		loginInfo.setEmailValidated(u.getEmailValidated());
 		loginInfo.setEmailAddress(u.getEmailAddress());
 		loginInfo.setNickname(u.getNickname());
 		loginInfo.setLogoutUrl("");    	
@@ -156,11 +170,12 @@ public class AccountManager implements IAccountManager {
 		loginInfo.setLastClubhouseId(u.getLastClubhouseId());
 		loginInfo.setLastCompetitionId(u.getLastCompetitionId());
 		loginInfo.setMustChangePassword(u.isMustChangePassword());
+
 		if (u instanceof ITopTenUser) {
 			loginInfo.setTopTenContentContributor(((ITopTenUser)u).isTopTenContentContributor());
 			loginInfo.setTopTenContentEditor(((ITopTenUser)u).isTopTenContentEditor());
 		}
-		
+
 		// see if they have done the draft and round picks yet.
 		//ArrayList<Group> groups = getGroupsByGroupType(GroupType.MY);
 		//	  for (int i=0; i<10; i++) {
@@ -201,7 +216,7 @@ public class AccountManager implements IAccountManager {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void sendUserEmail(IAppUser u, String subject, String message) {
 		Properties props = new Properties();
@@ -244,7 +259,7 @@ public class AccountManager implements IAccountManager {
 
 		return info;
 	}
-	
+
 	private IAppUser addJSONAttributes(IAppUser au, JSONObject attributes) throws NumberFormatException, JSONException, ParseException {
 		if (attributes.has("id")) {
 			Long parsed = Long.parseLong(attributes.getString("id"));
@@ -276,13 +291,13 @@ public class AccountManager implements IAccountManager {
 			au.setGender(attributes.getString("gender"));
 		}	
 		if (attributes.has("timezone")) {
-			au.setTimezone(attributes.getString("timezone"));
+			au.setTimezone(((Integer)attributes.getInt("timezone")).toString());
 		}	
 		if (attributes.has("locale")) {
 			au.setLocale(attributes.getString("locale"));
 		}	
 		if (attributes.has("verified")) {
-			if (attributes.getString("verified").equals("true"))
+			if (attributes.getBoolean("verified") == true)
 				au.setFbVerified(true);
 			else
 				au.setFbVerified(false);				
@@ -292,13 +307,13 @@ public class AccountManager implements IAccountManager {
 			Date date = format.parse(attributes.getString("updated_time"));
 			au.setFbUpdatedTime(date);
 		}	
-		
+
 		auf.put(au);
-		
+
 		return au;
-		
+
 	}
-	
+
 	@Override
 	public void processUser(String email, LoginInfo.ProviderType providerType, LoginInfo.Selector selector, HttpServletRequest req, HttpServletResponse resp, JSONObject attributes) throws IOException, NumberFormatException, JSONException, ParseException {
 		LoginInfo loginInfo = new LoginInfo();
@@ -308,68 +323,74 @@ public class AccountManager implements IAccountManager {
 
 		// if we don't find them, we need to create a new profile for them
 		if (u == null) {
-
+			boolean error = false;
 			try {
 				// create their AppUser account with a generic screen name, then send them to change it
-				u = createAccount(email.toLowerCase(), null, null, attributes, providerType.equals(LoginInfo.ProviderType.openid), providerType.equals(LoginInfo.ProviderType.facebook), providerType.equals(LoginInfo.ProviderType.oauth2),req);
+				loginInfo = createAccount(email.toLowerCase(), null, null, attributes, providerType.equals(LoginInfo.ProviderType.openid), providerType.equals(LoginInfo.ProviderType.facebook), providerType.equals(LoginInfo.ProviderType.oauth2),req);
 
+				if (loginInfo.isLoggedIn()) {
+					u = auf.get();
+					assert(u != null);
+				}
 			} catch (NumberFormatException e) {
 				Logger.getLogger("Login Servlet").log(Level.SEVERE,e.getLocalizedMessage(),e);
+				error = true;
 			} catch (JSONException e) {
 				Logger.getLogger("Login Servlet").log(Level.SEVERE,e.getLocalizedMessage(),e);
+				error = true;
 			} catch (ParseException e) {
 				Logger.getLogger("Login Servlet").log(Level.SEVERE,e.getLocalizedMessage(),e);
+				error = true;
 			}
 
-			validateProvider(u, providerType, selector, attributes);
-			
-			assert(loginInfo != null && loginInfo.isLoggedIn() == true);
-			loginInfo.setProviderType(providerType);
-			loginInfo.setSelector(selector);
-			HttpSession session = req.getSession();
-			session.setAttribute("loginInfo", loginInfo);	
+			if (!error) {
+				validateProvider(u, providerType, selector, attributes);
+				loginInfo = getLoginInfo(u);
+				assert(loginInfo != null && loginInfo.isLoggedIn() == true);
+				loginInfo.setProviderType(providerType);
+				loginInfo.setSelector(selector);
+				HttpSession session = req.getSession();
+				session.setAttribute("loginInfo", loginInfo);	
 
 
-			String destination = req.getParameter(Keys.destination.toString());
-			// note we have to unfortunately encode the destination ourselves because we use the GWT encoder in the Profile code which doesn't work on the server side
-			Profile place = new Profile(Actions.updateScreenName, providerType, selector, null); 
-			
-			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
-			String url = "";
-			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/s/?gwt.codesvr=127.0.0.1:9997#Profile:";
-			else
-				url = "/s/?#Profile:";
+				String destination = req.getParameter(Keys.destination.toString());
+				// note we have to unfortunately encode the destination ourselves because we use the GWT encoder in the Profile code which doesn't work on the server side
+				Profile place = new Profile(Actions.updateScreenName, providerType, selector, null); 
 
-			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
-				destination = Base64Helper.decode(destination);
+				Profile.Tokenizer tokenizer = new Profile.Tokenizer();
+				String url = "/s/#Profile:";
+
+				if ((providerType.equals(LoginInfo.ProviderType.facebook) || providerType.equals(LoginInfo.ProviderType.oauth2) || providerType.equals(LoginInfo.ProviderType.openid)) && destination != null) {
+					destination = Base64Helper.decode(destination);
+				}
+				url += tokenizer.getToken(place) + "&destination=" + URLEncoder.encode(destination, resp.getCharacterEncoding());
+
+				resp.sendRedirect(url);
+			} else {
+				// something bad happened trying to create the user.
+				resp.sendRedirect("/404.html"); // @TODO - need error page that doesn't provide too much info.
 			}
-			url += tokenizer.getToken(place) + "&destination=" + URLEncoder.encode(destination, resp.getCharacterEncoding());
-			resp.sendRedirect(url);
 		} else {
 			// if we did find them, make sure they are all set
 			validateProvider(u, providerType, selector, attributes);
-			
+
 			HttpSession session = req.getSession();
 
 			loginInfo = getLoginInfo(u);
 			loginInfo.setProviderType(providerType);
+			loginInfo.setLoggedIn(true);
 			loginInfo.setSelector(selector);
 			session.setAttribute("loginInfo", loginInfo);	
 			String destination = req.getParameter(Keys.destination.toString());
 			Profile place = new Profile(Actions.done, providerType, selector, null);
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
-			String url = "";
-			if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) 
-				url = "/s/?gwt.codesvr=127.0.0.1:9997#Profile:";
-			else
-				url = "/s/?#Profile:";
+			String url = "/s/#Profile:";
 
-			if (providerType.equals(LoginInfo.ProviderType.facebook) && destination != null) {
+			if ((providerType.equals(LoginInfo.ProviderType.facebook) || providerType.equals(LoginInfo.ProviderType.oauth2)) && destination != null) {
 				destination = Base64Helper.decode(destination);
 			}
-			
-			url += tokenizer.getToken(place) + "&destination=" + destination;
+
+			url += tokenizer.getToken(place) + "&destination="  + URLEncoder.encode(destination, resp.getCharacterEncoding());
 			resp.sendRedirect(url);
 		}
 	}
@@ -424,7 +445,7 @@ public class AccountManager implements IAccountManager {
 				needSave = true;
 			}
 		}
-		
+
 		if (needSave) {
 			auf.put(u);
 		}
@@ -456,10 +477,10 @@ public class AccountManager implements IAccountManager {
 		auf.put(u);
 
 		loginInfo = getLoginInfo(u);
-		
+
 		return loginInfo;
 	}
-	
+
 	/**
 	 * http://nscraps.com/Java/748-random-password-generator-java-example-source-code.htm
 	 */
@@ -506,7 +527,7 @@ public class AccountManager implements IAccountManager {
 				loginInfo.setLoggedIn(false);
 				return loginInfo;
 			}
-			
+
 			// Leaving just #3
 			// generate a random password for them
 			String password = randomPassword();
@@ -515,12 +536,41 @@ public class AccountManager implements IAccountManager {
 			u.setMustChangePassword(true);
 			auf.put(u);
 			// send them email
-			sendUserEmail(u, "Password reset from Rugby.net", "Hi, we received a request to reset your password. Your temporary password is " + password + " - please use it to login and set up a new password. If you didn't ask to have your password reset, sorry for the inconvenience.");
+			sendUserEmail(u, "Password reset from The Rugby Net", "Hi, we received a request to reset your password. Your temporary password is " + password + " - please use it to login and set up a new password. If you didn't ask to have your password reset, sorry for the inconvenience.");
 
 			loginInfo = getLoginInfo(u);
 			loginInfo.setLoggedIn(false);
 			return loginInfo;
-			
+
+		}  catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}	
+	}
+
+	@Override
+	public LoginInfo validateEmail(String email, String validationCode) {
+		try {
+			auf.setEmail(email);
+			IAppUser user = auf.get();
+
+			if (user != null && user.isNative()) {
+				if (validationCode.trim().equals(user.getEmailValidationCode())) {
+					user.setEmailValidated(true);
+					auf.put(user);
+					
+					// and they are logged on now
+					LoginInfo loginInfo = getLoginInfo(user);
+					assert(loginInfo != null);
+					loginInfo.setLoggedIn(true);
+					loginInfo.setStatus("Email successfully validated");
+					return loginInfo;
+				}
+			}
+			LoginInfo loginInfo = new LoginInfo();
+			loginInfo.setEmailAddress(email);
+			loginInfo.setStatus("Problems validating email");
+			return loginInfo;
 		}  catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;

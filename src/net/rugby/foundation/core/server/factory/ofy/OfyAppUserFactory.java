@@ -70,7 +70,7 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 	private IAppUser getByEmail() {
 		Objectify ofy = DataStoreFactory.getOfy();
 
-		Query<AppUser> q = ofy.query(AppUser.class).filter("emailAddress", email );
+		Query<AppUser> q = ofy.query(AppUser.class).filter("emailAddress", email.toLowerCase() );
 		if (q.count() == 0) {
 			return null; //empty
 		}

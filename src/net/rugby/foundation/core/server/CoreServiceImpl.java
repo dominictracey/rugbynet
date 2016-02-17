@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -25,6 +28,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.ISponsorFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
@@ -152,11 +156,29 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	@Override
 	public LoginInfo createAccount(String emailAddress, String nickName, String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2) {
 		try {
-			IAppUser u = am.createAccount(emailAddress, nickName, password, null, isGoogle, isFacebook, isOAuth2, this.getThreadLocalRequest());
+			LoginInfo info = new LoginInfo();
+			IAppUser u = null;
+			Pattern p = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$");
+			Matcher m = p.matcher(emailAddress.toUpperCase());
+			boolean matchFound = m.matches();
+			if (!matchFound) {
+				// TODO this may be a merge
+				info.setStatus(CoreConfiguration.getCreateacctErrorInvalidEmail());
+				return info;
+			}
+			
+			info = am.createAccount(emailAddress, nickName, password, null, isGoogle, isFacebook, isOAuth2, this.getThreadLocalRequest());
+			if (info.isLoggedIn()) {
+				auf.setEmail(info.getEmailAddress());
+				u = auf.get();
+			} else {
+				return info;
+			}
+			
 			if (u != null) {
 				HttpServletRequest request = this.getThreadLocalRequest();
 				HttpSession session = request.getSession();
-				LoginInfo info = am.getLoginInfo(u);
+				info = am.getLoginInfo(u);
 				session.setAttribute("loginInfo", info);
 				return info;
 			}
@@ -178,7 +200,19 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			if (u == null) {
 				return new LoginInfo();
 			}
-
+		
+			// first check if this is a non-native account - if they try to log on with a password for an 
+			// account that has already been established with an external authenticator return a non logged in status
+			// with the hint set.
+			if (u.isFacebook() || u.isOath2() || u.isOpenId()) {
+				LoginInfo info = new LoginInfo();
+				info.setFacebook(u.isFacebook());
+				info.setIsOpenId(u.isOpenId());
+				info.setIsOauth2(u.isOath2());
+				info.setLoggedIn(false);
+				return info;
+			}
+			
 			String hash = DigestUtils.md5Hex(password);
 			if (u.getPwHash() == null || !u.getPwHash().equals(hash))  {
 				return loginInfo; //empty		
@@ -187,6 +221,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			HttpServletRequest request = this.getThreadLocalRequest();
 			HttpSession session = request.getSession();
 			LoginInfo info = am.getLoginInfo(u);
+			info.setLoggedIn(true);
 			session.setAttribute("loginInfo", info);
 
 			return info;
@@ -612,6 +647,22 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 				return ctf.getMenuMap(true);
 			}
 			return null;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public LoginInfo validateEmail(String email, String validationCode) {
+		try {
+
+			LoginInfo loginInfo = am.validateEmail(email,validationCode);
+			HttpServletRequest request = this.getThreadLocalRequest();
+			HttpSession session = request.getSession();
+			session.setAttribute("loginInfo", loginInfo);
+			
+			return loginInfo;
 		}  catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 			return null;

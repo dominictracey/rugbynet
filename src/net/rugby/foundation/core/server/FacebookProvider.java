@@ -113,8 +113,8 @@ public class FacebookProvider implements IExternalAuthenticatorProvider {
 			}
 			
 			//TODO REX Took out to get compiling with Maven commons-codec
-//			return new String(Base64.decodeBase64(input));
-			return new String();
+			return new String(Base64.decodeBase64(input));
+//			return new String();
 
 		}
 
@@ -234,9 +234,9 @@ public class FacebookProvider implements IExternalAuthenticatorProvider {
 		if (req.getLocalPort() != 80 && req.getLocalPort() != 0) {
 			port = ":" + Integer.toString(req.getLocalPort());
 		}
-		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
-			dev_gwtserver += Constants.getFacebookLocalDevCodeserver();
-		}
+//		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
+//			dev_gwtserver += Constants.getFacebookLocalDevCodeserver();
+//		}
 
 		if (destination == null) {
 			destination = "";
@@ -265,7 +265,8 @@ public class FacebookProvider implements IExternalAuthenticatorProvider {
 		String code = req.getParameter("code");
 
 		if (code == null || code.isEmpty()) { // this is the first call from the client - just build them the initial redirect URL for facebook
-			resp.sendRedirect(getCodeUrl());
+			String codeUrl = getCodeUrl();
+			resp.sendRedirect(codeUrl);
 		} else { // this is the redirect from facebook
 			// get the access token
 			String accessTokenUrlString = getAccessTokenUrl(code,req.getServerName());
@@ -292,8 +293,8 @@ public class FacebookProvider implements IExternalAuthenticatorProvider {
 				}
 
 				if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
-					String dev_gwtserver = Constants.getFacebookLocalDevCodeserver();
-					resp.sendRedirect("http://" + server + port + "/index.html?" + dev_gwtserver + "#" + destination);
+					String dev_gwtserver = ""; //Constants.getFacebookLocalDevCodeserver();
+					resp.sendRedirect("http://" + server + port + "/" + dev_gwtserver + "#" + destination);
 				}
 			} else {
 				try {

@@ -83,4 +83,5 @@ public interface CoreServiceAsync {
 	void getContent(String string, AsyncCallback<IContent> cb);
 	void getOAuth2Url(String destination, AsyncCallback<String> asyncCallback);
 	public void getContentItems(AsyncCallback<HashMap<String,Long>> asyncCallback);
+	void validateEmail(String email, String validationCode, AsyncCallback<LoginInfo> asyncCallback);
 }

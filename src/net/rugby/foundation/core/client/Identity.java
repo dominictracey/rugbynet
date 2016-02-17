@@ -15,6 +15,12 @@ import org.gwtbootstrap3.client.ui.Nav;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
@@ -26,6 +32,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		 * Notifications of login status are sent here.
 		 */
 		void onLoginComplete(String destination);
+		void showFacebookComments(boolean show);
 	}
 
 //	public enum Actions { login, logout, createFacebook, createOpenId, mergeFacebook, mergeOpenId, done, updateScreenName }
@@ -59,11 +66,6 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 
 	CoreClientFactory clientFactory = null;
-//	ListGroupItem parent = null;
-//	AnchorListItem signUpLink;
-//	AnchorListItem signInLink;
-//	AnchorListItem signOutLink;
-//	AnchorListItem editProfileLink;
 
 	Label sep = new HTML("&nbsp;&nbsp;| ");
 	private Presenter presenter = null;
@@ -131,6 +133,16 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	protected ClickHandler signUpHandler = new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
+			// get a session going to avoid the jsessionid url re-writing problem
+			startSession();
+			
+			//everything after the #
+			String href = Window.Location.getHref();
+			destination = href.substring(href.indexOf('#')+1);
+			if (getManageProfileDialog().getAbsoluteTop() < 100) {
+				getManageProfileDialog().setPopupPosition(getManageProfileDialog().getAbsoluteTop(), 100);
+			}
+			presenter.showFacebookComments(false);
 			getManageProfileDialog().init(clientFactory.getLoginInfo());
 		}	
 	};
@@ -139,9 +151,16 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 		@Override
 		public void onClick(ClickEvent event) {
+			// get a session going to avoid the jsessionid url re-writing problem
+			startSession();
+			
+			//everything after the #
+			String href = Window.Location.getHref();
+			destination = href.substring(href.indexOf('#')+1);
 			if (getLoginDialog().getAbsoluteTop() < 100) {
 				getLoginDialog().setPopupPosition(getLoginDialog().getAbsoluteTop(), 100);
 			}
+			presenter.showFacebookComments(false);
 			getLoginDialog().init();			
 		}	
 	};
@@ -149,7 +168,9 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	private ClickHandler signOutHandler = new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
-
+			//everything after the #
+			String href = Window.Location.getHref();
+			destination = href.substring(href.indexOf('#')+1);
 			Core.getCore().logOff(clientFactory.getLoginInfo(),
 					new AsyncCallback<LoginInfo>() {
 				public void onSuccess(LoginInfo result) {
@@ -168,6 +189,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 		@Override
 		public void onClick(ClickEvent event) {
+			presenter.showFacebookComments(false);
 			getManageProfileDialog().init(clientFactory.getLoginInfo());			
 		}	
 	};
@@ -177,6 +199,25 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 	public CoreClientFactory getClientFactory() {
 		return clientFactory;
+	}
+
+	protected void startSession() {
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, "/session/");
+
+	    try {
+	      Request response = builder.sendRequest(null, new RequestCallback() {
+	        public void onError(Request request, Throwable exception) {
+	          // Code omitted for clarity
+	        }
+
+	        public void onResponseReceived(Request request, Response response) {
+	          Logger.getLogger("Identity").log(Level.INFO,"started session");
+	        }
+	      });
+	    } catch (RequestException e) {
+	      // Code omitted for clarity
+	    }
+		
 	}
 
 	public void setClientFactory(CoreClientFactory clientFactory) {
@@ -190,122 +231,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		}
 		
 		dab.build();
-//		//clear any existing widget links
-//		if (accountManagement != null) {
-//			accountManagement.removeFromParent();
-//		}
-//		
-//		if (tog != null) {
-//			tog.removeFromParent();
-//		}
-//
-//		accountManagement = new DropDownMenu(); //HorizontalPanel();
-//		accountManagement.addStyleName("dropdown-menu-right");
-//		tog = new Anchor();
-//		tog.setDataToggle(Toggle.DROPDOWN);
-//		//tog.setIcon(IconType.USER);
-//		
-//
-//
-//		if (clientFactory.getLoginInfo() != null && clientFactory.getLoginInfo().isLoggedIn()) {
-//			if (clientFactory.getLoginInfo().getProviderType() == null || !clientFactory.getLoginInfo().getProviderType().equals(ProviderType.facebook)) {
-//				// native or openid
-//				tog.setHTML(clientFactory.getLoginInfo().getNickname() + "<b class=\"caret\"></b>");
-//				signOutLink = new AnchorListItem("sign out");
-//				signOutLink.setIcon(IconType.UNLOCK);
-//				signOutLink.addClickHandler(signOutHandler);
-//				signOutLink.addStyleDependentName("IdentityButton");
-//				editProfileLink = new AnchorListItem("Profile"); 				
-//				editProfileLink.addClickHandler(editProfileHandler);
-//				editProfileLink.addStyleDependentName("IdentityButton");
-//				editProfileLink.setIcon(IconType.COG);
-//				accountManagement.add(editProfileLink);			  		
-//				accountManagement.add(signOutLink);
-//				signOutLink.setVisible(true);
-//				editProfileLink.setVisible(true);
-//			} else {
-//
-//				// Get login status - will update the Facebook UI element in the header appropriately
-////				fbCore.getLoginStatus(loginStatusCallback);
-//			}
-//
-//		}
-//		else {
-//			tog.setHTML("Account" + "<b class=\"caret\"></b>");
-//			
-//			signInLink = new AnchorListItem("sign in");
-//			signInLink.setIcon(IconType.KEY);
-//			signInLink.addClickHandler(signInHandler);
-//			signInLink.addStyleDependentName("IdentityButton");
-//			signUpLink = new AnchorListItem("sign up");
-//			signUpLink.addStyleDependentName("IdentityButton");
-//			signUpLink.setIcon(IconType.LOCK);
-//			signUpLink.addClickHandler(signUpHandler);
-//
-//			accountManagement.add(signInLink);
-//			accountManagement.add(signUpLink);
-//			signUpLink.setVisible(true);
-//			signInLink.setVisible(true);
-//
-//		}	
-//		if (parent != null) {
-//			parent.add(tog);
-//			parent.add(accountManagement);
-//		}
-	}
 
-	
-	// Callback used when checking login status at facebook
-//	class LoginStatusCallback extends Callback<JavaScriptObject> {
-//		public void onSuccess ( JavaScriptObject response ) {
-//			JSOModel jso = response.cast ();
-//			if ( jso.hasKey ( "error" ) ) {
-//				actionsComplete(new LoginInfo());
-//				return;
-//			}
-//
-//			if (accountManagement != null) {
-//				accountManagement.removeFromParent();
-//			}
-//			accountManagement = new HorizontalPanel();
-//			parent.add(accountManagement);
-//			
-//			String status = jso.get("status");
-//
-//			if (status.equals("connected")) {
-//				// @TODO show the facebook user's name in the top bar & sign out link
-//				signOutLink = new Button("sign out");
-//				signOutLink.setIcon(IconType.UNLOCK);
-//				signOutLink.addClickHandler(signOutHandler);
-//				editProfileLink = new Button(clientFactory.getLoginInfo().getNickname());
-//				editProfileLink.setIcon(IconType.COG);
-//				editProfileLink.addClickHandler(editProfileHandler);	
-//				accountManagement.add(editProfileLink);
-//				accountManagement.add(signOutLink);
-//				signOutLink.setVisible(true);
-//				editProfileLink.setVisible(true);
-//			} else if (status.equals("disconnected")) {
-//				// @TODO show login button in the top bar
-//				HTML facebookLogin = new HTML ( "<div style='margin-top: 2px; float: right;'><div class='fb-login-button' autologoutlink='true' scope='email' /> </div>");
-//				accountManagement.add(facebookLogin);
-//				accountManagement.add(sep);				
-//			} else {
-//				// @TODO unknown - so they have de-authorized us. Just show the normal sign in | sign up
-//				signInLink = new Button("sign in");
-//				signInLink.setIcon(IconType.LOCK);
-//				signInLink.addClickHandler(signInHandler);
-//				signUpLink = new Button("sign up");
-//				signUpLink.setIcon(IconType.PLUS);
-//				signUpLink.addClickHandler(signUpHandler);
-//
-//				accountManagement.add(signInLink);
-//				accountManagement.add(signUpLink);
-//				signUpLink.setVisible(true);
-//				signInLink.setVisible(true);
-//			}
-//		}
-//	}
-//
+	}
 
 	public Presenter getPresenter() {
 		return presenter;
@@ -321,7 +248,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			public void onSuccess(LoginInfo result) {
 				if (result.isLoggedIn()) {
 					actionsComplete(result);
-				}
+				} 
 			}
 
 			@Override
@@ -359,6 +286,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 						clientFactory.setLoginInfo(result);
 						//showLoggedIn();
 						//getManageProfileDialog().setNative(false);
+						presenter.showFacebookComments(false);
 						getManageProfileDialog().init(result);
 					} else {
 						console("Not logged in so can't update profile");
@@ -380,6 +308,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				@Override
 				public void onSuccess(LoginInfo result) {
 					actionsComplete(result);
+					console("Profile processing complete");
 				}
 
 				@Override
@@ -391,7 +320,6 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 
 		}
-
 	}
 
 	public String getDestination() {
@@ -399,7 +327,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	}
 
 	public void setDestination(String destination) {
-		Logger.getLogger("").log(Level.FINE, this.getClass().toString() + "Destination: " + destination);
+		Logger.getLogger("Identity").log(Level.FINE, this.getClass().toString() + "Destination: " + destination);
 
 		this.destination = destination;
 	}
@@ -443,9 +371,19 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	public void doLogin(String emailAddress, String password) {
 		clientFactory.getRpcService().nativeLogin(emailAddress, password, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
-				if (result==null || !result.isLoggedIn()) {
+				if (result==null) {
 					getLoginDialog().showError("Incorrect email or password");
 
+				} else if (!result.isLoggedIn()) {
+					if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
+						getLoginDialog().showNonNativeLogins(true);
+						getLoginDialog().showError("You don't need your password! Just click on the button you signed up with above.");
+						//actionsComplete(result);							
+					} else if (result.isFacebook() && !result.isLoggedIn()){ // 2b. use your external authenticator
+						getLoginDialog().showNonNativeLogins(true);
+						getLoginDialog().showError("You don't need your password! Just click on the Facebook button above.");
+						//actionsComplete(result);							
+					}
 				} else { 
 					assert result.isLoggedIn();
 					actionsComplete(result);
@@ -521,11 +459,16 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			clientFactory.getRpcService().createAccount(email, nickName, password, false, false, false, new AsyncCallback<LoginInfo>() {
 				public void onSuccess(LoginInfo result) {
 					if (!result.isLoggedIn()) {
-						getManageProfileDialog().showError(result.getStatus());
+						if (!result.isEmailValidated() && (result.getStatus() == null || result.getStatus().isEmpty())) {
+							getManageProfileDialog().init(result); // show email validation panel
+						} else {
+							getManageProfileDialog().showError(result.getStatus());
+						}
 
 					} else { 
 						actionsComplete(result);
 						getManageProfileDialog().hide();
+
 					}
 
 				}
@@ -598,10 +541,12 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 					getLoginDialog().hide();
 					getManageProfileDialog().init(result);
 				} else if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
-					getLoginDialog().showError("You don't need your password! Just click on the button you signed up with to the left.");
+					getLoginDialog().showNonNativeLogins(true);
+					getLoginDialog().showError("You don't need your password! Just click on the button you signed up with above.");
 					//actionsComplete(result);							
 				} else if (result.isFacebook() && !result.isLoggedIn()){ // 2b. use your external authenticator
-					getLoginDialog().showError("You don't need your password! Just click on the Facebook button to the left.");
+					getLoginDialog().showNonNativeLogins(true);
+					getLoginDialog().showError("You don't need your password! Just click on the Facebook button above.");
 					//actionsComplete(result);							
 				}
 
@@ -623,18 +568,17 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	@Override
 	public void doChangePassword(String oldPassword, String newPassword) {
 		String email = clientFactory.getLoginInfo().getEmailAddress();
-		
+		getManageProfileDialog().showError("");
 		clientFactory.getRpcService().changePassword(email, oldPassword, newPassword, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
 				if (!result.isLoggedIn()) {
 					// bad email or password (probably password)
-					getManageProfileDialog().init(result);
+					//getManageProfileDialog().init(result);
 					getManageProfileDialog().showError("Old password incorrect");
 				} else {
 					getManageProfileDialog().hide();
-				}
-				
-				actionsComplete(result);
+					actionsComplete(result);
+				}			
 			}
 
 			@Override
@@ -686,6 +630,31 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 	public void setNav(Nav nav) {
 		this.nav = nav;
+	}
+
+
+	@Override
+	public void doValidateEmail(String email, String emailValidationCode) {
+		clientFactory.getRpcService().validateEmail(email,emailValidationCode, new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				getManageProfileDialog().showError("Problem validating email. Please contact support: info@rugby.net");
+				
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				if (result != null && result.isLoggedIn()) { //result.getStatus().equals("Email successfully validated")) {
+					getManageProfileDialog().hide();
+					actionsComplete(result);
+				} else {
+					getManageProfileDialog().showError(result.getStatus() + ". Please try again and if the problem persists contact support: info@rugby.net");
+				}
+				
+			}
+			
+		});
 	}
 	
 //	private void showLoggedInMobile()

@@ -893,6 +893,20 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 		
 	}
+	@Override
+	public void showFacebookComments(boolean show) {
+		Element fb = DOM.getElementById("fbWrapper");
+		
+		if (fb != null) {
+			if (!show) {
+				fb.addClassName("hidden");
+				console("hide fb");
+			} else {
+				fb.removeClassName("hidden");
+				console("show fb");
+			}
+		}
+	}
 
 
 

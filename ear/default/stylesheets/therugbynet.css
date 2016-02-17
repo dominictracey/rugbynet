@@ -444,6 +444,7 @@ input.accountInput {
 .serverResponseLabelError {
 	color:red;
 	font-weight:bold;
+	padding: 15px;
 }
 
 input.joinLink {
@@ -734,5 +735,9 @@ header{ background-color:#FFF}
 
 .banner-img {
 	float: right;
+}
+
+.padding-left {
+	padding-left: 10px;
 }
 

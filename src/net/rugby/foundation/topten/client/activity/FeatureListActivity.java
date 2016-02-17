@@ -422,4 +422,9 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 		}
 	}
 
+	@Override
+	public void showFacebookComments(boolean show) {
+		clientFactory.showFacebookComments(show);
+		
+	}
 }

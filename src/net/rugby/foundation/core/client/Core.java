@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.rugby.foundation.core.client.ui.CreateClubhouse;
@@ -491,11 +494,28 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	}
 
 	/**
-	 * @return Synchronously return the current ICompetition. Core must be initialized before calling.
+	 * @param asyncCallback 
+	 * @return Asynchronously return the current ICompetition. Core must be initialized before returning.
 	 */
-	public ICompetition getCurrentComp() {
-		assert (isInitialized());
-		return compMap.get(currentCompId);
+	public void getCurrentComp(final AsyncCallback<ICompetition> asyncCallback) {
+		if (!isInitialized()) {
+			// wait for it
+			Timer t = new Timer() {
+			      @Override
+			      public void run() {
+			        if (isInitialized()) {
+			        	asyncCallback.onSuccess(compMap.get(currentCompId));
+			        } else {
+			        	this.schedule(500);
+			        }
+			      }
+			    };
+
+			    // Schedule the timer to run once in a half second.
+			    t.schedule(500);
+		} else {
+			asyncCallback.onSuccess(compMap.get(currentCompId));
+		}
 	}
 
 	/**
@@ -659,47 +679,60 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		return clubhouseMap;
 	}
 
-	public void setCurrentRoundOrdinal(int i, boolean force) {
+	public void setCurrentRoundOrdinal(final int j, final boolean force) {
+		final Core _this = this;
 		// first off, does this round make sense for this comp? Is it within the time bounds of the comp? If it is before the first, set it to the first round; if it is after the last set it to the last
-		ICompetition comp = getCurrentComp();
-
-		if (comp != null && comp.getRounds() != null && !comp.getRounds().isEmpty()) {
-			if (i < comp.getRounds().get(0).getUrOrdinal()) {
-				i = comp.getRounds().get(0).getUrOrdinal();
-			} else if (i > comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal()) {
-				i = comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal();
-			}
-		} 
-
-		if (this.currentRoundOrdinal != i || force) {
-			this.currentRoundOrdinal = i;
-			final int ord = i;
-			if (!universalRoundMap.containsKey(i)) {
-				clientFactory.getRpcService().getUniversalRound(i, new AsyncCallback<UniversalRound>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-
+		getCurrentComp(new AsyncCallback<ICompetition>() {
+			@Override
+			public void onSuccess(ICompetition comp) {
+				int i = j;
+				if (comp != null && comp.getRounds() != null && !comp.getRounds().isEmpty()) {
+					if (i < comp.getRounds().get(0).getUrOrdinal()) {
+						i = comp.getRounds().get(0).getUrOrdinal();
+					} else if (i > comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal()) {
+						i = comp.getRounds().get(comp.getRounds().size()-1).getUrOrdinal();
 					}
-
-					@Override
-					public void onSuccess(UniversalRound result) {
-						universalRoundMap.put(ord,result);
+				} 
+		
+				if (_this.currentRoundOrdinal != i || force) {
+					_this.currentRoundOrdinal = i;
+					final int ord = i;
+					if (!universalRoundMap.containsKey(i)) {
+						clientFactory.getRpcService().getUniversalRound(i, new AsyncCallback<UniversalRound>() {
+		
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+		
+							}
+		
+							@Override
+							public void onSuccess(UniversalRound result) {
+								universalRoundMap.put(ord,result);
+								for (RoundChangeListener l : roundChangeListeners) {
+									l.roundChanged(result);
+								}
+							}
+		
+						});
+					} else {
 						for (RoundChangeListener l : roundChangeListeners) {
-							l.roundChanged(result);
+							l.roundChanged(universalRoundMap.get(i));
 						}
-					}
-
-				});
-			} else {
-				for (RoundChangeListener l : roundChangeListeners) {
-					l.roundChanged(universalRoundMap.get(i));
+					}		
 				}
-			}
-
-
 		}
+		@Override
+		public void onFailure(Throwable caught) {
+			Logger.getLogger("Core").log(Level.SEVERE, "Caught in isInitialed()" + caught.getLocalizedMessage());
+			
+		}
+
+
+
+			
+		
+		});
 
 	}
 
@@ -895,4 +928,23 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		});        
 
 	}
+
+	@Override
+	public void validateEmail(String email, String validationCode, final AsyncCallback<LoginInfo> cb) {
+		clientFactory.getRpcService().validateEmail(email, validationCode, new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);			
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				cb.onSuccess(result);				
+			}
+			
+		});
+		
+	}
+
 }

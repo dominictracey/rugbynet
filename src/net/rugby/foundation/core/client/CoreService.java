@@ -129,5 +129,5 @@ public interface CoreService extends RemoteService {
 	UniversalRound getUniversalRound(int ordinal);
 	
 	public HashMap<String,Long> getContentItems();
-	
+	public LoginInfo validateEmail(String email, String validationCode);
 }
