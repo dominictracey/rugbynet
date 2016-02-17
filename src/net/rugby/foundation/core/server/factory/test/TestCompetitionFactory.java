@@ -64,12 +64,14 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 			return getTestComp1();
 		} else if (id == 2L) {
 			return getTestComp2();
-		} else if (id == 3L) {
+		} else if (id == 3L){
 			return getTestComp3();
 		} else if (id == 4L) {
 			return getTestComp4();
-		} else if (id == 5L){
+		} else if (id == 5L) {
 			return getTestComp5();
+		} else if (id == 6L){
+			return getTestComp6();
 		} else if (id == 100000L) {
 			return getGlobalComp();
 		}
@@ -193,7 +195,34 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 		c.setCompType(CompetitionType.SUPER_RUGBY);
 		return c;
 	}
-
+	private ICompetition getTestComp6() {
+		ICompetition c = getEmptyComp(6L);
+		c.getRoundIds().add(17L);
+		addRounds(c);
+		 
+//			c.getTeamIds().add(9210L);
+//			c.getTeams().add(tf.get(9210L));
+			c.getTeamIds().add(9302L);
+			c.getTeams().add(tf.get(9302L));
+			c.getTeamIds().add(9305L);
+			c.getTeams().add(tf.get(9305L));
+			c.getTeamIds().add(9309L);
+			c.getTeams().add(tf.get(9309L));
+			c.getTeamIds().add(9314L);
+			c.getTeams().add(tf.get(9314L));
+			c.getTeamIds().add(9318L);
+			c.getTeams().add(tf.get(9318L));
+			c.getTeamIds().add(9321L);
+			c.getTeams().add(tf.get(9321L));
+			
+		
+		//setNextAndPrevRound(c);
+		//		c.setPrevRoundIndex(-1);
+		//		c.setNextRoundIndex(0);
+		//		setBeginAndEnd(c);
+		c.setCompType(CompetitionType.AVIVA_PREMIERSHIP);
+		return c;
+	}
 	@Override
 	protected ICompetition putToPersistentDatastore(ICompetition c) {
 

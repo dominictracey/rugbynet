@@ -121,6 +121,12 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 				r.setName("Round 1");
 				r.setCompId(5L);
 			}
+		// PREMIERSHIP RUGBY 2015-2016
+		 else  if (roundId == 17L) {
+				r.setAbbr("1");
+				r.setName("Round 1");
+				r.setCompId(6L);
+			}
 		
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(new Date());

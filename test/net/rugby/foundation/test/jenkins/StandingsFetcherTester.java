@@ -14,10 +14,12 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
+import net.rugby.foundation.topten.server.TopTenTestModule;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +31,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.inject.Inject;
 
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, AdminTestModule.class, CoreTestModule.class })
+@GuiceModules({ Game1TestModule.class, TopTenTestModule.class, AdminTestModule.class, CoreTestModule.class })
 public class StandingsFetcherTester {
 
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
@@ -163,5 +165,48 @@ public class StandingsFetcherTester {
 			 }
 		 }
 		 assertTrue(count == 6);
+	 }
+	 @Test
+	 public void testAvivaPremiership() {
+
+
+		ICompetition c = cf.get(6L);
+
+		 assertTrue(c != null);
+		 assertTrue(c.getTeams().size() == 6);
+		 assertTrue(c.getCompType() == CompetitionType.AVIVA_PREMIERSHIP);
+
+		 sFetcher = sFetcherFactory.getFetcher(c.getRounds().get(0));
+		
+		 assertTrue(sFetcher != null);
+	 
+		 sFetcher.setComp(c);
+		 sFetcher.setRound(c.getRounds().get(0));
+		 sFetcher.setUrl("testData/Aviva_Premiership_20160201.html");
+		 sFetcher.setUc(uc);
+
+		 Iterator<ITeamGroup> it = c.getTeams().iterator();
+		 int count = 0;
+		 while (it.hasNext()) {
+			 ITeamGroup team = it.next();
+
+ 			 IStanding s = sFetcher.getStandingForTeam(team);
+
+			 if (s != null) {
+				 if (s.getTeam().getDisplayName().equals("Saracens")) {
+					 assertTrue(s.getStanding().equals(1));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Exeter Chiefs")) {
+					 assertTrue(s.getStanding().equals(2));
+					 count++;
+				 } else if (s.getTeam().getDisplayName().equals("Northampton Saints")) {
+					 assertTrue(s.getStanding().equals(6));
+					 count++;
+				 } 
+			 } else {
+				 assertTrue(false); // did not process correctly
+			 }
+		 }
+		 assertTrue(count == 3);
 	 }
 }

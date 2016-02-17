@@ -15,6 +15,45 @@ public class TopTenList  implements Serializable, ITopTenList {
 
 	
 
+	public TopTenList() {
+		
+		
+	}
+	public TopTenList(Long id, List<ITopTenItem> list, List<Long> itemIds,
+			Date created, Date published, Date expiration, int roundOrdinal,
+			Boolean live, Boolean series, String summary, Long editorId,
+			String pipeLineId, String title, String context, String content,
+			Long nextId, Long nextPublishedId, Long prevId,
+			Long prevPublishedId, Long compId, Long queryId,
+			String twitterDescription, String guid, String featureGuid,
+			Long sponsorId) {
+		super();
+		this.id = id;
+		this.list = list;
+		this.itemIds = itemIds;
+		this.created = created;
+		this.published = published;
+		this.expiration = expiration;
+		this.roundOrdinal = roundOrdinal;
+		this.live = live;
+		this.series = series;
+		this.summary = summary;
+		this.editorId = editorId;
+		this.pipeLineId = pipeLineId;
+		this.title = title;
+		this.context = context;
+		this.content = content;
+		this.nextId = nextId;
+		this.nextPublishedId = nextPublishedId;
+		this.prevId = prevId;
+		this.prevPublishedId = prevPublishedId;
+		this.compId = compId;
+		this.queryId = queryId;
+		this.twitterDescription = twitterDescription;
+		this.guid = guid;
+		this.featureGuid = featureGuid;
+		this.sponsorId = sponsorId;
+	}
 	/**
 	 * 
 	 */

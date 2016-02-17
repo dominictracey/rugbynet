@@ -185,7 +185,7 @@ public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactor
 			t.setShortName("Quins");
 			((IGroup)t).setDisplayName("Harlequins");
 			t.setColor("#330033");
-		}  else if (id == 9212) {
+		}  else if (id == 9212L) {
 			t.setAbbr("LIR");
 			t.setShortName("London Irish");
 			((IGroup)t).setDisplayName("London Irish");
@@ -245,6 +245,8 @@ public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactor
 			t.setDisplayName("Munster");
 		} else if (id == 9323) {
 			t.setDisplayName("Perpignan");
+		}else if (id == 9324) {
+			t.setDisplayName("London Irish");
 		}
 		//SUPER RUGBY
 		else if (id == 9400) {

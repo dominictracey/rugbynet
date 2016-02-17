@@ -23,9 +23,10 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
+import net.rugby.foundation.topten.server.TopTenTestModule;
 
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ Game1TestModule.class, CoreTestModule.class, AdminTestModule.class })
+@GuiceModules({ Game1TestModule.class, TopTenTestModule.class, CoreTestModule.class, AdminTestModule.class })
 public class StandingTester {
 
 	private final LocalServiceTestHelper helper =
