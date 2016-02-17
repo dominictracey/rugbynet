@@ -98,12 +98,16 @@ public class ExternalAuthenticatorFactory implements
 		String destination = req.getParameter("destination");
 
 		if (providerType.equals(LoginInfo.ProviderType.oauth2)) {
+			if (destination != null)
+				destination = Base64Helper.decode(destination);
 			return get(LoginInfo.ProviderType.oauth2, null, destination);
 		} else if (providerType.equals(LoginInfo.ProviderType.facebook)) {
 			if (destination != null)
 				destination = Base64Helper.decode(destination);
 			return get(LoginInfo.ProviderType.facebook, null, destination);
 		} else { //OpenId
+			if (destination != null)
+				destination = Base64Helper.decode(destination);
 			assert (tok.length > 4);
 			String selectorS = tok[5];
 			LoginInfo.Selector selector = IdentityTypes.getSelector(selectorS);

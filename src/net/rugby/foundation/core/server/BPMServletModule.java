@@ -32,6 +32,7 @@ public class BPMServletModule extends ServletModule {
 		serve("/s/*").with(SeriesPage.class);
 		serve("/teams/*").with(TeamPage.class);
 		serve("/sitemap/*").with(SiteMap.class);
+		serve("/session/").with(SessionServlet.class);
 		serve("/").with(HomePage.class);
 //		serve("/_ah/pipeline/*").with(PipelineServlet.class); // not @Singleton
 	}

@@ -270,9 +270,9 @@ public class Game1Activity extends AbstractActivity implements Presenter, SmartB
 		nev.setPresenter(this);
 		assert (Core.getCore().isInitialized());
 		if (Core.getCore().isInitialized()) {
-			ICompetition comp = Core.getCore().getCurrentComp();
-			if (comp != null)
-				nev.setCompName(comp.getShortName());
+//			ICompetition comp = Core.getCore().getCurrentComp();
+//			if (comp != null)
+//				nev.setCompName(comp.getShortName());
 			nev.setUserName(clientFactory.getCoreClientFactory().getLoginInfo().getNickname());
 			nev.setCount(numEntries);
 			nev.center();
@@ -308,7 +308,7 @@ public class Game1Activity extends AbstractActivity implements Presenter, SmartB
 							@Override
 							public void onSuccess(final IEntry entry) {
 								nev.hide();
-								clientFactory.getGame1View().getPlayView().setEntry(entry, Core.getCore().getCurrentComp());
+//								clientFactory.getGame1View().getPlayView().setEntry(entry, Core.getCore().getCurrentComp());
 								clientFactory.getGame1View().selectTab(1);						
 							}
 						});
@@ -352,40 +352,40 @@ public class Game1Activity extends AbstractActivity implements Presenter, SmartB
 			}
 
 			//TODO lazy load this
-			if (Core.getCore().getCurrentClubhouse() != null && Core.getCore().getCurrentComp() != null) {
-				//find the clubhouse's league
-				setClubhouseContent(Core.getCore().getCurrentComp(), Core.getCore().getCurrentClubhouse());
-			}
+//			if (Core.getCore().getCurrentClubhouse() != null && Core.getCore().getCurrentComp() != null) {
+//				//find the clubhouse's league
+//				setClubhouseContent(Core.getCore().getCurrentComp(), Core.getCore().getCurrentClubhouse());
+//			}
 		}
 	}
 
 	private void setEntryContent(IEntry entry) {
 		assert(Core.getCore().isInitialized());
 
-		if (Core.getCore().isInitialized()) {
-			clientFactory.getGame1View().getPlayView().setEntry(entry, Core.getCore().getCurrentComp());
-		}
+//		if (Core.getCore().isInitialized()) {
+//			clientFactory.getGame1View().getPlayView().setEntry(entry, Core.getCore().getCurrentComp());
+//		}
 
 	}
 
 	private void setLeaderboardContent(Long leagueId)	{
 
-		clientFactory.getRpcservice().getLeaderboard(Core.getCore().getCurrentCompId(), Core.getCore().getCurrentComp().getCompClubhouseId(), new AsyncCallback<ILeaderboard>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Fail!");				
-				clientFactory.getGame1View().getLeaderboardView().setData(null);
-			}
-
-			@Override
-			public void onSuccess(final ILeaderboard lb) {
-
-				// it's ok if we get back null, the view will just show a "No leaderboard available yet" message.
-				clientFactory.getGame1View().getLeaderboardView().setData(lb);
-
-			}
-		});
+//		clientFactory.getRpcservice().getLeaderboard(Core.getCore().getCurrentCompId(), Core.getCore().getCurrentComp().getCompClubhouseId(), new AsyncCallback<ILeaderboard>() {
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				Window.alert("Fail!");				
+//				clientFactory.getGame1View().getLeaderboardView().setData(null);
+//			}
+//
+//			@Override
+//			public void onSuccess(final ILeaderboard lb) {
+//
+//				// it's ok if we get back null, the view will just show a "No leaderboard available yet" message.
+//				clientFactory.getGame1View().getLeaderboardView().setData(lb);
+//
+//			}
+//		});
 
 	}
 
@@ -446,21 +446,21 @@ public class Game1Activity extends AbstractActivity implements Presenter, SmartB
 
 			@Override
 			public void onSuccess(final IEntry entry) {
-				clientFactory.getGame1View().getPlayView().setEntry(entry, Core.getCore().getCurrentComp());
-				Window.alert("Saved");
-				clientFactory.getRpcservice().getEntriesForCurrentUser(Core.getCore().getCurrentCompId(), new AsyncCallback<ArrayList<IEntry>>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Logger.getLogger("Game1Activity").log(Level.SEVERE, "start.getEntriesForCurrentUser: " +  caught.getMessage());
-					}
-
-					@Override
-					public void onSuccess(ArrayList<IEntry> entries) {
-						showEntryChoices(entries, Core.getCore().getCurrentComp());
-						numEntries = entries.size() + 1;
-					}
-				});
+//				clientFactory.getGame1View().getPlayView().setEntry(entry, Core.getCore().getCurrentComp());
+//				Window.alert("Saved");
+//				clientFactory.getRpcservice().getEntriesForCurrentUser(Core.getCore().getCurrentCompId(), new AsyncCallback<ArrayList<IEntry>>() {
+//
+//					@Override
+//					public void onFailure(Throwable caught) {
+//						Logger.getLogger("Game1Activity").log(Level.SEVERE, "start.getEntriesForCurrentUser: " +  caught.getMessage());
+//					}
+//
+//					@Override
+//					public void onSuccess(ArrayList<IEntry> entries) {
+//						showEntryChoices(entries, Core.getCore().getCurrentComp());
+//						numEntries = entries.size() + 1;
+//					}
+//				});
 			}
 		});
 	}
@@ -588,8 +588,22 @@ public class Game1Activity extends AbstractActivity implements Presenter, SmartB
 			}
 
 			@Override
-			public void onSuccess(IClubhouse currentClubhouse) {
-				setClubhouseContent(Core.getCore().getCurrentComp(), currentClubhouse);
+			public void onSuccess(final IClubhouse currentClubhouse) {
+				Core.getCore().getCurrentComp(new AsyncCallback<ICompetition>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onSuccess(ICompetition result) {
+						setClubhouseContent(result, currentClubhouse);
+					}
+					
+				});
+				
 
 			}
 
