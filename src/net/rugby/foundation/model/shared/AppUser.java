@@ -31,7 +31,7 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	private boolean isOpenId;
 	private boolean isFacebook;
 	private boolean isOath2;
-	private boolean optOut;
+	private boolean optOut = false;
 	private Long lastEntryId;
 	private Long lastClubhouseId;
 	private Long lastCompetitionId;
@@ -60,7 +60,7 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	// mail
 	private EmailStatus emailStatus;
 	private String emailValidationCode;
-	private boolean emailValidated;
+	private boolean emailValidated = false;
 	
 	public AppUser() {
 

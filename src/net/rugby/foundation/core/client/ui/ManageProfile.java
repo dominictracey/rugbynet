@@ -3,6 +3,7 @@ package net.rugby.foundation.core.client.ui;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Label;
@@ -12,6 +13,8 @@ import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
+import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
@@ -46,14 +49,12 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	
 	@UiField Button submit;
 	@UiField Button cancel;
-	@UiField Label error;
+//	@UiField Label error;
 	@UiField Panel topLevel;
 	@UiField LayoutPanel nonNativeLayer;
 	@UiField PanelBody nativeLayer;
-//	@UiField LayoutPanel facebookLayer;
 	@UiField LayoutPanel changePasswordLayer;
 	@UiField ExternalAuthenticatorPanel nonNativeLogins;
-//	@UiField FacebookRegistrationPanel facebookPanel;
 	@UiField ChangePasswordPanel changePasswordPanel;
 	@UiField Anchor showNativeLink;
 	@UiField Column captionPanel;
@@ -67,6 +68,14 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	@UiField Button emailValidationSubmit;
 	@UiField Button emailValidationCancel;
 	@UiField TextBox emailValidationEmail;
+	
+	@UiField Alert alert;
+	@UiField Strong alertStrong;
+	@UiField Text alertText;
+	
+//	@UiField Alert success;
+//	@UiField Strong successStrong;
+//	@UiField Text successText;
 	
 	Presenter presenter;
 	private boolean editing;
@@ -86,7 +95,7 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		super.setAnimationEnabled(true);
 
 		setWidget(uiBinder.createAndBindUi(this));
-		error.setVisible(false);
+		alert.setVisible(false);
 		//setText("Account");
 
 		
@@ -94,13 +103,17 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		nonNativeLogins.setPresenter(this);
 		nativeLayer.setSize("50em", "35em");
 		nonNativeLayer.setSize("40em", "30em");
-		changePasswordLayer.setSize("50em", "30em");
+		changePasswordLayer.setSize("50em", "40em");
 		emailValidationLayer.setSize("50em", "30em");
 		showPanels(true,false, false, false, false);
 
 		topLevel.addStyleName("col-md-12"); 
-		error.addStyleName("col-md-12"); 
-		error.setVisible(false);
+		alert.addStyleName("col-md-12"); 
+		alert.setVisible(false);
+		alertStrong.setText("Error: ");
+//		success.addStyleName("col-md-12"); 
+//		success.setVisible(false);
+//		successStrong.setText("Success: ");
 		nonNativeLogins.setPresenter(this);
 		
 		nativeLayer.addStyleName("col-md-8"); 
@@ -116,9 +129,13 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 
 	@UiHandler("showNativeLink")
 	void onShowNativeButtonClicked(ClickEvent event) {
-
+		password1.setVisible(true);
+		password2.setVisible(true);
+		password1Label.setVisible(true);
+		password2Label.setVisible(true);
+		submit.setText("Sign Up");
+		emailAddress.setFocus(true);
 		showPanels(false, true, false, false, false);
-
 	}
 
 	@UiHandler("submit")
@@ -163,7 +180,7 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	public void init(LoginInfo loginInfo) {
 
 		assert(presenter != null);
-		error.setVisible(false);
+		alert.setVisible(false);
 
 		editing = false;
 		
@@ -174,6 +191,7 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				emailAddress.setText(loginInfo.getEmailAddress());
 				emailAddress.setEnabled(false);
 				nickName.setText(loginInfo.getNickname());
+				title.setText("Update Profile");
 				if (loginInfo.getNickname() != null) {
 					nickName.setSelectionRange(0, loginInfo.getNickname().length());
 				}
@@ -188,8 +206,8 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				showPanels(false, true, false, false, false);
 			} else if (loginInfo.getMustChangePassword()) {
 				showPanels(false,false,false,true, false);
-				error.setText(" Check your email for your temporary password.");
-				error.setVisible(true);
+				alert. setText(" Check your email for your temporary password.");
+				alert.setVisible(true);
 				submit.setText("Change Password");
 				title.setText("Change Password");
 			} else if (!loginInfo.isEmailValidated() && loginInfo.getEmailAddress() != null && !loginInfo.getEmailAddress().isEmpty()) {
@@ -204,9 +222,13 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				emailAddress.setFocus(true);
 			}
 		}	else {
-			// should never get here
+			// should never get here?
 			assert(false);
 			showPanels(true, false, false, false, false);
+			password1.setVisible(true);
+			password2.setVisible(true);
+			password1Label.setVisible(true);
+			password2Label.setVisible(true);
 			submit.setText("Sign Up");
 			emailAddress.setFocus(true);
 		}
@@ -215,15 +237,34 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 
 	}
 
-
+	/*
+	 * When the user clicks a link we email them with the new password, it starts a profile activity which calls Identity.handlePasswordReset, which calls this
+	 * We need to show the changePassword panel, with the temp password filled in.
+	 */
+	public void collectNewPassword(String email, String tempPassword) {
+		showPanels(false,false,false,true, false);
+		//error.setText(" Check your email for your temporary password.");
+		alert.setVisible(false);
+		changePasswordPanel.emailAddress.setText(email);
+		changePasswordPanel.oldPassword.setText(tempPassword);
+		changePasswordPanel.
+		submit.setText("Change Password");
+		title.setText("Change Password");
+		password1.setFocus(true);
+	}
+	
 	void doCreate() {
 		if (nickName.getText().isEmpty()) {
 			showError(CoreConfiguration.getCreateacctErrorNicknameCantBeNull());
 		} else if (editing) {
 			presenter.doUpdate(emailAddress.getText(), nickName.getText());
 		} else if (!password1.getText().equals(password2.getText())) {			
-			error.setText("Passwords don't match!");
-			error.setVisible(true);
+			alertStrong.setText("Error: ");
+			alertText.setText("Passwords don't match!");
+			alert.removeStyleName("alert-success");
+			alert.addStyleName("alert-error");
+			alert.setVisible(true);
+			
 			password1.setText("");
 			password2.setText("");
 			password1.setFocus(true);
@@ -250,10 +291,14 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	
 	public void showError(String errorMessage) {
 		if (errorMessage.equals("")) {
-			error.setText("");
-			error.setVisible(false);
+			alertStrong.setText("");
+			alertText.setText("");
+			alert.setVisible(false);
 		} else if (errorMessage != null) {
-			error.setText(errorMessage);
+			alertStrong.setText("Error: ");
+			alertText.setText(errorMessage);
+			alert.removeStyleName("alert-success");
+			alert.addStyleName("alert-error");
 			 if (errorMessage.equals(CoreConfiguration.getCreateacctErrorExists()) ||
 					 errorMessage.equals(CoreConfiguration.getCreateacctErrorInvalidEmail())) {
 				 emailAddress.setText("");
@@ -269,9 +314,9 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				 nickName.setFocus(true);
 			 }
 		
-			error.setVisible(true);
+			alert.setVisible(true);
 		}
-	
+		center();
 	}
 
 	/* (non-Javadoc)
@@ -341,5 +386,9 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	private boolean isCloseEvent(NativeEvent event)
 	{
 		return event.getEventTarget().equals(close.getElement());//compares equality of the underlying DOM elements
+	}
+
+	public ChangePasswordPanel getChangePasswordPanel() {
+		return changePasswordPanel;
 	}
 }

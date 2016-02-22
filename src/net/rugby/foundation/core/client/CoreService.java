@@ -52,7 +52,7 @@ public interface CoreService extends RemoteService {
 	 * @return
 	 */
 	LoginInfo createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2);
+			String password, String destination, boolean isGoogle, boolean isFacebook, boolean isOAuth2);
 
 	/**
 	 * @param loginInfo - Only will update lastEntryId, lastClubhouseId and lastCompetitionId
@@ -109,7 +109,7 @@ public interface CoreService extends RemoteService {
 	 * @return an empty LoginInfo if it couldn't find user or oldPassword wasn't correct
 	 */
 	LoginInfo changePassword(String email, String oldPassword, String newPassword);
-	LoginInfo forgotPassword(String email);
+	LoginInfo forgotPassword(String email, String destination);
 	
 	IContent getContent(Long contentId);
 	IContent saveContent(IContent content);

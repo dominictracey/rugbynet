@@ -154,7 +154,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 
 
 	@Override
-	public LoginInfo createAccount(String emailAddress, String nickName, String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2) {
+	public LoginInfo createAccount(String emailAddress, String nickName, String password, String destination, boolean isGoogle, boolean isFacebook, boolean isOAuth2) {
 		try {
 			LoginInfo info = new LoginInfo();
 			IAppUser u = null;
@@ -167,7 +167,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 				return info;
 			}
 			
-			info = am.createAccount(emailAddress, nickName, password, null, isGoogle, isFacebook, isOAuth2, this.getThreadLocalRequest());
+			info = am.createAccount(emailAddress, nickName, password, destination, null,  isGoogle, isFacebook, isOAuth2, this.getThreadLocalRequest());
 			if (info.isLoggedIn()) {
 				auf.setEmail(info.getEmailAddress());
 				u = auf.get();
@@ -254,6 +254,10 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 		}
 	}
 
+	/**
+	 * Return the currently logged on user
+	 * @return
+	 */
 	private IAppUser getAppUser()
 	{
 		LoginInfo info = null;
@@ -553,9 +557,9 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	 * @see net.rugby.foundation.core.client.CoreService#forgotPassword(java.lang.String)
 	 */
 	@Override
-	public LoginInfo forgotPassword(String email) {
+	public LoginInfo forgotPassword(String email, String destination) {
 		try {
-			LoginInfo loginInfo = am.forgotPassword(email);
+			LoginInfo loginInfo = am.forgotPassword(email, destination);
 			HttpServletRequest request = this.getThreadLocalRequest();
 			HttpSession session = request.getSession();
 			session.setAttribute("loginInfo", loginInfo);

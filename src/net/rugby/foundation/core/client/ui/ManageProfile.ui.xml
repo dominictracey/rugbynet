@@ -138,7 +138,15 @@
 				</g:HTMLPanel>
 			</g:layer>
 		</g:LayoutPanel>
-		<b:Label ui:field="error" styleName="serverResponseLabelError"></b:Label>
+<!-- 		<b:Label ui:field="error" styleName="serverResponseLabelError"></b:Label> -->
+		<b:Alert type="DANGER" ui:field="alert">
+  			<b.html:Strong ui:field="alertStrong" text="Check your email."/>
+ 			<b.html:Text ui:field="alertText" text="We have sent you a temporary password. Click the link in the email or enter the temporary password from the email below."/>
+		</b:Alert> 
+<!-- 		<b:Alert type="SUCCESS" ui:field="success"> -->
+<!--   			<b.html:Strong ui:field="successStrong" text="Check your email."/> -->
+<!--  			<b.html:Text ui:field="successText" text="We have sent you a temporary password. Click the link in the email or enter the temporary password from the email below."/> -->
+<!-- 		</b:Alert>  -->
 		</b:Row>
 	</b:Panel>
 </ui:UiBinder>

@@ -16,9 +16,9 @@
 <!-- 			<li id="openid" class=""> -->
 <!-- 				<g:Anchor ui:field="openid_com" /> -->
 <!-- 			</li> -->
-			<li id="yahoo" class="">
-				<g:Anchor ui:field="yahoo" />
-			</li>
+<!-- 			<li id="yahoo" class=""> -->
+<!-- 				<g:Anchor ui:field="yahoo" /> -->
+<!-- 			</li> -->
 		</ul>
 
 	</g:HTMLPanel>

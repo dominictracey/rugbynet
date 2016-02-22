@@ -92,6 +92,8 @@ public class ProfileActivity implements Activity, Presenter {
 					identity.startProfileProcess(place.getAction(),place.getProviderType(),place.getSelector());
 				} else if (place.getAction() == Actions.validateEmail) {
 					identity.doValidateEmail(place.getEmail(),place.getValidationCode());
+				} else if (place.getAction() == Actions.changePassword) {
+					identity.handlePasswordReset(place.getEmail(),place.getTemporaryPassword(), place.getDestination());
 				}
 					
 			}

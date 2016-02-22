@@ -25,4 +25,6 @@ public interface CoreClientFactory {
 	HashMap<String, Long> getContentNameMap();
 	void setContentNameMap(HashMap<String, Long> contentNameMap);
 	void console(String text);
+	
+	void recordAnalyticsEvent(String cat, String action, String label, int val);
 }

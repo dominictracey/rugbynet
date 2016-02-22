@@ -258,10 +258,10 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 */
 	@Override
 	public void createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2,
+			String password, String destination, boolean isGoogle, boolean isFacebook, boolean isOAuth2,
 			final AsyncCallback<LoginInfo> cb) {
 		clientFactory.getRpcService().createAccount(emailAddress,  nickName,
-				password,  isGoogle,  isFacebook, isOAuth2, new AsyncCallback<LoginInfo> () {
+				password, destination,  isGoogle,  isFacebook, isOAuth2, new AsyncCallback<LoginInfo> () {
 			@Override
 			public void onFailure(Throwable caught) {
 				cb.onFailure(caught);
@@ -621,7 +621,7 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 * @see net.rugby.foundation.core.client.CoreServiceAsync#forgotPassword(java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)
 	 */
 	@Override
-	public void forgotPassword(String email,
+	public void forgotPassword(String email, String destination,
 			AsyncCallback<LoginInfo> asyncCallback) {
 		assert false;
 

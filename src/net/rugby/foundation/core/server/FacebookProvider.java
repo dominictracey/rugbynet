@@ -48,7 +48,7 @@ public class FacebookProvider implements IExternalAuthenticatorProvider {
 
 		public static final String FACEBOOK_REDIRECT_KEY = "&redirect_uri=";
 		public static final String FACEBOOK_LOCAL_REDIRECT_VAL = "/login/facebook/0/";
-		public static final String FACEBOOK_LOCAL_DEV_CODESERVER = "gwt.codesvr=127.0.0.1%3A9997";
+		//public static final String FACEBOOK_LOCAL_DEV_CODESERVER = "gwt.codesvr=127.0.0.1%3A9997";
 		public static final String FACEBOOK_LOCAL_REDIRECT_KEY = "destination=";
 
 		public static String getFacebookCodeUrl() {
@@ -75,9 +75,9 @@ public class FacebookProvider implements IExternalAuthenticatorProvider {
 			return FACEBOOK_LOCAL_REDIRECT_KEY;
 		}
 
-		public static String getFacebookLocalDevCodeserver() {
-			return FACEBOOK_LOCAL_DEV_CODESERVER;
-		}
+//		public static String getFacebookLocalDevCodeserver() {
+//			return FACEBOOK_LOCAL_DEV_CODESERVER;
+//		}
 
 		public static String getFacebookRedirectKey() {
 			return FACEBOOK_REDIRECT_KEY;

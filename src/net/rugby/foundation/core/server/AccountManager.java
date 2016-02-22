@@ -23,12 +23,15 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMessage.RecipientType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import net.rugby.foundation.core.server.FacebookProvider.Base64Helper;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.mail.UserEmailer;
 import net.rugby.foundation.core.shared.IdentityTypes.Actions;
 import net.rugby.foundation.core.shared.IdentityTypes.Keys;
 import net.rugby.foundation.game1.client.place.Profile;
@@ -52,14 +55,18 @@ import com.google.appengine.api.utils.SystemProperty;
 public class AccountManager implements IAccountManager {
 
 	private IAppUserFactory auf;
-
+	private UserEmailer userEmailer = null;
+	private IConfigurationFactory ccf;
+	private String charEncoding = "UTF-8";
+	
 	@Inject
-	public AccountManager(IAppUserFactory auf) {
+	public AccountManager(IAppUserFactory auf, IConfigurationFactory ccf) {
 		this.auf = auf;
+		this.ccf = ccf;
 	}
 
 	@Override
-	public LoginInfo createAccount(String emailAddress, String nickName, String password, JSONObject attributes, boolean isOpenId, boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException {
+	public LoginInfo createAccount(String emailAddress, String nickName, String password, String destination, JSONObject attributes, boolean isOpenId, boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException {
 
 		LoginInfo info = new LoginInfo();
 		info.setEmailAddress(emailAddress);
@@ -127,8 +134,6 @@ public class AccountManager implements IAccountManager {
 						u.setEmailValidated(true);
 					}
 
-					//info.setEmailValidated(u.getEmailValidated());
-
 					if (attributes != null)
 						u = addJSONAttributes(u,attributes);
 
@@ -138,18 +143,35 @@ public class AccountManager implements IAccountManager {
 						u = auf.put(u);
 					}
 
-					//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Setting login info to user session: " + u.getNickname());
-					//
-					//					HttpSession session = request.getSession();
+
 					info = getLoginInfo(u);
-					//					assert(info.isLoggedIn());
-					//					session.setAttribute("loginInfo", info);
 				}
 			}
 		}
 
 
 		sendAdminEmail("New Fantasy Rugby user", info.getEmailAddress() + "\n" + info.getNickname());
+		if (u.isNative()) {
+			if (userEmailer == null) {
+				userEmailer = new UserEmailer();
+			}
+			
+			String dest = "";
+			try {
+				dest = URLEncoder.encode(destination, charEncoding);
+			} catch (UnsupportedEncodingException e) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,e.getLocalizedMessage());
+			}
+					
+			// chop the /s/ from the end of the BaseToptenUrl
+			String linkTarget = ccf.get().getBaseToptenUrl() + "#Profile:" + Keys.action + "=" + Actions.validateEmail + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.validationCode + "=" + u.getEmailValidationCode() + "&" + Keys.destination + "=" + dest;
+			boolean configured = userEmailer.configure("Account verification link from The Rugby Net", "Account Services", "Click here to activate your account", linkTarget, "If the link above doesn't work, you can enter your validation code (" + u.getEmailValidationCode() +") in the sign up page.", "", u);
+			if (configured) {
+		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent email validation link " + u.getEmailValidationCode() + " to " + u.getEmailAddress());
+				userEmailer.send();
+			}	
+		}
+		
 		return info;
 
 	}
@@ -249,14 +271,30 @@ public class AccountManager implements IAccountManager {
 	 */
 	@Override
 	public LoginInfo updateAccount(IAppUser au, String email, String screenName, HttpServletRequest request) {
-		au.setEmailAddress(email);
-		au.setNickname(screenName);
-		auf.put(au);
+
+		// is the nickname valid?
+		auf.setNickName(screenName);
+		IAppUser u = auf.get();
+		
+		String error = "";
+		if (u != null) {
+			// already in use
+			error = "That screen name is already in use. Please pick another.";
+		} else {
+			au.setNickname(screenName);
+			auf.put(au);
+		}
+		
 
 		HttpSession session = request.getSession();
 		LoginInfo info = getLoginInfo(au);
+		info.setLoggedIn(true);
+		if (!error.isEmpty()) {
+			info.setStatus(error);
+		}
+		
 		session.setAttribute("loginInfo", info);
-
+		
 		return info;
 	}
 
@@ -326,7 +364,7 @@ public class AccountManager implements IAccountManager {
 			boolean error = false;
 			try {
 				// create their AppUser account with a generic screen name, then send them to change it
-				loginInfo = createAccount(email.toLowerCase(), null, null, attributes, providerType.equals(LoginInfo.ProviderType.openid), providerType.equals(LoginInfo.ProviderType.facebook), providerType.equals(LoginInfo.ProviderType.oauth2),req);
+				loginInfo = createAccount(email.toLowerCase(), null, null, "", attributes, providerType.equals(LoginInfo.ProviderType.openid), providerType.equals(LoginInfo.ProviderType.facebook), providerType.equals(LoginInfo.ProviderType.oauth2),req);
 
 				if (loginInfo.isLoggedIn()) {
 					u = auf.get();
@@ -467,17 +505,19 @@ public class AccountManager implements IAccountManager {
 
 		String hash = DigestUtils.md5Hex(oldPassword);
 		if (u.getPwHash() == null || !u.getPwHash().equals(hash))  {
+			loginInfo.setStatus("Temporary password incorrect");
+			loginInfo.setEmailAddress(email);
 			return loginInfo; //empty		
 		}
 
 		hash = DigestUtils.md5Hex(newPassword);
 		u.setPwHash(hash);
 		u.setMustChangePassword(false);
-
+		
 		auf.put(u);
 
 		loginInfo = getLoginInfo(u);
-
+		loginInfo.setLoggedIn(true);
 		return loginInfo;
 	}
 
@@ -503,7 +543,7 @@ public class AccountManager implements IAccountManager {
 	 * @see net.rugby.foundation.core.client.CoreService#forgotPassword(java.lang.String)
 	 */
 	@Override
-	public LoginInfo forgotPassword(String email) {
+	public LoginInfo forgotPassword(String email, String destination) {
 		try {
 			// so we can get three results here:
 			// 1. Native account exists, password reset and email sent
@@ -536,7 +576,24 @@ public class AccountManager implements IAccountManager {
 			u.setMustChangePassword(true);
 			auf.put(u);
 			// send them email
-			sendUserEmail(u, "Password reset from The Rugby Net", "Hi, we received a request to reset your password. Your temporary password is " + password + " - please use it to login and set up a new password. If you didn't ask to have your password reset, sorry for the inconvenience.");
+			//sendUserEmail(u, "Password reset from The Rugby Net", "Hi, we received a request to reset your password. Your temporary password is " + password + " - please use it to login and set up a new password. If you didn't ask to have your password reset, sorry for the inconvenience.");
+			if (userEmailer == null) {
+				userEmailer = new UserEmailer();
+			}
+			
+			String dest = "";
+			try {
+				dest = URLEncoder.encode(destination, charEncoding);
+			} catch (UnsupportedEncodingException e) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,e.getLocalizedMessage());
+			}
+					
+			String linkTarget = ccf.get().getBaseToptenUrl() + "#Profile:" + Keys.action + "=" + Actions.changePassword + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.temporaryPassword + "=" + password + "&" + Keys.destination + "=" + dest;
+			boolean configured = userEmailer.configure("Password reset link from The Rugby Net", "Account Services", "Click here to create a new password", linkTarget, "If the link above doesn't work, you can enter your temporary password (<bold>" + password +"</bold>) in the change password page.", "", u);
+			if (configured) {
+		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent password change link " + password + " to " + u.getEmailAddress());
+				userEmailer.send();
+			}	
 
 			loginInfo = getLoginInfo(u);
 			loginInfo.setLoggedIn(false);

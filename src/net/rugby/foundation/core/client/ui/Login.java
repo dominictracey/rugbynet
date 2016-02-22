@@ -1,5 +1,6 @@
 package net.rugby.foundation.core.client.ui;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
@@ -9,6 +10,8 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
+import org.gwtbootstrap3.client.ui.html.Text;
 
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.gwt.core.client.GWT;
@@ -57,7 +60,7 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	@UiField Input password1;
 	@UiField Button submit;
 	@UiField Button cancel;
-	@UiField Label error;
+	
 	@UiField ExternalAuthenticatorPanel nonNativeLogins;
 	@UiField FormGroup passwordGroup;
 	@UiField Anchor forgotPassword;
@@ -66,6 +69,11 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	@UiField Image close;
 	@UiField Span title;
 	@UiField PanelHeader header;
+	
+	@UiField Alert error;
+	@UiField Strong alertStrong;
+	@UiField Text alertText;
+	
 	Presenter presenter;
 	boolean resettingPassword = false;
 
@@ -108,7 +116,7 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 		header.addStyleName("panel-header");
 		
 		forgotPassword.addStyleName("padding-left");
-
+		forgotPassword.addStyleName("padding-top");
 	}
 	
 	@UiHandler("password1")
@@ -127,8 +135,12 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	void onForgotPasswordLinkClicked(ClickEvent event) {
 		this.setWidth("30em");
 		title.setText("Forgot Password");
+		error.removeStyleName("alert-danger");
+		error.addStyleName("alert-success");
+		alertStrong.setText("Enter email: ");
+		alertText.setText(" Tell us the email of the account for which you would like to reset the password.");
 		error.setVisible(true);
-		error.setText(" Please enter your email above.");
+		error.setText("");
 		nonNativeLogins.setVisible(false);
 		passwordGroup.setVisible(false);
 		orLabel.setVisible(false);
@@ -175,7 +187,8 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	}
 
 	public void showError(String errorMessage) {
-		error.setText(errorMessage);
+		alertStrong.setText("Error ");
+		alertText.setText(errorMessage);
 		error.setVisible(true);
 		emailAddress.setText("");
 		password1.setText("");

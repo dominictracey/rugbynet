@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.core.client.nav.DesktopAccountBuilder;
+import net.rugby.foundation.core.client.nav.MobileAccountBuilder;
 import net.rugby.foundation.core.client.ui.ExternalAuthenticatorPanel;
 import net.rugby.foundation.core.client.ui.ChangePasswordPanel;
 import net.rugby.foundation.core.client.ui.Login;
@@ -11,7 +12,13 @@ import net.rugby.foundation.core.client.ui.ManageProfile;
 import net.rugby.foundation.core.shared.IdentityTypes.Actions;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
+
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Nav;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.constants.Styles;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,6 +31,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RootPanel;
 
 public class Identity implements ManageProfile.Presenter, Login.Presenter, ExternalAuthenticatorPanel.Presenter, ChangePasswordPanel.Presenter {
 
@@ -35,6 +43,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		void showFacebookComments(boolean show);
 	}
 
+	public enum EventActions { show, submit, cancel, click, error, complete }
 //	public enum Actions { login, logout, createFacebook, createOpenId, mergeFacebook, mergeOpenId, done, updateScreenName }
 //	public enum Keys { action, selector, destination, providerType }
 //
@@ -61,6 +70,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 //		}
 //		return null;
 //	}
+
+	protected static final String IDENTITY_LABEL = "identity";
 
 //	private FBCore fbCore;
 
@@ -143,6 +154,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				getManageProfileDialog().setPopupPosition(getManageProfileDialog().getAbsoluteTop(), 100);
 			}
 			presenter.showFacebookComments(false);
+			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "sign up menu", 1);
+
 			getManageProfileDialog().init(clientFactory.getLoginInfo());
 		}	
 	};
@@ -161,6 +174,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				getLoginDialog().setPopupPosition(getLoginDialog().getAbsoluteTop(), 100);
 			}
 			presenter.showFacebookComments(false);
+			
+			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "sign in menu", 1);
 			getLoginDialog().init();			
 		}	
 	};
@@ -171,14 +186,19 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			//everything after the #
 			String href = Window.Location.getHref();
 			destination = href.substring(href.indexOf('#')+1);
+			
+			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "sign out menu", 1);
+
 			Core.getCore().logOff(clientFactory.getLoginInfo(),
 					new AsyncCallback<LoginInfo>() {
 				public void onSuccess(LoginInfo result) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "sign out menu", 1);
 					actionsComplete(result);
 				}
 
 				@Override
 				public void onFailure(Throwable caught) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "sign out menu", 1);
 					actionsComplete(new LoginInfo());		
 				}
 			});		
@@ -190,12 +210,13 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		@Override
 		public void onClick(ClickEvent event) {
 			presenter.showFacebookComments(false);
+			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "edit profile menu", 1);
 			getManageProfileDialog().init(clientFactory.getLoginInfo());			
 		}	
 	};
 
 	private DesktopAccountBuilder dab;
-
+	private MobileAccountBuilder mab;
 
 	public CoreClientFactory getClientFactory() {
 		return clientFactory;
@@ -349,16 +370,21 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	 */
 	@Override
 	public void doOpenIdLogin(LoginInfo.Selector selector) {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "openID button", 1);
+
 		// we want to preserve the url string in case they are trying to do something like join a clubhouse
 		clientFactory.getRpcService().getOpenIdUrl(selector, destination, new AsyncCallback<String>() {
 
 			@Override
 			public void onFailure(Throwable caught) {				
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "openID button", 1);
 				getLoginDialog().showError("Something went wrong. Try a different login method.");
 			}
 
 			@Override
 			public void onSuccess(String result) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "openID button", 1);
+
 				redirect(result);
 
 			}
@@ -372,19 +398,31 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		clientFactory.getRpcService().nativeLogin(emailAddress, password, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
 				if (result==null) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Incorrect email or password", 1);
+
 					getLoginDialog().showError("Incorrect email or password");
 
 				} else if (!result.isLoggedIn()) {
 					if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
 						getLoginDialog().showNonNativeLogins(true);
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Use external authentication", 1);
+
 						getLoginDialog().showError("You don't need your password! Just click on the button you signed up with above.");
 						//actionsComplete(result);							
 					} else if (result.isFacebook() && !result.isLoggedIn()){ // 2b. use your external authenticator
 						getLoginDialog().showNonNativeLogins(true);
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Use Facebook", 1);
+
 						getLoginDialog().showError("You don't need your password! Just click on the Facebook button above.");
 						//actionsComplete(result);							
+					} else {
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Unspecified login error", 1);
+
+						getLoginDialog().showError("Incorrect email or password");
 					}
 				} else { 
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "native login", 1);
+
 					assert result.isLoggedIn();
 					actionsComplete(result);
 					getLoginDialog().hide();
@@ -394,6 +432,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 			@Override
 			public void onFailure(Throwable caught) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Server login error", 1);
+
 				getLoginDialog().showError("Problems logging in, please try again later.");
 
 			}});		
@@ -410,6 +450,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	 */
 	@Override
 	public void onCancelLogin() {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.cancel.toString(), "login", 1);
+
 		getLoginDialog().hide();
 		actionsComplete(new LoginInfo());
 	}
@@ -417,10 +459,20 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	public void actionsComplete(LoginInfo loginInfo) {
 		clientFactory.setLoginInfo(loginInfo);
 		showLoggedIn();
+		
+		//if (!(loginInfo.getStatus() == null) && !loginInfo.getStatus().isEmpty()) {
+//			Alert alert = new Alert();
+//			alert.setText(loginInfo.getStatus());
+//			alert.setType(AlertType.SUCCESS); //.setFade(true);
+//			alert.setDismissable(false);
+//			alert.setPull(Pull.RIGHT);
+//			//alert.addStyleName(Styles.FADE);
+//			//alert.setVisible(elem, visible)
+//			alert.setVisible(true);
+//			RootPanel.get("app").add(alert);
+		//}
 		//			
-		//		if (destination != null) {
-		//			setDestination(null);
-		//		}
+
 		presenter.onLoginComplete(destination);	
 	}
 
@@ -434,12 +486,16 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		clientFactory.getRpcService().getFacebookLoginUrl(destination, new AsyncCallback<String>() {
 
 			@Override
-			public void onFailure(Throwable caught) {				
+			public void onFailure(Throwable caught) {			
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "facebook login error", 1);
+
 				getLoginDialog().showError("Something went wrong. Try a different login method.");
 			}
 
 			@Override
 			public void onSuccess(String result) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "facebook login", 1);
+
 				redirect(result);
 
 			}
@@ -454,19 +510,26 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	public void doCreate(String email, String nickName, String password) {
 
 		LoginInfo loginInfo = clientFactory.getLoginInfo();
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "create native account", 1);
 
 		if (!loginInfo.isLoggedIn()) {
-			clientFactory.getRpcService().createAccount(email, nickName, password, false, false, false, new AsyncCallback<LoginInfo>() {
+			clientFactory.getRpcService().createAccount(email, nickName, password, destination, false, false, false, new AsyncCallback<LoginInfo>() {
 				public void onSuccess(LoginInfo result) {
 					if (!result.isLoggedIn()) {
 						if (!result.isEmailValidated() && (result.getStatus() == null || result.getStatus().isEmpty())) {
+							clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.show.toString(), "email validation sent", 1);
+
 							getManageProfileDialog().init(result); // show email validation panel
 						} else {
+							clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "native account creation error", 1);
+
 							getManageProfileDialog().showError(result.getStatus());
 						}
 
 					} else { 
 						actionsComplete(result);
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "native account created", 1);
+
 						getManageProfileDialog().hide();
 
 					}
@@ -475,6 +538,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 				@Override
 				public void onFailure(Throwable caught) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "native account create server error", 1);
+
 					getManageProfileDialog().showError("Problems creating account, try again later.");
 				}
 			});
@@ -486,17 +551,24 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	 * @see net.rugby.foundation.core.client.ui.ManageProfile.Presenter#doUpdate(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void doUpdate(String email, String nickName) {
+	public void doUpdate(String email, final String nickName) {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "update profile", 1);
 
 		if (nickName.length() == 0) {
+			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "update profile empty nickname", 1);
+
 			getManageProfileDialog().showError(CoreConfiguration.getCreateacctErrorNicknameCantBeNull());
 		} 
 		else {
 			clientFactory.getRpcService().updateAccount(email, nickName, new AsyncCallback<LoginInfo>() {
 				public void onSuccess(LoginInfo result) {
-					if (!result.isLoggedIn()) {
+					if (!result.isLoggedIn() || !(result.getStatus() == null)) {
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "update profile", 1);
+
 						getManageProfileDialog().showError(result.getStatus());
 					} else { 
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "update profile", 1);
+
 						getManageProfileDialog().hide();
 						actionsComplete(result);							
 					}
@@ -506,6 +578,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				@Override
 				public void onFailure(Throwable caught) {
 					clientFactory.setLoginInfo(new LoginInfo());
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "update profile server error", 1);
+
 					getManageProfileDialog().showError("Problems updating account, try again later.");						
 				}
 
@@ -519,7 +593,12 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	 */
 	@Override
 	public void forgotPassword(final String email) {
-		clientFactory.getRpcService().forgotPassword(email, new AsyncCallback<LoginInfo>() {
+		
+		String href = Window.Location.getHref();
+		destination = href.substring(href.indexOf('#')+1);
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "reset password", 1);
+
+		clientFactory.getRpcService().forgotPassword(email, destination, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
 				clientFactory.setLoginInfo(result);
 				
@@ -533,18 +612,26 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				
 				if (result.getEmailAddress() == null) {
 					// 3.
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "reset password no account", 1);
+
 					getLoginDialog().hide();
 					getManageProfileDialog().init(result);
 					getManageProfileDialog().showError("We don't have an account with that email address. Click a button above to sign in.");
 				}  else	if (result.getEmailAddress().equals(email) && result.getMustChangePassword()) {
 					// 1. changed it - check your email
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "reset password", 1);
+
 					getLoginDialog().hide();
 					getManageProfileDialog().init(result);
 				} else if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "reset password use external authenticator", 1);
+
 					getLoginDialog().showNonNativeLogins(true);
 					getLoginDialog().showError("You don't need your password! Just click on the button you signed up with above.");
 					//actionsComplete(result);							
 				} else if (result.isFacebook() && !result.isLoggedIn()){ // 2b. use your external authenticator
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "reset password use facebook", 1);
+
 					getLoginDialog().showNonNativeLogins(true);
 					getLoginDialog().showError("You don't need your password! Just click on the Facebook button above.");
 					//actionsComplete(result);							
@@ -554,6 +641,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 			@Override
 			public void onFailure(Throwable caught) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "reset password server error", 1);
+
 				clientFactory.setLoginInfo(new LoginInfo());
 				getManageProfileDialog().showError("Problems updating account, try again later.");						
 			}
@@ -568,14 +657,20 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	@Override
 	public void doChangePassword(String oldPassword, String newPassword) {
 		String email = clientFactory.getLoginInfo().getEmailAddress();
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "change password", 1);
+
 		getManageProfileDialog().showError("");
 		clientFactory.getRpcService().changePassword(email, oldPassword, newPassword, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
 				if (!result.isLoggedIn()) {
 					// bad email or password (probably password)
 					//getManageProfileDialog().init(result);
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "change password: bad old password", 1);
+
 					getManageProfileDialog().showError("Old password incorrect");
 				} else {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "change password", 1);
+
 					getManageProfileDialog().hide();
 					actionsComplete(result);
 				}			
@@ -583,6 +678,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 			@Override
 			public void onFailure(Throwable caught) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "change password server error", 1);
+
 				clientFactory.setLoginInfo(new LoginInfo());
 				getManageProfileDialog().showError("Problems updating password, try again later.");						
 			}
@@ -595,22 +692,30 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	 */
 	@Override
 	public void onCancelChangePassword() {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.cancel.toString(), "change password", 1);
+
 		getManageProfileDialog().hide();
 		
 	}
 
 	@Override
 	public void doOAuth2Login() {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "oauth2 login", 1);
+
 		// we want to preserve the url string in case they are trying to do something like join a clubhouse
 			clientFactory.getRpcService().getOAuth2Url(destination, new AsyncCallback<String>() {
 
 				@Override
-				public void onFailure(Throwable caught) {				
+				public void onFailure(Throwable caught) {		
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "oauth2 login server error", 1);
+
 					getLoginDialog().showError("Something went wrong. Try a different login method.");
 				}
 
 				@Override
 				public void onSuccess(String result) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "oauth2 login", 1);
+
 					redirect(result);
 
 				}
@@ -635,10 +740,14 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 	@Override
 	public void doValidateEmail(String email, String emailValidationCode) {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "validate email", 1);
+
 		clientFactory.getRpcService().validateEmail(email,emailValidationCode, new AsyncCallback<LoginInfo>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "validate email server error", 1);
+
 				getManageProfileDialog().showError("Problem validating email. Please contact support: info@rugby.net");
 				
 			}
@@ -646,9 +755,13 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			@Override
 			public void onSuccess(LoginInfo result) {
 				if (result != null && result.isLoggedIn()) { //result.getStatus().equals("Email successfully validated")) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "validate email", 1);
+
 					getManageProfileDialog().hide();
 					actionsComplete(result);
 				} else {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "validate email", 1);
+
 					getManageProfileDialog().showError(result.getStatus() + ". Please try again and if the problem persists contact support: info@rugby.net");
 				}
 				
@@ -656,68 +769,19 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			
 		});
 	}
+
+	// Called from profileActivity when the person clicks on a password reset email link
+	public void handlePasswordReset(String email, String temporaryPassword, String destination) {
+		this.destination = destination;
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "password reset email link", 1);
+
+		presenter.showFacebookComments(false);
+		if (getManageProfileDialog().getChangePasswordPanel() != null) {
+			getManageProfileDialog().getChangePasswordPanel().setAlert("Pick a new password!", "It must be at least 6 characters long.");
+		}
+		getManageProfileDialog().collectNewPassword(email, temporaryPassword);
+		getManageProfileDialog().center();
+	}
 	
-//	private void showLoggedInMobile()
-//	{
-//		Widget parent = RootPanel.get("sidebar-profile");
-//		
-//		final ListGroupItem li = new ListGroupItem();
-//		Anchor a = new Anchor();
-//		a.setHTML("<i class=\"fa fa-laptop\"></i><span>" + compName + "</span><b class=\"caret\"></b>");
-//		anchorMap.put(compId, a);
-//		liMap.put(compId, li);
-//		li.add(a);
-//		dashboardMenu.add(li);
-//		li.removeStyleName("list-group-item");
-//		
-//		if (modeMap.isEmpty()) {
-//			a.addClickHandler(new ClickHandler() {
-//
-//				@Override
-//				public void onClick(ClickEvent event) {
-//					// TODO Auto-generated method stub
-//
-//				}
-//
-//			});
-//		} else {
-//			// first create submenu
-//			ListGroup submenu = new ListGroup();
-//			submenuMap.put(compId, submenu);
-//			submenu.setStyleName("submenu");
-//			for (RatingMode mode: modeMap.keySet()) {
-//				ListGroupItem lgi = new ListGroupItem();
-//				lgi.removeStyleName("list-group-item");
-//				Anchor modeLink = new Anchor();
-//				modeLink.setText(mode.getMenuName());
-//				final RatingMode _mode = mode;
-//				modeLink.addClickHandler(new ClickHandler() {
-//
-//					@Override
-//					public void onClick(ClickEvent event) {
-//						SeriesPlace place = new SeriesPlace();
-//						place.setCompId(compId);
-//						place.setSeriesId(modeMap.get(_mode));
-//						
-//						// remove the carat if it is somewhere else
-//						if (caratParent != null && carat != null) {
-//							caratParent.remove(carat);
-//						}
-//						
-//						// add the carat
-//						li.add(carat);
-//						caratParent = li;
-//						
-//						clientFactory.getPlaceController().goTo(place);
-//					}
-//					
-//				});
-//				lgi.add(modeLink);
-//				submenu.add(lgi);
-//			}
-//			li.add(submenu);
-//			a.setStyleName("dropdown-toggle");
-//
-//		}
-//	}
+
 }
