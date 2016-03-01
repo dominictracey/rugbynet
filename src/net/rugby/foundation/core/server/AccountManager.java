@@ -165,7 +165,7 @@ public class AccountManager implements IAccountManager {
 					
 			// chop the /s/ from the end of the BaseToptenUrl
 			String linkTarget = ccf.get().getBaseToptenUrl() + "#Profile:" + Keys.action + "=" + Actions.validateEmail + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.validationCode + "=" + u.getEmailValidationCode() + "&" + Keys.destination + "=" + dest;
-			boolean configured = userEmailer.configure("Account verification link from The Rugby Net", "Account Services", "Click here to activate your account", linkTarget, "If the link above doesn't work, you can enter your validation code (" + u.getEmailValidationCode() +") in the sign up page.", "", u);
+			boolean configured = userEmailer.configure("Account verification link from The Rugby Net", "Account Services", "Click here to activate your account", linkTarget, "If the link above doesn't work, you can enter your validation code (" + u.getEmailValidationCode() +") in the sign up window.", "", u);
 			if (configured) {
 		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent email validation link " + u.getEmailValidationCode() + " to " + u.getEmailAddress());
 				userEmailer.send();
