@@ -1,6 +1,5 @@
 package net.rugby.foundation.admin.server.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,8 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
-public class SingleTableStandingsFetcher implements IStandingsFetcher {
+
+public class PoolTableStandingsFetcher implements IStandingsFetcher {
 
 	private IRound round = null;
 	private ICompetition comp = null;
@@ -27,7 +27,7 @@ public class SingleTableStandingsFetcher implements IStandingsFetcher {
 	
 	
 	//    @Inject
-	public SingleTableStandingsFetcher(IStandingFactory sf) {
+	public PoolTableStandingsFetcher(IStandingFactory sf) {
 		this.standingFetcher = sf;
 	}
 

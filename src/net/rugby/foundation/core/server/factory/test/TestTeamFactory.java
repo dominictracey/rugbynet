@@ -262,7 +262,7 @@ public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactor
 		} else if (id == 9405) {
 			t.setDisplayName("Crusaders");
 		} else if (id == 9406) {
-			t.setDisplayName("Force");
+			t.setDisplayName("Western Force");
 		} else if (id == 9407) {
 			t.setDisplayName("Highlanders");
 		} else if (id == 9408) {
@@ -272,7 +272,7 @@ public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactor
 		} else if (id == 9410) {
 			t.setDisplayName("Rebels");
 		} else if (id == 9411) {
-			t.setDisplayName("Reds");
+			t.setDisplayName("Queensland Reds");
 		} else if (id == 9412) {
 			t.setDisplayName("Sharks");
 		} else if (id == 9413) {

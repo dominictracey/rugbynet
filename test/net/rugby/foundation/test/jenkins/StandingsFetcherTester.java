@@ -130,7 +130,7 @@ public class StandingsFetcherTester {
 	 
 		 sFetcher.setComp(c);
 		 sFetcher.setRound(c.getRounds().get(0));
-		 sFetcher.setUrl("testData/SuperRugbyTable.html");
+		 sFetcher.setUrl("testData/SuperRugby16.html");
 		 sFetcher.setUc(uc);
 
 		 Iterator<ITeamGroup> it = c.getTeams().iterator();
@@ -145,19 +145,19 @@ public class StandingsFetcherTester {
 					 assertTrue(s.getStanding().equals(1));
 					 count++;
 				 } else if (s.getTeam().getDisplayName().equals("Chiefs")) {
-					 assertTrue(s.getStanding().equals(3));
+					 assertTrue(s.getStanding().equals(1));
 					 count++;
 				 } else if (s.getTeam().getDisplayName().equals("Hurricanes")) {
-					 assertTrue(s.getStanding().equals(15));
+					 assertTrue(s.getStanding().equals(5));
 					 count++;
-				 } else if (s.getTeam().getDisplayName().equals("Reds")) {
-					 assertTrue(s.getStanding().equals(6));
+				 } else if (s.getTeam().getDisplayName().equals("Queensland Reds")) {
+					 assertTrue(s.getStanding().equals(5));
 					 count++;
 				 } else if (s.getTeam().getDisplayName().equals("Lions")) {
-					 assertTrue(s.getStanding().equals(7));
+					 assertTrue(s.getStanding().equals(2));
 					 count++;
-				 } else if (s.getTeam().getDisplayName().equals("Force")) {
-					 assertTrue(s.getStanding().equals(10));
+				 } else if (s.getTeam().getDisplayName().equals("Western Force")) {
+					 assertTrue(s.getStanding().equals(4));
 					 count++;
 				 }
 			 } else {
