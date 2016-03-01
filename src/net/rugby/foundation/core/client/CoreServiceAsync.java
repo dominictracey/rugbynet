@@ -11,6 +11,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.IClubhouseMembership;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -50,10 +51,12 @@ public interface CoreServiceAsync {
 	/**
 	 * @param email
 	 * @param screenName
+	 * @param optOut 
+	 * @param compList 
 	 * @param asyncCallback
 	 */
 	void updateAccount(String email, String screenName,
-			AsyncCallback<LoginInfo> asyncCallback);
+			List<CompetitionType> compList, Boolean optOut, AsyncCallback<LoginInfo> asyncCallback);
 	/**
 	 * @param destination
 	 * @param asyncCallback

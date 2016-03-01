@@ -1,6 +1,7 @@
 package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
+import net.rugby.foundation.core.server.mail.UnsubscribeServlet;
 import net.rugby.foundation.topten.server.HomePage;
 import net.rugby.foundation.topten.server.MetaTagGenerator;
 import net.rugby.foundation.topten.server.SeriesPage;
@@ -24,7 +25,7 @@ public class BPMServletModule extends ServletModule {
 		serve("/login/*").with(LoginServlet.class);
 		serve("/_ah/login/*").with(LoginServlet.class);
 		serve("/util/facebook/channel.html").with(FacebookChannelServlet.class);
-		serve("/_ah/start").with(BackEndStartupServlet.class);
+		//serve("/_ah/start").with(BackEndStartupServlet.class);
 		serve("/fb/core/CoreService").with(CoreServiceImpl.class);
 		serve("/fb/topten/TopTenService").with(TopTenServiceImpl.class);
 		serve("/fb/topten.html").with(MetaTagGenerator.class);
@@ -34,6 +35,7 @@ public class BPMServletModule extends ServletModule {
 		serve("/sitemap/*").with(SiteMap.class);
 		serve("/session/").with(SessionServlet.class);
 		serve("/").with(HomePage.class);
+		serve("/email/unsubscribe/").with(UnsubscribeServlet.class);
 //		serve("/_ah/pipeline/*").with(PipelineServlet.class); // not @Singleton
 	}
 }

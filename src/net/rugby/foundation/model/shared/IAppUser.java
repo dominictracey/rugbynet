@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IAppUser.EmailStatus;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 /**
  * @author home
@@ -243,5 +244,12 @@ public interface IAppUser {
 	boolean getEmailValidated();
 
 	void setEmailValidated(boolean emailValidated);
+
+	List<CompetitionType> getCompList();
+
+	void setCompList(List<CompetitionType> compList);
+	
+	boolean getTestUser();
+	void setTestUser(boolean isTest);
 
 }

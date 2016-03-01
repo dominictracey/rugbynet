@@ -1,11 +1,18 @@
 package net.rugby.foundation.core.client.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.rugby.foundation.model.shared.CoreConfiguration;
+import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.LoginInfo;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -61,6 +68,9 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	@UiField Image close;
 	@UiField Span title;
 	@UiField PanelHeader header;
+	@UiField FormGroup compList;
+	@UiField FormGroup optOutGroup;
+	@UiField CheckBox optOut;
 	
 	//email validation panel
 	@UiField PanelBody emailValidationLayer;
@@ -79,11 +89,12 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	
 	Presenter presenter;
 	private boolean editing;
+	private boolean compListInitialized;
 	
 
 	public interface Presenter {
 		void doCreate(String email, String nickName, String password);
-		void doUpdate(String email, String nickName);
+		void doUpdate(String email, String nickName, List<CompetitionType> newList, Boolean optOut);
 		void doCancel();
 		void doValidateEmail(String email, String emailValidationCode);
 	}
@@ -183,10 +194,13 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		alert.setVisible(false);
 
 		editing = false;
+		compList.setVisible(false);
+		optOutGroup.setVisible(false);
 		
 		if(loginInfo != null) {
 			if (loginInfo.isLoggedIn())	{
 				// if they are logged in - allow them to only edit their screen name
+				// also the comp list
 				editing = true;
 				emailAddress.setText(loginInfo.getEmailAddress());
 				emailAddress.setEnabled(false);
@@ -201,22 +215,32 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				password2Label.setVisible(false);
 				nickName.setFocus(true);
 				
+				nativeLayer.setSize("50em", "45em");
+				initCompList(loginInfo);
+				compList.setVisible(true);
+				optOutGroup.setVisible(true);
+				optOut.setValue(loginInfo.getOptOut());
+				
+				submit.addStyleName("btn-primary");			
 				submit.setText("Update");
 
 				showPanels(false, true, false, false, false);
 			} else if (loginInfo.getMustChangePassword()) {
 				showPanels(false,false,false,true, false);
-				alert. setText(" Check your email for your temporary password.");
-				alert.setVisible(true);
+				alert. setText("");
+				alert.setVisible(false);
+				submit.removeStyleName("btn-primary");
 				submit.setText("Change Password");
 				title.setText("Change Password");
 			} else if (!loginInfo.isEmailValidated() && loginInfo.getEmailAddress() != null && !loginInfo.getEmailAddress().isEmpty()) {
 				showPanels(false, false, false, false, true);
 				title.setText("Validate");
+				submit.removeStyleName("btn-primary");
 				emailValidationCode.setEnabled(true);
 				emailValidationCode.setFocus(true);
 			} else  {
 				showPanels(true, false, false, false, false);
+				submit.removeStyleName("btn-primary");
 				submit.setText("Sign Up");
 				emailAddress.setEnabled(true);
 				emailAddress.setFocus(true);
@@ -237,6 +261,24 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 
 	}
 
+	private void initCompList(LoginInfo loginInfo) {
+		if (!compListInitialized) {
+			for (ICompetition.CompetitionType ct : ICompetition.CompetitionType.values()) {
+				if (ct.getShowToClient()) {
+					//Label label = new Label(ct.getDisplayName());
+					CheckBox cb = new CheckBox();
+					cb.setText(ct.getDisplayName());
+					compList.add(cb);
+					if (loginInfo.getCompList().contains(ct)) {
+						cb.setValue(true);
+					}
+				}
+			}
+			compListInitialized = true;
+		}
+		
+	}
+
 	/*
 	 * When the user clicks a link we email them with the new password, it starts a profile activity which calls Identity.handlePasswordReset, which calls this
 	 * We need to show the changePassword panel, with the temp password filled in.
@@ -245,7 +287,12 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		showPanels(false,false,false,true, false);
 		//error.setText(" Check your email for your temporary password.");
 		alert.setVisible(false);
-		changePasswordPanel.emailAddress.setText(email);
+		if (email != null && !email.isEmpty()) {
+			changePasswordPanel.emailAddress.setText(email);
+			changePasswordPanel.emailAddress.setEnabled(false);
+		} else {
+			changePasswordPanel.emailAddress.setEnabled(true);
+		}
 		changePasswordPanel.oldPassword.setText(tempPassword);
 		changePasswordPanel.
 		submit.setText("Change Password");
@@ -257,7 +304,18 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		if (nickName.getText().isEmpty()) {
 			showError(CoreConfiguration.getCreateacctErrorNicknameCantBeNull());
 		} else if (editing) {
-			presenter.doUpdate(emailAddress.getText(), nickName.getText());
+			// collect the compList
+			List<CompetitionType> newList = new ArrayList<CompetitionType>();
+			for (int i=1; i<compList.getWidgetCount(); ++i) {
+				CheckBox cb = (CheckBox) compList.getWidget(i);
+				if (cb != null) {
+					if (cb.getValue()) {
+						newList.add(CompetitionType.values()[i]);
+					}
+				}
+			}
+			
+			presenter.doUpdate(emailAddress.getText(), nickName.getText(), newList, optOut.getValue());
 		} else if (!password1.getText().equals(password2.getText())) {			
 			alertStrong.setText("Error: ");
 			alertText.setText("Passwords don't match!");

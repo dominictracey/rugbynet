@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.persistence.Id;
 
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
+
 
 import com.googlecode.objectify.annotation.Entity;
 
@@ -61,6 +63,10 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	private EmailStatus emailStatus;
 	private String emailValidationCode;
 	private boolean emailValidated = false;
+	private boolean isTestUser = false;
+	
+	private List<CompetitionType> compList = null;
+	
 	
 	public AppUser() {
 
@@ -472,5 +478,31 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	public void setEmailValidated(boolean emailValidated) {
 		this.emailValidated = emailValidated;
 	}
+	@Override
+	public List<CompetitionType> getCompList() {
+		//initialize to all
+		if (compList == null) {
+			compList = new ArrayList<CompetitionType>();
+			for (CompetitionType ct : CompetitionType.values()) {
+				if (ct.getShowToClient()) {
+					compList.add(ct);
+				}
+			}
+		}
+		return compList;
+	}
+	@Override
+	public void setCompList(List<CompetitionType> compList) {
+		this.compList = compList;
+	}
+	@Override
+	public boolean getTestUser() {
+		return isTestUser;
+	}
+	@Override
+	public void setTestUser(boolean isTest) {
+		isTestUser = isTest;
+	}
 
+	
 }

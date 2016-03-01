@@ -1,5 +1,6 @@
 package net.rugby.foundation.admin.server;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import net.rugby.foundation.admin.client.RugbyAdminService;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
+import net.rugby.foundation.admin.server.factory.IBlurbFactory;
+import net.rugby.foundation.admin.server.factory.IDigestEmailFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
@@ -29,6 +32,7 @@ import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.util.CountryLoader;
+import net.rugby.foundation.admin.server.util.DigestEmailer;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.matchrating.FetchTeamMatchStats;
 import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
@@ -36,7 +40,10 @@ import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.SeriesActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.UserActions;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.IBlurb;
+import net.rugby.foundation.admin.shared.IDigestEmail;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -48,6 +55,7 @@ import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
+import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
@@ -90,6 +98,7 @@ import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
@@ -100,9 +109,11 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
@@ -159,6 +170,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IRatingGroupFactory rgf;
 	private IRatingMatrixFactory rmf;
 	private IRawScoreFactory rwsf;
+	private IBlurbFactory bf;
+	private IPlaceFactory spf;
+	private IDigestEmailFactory def;
+	private DigestEmailer digestEmailer;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -181,7 +196,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
 			IContentFactory ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
 			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
-			IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
+			IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf,
+			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -217,7 +233,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.rsf = rsf;
 			this.rgf = rgf;
 			this.rmf = rmf;
-
+			this.bf = bf;
+			this.spf = spf;
+			this.def = def;
+			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 		}
@@ -1798,22 +1817,30 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ICoreConfiguration getConfiguration() {
 		try {
 			ICoreConfiguration conf = ccf.get();
-			// check that environment is set
-			if (conf.getEnvironment() == null) {
-				HttpServletRequest req = this.getThreadLocalRequest();
-				if (req.getServerName().contains("127.0.0.1")) {
-					conf.setEnvironment(Environment.LOCAL);
-				} else if (req.getServerName().contains("dev")) {
-					conf.setEnvironment(Environment.DEV);
-				} else if (req.getServerName().contains("beta")) {
-					conf.setEnvironment(Environment.BETA);
-				} else if (req.getServerName().contains("www")) {
-					conf.setEnvironment(Environment.PROD);
-				} else {
-					throw new RuntimeException("Could not determine environment for configuration");
-				}
-				conf = ccf.put(conf);
+			
+			// check that environment is set properly
+			Environment env = conf.getEnvironment();
+			
+			HttpServletRequest req = this.getThreadLocalRequest();
+			if (req.getServerName().contains("127.0.0.1")) {
+				conf.setEnvironment(Environment.LOCAL);
+			} else if (req.getServerName().contains("dev")) {
+				conf.setEnvironment(Environment.DEV);
+			} else if (req.getServerName().contains("beta")) {
+				conf.setEnvironment(Environment.BETA);
+			} else if (req.getServerName().contains("www")) {
+				conf.setEnvironment(Environment.PROD);
+			} else {
+				throw new RuntimeException("Could not determine environment for configuration");
 			}
+			
+			// if we had to adjust it, save
+			// note that this will happen when we "copy down" prod data to development
+			// we also check this value when determining whether to send out emails in our development environment so it's important!
+			if (conf.getEnvironment() != null && !conf.getEnvironment().equals(env)) {
+ 				conf = ccf.put(conf);
+			}
+			
 			return conf;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -2413,8 +2440,162 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 	}
 
+	@Override
+	public List<IBlurb> getAllBlurbs(Boolean active) {
+		try {
+			if (checkAdmin()) {
+				return bf.getActive();
+			} 
+			
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public List<IBlurb> addBlurb(String url, String linkText, String bodyText) {
+		try {
+			if (checkAdmin()) {
+				assert (url != null && !url.isEmpty());
+				IBlurb blurb = bf.create();
+				String[] chunks = url.split("/");
+				String guid = chunks[chunks.length-1];
+				if (guid != null) {
+					IServerPlace sp = spf.getForGuid(guid);
+					blurb.setServerPlace(sp);
+					blurb.setServerPlaceId(sp.getId());
+					blurb.setBodyText(bodyText);
+					blurb.setLinkText(linkText);
+					
+					bf.put(blurb);
+				} 
+				
+				return bf.getActive();
+			} 		
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public String getListNameForUrl(String url) {
+		try {
+			if (checkAdmin()) {
+				assert (url != null && !url.isEmpty());
+				IBlurb blurb = bf.create();
+				String[] chunks = url.split("/");
+				String guid = chunks[chunks.length-1];
+				if (guid != null) {
+					IServerPlace sp = spf.getForGuid(guid);
+					if (sp != null && sp.getListId() != null) {
+						return ttlf.get(sp.getListId()).getTitle();
+					}
+				} 
+				
+				return null;
+			} 		
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+
+	}
+
+	@Override
+	public String getDigestPreview(String message, List<Long> blurbIds) {
+		try {
+			if (checkAdmin()) {
+				if (digestEmailer == null) {
+					digestEmailer = new DigestEmailer(cf);
+				}
+//				List<IBlurb> blurbs = new ArrayList<IBlurb>();
+//				for (Long id : blurbIds) {
+//					blurbs.add(bf.get(id));
+//				}
+//				digestEmailer.setBlurbs(blurbs);
+//				digestEmailer.configure("Subject", "Title", "Body");
+//				return digestEmailer.buildMessage();
+				IDigestEmail de = def.create();
+				de.setMessage(message);
+				de.setBlurbIds(blurbIds);
+				de.setSubject("Latest from The Rugby Net");
+				de.setTitle("Latest from The Rugby Net");
+				def.populatedigestEmail(de);
+				
+				digestEmailer.configure(de,null);
+				return digestEmailer.buildMessage();
+			}
+		 	return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+		
+	}
+
+	@Override
+	public Integer sendDigestEmail(String message, List<Long> blurbIds) {
+		try {
+			if (checkAdmin()) {
+				IDigestEmail email = def.create();
+				email.setMessage(message);
+				email.setBlurbIds(blurbIds);
+				email.setSubject("Latest from The Rugby Net");
+				email.setTitle("Latest from The Rugby Net");
+				def.put(email);
+				
+				List<IAppUser> recips = auf.getDigestEmailRecips();
+				for (IAppUser u : recips) {
+								
+					if (u != null) {
+						String url2 = ccf.get().getEngineUrl() + "/orchestration/IDigestEmail";
+			
+						QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(300000).
+								param(AdminOrchestrationActions.RatingActions.getKey(), UserActions.SEND_DIGEST.toString()).
+								param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.USER.toString()).
+								param("id",u.getId().toString()).
+								param("extraKey", email.getId().toString()));
+					}
+					
+				}
+				
+				return recips.size();
+			}
+		 	return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
 
 
+	@Override
+	public String getDigestUserList() {
+		try {
+			if (checkAdmin()) {
+			
+				String retval = "<h3>Users who have not opted out: </h3>";
+				List<IAppUser> recips = auf.getDigestEmailRecips();
+				for (IAppUser u : recips) {
+								
+					if (u != null) {
+						retval += u.getEmailAddress() + "<br/>";
+					}				
+				}
+				
+				return retval;
+			}
+		 	return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
 
 
 

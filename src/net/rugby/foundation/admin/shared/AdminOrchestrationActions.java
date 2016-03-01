@@ -3,6 +3,7 @@
  */
 package net.rugby.foundation.admin.shared;
 
+import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -117,6 +118,35 @@ public class AdminOrchestrationActions {
 		private final static String actionKey = "Action";
 
 		private SeriesActions(String value)
+		{
+			this.setValue(value);
+		}
+
+		public static final String getKey() {
+			return actionKey;
+		}
+
+		/* (non-Javadoc)
+		 * @see net.rugby.foundation.admin.server.factory.IOrchestrationActions#getValue()
+		 */
+		@Override
+		public String getValue() {
+			return value;
+		}
+
+		private void setValue(String value) {
+			this.value = value;
+		}
+	}
+	
+	public enum UserActions implements IOrchestrationActions<IAppUser> { 
+
+		SEND_DIGEST("sendDigest");
+
+		private String value;
+		private final static String actionKey = "Action";
+
+		private UserActions(String value)
 		{
 			this.setValue(value);
 		}

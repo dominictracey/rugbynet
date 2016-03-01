@@ -3,6 +3,8 @@
  */
 package net.rugby.foundation.core.server.factory.test;
 
+import java.util.List;
+
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.model.shared.AppUser;
 import net.rugby.foundation.model.shared.IAppUser;
@@ -188,6 +190,12 @@ public class TestAppUserFactory implements IAppUserFactory {
 		this.email = null;		
 		this.nickname = nickName;
 		
+	}
+
+	@Override
+	public List<IAppUser> getDigestEmailRecips() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

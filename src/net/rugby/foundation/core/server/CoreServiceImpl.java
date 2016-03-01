@@ -39,6 +39,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -498,7 +499,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	 * @see net.rugby.foundation.core.client.CoreService#updateAccount(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public LoginInfo updateAccount(String email, String screenName) {
+	public LoginInfo updateAccount(String email, String screenName, List<CompetitionType> compList, Boolean optOut) {
 		try {
 			// check they are who they say they are
 			// confirm the user is logged on
@@ -506,6 +507,9 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			if (u == null) {
 				return new LoginInfo();
 			}
+			
+			u.setCompList(compList);
+			u.setOptOut(optOut);
 
 			LoginInfo loginInfo = am.updateAccount(u, email, screenName, this.getThreadLocalRequest());
 

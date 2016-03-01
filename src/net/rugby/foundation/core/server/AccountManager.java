@@ -198,6 +198,9 @@ public class AccountManager implements IAccountManager {
 			loginInfo.setTopTenContentEditor(((ITopTenUser)u).isTopTenContentEditor());
 		}
 
+		loginInfo.setCompList(u.getCompList());
+		loginInfo.setOptOut(u.getOptOut());
+		
 		// see if they have done the draft and round picks yet.
 		//ArrayList<Group> groups = getGroupsByGroupType(GroupType.MY);
 		//	  for (int i=0; i<10; i++) {
@@ -277,7 +280,7 @@ public class AccountManager implements IAccountManager {
 		IAppUser u = auf.get();
 		
 		String error = "";
-		if (u != null) {
+		if (u != null && !u.getId().equals(au.getId()) ) {
 			// already in use
 			error = "That screen name is already in use. Please pick another.";
 		} else {
@@ -514,6 +517,9 @@ public class AccountManager implements IAccountManager {
 		u.setPwHash(hash);
 		u.setMustChangePassword(false);
 		
+		// they had to have gotten an email for this. There is a flow that they can get here without doing the email validation link so...
+		u.setEmailValidated(true);
+		
 		auf.put(u);
 
 		loginInfo = getLoginInfo(u);
@@ -562,7 +568,7 @@ public class AccountManager implements IAccountManager {
 				return loginInfo; //empty (#3)
 			}
 
-			if (u.isFacebook() || u.isOpenId()) {  // #2
+			if (u.isFacebook() || u.isOath2() || u.isOpenId()) {  // #2
 				loginInfo = getLoginInfo(u);
 				loginInfo.setLoggedIn(false);
 				return loginInfo;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
+import net.rugby.foundation.admin.client.ui.SmartBar.PromotePresenter;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
@@ -50,6 +51,12 @@ public interface SmartBar extends IsWidget {
 	
 		void createSchema();
 	}
+	
+	public interface PromotePresenter {
+	
+		void createDigestEmail();
+	}
+	
 
 	/**
 	 * @param compMap - hash table key: compId, value: ICompetition

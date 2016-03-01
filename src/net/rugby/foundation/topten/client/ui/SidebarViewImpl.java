@@ -2,8 +2,13 @@ package net.rugby.foundation.topten.client.ui;
 
 import java.util.HashMap;
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.AnchorButton;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.ListGroupItem;
+import org.gwtbootstrap3.client.ui.constants.IconPosition;
+import org.gwtbootstrap3.client.ui.html.Span;
+
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
@@ -31,12 +36,14 @@ public class SidebarViewImpl extends Composite
 	protected ListGroup dashboardMenu;
 
 	boolean ignore = false;
-//	@UiField 
-//	protected ListGroup profileMenu;
-//
-//	@UiField 
-//	protected ListGroupItem sidebarProfile = null;
+	@UiField 
+	protected DropDownMenu profileMenu;
 
+	@UiField 
+	protected ListGroupItem sidebarProfile;
+
+	@UiField AnchorButton profileButton;
+	
 	ListGroupItem caratParent = null;
 
 
@@ -60,12 +67,19 @@ public class SidebarViewImpl extends Composite
 			RootPanel.get("sidebar-nav").add(this);
 			dashboardMenu.removeStyleName("list-group");
 			dashboardMenu.setId("dashboard-menu");
-//			profileMenu.removeStyleName("list-group");
-//			profileMenu.setId("profile-menu");
-//			profileMenu.setStyleName("show-xs");  
-//			profileMenu.addStyleName("hidden-md");
-//			profileMenu.addStyleName("hidden-lg");
-//			profileMenu.addStyleName("hidden-sm");
+			sidebarProfile.removeStyleName("list-group-item");
+			sidebarProfile.setStyleName("show-xs");  
+			sidebarProfile.addStyleName("hidden-md");
+			sidebarProfile.addStyleName("hidden-lg");
+			sidebarProfile.addStyleName("hidden-sm");
+			profileButton.removeStyleName("btn");
+			profileButton.removeStyleName("btn-default");
+			profileButton.setIconPosition(IconPosition.LEFT);
+			Span span = new Span("Account");
+			profileButton.add(span);
+			profileMenu.removeStyleName("dropdown-menu");
+			profileMenu.addStyleName("submenu");
+
 			carat.setStyleName("pointer");
 		}
 	}
@@ -246,8 +260,8 @@ public class SidebarViewImpl extends Composite
 
 	}
 
-	public ListGroupItem getSidebarProfile() {
-		return null; //sidebarProfile;
+	public DropDownMenu getSidebarProfile() {
+		return profileMenu;
 	}
 
 }

@@ -46,6 +46,12 @@
 			    </g:MenuItem>
 			</g:MenuBar>
 		</g:MenuItem>
+		<g:MenuItem ui:field="promoteMenuItem">
+			Promote
+			<g:MenuBar ui:field="promoteBar" vertical="true">
+			    <g:MenuItem ui:field="promoteMenuNew">Create Digest Email</g:MenuItem>
+			</g:MenuBar>
+		</g:MenuItem>
 		<g:MenuItem ui:field="adminMenuItem">
 			Admin
 			<g:MenuBar ui:field="adminBar" vertical="true">

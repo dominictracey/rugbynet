@@ -43,9 +43,11 @@ public class BounceHandlerServlet extends HttpServlet {
 	       
        		// find the AppUser and mark their email status as BOUNCE
        		auf.setEmail(bounce.getOriginal().getTo());
+       		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"bounce for " + bounce.getOriginal().getTo() + " details: " + bounce.getRawMessage());
        		IAppUser user = auf.get();
        		
        		if (user != null) {
+       			user.setOptOut(true);
        			user.setEmailStatus(EmailStatus.BOUNCE);
        			auf.put(user);
        		}

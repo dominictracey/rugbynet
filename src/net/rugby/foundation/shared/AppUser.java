@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import com.googlecode.objectify.annotation.Entity;
 
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 /**
  * @author home
@@ -604,6 +605,30 @@ public class AppUser implements IAppUser, Serializable {
 
 	@Override
 	public void setEmailValidated(boolean emailValidated) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<CompetitionType> getCompList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setCompList(List<CompetitionType> compList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean getTestUser() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setTestUser(boolean isTest) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -43,7 +43,7 @@
 								<b:Input type="PASSWORD" b:id="formPassword" ui:field="password1" />
 							</b:FormGroup>
 
-							<b:Button ui:field="submit" type="PRIMARY">Login</b:Button>
+							<b:Button ui:field="submit" type="PRIMARY" data-loading-text="<i class='icon-upload icon-white'></i>">Login</b:Button>
 							<b:Button ui:field="cancel" type="DEFAULT">Cancel</b:Button>
 							<b:Anchor ui:field="forgotPassword" href="javascript:;">Forgot
 								Password?</b:Anchor>

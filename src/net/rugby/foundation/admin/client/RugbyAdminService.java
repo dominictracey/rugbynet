@@ -6,6 +6,7 @@ import java.util.Map;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -28,6 +29,7 @@ import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -147,4 +149,12 @@ public interface RugbyAdminService extends RemoteService {
 	ICompetition addVirtualComp();
 	ISeriesConfiguration rollBackSeriesConfiguration(Long id);
 	Boolean addRound(Long compId, int uri, String name);
+	
+	// promote
+	List<IBlurb> getAllBlurbs(Boolean active);
+	List<IBlurb> addBlurb(String url, String linkText, String bodyText);
+	String getListNameForUrl(String url);
+	String getDigestPreview(String message, List<Long> blurbIds);
+	Integer sendDigestEmail(String message, List<Long> blurbIds);
+	String getDigestUserList();
 }

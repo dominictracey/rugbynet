@@ -14,11 +14,13 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView;
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
+import net.rugby.foundation.admin.client.ui.promote.PromoteView;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupView;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView;
 import net.rugby.foundation.admin.client.ui.task.TaskView;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
@@ -107,4 +109,6 @@ public interface ClientFactory extends EditContentPresenter {
 	AddRoundPopup getAddRoundPopup();
 	
 	AddMatchPopup getAddMatchPopup();
+
+	PromoteView<IBlurb> getPromoteView();
 }

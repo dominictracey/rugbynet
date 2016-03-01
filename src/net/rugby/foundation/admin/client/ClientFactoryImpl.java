@@ -31,6 +31,9 @@ import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewFieldDefi
 import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupViewImpl;
 import net.rugby.foundation.admin.client.ui.portal.PortalView;
 import net.rugby.foundation.admin.client.ui.portal.PortalViewImpl;
+import net.rugby.foundation.admin.client.ui.promote.PromoteView;
+import net.rugby.foundation.admin.client.ui.promote.PromoteViewColumnDefinitions;
+import net.rugby.foundation.admin.client.ui.promote.PromoteViewImpl;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupView;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupViewImpl;
@@ -44,6 +47,7 @@ import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPo
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewFieldDefinitions;
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupViewImpl;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -64,7 +68,6 @@ import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.DialogBox;
 
 /**
  * Sample implementation of {@link ClientFactory}.
@@ -96,6 +99,8 @@ public class ClientFactoryImpl implements ClientFactory {
 	private List<ColumnDefinition<IPlayerRating>> playerListViewColumnDefinitions =  null; 
 	private PlayerListView<IPlayerRating> ratingListView = null;
 	private List<ColumnDefinition<IPlayerRating>> ratingListViewColumnDefinitions =  null;
+	private PromoteView<IBlurb> promoteListView = null;
+	private PromoteViewColumnDefinitions<IBlurb> promoteViewColumnDefinitions =  null;
 	
 	private AddRoundPopup addRoundPopup = null;
 	
@@ -503,6 +508,23 @@ public class ClientFactoryImpl implements ClientFactory {
 			addMatchPopup.setClientFactory(this);
 		}
 		return addMatchPopup;
+	}
+
+	@Override
+	public PromoteView<IBlurb> getPromoteView() {
+		if (promoteListView == null) {
+			promoteListView = new PromoteViewImpl<IBlurb>();
+			promoteListView.setClientFactory(this);
+
+
+			if (promoteViewColumnDefinitions == null) {
+				promoteViewColumnDefinitions = new PromoteViewColumnDefinitions<IBlurb>();
+		    }
+							
+			promoteListView.setColumnDefinitions(promoteViewColumnDefinitions);
+			promoteListView.setColumnHeaders(promoteViewColumnDefinitions.getHeaders());
+		}
+		return promoteListView;
 	}
 
 

@@ -741,3 +741,6 @@ header{ background-color:#FFF}
 	padding-left: 10px;
 }
 
+#draggablePanelList .panel-heading {
+        cursor: move;
+ }

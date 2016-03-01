@@ -27,6 +27,7 @@ import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.Sponsor;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -571,9 +572,9 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 * @see net.rugby.foundation.core.client.CoreServiceAsync#updateAccount(java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)
 	 */
 	@Override
-	public void updateAccount(String email, String screenName,
+	public void updateAccount(String email, String screenName, List<CompetitionType> compList, Boolean optOut,
 			final AsyncCallback<LoginInfo> cb) {
-		clientFactory.getRpcService().updateAccount(email, screenName, new AsyncCallback<LoginInfo> () {
+		clientFactory.getRpcService().updateAccount(email, screenName, compList, optOut, new AsyncCallback<LoginInfo> () {
 			@Override
 			public void onFailure(Throwable caught) {
 				cb.onFailure(caught);

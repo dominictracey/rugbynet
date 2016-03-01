@@ -4,13 +4,21 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.model.shared.AppUser;
+import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IAppUser;
 
@@ -27,9 +35,11 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 	private Long id;
 	private String email;
 	private String nickName;
+	private IConfigurationFactory ccf;
 	
-	public OfyAppUserFactory() {
-
+	@Inject
+	public OfyAppUserFactory(IConfigurationFactory ccf) {
+		this.ccf = ccf;
 	}
 	
 	/* (non-Javadoc)
@@ -123,6 +133,33 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 		this.email = null;
 		this.id = null;
 		this.nickName = nickName;	}
+
+	@Override
+	public List<IAppUser> getDigestEmailRecips() {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			
+			Environment env = ccf.get().getEnvironment();
+			
+			Query<AppUser> qg = null;
+			if (env != Environment.DEV && env != Environment.BETA) {
+				qg = ofy.query(AppUser.class).filter("optOut ==", false);
+			} else {
+				qg = ofy.query(AppUser.class).filter("optOut ==", false).filter("isTestUser ==", true);
+			}
+			
+			List<IAppUser> list = new ArrayList<IAppUser>();
+			Iterator<AppUser> it = qg.list().iterator();
+			while (it.hasNext()) {
+				IAppUser g = (IAppUser)it.next();				
+				list.add(g);
+			}
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getDigestEmailRecips", ex);
+			return null;
+		}
+	}
 
 
 
