@@ -3,8 +3,8 @@ package net.rugby.foundation.core.shared;
 import net.rugby.foundation.model.shared.LoginInfo;
 
 public class IdentityTypes {
-	public enum Actions { login, logout, createFacebook, createOpenId, mergeFacebook, mergeOpenId, done, updateScreenName }
-	public enum Keys { action, selector, destination, providerType }
+	public enum Actions { login, logout, createFacebook, createOpenId, mergeFacebook, mergeOpenId, done, updateScreenName, validateEmail, optOut, changePassword }
+	public enum Keys { action, selector, destination, providerType, email, validationCode, optoutCode, temporaryPassword }
 
 	public static LoginInfo.ProviderType getProviderType(String string) {
 		if (string.toLowerCase().equals("oauth2")) {

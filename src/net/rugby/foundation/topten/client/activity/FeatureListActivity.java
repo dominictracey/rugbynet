@@ -361,7 +361,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 						view.setClientFactory(clientFactory);
 
 						if (ttl != null) {
-							view.setList(ttl, _coreConfig.getBaseToptenUrlForFacebook());
+							view.setList(ttl, _coreConfig.getBaseToptenUrl());
 						} else {
 							Window.alert("Failed to fetch top ten list.");
 							view.setList(null,"");
@@ -422,4 +422,9 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 		}
 	}
 
+	@Override
+	public void showFacebookComments(boolean show) {
+		clientFactory.showFacebookComments(show);
+		
+	}
 }

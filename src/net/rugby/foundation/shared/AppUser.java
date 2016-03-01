@@ -572,4 +572,40 @@ public class AppUser implements IAppUser, Serializable {
 		return false;
 	}
 
+	@Override
+	public EmailStatus getEmailStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setEmailStatus(EmailStatus emailStatus) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getEmailValidationCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setEmailValidationCode(String emailValidationCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean getEmailValidated() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setEmailValidated(boolean emailValidated) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

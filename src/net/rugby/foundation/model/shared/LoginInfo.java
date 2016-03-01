@@ -7,6 +7,11 @@ import java.util.List;
 
 public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4357097353630494993L;
+
 	public static enum ProviderType { openid, facebook, oauth2 }
 
 	public static enum Selector { google, googlePlus, yahoo, myspace, aol, myopenid_com }
@@ -14,7 +19,7 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+
 	private boolean loggedIn = false;
 	private String loginUrl;
 	private String logoutUrl;
@@ -35,6 +40,7 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
 	private boolean isTopTenContentContributor = false;
 	private boolean isTopTenContentEditor = false;
+	private boolean emailValidated = false;
 	
 	public boolean isAdmin() {
 		return isAdmin;
@@ -42,6 +48,7 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
 	private List<Long> teamIDs = new ArrayList<Long>();  //lineups for rounds
 	private List<Boolean> roundsComplete = new ArrayList<Boolean>();
+	private boolean oauth2;
 
 	public boolean isLoggedIn() {
 		return loggedIn;
@@ -216,4 +223,20 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 		isTopTenContentContributor = set;
 	}
 
+	public void setIsOauth2(boolean oauth2) {
+		this.oauth2 = oauth2;	
+	}
+
+	public boolean IsOauth2() {
+		return oauth2;
+	}
+
+	public boolean isEmailValidated() {
+		return emailValidated;
+	}
+
+	public void setEmailValidated(boolean emailValidated) {
+		this.emailValidated = emailValidated;
+	}
+	
 }

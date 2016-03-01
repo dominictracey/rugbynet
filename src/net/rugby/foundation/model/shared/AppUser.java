@@ -31,7 +31,7 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	private boolean isOpenId;
 	private boolean isFacebook;
 	private boolean isOath2;
-	private boolean optOut;
+	private boolean optOut = false;
 	private Long lastEntryId;
 	private Long lastClubhouseId;
 	private Long lastCompetitionId;
@@ -57,6 +57,11 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	
 	private boolean mustChangePassword;
 
+	// mail
+	private EmailStatus emailStatus;
+	private String emailValidationCode;
+	private boolean emailValidated = false;
+	
 	public AppUser() {
 
 	}
@@ -440,6 +445,32 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	@Override
 	public void setOath2(boolean isOath2) {
 		this.isOath2 = isOath2;
+	}
+	
+	@Override
+	public EmailStatus getEmailStatus() {
+		return emailStatus;
+	}
+	
+	@Override
+	public void setEmailStatus(EmailStatus emailStatus) {
+		this.emailStatus = emailStatus;
+	}
+	@Override
+	public String getEmailValidationCode() {
+		return emailValidationCode;
+	}
+	@Override
+	public void setEmailValidationCode(String emailValidationCode) {
+		this.emailValidationCode = emailValidationCode;
+	}
+	@Override
+	public boolean getEmailValidated() {
+		return emailValidated;
+	}
+	@Override
+	public void setEmailValidated(boolean emailValidated) {
+		this.emailValidated = emailValidated;
 	}
 
 }

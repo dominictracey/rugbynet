@@ -74,8 +74,10 @@ public interface IAccountManager {
 	 * @param email
 	 * @return
 	 */
-	LoginInfo forgotPassword(String email);
-	IAppUser createAccount(String emailAddress, String nickName,
-			String password, JSONObject attributes, boolean isOpenId,
+	LoginInfo forgotPassword(String email, String destination);
+	LoginInfo createAccount(String emailAddress, String nickName,
+			String password, String destination, JSONObject attributes, boolean isOpenId,
 			boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException;
+
+	LoginInfo validateEmail(String email, String validationCode);
 }

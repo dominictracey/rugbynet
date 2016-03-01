@@ -35,7 +35,7 @@ public interface CoreServiceAsync {
 	void logOff(LoginInfo info, AsyncCallback<LoginInfo> asyncCallback);
 	void nativeLogin(String emailAddress, String password, AsyncCallback<LoginInfo> asyncCallback);
 	void createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2, AsyncCallback<LoginInfo> asyncCallback);
+			String password, String destination, boolean isGoogle, boolean isFacebook, boolean isOAuth2, AsyncCallback<LoginInfo> asyncCallback);
 
 	void updatePreferences(LoginInfo loginInfo, AsyncCallback<LoginInfo> cb);
 	void createClubhouse(String name, String description, Boolean publicClubhouse, AsyncCallback<IClubhouse> cb);
@@ -72,7 +72,7 @@ public interface CoreServiceAsync {
 	 * @param email
 	 * @param asyncCallback
 	 */
-	void forgotPassword(String email, AsyncCallback<LoginInfo> asyncCallback);
+	void forgotPassword(String email, String destination, AsyncCallback<LoginInfo> asyncCallback);
 	void getContent(Long contentId, AsyncCallback<IContent> asyncCallback);
 	void saveContent(IContent content, AsyncCallback<IContent> asyncCallback);
 	
@@ -83,4 +83,5 @@ public interface CoreServiceAsync {
 	void getContent(String string, AsyncCallback<IContent> cb);
 	void getOAuth2Url(String destination, AsyncCallback<String> asyncCallback);
 	public void getContentItems(AsyncCallback<HashMap<String,Long>> asyncCallback);
+	void validateEmail(String email, String validationCode, AsyncCallback<LoginInfo> asyncCallback);
 }

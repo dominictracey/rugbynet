@@ -130,5 +130,12 @@ public class Game1 implements EntryPoint, Presenter {
 //		}
 		
 	}
+
+
+	@Override
+	public void showFacebookComments(boolean show) {
+		// TODO Auto-generated method stub
+		
+	}
 		
 }

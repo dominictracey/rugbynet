@@ -239,7 +239,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 					if (i.getNav() == null) {
 						// are we in a mobile screen?
 						if (Window.getClientWidth() < 768) {
-							// for now, no login from mobile devices
+							// login from mobile devices
 							//i.setParentWidget(getSidebarView().getSidebarProfile());
 						} else {
 							i.setNav(getHeaderView().getNav());
@@ -892,6 +892,20 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 			placeController.goTo(new ContentPlace(contentId));
 		}
 		
+	}
+	@Override
+	public void showFacebookComments(boolean show) {
+		Element fb = DOM.getElementById("fbWrapper");
+		
+		if (fb != null) {
+			if (!show) {
+				fb.addClassName("hidden");
+				console("hide fb");
+			} else {
+				fb.removeClassName("hidden");
+				console("show fb");
+			}
+		}
 	}
 
 

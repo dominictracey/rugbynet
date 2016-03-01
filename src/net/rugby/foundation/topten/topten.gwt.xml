@@ -9,11 +9,11 @@
 	<inherits name="net.rugby.foundation.core.Core" />
 	<inherits name="net.rugby.foundation.result.Result" />
     <inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/>
+    <inherits name="com.google.gwt.http.HTTP"/>
 <!-- 	<set-property name="bootstrap.responsiveDesign" value="true"/> -->
 
 <!-- 	<inherits name="org.gwtbootstrap3.GwtBootstrap3"/> -->
 <!-- 	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
-<!-- 	<inherits name="com.gwtfb.GwtFB"/> -->
 
 <!--     <public path='theme'> -->
 <!--         <include name='theme/css/*.css'/> -->

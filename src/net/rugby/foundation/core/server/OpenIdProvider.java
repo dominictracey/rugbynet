@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 
+import net.rugby.foundation.core.server.FacebookProvider.Base64Helper;
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -33,6 +34,7 @@ public class OpenIdProvider implements IExternalAuthenticatorProvider {
 	private IAccountManager am;
 	private LoginInfo.Selector selector;
 	private String destination;
+	private String emptyDest = Base64Helper.encode("null");
 	
 	/**
 	 * private because we need to specify a selector
@@ -57,7 +59,13 @@ public class OpenIdProvider implements IExternalAuthenticatorProvider {
 	 */
 	@Override
 	public String getLocalURL() {
-		return "/login/openid/"+selector.toString()+"/?destination="+destination;
+		String dest = "";
+		if (destination != null && !destination.isEmpty()) {
+			dest = Base64Helper.encode(destination);
+		} else {
+			dest = emptyDest;
+		}
+		return "/login/openid/"+selector.toString()+"/?destination="+dest;
 	}
 	
 	/* (non-Javadoc)

@@ -34,6 +34,10 @@
 	<!-- needed for Juno -->
 	<threadsafe>true</threadsafe>
 	
+	<inbound-services>
+ 		 <service>mail_bounce</service>
+	</inbound-services>
+
 <!-- 	<admin-console> -->
 <!-- 	    <page name="Appstats" url="/appstats"/> -->
 <!-- 	</admin-console> -->

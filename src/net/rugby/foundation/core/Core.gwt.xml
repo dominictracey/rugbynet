@@ -7,7 +7,6 @@
 	<inherits name="org.gwtbootstrap3.GwtBootstrap3NoTheme"/>
 
 <!-- 		<inherits name="org.gwtbootstrap3.GwtBootstrap3"/> -->
-<!-- 	<inherits name="com.gwtfb.GwtFB"/> -->
 
 <!--     <public path='theme'> -->
 <!--         <include name='/core/theme/css/*.css'/> -->

@@ -3,25 +3,36 @@ package net.rugby.foundation.core.client.ui;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.LoginInfo;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.PanelBody;
+import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
+import org.gwtbootstrap3.client.ui.html.Text;
+
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class ManageProfile extends DialogBox implements ExternalAuthenticatorPanel.Presenter, FacebookRegistrationPanel.Presenter
+public class ManageProfile extends DialogBox implements ExternalAuthenticatorPanel.Presenter//, FacebookRegistrationPanel.Presenter
 {
 	private static ManageProfileUiBinder uiBinder = GWT.create(ManageProfileUiBinder.class);
 
@@ -38,16 +49,33 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	
 	@UiField Button submit;
 	@UiField Button cancel;
-	@UiField Label error;
+//	@UiField Label error;
 	@UiField Panel topLevel;
 	@UiField LayoutPanel nonNativeLayer;
-	@UiField LayoutPanel nativeLayer;
-	@UiField LayoutPanel facebookLayer;
+	@UiField PanelBody nativeLayer;
 	@UiField LayoutPanel changePasswordLayer;
 	@UiField ExternalAuthenticatorPanel nonNativeLogins;
-	@UiField FacebookRegistrationPanel facebookPanel;
 	@UiField ChangePasswordPanel changePasswordPanel;
 	@UiField Anchor showNativeLink;
+	@UiField Column captionPanel;
+	@UiField Image close;
+	@UiField Span title;
+	@UiField PanelHeader header;
+	
+	//email validation panel
+	@UiField PanelBody emailValidationLayer;
+	@UiField TextBox emailValidationCode;
+	@UiField Button emailValidationSubmit;
+	@UiField Button emailValidationCancel;
+	@UiField TextBox emailValidationEmail;
+	
+	@UiField Alert alert;
+	@UiField Strong alertStrong;
+	@UiField Text alertText;
+	
+//	@UiField Alert success;
+//	@UiField Strong successStrong;
+//	@UiField Text successText;
 	
 	Presenter presenter;
 	private boolean editing;
@@ -57,6 +85,7 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		void doCreate(String email, String nickName, String password);
 		void doUpdate(String email, String nickName);
 		void doCancel();
+		void doValidateEmail(String email, String emailValidationCode);
 	}
 	
 	public ManageProfile()
@@ -66,41 +95,47 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		super.setAnimationEnabled(true);
 
 		setWidget(uiBinder.createAndBindUi(this));
-		error.setVisible(false);
+		alert.setVisible(false);
 		//setText("Account");
 
 		
 
 		nonNativeLogins.setPresenter(this);
-		showPanels(true,false, false, false);
+		nativeLayer.setSize("50em", "35em");
+		nonNativeLayer.setSize("40em", "30em");
+		changePasswordLayer.setSize("50em", "40em");
+		emailValidationLayer.setSize("50em", "30em");
+		showPanels(true,false, false, false, false);
 
 		topLevel.addStyleName("col-md-12"); 
-//		topLevel.addStyleName("col-sm-10");
-//		topLevel.addStyleName("col-xs-12");
-//		topLevel.addStyleName("col-md-offset-2");
-//		topLevel.addStyleName("col-xs-offset-1");
-		
-		
-		error.setVisible(false);
+		alert.addStyleName("col-md-12"); 
+		alert.setVisible(false);
+		alertStrong.setText("Error: ");
+//		success.addStyleName("col-md-12"); 
+//		success.setVisible(false);
+//		successStrong.setText("Success: ");
 		nonNativeLogins.setPresenter(this);
 		
-		//this.setWidth("1150px");
-//		nativeLayer.addStyleName("toptentext");  //padding: 15px; 
-		
 		nativeLayer.addStyleName("col-md-8"); 
-//		nativeLayer.addStyleName("col-sm-10");
-//		nativeLayer.addStyleName("col-xs-12");
-//		nativeLayer.addStyleName("col-md-offset-2");
-//		nativeLayer.addStyleName("col-xs-offset-1");
+
+		title.addStyleName("popupCaption");//padding
+		title.setText("Sign Up");
+		close.addStyleName("popupCloseButton");//float:right
+		captionPanel.addStyleName("panel-default");
+		header.addStyleName("panel-header");
+		
+		emailValidationEmail.addStyleName("hidden");
 	}
 
 	@UiHandler("showNativeLink")
 	void onShowNativeButtonClicked(ClickEvent event) {
-		//nativeLayer.setWidgetTopHeight(nativeLayer.getW), 0, Style.Unit.EM, 40, Style.Unit.EM);	
-		//nonNativeLayer.setSize("0em", "0em");
-		//nonNativeLayer.animate(3000);
-		showPanels(false, true, false, false);
-		//nativeLayer.animate(3000);
+		password1.setVisible(true);
+		password2.setVisible(true);
+		password1Label.setVisible(true);
+		password2Label.setVisible(true);
+		submit.setText("Sign Up");
+		emailAddress.setFocus(true);
+		showPanels(false, true, false, false, false);
 	}
 
 	@UiHandler("submit")
@@ -120,18 +155,32 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		} else {
 			if (!password2.getText().isEmpty()) {
 				if (password2.getText().equals(password1.getText())) {
-					submit.getElement().setAttribute("type","PRIMARY");
+					submit.getElement().removeClassName("btn-default"); 
+					submit.getElement().addClassName("btn-primary");
+					//submit.getElement().setAttribute("type","PRIMARY");
 				} else {
-					submit.getElement().removeAttribute("type");
+					submit.getElement().addClassName("btn-default"); 
+					submit.getElement().removeClassName("btn-primary");
+					//submit.getElement().removeAttribute("type");
 				}
 			}
 		}
 	}
+	
+	@UiHandler("emailValidationSubmit")
+	void onValidateEmail(ClickEvent event) {
+		presenter.doValidateEmail(emailValidationEmail.getText(), emailValidationCode.getText());
+	}
 
+	@UiHandler("emailValidationCancel") 
+	void onValidateCancel(ClickEvent event) {
+		presenter.doCancel();
+	}
+	
 	public void init(LoginInfo loginInfo) {
 
 		assert(presenter != null);
-		error.setVisible(false);
+		alert.setVisible(false);
 
 		editing = false;
 		
@@ -142,6 +191,7 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				emailAddress.setText(loginInfo.getEmailAddress());
 				emailAddress.setEnabled(false);
 				nickName.setText(loginInfo.getNickname());
+				title.setText("Update Profile");
 				if (loginInfo.getNickname() != null) {
 					nickName.setSelectionRange(0, loginInfo.getNickname().length());
 				}
@@ -153,22 +203,32 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				
 				submit.setText("Update");
 
-				showPanels(false, true, false, false);
+				showPanels(false, true, false, false, false);
 			} else if (loginInfo.getMustChangePassword()) {
-				showPanels(false,false,false,true);
-				error.setText(" Check your email for your temporary password.");
-				error.setVisible(true);
+				showPanels(false,false,false,true, false);
+				alert. setText(" Check your email for your temporary password.");
+				alert.setVisible(true);
 				submit.setText("Change Password");
+				title.setText("Change Password");
+			} else if (!loginInfo.isEmailValidated() && loginInfo.getEmailAddress() != null && !loginInfo.getEmailAddress().isEmpty()) {
+				showPanels(false, false, false, false, true);
+				title.setText("Validate");
+				emailValidationCode.setEnabled(true);
+				emailValidationCode.setFocus(true);
 			} else  {
-				showPanels(true, false, false, false);
+				showPanels(true, false, false, false, false);
 				submit.setText("Sign Up");
 				emailAddress.setEnabled(true);
 				emailAddress.setFocus(true);
 			}
 		}	else {
-			// should never get here
+			// should never get here?
 			assert(false);
-			showPanels(true, false, false, false);
+			showPanels(true, false, false, false, false);
+			password1.setVisible(true);
+			password2.setVisible(true);
+			password1Label.setVisible(true);
+			password2Label.setVisible(true);
 			submit.setText("Sign Up");
 			emailAddress.setFocus(true);
 		}
@@ -177,20 +237,40 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 
 	}
 
-
+	/*
+	 * When the user clicks a link we email them with the new password, it starts a profile activity which calls Identity.handlePasswordReset, which calls this
+	 * We need to show the changePassword panel, with the temp password filled in.
+	 */
+	public void collectNewPassword(String email, String tempPassword) {
+		showPanels(false,false,false,true, false);
+		//error.setText(" Check your email for your temporary password.");
+		alert.setVisible(false);
+		changePasswordPanel.emailAddress.setText(email);
+		changePasswordPanel.oldPassword.setText(tempPassword);
+		changePasswordPanel.
+		submit.setText("Change Password");
+		title.setText("Change Password");
+		password1.setFocus(true);
+	}
+	
 	void doCreate() {
 		if (nickName.getText().isEmpty()) {
 			showError(CoreConfiguration.getCreateacctErrorNicknameCantBeNull());
 		} else if (editing) {
 			presenter.doUpdate(emailAddress.getText(), nickName.getText());
-		} else if (password1.getText().equals(password2.getText())) {
-			presenter.doCreate(emailAddress.getText(), nickName.getText(), password1.getText());
-		} else {
-			error.setText("Passwords don't match!");
-			error.setVisible(true);
+		} else if (!password1.getText().equals(password2.getText())) {			
+			alertStrong.setText("Error: ");
+			alertText.setText("Passwords don't match!");
+			alert.removeStyleName("alert-success");
+			alert.addStyleName("alert-error");
+			alert.setVisible(true);
+			
 			password1.setText("");
 			password2.setText("");
 			password1.setFocus(true);
+		} else {
+			emailValidationEmail.setText(emailAddress.getText());
+			presenter.doCreate(emailAddress.getText(), nickName.getText(), password1.getText());
 		}
 	}
 	
@@ -210,8 +290,15 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 //	}
 	
 	public void showError(String errorMessage) {
-		if (errorMessage != null) {
-			error.setText(errorMessage);
+		if (errorMessage.equals("")) {
+			alertStrong.setText("");
+			alertText.setText("");
+			alert.setVisible(false);
+		} else if (errorMessage != null) {
+			alertStrong.setText("Error: ");
+			alertText.setText(errorMessage);
+			alert.removeStyleName("alert-success");
+			alert.addStyleName("alert-error");
 			 if (errorMessage.equals(CoreConfiguration.getCreateacctErrorExists()) ||
 					 errorMessage.equals(CoreConfiguration.getCreateacctErrorInvalidEmail())) {
 				 emailAddress.setText("");
@@ -226,11 +313,10 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 			 } else if (errorMessage.equals(CoreConfiguration.getCreateacctErrorNicknameCantBeNull())) {
 				 nickName.setFocus(true);
 			 }
-		} else {
-			error.setText("Unknown Error. Please try again later.");
-		}
 		
-		error.setVisible(true);
+			alert.setVisible(true);
+		}
+		center();
 	}
 
 	/* (non-Javadoc)
@@ -253,45 +339,27 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 			//showPanels(false,false,true);
 	}
 	
-	private void showPanels(boolean showNonNative, boolean showNative, boolean showFacebook, boolean changePassword) {
+	private void showPanels(boolean showNonNative, boolean showNative, boolean showFacebook, boolean changePassword, boolean emailValidation) {
 		if (showNonNative)
-			nonNativeLayer.setSize("40em", "30em");
+			nonNativeLayer.removeStyleName("hidden");
 		else
-			nonNativeLayer.setSize("0em", "0em");
+			nonNativeLayer.addStyleName("hidden");
 			
-		
-		if (showNative)
-			nativeLayer.setSize("50em", "35em");
-		else
-			nativeLayer.setSize("0em", "0em");
-		
-		if (showFacebook)
-			facebookLayer.setSize("50em", "20em");
-		else
-			facebookLayer.setSize("0em", "0em");
+		if (!showNative) {			
+			nativeLayer.addStyleName("hidden");
+		} else {
+			nativeLayer.removeStyleName("hidden");
+		}
 		
 		if (changePassword)
-			changePasswordLayer.setSize("50em", "20em");
+			changePasswordLayer.removeStyleName("hidden");
 		else
-			changePasswordLayer.setSize("0em", "0em");
-	}
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.client.ui.FacebookRegistrationPanel.Presenter#getDestination()
-	 */
-	@Override
-	public String getDestination() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.rugby.foundation.core.client.ui.FacebookRegistrationPanel.Presenter#getAppId()
-	 */
-	@Override
-	public String getAppId() {
-		// TODO Auto-generated method stub
-		return null;
+			changePasswordLayer.addStyleName("hidden");
+		
+		if (emailValidation) 
+			emailValidationLayer.removeStyleName("hidden");
+		else 
+			emailValidationLayer.addStyleName("hidden");
 	}
 
 	@Override
@@ -301,5 +369,26 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		
 	}
 
+	@Override
+	protected void onPreviewNativeEvent(NativePreviewEvent event)
+	{
+		 NativeEvent nativeEvent = event.getNativeEvent();
+		  
+		 if (!event.isCanceled()
+		 && (event.getTypeInt() == Event.ONCLICK)
+		 && isCloseEvent(nativeEvent))
+		 {
+			 this.hide();
+		 }
+		 super.onPreviewNativeEvent(event);
+	}
 
+	private boolean isCloseEvent(NativeEvent event)
+	{
+		return event.getEventTarget().equals(close.getElement());//compares equality of the underlying DOM elements
+	}
+
+	public ChangePasswordPanel getChangePasswordPanel() {
+		return changePasswordPanel;
+	}
 }
