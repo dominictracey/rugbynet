@@ -129,4 +129,10 @@ public class ContentActivity extends AbstractActivity implements ContentPresente
 	public void onLoginComplete(String destination) {
 		clientFactory.getPlaceController().goTo(place);
 	}
+
+	@Override
+	public void showFacebookComments(boolean show) {
+		clientFactory.showFacebookComments(show);
+		
+	}
 }

@@ -70,6 +70,7 @@ public class CountryTester {
 		assertTrue(c != null);
 		assertTrue(c.getAbbr().equals("NZL"));
 
+		assertTrue(27 == 27);
 	}
 
 	@Test

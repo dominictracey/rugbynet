@@ -163,10 +163,13 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 	}
 
-
-
+	@UiHandler("promote")
+	void onPromoteButtonClicked(ClickEvent event) {	
+		presenter.promote(list);
+	}
+	
 	@Override
-	public void setSeries(final IRatingSeries result, final String baseUrl) {
+	public void setSeries(final IRatingSeries result) {
 		series = result;
 
 		if (result != null) {

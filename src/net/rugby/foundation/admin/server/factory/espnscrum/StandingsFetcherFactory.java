@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IStandingsFetcher;
+import net.rugby.foundation.admin.server.model.PoolTableStandingsFetcher;
 import net.rugby.foundation.admin.server.model.ScrumHeinekenStandingsFetcher;
 import net.rugby.foundation.admin.server.model.ScrumSuperRugbyStandingsFetcher;
+import net.rugby.foundation.admin.server.model.SingleTableStandingsFetcher;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -32,7 +34,11 @@ public class StandingsFetcherFactory implements IStandingsFetcherFactory {
 		if (c != null && c.getCompType() == ICompetition.CompetitionType.HEINEKEN_CUP) {
 			return new ScrumHeinekenStandingsFetcher(sf);
 		} else if (c != null && c.getCompType() == ICompetition.CompetitionType.SUPER_RUGBY) {
-			return new ScrumSuperRugbyStandingsFetcher(sf);
+			return new PoolTableStandingsFetcher(sf);
+		} else if (c != null && (c.getCompType() == ICompetition.CompetitionType.AVIVA_PREMIERSHIP || 
+				 				c.getCompType() == ICompetition.CompetitionType.PRO12 || 
+				 				c.getCompType() == ICompetition.CompetitionType.TOP14)) {
+				return new SingleTableStandingsFetcher(sf);
 		}
 		return null;
 	}

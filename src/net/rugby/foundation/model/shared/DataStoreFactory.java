@@ -4,6 +4,8 @@
 package net.rugby.foundation.model.shared;
 
 import net.rugby.foundation.admin.shared.AdminTask;
+import net.rugby.foundation.admin.shared.Blurb;
+import net.rugby.foundation.admin.shared.DigestEmail;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
@@ -70,6 +72,8 @@ public class DataStoreFactory {
 			ObjectifyService.register(ScrumMatchRatingEngineSchema.class);
 			ObjectifyService.register(ScrumMatchRatingEngineSchema20130713.class);
 			ObjectifyService.register(BaseSeriesConfiguration.class);
+			ObjectifyService.register(Blurb.class);
+			ObjectifyService.register(DigestEmail.class);
 			
 			//topten
 			ObjectifyService.register(TopTenList.class);

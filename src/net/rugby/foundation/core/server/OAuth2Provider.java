@@ -15,10 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 
+import net.rugby.foundation.core.server.FacebookProvider.Base64Helper;
 import net.rugby.foundation.model.shared.LoginInfo;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gwt.http.client.URL;
 
 /**
  * @author home
@@ -33,7 +35,7 @@ public class OAuth2Provider implements IExternalAuthenticatorProvider {
 	private IAccountManager am;
 
 	private String destination;
-	
+	private String emptyDest = Base64Helper.encode("null");
 	/**
 	 * private because we need to specify a selector
 	 */
@@ -56,7 +58,13 @@ public class OAuth2Provider implements IExternalAuthenticatorProvider {
 	 */
 	@Override
 	public String getLocalURL() {
-		return "/login/oauth2/?destination="+destination;
+		String dest = "";
+		if (destination != null && !destination.isEmpty()) {
+			dest = Base64Helper.encode(destination);
+		} else {
+			dest = emptyDest;
+		}
+		return "/login/oauth2/?destination="+ dest;
 	}
 	
 	/* (non-Javadoc)
@@ -96,14 +104,6 @@ public class OAuth2Provider implements IExternalAuthenticatorProvider {
 		else 
 			resp.sendRedirect(getExternalURL());
 	}
-//
-//	public String getFederatedIdentity() {
-//		return federatedIdentity;
-//	}
-//
-//	public void setFederatedIdentity(String federatedIdentity) {
-//		this.federatedIdentity = federatedIdentity;
-//	}
 
 
 	/* (non-Javadoc)

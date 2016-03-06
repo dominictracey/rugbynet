@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-	<application>fantasyrugbyengine-hrd</application>
+	<application>fantasyrugbyengine-hrd-prod</application>
 	<version>9</version>
 	<module>default</module>
 	  <instance-class>F1</instance-class>
@@ -34,6 +34,10 @@
 	<!-- needed for Juno -->
 	<threadsafe>true</threadsafe>
 	
+	<inbound-services>
+ 		 <service>mail_bounce</service>
+	</inbound-services>
+
 <!-- 	<admin-console> -->
 <!-- 	    <page name="Appstats" url="/appstats"/> -->
 <!-- 	</admin-console> -->

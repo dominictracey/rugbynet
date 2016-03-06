@@ -14,12 +14,12 @@ import net.rugby.foundation.model.shared.ITeamGroup;
 
 public class ScrumHeinekenStandingsFetcher implements IStandingsFetcher {
 
-    private IRound round = null;
-    private ICompetition comp = null;
-    private IUrlCacher urlCacher = null;
-    private IStandingFactory standingFetcher = null;
-    private List<String> standingTablesList = null;
-    private String url = null;
+    protected IRound round = null;
+    protected ICompetition comp = null;
+    protected IUrlCacher urlCacher = null;
+    protected IStandingFactory standingFetcher = null;
+    protected List<String> standingTablesList = null;
+    protected String url = null;
 
 //    @Inject
 	public ScrumHeinekenStandingsFetcher(IStandingFactory sf) {

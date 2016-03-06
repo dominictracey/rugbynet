@@ -50,4 +50,5 @@ public interface TopTenListService extends RemoteService {
 	public List<Feature> getLatestFeatures();
 	public HashMap<Long, String> getTeamLogoStyleMap();
 	public Boolean deleteNote(Long noteId);
+	public String sendTweets(Long ttlId);
 }

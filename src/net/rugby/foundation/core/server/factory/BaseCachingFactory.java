@@ -39,9 +39,11 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 					out.close();
 					bos.close();
 
-					syncCache.put(id, yourBytes);
-					//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** getting object (and putting in memcache)" + mr.getId() + " *** \n" + syncCache.getStatistics());
-
+					if (yourBytes.length < 1048000) {
+						syncCache.put(id, yourBytes);
+					} else {
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"** attempt to store oversize object: " + mr.getId() + " *** \n" + syncCache.getStatistics());
+					}
 				}
 			} else {
 

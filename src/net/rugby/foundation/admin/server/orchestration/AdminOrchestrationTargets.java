@@ -16,7 +16,8 @@ public class AdminOrchestrationTargets {
 		ROUND ("Round"),
 		APPUSER ("App User"),
 		RATING ("Rating"), 
-		SERIES ("Series");	
+		SERIES ("Series"), 
+		USER ("User");	
 		
 		private String value;
 		private final static String targetKey = "Target";

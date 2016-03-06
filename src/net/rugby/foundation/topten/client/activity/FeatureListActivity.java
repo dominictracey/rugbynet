@@ -1,5 +1,8 @@
 package net.rugby.foundation.topten.client.activity;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
@@ -69,7 +72,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 							@Override
 							public void onFailure(Throwable caught) {
 								// fail silently
-								view.setList(null,"");
+								view.setList(null);
 							}
 
 							@Override
@@ -82,7 +85,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 								
 
 								if (ttl != null) {
-									view.setList(ttl, coreConfig.getBaseToptenUrl());
+									view.setList(ttl);
 									// allow other elements to display this comp/round
 									Long compId = ttl.getCompId();
 									//if (!Core.getCore().getCurrentCompId().equals(compId)) {
@@ -108,7 +111,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 									
 								} else {
 									Window.alert("Failed to fetch top ten list.");
-									view.setList(null,"");
+									view.setList(null);
 								}
 
 
@@ -250,7 +253,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 			//
 			//				@Override
 			//				public void onSuccess(ITopTenList result) {
-			//					view.setList(result, _coreConfig.getBaseToptenUrl());
+			//					view.setList(result);
 			//					place = new FeatureListPlace(result.getCompId(), result.getId(), null);
 			//					setURL();
 			//				}
@@ -271,7 +274,12 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				view.setList(result, _coreConfig.getBaseToptenUrl());				
+				view.setList(result);	
+				if (result.getLive()) {
+					Notify.notify(result.getTitle() + " has been published.");
+				} else {
+					Notify.notify(result.getTitle() + " has been unpublished.");
+				}
 			}
 
 
@@ -291,7 +299,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				view.setList(result, _coreConfig.getBaseToptenUrl());				
+				view.setList(result);				
 			}
 
 
@@ -301,8 +309,18 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 
 	@Override
 	public void promote(ITopTenList list) {
-		// TODO Auto-generated method stub
+		clientFactory.getRpcService().sendTweets(list.getId(), new AsyncCallback<String>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed tweeting");
+			}
 
+			@Override
+			public void onSuccess(String result) {
+				Bootbox.alert(result);
+			}
+		});
+		
 	}
 
 	@Override
@@ -335,7 +353,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 
 			@Override
 			public void onSuccess(ITopTenList result) {
-				view.setList(result, _coreConfig.getBaseToptenUrl());				
+				view.setList(result);				
 			}
 
 
@@ -351,7 +369,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 				clientFactory.getRpcService().getTopTenList(place.getListId(), new AsyncCallback<ITopTenList>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						view.setList(null,"");
+						view.setList(null);
 					}
 
 					@Override
@@ -361,10 +379,10 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 						view.setClientFactory(clientFactory);
 
 						if (ttl != null) {
-							view.setList(ttl, _coreConfig.getBaseToptenUrlForFacebook());
+							view.setList(ttl);
 						} else {
 							Window.alert("Failed to fetch top ten list.");
-							view.setList(null,"");
+							view.setList(null);
 						}
 
 						view.showContributorButtons(login.isTopTenContentContributor());
@@ -386,7 +404,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 			@Override
 			public void onSuccess(ITopTenList result) {
 				clientFactory.getFeatureListView().expandView(false);
-				view.setList(result, "");
+				view.setList(result);
 				editing = false;
 			}
 		});		
@@ -397,7 +415,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 	@Override
 	public void cancelEditTTLInfo(ITopTenList ttl) {
 		clientFactory.getFeatureListView().expandView(false);
-		view.setList(view.getList(), _coreConfig.getBaseToptenUrl());
+		view.setList(view.getList());
 		editing = false;
 	}
 
@@ -422,4 +440,9 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 		}
 	}
 
+	@Override
+	public void showFacebookComments(boolean show) {
+		clientFactory.showFacebookComments(show);
+		
+	}
 }

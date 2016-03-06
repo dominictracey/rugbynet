@@ -7,6 +7,10 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.joda.time.DateTime;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -39,6 +43,7 @@ public class LoginServlet extends HttpServlet {
 			throws IOException {
 
 		try {
+			
 			IExternalAuthenticatorProvider provider = eapf.get(req);
 			if (provider != null)
 				provider.handleLogin(req, resp);

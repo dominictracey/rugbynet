@@ -24,7 +24,7 @@ public interface FeatureListView<T extends ITopTenList> extends IsWidget
 		void delete(ITopTenList list);
 	}
 
-	void setList(T result, String baseUrl);
+	void setList(T result);
 	void setClientFactory(ClientFactory clientFactory);
 
 	ITopTenList getList();

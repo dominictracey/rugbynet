@@ -6,6 +6,8 @@ package net.rugby.foundation.admin.server.orchestration;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
+import net.rugby.foundation.admin.server.factory.IBlurbFactory;
+import net.rugby.foundation.admin.server.factory.IDigestEmailFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
@@ -13,11 +15,13 @@ import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.SeriesActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.UserActions;
 import net.rugby.foundation.admin.shared.IOrchestrationActions;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseMembershipFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
@@ -82,6 +86,9 @@ IOrchestrationFactory {
 	private IPlayerRatingFactory prf;
 	private ISeriesConfigurationFactory scf;
 	private ITopTenListFactory ttlf;
+	private IBlurbFactory bf;
+	private IDigestEmailFactory def;
+	private IConfigurationFactory ccf;
 
 	//@REX this is probably horrendously inefficient
 	@Inject
@@ -94,7 +101,8 @@ IOrchestrationFactory {
 			//			IClubhouseLeagueMapFactory chlmf, IMatchEntryFactory mef, IRoundEntryFactory ref, 
 			IMatchRatingEngineSchemaFactory mresf, IQueryRatingEngineFactory qref,
 			IRatingQueryFactory rqf, IAdminTaskFactory atf, IPlayerRatingFactory prf,
-			ISeriesConfigurationFactory scf, ITopTenListFactory ttlf) {
+			ISeriesConfigurationFactory scf, ITopTenListFactory ttlf,
+			IBlurbFactory bf, IDigestEmailFactory def, IConfigurationFactory ccf) {
 		this.cf = cf;
 		this.mf = mf;
 		//this.mf.setFactories(rf, tf);
@@ -117,13 +125,15 @@ IOrchestrationFactory {
 		this.prf = prf;
 		this.scf = scf;
 		this.ttlf = ttlf;
+		this.bf = bf;
+		this.def = def;
+		this.ccf = ccf;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.factory.IOrchestrationFactory#get(net.rugby.foundation.model.shared.IMatchGroup, net.rugby.foundation.admin.server.factory.IOrchestrationActions)
 	 */
 	@Override
-	public IOrchestration<IMatchGroup> get(IMatchGroup target,
-			IOrchestrationActions<IMatchGroup> action) {
+	public IOrchestration<IMatchGroup> get(IMatchGroup target, IOrchestrationActions<IMatchGroup> action) {
 		if (action.equals(AdminOrchestrationActions.MatchActions.FETCH)) {
 			IOrchestration<IMatchGroup> o = new FetchBasicScoreMatchResultOrchestration(rff, cf, mrf, mf, ocf);	
 			o.setTarget(target);
@@ -287,6 +297,16 @@ IOrchestrationFactory {
 //			o.setTarget(target);
 //			return o;
 //		} 
+		return null;
+	}
+	
+	@Override
+	public IOrchestration<IAppUser> get(IAppUser target, UserActions action) {
+		if (action.equals(AdminOrchestrationActions.UserActions.SEND_DIGEST)) {
+			IOrchestration<IAppUser> o = new SendDigestOrchestration(ocf, auf, bf, def, cf, ccf);
+			o.setTarget(target);
+			return o;
+		} 
 		return null;
 	}
 }

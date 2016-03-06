@@ -4,8 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
+
 
 public class LoginInfo implements Serializable, ITopTenRoleProvider {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4357097353630494993L;
 
 	public static enum ProviderType { openid, facebook, oauth2 }
 
@@ -14,7 +21,7 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+
 	private boolean loggedIn = false;
 	private String loginUrl;
 	private String logoutUrl;
@@ -35,14 +42,20 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
 	private boolean isTopTenContentContributor = false;
 	private boolean isTopTenContentEditor = false;
+	private boolean emailValidated = false;
+	
+	private List<CompetitionType> compList = new ArrayList<CompetitionType>();
+
+	private List<Long> teamIDs = new ArrayList<Long>();  //lineups for rounds
+	private List<Boolean> roundsComplete = new ArrayList<Boolean>();
+	private boolean oauth2;
+	private Boolean optOut;
+
 	
 	public boolean isAdmin() {
 		return isAdmin;
 	}
-
-	private List<Long> teamIDs = new ArrayList<Long>();  //lineups for rounds
-	private List<Boolean> roundsComplete = new ArrayList<Boolean>();
-
+	
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
@@ -216,4 +229,36 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 		isTopTenContentContributor = set;
 	}
 
+	public void setIsOauth2(boolean oauth2) {
+		this.oauth2 = oauth2;	
+	}
+
+	public boolean IsOauth2() {
+		return oauth2;
+	}
+
+	public boolean isEmailValidated() {
+		return emailValidated;
+	}
+
+	public void setEmailValidated(boolean emailValidated) {
+		this.emailValidated = emailValidated;
+	}
+
+	public List<CompetitionType> getCompList() {
+		return compList;
+	}
+
+	public void setCompList(List<CompetitionType> compList) {
+		this.compList = compList;
+	}
+
+	public Boolean getOptOut() {
+		return optOut;
+	}
+	
+	public void setOptOut(Boolean optOut) {
+		this.optOut = optOut;
+	}
+	
 }

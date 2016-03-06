@@ -94,7 +94,7 @@ public interface ClientFactory {
 	void setTTLName(Long nextId, Anchor nextLabel);
 
 	void showFacebookComments(String url);
-
+	void showFacebookComments(boolean show);
 	String getTeamLogoStyle(Long teamId);
 	
 	void getSponsorForList(ITopTenList list, AsyncCallback<ISponsor> cb);

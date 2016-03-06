@@ -17,6 +17,8 @@ import com.google.gwt.place.shared.PlaceTokenizer;
 public class Profile extends Place {
 
 
+
+
 	// URL scheme: #Profile:'action='action&'providerType='providerType'&selector=]selector'&destination'=urlencodedDest
 	private String seps = "[=&]";
 
@@ -24,7 +26,10 @@ public class Profile extends Place {
 	private LoginInfo.ProviderType providerType = null;
 	private LoginInfo.Selector selector = null;
 	private String destination = null;
-
+	private String email = null;
+	private String validationCode = null;
+	private String temporaryPassword = null;
+	
 	/**
 	 * 
 	 * @param token
@@ -44,10 +49,18 @@ public class Profile extends Place {
 			} else if (tok[i].equals(Keys.selector.toString())) {
 				if (tok.length >= i+1)
 					setSelector(IdentityTypes.getSelector(tok[i+1]));
-			} 
-			else if (tok[i].equals(Keys.destination.toString())) {
+			} else if (tok[i].equals(Keys.destination.toString())) {
 				if (tok.length >= i+1)
 					setDestination(URL.decode(tok[i+1]));
+			}  else if (tok[i].equals(Keys.email.toString())) {
+				if (tok.length >= i+1)
+					setEmail(URL.decode(tok[i+1]));
+			}  else if (tok[i].equals(Keys.validationCode.toString())) {
+				if (tok.length >= i+1)
+					setValidationCode(URL.decode(tok[i+1]));
+			}  else if (tok[i].equals(Keys.temporaryPassword.toString())) {
+				if (tok.length >= i+1)
+					setTemporaryPassword(URL.decode(tok[i+1]));
 			}
 
 		}
@@ -63,6 +76,15 @@ public class Profile extends Place {
 		this.destination = destination;
 	}
 
+	public Profile(Actions action, String destination, String email,
+			String validationCode) {
+		super();
+		this.action = action;
+		this.destination = destination;
+		this.email = email;
+		this.validationCode = validationCode;
+	}
+	
 	public Actions getAction() {
 		return action;
 	}
@@ -100,6 +122,36 @@ public class Profile extends Place {
 
 	public void setProviderType(LoginInfo.ProviderType providerType) {
 		this.providerType = providerType;
+	}
+
+
+	public String getEmail() {
+		return email;
+	}
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+
+	public String getValidationCode() {
+		return validationCode;
+	}
+
+
+	public void setValidationCode(String validationCode) {
+		this.validationCode = validationCode;
+	}
+
+
+	public String getTemporaryPassword() {
+		return temporaryPassword;
+	}
+
+
+	public void setTemporaryPassword(String temporaryPassword) {
+		this.temporaryPassword = temporaryPassword;
 	}
 
 

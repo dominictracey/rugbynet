@@ -61,7 +61,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		boolean dirty = false;
 		for (Long compId : copyOf) {
 			ICompetition comp =  (ICompetition)ofy.get(new Key<Competition>(Competition.class,compId));  //cf.get(compId);  // << this should speed it up as we don't build all comps
-			if (comp != null) {
+			if (comp != null && comp.getUnderway()) {
 				c.addCompetition(compId, comp.getLongName());
 				//c.getSeriesMap().put(compId, comp.getSeriesMap());
 			} else {
@@ -74,6 +74,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		
 		if (dirty) {
 			put(c);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Overwriting active comp list in core config to save removal of stale underway comps");
 		}
 		
 		// and the comps for the client self-cleaning oven
@@ -82,7 +83,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		dirty = false;
 		for (Long compId : copyOf) {
 			ICompetition comp = cf.get(compId);
-			if (comp != null) {
+			if (comp != null && comp.getShowToClient()) {
 				c.addCompForClient(compId);
 				c.getSeriesMap().put(compId, comp.getSeriesMap());
 			} else {
@@ -95,6 +96,7 @@ public class OfyConfigurationFactory extends BaseConfigurationFactory implements
 		
 		if (dirty) {
 			put(c);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Overwriting client comp list in core config to save removal of stale underway comps");
 		}
 		
 

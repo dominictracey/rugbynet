@@ -66,4 +66,5 @@ public interface TopTenListServiceAsync {
 	public void getLatestFeatures(AsyncCallback<List<Feature>> asyncCallback);
 	public void getTeamLogoStyleMap(AsyncCallback<HashMap<Long, String>> asyncCallback);
 	public void deleteNote(Long noteId, AsyncCallback<Boolean> asyncCallback);
+	public void sendTweets(Long ttlId, AsyncCallback<String> asyncCallback);
 }

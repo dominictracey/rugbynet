@@ -3,6 +3,8 @@
  */
 package net.rugby.foundation.core.server.factory;
 
+import java.util.List;
+
 import net.rugby.foundation.model.shared.IAppUser;
 
 /**
@@ -19,4 +21,6 @@ public interface IAppUserFactory {
 	void setId(Long id);
 	IAppUser get();
 	IAppUser put(IAppUser appUser);
+	List<IAppUser> getDigestEmailRecips();
+	IAppUser put(IAppUser appUser, boolean loginOnly);
 }

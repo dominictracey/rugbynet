@@ -16,6 +16,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -52,7 +53,7 @@ public interface CoreService extends RemoteService {
 	 * @return
 	 */
 	LoginInfo createAccount(String emailAddress, String nickName,
-			String password, boolean isGoogle, boolean isFacebook, boolean isOAuth2);
+			String password, String destination, boolean isGoogle, boolean isFacebook, boolean isOAuth2);
 
 	/**
 	 * @param loginInfo - Only will update lastEntryId, lastClubhouseId and lastCompetitionId
@@ -97,7 +98,7 @@ public interface CoreService extends RemoteService {
 	 */
 	String getOpenIdUrl(LoginInfo.Selector selector, String destination);
 	String getOAuth2Url(String destination);
-	LoginInfo updateAccount(String email, String screenName);
+	LoginInfo updateAccount(String email, String screenName, List<CompetitionType> compList, Boolean optOut);
 	
 	String getFacebookLoginUrl(String destination);
 	
@@ -109,7 +110,7 @@ public interface CoreService extends RemoteService {
 	 * @return an empty LoginInfo if it couldn't find user or oldPassword wasn't correct
 	 */
 	LoginInfo changePassword(String email, String oldPassword, String newPassword);
-	LoginInfo forgotPassword(String email);
+	LoginInfo forgotPassword(String email, String destination);
 	
 	IContent getContent(Long contentId);
 	IContent saveContent(IContent content);
@@ -129,5 +130,6 @@ public interface CoreService extends RemoteService {
 	UniversalRound getUniversalRound(int ordinal);
 	
 	public HashMap<String,Long> getContentItems();
-	
+	public LoginInfo validateEmail(String email, String validationCode);
+	LoginInfo resendValidationEmail(String email);
 }

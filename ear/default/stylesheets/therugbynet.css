@@ -444,6 +444,7 @@ input.accountInput {
 .serverResponseLabelError {
 	color:red;
 	font-weight:bold;
+	padding: 15px;
 }
 
 input.joinLink {
@@ -736,3 +737,14 @@ header{ background-color:#FFF}
 	float: right;
 }
 
+.padding-left {
+	padding-left: 10px;
+}
+
+.padding-top {
+	padding-top: 10px;
+}
+
+#draggablePanelList .panel-heading {
+        cursor: move;
+ }

@@ -25,7 +25,7 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 //		void setFBListLike(ITopTenList list, String baseUrl);
 	}
 	void setPresenter(TopTenListViewPresenter presenter); 
-	void setList(ITopTenList result, String baseUrl);
+	void setList(ITopTenList result);
 	void setClientFactory(ClientFactory clientFactory);
 	//List<TopTenItemView> getItemViews();
 	ITopTenList getList();

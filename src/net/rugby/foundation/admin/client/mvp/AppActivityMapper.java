@@ -4,12 +4,14 @@ import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.activity.CompActivity;
 import net.rugby.foundation.admin.client.activity.OrchestrationConfigurationActivity;
 import net.rugby.foundation.admin.client.activity.PortalActivity;
+import net.rugby.foundation.admin.client.activity.PromoteActivity;
 import net.rugby.foundation.admin.client.activity.SeriesActivity;
 import net.rugby.foundation.admin.client.activity.TaskActivity;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminOrchPlace;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.place.PortalPlace;
+import net.rugby.foundation.admin.client.place.PromotePlace;
 import net.rugby.foundation.admin.client.place.SeriesPlace;
 
 import com.google.gwt.activity.shared.Activity;
@@ -44,7 +46,8 @@ public class AppActivityMapper implements ActivityMapper {
 			return new PortalActivity((PortalPlace) place, clientFactory);
 		if (place instanceof SeriesPlace)
 			return new SeriesActivity((SeriesPlace) place, clientFactory);
-
+		if (place instanceof PromotePlace)
+			return new PromoteActivity((PromotePlace) place, clientFactory);
 		return null;
 	}
 

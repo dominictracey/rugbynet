@@ -88,4 +88,12 @@ public class CoreClientFactoryImpl implements CoreClientFactory {
 	    console.log(text);
 	}-*/;
 
+	public static native void recordAnalyticsEvent_(String cat, String action, String label, int val) /*-{
+		$wnd.ganew('send', 'event', cat, action, label, val);
+	}-*/;
+
+	@Override
+	public void recordAnalyticsEvent(String cat, String action, String label, int val) {
+		recordAnalyticsEvent_(cat,action,label,val);		
+	}
 }

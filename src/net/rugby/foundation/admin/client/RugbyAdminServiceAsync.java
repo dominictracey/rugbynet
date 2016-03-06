@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
@@ -187,4 +188,26 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<IRatingQuery> asyncCallback);
 	public void addRound(Long compId, int uri, String name,
 			AsyncCallback<Boolean> asyncCallback);
+	public void getAllBlurbs(Boolean active,
+			AsyncCallback<List<IBlurb>> asyncCallback);
+	public void addBlurb(String url, String linkText, String bodyText,
+			AsyncCallback<List<IBlurb>> asyncCallback);
+	/**
+	 * 
+	 * @param url - pass in a url of the form http://xxx.rugby.net/guid
+	 * @param 
+	 */
+	public void getListNameForUrl(String url,
+			AsyncCallback<String> asyncCallback);
+	public void getDigestPreview(String message, List<Long> blurbIds,
+			AsyncCallback<String> asyncCallback);
+	public void sendDigestEmail(String message, List<Long> blurbIds,
+			AsyncCallback<Integer> asyncCallback);
+	public void getDigestUserList(AsyncCallback<String> asyncCallback);
+	public void archive(List<Long> blurbIds,
+			AsyncCallback<Integer> asyncCallback);
+	public void facebook(List<Long> blurbIds,
+			AsyncCallback<Integer> asyncCallback);
+	public void twitter(List<Long> blurbIds,
+			AsyncCallback<List<Long>> asyncCallback);
 }

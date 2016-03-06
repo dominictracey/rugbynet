@@ -66,8 +66,8 @@ public class DesktopAccountBuilder extends AccountBuilder {
 
 
 			if (clientFactory.getLoginInfo() != null && clientFactory.getLoginInfo().isLoggedIn()) {
-				if (clientFactory.getLoginInfo().getProviderType() == null || !clientFactory.getLoginInfo().getProviderType().equals(ProviderType.facebook)) {
-					// native or openid
+//				if (clientFactory.getLoginInfo().getProviderType() == null) {// || !clientFactory.getLoginInfo().getProviderType().equals(ProviderType.facebook)) {
+					// native, google+ or facebook
 					tog.setHTML(clientFactory.getLoginInfo().getNickname() + "<b class=\"caret\"></b>");
 					signOutLink = new AnchorListItem("sign out");
 					signOutLink.setIcon(IconType.UNLOCK);
@@ -81,11 +81,11 @@ public class DesktopAccountBuilder extends AccountBuilder {
 					accountManagement.add(signOutLink);
 					signOutLink.setVisible(true);
 					editProfileLink.setVisible(true);
-				} else {
-
-					// Get login status - will update the Facebook UI element in the header appropriately
+//				} else {
+//
+//					 //Get login status - will update the Facebook UI element in the header appropriately
 //					fbCore.getLoginStatus(loginStatusCallback);
-				}
+//				}
 
 			}
 			else {
