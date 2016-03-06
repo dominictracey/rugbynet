@@ -87,4 +87,5 @@ public interface CoreServiceAsync {
 	void getOAuth2Url(String destination, AsyncCallback<String> asyncCallback);
 	public void getContentItems(AsyncCallback<HashMap<String,Long>> asyncCallback);
 	void validateEmail(String email, String validationCode, AsyncCallback<LoginInfo> asyncCallback);
+	void resendValidationEmail(String email, AsyncCallback<LoginInfo> asyncCallback);
 }

@@ -13,6 +13,8 @@
 <!-- 	<set-property name="bootstrap.responsiveDesign" value="true"/> -->
 
 <!-- 	<inherits name="org.gwtbootstrap3.GwtBootstrap3"/> -->
+	<inherits name="org.gwtbootstrap3.extras.notify.Notify"/>
+ 	<inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
 <!-- 	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
 
 <!--     <public path='theme'> -->

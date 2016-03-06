@@ -131,4 +131,5 @@ public interface CoreService extends RemoteService {
 	
 	public HashMap<String,Long> getContentItems();
 	public LoginInfo validateEmail(String email, String validationCode);
+	LoginInfo resendValidationEmail(String email);
 }

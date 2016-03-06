@@ -157,4 +157,7 @@ public interface RugbyAdminService extends RemoteService {
 	String getDigestPreview(String message, List<Long> blurbIds);
 	Integer sendDigestEmail(String message, List<Long> blurbIds);
 	String getDigestUserList();
+	Integer archive(List<Long> blurbIds);
+	Integer facebook(List<Long> blurbIds);
+	List<Long> twitter(List<Long> blurbIds);
 }

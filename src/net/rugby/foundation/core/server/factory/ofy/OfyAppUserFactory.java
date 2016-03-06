@@ -5,6 +5,7 @@ package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,6 +22,7 @@ import net.rugby.foundation.model.shared.AppUser;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.model.shared.IAppUser.EmailStatus;
 
 /**
  * @author home
@@ -73,8 +75,12 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 			return getByEmail();
 		else if (nickName != null)
 			return getByNickname();
-		else  // give an empty one
-			return new AppUser();
+		else  {// give an empty one
+			IAppUser u = new AppUser();
+			u.setCreated(new Date());
+			u.setEmailStatus(EmailStatus.NEW);
+			return u;
+		}
 	}
 	
 	private IAppUser getByEmail() {
@@ -121,10 +127,27 @@ public class OfyAppUserFactory implements IAppUserFactory, Serializable {
 		appUser.setEmailAddress(email);
 		Objectify ofy = DataStoreFactory.getOfy();
 
+		appUser.setLastUpdated(new Date());
 		ofy.put((AppUser)appUser);
 		return appUser;
 	}
 
+	@Override
+	public IAppUser put(IAppUser appUser, boolean loginOnly) {
+		// normalize the email
+		String email = appUser.getEmailAddress().toLowerCase();
+		appUser.setEmailAddress(email);
+		Objectify ofy = DataStoreFactory.getOfy();
+
+		if (loginOnly)
+			appUser.setLastLogin(new Date());
+		else 
+			appUser.setLastUpdated(new Date());
+		
+		ofy.put((AppUser)appUser);
+		return appUser;
+	}
+	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IAppUserFactory#setNickName(java.lang.String)
 	 */

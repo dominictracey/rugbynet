@@ -122,10 +122,10 @@
 		<role-name>admin</role-name>
 	</auth-constraint>
 </security-constraint>
-
+ -->
 <servlet>
   <servlet-name>bouncehandler</servlet-name>
-  <servlet-class>BounceHandlerServlet</servlet-class>
+  <servlet-class>net.rugby.foundation.core.server.mail.BounceHandlerServlet</servlet-class>
 </servlet>
 <servlet-mapping>
   <servlet-name>bouncehandler</servlet-name>
@@ -142,7 +142,7 @@
 </security-constraint>
 
 
- -->
+
 <session-config>
 	<session-timeout>25000</session-timeout>
 	<tracking-mode>COOKIE</tracking-mode>

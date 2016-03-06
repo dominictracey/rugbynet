@@ -80,4 +80,5 @@ public interface IAccountManager {
 			boolean isFacebook, boolean isOAuth2, HttpServletRequest request) throws NumberFormatException, JSONException, ParseException;
 
 	LoginInfo validateEmail(String email, String validationCode);
+	LoginInfo resendValidationEmail(String email);
 }

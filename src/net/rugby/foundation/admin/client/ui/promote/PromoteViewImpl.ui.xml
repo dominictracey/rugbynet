@@ -38,6 +38,9 @@
 				size="LARGE" ui:field="addDigest">New Digest Email</b:Button>
 				<b:Button dataTarget="#recipeientsModal" dataToggle="MODAL" type="PRIMARY"
 				size="LARGE" ui:field="recipientsDigest">Show Recipents</b:Button>
+				<b:Button type="PRIMARY" size="LARGE" ui:field="archive">Archive</b:Button>
+				<b:Button type="PRIMARY" size="LARGE" ui:field="facebook">Facebook</b:Button>
+				<b:Button type="PRIMARY" size="LARGE" ui:field="twitter">Twitter</b:Button>
 			<g:FlexTable addStyleNames="{style.playersViewPlayersFlexTable}"
 
 				ui:field="blurbTable" />

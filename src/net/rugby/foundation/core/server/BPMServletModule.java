@@ -1,6 +1,7 @@
 package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
+import net.rugby.foundation.core.server.mail.BounceHandlerServlet;
 import net.rugby.foundation.core.server.mail.UnsubscribeServlet;
 import net.rugby.foundation.topten.server.HomePage;
 import net.rugby.foundation.topten.server.MetaTagGenerator;
@@ -35,8 +36,7 @@ public class BPMServletModule extends ServletModule {
 		serve("/sitemap/*").with(SiteMap.class);
 		serve("/session/").with(SessionServlet.class);
 		serve("/").with(HomePage.class);
-		serve("/email/unsubscribe/").with(UnsubscribeServlet.class);
-//		serve("/_ah/pipeline/*").with(PipelineServlet.class); // not @Singleton
+		serve("/email/unsubscribe").with(UnsubscribeServlet.class);
 	}
 }
 

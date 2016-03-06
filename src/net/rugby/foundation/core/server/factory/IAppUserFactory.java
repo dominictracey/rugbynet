@@ -22,4 +22,5 @@ public interface IAppUserFactory {
 	IAppUser get();
 	IAppUser put(IAppUser appUser);
 	List<IAppUser> getDigestEmailRecips();
+	IAppUser put(IAppUser appUser, boolean loginOnly);
 }

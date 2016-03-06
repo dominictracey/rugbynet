@@ -11,6 +11,7 @@ import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 
 @Entity
 public class AppUser implements Serializable, IAppUser, ITopTenUser {
@@ -25,6 +26,7 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 
 	private String emailAddress;
 	private String nickname;
+	@Unindexed
 	private String pwHash; 
 	private boolean active;
 	private boolean admin;
@@ -34,17 +36,24 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	private boolean isFacebook;
 	private boolean isOath2;
 	private boolean optOut = false;
+	@Unindexed
 	private Long lastEntryId;
+	@Unindexed
 	private Long lastClubhouseId;
+	@Unindexed
 	private Long lastCompetitionId;
 
 	// new from Fasebuk
+	@Unindexed
 	private String firstName;
+	@Unindexed
 	private String lastName;
 	private Long fbId;
 	private String fbName;
 	private String facebookLink;
+	@Unindexed
 	private Long fbLocationId;
+	@Unindexed
 	private String fbLocationName;
 	private String gender;
 	private String timezone;
@@ -57,16 +66,25 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	private boolean isTopTenContentContributor;
 	private boolean isTopTenContentEditor;
 	
+	@Unindexed
 	private boolean mustChangePassword;
 
 	// mail
 	private EmailStatus emailStatus;
+	@Unindexed
 	private String emailValidationCode;
 	private boolean emailValidated = false;
 	private boolean isTestUser = false;
+	@Unindexed
+	private String optOutCode;
 	
+	@Unindexed
 	private List<CompetitionType> compList = null;
 	
+	protected Date lastLogin;
+	protected Date created;
+	protected Date lastUpdated;
+	protected Date optedOut;
 	
 	public AppUser() {
 
@@ -502,6 +520,46 @@ public class AppUser implements Serializable, IAppUser, ITopTenUser {
 	@Override
 	public void setTestUser(boolean isTest) {
 		isTestUser = isTest;
+	}
+	@Override
+	public String getOptOutCode() {
+		return optOutCode;
+	}
+	@Override
+	public void setOptOutCode(String optOutCode) {
+		this.optOutCode = optOutCode;
+	}
+	@Override
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+	@Override
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+	@Override
+	public Date getCreated() {
+		return created;
+	}
+	@Override
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+	@Override
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+	@Override
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+	@Override
+	public Date getOptedOut() {
+		return optedOut;
+	}
+	@Override
+	public void setOptedOut(Date optedOut) {
+		this.optedOut = optedOut;
 	}
 
 	

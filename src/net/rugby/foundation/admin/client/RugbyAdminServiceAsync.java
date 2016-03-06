@@ -204,4 +204,10 @@ public interface RugbyAdminServiceAsync {
 	public void sendDigestEmail(String message, List<Long> blurbIds,
 			AsyncCallback<Integer> asyncCallback);
 	public void getDigestUserList(AsyncCallback<String> asyncCallback);
+	public void archive(List<Long> blurbIds,
+			AsyncCallback<Integer> asyncCallback);
+	public void facebook(List<Long> blurbIds,
+			AsyncCallback<Integer> asyncCallback);
+	public void twitter(List<Long> blurbIds,
+			AsyncCallback<List<Long>> asyncCallback);
 }

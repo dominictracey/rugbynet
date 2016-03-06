@@ -33,14 +33,14 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 		void gotoPlace(Place place);
 		void switchMode(Long compId, RatingMode _mode);
 		void process(SeriesPlace place);
-		void promote(SeriesPlace place);
 		/**
 		 * The admin user has indicated they want to create or edit a feature
 		 */
 		void clickFeature(SeriesPlace place);
+		void promote(ITopTenList list);
 	}
 	
-	void setSeries(IRatingSeries series, String baseUrl);
+	void setSeries(IRatingSeries series);
 	void setClientFactory(ClientFactory clientFactory);
 	void setListView(TopTenListView<ITopTenItem> listView);
 	IRatingSeries getSeries();

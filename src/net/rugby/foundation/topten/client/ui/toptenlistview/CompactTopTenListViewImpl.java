@@ -284,7 +284,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 
 	@Override
-	public void setList(final ITopTenList result, final String baseUrl) {
+	public void setList(final ITopTenList result) {
 		list = result;
 		
 		if (result != null) {

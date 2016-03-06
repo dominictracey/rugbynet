@@ -633,4 +633,64 @@ public class AppUser implements IAppUser, Serializable {
 		
 	}
 
+	@Override
+	public void setOptOutCode(String randomPassword) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getOptOutCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setOptedOut(Date optedOut) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getOptedOut() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLastUpdated(Date lastUpdated) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getLastUpdated() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setCreated(Date created) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getCreated() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLastLogin(Date lastLogin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getLastLogin() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

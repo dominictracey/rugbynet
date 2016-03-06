@@ -1,5 +1,6 @@
 package net.rugby.foundation.admin.client.activity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -240,6 +241,77 @@ PromoteViewPresenter<IBlurb>
 			@Override
 			public void onSuccess(Integer result) {
 				Bootbox.alert("Digest email queued for sending to " + result + " users.");
+			}
+		});
+		
+	}
+
+	@Override
+	public void archive() {
+		List<Long> blurbIds = getBlurbIds();
+		clientFactory.getRpcService().archive(blurbIds, new AsyncCallback<Integer>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to archive blurb list");
+			}
+
+			@Override
+			public void onSuccess(Integer result) {
+				selectionModel.selectedItems.clear();
+				Notify.notify("Archived " + result + " blurbs.");
+				clientFactory.getRpcService().getAllBlurbs(place.getActive(), new AsyncCallback<List<IBlurb>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to fetch blurb list");
+					}
+
+					@Override
+					public void onSuccess(List<IBlurb> result) {
+						view.showList(result);
+					}
+				});
+			}
+		});
+	}
+	
+	private List<Long> getBlurbIds() {
+		List<Long> retval = new ArrayList<Long>();
+		for (IBlurb b : selectionModel.selectedItems) {
+			retval.add(b.getId());
+		}
+		return retval;
+	}
+
+	@Override
+	public void facebook() {
+		List<Long> blurbIds = getBlurbIds();
+		clientFactory.getRpcService().facebook(blurbIds, new AsyncCallback<Integer>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to post blurbs to facebook");
+			}
+
+			@Override
+			public void onSuccess(Integer result) {
+				Bootbox.alert("Buffered " + result + " facebook posts.");
+			}
+		});
+	}
+
+	@Override
+	public void twitter() {
+		final List<Long> blurbIds = getBlurbIds();
+		clientFactory.getRpcService().twitter(blurbIds, new AsyncCallback<List<Long>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to fetch blurb list");
+			}
+
+			@Override
+			public void onSuccess(List<Long> result) {
+				Bootbox.alert("Buffered " + (blurbIds.size() - result.size()) + " tweets.");
+				
+				//@TODO allow user to edit players without twitter handles to add them in for next time.
 			}
 		});
 		

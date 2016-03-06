@@ -29,6 +29,9 @@ import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.UListElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -47,6 +50,7 @@ import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+
 
 /**
  * @author home
@@ -75,6 +79,7 @@ public class PromoteViewImpl<T extends IBlurb> extends Composite implements Prom
 	@UiField Modal blurbModal;
 	@UiField ListGroup dragPanel;
 
+	@UiField Modal digestModal;
 	@UiField Button digestPreview;
 	@UiField Button digestSend;
 	@UiField TextArea message;
@@ -84,6 +89,10 @@ public class PromoteViewImpl<T extends IBlurb> extends Composite implements Prom
 
 	@UiField HTML recipientsHtml;
 	@UiField Modal recipientsModal;
+	
+	@UiField Button archive;
+	@UiField Button facebook;
+	@UiField Button twitter;
 	
 	private PromoteViewColumnDefinitions<T> columnDefinitions;
 	private List<T> blurbList;
@@ -108,6 +117,9 @@ public class PromoteViewImpl<T extends IBlurb> extends Composite implements Prom
 		dragPanel.addStyleName("list-unstyled");
 		dragPanel.addStyleName("ui-sortable");
 		dragPanel.addStyleName("draggablePanelList");
+		
+		facebook.setVisible(false);
+		twitter.setVisible(false);
 	}
 
 	@Override
@@ -143,20 +155,30 @@ public class PromoteViewImpl<T extends IBlurb> extends Composite implements Prom
 			@Override
 			public void callback(boolean result) {
 				if (result) {
-					Iterator<Widget> it = dragPanel.iterator();
-					List<Long> blurbIds = new ArrayList<Long>();
-					while (it.hasNext()) {
-						Widget w = it.next();
-						if (w instanceof ListGroupItem) {
-							Long id = Long.parseLong(((ListGroupItem)w).getId());
-							blurbIds.add(id);
-						}
-					}
+					List<Long> blurbIds = getBlurbIds();
 					listener.sendDigest(message.getText(), blurbIds);
+					digestModal.hide();
 				}
 			}
 		});
 	}
+	
+	@UiHandler("previewSend")
+	void onPreviewSend(ClickEvent event) {
+		Bootbox.confirm("Are you sure you want to email this digest to The Rugby Net user base?", new ConfirmCallback() {
+			@Override
+			public void callback(boolean result) {
+				if (result) {
+					List<Long> blurbIds = getBlurbIds();
+					listener.sendDigest(message.getText(), blurbIds);
+					previewModal.hide();
+					digestModal.hide();
+					
+				}
+			}
+		});
+	}
+
 
 	@UiHandler("suggest")
 	void onSuggestButtonClicked(ClickEvent event) {
@@ -180,17 +202,35 @@ public class PromoteViewImpl<T extends IBlurb> extends Composite implements Prom
 
 	@UiHandler("digestPreview")
 	void onPreviewClicked(ClickEvent event) {
-		Iterator<Widget> it = dragPanel.iterator();
-		List<Long> blurbIds = new ArrayList<Long>();
-		while (it.hasNext()) {
-			Widget w = it.next();
-			if (w instanceof ListGroupItem) {
-				Long id = Long.parseLong(((ListGroupItem)w).getId());
-				blurbIds.add(id);
-			}
-		}
-
+		List<Long> blurbIds = getBlurbIds();
 		listener.digestPreview(message.getText(), blurbIds);
+	}
+	
+	@UiHandler("archive")
+	void onArchiveClicked(ClickEvent event) {
+		listener.archive();
+	}
+	
+	@UiHandler("facebook")
+	void onFacebookClicked(ClickEvent event) {
+		listener.facebook();
+	}
+	
+	@UiHandler("twitter")
+	void onTwitterClicked(ClickEvent event) {
+		listener.twitter();
+	}
+
+	private List<Long> getBlurbIds() {
+		List<Long> blurbIds = new ArrayList<Long>();
+		Element dpe = dragPanel.getElement();
+		NodeList<Element> children = dpe.getElementsByTagName("li");
+		for  (int i=0; i < children.getLength(); ++i) {
+			Long id = Long.parseLong(children.getItem(i).getId());
+			blurbIds.add(id);
+		}
+		
+		return blurbIds;
 	}
 
 	@UiHandler("addDigest")

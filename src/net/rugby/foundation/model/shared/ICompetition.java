@@ -25,8 +25,12 @@ public interface ICompetition extends IHasId {
 		SIX_NATIONS ("Six Nations", "Six Nations", "6N", "6N", "/resources/comps/6N/200.png", "/resources/comps/6N/200R.png", 2.0F, true), 
 		RUGBY_CHAMPIONSHIP ("The Rugby Championship", "Rugby Championship", "TRC", "TRC", "/resources/comps/TRC/200.png", "/resources/comps/NOV/200R.png", 2.0F, true), 
 		AUTUMN_INTERNATIONALS ("Novemeber Internationals", "November Tests", "NOV", "NOV", "/resources/comps/TRC/200.png", "/resources/comps/NOV/200R.png", 2.0F, true), 
-		JUNE_TOURS ("June Internationals", "June Tests", "JUN", "JUN", "/resources/comps/JUN/200.png", "/resources/comps/JUN/200R.png", 2.0F, true), 
-		GLOBAL ("Global", "Global", "GLOBAL", "GLOBAL", "/resources/comps/GLOBAL/200.png", "/resources/comps/GLOBAL/200R.png", 4.0F, false);
+		JUNE_TOURS ("June Internationals", "June Tests", "JUN", "JUN", "/resources/comps/JUN/200.png", "/resources/comps/JUN/200R.png", 2.0F, true),
+		TEST ("Internationals", "Test Rugby", "TEST", "TEST", "/resources/comps/GLOBAL/200.png", "/resources/comps/GLOBAL/200R.png", 2.0F, true),
+		RUGBY_WORLD_CUP ("Rugby World Cup", "World Cup", "RWC", "RWC", "/resources/comps/RWC/200.png", "/resources/comps/RWC/200R.png", 2.5F, true),
+		SOUTHERN_HEMISPHERE ("Southern Hemisphere", "Southern Hemisphere", "SH", "SH", "/resources/comps/SH/200.png", "/resources/comps/SH/200R.png", 3.0F, true),
+		EUROPE ("Europe", "Europe", "EU", "EU", "/resources/comps/EU/200.png", "/resources/comps/EU/200R.png", 3.0F, true),
+		GLOBAL ("Global", "World", "GLOBAL", "GLOBAL", "/resources/comps/GLOBAL/200.png", "/resources/comps/GLOBAL/200R.png", 4.0F, true);
 		
 		private String displayName;
 		private String shortName;

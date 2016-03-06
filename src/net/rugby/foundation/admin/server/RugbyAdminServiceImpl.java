@@ -1,6 +1,14 @@
 package net.rugby.foundation.admin.server;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -109,12 +117,12 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.UniversalRound;
-import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -2595,6 +2603,116 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
+	}
+
+	@Override
+	public Integer archive(List<Long> blurbIds) {
+		try {
+			if (checkAdmin()) {
+			
+				Integer retval = 0;
+				for (Long bid : blurbIds) {
+					IBlurb b = bf.get(bid);
+					if (b!=null) {
+						b.setActive(false);
+						bf.put(b);
+						retval++;
+					}
+				}
+				
+				return retval;
+			}
+		 	return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public Integer facebook(List<Long> blurbIds) {
+		try {
+			if (checkAdmin()) {
+			
+				Integer retval = 0;
+				for (Long bid : blurbIds) {
+					IBlurb b = bf.get(bid);
+					if (b!=null) {
+						if (postToFacebook(b))
+							retval++;
+					}
+				}
+				
+				return retval;
+			}
+		 	return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	private final static String BUFFER_CREATE_URL = "https://api.bufferapp.com/1/updates/create.json";
+	private boolean postToFacebook(IBlurb b) {
+		try {
+			String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+			
+			StringBuilder params = new StringBuilder();
+			params.append("access_token=1/4266c2423560ded98f0b532cac894c07");
+			params.append("&profile_ids[]=53f4ab03c4320ad025b8ee70");
+			params.append("&text=" + URLEncoder.encode(b.getBodyText(),charset));
+			params.append("&shorten=false");
+			params.append("&profile_service=facebook");  // << this seems to be ignored, they just go to twitter
+			String link = ccf.get().getBaseToptenUrl() + "s/" + b.getServerPlace().getGuid();
+			params.append("&media[link]=" + URLEncoder.encode(link,charset));
+			params.append("media[title]=" + URLEncoder.encode(b.getLinkText(),charset));
+			
+			byte[] postData = params.toString().getBytes(charset);
+			int    postDataLength = postData.length;
+			
+			URL url = new URL(BUFFER_CREATE_URL);
+			HttpURLConnection conn= (HttpURLConnection) url.openConnection();           
+			conn.setDoOutput(true);
+			conn.setInstanceFollowRedirects( false );
+			conn.setRequestMethod( "POST" );
+			conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
+			conn.setRequestProperty( "charset", charset);
+			conn.setRequestProperty( "Content-Length", Integer.toString(postDataLength));
+			conn.setUseCaches( false );
+			
+			DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+			wr.write(postData);
+			Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
+
+			StringBuilder sb = new StringBuilder();
+	        for (int c; (c = in.read()) >= 0;)
+	            sb.append((char)c);
+	        String response = sb.toString();
+
+			JSONObject json = new JSONObject(response);
+			
+			return json.getBoolean("success");
+			
+
+//		} catch (MalformedURLException ex) {
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+//			return false;
+		} catch (IOException ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return false;
+//		} catch (URISyntaxException ex) {
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+//			return false;
+		}  catch (JSONException ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return false;
+		}
+	}
+
+	@Override
+	public List<Long> twitter(List<Long> blurbIds) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

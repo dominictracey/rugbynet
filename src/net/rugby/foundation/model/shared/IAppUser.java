@@ -252,4 +252,23 @@ public interface IAppUser {
 	boolean getTestUser();
 	void setTestUser(boolean isTest);
 
+	public abstract void setOptOutCode(String randomPassword);
+	public abstract String getOptOutCode();
+
+	void setOptedOut(Date optedOut);
+
+	Date getOptedOut();
+
+	void setLastUpdated(Date lastUpdated);
+
+	Date getLastUpdated();
+
+	void setCreated(Date created);
+
+	Date getCreated();
+
+	void setLastLogin(Date lastLogin);
+
+	Date getLastLogin();
+
 }

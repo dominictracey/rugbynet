@@ -18,17 +18,20 @@ import net.rugby.foundation.admin.shared.DigestEmail;
 import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.IDigestEmail;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 
 public class OfyDigestEmailFactory extends BaseCachingFactory<IDigestEmail> implements IDigestEmailFactory {
 	
 	private Objectify ofy;
 	private IBlurbFactory bf;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	public OfyDigestEmailFactory(IBlurbFactory bf) {
+	public OfyDigestEmailFactory(IBlurbFactory bf, IConfigurationFactory ccf) {
 		this.ofy = DataStoreFactory.getOfy();
 		this.bf = bf;
+		this.ccf = ccf;
 	}
 	
 	@Override
@@ -115,7 +118,7 @@ public class OfyDigestEmailFactory extends BaseCachingFactory<IDigestEmail> impl
 	
 	private void buildFormattedBlurb(IBlurb b, IDigestEmail de) {
 		String fb = de.getPart3();
-		String url = "http://www.rugby.net/s/" + b.getServerPlace().getGuid();
+		String url = ccf.get().getBaseToptenUrl() + "s/" + b.getServerPlace().getGuid();
 		String link = "<a href=\"" + url+ "\" style=\"text-decoration:none;display:block;font-size:19px;color:#333;letter-spacing:-0.5px;line-height:1.25;font-weight:bold;color:#155fad\" target=\"_blank\"><span>" + b.getLinkText() + "</span></a>";
 		String readMore = "<a href=\"" + url+ "\"style=\"border-collapse:collapse;display:block;font-family:Georgia,Times,'Times New Roman',serif;font-size:15px;line-height:1.4;color:#155fad\" target=\"_blank\"><span> See the full list...</span></a>";
 

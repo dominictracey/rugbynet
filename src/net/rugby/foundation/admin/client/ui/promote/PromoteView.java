@@ -30,6 +30,10 @@ public interface PromoteView<T extends IBlurb> extends IsWidget {
 		void digestPreview(String text, List<Long> blurbIds);
 
 		void sendDigest(String text, List<Long> blurbIds);
+
+		void archive();
+		void facebook();
+		void twitter();
 	} 
 
 

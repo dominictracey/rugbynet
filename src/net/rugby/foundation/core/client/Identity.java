@@ -159,8 +159,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			presenter.showFacebookComments(false);
 			RootPanel.get().removeStyleName("menu");
 			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "sign up menu", 1);
-
-			getManageProfileDialog().init(clientFactory.getLoginInfo());
+			
+			getManageProfileDialog().init(new LoginInfo());
 		}	
 	};
 
@@ -319,7 +319,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			clientFactory.getRpcService().login(new AsyncCallback<LoginInfo>() {
 				@Override
 				public void onSuccess(LoginInfo result) {
-					if (result.isLoggedIn()) {
+					if (result.getEmailAddress() != null && !result.getEmailAddress().isEmpty()) {
 						clientFactory.setLoginInfo(result);
 						//showLoggedIn();
 						//getManageProfileDialog().setNative(false);
@@ -327,6 +327,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 						getManageProfileDialog().init(result);
 					} else {
 						console("Not logged in so can't update profile");
+						presenter.showFacebookComments(false);
+						getLoginDialog().init();
 					}
 				}
 
@@ -337,6 +339,9 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				}
 			});		
 
+		} else if (action == Actions.create) {
+			presenter.showFacebookComments(false);
+			getManageProfileDialog().init(new LoginInfo()); // create
 		} else if (action == Actions.done) {
 			// this is where we get sent after we sign up with a non-native ID
 			// because that process uses the non-RPC servlet we don't have a client-side copy of 
@@ -410,8 +415,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	}
 
 	@Override
-	public void doLogin(String emailAddress, String password) {
-		clientFactory.getRpcService().nativeLogin(emailAddress, password, new AsyncCallback<LoginInfo>() {
+	public void doLogin(final String emailAddress, final String password) {
+		clientFactory.getRpcService().nativeLogin( emailAddress, password, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
 				if (result==null) {
 					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Incorrect email or password", 1);
@@ -419,7 +424,19 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 					getLoginDialog().showError("Incorrect email or password");
 
 				} else if (!result.isLoggedIn()) {
-					if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
+					// do they need to validate their email still?
+					if (!result.isEmailValidated()) {
+						getLoginDialog().hide();
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "native login on unvalidated email", 1);
+						getManageProfileDialog().init(result);
+					} else if (result.getMustChangePassword()){ // has to pick new password
+						getLoginDialog().showNonNativeLogins(true);
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "need to pick new password", 1);
+						getLoginDialog().hide();
+						//getManageProfileDialog().init(result);
+						//getManageProfileDialog().showMessage(result.getStatus());
+						getManageProfileDialog().collectNewPassword(emailAddress, password, "Choose a new password ", result.getStatus());
+					} else if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
 						getLoginDialog().showNonNativeLogins(true);
 						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Use external authentication", 1);
 
@@ -639,7 +656,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 					getLoginDialog().hide();
 					getManageProfileDialog().init(result);
-				} else if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
+				} else if ((result.IsOauth2() || result.isOpenId()) && !result.isLoggedIn()){ // 2a. use your external authenticator
 					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "reset password use external authenticator", 1);
 
 					getLoginDialog().showNonNativeLogins(true);
@@ -802,6 +819,37 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	public void setParentWidget(DropDownMenu sidebarProfile) {
 		mobileParent = sidebarProfile;
 		
+	}
+
+	@Override
+	public void doResendValidationEmail(String email) {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "resend validation email", 1);
+
+		clientFactory.getRpcService().resendValidationEmail(email, new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "resend validation email server error", 1);
+
+				getManageProfileDialog().showError("Problem resending validation email. Please contact support: info@rugby.net");
+				
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				if (result != null) { //result.getStatus().equals("Email successfully validated")) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "resend validation email", 1);
+
+					getManageProfileDialog().init(result);
+				} else {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "resend validation email", 1);
+
+					getManageProfileDialog().showError(result.getStatus() + ". Please try again and if the problem persists contact support: info@rugby.net");
+				}
+				
+			}
+			
+		});
 	}
 	
 

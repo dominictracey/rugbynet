@@ -53,6 +53,7 @@ public class DigestEmailer {
 
 	private ICompetitionFactory cf;
 	private IDigestEmail de;
+	private ICoreConfiguration cc;
     
 	@Inject
 	public DigestEmailer(ICompetitionFactory cf) {
@@ -78,10 +79,13 @@ public class DigestEmailer {
 			// **************************
 			// *** ONLY IN PROD  *******
 			// **************************
-			if (cc != null && (cc.getEnvironment() == Environment.PROD || cc.getEnvironment() == Environment.LOCAL)) {
+//			if (cc != null && (cc.getEnvironment() == Environment.PROD || cc.getEnvironment() == Environment.LOCAL)) {
+			// this is taken care of in OfyAppUserFactory.getUsersForDigest() - which chooses only those with isTestUser==true
 		        Message msg = new MimeMessage(session);
 		        MimeMultipart mpart = new MimeMultipart();
 		        MimeBodyPart bp = new MimeBodyPart();
+		        
+		        this.cc = cc;
 		        
 		        String content = buildMessage();
 		        
@@ -96,9 +100,9 @@ public class DigestEmailer {
 		        msg.saveChanges();
 		        
 		        Transport.send(msg);
-		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent mail to " + msg.getRecipients(RecipientType.TO)[0].toString());
+		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Sent mail to " + msg.getRecipients(RecipientType.TO)[0].toString());
 		        
-			}
+//			}
 	
 	    } catch (AddressException e) {
 	    	Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error sending mail 1 " + e.getLocalizedMessage());
@@ -156,12 +160,15 @@ public class DigestEmailer {
 	private String buildUnsubLink() {
 		try {
 			String email = null;
+			String code = null;
 			if (recip != null) { 
 				email = recip.getEmailAddress();
+				code = recip.getOptOutCode();
 			} else {
 				email = "test@example.com";
+				code = "";
 			}
-			return "<a href=\"http://www.rugby.net/email/unsubscribe?email=" + URLEncoder.encode(email, "UTF-8") + "\" style=\"text-decoration:underline;color:#999\" target=\"_blank\">Unsubscribe</a> from this email.";
+			return "<a href=\"" + cc.getBaseToptenUrl() + "email/unsubscribe?email=" + URLEncoder.encode(email, "UTF-8") + "&optOutCode=" + code + "\" style=\"text-decoration:underline;color:#999\" target=\"_blank\">Unsubscribe</a> from this email.";
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Error building unsubscribe link" + e.getLocalizedMessage());
 			return null;

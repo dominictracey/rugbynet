@@ -948,4 +948,22 @@ public class Core implements CoreServiceAsync, EntryPoint {
 		
 	}
 
+	@Override
+	public void resendValidationEmail(String email, final AsyncCallback<LoginInfo> cb) {
+		clientFactory.getRpcService().resendValidationEmail(email, new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);			
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				cb.onSuccess(result);				
+			}
+			
+		});
+		
+	}
+
 }
