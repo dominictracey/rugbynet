@@ -1,25 +1,19 @@
 package net.rugby.foundation.admin.server.factory.test;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-
+import com.google.inject.Inject;
 import net.rugby.foundation.admin.server.factory.IBlurbFactory;
 import net.rugby.foundation.admin.server.factory.IDigestEmailFactory;
 import net.rugby.foundation.admin.shared.DigestEmail;
-import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.IDigestEmail;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
-import net.rugby.foundation.model.shared.DataStoreFactory;
 
 public class TestDigestEmailFactory extends BaseCachingFactory<IDigestEmail> implements IDigestEmailFactory {
 
 	private IBlurbFactory bf;
-
+	@Inject
 	public TestDigestEmailFactory(IBlurbFactory bf) {
 
 		this.bf = bf;
