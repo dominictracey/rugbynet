@@ -13,7 +13,81 @@ import java.util.List;
  */
 public interface ICompetition extends IHasId {
 
-	public enum CompetitionType {HEINEKEN_CUP, AVIVA_PREMIERSHIP, SUPER_RUGBY, AUTUMN_INTERNATIONALS, GLOBAL}
+	public enum CompetitionType {
+
+		HEINEKEN_CUP ("Heineken Cup", "Heineken Cup", "HNK", "HNK", "/resources/comps/HNK/200.png", "/resources/comps/HNK/200R.png", 1.1F, false), 
+		AVIVA_PREMIERSHIP ("Aviva Premiership", "Premiership", "AP", "AP", "/resources/comps/AP/200.png", "/resources/comps/AP/200R.png", 1.1F, true), 
+		PRO12 ("Guiness PRO12", "PRO12", "PRO12", "PRO12", "/resources/comps/PRO12/200.png", "/resources/comps/PRO12/200R.png", 1.1F, true), 
+		TOP14 ("Orange Top 14", "Top 14", "TOP14", "TOP14", "/resources/comps/TOP14/200.png", "/resources/comps/TOP14/200R.png", 1.1F, true), 
+		SUPER_RUGBY ("Super Rugby", "Super Rugby", "SR", "SR", "/resources/comps/SR/200.png", "/resources/comps/SR/200R.png", 1.1F, true), 
+		CHAMPIONS_CUP ("European Champions Cup", "Champions Cup", "ERCC", "ERCC", "/resources/comps/ERCC/200.png", "/resources/comps/ERCC/200R.png", 1.2F, true), 
+		CHALLENGE_CUP ("European Challenge Cup", "Challenge Cup", "ERC", "ERC", "/resources/comps/ERC/200.png", "/resources/comps/ERC/200R.png", 1.2F, true), 
+		SIX_NATIONS ("Six Nations", "Six Nations", "6N", "6N", "/resources/comps/6N/200.png", "/resources/comps/6N/200R.png", 2.0F, true), 
+		RUGBY_CHAMPIONSHIP ("The Rugby Championship", "Rugby Championship", "TRC", "TRC", "/resources/comps/TRC/200.png", "/resources/comps/NOV/200R.png", 2.0F, true), 
+		AUTUMN_INTERNATIONALS ("Novemeber Internationals", "November Tests", "NOV", "NOV", "/resources/comps/TRC/200.png", "/resources/comps/NOV/200R.png", 2.0F, true), 
+		JUNE_TOURS ("June Internationals", "June Tests", "JUN", "JUN", "/resources/comps/JUN/200.png", "/resources/comps/JUN/200R.png", 2.0F, true),
+		TEST ("Internationals", "Test Rugby", "TEST", "TEST", "/resources/comps/GLOBAL/200.png", "/resources/comps/GLOBAL/200R.png", 2.0F, true),
+		RUGBY_WORLD_CUP ("Rugby World Cup", "World Cup", "RWC", "RWC", "/resources/comps/RWC/200.png", "/resources/comps/RWC/200R.png", 2.5F, true),
+		SOUTHERN_HEMISPHERE ("Southern Hemisphere", "Southern Hemisphere", "SH", "SH", "/resources/comps/SH/200.png", "/resources/comps/SH/200R.png", 3.0F, true),
+		EUROPE ("Europe", "Europe", "EU", "EU", "/resources/comps/EU/200.png", "/resources/comps/EU/200R.png", 3.0F, true),
+		GLOBAL ("Global", "World", "GLOBAL", "GLOBAL", "/resources/comps/GLOBAL/200.png", "/resources/comps/GLOBAL/200R.png", 4.0F, true);
+		
+		private String displayName;
+		private String shortName;
+		private String abbr;
+		private String styleClass;
+		private String squareImageUrl;
+		private String rectImageUrl;
+		private Float weight;
+		private Boolean showToClient;
+		
+		private CompetitionType(String displayName, String shortName, String abbr,
+				String styleClass, String squareImageUrl, String rectImageUrl,
+				Float weight, Boolean showToClient) {
+			this.displayName = displayName;
+			this.shortName = shortName;
+			this.abbr = abbr;
+			this.styleClass = styleClass;
+			this.squareImageUrl = squareImageUrl;
+			this.rectImageUrl = rectImageUrl;
+			this.weight = weight;
+			this.showToClient = showToClient;
+		}
+
+		public String getDisplayName() {
+			return displayName;
+		}
+
+		public String getShortName() {
+			return shortName;
+		}
+		public String getAbbr() {
+			return abbr;
+		}
+
+		public String getStyleClass() {
+			return styleClass;
+		}
+
+		public String getSquareImageUrl() {
+			return squareImageUrl;
+		}
+
+		public String getRectImageUrl() {
+			return rectImageUrl;
+		}
+
+		public Float getWeight() {
+			return weight;
+		}
+
+		public Boolean getShowToClient() {
+			return showToClient;
+		}
+
+		
+		
+	}
 
 	public abstract Long getId();
 	public abstract void setId(Long id);

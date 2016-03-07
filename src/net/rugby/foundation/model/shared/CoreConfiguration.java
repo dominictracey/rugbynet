@@ -127,18 +127,18 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 //
 	//i18n?
 	private final static String CREATEACCT_ERROR_EXISTS = "Error creating: Email in use"; 
-	private final static String CREATEACCT_ERROR_PASSWORD_TOO_SHORT = "Error creating: Password must be at least 5 characters"; 
-	private final static String CREATEACCT_ERROR_INVALID_EMAIL = "Error creating: Not a valid email address"; 
-	private final static String CREATEACCT_ERROR__NICKNAME_EXISTS = "Error creating: That screen name is in use"; 
-	private final static String CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL = "Error: Screen name required";
+	private final static String CREATEACCT_ERROR_PASSWORD_TOO_SHORT = " Password must be at least 5 characters"; 
+	private final static String CREATEACCT_ERROR_INVALID_EMAIL = " Not a valid email address"; 
+	private final static String CREATEACCT_ERROR__NICKNAME_EXISTS = " That screen name is in use"; 
+	private final static String CREATEACCT_ERROR__NICKNAME_CANT_BE_NULL = " Screen name required";
 	private final static String CREATEACCT_OK = "Congratulations - account created!";
 //	
 //	private static final String DEFAULT_COMPETITION_SHORT_NAME = "2011 RWC Knockout"; 
 	
-	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/s/";
-	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/s/";
-	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/s/";
-	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/s/";
+	private final static String LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/";
+	private final static String DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/";
+	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/";
+	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/";
 	
 	// Facebook
 //	private final static String FB_LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/fb/topten.html";

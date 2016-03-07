@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import com.googlecode.objectify.annotation.Entity;
 
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 /**
  * @author home
@@ -606,6 +607,90 @@ public class AppUser implements IAppUser, Serializable {
 	public void setEmailValidated(boolean emailValidated) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<CompetitionType> getCompList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setCompList(List<CompetitionType> compList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean getTestUser() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setTestUser(boolean isTest) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setOptOutCode(String randomPassword) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getOptOutCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setOptedOut(Date optedOut) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getOptedOut() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLastUpdated(Date lastUpdated) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getLastUpdated() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setCreated(Date created) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getCreated() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLastLogin(Date lastLogin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Date getLastLogin() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

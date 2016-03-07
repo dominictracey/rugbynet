@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.place.AdminOrchPlace;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.place.PortalPlace;
+import net.rugby.foundation.admin.client.place.PromotePlace;
 import net.rugby.foundation.admin.client.place.SeriesPlace;
 import net.rugby.foundation.admin.client.ui.EditContent.EditContentPresenter;
 import net.rugby.foundation.model.shared.IContent;
@@ -50,6 +51,8 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@UiField MenuBar schemaBar;
 	@UiField MenuItem schemaMenuNew;
 	@UiField MenuBar schemaList;
+	@UiField MenuBar promoteBar;
+	@UiField MenuItem promoteMenuNew;
 	@UiField MenuItem adminMenuFlushAllPipelineJobs;
 	@UiField MenuItem adminMenuCreateContent;
 	@UiField MenuItem adminMenuCleanup;
@@ -57,6 +60,8 @@ public class SmartBarImpl extends Composite implements SmartBar {
 
 	private SchemaPresenter schemaListener;
 	private EditContentPresenter contentListener;
+
+	private PromotePresenter promoteListener;
 	
 	public SmartBarImpl() {
 		initWidget(binder.createAndBindUi(this));
@@ -124,6 +129,13 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			}	
 		});
 
+		promoteMenuNew.setCommand(new Command() {
+			@Override
+			public void execute() {
+				listener.goTo(new PromotePlace(true));
+			}
+
+		});
 	}
 
 	@Override
@@ -137,7 +149,6 @@ public class SmartBarImpl extends Composite implements SmartBar {
 
 		});
 	}
-
 
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.game1.client.ui.SmartBar#setComps(java.util.Map)

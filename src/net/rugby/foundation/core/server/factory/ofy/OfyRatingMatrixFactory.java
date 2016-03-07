@@ -96,7 +96,7 @@ public class OfyRatingMatrixFactory extends BaseRatingMatrixFactory implements I
 		List<IRatingMatrix> matrices = new ArrayList<IRatingMatrix>();
 		Query<RatingMatrix> qrm = ofy.query(RatingMatrix.class).filter("ratingGroupId", ratingGroupId);
 		matrices.addAll(qrm.list());
-		return null;
+		return matrices;
 	}
 
 

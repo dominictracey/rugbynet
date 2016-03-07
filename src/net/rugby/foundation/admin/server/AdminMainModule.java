@@ -1,6 +1,8 @@
 package net.rugby.foundation.admin.server;
 
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
+import net.rugby.foundation.admin.server.factory.IBlurbFactory;
+import net.rugby.foundation.admin.server.factory.IDigestEmailFactory;
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
@@ -16,6 +18,8 @@ import net.rugby.foundation.admin.server.factory.espnscrum.ScrumResultFetcherFac
 import net.rugby.foundation.admin.server.factory.espnscrum.StandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.factory.ofy.OfyAdminTaskFactory;
+import net.rugby.foundation.admin.server.factory.ofy.OfyBlurbFactory;
+import net.rugby.foundation.admin.server.factory.ofy.OfyDigestEmailFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfyMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfySeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.factory.test.TestSeriesConfigurationFactory;
@@ -58,6 +62,8 @@ public class AdminMainModule extends AbstractModule {
 		bind(IPlayerRatingFactory.class).to(OfyPlayerRatingFactory.class);
 		bind(ISeriesConfigurationFactory.class).to(OfySeriesConfigurationFactory.class);
 		bind(IUniversalRoundFactory.class).to(UniversalRoundFactory.class);
+		bind(IBlurbFactory.class).to(OfyBlurbFactory.class);
+		bind(IDigestEmailFactory.class).to(OfyDigestEmailFactory.class);
 	}
 	
 }

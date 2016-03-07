@@ -97,7 +97,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 		resultType.clear();
 		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {
-			resultType.addItem(ICompetition.CompetitionType.values()[i].toString());
+			resultType.addItem(ICompetition.CompetitionType.values()[i].getDisplayName());
 			//			if (comp.getCompType() == ICompetition.CompetitionType.values()[i]) {
 			//				resultType.setSelectedIndex(i);
 			//			}
@@ -188,8 +188,6 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		if (listener instanceof SmartBar.SchemaPresenter) {
 			smartBar.setSchemaPresenter((SmartBar.SchemaPresenter)listener);	
 		}
-
-
 
 		compTree.addSelectionHandler( new SelectionHandler<TreeItem>() {
 

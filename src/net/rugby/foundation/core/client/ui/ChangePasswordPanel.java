@@ -1,5 +1,7 @@
 package net.rugby.foundation.core.client.ui;
 
+import net.rugby.foundation.model.shared.LoginInfo;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
@@ -102,8 +104,8 @@ public class ChangePasswordPanel extends Composite
 		error.setVisible(false);
 	}
 
-	public void init(){
-
+	public void init(LoginInfo info){
+		emailAddress.setText(info.getEmailAddress());
 	}
 
 	public void showError(String errorMessage) {

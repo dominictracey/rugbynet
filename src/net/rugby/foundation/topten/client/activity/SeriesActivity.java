@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.shared.EventBus;
@@ -214,7 +217,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			public void onSuccess(IRatingSeries result) {
 				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getDefaultRatingSeries");
 				if (result != null) {
-					view.setSeries(result, _coreConfig.getBaseToptenUrl() );
+					view.setSeries(result);
 //					clientFactory.setPlaceInUrl(sPlace);
 				}
 			}
@@ -235,7 +238,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			public void onSuccess(IRatingSeries result) {
 				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getRatingSeries");
 				if (result != null) {
-					view.setSeries(result, _coreConfig.getBaseToptenUrl());
+					view.setSeries(result);
 				}
 			}
 		});
@@ -376,13 +379,13 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			public void onSuccess(ITopTenList result) {		
 				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getList");
 				view.setList(result);
-				listView.setList(result, _coreConfig.getBaseToptenUrl());
+				listView.setList(result);
 				getNotes(result);
 				refreshButtons();
 				Core.getCore().setCurrentRoundOrdinal(result.getRoundOrdinal(), false);
 				
 				// show facebook comments				
-				clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + result.getGuid() + "/");
+				clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + "s/" + result.getGuid() + "/");
 			}
 
 		});
@@ -641,8 +644,18 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	}
 
 	@Override
-	public void promote(SeriesPlace place) {
-		// TODO Auto-generated method stub
+	public void promote(ITopTenList list) {
+		clientFactory.getRpcService().sendTweets(list.getId(), new AsyncCallback<String>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed tweeting");
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				Bootbox.alert(result);
+			}
+		});
 		
 	}
 

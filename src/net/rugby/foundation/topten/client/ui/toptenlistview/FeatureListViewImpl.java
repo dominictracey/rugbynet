@@ -133,7 +133,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 	protected String currentSponsorStyle = "";
 
 	@Override
-	public void setList(ITopTenList result, String baseUrl) {
+	public void setList(ITopTenList result) {
 		list = result;
 		//featureBody.clear();
 		if (added) {
@@ -141,7 +141,7 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 		}
 		
 		if (result != null) {
-			clientFactory.getSimpleView().setList(result, baseUrl);
+			clientFactory.getSimpleView().setList(result);
 			
 			if (body != null) {
 				featureBody.remove(body);
@@ -231,8 +231,10 @@ public class FeatureListViewImpl extends Composite implements FeatureListView<IT
 //			  "<script type=\"text/javascript\" src=\"//www.redditstatic.com/button/button3.js\"></script>"));
 			if (list.getLive()) {
 				publish.setText("Unpublish");
+				promote.setEnabled(true);
 			} else {
 				publish.setText("Publish");
+				promote.setEnabled(false);
 			}
 		} else {
 			// just blank everything out I guess

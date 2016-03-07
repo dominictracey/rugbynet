@@ -16,6 +16,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -97,7 +98,7 @@ public interface CoreService extends RemoteService {
 	 */
 	String getOpenIdUrl(LoginInfo.Selector selector, String destination);
 	String getOAuth2Url(String destination);
-	LoginInfo updateAccount(String email, String screenName);
+	LoginInfo updateAccount(String email, String screenName, List<CompetitionType> compList, Boolean optOut);
 	
 	String getFacebookLoginUrl(String destination);
 	
@@ -130,4 +131,5 @@ public interface CoreService extends RemoteService {
 	
 	public HashMap<String,Long> getContentItems();
 	public LoginInfo validateEmail(String email, String validationCode);
+	LoginInfo resendValidationEmail(String email);
 }

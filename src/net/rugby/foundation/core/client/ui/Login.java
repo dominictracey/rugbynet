@@ -8,7 +8,9 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelHeader;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -58,8 +60,11 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	@UiField Panel nativePanel;
 	@UiField TextBox emailAddress;
 	@UiField Input password1;
-	@UiField Button submit;
+	@UiField Button login;
+	@UiField Button forgot;
 	@UiField Button cancel;
+	@UiField Row buttonRow;
+	@UiField Row forgotLinkRow;
 	
 	@UiField ExternalAuthenticatorPanel nonNativeLogins;
 	@UiField FormGroup passwordGroup;
@@ -104,8 +109,7 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 		nativePanel.setPaddingTop(20);
 		nativePanel.setPaddingLeft(20);
 		nativePanel.setPaddingRight(20);
-		this.setTitle("Login");
-		
+		nativePanel.getElement().getStyle().setBackgroundColor("#eeeeee");
 		orLabel.addStyleName("popupCaption");
 		orLabel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
@@ -114,6 +118,14 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 		close.addStyleName("popupCloseButton");//float:right
 		captionPanel.addStyleName("panel-default");
 		header.addStyleName("panel-header");
+		
+		buttonRow.addStyleName("text-center");
+		forgotLinkRow.addStyleName("text-center");
+		forgotLinkRow.addStyleName("padding-top");
+		login.addStyleName("text-center");
+		forgot.addStyleName("text-center");
+		cancel.addStyleName("text-center");
+		forgotPassword.addStyleName("text-center");
 		
 		forgotPassword.addStyleName("padding-left");
 		forgotPassword.addStyleName("padding-top");
@@ -126,10 +138,15 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 		}
 	}
 
-	@UiHandler("submit")
-	void onSubmitButtonClicked(ClickEvent event) {
+	@UiHandler("login")
+	void onLoginButtonClicked(ClickEvent event) {
 		doLogin();
-	}	  
+	}	 
+	
+	@UiHandler("forgot")
+	void onForgotButtonClicked(ClickEvent event) {
+		doLogin();
+	}	
 
 	@UiHandler("forgotPassword")
 	void onForgotPasswordLinkClicked(ClickEvent event) {
@@ -146,17 +163,22 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 		orLabel.setVisible(false);
 		//nativePanel.setWidth("30em");
 		cancel.setVisible(false);
-		submit.setText("Reset password");
+		login.setVisible(false);
+		forgot.state().reset();
+		forgot.setVisible(true);
+		
 		resettingPassword = true;
 		forgotPassword.setVisible(false);
 	}	  
 
 	private void doLogin() {
 		error.setVisible(false);
-
+		
 		if (!resettingPassword) {
+			login.state().loading();
 			presenter.doLogin(emailAddress.getText(), password1.getText());
 		} else {
+			forgot.state().loading();
 			presenter.forgotPassword(emailAddress.getText());
 		}
 	}
@@ -171,28 +193,46 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 
 	}
 
+	/**
+	 * Show as the default login view
+	 */
 	public void init(){
+		this.removeStyleName("disabled");
 		title.setText("Sign In");
 		passwordGroup.setVisible(true);
 		nonNativeLogins.setVisible(true);
 		cancel.setVisible(true);
 		orLabel.setVisible(true);
-		submit.setText("Login");
+
+		login.state().reset();
+		login.setVisible(true);
+		
 		resettingPassword = false;
 		forgotPassword.setVisible(true);
+		forgot.state().reset();
+		forgot.setVisible(false);
+		
 		error.setText("");
 		error.setVisible(false);
-		this.setWidth("30em");
+		
+		this.setWidth("35em");
 		center(); 
 	}
 
 	public void showError(String errorMessage) {
+		this.removeStyleName("disabled");
+		error.setType(AlertType.DANGER);
+		login.state().reset();
+		forgot.state().reset();
+		
 		alertStrong.setText("Error ");
 		alertText.setText(errorMessage);
 		error.setVisible(true);
 		emailAddress.setText("");
 		password1.setText("");
-		//emailAddress.setFocus(true);
+		
+		emailAddress.setFocus(true);
+
 	}
 
 	/* (non-Javadoc)
@@ -209,12 +249,21 @@ public class Login extends DialogBox implements net.rugby.foundation.core.client
 	 */
 	@Override
 	public void doFacebookLogin() {
+		alertStrong.setText("Logging in... ");
+		alertText.setText(" just a moment while we secure your session.");
+		error.setVisible(true);
+		error.setType(AlertType.SUCCESS);
 		presenter.doFacebookLogin();
 		
 	}
 
 	@Override
 	public void doOAuth2Login() {
+		alertStrong.setText("Logging in... ");
+		alertText.setText(" just a moment while we secure your session.");
+		error.setVisible(true);
+		error.setType(AlertType.SUCCESS);
+		this.addStyleName("disabled");
 		presenter.doOAuth2Login();
 		
 	}

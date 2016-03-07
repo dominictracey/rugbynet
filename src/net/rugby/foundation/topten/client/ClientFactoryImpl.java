@@ -240,7 +240,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 						// are we in a mobile screen?
 						if (Window.getClientWidth() < 768) {
 							// login from mobile devices
-							//i.setParentWidget(getSidebarView().getSidebarProfile());
+							i.setParentWidget(getSidebarView().getSidebarProfile());
 						} else {
 							i.setNav(getHeaderView().getNav());
 						}

@@ -1,4 +1,6 @@
 <module rename-to="admin">
+	
+
 	<inherits name="com.google.gwt.user.User"/>
 	<inherits name="com.google.gwt.user.theme.standard.Standard"/>
 	<inherits name="com.google.gwt.place.Place"/>
@@ -8,7 +10,11 @@
 	<inherits name="net.rugby.foundation.model.Model" />
 	<inherits name="com.google.gwt.logging.Logging"/>
  	<inherits name="org.gwtbootstrap3.GwtBootstrap3"/>
+ 	<inherits name="org.gwtbootstrap3.extras.notify.Notify"/>
+ 	<inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
  	<inherits name="net.rugby.foundation.core.Core" /> 
+
+<!--  	<script src="theme/js/notify/jquery-ui.js"/> -->
 	<entry-point class="net.rugby.foundation.admin.client.Admin"/>
 	<replace-with class="net.rugby.foundation.admin.client.ClientFactoryImpl">
 		<when-type-is class="net.rugby.foundation.admin.client.ClientFactory"/>

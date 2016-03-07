@@ -1,11 +1,18 @@
 package net.rugby.foundation.core.client.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.rugby.foundation.model.shared.CoreConfiguration;
+import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.LoginInfo;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -47,9 +54,11 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	@UiField Label password1Label;
 	@UiField Label password2Label;
 	
-	@UiField Button submit;
+	@UiField Button create;
+	@UiField Button update;
+	@UiField Button changePassword;
 	@UiField Button cancel;
-//	@UiField Label error;
+	
 	@UiField Panel topLevel;
 	@UiField LayoutPanel nonNativeLayer;
 	@UiField PanelBody nativeLayer;
@@ -61,11 +70,17 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	@UiField Image close;
 	@UiField Span title;
 	@UiField PanelHeader header;
+	@UiField FormGroup compList;
+	@UiField Column compListA;
+	@UiField Column compListB;
+	@UiField FormGroup optOutGroup;
+	@UiField CheckBox optOut;
 	
 	//email validation panel
 	@UiField PanelBody emailValidationLayer;
 	@UiField TextBox emailValidationCode;
 	@UiField Button emailValidationSubmit;
+	@UiField Button emailValidationResend;
 	@UiField Button emailValidationCancel;
 	@UiField TextBox emailValidationEmail;
 	
@@ -78,14 +93,18 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 //	@UiField Text successText;
 	
 	Presenter presenter;
-	private boolean editing;
+	//private boolean editing;
+	private boolean compListInitialized;
+	private Mode mode;
 	
+	public enum Mode { CREATE, UPDATE, VALIDATE, CHANGE_PASSWORD }
 
 	public interface Presenter {
 		void doCreate(String email, String nickName, String password);
-		void doUpdate(String email, String nickName);
+		void doUpdate(String email, String nickName, List<CompetitionType> newList, Boolean optOut);
 		void doCancel();
 		void doValidateEmail(String email, String emailValidationCode);
+		void doResendValidationEmail(String email);
 	}
 	
 	public ManageProfile()
@@ -133,16 +152,55 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		password2.setVisible(true);
 		password1Label.setVisible(true);
 		password2Label.setVisible(true);
-		submit.setText("Sign Up");
+
+		showButtons(Mode.CREATE);
+		
 		emailAddress.setFocus(true);
 		showPanels(false, true, false, false, false);
 	}
 
-	@UiHandler("submit")
-	void onSubmitButtonClicked(ClickEvent event) {
+	private void showButtons(Mode m) {
+		this.mode = m;
+		
+		if (m == Mode.CREATE) {
+			create.state().reset();
+			create.setVisible(true);
+			update.setVisible(false);
+			changePassword.setVisible(false);
+		} else if (m == Mode.UPDATE) {
+			update.state().reset();
+			create.setVisible(false);
+			update.setVisible(true);
+			changePassword.setVisible(false);
+		} else if (m == Mode.VALIDATE) {
+			emailValidationSubmit.state().reset();
+			create.setVisible(false);
+			update.setVisible(false);
+			changePassword.setVisible(false);
+		}  else if (m == Mode.CHANGE_PASSWORD) {
+			changePassword.state().reset();
+			create.setVisible(false);
+			update.setVisible(false);
+			changePassword.setVisible(true);
+		} 
+		
+	}
+
+	@UiHandler("create")
+	void onCreateButtonClicked(ClickEvent event) {
+		create.state().loading();
 		doCreate();
 	}
 	
+	@UiHandler("update")
+	void onUpdateButtonClicked(ClickEvent event) {
+		update.state().loading();
+		List<CompetitionType> cList = readCompList();
+		presenter.doUpdate(emailAddress.getText(), nickName.getText(), cList, optOut.getValue());
+	}
+	
+
+
 	@UiHandler("cancel")
 	void onCancelButtonClicked(ClickEvent event) {
 		presenter.doCancel();
@@ -150,18 +208,33 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 
 	@UiHandler("password2")
 	void onKeyUp(KeyUpEvent event) {
+		assert (mode == Mode.CREATE || mode == Mode.CHANGE_PASSWORD);
+		
 		if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+			if (mode == Mode.CREATE) {
+				create.state().loading();
+			} else if (mode == Mode.CHANGE_PASSWORD) {
+				changePassword.state().loading();
+			}
 			doCreate();
 		} else {
 			if (!password2.getText().isEmpty()) {
 				if (password2.getText().equals(password1.getText())) {
-					submit.getElement().removeClassName("btn-default"); 
-					submit.getElement().addClassName("btn-primary");
-					//submit.getElement().setAttribute("type","PRIMARY");
-				} else {
-					submit.getElement().addClassName("btn-default"); 
-					submit.getElement().removeClassName("btn-primary");
-					//submit.getElement().removeAttribute("type");
+					if (mode == Mode.CREATE) {
+						create.getElement().removeClassName("btn-default"); 
+						create.getElement().addClassName("btn-primary");
+					} else if (mode == Mode.CHANGE_PASSWORD) {
+						changePassword.getElement().removeClassName("btn-default"); 
+						changePassword.getElement().addClassName("btn-primary");
+					}
+				} else {	
+					if (mode == Mode.CREATE) {
+						create.getElement().addClassName("btn-default"); 
+						create.getElement().removeClassName("btn-primary");
+					} else  if (mode == Mode.CHANGE_PASSWORD) {
+						changePassword.getElement().addClassName("btn-default"); 
+						changePassword.getElement().removeClassName("btn-primary");
+					}
 				}
 			}
 		}
@@ -169,9 +242,16 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 	
 	@UiHandler("emailValidationSubmit")
 	void onValidateEmail(ClickEvent event) {
+		emailValidationSubmit.state().loading();
 		presenter.doValidateEmail(emailValidationEmail.getText(), emailValidationCode.getText());
 	}
-
+	
+	@UiHandler("emailValidationResend")
+	void onResendValidationEmail(ClickEvent event) {
+		emailValidationResend.state().loading();
+		presenter.doResendValidationEmail(emailValidationEmail.getText());
+	}
+	
 	@UiHandler("emailValidationCancel") 
 	void onValidateCancel(ClickEvent event) {
 		presenter.doCancel();
@@ -182,12 +262,15 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 		assert(presenter != null);
 		alert.setVisible(false);
 
-		editing = false;
+		compList.setVisible(false);
+		optOutGroup.setVisible(false);
 		
 		if(loginInfo != null) {
 			if (loginInfo.isLoggedIn())	{
 				// if they are logged in - allow them to only edit their screen name
-				editing = true;
+				// also the comp list
+				mode = Mode.UPDATE;
+				showButtons(mode);
 				emailAddress.setText(loginInfo.getEmailAddress());
 				emailAddress.setEnabled(false);
 				nickName.setText(loginInfo.getNickname());
@@ -201,23 +284,53 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 				password2Label.setVisible(false);
 				nickName.setFocus(true);
 				
-				submit.setText("Update");
+				nativeLayer.setSize("50em", "45em");
+				initCompList(loginInfo);
+				compList.setVisible(true);
+				optOutGroup.setVisible(true);
+				optOut.setValue(loginInfo.getOptOut());
+				
+				update.addStyleName("btn-primary");	
 
 				showPanels(false, true, false, false, false);
 			} else if (loginInfo.getMustChangePassword()) {
 				showPanels(false,false,false,true, false);
-				alert. setText(" Check your email for your temporary password.");
-				alert.setVisible(true);
-				submit.setText("Change Password");
-				title.setText("Change Password");
+				
+				mode = Mode.CHANGE_PASSWORD;
+				showButtons(mode);
+				changePasswordPanel.init(loginInfo);
+				changePasswordPanel.oldPassword.setText("");
+				changePasswordPanel.password1.setText("");
+				changePasswordPanel.password2.setText("");
+				
+				if (loginInfo.getStatus() != null && !loginInfo.getStatus().isEmpty()) {
+					showMessage(loginInfo.getStatus());
+				}
+				changePassword.removeStyleName("btn-primary");		
+				
+				title.setText("Pick a new password");
 			} else if (!loginInfo.isEmailValidated() && loginInfo.getEmailAddress() != null && !loginInfo.getEmailAddress().isEmpty()) {
 				showPanels(false, false, false, false, true);
 				title.setText("Validate");
+				
+				mode = Mode.VALIDATE;
+				emailValidationResend.state().reset();
+				emailValidationSubmit.state().reset();
+				
+				if (loginInfo.getStatus() != null && !loginInfo.getStatus().isEmpty()) {
+					showMessage(loginInfo.getStatus());
+				}
+				
+				//showButtons(mode);
+				emailValidationEmail.setText(loginInfo.getEmailAddress());
 				emailValidationCode.setEnabled(true);
 				emailValidationCode.setFocus(true);
 			} else  {
 				showPanels(true, false, false, false, false);
-				submit.setText("Sign Up");
+				create.removeStyleName("btn-primary");
+				mode = Mode.CREATE;
+				showButtons(mode);
+				
 				emailAddress.setEnabled(true);
 				emailAddress.setFocus(true);
 			}
@@ -229,7 +342,11 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 			password2.setVisible(true);
 			password1Label.setVisible(true);
 			password2Label.setVisible(true);
-			submit.setText("Sign Up");
+			
+			create.removeStyleName("btn-primary");
+			mode = Mode.CREATE;
+			showButtons(mode);
+			
 			emailAddress.setFocus(true);
 		}
 
@@ -237,27 +354,93 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 
 	}
 
+	private void initCompList(LoginInfo loginInfo) {
+		if (!compListInitialized) {
+			boolean left = true;
+			for (ICompetition.CompetitionType ct : ICompetition.CompetitionType.values()) {
+				if (ct.getShowToClient()) {
+					//Label label = new Label(ct.getDisplayName());
+					CheckBox cb = new CheckBox();
+					cb.setText(ct.getDisplayName());
+					if (left) {
+						compListA.add(cb);
+					} else {
+						compListB.add(cb);
+					}
+					left = !left;
+					
+					cb.setFormValue(Integer.toString(ct.ordinal()));
+					if (loginInfo.getCompList().contains(ct)) {
+						cb.setValue(true);
+					} else {
+						cb.setValue(false);
+					}
+				}
+			}
+			compListInitialized = true;
+		}
+		
+	}
+
+	private List<CompetitionType> readCompList() {
+		// collect the compList
+		List<CompetitionType> newList = new ArrayList<CompetitionType>();
+		for (int i=0; i<compListA.getWidgetCount(); ++i) {
+			CheckBox cb = (CheckBox) compListA.getWidget(i);
+	
+			if (cb != null) {
+				if (cb.getValue()) {
+					newList.add(CompetitionType.values()[Integer.parseInt(cb.getFormValue())]);
+				}
+			}
+		}
+		
+		for (int i=0; i<compListB.getWidgetCount(); ++i) {
+			CheckBox cb = (CheckBox) compListB.getWidget(i);
+			if (cb != null) {
+				if (cb.getValue()) {
+					newList.add(CompetitionType.values()[Integer.parseInt(cb.getFormValue())]);
+				}
+			}
+		}
+		return newList;
+	}
 	/*
 	 * When the user clicks a link we email them with the new password, it starts a profile activity which calls Identity.handlePasswordReset, which calls this
 	 * We need to show the changePassword panel, with the temp password filled in.
 	 */
 	public void collectNewPassword(String email, String tempPassword) {
 		showPanels(false,false,false,true, false);
-		//error.setText(" Check your email for your temporary password.");
+		
+		mode = Mode.CHANGE_PASSWORD;
+		showButtons(mode);
+		
 		alert.setVisible(false);
-		changePasswordPanel.emailAddress.setText(email);
+		if (email != null && !email.isEmpty()) {
+			changePasswordPanel.emailAddress.setText(email);
+			changePasswordPanel.emailAddress.setEnabled(false);
+		} else {
+			changePasswordPanel.emailAddress.setEnabled(true);
+		}
 		changePasswordPanel.oldPassword.setText(tempPassword);
-		changePasswordPanel.
-		submit.setText("Change Password");
+		changePasswordPanel.password1.setText("");
+		changePasswordPanel.password2.setText("");
+		
 		title.setText("Change Password");
 		password1.setFocus(true);
+		
+		center();
 	}
 	
-	void doCreate() {
+	public void collectNewPassword(String email, String tempPassword, String strong, String message) {
+		changePasswordPanel.alertStrong.setText(strong);
+		changePasswordPanel.alertText.setText(message);
+		collectNewPassword(email, tempPassword);
+	}
+	
+	private void doCreate() {
 		if (nickName.getText().isEmpty()) {
 			showError(CoreConfiguration.getCreateacctErrorNicknameCantBeNull());
-		} else if (editing) {
-			presenter.doUpdate(emailAddress.getText(), nickName.getText());
 		} else if (!password1.getText().equals(password2.getText())) {			
 			alertStrong.setText("Error: ");
 			alertText.setText("Passwords don't match!");
@@ -290,6 +473,12 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 //	}
 	
 	public void showError(String errorMessage) {
+		emailValidationSubmit.state().reset();
+		emailValidationResend.state().reset();
+		create.state().reset();
+		update.state().reset();
+		changePassword.state().reset();
+		
 		if (errorMessage.equals("")) {
 			alertStrong.setText("");
 			alertText.setText("");
@@ -317,6 +506,13 @@ public class ManageProfile extends DialogBox implements ExternalAuthenticatorPan
 			alert.setVisible(true);
 		}
 		center();
+	}
+	
+	public void showMessage(String message) {
+		alertStrong.setText("");
+		alertText.setText(message);
+		alert.removeStyleName("alert-error");
+		alert.addStyleName("alert-success");
 	}
 
 	/* (non-Javadoc)

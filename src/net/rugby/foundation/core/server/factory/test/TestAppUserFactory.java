@@ -3,10 +3,14 @@
  */
 package net.rugby.foundation.core.server.factory.test;
 
+import java.util.Date;
+import java.util.List;
+
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.model.shared.AppUser;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ITopTenUser;
+import net.rugby.foundation.model.shared.IAppUser.EmailStatus;
 
 /**
  * @author home
@@ -49,8 +53,13 @@ public class TestAppUserFactory implements IAppUserFactory {
 			return getByEmail();
 		else if (nickname != null)
 			return getByNickname();
-		else  // give an empty one
-			return new AppUser();
+		else {
+			// give an empty one
+			IAppUser u = new AppUser();
+			u.setCreated(new Date());
+			u.setEmailStatus(EmailStatus.NEW);
+			return u;
+		}
 	}
 
 	/**
@@ -188,6 +197,22 @@ public class TestAppUserFactory implements IAppUserFactory {
 		this.email = null;		
 		this.nickname = nickName;
 		
+	}
+
+	@Override
+	public List<IAppUser> getDigestEmailRecips() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IAppUser put(IAppUser appUser, boolean loginOnly) {
+		if (loginOnly) {
+			appUser.setLastLogin(new Date());
+		} else {
+			appUser.setLastUpdated(new Date());
+		}
+		return appUser;
 	}
 
 

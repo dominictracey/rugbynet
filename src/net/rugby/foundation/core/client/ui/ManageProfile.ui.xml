@@ -103,9 +103,21 @@
 						<b:Label ui:field="password2Label">Password (again)</b:Label>
 						<b:Input ui:field="password2" type="PASSWORD"></b:Input>
 					</b:FormGroup>
-
+					<b:FormGroup ui:field="compList">
+					<b:HelpBlock>Select the competitions in which you are interested:</b:HelpBlock>
+					<b:Row>
+						<b:Column size="MD_6" ui:field="compListA"></b:Column>
+						<b:Column size="MD_6" ui:field="compListB"></b:Column>
+					</b:Row>						
+					</b:FormGroup>
+					<b:FormGroup ui:field="optOutGroup">
+						<b:HelpBlock>Check the box to stop receiving emails from us.</b:HelpBlock>
+						<b:CheckBox ui:field="optOut">Email opt out</b:CheckBox>
+					</b:FormGroup>
 					<b:ButtonGroup ui:field='buttonBar'>
-						<b:Button ui:field="submit" >Sign Up</b:Button>
+						<b:Button ui:field="create" dataLoadingText="Creating account...">Sign Up</b:Button>
+						<b:Button ui:field="update" dataLoadingText="Updating account...">Save</b:Button>
+						<b:Button ui:field="changePassword" dataLoadingText="Updating password...">Sign Up</b:Button>
 						<b:Button ui:field="cancel" type="DEFAULT">Cancel</b:Button>
 					</b:ButtonGroup>
 
@@ -124,29 +136,27 @@
 					</b:FormGroup>
 					<b:TextBox ui:field="emailValidationEmail"></b:TextBox>
 					<b:ButtonGroup>
-						<b:Button ui:field="emailValidationSubmit" type="PRIMARY">Validate</b:Button>
+						<b:Button ui:field="emailValidationSubmit" dataLoadingText="Validating account..." type="PRIMARY">Validate</b:Button>
+						<b:Button ui:field="emailValidationResend" dataLoadingText="Resending email..." type="PRIMARY">Resend Validation Email</b:Button>
 						<b:Button ui:field="emailValidationCancel" type="DEFAULT">Cancel</b:Button>
 					</b:ButtonGroup>
 				</b:Form>
 			</b:PanelBody>
 		</b:Row>
+
 		<b:Row>
-		<g:LayoutPanel styleName="accountPanel" ui:field="changePasswordLayer">
-			<g:layer>
-				<g:HTMLPanel>
-					<core:ChangePasswordPanel ui:field="changePasswordPanel" />
-				</g:HTMLPanel>
-			</g:layer>
-		</g:LayoutPanel>
-<!-- 		<b:Label ui:field="error" styleName="serverResponseLabelError"></b:Label> -->
-		<b:Alert type="DANGER" ui:field="alert">
-  			<b.html:Strong ui:field="alertStrong" text="Check your email."/>
- 			<b.html:Text ui:field="alertText" text="We have sent you a temporary password. Click the link in the email or enter the temporary password from the email below."/>
-		</b:Alert> 
-<!-- 		<b:Alert type="SUCCESS" ui:field="success"> -->
-<!--   			<b.html:Strong ui:field="successStrong" text="Check your email."/> -->
-<!--  			<b.html:Text ui:field="successText" text="We have sent you a temporary password. Click the link in the email or enter the temporary password from the email below."/> -->
-<!-- 		</b:Alert>  -->
+			<g:LayoutPanel styleName="accountPanel" ui:field="changePasswordLayer">
+				<g:layer>
+					<g:HTMLPanel>
+						<core:ChangePasswordPanel ui:field="changePasswordPanel" />
+					</g:HTMLPanel>
+				</g:layer>
+			</g:LayoutPanel>
+			
+			<b:Alert type="DANGER" ui:field="alert">
+	  			<b.html:Strong ui:field="alertStrong" text="Check your email."/>
+	 			<b.html:Text ui:field="alertText" text="We have sent you a temporary password. Click the link in the email or enter the temporary password from the email below."/>
+			</b:Alert> 
 		</b:Row>
 	</b:Panel>
 </ui:UiBinder>

@@ -37,6 +37,7 @@ import net.rugby.foundation.core.shared.IdentityTypes.Keys;
 import net.rugby.foundation.game1.client.place.Profile;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.model.shared.IAppUser.EmailStatus;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.LoginInfo.ProviderType;
@@ -134,6 +135,8 @@ public class AccountManager implements IAccountManager {
 						u.setEmailValidated(true);
 					}
 
+					u.setOptOutCode(randomPassword());
+					
 					if (attributes != null)
 						u = addJSONAttributes(u,attributes);
 
@@ -152,28 +155,32 @@ public class AccountManager implements IAccountManager {
 
 		sendAdminEmail("New Fantasy Rugby user", info.getEmailAddress() + "\n" + info.getNickname());
 		if (u.isNative()) {
-			if (userEmailer == null) {
-				userEmailer = new UserEmailer();
-			}
-			
-			String dest = "";
-			try {
-				dest = URLEncoder.encode(destination, charEncoding);
-			} catch (UnsupportedEncodingException e) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,e.getLocalizedMessage());
-			}
-					
-			// chop the /s/ from the end of the BaseToptenUrl
-			String linkTarget = ccf.get().getBaseToptenUrl() + "#Profile:" + Keys.action + "=" + Actions.validateEmail + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.validationCode + "=" + u.getEmailValidationCode() + "&" + Keys.destination + "=" + dest;
-			boolean configured = userEmailer.configure("Account verification link from The Rugby Net", "Account Services", "Click here to activate your account", linkTarget, "If the link above doesn't work, you can enter your validation code (" + u.getEmailValidationCode() +") in the sign up page.", "", u);
-			if (configured) {
-		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent email validation link " + u.getEmailValidationCode() + " to " + u.getEmailAddress());
-				userEmailer.send();
-			}	
+			sendValidationEmail(u, destination);
 		}
 		
 		return info;
 
+	}
+	
+	protected void sendValidationEmail(IAppUser u, String destination) {
+		if (userEmailer == null) {
+			userEmailer = new UserEmailer();
+		}
+		
+		String dest = "";
+		try {
+			dest = URLEncoder.encode(destination, charEncoding);
+		} catch (UnsupportedEncodingException e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,e.getLocalizedMessage());
+		}
+				
+		// chop the /s/ from the end of the BaseToptenUrl
+		String linkTarget = ccf.get().getBaseToptenUrl() + "s/#Profile:" + Keys.action + "=" + Actions.validateEmail + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.validationCode + "=" + u.getEmailValidationCode() + "&" + Keys.destination + "=" + dest;
+		boolean configured = userEmailer.configure("Account verification link from The Rugby Net", "Account Services", "Click here to activate your account", linkTarget, "If the link above doesn't work, you can enter your validation code (" + u.getEmailValidationCode() +") in the sign up window.", "", u);
+		if (configured) {
+	        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent email validation link " + u.getEmailValidationCode() + " to " + u.getEmailAddress());
+			userEmailer.send();
+		}
 	}
 
 	@Override
@@ -192,12 +199,15 @@ public class AccountManager implements IAccountManager {
 		loginInfo.setLastClubhouseId(u.getLastClubhouseId());
 		loginInfo.setLastCompetitionId(u.getLastCompetitionId());
 		loginInfo.setMustChangePassword(u.isMustChangePassword());
-
+		
 		if (u instanceof ITopTenUser) {
 			loginInfo.setTopTenContentContributor(((ITopTenUser)u).isTopTenContentContributor());
 			loginInfo.setTopTenContentEditor(((ITopTenUser)u).isTopTenContentEditor());
 		}
 
+		loginInfo.setCompList(u.getCompList());
+		loginInfo.setOptOut(u.getOptOut());
+		
 		// see if they have done the draft and round picks yet.
 		//ArrayList<Group> groups = getGroupsByGroupType(GroupType.MY);
 		//	  for (int i=0; i<10; i++) {
@@ -277,7 +287,7 @@ public class AccountManager implements IAccountManager {
 		IAppUser u = auf.get();
 		
 		String error = "";
-		if (u != null) {
+		if (u != null && !u.getId().equals(au.getId()) ) {
 			// already in use
 			error = "That screen name is already in use. Please pick another.";
 		} else {
@@ -424,6 +434,9 @@ public class AccountManager implements IAccountManager {
 			Profile.Tokenizer tokenizer = new Profile.Tokenizer();
 			String url = "/s/#Profile:";
 
+			u.setLastLogin(new Date());
+			auf.put(u);
+			
 			if ((providerType.equals(LoginInfo.ProviderType.facebook) || providerType.equals(LoginInfo.ProviderType.oauth2)) && destination != null) {
 				destination = Base64Helper.decode(destination);
 			}
@@ -514,6 +527,9 @@ public class AccountManager implements IAccountManager {
 		u.setPwHash(hash);
 		u.setMustChangePassword(false);
 		
+		// they had to have gotten an email for this. There is a flow that they can get here without doing the email validation link so...
+		u.setEmailValidated(true);
+		u.setLastLogin(new Date());
 		auf.put(u);
 
 		loginInfo = getLoginInfo(u);
@@ -562,7 +578,7 @@ public class AccountManager implements IAccountManager {
 				return loginInfo; //empty (#3)
 			}
 
-			if (u.isFacebook() || u.isOpenId()) {  // #2
+			if (u.isFacebook() || u.isOath2() || u.isOpenId()) {  // #2
 				loginInfo = getLoginInfo(u);
 				loginInfo.setLoggedIn(false);
 				return loginInfo;
@@ -588,7 +604,7 @@ public class AccountManager implements IAccountManager {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,e.getLocalizedMessage());
 			}
 					
-			String linkTarget = ccf.get().getBaseToptenUrl() + "#Profile:" + Keys.action + "=" + Actions.changePassword + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.temporaryPassword + "=" + password + "&" + Keys.destination + "=" + dest;
+			String linkTarget = ccf.get().getBaseToptenUrl() + "s/#Profile:" + Keys.action + "=" + Actions.changePassword + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.temporaryPassword + "=" + password + "&" + Keys.destination + "=" + dest;
 			boolean configured = userEmailer.configure("Password reset link from The Rugby Net", "Account Services", "Click here to create a new password", linkTarget, "If the link above doesn't work, you can enter your temporary password (<bold>" + password +"</bold>) in the change password page.", "", u);
 			if (configured) {
 		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent password change link " + password + " to " + u.getEmailAddress());
@@ -614,6 +630,8 @@ public class AccountManager implements IAccountManager {
 			if (user != null && user.isNative()) {
 				if (validationCode.trim().equals(user.getEmailValidationCode())) {
 					user.setEmailValidated(true);
+					user.setEmailStatus(EmailStatus.VALIDATED);
+					user.setLastLogin(new Date());
 					auf.put(user);
 					
 					// and they are logged on now
@@ -632,5 +650,19 @@ public class AccountManager implements IAccountManager {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}	
+	}
+
+	@Override
+	public LoginInfo resendValidationEmail(String email) {
+		auf.setEmail(email);
+		IAppUser u = auf.get();
+		if (u != null) {
+			sendValidationEmail(u, "");
+			LoginInfo loginInfo = getLoginInfo(u);
+			loginInfo.setLoggedIn(false);
+			loginInfo.setStatus("Your validation code has been resent, check your email for the link. If it doesn't work, you can enter the code in the email above.");
+			return loginInfo;
+		}
+		return null;
 	}
 }

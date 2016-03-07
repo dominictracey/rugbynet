@@ -35,10 +35,11 @@ public class StandingsFetcherFactory implements IStandingsFetcherFactory {
 			return new ScrumHeinekenStandingsFetcher(sf);
 		} else if (c != null && c.getCompType() == ICompetition.CompetitionType.SUPER_RUGBY) {
 			return new PoolTableStandingsFetcher(sf);
-		}
-		 else if (c != null && c.getCompType() == ICompetition.CompetitionType.AVIVA_PREMIERSHIP) {
+		} else if (c != null && (c.getCompType() == ICompetition.CompetitionType.AVIVA_PREMIERSHIP || 
+				 				c.getCompType() == ICompetition.CompetitionType.PRO12 || 
+				 				c.getCompType() == ICompetition.CompetitionType.TOP14)) {
 				return new SingleTableStandingsFetcher(sf);
-			}
+		}
 		return null;
 	}
 

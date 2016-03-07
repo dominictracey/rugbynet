@@ -27,6 +27,7 @@ import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.Sponsor;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -571,9 +572,9 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	 * @see net.rugby.foundation.core.client.CoreServiceAsync#updateAccount(java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)
 	 */
 	@Override
-	public void updateAccount(String email, String screenName,
+	public void updateAccount(String email, String screenName, List<CompetitionType> compList, Boolean optOut,
 			final AsyncCallback<LoginInfo> cb) {
-		clientFactory.getRpcService().updateAccount(email, screenName, new AsyncCallback<LoginInfo> () {
+		clientFactory.getRpcService().updateAccount(email, screenName, compList, optOut, new AsyncCallback<LoginInfo> () {
 			@Override
 			public void onFailure(Throwable caught) {
 				cb.onFailure(caught);
@@ -932,6 +933,24 @@ public class Core implements CoreServiceAsync, EntryPoint {
 	@Override
 	public void validateEmail(String email, String validationCode, final AsyncCallback<LoginInfo> cb) {
 		clientFactory.getRpcService().validateEmail(email, validationCode, new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				cb.onFailure(caught);			
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				cb.onSuccess(result);				
+			}
+			
+		});
+		
+	}
+
+	@Override
+	public void resendValidationEmail(String email, final AsyncCallback<LoginInfo> cb) {
+		clientFactory.getRpcService().resendValidationEmail(email, new AsyncCallback<LoginInfo>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

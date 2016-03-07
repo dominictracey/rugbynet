@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
+
 
 public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
@@ -42,14 +44,18 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 	private boolean isTopTenContentEditor = false;
 	private boolean emailValidated = false;
 	
-	public boolean isAdmin() {
-		return isAdmin;
-	}
+	private List<CompetitionType> compList = new ArrayList<CompetitionType>();
 
 	private List<Long> teamIDs = new ArrayList<Long>();  //lineups for rounds
 	private List<Boolean> roundsComplete = new ArrayList<Boolean>();
 	private boolean oauth2;
+	private Boolean optOut;
 
+	
+	public boolean isAdmin() {
+		return isAdmin;
+	}
+	
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
@@ -237,6 +243,22 @@ public class LoginInfo implements Serializable, ITopTenRoleProvider {
 
 	public void setEmailValidated(boolean emailValidated) {
 		this.emailValidated = emailValidated;
+	}
+
+	public List<CompetitionType> getCompList() {
+		return compList;
+	}
+
+	public void setCompList(List<CompetitionType> compList) {
+		this.compList = compList;
+	}
+
+	public Boolean getOptOut() {
+		return optOut;
+	}
+	
+	public void setOptOut(Boolean optOut) {
+		this.optOut = optOut;
 	}
 	
 }

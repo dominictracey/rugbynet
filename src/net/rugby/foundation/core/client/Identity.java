@@ -1,5 +1,6 @@
 package net.rugby.foundation.core.client;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,9 +12,11 @@ import net.rugby.foundation.core.client.ui.Login;
 import net.rugby.foundation.core.client.ui.ManageProfile;
 import net.rugby.foundation.core.shared.IdentityTypes.Actions;
 import net.rugby.foundation.model.shared.CoreConfiguration;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.LoginInfo;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Nav;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
@@ -154,9 +157,10 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				getManageProfileDialog().setPopupPosition(getManageProfileDialog().getAbsoluteTop(), 100);
 			}
 			presenter.showFacebookComments(false);
+			RootPanel.get().removeStyleName("menu");
 			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "sign up menu", 1);
-
-			getManageProfileDialog().init(clientFactory.getLoginInfo());
+			
+			getManageProfileDialog().init(new LoginInfo());
 		}	
 	};
 
@@ -174,7 +178,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				getLoginDialog().setPopupPosition(getLoginDialog().getAbsoluteTop(), 100);
 			}
 			presenter.showFacebookComments(false);
-			
+			RootPanel.get().removeStyleName("menu");
 			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "sign in menu", 1);
 			getLoginDialog().init();			
 		}	
@@ -186,7 +190,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			//everything after the #
 			String href = Window.Location.getHref();
 			destination = href.substring(href.indexOf('#')+1);
-			
+			RootPanel.get().removeStyleName("menu");
 			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "sign out menu", 1);
 
 			Core.getCore().logOff(clientFactory.getLoginInfo(),
@@ -209,6 +213,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 		@Override
 		public void onClick(ClickEvent event) {
+			RootPanel.get().removeStyleName("menu");
 			presenter.showFacebookComments(false);
 			clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.click.toString(), "edit profile menu", 1);
 			getManageProfileDialog().init(clientFactory.getLoginInfo());			
@@ -217,6 +222,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 	private DesktopAccountBuilder dab;
 	private MobileAccountBuilder mab;
+
+	private DropDownMenu mobileParent;
 
 	public CoreClientFactory getClientFactory() {
 		return clientFactory;
@@ -246,12 +253,21 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	}
 
 	public void showLoggedIn() {
-		if (dab == null) {
-			dab = new DesktopAccountBuilder(clientFactory, signInHandler, signUpHandler, editProfileHandler, signOutHandler);
-			dab.setParent(nav);
+		if (nav != null) {
+			if (dab == null) {
+				dab = new DesktopAccountBuilder(clientFactory, signInHandler, signUpHandler, editProfileHandler, signOutHandler);
+				dab.setParent(nav);
+			}
+			
+			dab.build();
+		} else if (mobileParent != null) {
+			if (mab == null) {
+				mab = new MobileAccountBuilder(clientFactory, signInHandler, signUpHandler, editProfileHandler, signOutHandler);
+				mab.setParent(mobileParent);
+			}
+			
+			mab.build();
 		}
-		
-		dab.build();
 
 	}
 
@@ -303,7 +319,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			clientFactory.getRpcService().login(new AsyncCallback<LoginInfo>() {
 				@Override
 				public void onSuccess(LoginInfo result) {
-					if (result.isLoggedIn()) {
+					if (result.getEmailAddress() != null && !result.getEmailAddress().isEmpty()) {
 						clientFactory.setLoginInfo(result);
 						//showLoggedIn();
 						//getManageProfileDialog().setNative(false);
@@ -311,6 +327,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 						getManageProfileDialog().init(result);
 					} else {
 						console("Not logged in so can't update profile");
+						presenter.showFacebookComments(false);
+						getLoginDialog().init();
 					}
 				}
 
@@ -321,6 +339,9 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 				}
 			});		
 
+		} else if (action == Actions.create) {
+			presenter.showFacebookComments(false);
+			getManageProfileDialog().init(new LoginInfo()); // create
 		} else if (action == Actions.done) {
 			// this is where we get sent after we sign up with a non-native ID
 			// because that process uses the non-RPC servlet we don't have a client-side copy of 
@@ -394,8 +415,8 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	}
 
 	@Override
-	public void doLogin(String emailAddress, String password) {
-		clientFactory.getRpcService().nativeLogin(emailAddress, password, new AsyncCallback<LoginInfo>() {
+	public void doLogin(final String emailAddress, final String password) {
+		clientFactory.getRpcService().nativeLogin( emailAddress, password, new AsyncCallback<LoginInfo>() {
 			public void onSuccess(LoginInfo result) {
 				if (result==null) {
 					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Incorrect email or password", 1);
@@ -403,7 +424,19 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 					getLoginDialog().showError("Incorrect email or password");
 
 				} else if (!result.isLoggedIn()) {
-					if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
+					// do they need to validate their email still?
+					if (!result.isEmailValidated()) {
+						getLoginDialog().hide();
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "native login on unvalidated email", 1);
+						getManageProfileDialog().init(result);
+					} else if (result.getMustChangePassword()){ // has to pick new password
+						getLoginDialog().showNonNativeLogins(true);
+						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "need to pick new password", 1);
+						getLoginDialog().hide();
+						//getManageProfileDialog().init(result);
+						//getManageProfileDialog().showMessage(result.getStatus());
+						getManageProfileDialog().collectNewPassword(emailAddress, password, "Choose a new password ", result.getStatus());
+					} else if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
 						getLoginDialog().showNonNativeLogins(true);
 						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "Use external authentication", 1);
 
@@ -551,7 +584,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 	 * @see net.rugby.foundation.core.client.ui.ManageProfile.Presenter#doUpdate(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void doUpdate(String email, final String nickName) {
+	public void doUpdate(String email, final String nickName, List<CompetitionType> compList, Boolean optOut) {
 		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "update profile", 1);
 
 		if (nickName.length() == 0) {
@@ -560,7 +593,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 			getManageProfileDialog().showError(CoreConfiguration.getCreateacctErrorNicknameCantBeNull());
 		} 
 		else {
-			clientFactory.getRpcService().updateAccount(email, nickName, new AsyncCallback<LoginInfo>() {
+			clientFactory.getRpcService().updateAccount(email, nickName, compList, optOut, new AsyncCallback<LoginInfo>() {
 				public void onSuccess(LoginInfo result) {
 					if (!result.isLoggedIn() || !(result.getStatus() == null)) {
 						clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "update profile", 1);
@@ -623,7 +656,7 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 
 					getLoginDialog().hide();
 					getManageProfileDialog().init(result);
-				} else if (result.isOpenId() && !result.isLoggedIn()){ // 2a. use your external authenticator
+				} else if ((result.IsOauth2() || result.isOpenId()) && !result.isLoggedIn()){ // 2a. use your external authenticator
 					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "reset password use external authenticator", 1);
 
 					getLoginDialog().showNonNativeLogins(true);
@@ -781,6 +814,42 @@ public class Identity implements ManageProfile.Presenter, Login.Presenter, Exter
 		}
 		getManageProfileDialog().collectNewPassword(email, temporaryPassword);
 		getManageProfileDialog().center();
+	}
+
+	public void setParentWidget(DropDownMenu sidebarProfile) {
+		mobileParent = sidebarProfile;
+		
+	}
+
+	@Override
+	public void doResendValidationEmail(String email) {
+		clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.submit.toString(), "resend validation email", 1);
+
+		clientFactory.getRpcService().resendValidationEmail(email, new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "resend validation email server error", 1);
+
+				getManageProfileDialog().showError("Problem resending validation email. Please contact support: info@rugby.net");
+				
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				if (result != null) { //result.getStatus().equals("Email successfully validated")) {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.complete.toString(), "resend validation email", 1);
+
+					getManageProfileDialog().init(result);
+				} else {
+					clientFactory.recordAnalyticsEvent(IDENTITY_LABEL, EventActions.error.toString(), "resend validation email", 1);
+
+					getManageProfileDialog().showError(result.getStatus() + ". Please try again and if the problem persists contact support: info@rugby.net");
+				}
+				
+			}
+			
+		});
 	}
 	
 

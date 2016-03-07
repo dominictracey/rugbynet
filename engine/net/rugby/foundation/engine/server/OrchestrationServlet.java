@@ -17,12 +17,14 @@ import net.rugby.foundation.admin.server.orchestration.IOrchestration;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -38,15 +40,17 @@ public class OrchestrationServlet extends HttpServlet {
 	private IMatchGroupFactory mgf;
 	private IRatingQueryFactory rqf;
 	private ISeriesConfigurationFactory scf;
+	private IAppUserFactory auf;
 
 	@Inject
 	public OrchestrationServlet(IOrchestrationFactory of, ICompetitionFactory cf, IMatchGroupFactory mgf, IRoundFactory rf, ITeamGroupFactory tf, 
-			IRatingQueryFactory rqf, ISeriesConfigurationFactory scf) {
+			IRatingQueryFactory rqf, ISeriesConfigurationFactory scf, IAppUserFactory auf) {
 		this.of = of;
 		this.cf = cf;
 		this.mgf = mgf;
 		this.rqf = rqf;
 		this.scf = scf;
+		this.auf = auf;
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -114,6 +118,23 @@ public class OrchestrationServlet extends HttpServlet {
 	        IOrchestration<ISeriesConfiguration> orch = of.get(sc, AdminOrchestrationActions.RatingActions.valueOf(AdminOrchestrationActions.SeriesActions.class, action));
 	        if (orch != null) {
 	        	orch.execute();
+	        }
+		}   else if (target.equals(AdminOrchestrationTargets.Targets.USER.toString())) {
+			if (req.getParameter("id") == null) {
+				resp.getWriter().println("No id parameter (for AppUser).");
+				return;
+			}
+	        IAppUser au = null;
+	        if (Long.parseLong(req.getParameter("id")) != 0) {
+	        	auf.setId(Long.parseLong(req.getParameter("id")));
+	        	au = auf.get();
+	        }
+	        IOrchestration<IAppUser> orch = of.get(au, AdminOrchestrationActions.UserActions.valueOf(AdminOrchestrationActions.UserActions.class, action));
+	        if (orch != null) {
+	        	if (req.getParameter("extraKey") != null) {
+		        	orch.setExtraKey(Long.parseLong(req.getParameter("extraKey")));
+		        	orch.execute();
+	        	}
 	        }
 		} 
 		} catch (Exception ex)  {

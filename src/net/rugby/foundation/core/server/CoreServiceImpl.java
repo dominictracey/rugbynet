@@ -39,6 +39,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -161,6 +162,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			Pattern p = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$");
 			Matcher m = p.matcher(emailAddress.toUpperCase());
 			boolean matchFound = m.matches();
+			
 			if (!matchFound) {
 				// TODO this may be a merge
 				info.setStatus(CoreConfiguration.getCreateacctErrorInvalidEmail());
@@ -192,15 +194,16 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	@Override
 	public LoginInfo nativeLogin(String emailAddress, String password) {
 		try {
-			LoginInfo loginInfo = new LoginInfo();
+			//LoginInfo loginInfo = new LoginInfo();
 
 			auf.setEmail(emailAddress.toLowerCase());
 			IAppUser u = auf.get();
 
 			if (u == null) {
-				return new LoginInfo();
+				return null;  // bad userId or password
 			}
 		
+			
 			// first check if this is a non-native account - if they try to log on with a password for an 
 			// account that has already been established with an external authenticator return a non logged in status
 			// with the hint set.
@@ -213,10 +216,27 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 				return info;
 			}
 			
+			// now confirm they have validated their email
+			if ((u.isNative() && !u.isFacebook() && !u.isOath2()) && !u.getEmailValidated()) {
+				LoginInfo info = am.getLoginInfo(u);
+				info.setStatus("You must validate your email address before you sign in.");
+				info.setLoggedIn(false);
+				return info;
+			}
+	
 			String hash = DigestUtils.md5Hex(password);
 			if (u.getPwHash() == null || !u.getPwHash().equals(hash))  {
-				return loginInfo; //empty		
+				return null;  // bad userId or password		
 			}
+
+			// also confirm they aren't running a temporary password
+			if (u.isMustChangePassword()) {
+				LoginInfo info = am.getLoginInfo(u);
+				info.setStatus("You must pick a new password to sign in.");
+				info.setLoggedIn(false);
+				return info;
+			}
+			
 
 			HttpServletRequest request = this.getThreadLocalRequest();
 			HttpSession session = request.getSession();
@@ -224,6 +244,9 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 			info.setLoggedIn(true);
 			session.setAttribute("loginInfo", info);
 
+			u.setLastLogin(new Date());
+			auf.put(u);
+			
 			return info;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -498,14 +521,18 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	 * @see net.rugby.foundation.core.client.CoreService#updateAccount(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public LoginInfo updateAccount(String email, String screenName) {
+	public LoginInfo updateAccount(String email, String screenName, List<CompetitionType> compList, Boolean optOut) {
 		try {
 			// check they are who they say they are
 			// confirm the user is logged on
+			
 			IAppUser u = getAppUser();
 			if (u == null) {
 				return new LoginInfo();
 			}
+			
+			u.setCompList(compList);
+			u.setOptOut(optOut);
 
 			LoginInfo loginInfo = am.updateAccount(u, email, screenName, this.getThreadLocalRequest());
 
@@ -634,7 +661,7 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 
 	@Override
 	public String getOAuth2Url(String destination) {
-		try {
+		try {		
 			return eapf.get(LoginInfo.ProviderType.oauth2,null, destination).getLocalURL();
 		}  catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -660,8 +687,22 @@ public class CoreServiceImpl extends RemoteServiceServlet implements CoreService
 	@Override
 	public LoginInfo validateEmail(String email, String validationCode) {
 		try {
-
 			LoginInfo loginInfo = am.validateEmail(email,validationCode);
+			HttpServletRequest request = this.getThreadLocalRequest();
+			HttpSession session = request.getSession();
+			session.setAttribute("loginInfo", loginInfo);
+			
+			return loginInfo;
+		}  catch (Throwable e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+			return null;
+		}
+	}
+
+	@Override
+	public LoginInfo resendValidationEmail(String email) {
+		try {
+			LoginInfo loginInfo = am.resendValidationEmail(email);
 			HttpServletRequest request = this.getThreadLocalRequest();
 			HttpSession session = request.getSession();
 			session.setAttribute("loginInfo", loginInfo);
