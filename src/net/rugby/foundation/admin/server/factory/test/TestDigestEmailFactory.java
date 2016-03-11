@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 
@@ -19,7 +20,8 @@ import net.rugby.foundation.model.shared.DataStoreFactory;
 public class TestDigestEmailFactory extends BaseCachingFactory<IDigestEmail> implements IDigestEmailFactory {
 
 	private IBlurbFactory bf;
-
+	
+	@Inject
 	public TestDigestEmailFactory(IBlurbFactory bf) {
 
 		this.bf = bf;
