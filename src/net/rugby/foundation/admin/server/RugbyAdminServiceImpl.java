@@ -112,6 +112,7 @@ import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ITopTenUser;
+import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
@@ -124,6 +125,7 @@ import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.pipeline.JobInfo;
@@ -1902,7 +1904,15 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 									fetcher.setComp(c);
 									fetcher.setRound(r);
 									fetcher.setUc(uc);
-									fetcher.setUrl(c.getForeignURL()+"?template=pointstable");
+									
+									// with the new espn.co.uk tables, we are seeing the new comps (as of SR 2016) 
+									// not working with the old template syntax. Allow over-ride from admin.html
+									if (c.getTableURL() != null && !c.getTableURL().isEmpty()) {
+										fetcher.setUrl(c.getTableURL());
+									} else {
+										fetcher.setUrl(c.getForeignURL()+"?template=pointstable");
+									}
+									
 									List<IStanding> standings = new ArrayList<IStanding>();
 									Iterator<ITeamGroup> it = c.getTeams().iterator();
 									while (it.hasNext()) {
@@ -2081,14 +2091,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public String cleanUp() {
 		try {
 			if (checkAdmin()) {
-				String url2 = ccf.get().getEngineUrl() +
-						"/orchestration/IRatingQuery";
-
-				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
-						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.CLEANUP.toString()).
-						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
-						param("id","0").
-						param("extraKey", "0"));
+				Queue queue = QueueFactory.getDefaultQueue();
+	            
+	            queue.add(withUrl(ccf.get().getEngineUrl() + "/cleanUp").param("action", net.rugby.foundation.engine.server.CleanupServlet.Actions.SHRINK.name()).param("clazz", PlayerRating.class.getCanonicalName()));
+//				String url2 = ccf.get().getEngineUrl() +
+//						"/orchestration/IRatingQuery";
+//
+//				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
+//						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.CLEANUP.toString()).
+//						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+//						param("id","0").
+//						param("extraKey", "0"));
 
 				//				rqf.deleteAll();
 				//				prf.deleteAll();

@@ -276,4 +276,5 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}	
 	}
+	
 }

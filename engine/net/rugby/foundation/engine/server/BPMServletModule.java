@@ -1,9 +1,5 @@
 package net.rugby.foundation.engine.server;
 
-import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
-import net.rugby.foundation.topten.server.MetaTagGenerator;
-import net.rugby.foundation.topten.server.TopTenServiceImpl;
-
 import com.google.inject.servlet.ServletModule;
 
 public class BPMServletModule extends ServletModule {
@@ -14,6 +10,7 @@ public class BPMServletModule extends ServletModule {
 //		serve("/game1/service").with(Game1ServiceImpl.class);
 		serve("/engine/orchestration/*").with(net.rugby.foundation.engine.server.OrchestrationServlet.class);
 		serve("/engine/workflow/*").with(net.rugby.foundation.engine.server.WorkflowServlet.class);
+		serve("/engine/cleanUp").with(CleanupServlet.class);
 	}
 }
 

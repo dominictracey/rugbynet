@@ -36,6 +36,8 @@ public class Competition implements Serializable, ICompetition {
 	
 	private Long foreignID;
 	private String foreignURL;
+	private String tableURL;
+	
 	private Long compClubhouse;
 	private Date lastSaved;
 	private Float weightingFactor;
@@ -470,6 +472,14 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setShowToClient(Boolean showToClient) {
 		this.showToClient = showToClient;
+	}
+	@Override
+	public String getTableURL() {
+		return tableURL;
+	}
+	@Override
+	public void setTableURL(String tableURL) {
+		this.tableURL = tableURL;
 	}
 
 

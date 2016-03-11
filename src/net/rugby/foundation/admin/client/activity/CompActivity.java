@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.ui.AddMatchPopup.AddMatchPopupPresenter;
@@ -478,7 +480,8 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			public void onSuccess(ICompetition result) {
 				//ec.SetPresenter(presenter);
 				if (result != null)
-					Window.alert("Comp saved");
+					//Window.alert("Comp saved");
+					Notify.notify("Comp " + result.getLongName() + " saved.");
 				else
 					Window.alert("Comp not saved");
 
