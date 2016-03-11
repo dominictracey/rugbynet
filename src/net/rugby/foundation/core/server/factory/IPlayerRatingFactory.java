@@ -3,6 +3,7 @@
  */
 package net.rugby.foundation.core.server.factory;
 
+import java.util.Date;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -28,4 +29,10 @@ public interface IPlayerRatingFactory extends ICachingFactory<IPlayerRating> {
 	List<IPlayerRating> getForMatch(Long matchId, IRatingEngineSchema schema);
 	Boolean deleteForSchema(IRatingEngineSchema schema);
 	void deleteAll();
+	List<IPlayerRating> getFromBefore(Date datetime);
+	List<IPlayerRating> putBatch(List<IPlayerRating> prl);
+	void touchAll();
+	void cleanUp();
+		
+	
 }

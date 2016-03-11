@@ -18,6 +18,7 @@ import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.game1.server.Game1TestModule;
 import net.rugby.foundation.test.GuiceJUnitRunner;
 import net.rugby.foundation.test.GuiceJUnitRunner.GuiceModules;
+import net.rugby.foundation.topten.server.TopTenTestModule;
 
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalTaskQueueTestConfig;
@@ -29,7 +30,7 @@ import junit.framework.Assert;
  *
  */
 @RunWith(GuiceJUnitRunner.class)
-@GuiceModules({ AdminTestModule.class, CoreTestModule.class, Game1TestModule.class })
+@GuiceModules({ AdminTestModule.class, CoreTestModule.class, Game1TestModule.class, TopTenTestModule.class })
 public class WorkFlowTester {
     private final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalTaskQueueTestConfig());

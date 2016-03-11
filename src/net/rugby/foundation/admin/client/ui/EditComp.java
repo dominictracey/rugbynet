@@ -64,6 +64,7 @@ public class EditComp extends Composite {
 	CheckBox underway;
 	@UiField
 	CheckBox showInClient;
+	@UiField TextBox tableUrl;
 	@UiField
 	TextBox weightingFactor;
 	@UiField
@@ -87,6 +88,7 @@ public class EditComp extends Composite {
 		comp.setUnderway(underway.getValue());
 		comp.setWeightingFactor(Float.parseFloat(weightingFactor.getText()));
 		comp.setShowToClient(showInClient.getValue());
+		comp.setTableURL(tableUrl.getText());
 //		if (!compType.isItemSelected(-1)) {
 			comp.setCompType(ICompetition.CompetitionType.values()[compType.getSelectedIndex()]);
 //		}
@@ -103,6 +105,7 @@ public class EditComp extends Composite {
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
 		comp.setShowToClient(showInClient.getValue());
+		comp.setTableURL(tableUrl.getText());
 		listener.repairComp(comp);
 	}
 	
@@ -131,6 +134,8 @@ public class EditComp extends Composite {
 		twitter.setText(comp.getTwitter());
 		underway.setValue(comp.getUnderway());
 		showInClient.setValue(comp.getShowToClient());
+		tableUrl.setText(comp.getTableURL());
+		
 		if (comp.getWeightingFactor() != null) {
 			weightingFactor.setValue(comp.getWeightingFactor().toString());
 		} else {

@@ -16,6 +16,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.inject.Inject;
@@ -344,6 +346,30 @@ public class TestPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> i
 	public void deleteAll() {
 		return;
 
+	}
+
+	@Override
+	public List<IPlayerRating> putBatch(List<IPlayerRating> prl) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<IPlayerRating> getFromBefore(Date datetime) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void touchAll() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cleanUp() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

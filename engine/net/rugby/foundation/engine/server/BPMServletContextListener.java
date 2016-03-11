@@ -23,7 +23,7 @@ public class BPMServletContextListener extends GuiceServletContextListener {
 	
 	public static final Injector getInjectorForNonServlets() {
 
-		return Guice.createInjector(new CoreMainModule(), new Game1MainModule(), new AdminMainModule(), new TopTenMainModule());
+		return Guice.createInjector(new CoreMainModule(), new AdminMainModule(), new TopTenMainModule());
 //	return Guice.createInjector(new CoreTestModule(), new Game1TestModule(), new AdminTestModule(), new TopTenTestModule());		
 	}
 	
@@ -32,7 +32,7 @@ public class BPMServletContextListener extends GuiceServletContextListener {
 	 */
 	@Override
 	public Injector getInjector() {
-		return Guice.createInjector(new BPMServletModule(), new CoreMainModule(), new Game1MainModule(), new AdminMainModule(), new TopTenMainModule());
+		return Guice.createInjector(new BPMServletModule(), new CoreMainModule(),  new AdminMainModule(), new TopTenMainModule());
 //		return Guice.createInjector(new BPMServletModule(), new CoreTestModule(), new Game1TestModule(), new AdminTestModule(), new TopTenTestModule());
 
 	}

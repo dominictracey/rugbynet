@@ -53,8 +53,6 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		 * 
 		 */
 		private static final long serialVersionUID = 3979300783273508712L;
-
-		private Long scrumId;
 		
 
 		public RatingComponent() {
@@ -93,7 +91,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		protected float forwardScore;
 		@Unindexed
 		protected float rawScore; 
-		
+		@Unindexed		
 		private Long playerMatchStatsId;
 		@Unindexed
 		protected String ratingDetails;
@@ -101,19 +99,25 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 		protected String statsDetails;
 		@Unindexed
 		protected String matchLabel;
-
 		@Unindexed
 		protected float scaledRating;
 		@Unindexed
 		protected float unscaledRating;
-
+		@Unindexed
 		protected float offence;
+		@Unindexed
 		protected float defence;
+		@Unindexed
 		protected float setPlay;
+		@Unindexed
 		protected float loosePlay;
+		@Unindexed
 		protected float discipline;
+		@Unindexed
 		protected float matchResult;
-		
+		@Unindexed
+		private Long scrumId;
+
 		public Long getId() {
 			return id;
 		}
@@ -182,7 +186,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 
 		public void setStatsDetails(String details) {
 			// truncate so we don't have GAE throwing exceptions and turning our String into Text and stuff
-			if (details.length() > 500) {
+			if (details != null && details.length() > 500) {
 				details = details.substring(0, 499);
 			}
 			this.statsDetails = details;
@@ -287,8 +291,10 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	protected Long id;
 	protected Integer rating;
 	protected Long groupId;
-	@Unindexed
+
+	// need to be indexed for prf.getBefore() query for clean up
 	protected Date generated;
+	
 	@Transient
 	protected IGroup group;
 	protected Long schemaId;
@@ -559,7 +565,7 @@ public class PlayerRating implements IPlayerRating, Serializable, Comparable<IPl
 	@Override
 	public void setDetails(String details) {
 		// truncate so we don't have GAE throwing exceptions and turning our String into Text and stuff
-		if (details.length() > 500) {
+		if (details != null && details.length() > 500) {
 			details = details.substring(0, 499);
 		}
 		this.details = details;

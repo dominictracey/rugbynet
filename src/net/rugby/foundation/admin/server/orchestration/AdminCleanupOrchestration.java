@@ -3,8 +3,11 @@
  */
 package net.rugby.foundation.admin.server.orchestration;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import org.joda.time.DateTime;
 
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
@@ -15,7 +18,9 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 
 /**
  * @author home
@@ -53,8 +58,8 @@ public class AdminCleanupOrchestration extends OrchestrationCore<IRatingQuery> {
 	 */
 	@Override
 	public void execute() {
-		rqf.deleteAll();
-		prf.deleteAll();
+//		rqf.deleteAll();
+//		prf.deleteAll();
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 
@@ -70,8 +75,11 @@ public class AdminCleanupOrchestration extends OrchestrationCore<IRatingQuery> {
 			} catch (NoSuchObjectException nsox) {
 				// it's ok, just was a dangling reference in the match record
 			}
-
 		}
+		
+		// clean up the rating details that are more than two weeks old
+		prf.cleanUp();
+		
 	}
 
 	/* (non-Javadoc)

@@ -3,6 +3,7 @@ package net.rugby.foundation.core.server;
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
 import net.rugby.foundation.core.server.mail.BounceHandlerServlet;
 import net.rugby.foundation.core.server.mail.UnsubscribeServlet;
+import net.rugby.foundation.engine.server.CleanupServlet;
 import net.rugby.foundation.topten.server.HomePage;
 import net.rugby.foundation.topten.server.MetaTagGenerator;
 import net.rugby.foundation.topten.server.SeriesPage;
@@ -20,6 +21,7 @@ public class BPMServletModule extends ServletModule {
 //		serve("/game1/service").with(Game1ServiceImpl.class);
 		serve("/admin/orchestration/*").with(net.rugby.foundation.engine.server.OrchestrationServlet.class);
 		serve("/admin/workflow/*").with(net.rugby.foundation.engine.server.WorkflowServlet.class);
+		serve("/admin/cleanUp").with(CleanupServlet.class);
 		serve("/admin/rugbyAdminService").with(RugbyAdminServiceImpl.class);
 		serve("/core/CoreService").with(CoreServiceImpl.class);
 		serve("/topten/TopTenService").with(TopTenServiceImpl.class);

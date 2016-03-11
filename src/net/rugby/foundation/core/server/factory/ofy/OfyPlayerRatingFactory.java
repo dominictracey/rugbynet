@@ -1,9 +1,12 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.joda.time.DateTime;
 
 import com.google.appengine.api.datastore.QueryResultIterable;
 import com.google.inject.Inject;
@@ -23,6 +26,7 @@ import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerRating;
 import net.rugby.foundation.model.shared.RatingQuery;
+import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 
 public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> implements IPlayerRatingFactory {
 
@@ -217,6 +221,98 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}	
 
+	}
+
+	@Override
+	public List<IPlayerRating> getFromBefore(Date datetime) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			// confirm list is in ascending order
+			Query<PlayerRating> prq = ofy.query(PlayerRating.class).filter("generated <", datetime);
+			List<IPlayerRating> list = new ArrayList<IPlayerRating>();
+			list.addAll(prq.list());
+//			for (IPlayerRating r : list) {
+//				if (r.getPlayerId() != null) {
+//					r.setPlayer(pf.get(r.getPlayerId()));
+//				}
+//				for (Long pmsid : r.getMatchStatIds()) {
+//					r.addMatchStats(pmsf.get(pmsid));
+//				}
+//			}
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	@Override
+	public List<IPlayerRating> putBatch(List<IPlayerRating> prl) {
+		try {
+			if (prl != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+				
+//				List<PlayerRating> cleansed = new ArrayList<PlayerRating>();
+//				
+//				// they have to already be in the database (i.e. they have to have an id);
+//				for (IPlayerRating pr : prl) {
+//					if (pr.getId() != null && pr instanceof PlayerRating) {
+//						cleansed.add((PlayerRating) pr);
+//					} else {
+//						// log and delete the existing one before saving
+//						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Trying to batch save a new PlayerRating, please save it individually first.");
+//					}
+//				}
+				ofy.put(prl);
+
+				// TODO  should return the cleansed one, but it's type is wrong
+				return prl;
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	/**
+	 * Just gets and puts everything in the database to index and de-index various fields.
+	 */
+	@Override
+	public void touchAll() {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+ 
+			Query<PlayerRating> prq = ofy.query(PlayerRating.class);
+			
+			for (PlayerRating r : prq.list()) {
+				ofy.put(r);
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+		}
+	}
+
+	@Override
+	public void cleanUp() {
+//		touchAll(); // we can take this line out once it's run once.
+//		
+//		Objectify ofy = DataStoreFactory.getOfy();
+//		DateTime twoWeeksAgo = new DateTime();
+//		twoWeeksAgo = twoWeeksAgo.minusWeeks(2);
+//		Query<PlayerRating> prq = ofy.query(PlayerRating.class).filter("generated <", twoWeeksAgo.toDate());
+//		
+//		for (IPlayerRating pr : prq) {
+//			pr.setDetails(null);
+//			for (RatingComponent rc : pr.getRatingComponents()) {
+//				rc.setRatingDetails(null);
+//				rc.setStatsDetails(null);
+//			}
+//		}
+//		
+//		ofy.put(prq);
+		
 	}
 
 
