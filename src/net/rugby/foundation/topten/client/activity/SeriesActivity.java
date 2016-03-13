@@ -663,6 +663,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	public void showFacebookComments(boolean show) {
 		clientFactory.showFacebookComments(show);		
 	}
+
 	
 
 }
