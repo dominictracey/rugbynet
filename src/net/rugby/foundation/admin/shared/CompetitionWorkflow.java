@@ -104,6 +104,8 @@ public class CompetitionWorkflow extends Workflow {
 					// getting really stale? (mark as unreported)
 					checkStaleGiveUp(m,c);
 					
+					// time to get all stats?
+					checkStats(m,c);
 				}
 			}		
 			
@@ -153,7 +155,15 @@ public class CompetitionWorkflow extends Workflow {
 		}						
 	}
 
-
+	private void checkStats(IMatchGroup m, ICompetition comp) {
+		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_STATS_TO_FETCH);
+			 
+		if (rule.test()) {
+			// fetch match
+			queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.FETCHSTATS, AdminOrchestrationTargets.Targets.MATCH, m, comp, log);
+		}						
+	}
+	
 	private void checkLocks(IMatchGroup m, ICompetition comp) {
 		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_TO_LOCK);
  

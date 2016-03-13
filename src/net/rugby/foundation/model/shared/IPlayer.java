@@ -1,6 +1,7 @@
 package net.rugby.foundation.model.shared;
 
 import java.util.Date;
+import java.util.List;
 
 public interface IPlayer extends IHasId {
 
@@ -68,6 +69,10 @@ public interface IPlayer extends IHasId {
 	public abstract String getForeignUrl();
 	public abstract String getTwitterHandle();
 	public abstract void setTwitterHandle(String twitterHandle);
+	public abstract List<Long> getTaskIds();
+	public abstract void setTaskIds(List<Long> taskIds);
+	public abstract List<Long> getBlockingTaskIds();
+	public abstract void setBlockingTaskIds(List<Long> taskIds);
 	
 	
 }

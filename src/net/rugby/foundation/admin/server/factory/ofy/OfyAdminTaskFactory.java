@@ -10,7 +10,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
@@ -61,7 +61,7 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 
 	@Override
 	public List<? extends IAdminTask> getAllOpen() {
-		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("status", Status.OPEN).order("created");
+		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("status", Status.OPEN).order("-created");
 		return qat.list();
 	}
 	

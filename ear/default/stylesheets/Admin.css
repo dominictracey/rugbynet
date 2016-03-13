@@ -316,3 +316,15 @@ a:visited {
 	border: 1px solid #999999;
 	margin: 10px;
 }
+
+span.badgeRed {
+	background-color: red;
+}
+
+span.badgeOrange {
+	background-color: orange;
+}
+
+span.badgeGreen {
+	background-color: green;
+}

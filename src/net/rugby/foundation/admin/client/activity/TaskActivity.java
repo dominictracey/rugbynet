@@ -2,6 +2,8 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -146,6 +148,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 	public void showTask(int i, IAdminTask target) {
 		this.target = target;
 		this.index = i;
+		Notify.notify(target.getSummary());
 		if (target.getAction().equals(IAdminTask.Action.EDITPLAYER)) {	
 			assert (target instanceof EditPlayerAdminTask);
 			clientFactory.getPlayerPopupView().setPresenter(this);

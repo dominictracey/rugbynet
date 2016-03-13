@@ -42,8 +42,8 @@ import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.util.DigestEmailer;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
-import net.rugby.foundation.admin.server.workflow.matchrating.FetchTeamMatchStats;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchTeamMatchStats;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
@@ -989,6 +989,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					}
 
 					atf.complete(task);
+					player.getTaskIds().remove(task.getId());
+					pf.put(player);
 				}
 				return player;
 			} else {
@@ -1265,8 +1267,12 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 						}
 					}
 					atf.complete(task);
+					stats.getTaskIds().remove(task.getId());
+					stats.getBlockingTaskIds().remove(task.getId());
+					pmsf.put(stats);
 				}
 				IPlayerRating pr = prf.create();
+				pr.setPlayer(pf.get(stats.getPlayerId()));
 				pr.addMatchStats(stats);
 				return pr;
 			} else {

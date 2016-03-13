@@ -1,12 +1,15 @@
 package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 
 @Entity
 public class ScrumPlayer implements IPlayer, Serializable {
@@ -17,34 +20,28 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	private static final long serialVersionUID = -2562186381925124329L;
 
 	@Id
-	private Long id;
-	
-	private Long scrumId;
-	
+	private Long id;	
+	private Long scrumId;	
 	private String displayName;
-
 	private Date birthDate;
-
 	private Float height;
-
 	private Float weight;
-
 	private String imageUri;
-
 	private Long countryId;
 	@Transient
 	private ICountry country;
-
 	private Position.position position;
-
 	private Integer numCaps;
-
 	private String givenName;
 	private String surName;
-	private String shortName;
-	
+	private String shortName;	
 	private String twitterHandle;
-
+	
+	@Unindexed
+	private List<Long> taskIds;
+	@Unindexed
+	private List<Long> blockingTaskIds;
+	
 	@Override
 	public Long getId() {
 		return id;
@@ -190,6 +187,28 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	@Override
 	public void setTwitterHandle(String twitterHandle) {
 		this.twitterHandle = twitterHandle;
+	}
+	@Override
+	public List<Long> getTaskIds() {
+		if (taskIds == null) {
+			taskIds = new ArrayList<Long>();
+		}
+		return taskIds;
+	}
+	@Override
+	public void setTaskIds(List<Long> taskIds) {
+		this.taskIds = taskIds;
+	}
+	@Override
+	public List<Long> getBlockingTaskIds() {
+		if (blockingTaskIds == null) {
+			blockingTaskIds = new ArrayList<Long>();
+		}
+		return blockingTaskIds;
+	}
+	@Override
+	public void setBlockingTaskIds(List<Long> taskIds) {
+		this.blockingTaskIds = taskIds;
 	}
 
 }

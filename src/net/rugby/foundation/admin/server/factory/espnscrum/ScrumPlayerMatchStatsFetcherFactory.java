@@ -8,7 +8,7 @@ import com.google.inject.Inject;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.ScrumPlayerMatchStatsFetcher;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;

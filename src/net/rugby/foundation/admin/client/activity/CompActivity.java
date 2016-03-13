@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
+import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.ui.AddMatchPopup.AddMatchPopupPresenter;
 import net.rugby.foundation.admin.client.ui.AddRoundPopup.AddRoundPopupPresenter;
 import net.rugby.foundation.admin.client.ui.AdminView;
@@ -772,11 +774,18 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	@Override
 	public void showEditStats(IPlayerRating info) {
 		if (ensureSingleMatch(info)) {
-			clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
-			clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getMatchStats().get(0));
-			((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
+			if (info.getMatchStats().get(0).getBlockingTaskIds() != null && !info.getMatchStats().get(0).getBlockingTaskIds().isEmpty()) {
+				AdminTaskPlace place = new AdminTaskPlace();
+				place.setFilter("All");
+				place.setTaskId(info.getMatchStats().get(0).getBlockingTaskIds().get(0).toString());
+				goTo(place);
+			} else {
+				clientFactory.getPlayerMatchStatsPopupView().setPresenter(this);
+				clientFactory.getPlayerMatchStatsPopupView().setTarget(info.getMatchStats().get(0));
+				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).center();
+			}
 		} else {
-			Window.alert("Invalid attempt to edit player match stats.");
+			Bootbox.alert("Invalid attempt to edit player match stats.");
 		}
 	}
 
@@ -834,7 +843,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 			@Override
 			public void onSuccess(IPlayerRating result) {
-
+				Notify.notify("Match stats for " + result.getPlayer().getDisplayName() + " saved.");
 				view.getPlayerListView().updatePlayerMatchStats(result);
 				((DialogBox) clientFactory.getPlayerMatchStatsPopupView()).hide();
 
