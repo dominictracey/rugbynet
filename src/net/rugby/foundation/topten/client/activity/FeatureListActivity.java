@@ -1,11 +1,14 @@
 package net.rugby.foundation.topten.client.activity;
 
+import java.util.List;
+
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.client.place.FeatureListPlace;
@@ -309,15 +312,15 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 
 	@Override
 	public void promote(ITopTenList list) {
-		clientFactory.getRpcService().sendTweets(list.getId(), new AsyncCallback<String>(){
+		clientFactory.getRpcService().sendTweets(list.getId(), new AsyncCallback<List<IPlayer>>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed tweeting");
 			}
 
 			@Override
-			public void onSuccess(String result) {
-				Bootbox.alert(result);
+			public void onSuccess(List<IPlayer> result) {
+				//Bootbox.alert(result);
 			}
 		});
 		

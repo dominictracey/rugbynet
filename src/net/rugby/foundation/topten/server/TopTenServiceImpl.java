@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -580,26 +581,28 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private final static String BUFFER_CREATE_URL = "https://api.bufferapp.com/1/updates/create.json";
 
 	@Override
-	public String sendTweets(Long ttlId) {
+	public List<IPlayer> sendTweets(Long ttlId) {
 		if (isAdmin()) {
 			try {				
+				List<IPlayer> playerList = new ArrayList<IPlayer>();
 				ITopTenList ttl = ttlf.get(ttlId);
 				String retval = "<h3>Tweet results for " + ttl.getTitle() + "</h3>";
 
 				if (ttl != null) {
 					for (ITopTenItem tti : ttl.getList()) {
 						retval += sendTweet(tti, ttl);
+						playerList.add(tti.getPlayer());
 					}
 				}
 				
 				retval += "<hr>Buffer count: " + bufferCount;
-				return retval;
+				return playerList;
 			}  catch (Throwable e) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
 				return null;
 			}
 		} else {
-			return "Not logged in as admin. Please contact info@rugby.net immediately.";
+			return null;
 		}
 	}
 	
@@ -695,6 +698,21 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Boolean savePlayer(IPlayer p) {
+		if (isAdmin()) {
+			try {				
+				pf.put(p);
+				return true;
+			}  catch (Throwable e) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 }
