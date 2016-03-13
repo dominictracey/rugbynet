@@ -1,4 +1,4 @@
-package net.rugby.foundation.admin.server.workflow.matchrating;
+package net.rugby.foundation.admin.server.workflow.fetchstats;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class GenerateMatchRatings extends Job1<GenerateMatchRatingsResults, IMatchGroup> implements Serializable {
+public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
@@ -36,7 +36,7 @@ public class GenerateMatchRatings extends Job1<GenerateMatchRatingsResults, IMat
 	private IPlayerFactory pf;
 
 	
-	public GenerateMatchRatings() {
+	public FetchMatchStats() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
@@ -58,7 +58,7 @@ public class GenerateMatchRatings extends Job1<GenerateMatchRatingsResults, IMat
 	 * 			Long adminID
 	 */		
 	@Override
-	public Value<GenerateMatchRatingsResults> run(IMatchGroup match) {
+	public Value<GenerateFetchMatchResults> run(IMatchGroup match) {
 
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();

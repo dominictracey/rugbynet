@@ -53,6 +53,29 @@ public class PlayerListViewImpl<T extends IPlayerRating> extends Composite imple
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		playersTable.addStyleName("groupList");
+		playersTable.addCellPreviewHandler( new Handler<T>() {
+
+			@Override
+			public void onCellPreview(CellPreviewEvent<T> event) {
+				boolean isClick = "click".equals(event.getNativeEvent().getType());
+				if (isClick) {
+					if (event.getColumn() == 0) {
+						listener.showEditTeamStats(event.getValue());
+					} else if (event.getColumn() == 1) {
+						listener.showEditPlayer(event.getValue());
+					} else if (event.getColumn() == 3) {
+						Window.alert((event.getValue()).getDetails()); 
+					} else if (event.getColumn() == 2) {
+						listener.showEditStats(event.getValue());
+					}
+				}  else if (event.getNativeEvent().getType().equals("mouseover")) {
+					if (event.getColumn() == 3) {
+						RatingComponent rc = ((IPlayerRating)event.getValue()).getRatingComponents().get(0);
+						playersTable.getRowElement(event.getIndex()).getCells().getItem(3).setTitle(rc.getStatsDetails()+"\n"+rc.getRatingDetails());
+					}
+				}
+			}
+		});
 	}
 
 
@@ -85,27 +108,8 @@ public class PlayerListViewImpl<T extends IPlayerRating> extends Composite imple
 			}			
 			playersTable.setVisibleRange(0, list.size());
 			
-			playersTable.addCellPreviewHandler( new Handler<T>() {
-
-				@Override
-				public void onCellPreview(CellPreviewEvent<T> event) {
-					boolean isClick = "click".equals(event.getNativeEvent().getType());
-					if (isClick) {
-						if (event.getColumn() == 0) {
-							listener.showEditTeamStats(event.getValue());
-						} else if (event.getColumn() == 3) {
-							Window.alert((event.getValue()).getDetails()); 
-						} else {
-							listener.showEditStats(event.getValue());
-						}
-					}  else if (event.getNativeEvent().getType().equals("mouseover")) {
-						if (event.getColumn() == 3) {
-							RatingComponent rc = ((IPlayerRating)event.getValue()).getRatingComponents().get(0);
-							playersTable.getRowElement(event.getIndex()).getCells().getItem(3).setTitle(rc.getStatsDetails()+"\n"+rc.getRatingDetails());
-						}
-					}
-				}
-			});
+			
+			
 		}
 	}
 

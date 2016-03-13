@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
@@ -14,6 +19,7 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRound;
@@ -493,7 +499,25 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						if (round.getText().contains(rid)) {
 							round.removeItems();
 							for (IMatchGroup mg : result) {
-								TreeItem ti = round.addTextItem(mg.getDisplayName() + "|" + mg.getId());
+								Div div  = new Div();
+								Icon icon = new Icon();
+								icon.setType(IconType.CIRCLE);
+								if (mg.getWorkflowStatus() == null || mg.getWorkflowStatus().equals(WorkflowStatus.PENDING)) {
+									icon.setColor("lightgrey");
+								} else if (mg.getWorkflowStatus().equals(WorkflowStatus.NO_STATS)) {
+									icon.setColor("black");
+								} else if (mg.getWorkflowStatus().equals(WorkflowStatus.FETCHED)) {
+									icon.setColor("green");
+								} else if (mg.getWorkflowStatus().equals(WorkflowStatus.TASKS_PENDING)) {
+									icon.setColor("orange");
+								} else if (mg.getWorkflowStatus().equals(WorkflowStatus.BLOCKED)) {
+									icon.setColor("red");
+								}
+								div.add(icon.asWidget());
+								Span span = new Span(mg.getDisplayName() + "|" + mg.getId());
+								div.add(span);
+								TreeItem ti = round.addItem(div);
+								//TreeItem ti = round.addTextItem(mg.getDisplayName() + "| " + mg.getId());
 								ti.addTextItem(mg.getDate().toString());
 								if (mg.getLocked() != null) {
 									if (mg.getLocked()) {

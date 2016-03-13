@@ -1,4 +1,4 @@
-package net.rugby.foundation.admin.server.workflow.matchrating;
+package net.rugby.foundation.admin.server.workflow.fetchstats;
 
 import java.util.List;
 import com.google.appengine.tools.pipeline.Job5;
@@ -15,7 +15,7 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-public class CompileMatchStats extends Job5<GenerateMatchRatingsResults, ITeamMatchStats, ITeamMatchStats, List<IPlayerMatchStats>, List<IPlayerMatchStats>, String> {
+public class CompileMatchStats extends Job5<GenerateFetchMatchResults, ITeamMatchStats, ITeamMatchStats, List<IPlayerMatchStats>, List<IPlayerMatchStats>, String> {
 
 
 	/**
@@ -30,7 +30,7 @@ public class CompileMatchStats extends Job5<GenerateMatchRatingsResults, ITeamMa
 	}
 
 	@Override
-	public Value<GenerateMatchRatingsResults> run(ITeamMatchStats hs, ITeamMatchStats vs, List<IPlayerMatchStats> hps, List<IPlayerMatchStats> vps, String job) {
+	public Value<GenerateFetchMatchResults> run(ITeamMatchStats hs, ITeamMatchStats vs, List<IPlayerMatchStats> hps, List<IPlayerMatchStats> vps, String job) {
 		Injector injector = BPMServletContextListener.getInjectorForNonServlets();
 
 		this.mf = injector.getInstance(IMatchGroupFactory.class);
@@ -56,7 +56,7 @@ public class CompileMatchStats extends Job5<GenerateMatchRatingsResults, ITeamMa
 			// send an admin email?
 		}
 		
-		return (Value<GenerateMatchRatingsResults>)immediate(new GenerateMatchRatingsResults(hs, vs, hps, vps, job));
+		return (Value<GenerateFetchMatchResults>)immediate(new GenerateFetchMatchResults(hs, vs, hps, vps, job));
 	}
 
 }

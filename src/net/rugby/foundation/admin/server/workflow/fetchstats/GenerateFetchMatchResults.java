@@ -1,4 +1,4 @@
-package net.rugby.foundation.admin.server.workflow.matchrating;
+package net.rugby.foundation.admin.server.workflow.fetchstats;
 
 import java.io.Serializable;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-public class GenerateMatchRatingsResults implements Serializable {
+public class GenerateFetchMatchResults implements Serializable {
 	/**
 	 * 
 	 */
@@ -17,7 +17,7 @@ public class GenerateMatchRatingsResults implements Serializable {
 	public ITeamMatchStats visitStats;
 	public String jobId;
 	
-	public GenerateMatchRatingsResults(	ITeamMatchStats homeStats,
+	public GenerateFetchMatchResults(	ITeamMatchStats homeStats,
 										ITeamMatchStats visitStats,
 										List<IPlayerMatchStats> homePlayerStats,
 										List<IPlayerMatchStats> visitPlayerStats,

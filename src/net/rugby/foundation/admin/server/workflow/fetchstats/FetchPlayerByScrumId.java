@@ -1,4 +1,4 @@
-package net.rugby.foundation.admin.server.workflow.matchrating;
+package net.rugby.foundation.admin.server.workflow.fetchstats;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -83,10 +83,17 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 				return player;
 			} else {
 				//still didn't find, need human to get this going.
+				
+				// all we know is the scrumId
+				IPlayer p = pf.create();
+				p.setScrumId(scrumPlayerId);
+				p.setDisplayName("--");
+				pf.put(p);
 				PromisedValue<IPlayer> x = newPromise(IPlayer.class);
-				IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
+				IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", p, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
 				atf.put(task);
-
+				p.getBlockingTaskIds().add(task.getId());
+				pf.put(p);
 				return x;
 			}
 
@@ -140,6 +147,11 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 						String fullName = line.split("</b>|</div>")[1].trim();
 						
 						setShortName(player, fullName);
+						
+						if (!player.getGivenName().isEmpty() && !player.getGivenName().isEmpty() && 
+								player.getCountry() != null && !player.getShortName().isEmpty()) {
+							found = true;  //names and country are good enough to allow workflow to continue
+						}
 					} catch (Exception e) {
 						errorDetails.add("Couldn't set player's short name");
 					}
@@ -157,10 +169,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 						dateRead = dateFormatter.parse(monthday + ", " + year);
 						if (dateRead != null) {
 							player.setBirthDate(dateRead);
-							if (!player.getGivenName().isEmpty() && !player.getGivenName().isEmpty() && 
-									player.getCountry() != null && !player.getShortName().isEmpty()) {
-								found = true;  //names, country and birthdate is good enough to allow workflow to continue
-							}
+							
 						} else {
 							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Unable to find birthday for player " + player.getDisplayName() + "'s country: " + line.split("<|>")[2].trim());
 							errorDetails.add("Invalid birthday");
@@ -235,6 +244,8 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 					pf.put(player); // need an id
 					IAdminTask task = atf.getNewEditPlayerTask("Error gathering player information for " + player.getDisplayName(), errorDetails.toString(), player, true, null,null,null);
 					atf.put(task);
+					player.getTaskIds().add(task.getId());
+					pf.put(player);
 					return immediate(player);
 				} else {
 					// if we don't have enough to keep going we can save the player as is and send back a promise
@@ -247,6 +258,8 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 						name = player.getDisplayName();
 					IAdminTask task = atf.getNewEditPlayerTask("Couldn't get sufficient info for player " + name, errorDetails.toString(), player, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());
 					atf.put(task);
+					player.getBlockingTaskIds().add(task.getId());
+					pf.put(player);
 					return x;
 				}
 			} else {
@@ -326,13 +339,13 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 		
 	}
 	
-	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown fetching player by scrumId: " + e.getLocalizedMessage());
-		//still didn't find, need human to get this going.
-		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
-		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
-		atf.put(task);
-
-		return x;
-	}
+//	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown fetching player by scrumId: " + e.getLocalizedMessage());
+//		//still didn't find, need human to get this going.
+//		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+//		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
+//		atf.put(task);
+//
+//		return x;
+//	}
 }

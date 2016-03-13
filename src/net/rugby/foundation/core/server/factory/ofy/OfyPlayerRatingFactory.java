@@ -186,6 +186,7 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 			IPlayerRating pr = create();
 			pr.addMatchStats(pms);
 			pr.setPlayerId(pms.getPlayerId());
+			pr.setPlayer(pf.get(pms.getPlayerId()));
 			list.add(pr);
 		}
 		return list;

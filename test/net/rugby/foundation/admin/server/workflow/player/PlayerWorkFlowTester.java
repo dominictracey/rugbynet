@@ -12,9 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
-import net.rugby.foundation.admin.server.workflow.matchrating.FetchPlayerByScrumId;
-import net.rugby.foundation.admin.server.workflow.matchrating.FetchPlayerMatchStats;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchPlayerByScrumId;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchPlayerMatchStats;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;

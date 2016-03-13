@@ -7,7 +7,7 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;

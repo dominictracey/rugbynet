@@ -134,6 +134,13 @@ public interface IPlayerMatchStats extends IHasId  {
 	void setTeamAbbr(String teamAbbr);
 
 	int isForward();
+
+	public abstract List<Long> getTaskIds();
+
+	void setTaskIds(List<Long> taskIds);
+
+	public abstract List<Long> getBlockingTaskIds();
+	void setBlockingTaskIds(List<Long> taskIds);
 	
 
 }

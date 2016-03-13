@@ -1,4 +1,4 @@
-package net.rugby.foundation.admin.server.workflow.matchrating;
+package net.rugby.foundation.admin.server.workflow.fetchstats;
 
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.google.inject.Injector;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
