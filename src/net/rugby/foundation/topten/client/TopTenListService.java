@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
@@ -50,5 +51,6 @@ public interface TopTenListService extends RemoteService {
 	public List<Feature> getLatestFeatures();
 	public HashMap<Long, String> getTeamLogoStyleMap();
 	public Boolean deleteNote(Long noteId);
-	public String sendTweets(Long ttlId);
+	public List<IPlayer> sendTweets(Long ttlId);
+	public Boolean savePlayer(IPlayer p);
 }

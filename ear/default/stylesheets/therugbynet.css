@@ -754,3 +754,9 @@ header{ background-color:#FFF}
 #draggablePanelList .panel-heading {
         cursor: move;
  }
+.redBadge {
+	background-color: red;
+}
+.greenBadge{
+	background-color: green;
+}

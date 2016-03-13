@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
@@ -66,5 +67,6 @@ public interface TopTenListServiceAsync {
 	public void getLatestFeatures(AsyncCallback<List<Feature>> asyncCallback);
 	public void getTeamLogoStyleMap(AsyncCallback<HashMap<Long, String>> asyncCallback);
 	public void deleteNote(Long noteId, AsyncCallback<Boolean> asyncCallback);
-	public void sendTweets(Long ttlId, AsyncCallback<String> asyncCallback);
+	public void sendTweets(Long ttlId, AsyncCallback<List<IPlayer>> asyncCallback);
+	public void savePlayer(IPlayer p, AsyncCallback<Boolean> asyncCallback);
 }
