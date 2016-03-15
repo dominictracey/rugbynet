@@ -178,6 +178,9 @@
             "type" : "string",
             "format" : "date-time"
           },
+          "longName" : {
+            "type" : "string"
+          },
           "prevRoundIndex" : {
             "type" : "integer"
           },
@@ -210,9 +213,6 @@
           },
           "showToClient" : {
             "type" : "boolean"
-          },
-          "longName" : {
-            "type" : "string"
           },
           "compType" : {
             "$ref" : "CompetitionType"
@@ -303,9 +303,6 @@
               "$ref" : "IMatchGroup"
             }
           },
-          "workflowStatus" : {
-            "$ref" : "WorkflowStatus"
-          },
           "ordinal" : {
             "type" : "integer"
           },
@@ -326,6 +323,9 @@
           "compId" : {
             "type" : "string",
             "format" : "int64"
+          },
+          "workflowStatus" : {
+            "$ref" : "WorkflowStatus"
           },
           "abbr" : {
             "type" : "string"
@@ -352,26 +352,6 @@
           "groupInfo" : {
             "type" : "string"
           },
-          "workflowStatus" : {
-            "$ref" : "WorkflowStatus"
-          },
-          "visitingTeam" : {
-            "$ref" : "ITeamGroup"
-          },
-          "visitingTeamId" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "simpleScoreMatchResult" : {
-            "$ref" : "ISimpleScoreMatchResult"
-          },
-          "simpleScoreMatchResultId" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "fetchMatchStatsPipelineId" : {
-            "type" : "string"
-          },
           "homeTeam" : {
             "$ref" : "ITeamGroup"
           },
@@ -393,17 +373,37 @@
           "guid" : {
             "type" : "string"
           },
+          "workflowStatus" : {
+            "$ref" : "WorkflowStatus"
+          },
+          "visitingTeam" : {
+            "$ref" : "ITeamGroup"
+          },
+          "visitingTeamId" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "simpleScoreMatchResult" : {
+            "$ref" : "ISimpleScoreMatchResult"
+          },
+          "simpleScoreMatchResultId" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "fetchMatchStatsPipelineId" : {
+            "type" : "string"
+          },
           "members" : {
             "type" : "array",
             "items" : {
               "$ref" : "IPlayer"
             }
           },
-          "snakeCaseDisplayName" : {
-            "type" : "string"
-          },
           "groupType" : {
             "$ref" : "GroupType"
+          },
+          "snakeCaseDisplayName" : {
+            "type" : "string"
           },
           "id" : {
             "type" : "string",
@@ -415,11 +415,6 @@
         "id" : "Status",
         "type" : "string",
         "enum" : [ "SCHEDULED", "FINAL_HOME_WIN", "FINAL_HOME_WIN_OT", "FINAL_VISITOR_WIN", "FINAL_VISITOR_WIN_OT", "FINAL_DRAW", "FINAL_DRAW_OT", "UNDERWAY_FIRST_HALF", "HALFTIME", "UNDERWAY_SECOND_HALF", "COMPLETE_AWAITING_RESULTS", "POSTPONED", "RESCHEDULED", "CANCELED", "UNREPORTED" ]
-      },
-      "WorkflowStatus" : {
-        "id" : "WorkflowStatus",
-        "type" : "string",
-        "enum" : [ "PENDING", "TASKS_PENDING", "NO_STATS", "FETCHED", "BLOCKED" ]
       },
       "ITeamGroup" : {
         "id" : "ITeamGroup",
@@ -455,11 +450,11 @@
               "$ref" : "IPlayer"
             }
           },
-          "snakeCaseDisplayName" : {
-            "type" : "string"
-          },
           "groupType" : {
             "$ref" : "GroupType"
+          },
+          "snakeCaseDisplayName" : {
+            "type" : "string"
           },
           "id" : {
             "type" : "string",
@@ -494,16 +489,6 @@
             "type" : "number",
             "format" : "float"
           },
-          "blockingTaskIds" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "format" : "int64"
-            }
-          },
-          "twitterHandle" : {
-            "type" : "string"
-          },
           "foreignUrl" : {
             "type" : "string"
           },
@@ -534,6 +519,16 @@
               "type" : "string",
               "format" : "int64"
             }
+          },
+          "blockingTaskIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "int64"
+            }
+          },
+          "twitterHandle" : {
+            "type" : "string"
           },
           "id" : {
             "type" : "string",
@@ -572,6 +567,11 @@
         "id" : "GroupType",
         "type" : "string",
         "enum" : [ "ADHOC", "TEAM", "POSITION", "MATCH", "FEATURED", "NONE", "MY" ]
+      },
+      "WorkflowStatus" : {
+        "id" : "WorkflowStatus",
+        "type" : "string",
+        "enum" : [ "PENDING", "TASKS_PENDING", "NO_STATS", "FETCHED", "BLOCKED" ]
       },
       "ISimpleScoreMatchResult" : {
         "id" : "ISimpleScoreMatchResult",
