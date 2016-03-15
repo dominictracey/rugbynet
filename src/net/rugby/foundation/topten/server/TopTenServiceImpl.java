@@ -42,6 +42,7 @@ import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -605,11 +606,21 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			return null;
 		}
 	}
-	
-	private String sendTweet(ITopTenItem tti, ITopTenList ttl) {
+	@Override
+	public String sendTweet(ITopTenItem tti, ITopTenList ttl) {
 		if (isAdmin()) {
 			try {
-
+				
+				// is this a recent save?
+				if (tti.getPlayer().getTwitterHandle() == null) {
+					IPlayer p = pf.get(tti.getPlayerId());
+					ITeamGroup t = tgf.get(tti.getTeamId());
+					if (p.getTwitterHandle() != null && !p.getTwitterHandle().isEmpty()) {
+						tti.setTweet(p.getTwitterHandle() + " of " + t.getTwitter());
+						tti.getPlayer().setTwitterHandle(p.getTwitterHandle());
+					}
+				}
+				
 				if (tti.getPlayer().getTwitterHandle() == null || tti.getPlayer().getTwitterHandle().isEmpty()) {
 					return tti.getPlayer().getDisplayName() + ": no twitter handle<br>";
 				}

@@ -27,6 +27,7 @@ import org.gwtbootstrap3.client.ui.Badge;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Modal;
@@ -37,6 +38,7 @@ import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import com.google.gwt.core.client.GWT;
@@ -123,7 +125,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@UiField
 	protected Button promoteSave;
 	@UiField
-	protected Panel promoteHtml;
+	protected Div promoteHtml;
 
 
 	protected Long compId;
@@ -669,13 +671,30 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		playerList = result; 
 		promoteHtml.clear();
 		for (IPlayer p: result){
-			Panel pp = new Panel();
-			pp.add(new Label(p.getDisplayName()));
+			Row row = new Row();
+			Column columnLabel = new Column("MD-3");
+			Column columnBadge = new Column("MD-1");
+			Column columnLink = new Column("md-1");
+			Column columnField = new Column("md-6");
+			columnBadge.addStyleName("col-md-2");
+			columnLink.addStyleName("col-md-1");
+			columnField.addStyleName("col-md-6");
+			columnLabel.add(new Span(p.getDisplayName()));
+			columnLabel.addStyleName("col-md-3");
+			columnLabel.addStyleName("twitterDialougeRow");
+			row.add(columnLabel);
+			row.add(columnBadge);
+			row.add(columnLink);
+			row.add(columnField);
 			if (p.getTwitterHandle() != null && !p.getTwitterHandle().isEmpty()){
 				Badge b = new Badge();
+				Span spanLink = new Span("&nbsp;");
+				Span spanField = new Span("&nbsp;");
+				columnLink.add(spanLink);
+				columnField.add(spanField);
 				b.addStyleName("greenBadge");
 				b.setText("Success");
-				pp.add(b);
+				columnBadge.add(b);
 			} else {
 				Badge b = new Badge();
 				b.addStyleName("redBadge");
@@ -693,12 +712,13 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				TextBox tb = new TextBox();
 				playerMap.put(p, tb);
 				tb.setName(p.getDisplayName());
-				pp.add(b);
-				pp.add(a);
-				pp.add(tb);
+				tb.setPlaceholder("@twitter");
+				columnBadge.add(b);
+				columnLink.add(a);
+				columnField.add(tb);
 			}
 
-			promoteHtml.add(pp);
+			promoteHtml.add(row);
 
 		}
 		promoteModal.show();
@@ -725,6 +745,31 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 						@Override
 						public void onSuccess(Boolean result) {
 							Notify.notify(p.getDisplayName() + " saved!");
+							ITopTenItem tti = null;
+							//list.getList();
+							//Look through the Top Ten List for the tti that has a playerId equal to the id of the player.
+							for (ITopTenItem i: list.getList()){
+								if (i.getPlayerId().equals(p.getId())){
+									tti=i;
+									break;
+								}
+								//Notify.notify(tti.getPlayer().getDisplayName());
+							}
+							clientFactory.getRpcService().sendTweet(tti, list, new AsyncCallback<String>(){
+
+								@Override
+								public void onFailure(Throwable caught) {
+									// TODO Auto-generated method stub
+									
+								}
+
+								@Override
+								public void onSuccess(String result) {
+									Notify.notify(result);
+									
+								}
+								
+							});
 
 						}
 

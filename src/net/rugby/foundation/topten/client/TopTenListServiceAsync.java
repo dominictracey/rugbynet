@@ -69,4 +69,5 @@ public interface TopTenListServiceAsync {
 	public void deleteNote(Long noteId, AsyncCallback<Boolean> asyncCallback);
 	public void sendTweets(Long ttlId, AsyncCallback<List<IPlayer>> asyncCallback);
 	public void savePlayer(IPlayer p, AsyncCallback<Boolean> asyncCallback);
+	public void sendTweet(ITopTenItem tti, ITopTenList ttl, AsyncCallback<String> asyncCallback);
 }
