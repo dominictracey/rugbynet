@@ -95,6 +95,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
@@ -868,8 +869,34 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IMatchGroup saveMatch(IMatchGroup matchGroup) {
 		try {
 			if (checkAdmin()) {
-				mf.put(matchGroup);
-				return matchGroup;
+				if (matchGroup != null) {
+					// see if they are changing the workflowStatus
+					IMatchGroup old = mf.get(matchGroup.getId());
+					if (!matchGroup.getWorkflowStatus().equals(old.getWorkflowStatus())) {
+						if (WorkflowStatus.NO_STATS == matchGroup.getWorkflowStatus() || WorkflowStatus.FETCHED == matchGroup.getWorkflowStatus()) {
+							// OPTA didn't create stats
+							// do we have a pipeline?							
+							String id = matchGroup.getFetchMatchStatsPipelineId();
+							if (id != null && !id.isEmpty()) {
+								matchGroup.setFetchMatchStatsPipelineId(null);
+								mf.put(matchGroup);
+								try {
+									PipelineService service = PipelineServiceFactory.newPipelineService();
+									service.deletePipelineRecords(id,true,false);
+								} catch (NoSuchObjectException nsox) {
+									// it's ok, just was a dangling reference in the match record
+								}
+							
+								List<? extends IAdminTask> tasks = atf.getForPipeline(id);
+								atf.delete((List<IAdminTask>) tasks);
+							}
+						}
+					}
+					mf.put(matchGroup);
+					return matchGroup;
+				} else {
+					return null;
+				}
 			} else {
 				return null;
 			}
@@ -961,7 +988,11 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IPlayer getPlayer(Long id) {
 		try {
 			if (checkAdmin()) {
-				return pf.get(id);
+				if (id == null) {
+					return pf.create();
+				} else {
+					return pf.get(id);
+				}
 			} else {
 				return null;
 			}
@@ -981,10 +1012,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 						PipelineService service = PipelineServiceFactory.newPipelineService();
 						try {
 							service.submitPromisedValue(task.getPromise(), player);
-						} catch (NoSuchObjectException e) {
-							e.printStackTrace();
-						} catch (OrphanedObjectException e) {
-							e.printStackTrace();
+						} catch (NoSuchObjectException ex) {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+						} catch (OrphanedObjectException ex) {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 						}
 					}
 

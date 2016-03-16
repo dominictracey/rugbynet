@@ -192,7 +192,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 14505L, 1L, null);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -236,7 +236,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Neil Best", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 15048L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Neil Best", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 15048L, 1L, null);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -279,7 +279,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 92047L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 92047L, 1L, null);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;

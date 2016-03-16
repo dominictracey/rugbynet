@@ -94,7 +94,7 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 				atf.put(task);
 				stats.getTaskIds().add(task.getId());
 				pmsf.put(stats);
-				if (match.getWorkflowStatus().equals(WorkflowStatus.BLOCKED)) {
+				if (!match.getWorkflowStatus().equals(WorkflowStatus.BLOCKED)) {
 					match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
 					mgf.put(match);
 				}

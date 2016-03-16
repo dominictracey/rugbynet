@@ -58,7 +58,7 @@ public class UnsubscribeServlet extends HttpServlet {
 				
 				if (u == null) {
 					resp.getWriter().println("<h3>Unkown email address " + req.getParameter("email") + ". Unsubscribe failed. Try logging on to your account and checking the Opt Out box." );
-				} else if (code == null && (u.getOptOutCode() == null || u.getOptOutCode().isEmpty())) {
+				} else if ((code == null || code.isEmpty() || "null".equals(code)) && (u.getOptOutCode() == null || u.getOptOutCode().isEmpty())) {
 					// legacy accounts don't need optOutCode
 					unsubscribeUser(u);
 					resp.getWriter().println(u.getEmailAddress() + " has been successfully unsubscribed. You can reactivate some or all of the email notifications on your profile page.");

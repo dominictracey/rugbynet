@@ -1,7 +1,6 @@
 package net.rugby.foundation.admin.server.workflow.fetchstats;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,19 +15,20 @@ import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 
-import com.google.appengine.tools.pipeline.Job5;
+import com.google.appengine.tools.pipeline.Job6;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
-import com.google.appengine.api.datastore.Key;
 import com.google.inject.Injector;
 
-public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, String, Long, Long> {
+public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, String, Long, Long, IMatchGroup> {
 
 	private static final long serialVersionUID = 483113213168220162L;
 	private transient IPlayerFactory pf;
@@ -38,6 +38,8 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 	private transient Long scrumPlayerId;
 	private transient Long adminId;
 	private transient String referringURL;
+	private IMatchGroupFactory mgf;
+	private IMatchGroup match;
 	
 	private static Injector injector = null;
 	
@@ -52,7 +54,7 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 	 * 			Long adminID
 	 */		
 	@Override
-	public Value<IPlayer> run(ICompetition comp, String playerName, String referringURL, Long scrumPlayerId, Long adminId) {
+	public Value<IPlayer> run(ICompetition comp, String playerName, String referringURL, Long scrumPlayerId, Long adminId, IMatchGroup match) {
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINER);
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINER, "Looking for " + playerName);
 		
@@ -63,11 +65,13 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 		this.pf = injector.getInstance(IPlayerFactory.class);
 		this.cf = injector.getInstance(ICountryFactory.class);
 		this.atf = injector.getInstance(IAdminTaskFactory.class);
+		this.mgf = injector.getInstance(IMatchGroupFactory.class);
 		
 		this.playerName = playerName;
 		this.scrumPlayerId = scrumPlayerId;
 		this.adminId = adminId;
 		this.referringURL = referringURL;
+		this.match = match;
 		
 		// first see if we have it in the database
 		IPlayer dbPlayer = pf.getByScrumId(scrumPlayerId);
@@ -94,6 +98,8 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 				atf.put(task);
 				p.getBlockingTaskIds().add(task.getId());
 				pf.put(p);
+				match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+				mgf.put(match);
 				return x;
 			}
 
@@ -246,6 +252,10 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 					atf.put(task);
 					player.getTaskIds().add(task.getId());
 					pf.put(player);
+					if (match.getWorkflowStatus() != WorkflowStatus.BLOCKED) {
+						match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+						mgf.put(match);
+					}
 					return immediate(player);
 				} else {
 					// if we don't have enough to keep going we can save the player as is and send back a promise
@@ -260,6 +270,9 @@ public class FetchPlayerByScrumId extends Job5<IPlayer, ICompetition, String, St
 					atf.put(task);
 					player.getBlockingTaskIds().add(task.getId());
 					pf.put(player);
+					
+					match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+					mgf.put(match);
 					return x;
 				}
 			} else {

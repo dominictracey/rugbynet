@@ -94,7 +94,7 @@ public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup
 			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
 				homePlayers.add(immediate(dbPlayer));
 			} else {
-				Value<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
+				Value<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match));
 				homePlayers.add(homePlayer);
 			}
 		}
@@ -108,7 +108,7 @@ public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup
 			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
 				visitorPlayers.add(immediate(dbPlayer));
 			} else {
-				Value<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L));
+				Value<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match));
 				visitorPlayers.add(visitPlayer);
 			}
 		}	   

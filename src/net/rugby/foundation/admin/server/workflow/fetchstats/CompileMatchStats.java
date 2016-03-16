@@ -37,8 +37,12 @@ public class CompileMatchStats extends Job5<GenerateFetchMatchResults, ITeamMatc
 		this.rf = injector.getInstance(IRoundFactory.class);
 		
 		IMatchGroup match = mf.get(hs.getMatchId());
-		match.setWorkflowStatus(WorkflowStatus.FETCHED);
-		mf.put(match);
+		
+		// TASKS_PENDING doesn't block us from getting here so we can't clear it
+		if (match.getWorkflowStatus() != WorkflowStatus.TASKS_PENDING) {
+			match.setWorkflowStatus(WorkflowStatus.FETCHED);
+			mf.put(match);
+		}
 		
 		IRound round = rf.get(match.getRoundId());
 		boolean done = true;
