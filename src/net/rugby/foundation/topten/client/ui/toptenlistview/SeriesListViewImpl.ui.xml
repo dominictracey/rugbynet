@@ -74,7 +74,7 @@
 		<b:Modal title="Promote Results" closable="true" fade="true"
 			dataBackdrop="STATIC" dataKeyboard="true" b:id="promoteModal" ui:field="promoteModal">
 			<b:ModalBody>
-				<b:Panel ui:field="promoteHtml"></b:Panel>
+				<b.html:Div ui:field="promoteHtml"></b.html:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DANGER" ui:field="promoteSave">Save</b:Button>

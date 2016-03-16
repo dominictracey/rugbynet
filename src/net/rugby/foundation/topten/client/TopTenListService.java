@@ -53,4 +53,5 @@ public interface TopTenListService extends RemoteService {
 	public Boolean deleteNote(Long noteId);
 	public List<IPlayer> sendTweets(Long ttlId);
 	public Boolean savePlayer(IPlayer p);
+	public String sendTweet(ITopTenItem tti, ITopTenList ttl);
 }

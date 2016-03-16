@@ -760,3 +760,6 @@ header{ background-color:#FFF}
 .greenBadge{
 	background-color: green;
 }
+.twitterDialougeRow{
+	min-height: 32px;
+}
