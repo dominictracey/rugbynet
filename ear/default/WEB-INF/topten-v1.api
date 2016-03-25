@@ -40,6 +40,21 @@
         "body" : "autoTemplate(backendResponse)"
       }
     },
+    "topten.content.getcontent" : {
+      "path" : "content",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ "replace this with your web client application ID" ],
+      "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
+      "rosyMethod" : "net.rugby.foundation.topten.server.rest.TopTenV1.getcontent",
+      "request" : {
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
     "topten.competition.getAll" : {
       "path" : "/competitions/",
       "httpMethod" : "GET",
@@ -69,21 +84,6 @@
       "response" : {
         "body" : "autoTemplate(backendResponse)"
       }
-    },
-    "topten.content.getcontent" : {
-      "path" : "content",
-      "httpMethod" : "GET",
-      "authLevel" : "NONE",
-      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
-      "audiences" : [ "replace this with your web client application ID" ],
-      "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
-      "rosyMethod" : "net.rugby.foundation.topten.server.rest.TopTenV1.getcontent",
-      "request" : {
-        "body" : "empty"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
     }
   },
   "descriptor" : {
@@ -94,6 +94,12 @@
         "properties" : {
           "environment" : {
             "$ref" : "Environment"
+          },
+          "engineUrl" : {
+            "type" : "string"
+          },
+          "seriesMap" : {
+            "$ref" : "JsonMap"
           },
           "competitionMap" : {
             "$ref" : "JsonMap"
@@ -129,12 +135,6 @@
           "currentUROrdinal" : {
             "type" : "integer"
           },
-          "engineUrl" : {
-            "type" : "string"
-          },
-          "seriesMap" : {
-            "$ref" : "JsonMap"
-          },
           "id" : {
             "type" : "string",
             "format" : "int64"
@@ -150,6 +150,48 @@
         "id" : "JsonMap",
         "type" : "object"
       },
+      "Content" : {
+        "id" : "Content",
+        "type" : "object",
+        "properties" : {
+          "createdDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "lastModifiedDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "body" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "menuOrder" : {
+            "type" : "integer"
+          },
+          "menuName" : {
+            "type" : "string"
+          },
+          "div" : {
+            "type" : "string"
+          },
+          "showInMenu" : {
+            "type" : "boolean"
+          },
+          "showInFooter" : {
+            "type" : "boolean"
+          }
+        }
+      },
       "ICompetition" : {
         "id" : "ICompetition",
         "type" : "object",
@@ -158,6 +200,9 @@
             "type" : "string",
             "format" : "int64"
           },
+          "imageUrl" : {
+            "type" : "string"
+          },
           "shortName" : {
             "type" : "string"
           },
@@ -165,60 +210,24 @@
             "type" : "string",
             "format" : "date-time"
           },
-          "imageUrl" : {
-            "type" : "string"
-          },
           "rounds" : {
             "type" : "array",
             "items" : {
               "$ref" : "IRound"
             }
           },
+          "longName" : {
+            "type" : "string"
+          },
           "begin" : {
             "type" : "string",
             "format" : "date-time"
           },
-          "longName" : {
-            "type" : "string"
-          },
-          "prevRoundIndex" : {
-            "type" : "integer"
-          },
-          "nextRoundIndex" : {
-            "type" : "integer"
-          },
-          "compClubhouseId" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "weightingFactor" : {
-            "type" : "number",
-            "format" : "float"
-          },
-          "twitterChannel2" : {
-            "type" : "string"
-          },
-          "twitterChannel1" : {
-            "type" : "string"
-          },
-          "ttltitleDesc" : {
-            "type" : "string"
-          },
-          "componentCompIds" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "format" : "int64"
-            }
-          },
-          "showToClient" : {
-            "type" : "boolean"
+          "seriesMap" : {
+            "$ref" : "JsonMap"
           },
           "compType" : {
             "$ref" : "CompetitionType"
-          },
-          "seriesMap" : {
-            "$ref" : "JsonMap"
           },
           "abbr" : {
             "type" : "string"
@@ -275,6 +284,39 @@
           },
           "tableURL" : {
             "type" : "string"
+          },
+          "prevRoundIndex" : {
+            "type" : "integer"
+          },
+          "nextRoundIndex" : {
+            "type" : "integer"
+          },
+          "compClubhouseId" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "weightingFactor" : {
+            "type" : "number",
+            "format" : "float"
+          },
+          "twitterChannel2" : {
+            "type" : "string"
+          },
+          "twitterChannel1" : {
+            "type" : "string"
+          },
+          "ttltitleDesc" : {
+            "type" : "string"
+          },
+          "componentCompIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "int64"
+            }
+          },
+          "showToClient" : {
+            "type" : "boolean"
           }
         }
       },
@@ -297,11 +339,8 @@
             "type" : "string",
             "format" : "date-time"
           },
-          "matches" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "IMatchGroup"
-            }
+          "abbr" : {
+            "type" : "string"
           },
           "ordinal" : {
             "type" : "integer"
@@ -309,6 +348,16 @@
           "computed" : {
             "type" : "string",
             "format" : "date-time"
+          },
+          "compId" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "matches" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "IMatchGroup"
+            }
           },
           "matchIDs" : {
             "type" : "array",
@@ -320,15 +369,8 @@
           "urOrdinal" : {
             "type" : "integer"
           },
-          "compId" : {
-            "type" : "string",
-            "format" : "int64"
-          },
           "workflowStatus" : {
             "$ref" : "WorkflowStatus"
-          },
-          "abbr" : {
-            "type" : "string"
           }
         }
       },
@@ -336,18 +378,18 @@
         "id" : "IMatchGroup",
         "type" : "object",
         "properties" : {
-          "displayName" : {
-            "type" : "string"
-          },
           "date" : {
             "type" : "string",
             "format" : "date-time"
           },
-          "locked" : {
-            "type" : "boolean"
+          "displayName" : {
+            "type" : "string"
           },
           "status" : {
             "$ref" : "Status"
+          },
+          "locked" : {
+            "type" : "boolean"
           },
           "groupInfo" : {
             "type" : "string"
@@ -426,19 +468,19 @@
           "color" : {
             "type" : "string"
           },
-          "groupInfo" : {
-            "type" : "string"
-          },
           "shortName" : {
             "type" : "string"
           },
-          "twitterChannel" : {
+          "groupInfo" : {
             "type" : "string"
           },
           "abbr" : {
             "type" : "string"
           },
           "twitter" : {
+            "type" : "string"
+          },
+          "twitterChannel" : {
             "type" : "string"
           },
           "displayName" : {
@@ -475,19 +517,19 @@
           "givenName" : {
             "type" : "string"
           },
+          "weight" : {
+            "type" : "number",
+            "format" : "float"
+          },
           "position" : {
             "$ref" : "position"
           },
-          "weight" : {
+          "height" : {
             "type" : "number",
             "format" : "float"
           },
           "shortName" : {
             "type" : "string"
-          },
-          "height" : {
-            "type" : "number",
-            "format" : "float"
           },
           "foreignUrl" : {
             "type" : "string"
@@ -547,13 +589,13 @@
             "type" : "string",
             "format" : "int64"
           },
+          "abbr" : {
+            "type" : "string"
+          },
           "irb" : {
             "type" : "string"
           },
           "nickName" : {
-            "type" : "string"
-          },
-          "abbr" : {
             "type" : "string"
           }
         }
@@ -638,54 +680,17 @@
             }
           }
         }
-      },
-      "Content" : {
-        "id" : "Content",
-        "type" : "object",
-        "properties" : {
-          "createdDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "lastModifiedDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "id" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "body" : {
-            "type" : "string"
-          },
-          "title" : {
-            "type" : "string"
-          },
-          "active" : {
-            "type" : "boolean"
-          },
-          "menuOrder" : {
-            "type" : "integer"
-          },
-          "menuName" : {
-            "type" : "string"
-          },
-          "div" : {
-            "type" : "string"
-          },
-          "showInMenu" : {
-            "type" : "boolean"
-          },
-          "showInFooter" : {
-            "type" : "boolean"
-          }
-        }
       }
     },
     "methods" : {
       "net.rugby.foundation.topten.server.rest.TopTenV1.getConfiguration" : {
         "response" : {
           "$ref" : "ICoreConfiguration"
+        }
+      },
+      "net.rugby.foundation.topten.server.rest.TopTenV1.getcontent" : {
+        "response" : {
+          "$ref" : "Content"
         }
       },
       "net.rugby.foundation.topten.server.rest.TopTenV1.getallcompetition" : {
@@ -696,11 +701,6 @@
       "net.rugby.foundation.topten.server.rest.TopTenV1.getcompetition" : {
         "response" : {
           "$ref" : "ICompetition"
-        }
-      },
-      "net.rugby.foundation.topten.server.rest.TopTenV1.getcontent" : {
-        "response" : {
-          "$ref" : "Content"
         }
       }
     }

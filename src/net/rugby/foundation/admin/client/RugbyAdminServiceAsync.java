@@ -210,4 +210,7 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<Integer> asyncCallback);
 	public void twitter(List<Long> blurbIds,
 			AsyncCallback<List<Long>> asyncCallback);
+	public void bulkUploadEmails(List<String> emailsValid,
+			AsyncCallback<List<String>> asyncCallback);
+
 }

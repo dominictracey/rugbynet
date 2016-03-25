@@ -56,6 +56,7 @@ import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
+import net.rugby.foundation.core.server.IAccountManager;
 import net.rugby.foundation.core.server.factory.IAppUserFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
@@ -88,6 +89,7 @@ import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IAppUser;
+import net.rugby.foundation.model.shared.IAppUser.EmailStatus;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
@@ -184,6 +186,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IPlaceFactory spf;
 	private IDigestEmailFactory def;
 	private DigestEmailer digestEmailer;
+	private IAccountManager am;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -207,7 +210,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IContentFactory ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
 			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
 			IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf,
-			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def) {
+			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def, IAccountManager am) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -246,7 +249,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.bf = bf;
 			this.spf = spf;
 			this.def = def;
-			
+			this.am = am;
+
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 		}
@@ -842,7 +846,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				} else {
 					cc.removeCompUnderway(comp.getId());
 				}
-				
+
 				if (comp.getShowToClient()) {
 					cc.addCompForClient(comp.getId());
 				} else {
@@ -1579,7 +1583,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;
 		}
 	}
-	
+
 	@Override
 	public ScrumMatchRatingEngineSchema createMatchRatingEngineSchema() {
 		try {
@@ -1644,7 +1648,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;
 		}
 	}
-	
+
 	@Override
 	public boolean deleteRawScoresForMatchRatingEngineSchema(ScrumMatchRatingEngineSchema20130713 schema) {
 		try {
@@ -1833,10 +1837,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ICoreConfiguration getConfiguration() {
 		try {
 			ICoreConfiguration conf = ccf.get();
-			
+
 			// check that environment is set properly
 			Environment env = conf.getEnvironment();
-			
+
 			HttpServletRequest req = this.getThreadLocalRequest();
 			if (req.getServerName().contains("127.0.0.1")) {
 				conf.setEnvironment(Environment.LOCAL);
@@ -1849,14 +1853,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			} else {
 				throw new RuntimeException("Could not determine environment for configuration");
 			}
-			
+
 			// if we had to adjust it, save
 			// note that this will happen when we "copy down" prod data to development
 			// we also check this value when determining whether to send out emails in our development environment so it's important!
 			if (conf.getEnvironment() != null && !conf.getEnvironment().equals(env)) {
- 				conf = ccf.put(conf);
+				conf = ccf.put(conf);
 			}
-			
+
 			return conf;
 		} catch (Throwable ex) {
 			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
@@ -1910,7 +1914,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 									fetcher.setComp(c);
 									fetcher.setRound(r);
 									fetcher.setUc(uc);
-									
+
 									// with the new espn.co.uk tables, we are seeing the new comps (as of SR 2016) 
 									// not working with the old template syntax. Allow over-ride from admin.html
 									if (c.getTableURL() != null && !c.getTableURL().isEmpty()) {
@@ -1918,7 +1922,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 									} else {
 										fetcher.setUrl(c.getForeignURL()+"?template=pointstable");
 									}
-									
+
 									List<IStanding> standings = new ArrayList<IStanding>();
 									Iterator<ITeamGroup> it = c.getTeams().iterator();
 									while (it.hasNext()) {
@@ -2068,18 +2072,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					mg.setDisplayName();
 				} else { // no teams provided. Shouldn't allow
 					return null;
-//					ITeamGroup t = tf.getTeamByName("TBD");
-//					if (t == null)
-//					{
-//						t = tf.getTeamByName("TBC");
-//						if (t == null)
-//						{
-//							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find team TBD to create new empty match. Giving up.");
-//							return null;
-//						}
-//					}
-//					mg.setHomeTeam(t);
-//					mg.setVisitingTeam(t);
+					//					ITeamGroup t = tf.getTeamByName("TBD");
+					//					if (t == null)
+					//					{
+					//						t = tf.getTeamByName("TBC");
+					//						if (t == null)
+					//						{
+					//							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find team TBD to create new empty match. Giving up.");
+					//							return null;
+					//						}
+					//					}
+					//					mg.setHomeTeam(t);
+					//					mg.setVisitingTeam(t);
 				}
 				mf.put(mg);
 				r.addMatch(mg);
@@ -2098,16 +2102,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				Queue queue = QueueFactory.getDefaultQueue();
-	            
-	            queue.add(withUrl(ccf.get().getEngineUrl() + "/cleanUp").param("action", net.rugby.foundation.engine.server.CleanupServlet.Actions.SHRINK.name()).param("clazz", PlayerRating.class.getCanonicalName()));
-//				String url2 = ccf.get().getEngineUrl() +
-//						"/orchestration/IRatingQuery";
-//
-//				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
-//						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.CLEANUP.toString()).
-//						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
-//						param("id","0").
-//						param("extraKey", "0"));
+
+				queue.add(withUrl(ccf.get().getEngineUrl() + "/cleanUp").param("action", net.rugby.foundation.engine.server.CleanupServlet.Actions.SHRINK.name()).param("clazz", PlayerRating.class.getCanonicalName()));
+				//				String url2 = ccf.get().getEngineUrl() +
+				//						"/orchestration/IRatingQuery";
+				//
+				//				QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(60000).
+				//						param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.CLEANUP.toString()).
+				//						param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
+				//						param("id","0").
+				//						param("extraKey", "0"));
 
 				//				rqf.deleteAll();
 				//				prf.deleteAll();
@@ -2242,16 +2246,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				ISeriesConfiguration sc = scf.get(sConfigId);
 				//IRatingSeries series = null;
 				if (sc != null) {
-//					if (sc.getSeriesId() != null) {
-//						series = rsf.get(sc.getSeriesId());
-//						if (series != null) {
-//							// first delete TTLs associated
-//							for (Long rgid : series.getRatingGroupIds()) {
-//								IRatingGroup rg = rgf.get(rgid);
-//								rgf.deleteTTLs(rg);
-//							}
-//						}
-//					}
+					//					if (sc.getSeriesId() != null) {
+					//						series = rsf.get(sc.getSeriesId());
+					//						if (series != null) {
+					//							// first delete TTLs associated
+					//							for (Long rgid : series.getRatingGroupIds()) {
+					//								IRatingGroup rg = rgf.get(rgid);
+					//								rgf.deleteTTLs(rg);
+					//							}
+					//						}
+					//					}
 
 					if (sc.getPipelineId() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();
@@ -2300,20 +2304,20 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 						throwUnsupportedSeriesConfigException();
 					}
 				}
-				
+
 				if (sConfig.getActiveCriteria().contains(Criteria.BEST_YEAR)) {
 					if (!sConfig.getMode().equals(RatingMode.BY_POSITION)) {
 						throwUnsupportedSeriesConfigException();
 					}
 				}
-				
+
 				if (sConfig.getActiveCriteria().contains(Criteria.AVERAGE_IMPACT))  {
 					if (!(sConfig.getMode().equals(RatingMode.BY_POSITION) || sConfig.getMode().equals(RatingMode.BY_TEAM))) {
 						throwUnsupportedSeriesConfigException();
 					}
 				}
-				
-				
+
+
 
 				return scf.put(sConfig);
 			} else {
@@ -2432,17 +2436,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				if (rq != null) {
 					String url2 = ccf.get().getEngineUrl() +
 							"/orchestration/IRatingQuery";
-	
+
 					QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(300000).
 							param(AdminOrchestrationActions.RatingActions.getKey(), RatingActions.RERUN.toString()).
 							param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.RATING.toString()).
 							param("id",rq.getId().toString()).
 							param("extraKey", "0L"));
-	
+
 					return rq;
 				}
 			} 
-			
+
 			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -2457,7 +2461,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			if (checkAdmin()) {
 				return cf.addRound(compId, uri, name);
 			} 
-			
+
 			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -2473,7 +2477,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			if (checkAdmin()) {
 				return bf.getActive();
 			} 
-			
+
 			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -2495,10 +2499,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					blurb.setServerPlaceId(sp.getId());
 					blurb.setBodyText(bodyText);
 					blurb.setLinkText(linkText);
-					
+
 					bf.put(blurb);
 				} 
-				
+
 				return bf.getActive();
 			} 		
 			return null;			
@@ -2522,7 +2526,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 						return ttlf.get(sp.getListId()).getTitle();
 					}
 				} 
-				
+
 				return null;
 			} 		
 			return null;			
@@ -2540,29 +2544,29 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				if (digestEmailer == null) {
 					digestEmailer = new DigestEmailer(cf);
 				}
-//				List<IBlurb> blurbs = new ArrayList<IBlurb>();
-//				for (Long id : blurbIds) {
-//					blurbs.add(bf.get(id));
-//				}
-//				digestEmailer.setBlurbs(blurbs);
-//				digestEmailer.configure("Subject", "Title", "Body");
-//				return digestEmailer.buildMessage();
+				//				List<IBlurb> blurbs = new ArrayList<IBlurb>();
+				//				for (Long id : blurbIds) {
+				//					blurbs.add(bf.get(id));
+				//				}
+				//				digestEmailer.setBlurbs(blurbs);
+				//				digestEmailer.configure("Subject", "Title", "Body");
+				//				return digestEmailer.buildMessage();
 				IDigestEmail de = def.create();
 				de.setMessage(message);
 				de.setBlurbIds(blurbIds);
 				de.setSubject("Latest from The Rugby Net");
 				de.setTitle("Latest from The Rugby Net");
 				def.populatedigestEmail(de);
-				
+
 				digestEmailer.configure(de,null);
 				return digestEmailer.buildMessage();
 			}
-		 	return null;			
+			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
-		
+
 	}
 
 	@Override
@@ -2575,25 +2579,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				email.setSubject("Latest from The Rugby Net");
 				email.setTitle("Latest from The Rugby Net");
 				def.put(email);
-				
+
 				List<IAppUser> recips = auf.getDigestEmailRecips();
 				for (IAppUser u : recips) {
-								
+
 					if (u != null) {
 						String url2 = ccf.get().getEngineUrl() + "/orchestration/IDigestEmail";
-			
+
 						QueueFactory.getDefaultQueue().add(withUrl(url2.toString()).etaMillis(300000).
 								param(AdminOrchestrationActions.RatingActions.getKey(), UserActions.SEND_DIGEST.toString()).
 								param(AdminOrchestrationTargets.Targets.getKey(), AdminOrchestrationTargets.Targets.USER.toString()).
 								param("id",u.getId().toString()).
 								param("extraKey", email.getId().toString()));
 					}
-					
+
 				}
-				
+
 				return recips.size();
 			}
-		 	return null;			
+			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
@@ -2605,19 +2609,19 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public String getDigestUserList() {
 		try {
 			if (checkAdmin()) {
-			
+
 				String retval = "<h3>Users who have not opted out: </h3>";
 				List<IAppUser> recips = auf.getDigestEmailRecips();
 				for (IAppUser u : recips) {
-								
+
 					if (u != null) {
 						retval += u.getEmailAddress() + "<br/>";
 					}				
 				}
-				
+
 				return retval;
 			}
-		 	return null;			
+			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
@@ -2628,7 +2632,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public Integer archive(List<Long> blurbIds) {
 		try {
 			if (checkAdmin()) {
-			
+
 				Integer retval = 0;
 				for (Long bid : blurbIds) {
 					IBlurb b = bf.get(bid);
@@ -2638,10 +2642,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 						retval++;
 					}
 				}
-				
+
 				return retval;
 			}
-		 	return null;			
+			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
@@ -2652,7 +2656,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public Integer facebook(List<Long> blurbIds) {
 		try {
 			if (checkAdmin()) {
-			
+
 				Integer retval = 0;
 				for (Long bid : blurbIds) {
 					IBlurb b = bf.get(bid);
@@ -2661,10 +2665,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 							retval++;
 					}
 				}
-				
+
 				return retval;
 			}
-		 	return null;			
+			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
@@ -2675,7 +2679,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private boolean postToFacebook(IBlurb b) {
 		try {
 			String charset = java.nio.charset.StandardCharsets.UTF_8.name();
-			
+
 			StringBuilder params = new StringBuilder();
 			params.append("access_token=1/4266c2423560ded98f0b532cac894c07");
 			params.append("&profile_ids[]=53f4ab03c4320ad025b8ee70");
@@ -2685,10 +2689,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			String link = ccf.get().getBaseToptenUrl() + "s/" + b.getServerPlace().getGuid();
 			params.append("&media[link]=" + URLEncoder.encode(link,charset));
 			params.append("media[title]=" + URLEncoder.encode(b.getLinkText(),charset));
-			
+
 			byte[] postData = params.toString().getBytes(charset);
 			int    postDataLength = postData.length;
-			
+
 			URL url = new URL(BUFFER_CREATE_URL);
 			HttpURLConnection conn= (HttpURLConnection) url.openConnection();           
 			conn.setDoOutput(true);
@@ -2698,30 +2702,30 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			conn.setRequestProperty( "charset", charset);
 			conn.setRequestProperty( "Content-Length", Integer.toString(postDataLength));
 			conn.setUseCaches( false );
-			
+
 			DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
 			wr.write(postData);
 			Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
 
 			StringBuilder sb = new StringBuilder();
-	        for (int c; (c = in.read()) >= 0;)
-	            sb.append((char)c);
-	        String response = sb.toString();
+			for (int c; (c = in.read()) >= 0;)
+				sb.append((char)c);
+			String response = sb.toString();
 
 			JSONObject json = new JSONObject(response);
-			
-			return json.getBoolean("success");
-			
 
-//		} catch (MalformedURLException ex) {
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-//			return false;
+			return json.getBoolean("success");
+
+
+			//		} catch (MalformedURLException ex) {
+			//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			//			return false;
 		} catch (IOException ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return false;
-//		} catch (URISyntaxException ex) {
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-//			return false;
+			//		} catch (URISyntaxException ex) {
+			//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			//			return false;
 		}  catch (JSONException ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return false;
@@ -2732,6 +2736,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<Long> twitter(List<Long> blurbIds) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<String> bulkUploadEmails(List<String> emailsValid) {
+		try {
+			if (checkAdmin()) {
+				List<String> retval = new ArrayList<String>();
+				for (String e : emailsValid) {
+
+					retval.add(am.createDigestAccount(e));
+
+				}
+				return retval;
+			}
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
 	}
 
 

@@ -1,11 +1,4 @@
-<!-- Indices written at Mon, 14 Mar 2016 16:48:24 EDT -->
+<!-- Indices written at Fri, 25 Mar 2016 14:01:14 EDT -->
 
-<datastore-indexes>
+<datastore-indexes/>
 
-    <!-- Used 1 time in query history -->
-    <datastore-index kind="TopTenList" ancestor="false" source="auto">
-        <property name="live" direction="asc"/>
-        <property name="published" direction="desc"/>
-    </datastore-index>
-
-</datastore-indexes>
