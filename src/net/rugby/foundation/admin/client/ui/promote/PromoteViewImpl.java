@@ -78,7 +78,11 @@ public class PromoteViewImpl<T extends IBlurb> extends Composite implements Prom
 	@UiField Button blurbSubmit;
 	@UiField Modal blurbModal;
 	@UiField ListGroup dragPanel;
-
+	
+	@UiField Button bulkUploadSave;
+	@UiField TextArea bulkUsers;
+	@UiField Modal bulkUsersModal;
+	
 	@UiField Modal digestModal;
 	@UiField Button digestPreview;
 	@UiField Button digestSend;
@@ -300,7 +304,11 @@ public class PromoteViewImpl<T extends IBlurb> extends Composite implements Prom
 			}
 		}
 	}
-
+	@UiHandler("bulkUploadSave")
+	void onBulkUploadSave(ClickEvent event) {
+		listener.onBulkUploadSaved(bulkUsers.getText());
+		bulkUsersModal.hide();
+	}
 
 	@Override
 	public void showList(List<T> blurbList) {

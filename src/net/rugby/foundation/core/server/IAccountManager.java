@@ -81,4 +81,5 @@ public interface IAccountManager {
 
 	LoginInfo validateEmail(String email, String validationCode);
 	LoginInfo resendValidationEmail(String email);
+	String createDigestAccount(String e);
 }

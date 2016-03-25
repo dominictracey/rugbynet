@@ -34,6 +34,10 @@ public interface PromoteView<T extends IBlurb> extends IsWidget {
 		void archive();
 		void facebook();
 		void twitter();
+
+		void onBulkUploadSaved(String text);
+
+		
 	} 
 
 

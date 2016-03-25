@@ -15,7 +15,7 @@ import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
  */
 public interface IAppUser {
 
-	public enum EmailStatus {NEW, VALIDATED, BOUNCE, OPTOUT }
+	public enum EmailStatus {NEW, VALIDATED, BOUNCE, OPTOUT, DIGEST }
 	
 	public abstract boolean isAdmin();
 
