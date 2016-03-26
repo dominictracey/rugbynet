@@ -369,6 +369,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 					globalComp.setCompType(CompetitionType.GLOBAL);
 					globalComp.setAbbr("Global");
 					globalComp.setUnderway(true);
+					globalComp.setWeightingFactor(4F);
 					ofy.put(globalComp);
 				}
 			}

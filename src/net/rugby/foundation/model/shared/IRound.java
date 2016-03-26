@@ -67,4 +67,7 @@ public interface IRound extends IHasId {
 
 	void setUrOrdinal(int universalRound);
 
+	public abstract void setWeekendProcessingPipelineId(String pipelineId);
+	public abstract String getWeekendProcessingPipelineId();
+
 }

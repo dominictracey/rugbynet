@@ -187,7 +187,7 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 		try {
 			Map<String, IMatchGroup> result = new HashMap<String, IMatchGroup>();
 
-			String resultURL = url + "?template=results";
+			String resultURL = url + "?noredir=1;template=results";
 
 			IUrlCacher urlCache = new UrlCacher(resultURL);
 			List<String> lines = urlCache.get();
@@ -410,6 +410,12 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime().toString() + "**" + m.getDisplayName();
+	}
+
+	@Override
+	public Boolean isAvailable(IMatchGroup match) {
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Don't use the base class ScrumSimpleScoreResultFetcher to check isAvailable, use the Super Rugby one." );
+		return null;
 	}
 
 

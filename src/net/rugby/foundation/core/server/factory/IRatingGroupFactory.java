@@ -6,4 +6,6 @@ public interface IRatingGroupFactory extends ICachingFactory<IRatingGroup> {
 
 	void deleteTTLs(IRatingGroup rg);
 
+	IRatingGroup getForUR(Long ratingSeriesId, int universalRoundOrdinal);
+
 }

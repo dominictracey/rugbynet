@@ -1108,11 +1108,15 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		boolean found = false;
 		for (IStanding s : list) {
 			if (s.getTeamId().equals(m.getHomeTeamId()) || s.getTeamId().equals(m.getVisitingTeamId())) {
-				sTot += s.getStanding();
-				count ++;
-				if (count == 2) {
-					found = true;
-					break;
+				if (s.getStanding() != null) {
+					sTot += s.getStanding();
+					count ++;
+					if (count == 2) {
+						found = true;
+						break;
+					}
+				} else {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Running rating engine for round without standings in place.");
 				}
 			}
 		}

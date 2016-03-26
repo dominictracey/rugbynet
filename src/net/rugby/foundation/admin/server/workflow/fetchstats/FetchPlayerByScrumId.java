@@ -17,29 +17,24 @@ import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
-import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
-
-import com.google.appengine.tools.pipeline.Job6;
+import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
-public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, String, Long, Long, IMatchGroup> {
+public class FetchPlayerByScrumId extends Job5<Long, String, String, Long, Long, Long> {
 
 	private static final long serialVersionUID = 483113213168220162L;
 	private transient IPlayerFactory pf;
 	private transient ICountryFactory cf;
 	private transient IAdminTaskFactory atf;
 	private transient String playerName;
-	private transient Long scrumPlayerId;
-	private transient Long adminId;
-	private transient String referringURL;
-	private IMatchGroupFactory mgf;
-	private IMatchGroup match;
+
+	private transient IMatchGroupFactory mgf;
+	private transient IMatchGroup match;
 	
 	private static Injector injector = null;
 	
@@ -54,7 +49,7 @@ public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, St
 	 * 			Long adminID
 	 */		
 	@Override
-	public Value<IPlayer> run(ICompetition comp, String playerName, String referringURL, Long scrumPlayerId, Long adminId, IMatchGroup match) {
+	public Value<Long> run(String playerName, String referringURL, Long scrumPlayerId, Long adminId, Long matchId) {
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINER);
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINER, "Looking for " + playerName);
 		
@@ -68,10 +63,8 @@ public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, St
 		this.mgf = injector.getInstance(IMatchGroupFactory.class);
 		
 		this.playerName = playerName;
-		this.scrumPlayerId = scrumPlayerId;
-		this.adminId = adminId;
-		this.referringURL = referringURL;
-		this.match = match;
+
+		this.match = mgf.get(matchId);
 		
 		// first see if we have it in the database
 		IPlayer dbPlayer = pf.getByScrumId(scrumPlayerId);
@@ -79,27 +72,28 @@ public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, St
 
 		// will return a "blank player" if it can't find it in the DB so check if the returned player has a scrum ID set.
 		if (dbPlayer != null && dbPlayer.getScrumId() != null) {
-			return immediate(dbPlayer);
+			return immediate(dbPlayer.getId());
 		} else { // didn't find, so go looking
-			Value<IPlayer> player = getPlayerFromScrum(pf, scrumPlayerId);
+			Value<Long> playerId = getPlayerFromScrum(scrumPlayerId);
 
-			if (player != null) {
-				return player;
+			if (playerId != null) {
+				return playerId;
 			} else {
 				//still didn't find, need human to get this going.
 				
 				// all we know is the scrumId
 				IPlayer p = pf.create();
 				p.setScrumId(scrumPlayerId);
-				p.setDisplayName("--");
+				p.setDisplayName(playerName);
+				p.setCountry(cf.getByName("None"));
 				pf.put(p);
-				PromisedValue<IPlayer> x = newPromise(IPlayer.class);
+				PromisedValue<Long> x = newPromise(Long.class);
 				IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", p, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
 				atf.put(task);
 				p.getBlockingTaskIds().add(task.getId());
 				pf.put(p);
-				match.setWorkflowStatus(WorkflowStatus.BLOCKED);
-				mgf.put(match);
+//				match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+//				mgf.put(match);
 				return x;
 			}
 
@@ -110,7 +104,7 @@ public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, St
 	/*
 	 * So we need to get at least a name, country and birthdate to let the workflow continue. Otherwise send a promised value.
 	 */
-	private Value<IPlayer> getPlayerFromScrum(IPlayerFactory pf, Long scrumPlayerId)  {
+	private Value<Long> getPlayerFromScrum(Long scrumPlayerId)  {
 		
 		IPlayer player = pf.create();  //empty
 
@@ -252,15 +246,15 @@ public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, St
 					atf.put(task);
 					player.getTaskIds().add(task.getId());
 					pf.put(player);
-					if (match.getWorkflowStatus() != WorkflowStatus.BLOCKED) {
-						match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
-						mgf.put(match);
-					}
-					return immediate(player);
+//					if (match.getWorkflowStatus() != WorkflowStatus.BLOCKED) {
+//						match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+//						mgf.put(match);
+//					}
+					return immediate(player.getId());
 				} else {
 					// if we don't have enough to keep going we can save the player as is and send back a promise
 					pf.put(player); // need an id
-					PromisedValue<IPlayer> x = newPromise(IPlayer.class);
+					PromisedValue<Long> x = newPromise(Long.class);
 					String name; 
 					if (player.getDisplayName().isEmpty())
 						name = playerName;
@@ -271,14 +265,14 @@ public class FetchPlayerByScrumId extends Job6<IPlayer, ICompetition, String, St
 					player.getBlockingTaskIds().add(task.getId());
 					pf.put(player);
 					
-					match.setWorkflowStatus(WorkflowStatus.BLOCKED);
-					mgf.put(match);
+//					match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+//					mgf.put(match);
 					return x;
 				}
 			} else {
 				if (found) {
 					pf.put(player);
-					return immediate(player);
+					return immediate(player.getId());
 				} else {
 					// no errors but not found?!?
 					return null;

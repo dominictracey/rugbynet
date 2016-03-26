@@ -6,11 +6,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.inject.Inject;
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
@@ -22,7 +17,11 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.Round;
-import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
+
+import com.google.inject.Inject;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoundFactory, Serializable {
 	/**
@@ -65,21 +64,10 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 			}
 
 			// self cleaning oven for workflowStatus
-			if (r.getWorkflowStatus() == null) {
-				// check it's matches to see if they are all fetched
-				r.setWorkflowStatus(WorkflowStatus.FETCHED);
-				for (IMatchGroup m : r.getMatches()) {
-					if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
-						r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
-						break;
-					} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
-						r.setWorkflowStatus(WorkflowStatus.PENDING);
-						// don't break in case there are tasks pending
-					}
-					// ignore if match is NO_STATS - the round can still be in FETCHED state
-				}
-				ofy.put(r); 	
-			}
+//			if (r.getWorkflowStatus() == null) {
+//				r.setWorkflowStatus(WorkflowStatus.FETCHED);
+//				ofy.put(r); 	
+//			}
 
 			// self cleaning oven for urOrdinal
 			if (r.getUrOrdinal() < 1) {
@@ -218,6 +206,28 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
+	}
+
+	@Override
+	public IRound getForUR(Long compId, int uROrdinal) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+
+			// Find the round
+			Query<Round> qr = ofy.query(Round.class).filter("compId", compId).filter("urOrdinal", uROrdinal);
+
+			if (qr.count() == 0) {
+				return null;
+			} else if (qr.count() > 1) {
+				throw new Exception("More than one round matches the parameters compId=" + compId + " and urOrdinal " + uROrdinal + ". This is a Bad Thing.");
+			} else {
+				return get(qr.get().getId());  // build the round
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+
 	}
 
 }

@@ -22,5 +22,6 @@ public interface IPlayerMatchStatsFetcher {
 	void setPlayer(IPlayer player);
 	IPlayer getPlayer();
 	String getErrorMessage();
-
+	Boolean hasFlopped();
+	void setUrl(String url, Boolean flushFromCache);
 }

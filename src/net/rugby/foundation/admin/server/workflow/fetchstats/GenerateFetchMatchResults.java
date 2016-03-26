@@ -3,29 +3,28 @@ package net.rugby.foundation.admin.server.workflow.fetchstats;
 import java.io.Serializable;
 import java.util.List;
 
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.admin.server.workflow.ResultWithLog;
 
-public class GenerateFetchMatchResults implements Serializable {
+public class GenerateFetchMatchResults extends ResultWithLog implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6754812367918042664L;
-	public List<IPlayerMatchStats> homePlayerStats;
-	public List<IPlayerMatchStats> visitPlayerStats;
-	public ITeamMatchStats homeStats;
-	public ITeamMatchStats visitStats;
+	public List<Long> homePlayerStatIds;
+	public List<Long> visitPlayerStatIds;
+	public Long homeStatId;
+	public Long visitStatsId;
 	public String jobId;
 	
-	public GenerateFetchMatchResults(	ITeamMatchStats homeStats,
-										ITeamMatchStats visitStats,
-										List<IPlayerMatchStats> homePlayerStats,
-										List<IPlayerMatchStats> visitPlayerStats,
+	public GenerateFetchMatchResults(	Long homeStatId,
+										Long visitStatsId,
+										List<Long> homePlayerStatIds,
+										List<Long> visitPlayerStatIds,
 										String jobId)  {
-		this.homePlayerStats = homePlayerStats;
-		this.visitPlayerStats = visitPlayerStats;
-		this.homeStats	= homeStats;
-		this.visitStats = visitStats;
+		this.homePlayerStatIds = homePlayerStatIds;
+		this.visitPlayerStatIds = visitPlayerStatIds;
+		this.homeStatId	= homeStatId;
+		this.visitStatsId = visitStatsId;
 		this.jobId = jobId;
 	}
 }

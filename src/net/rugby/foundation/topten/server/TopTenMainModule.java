@@ -2,6 +2,8 @@ package net.rugby.foundation.topten.server;
 
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlaceFactory;
+import net.rugby.foundation.core.server.promote.IPromoter;
+import net.rugby.foundation.core.server.promote.TwitterPromoter;
 import net.rugby.foundation.topten.server.factory.INoteFactory;
 import net.rugby.foundation.topten.server.factory.INoteRefFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
@@ -29,6 +31,7 @@ public class TopTenMainModule extends AbstractModule {
 		bind(INoteFactory.class).to(OfyNoteFactory.class);
 		bind(INoteRefFactory.class).to(OfyNoteRefFactory.class);
 		bind(INotesCreator.class).to(MatchNotesCreator.class);
+		bind(IPromoter.class).to(TwitterPromoter.class);
 		bind(TopTenNotesRenderer.class);
 		bind(TwitterNotesRenderer.class);
 		bind(TopTenNotesCreator.class);

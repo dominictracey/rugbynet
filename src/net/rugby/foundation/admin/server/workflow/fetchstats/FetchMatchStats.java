@@ -9,15 +9,13 @@ import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
+import net.rugby.foundation.admin.server.workflow.weekend.results.MS7StatsFetched;
 import net.rugby.foundation.core.server.BPMServletContextListener;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
-import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-import com.google.appengine.tools.pipeline.FutureList;
 import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.ImmediateValue;
 import com.google.appengine.tools.pipeline.Job1;
@@ -26,14 +24,15 @@ import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup> implements Serializable {
+public class FetchMatchStats extends Job1<MS7StatsFetched, Long> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
 	public enum Home_or_Visitor { HOME, VISITOR }
 
 	private static Injector injector = null;
-	private IPlayerFactory pf;
+	transient private IPlayerFactory pf;
+	transient private IMatchGroupFactory mgf;
 
 	
 	public FetchMatchStats() {
@@ -58,32 +57,46 @@ public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup
 	 * 			Long adminID
 	 */		
 	@Override
-	public Value<GenerateFetchMatchResults> run(IMatchGroup match) {
+	public Value<MS7StatsFetched> run(Long matchId) {
 
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();
 		}
 
 		this.pf = injector.getInstance(IPlayerFactory.class);
+		this.mgf = injector.getInstance(IMatchGroupFactory.class);
+		
+		IMatchGroup match = mgf.get(matchId);
+		if (match == null) {
+			GenerateFetchMatchResults retval = new GenerateFetchMatchResults(null, null, null, null, "");
+			retval.log.add("Invalid match Id provided: " + matchId);
+			MS7StatsFetched wrapper = new MS7StatsFetched();
+			wrapper.fetchSubTreeResults = retval;
+			return immediate(wrapper);
+		}
 		
 		if (match.getForeignUrl() == null) {
 			// need to get score and find match details url before we do this
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Need to get scores and populate match URL before trying to get match stats for match " + match.getDisplayName());
-			return null;
+			GenerateFetchMatchResults retval = new GenerateFetchMatchResults(null, null, null, null, "");
+			retval.log.add("Need to get scores and populate match URL before trying to get match stats for match " + match.getDisplayName());
+			MS7StatsFetched wrapper = new MS7StatsFetched();
+			wrapper.fetchSubTreeResults = retval;
+			return immediate(wrapper);
 		}
 
 		String url = match.getForeignUrl(); //+"?view=scorecard";
 
 		Logger.getLogger("FetchedPlayer").log(Level.INFO,"Starting generate match ratings for url " + url);
 
-		FutureValue<ITeamMatchStats> homeTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getHomeTeam()), immediate(match), immediate(Home_or_Visitor.HOME), immediate(url));
-		FutureValue<ITeamMatchStats> visitorTeamStats = futureCall(new FetchTeamMatchStats(), immediate(match.getVisitingTeam()), immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(url));
+		FutureValue<Long> homeTeamStats = futureCall(new FetchTeamMatchStats(), immediate(matchId), immediate(Home_or_Visitor.HOME), immediate(url));
+		FutureValue<Long> visitorTeamStats = futureCall(new FetchTeamMatchStats(), immediate(matchId), immediate(Home_or_Visitor.VISITOR), immediate(url));
 		
 		List<NameAndId> homeIds = getIds(Home_or_Visitor.HOME, url);
 		List<NameAndId> visitIds = getIds(Home_or_Visitor.VISITOR, url);
 
-		List<Value<IPlayer>> homePlayers = new ArrayList<Value<IPlayer>>();
-		List<Value<IPlayer>> visitorPlayers = new ArrayList<Value<IPlayer>>();
+		List<Value<Long>> homePlayers = new ArrayList<Value<Long>>();
+		List<Value<Long>> visitorPlayers = new ArrayList<Value<Long>>();
 
 		int count = 0;
 		for (NameAndId info : homeIds) {
@@ -92,10 +105,10 @@ public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup
 
 			// will return a "blank player" if it can't find it in the DB so check if the returned player has a scrum ID set.
 			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
-				homePlayers.add(immediate(dbPlayer));
+				homePlayers.add(immediate(dbPlayer.getId()));
 			} else {
-				Value<IPlayer> homePlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match));
-				homePlayers.add(homePlayer);
+				Value<Long> homePlayerId = futureCall(new FetchPlayerByScrumId(), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match.getId()));
+				homePlayers.add(homePlayerId);
 			}
 		}
 
@@ -106,19 +119,19 @@ public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup
 
 			// will return a "blank player" if it can't find it in the DB so check if the returned player has a scrum ID set.
 			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
-				visitorPlayers.add(immediate(dbPlayer));
+				visitorPlayers.add(immediate(dbPlayer.getId()));
 			} else {
-				Value<IPlayer> visitPlayer = futureCall(new FetchPlayerByScrumId(), immediate((ICompetition)null), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match));
-				visitorPlayers.add(visitPlayer);
+				Value<Long> visitPlayerId = futureCall(new FetchPlayerByScrumId(), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match.getId()));
+				visitorPlayers.add(visitPlayerId);
 			}
 		}	   
 
-		List<Value<IPlayerMatchStats>> homePlayerMatchStats = new ArrayList<Value<IPlayerMatchStats>>();
-		List<Value<IPlayerMatchStats>> visitorPlayerMatchStats = new ArrayList<Value<IPlayerMatchStats>>();
+		List<Value<Long>> homePlayerMatchStats = new ArrayList<Value<Long>>();
+		List<Value<Long>> visitorPlayerMatchStats = new ArrayList<Value<Long>>();
 
 		count = 0;
-		for (Value<IPlayer> fp : homePlayers) {
-			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
+		for (Value<Long> fp : homePlayers) {
+			FutureValue<Long> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match.getId()), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
 			
 			homePlayerMatchStats.add(stats);
 
@@ -126,9 +139,8 @@ public class FetchMatchStats extends Job1<GenerateFetchMatchResults, IMatchGroup
 
 
 		count = 0;
-		for (Value<IPlayer> fp : visitorPlayers) {
-			FutureValue<IPlayerMatchStats> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match), immediate(Home_or_Visitor.VISITOR), immediate(count++), immediate(url));
-			waitFor(stats);
+		for (Value<Long> fp : visitorPlayers) {
+			FutureValue<Long> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match.getId()), immediate(Home_or_Visitor.VISITOR), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
 			visitorPlayerMatchStats.add(stats);
 
 		}

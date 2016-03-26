@@ -1,7 +1,10 @@
 package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
-import net.rugby.foundation.core.server.mail.BounceHandlerServlet;
+import net.rugby.foundation.admin.server.workflow.servelets.CronWeekendFinalizeServlet;
+import net.rugby.foundation.admin.server.workflow.servelets.CronWeekendInitServlet;
+import net.rugby.foundation.admin.server.workflow.servelets.UtilRoundWorkflowServlet;
+import net.rugby.foundation.admin.server.workflow.servelets.UtilWeekendCancelServlet;
 import net.rugby.foundation.core.server.mail.UnsubscribeServlet;
 import net.rugby.foundation.engine.server.CleanupServlet;
 import net.rugby.foundation.topten.server.HomePage;
@@ -19,10 +22,7 @@ public class BPMServletModule extends ServletModule {
 //		serve("/game1/orchestration/*").with(net.rugby.foundation.game1.server.OrchestrationServlet.class);
 //		serve("/game1/workflow/").with(net.rugby.foundation.game1.server.WorkflowServlet.class);
 //		serve("/game1/service").with(Game1ServiceImpl.class);
-		serve("/admin/orchestration/*").with(net.rugby.foundation.engine.server.OrchestrationServlet.class);
-		serve("/admin/workflow/*").with(net.rugby.foundation.engine.server.WorkflowServlet.class);
-		serve("/admin/cleanUp").with(CleanupServlet.class);
-		serve("/admin/rugbyAdminService").with(RugbyAdminServiceImpl.class);
+		
 		serve("/core/CoreService").with(CoreServiceImpl.class);
 		serve("/topten/TopTenService").with(TopTenServiceImpl.class);
 		serve("/login/*").with(LoginServlet.class);
@@ -39,6 +39,17 @@ public class BPMServletModule extends ServletModule {
 		serve("/session/").with(SessionServlet.class);
 		serve("/").with(HomePage.class);
 		serve("/email/unsubscribe").with(UnsubscribeServlet.class);
+		
+		
+		// admin only
+		serve("/cron/weekend/process").with(CronWeekendInitServlet.class);
+		serve("/cron/weekend/finalize").with(CronWeekendFinalizeServlet.class);
+		serve("/admin/weekend/cancel").with(UtilWeekendCancelServlet.class);
+		serve("/admin/workflow/round").with(UtilRoundWorkflowServlet.class);
+		serve("/admin/orchestration/*").with(net.rugby.foundation.engine.server.OrchestrationServlet.class);
+		//serve("/admin/workflow/*").with(net.rugby.foundation.engine.server.WorkflowServlet.class);
+		serve("/admin/cleanUp").with(CleanupServlet.class);
+		serve("/admin/rugbyAdminService").with(RugbyAdminServiceImpl.class);
 	}
 }
 

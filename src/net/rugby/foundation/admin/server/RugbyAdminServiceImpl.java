@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -1011,7 +1010,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					if (task.getPromise() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();
 						try {
-							service.submitPromisedValue(task.getPromise(), player);
+							service.submitPromisedValue(task.getPromise(), player.getId());
 						} catch (NoSuchObjectException ex) {
 							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 						} catch (OrphanedObjectException ex) {
@@ -1020,6 +1019,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					}
 
 					atf.complete(task);
+					player.getBlockingTaskIds().remove(task.getId());
 					player.getTaskIds().remove(task.getId());
 					pf.put(player);
 				}
@@ -1290,7 +1290,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					if (task.getPromise() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();
 						try {
-							service.submitPromisedValue(task.getPromise(), stats);
+							service.submitPromisedValue(task.getPromise(), stats.getId());
 						} catch (NoSuchObjectException e) {
 							e.printStackTrace();
 						} catch (OrphanedObjectException e) {
@@ -1518,7 +1518,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				String pipelineId = "";
 
 				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-				pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), team, match, hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
+				pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), match.getId(), hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
 				while (true) {
@@ -1558,7 +1558,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					if (task.getPromise() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();
 						try {
-							service.submitPromisedValue(task.getPromise(), tms);
+							service.submitPromisedValue(task.getPromise(), tms.getId());
 						} catch (NoSuchObjectException e) {
 							e.printStackTrace();
 						} catch (OrphanedObjectException e) {

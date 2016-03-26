@@ -239,7 +239,7 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 	 * @param content - value to store or null to delete key
 	 * @return false on exception caught
 	 */
-	public boolean putItem(String divKey, T content) {
+	public boolean putItem(Object divKey, T content) {
 		try {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(divKey);

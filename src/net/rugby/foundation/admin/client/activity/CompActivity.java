@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.notify.client.ui.Notify;
-
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminCompPlace;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
@@ -31,16 +28,19 @@ import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
-import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Round;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
+
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
@@ -52,7 +52,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.PopupListener;
 
 /**
  * Activities are started and stopped by an ActivityManager associated with a container Widget.
@@ -749,6 +748,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	public void showEditPlayer(IPlayerRating player) {
 		if (ensureSingleMatch(player)) {
 			clientFactory.getPlayerPopupView().setPresenter(this);
+			
 			clientFactory.getRpcService().getPlayer(player.getMatchStats().get(0).getPlayerId(), new AsyncCallback<IPlayer>() {
 	
 				@Override
@@ -759,9 +759,15 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	
 				@Override
 				public void onSuccess(IPlayer result) {
-	
-					clientFactory.getPlayerPopupView().setPlayer(result);
-					((DialogBox) clientFactory.getPlayerPopupView()).center();
+					if (result.getBlockingTaskIds() == null || result.getBlockingTaskIds().isEmpty()) {
+						clientFactory.getPlayerPopupView().setPlayer(result);
+						((DialogBox) clientFactory.getPlayerPopupView()).center();
+					} else {
+						AdminTaskPlace place = new AdminTaskPlace();
+						place.setFilter("All");
+						place.setTaskId(result.getBlockingTaskIds().get(0).toString());
+						goTo(place);
+					}
 				}
 			});	
 		} else {

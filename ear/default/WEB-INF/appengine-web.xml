@@ -22,6 +22,10 @@
 
 		<include path="**.cache.*" expiration="365d" />
 		<exclude path="**.gwt.rpc" />
+		<include path="/**.png" >
+			<http-header name="Pragma" value="Public" />
+			<http-header name="Cache-Control" value="public, max-age=300" />
+		</include>
 	</static-files>
 
 	<!-- Configure java.util.logging -->

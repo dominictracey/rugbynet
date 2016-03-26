@@ -3,11 +3,6 @@ package net.rugby.foundation.admin.server.workflow.fetchstats;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.tools.pipeline.Job5;
-import com.google.appengine.tools.pipeline.PromisedValue;
-import com.google.appengine.tools.pipeline.Value;
-import com.google.inject.Injector;
-
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
@@ -15,13 +10,18 @@ import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Hom
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 
-public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMatchGroup, Home_or_Visitor, Integer, String> {
+import com.google.appengine.tools.pipeline.Job5;
+import com.google.appengine.tools.pipeline.PromisedValue;
+import com.google.appengine.tools.pipeline.Value;
+import com.google.inject.Injector;
+
+public class FetchPlayerMatchStats extends Job5<Long, Long, Long, Home_or_Visitor, Integer, String> {
 	private static Injector injector = null;
 	private transient IPlayerMatchStatsFetcherFactory pmsff;
 	private transient IPlayerMatchStatsFactory pmsf;
@@ -33,6 +33,7 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 	protected transient Home_or_Visitor hov;
 	protected transient Integer slot;
 	protected transient String url;
+	private transient IPlayerFactory pf;
 	
 	
 	public FetchPlayerMatchStats() {
@@ -45,10 +46,9 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 	private static final long serialVersionUID = 3101992931956737933L;
 
 	@Override
-	public Value<IPlayerMatchStats> run(IPlayer player, IMatchGroup match, Home_or_Visitor hov, Integer slot, String url) {
+	public Value<Long> run(Long playerId, Long matchId, Home_or_Visitor hov, Integer slot, String url) {
 
-		this.player = player;
-		this.match = match;
+
 		this.hov = hov;
 		this.slot = slot;
 		this.url = url;
@@ -61,12 +61,16 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 		this.pmsf = injector.getInstance(IPlayerMatchStatsFactory.class);
 		this.atf = injector.getInstance(IAdminTaskFactory.class);
 		this.mgf = injector.getInstance(IMatchGroupFactory.class);
-
+		this.pf = injector.getInstance(IPlayerFactory.class);
+		
+		this.player = pf.get(playerId);
+		this.match = mgf.get(matchId);
+		
 		if (player == null || match == null || player.getDisplayName() == null) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Bad name for player - bailing!!");
-			match.setWorkflowStatus(WorkflowStatus.BLOCKED);
-			mgf.put(match);
-			PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+//			match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+//			mgf.put(match);
+			PromisedValue<Long> x = newPromise(Long.class);
 			IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Couldn't get sufficient info for player in slot " + slot + " to collect match stats", "No player, match or player displayName", player, match, hov, slot, null, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
 			atf.put(task);
 			return x;
@@ -94,12 +98,12 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 				atf.put(task);
 				stats.getTaskIds().add(task.getId());
 				pmsf.put(stats);
-				if (!match.getWorkflowStatus().equals(WorkflowStatus.BLOCKED)) {
-					match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
-					mgf.put(match);
-				}
+//				if (!match.getWorkflowStatus().equals(WorkflowStatus.BLOCKED)) {
+//					match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+//					mgf.put(match);
+//				}
 			}
-			return immediate(stats);
+			return immediate(stats.getId());
 		} else { // blocking process
 			stats = fetcher.getStats();
 			if (stats == null) {
@@ -112,24 +116,15 @@ public class FetchPlayerMatchStats extends Job5<IPlayerMatchStats, IPlayer, IMat
 			pmsf.put(stats);
 
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());
-			PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
+			PromisedValue<Long> x = newPromise(Long.class);
 			IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot, fetcher.getErrorMessage(), player, match, hov, slot, stats, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
 			atf.put(task);
 			stats.getBlockingTaskIds().add(task.getId());
 			pmsf.put(stats);
-			match.setWorkflowStatus(WorkflowStatus.BLOCKED);
-			mgf.put(match);
+//			match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+//			mgf.put(match);
 			return x;
 		}
-
 	}
-	
-//	public Value<IPlayerMatchStats> handleFailure(Throwable e) {
-//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown getting player match stats for: " + e.getLocalizedMessage());
-//		PromisedValue<IPlayerMatchStats> x = newPromise(IPlayerMatchStats.class);
-//		IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Problem getting player match stats: for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot, e.getLocalizedMessage(), player, match, hov, slot, fetcher.getStats(), true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
-//		atf.put(task);
-//		return x;
-//	}
 
 }

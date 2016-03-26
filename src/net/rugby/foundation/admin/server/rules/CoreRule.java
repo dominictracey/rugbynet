@@ -10,7 +10,8 @@ package net.rugby.foundation.admin.server.rules;
 public class CoreRule<T> implements IRule<T> {
 
 	protected T target;
-
+	protected String log;
+	
 	public CoreRule(T t)
 	{
 		this.target = t;
@@ -31,6 +32,10 @@ public class CoreRule<T> implements IRule<T> {
 	public Boolean test() {
 		// default is null
 		return null;
+	}
+	@Override
+	public String getLog() {
+		return log;
 	}
 
 }

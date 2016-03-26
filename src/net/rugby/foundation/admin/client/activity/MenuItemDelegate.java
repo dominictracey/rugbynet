@@ -1,5 +1,8 @@
 package net.rugby.foundation.admin.client.activity;
 
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.ui.SmartBar;
+
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
@@ -7,9 +10,6 @@ import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.ui.SmartBar;
 
 public class MenuItemDelegate implements SmartBar.Presenter {
 

@@ -6,6 +6,17 @@ package net.rugby.foundation.admin.server.rules;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
+import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchStatsToFetch;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchToEnd;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchToFetch;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchToFinalScore;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchToLock;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchToPromote;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchToRate;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
@@ -18,10 +29,18 @@ import net.rugby.foundation.model.shared.IRound;
 public class CoreRuleFactory implements ICoreRuleFactory {
 
 	private IPlayerMatchStatsFetcherFactory pmsff;
+	private IRoundFactory rf;
+	private IResultFetcherFactory srff;
+	private ISeriesConfigurationFactory scf;
+	private IPlayerFactory pf;
 
 	@Inject
-	public CoreRuleFactory(IPlayerMatchStatsFetcherFactory pmsff) {
+	public CoreRuleFactory(IPlayerMatchStatsFetcherFactory pmsff, IRoundFactory rf, IResultFetcherFactory srff, ISeriesConfigurationFactory scf, IPlayerFactory pf) {
 		this.pmsff = pmsff;
+		this.rf = rf;
+		this.srff = srff;
+		this.scf = scf;
+		this.pf = pf;
 	}
 	
 	/* (non-Javadoc)
@@ -55,12 +74,18 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 	public IRule<IMatchGroup> get(IMatchGroup target, MatchRule rule) {
 		if (rule == MatchRule.MATCH_TO_LOCK) {
 			return new RuleMatchToLock(target);
+		} else if (rule == MatchRule.MATCH_TO_END) {
+			return new RuleMatchToEnd(target);
+		} else if (rule == MatchRule.MATCH_TO_FINAL) {
+			return new RuleMatchToFinalScore(target, rf, srff);
+		} else if (rule == MatchRule.MATCH_STATS_AVAILABLE) {
+			return new RuleMatchStatsToFetch(target, pmsff, pf);
 		} else if (rule == MatchRule.MATCH_TO_FETCH) {
 			return new RuleMatchToFetch(target);
-		}  else if (rule == MatchRule.MATCH_STATS_TO_FETCH) {
-			RuleMatchStatsToFetch r = new RuleMatchStatsToFetch(target);
-			r.setFetcherFactory(pmsff);
-			return r;
+		} else if (rule == MatchRule.MATCH_TO_RATE) {
+			return new RuleMatchToRate(target, rf, scf);
+		} else if (rule == MatchRule.MATCH_TO_PROMOTE) {
+			return new RuleMatchToPromote(target);
 		} else if (rule == MatchRule.STALE_MATCH_NEED_ATTENTION) {
 			return new RuleMatchStaleNeedsAttention(target);
 		} else if (rule == MatchRule.STALE_MATCH_TO_MARK_UNREPORTED) {

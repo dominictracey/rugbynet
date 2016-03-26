@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.inject.Inject;
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration.Status;
@@ -19,8 +14,13 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
-import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.RatingMode;
+
+import com.google.inject.Inject;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesConfiguration> implements ISeriesConfigurationFactory {
 
@@ -42,13 +42,13 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 		sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
 		sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
 		sc.setSeries(sf.get(sc.getSeriesId()));
-//		for (Long compId : sc.getCompIds()) {
-//			sc.getComps().add(cf.get(compId));
-//		}
+		//		for (Long compId : sc.getCompIds()) {
+		//			sc.getComps().add(cf.get(compId));
+		//		}
 		if (sc.getHostCompId() != null) {
 			sc.setHostComp(cf.get(sc.getHostCompId()));
 		}
-		
+
 		return sc;
 	}
 
@@ -60,13 +60,13 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 			if (sc != null) {
 				ofy.put(sc);
 			}
-			
+
 			// repopulate the comps list
-//			sc.setComps(new ArrayList<ICompetition>());
-//			for (Long compId : sc.getCompIds()) {
-//				sc.getComps().add(cf.get(compId));
-//			}
-			
+			//			sc.setComps(new ArrayList<ICompetition>());
+			//			for (Long compId : sc.getCompIds()) {
+			//				sc.getComps().add(cf.get(compId));
+			//			}
+
 			// if the series already exists, we may need to add or remove comps
 			if (sc.getSeriesId() != null) {
 				IRatingSeries rs = sf.get(sc.getSeriesId());
@@ -113,33 +113,72 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 
 	@Override
 	public List<ISeriesConfiguration> getAll(Boolean active) {
-		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).order("displayName");
-		if (active) {
-			qs = qs.filter("live",active);
+		try {
+			Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).order("displayName");
+			if (active) {
+				qs = qs.filter("live",active);
+			}
+			List<ISeriesConfiguration> retval = new ArrayList<ISeriesConfiguration>();
+			retval.addAll(qs.list());
+			for (ISeriesConfiguration sc : retval) {
+				sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
+				sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
+				sc.setSeries(sf.get(sc.getSeriesId()));
+			}
+			return retval;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getAll" + ex.getMessage(), ex);
+			return null;
 		}
-		List<ISeriesConfiguration> retval = new ArrayList<ISeriesConfiguration>();
-		retval.addAll(qs.list());
-		for (ISeriesConfiguration sc : retval) {
-			sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
-			sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
-			sc.setSeries(sf.get(sc.getSeriesId()));
-		}
-		return retval;
 	}
 
 	@Override
 	public ISeriesConfiguration create() {
-		ISeriesConfiguration sc = new BaseSeriesConfiguration();
-		sc.setStatus(Status.PENDING);
-		sc.setLive(true);
-		return sc;
+		try {
+			ISeriesConfiguration sc = new BaseSeriesConfiguration();
+			sc.setStatus(Status.PENDING);
+			sc.setLive(true);
+			return sc;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "create" + ex.getMessage(), ex);
+			return null;
+		}
 	}
 
 	@Override
 	public ISeriesConfiguration getForSeriesId(Long id) {
-		Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("seriesId",id);
-		assert (qs.list().size() == 1);
-		return qs.list().get(0);
+		try {
+			Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("seriesId",id);
+			assert (qs.list().size() == 1);
+			return qs.list().get(0);
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getForSeriesId" + ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	@Override
+	public ISeriesConfiguration getByCompAndMode(Long compId, RatingMode mode) {
+		try {
+			Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("hostCompId", compId).filter("mode", mode);
+			
+			List<ISeriesConfiguration> retval = new ArrayList<ISeriesConfiguration>();
+			retval.addAll(qs.list());
+			for (ISeriesConfiguration sc : retval) {
+				sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
+				sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
+				sc.setSeries(sf.get(sc.getSeriesId()));
+			}
+			if (retval.size() == 1) {
+				return retval.get(0);
+			} else {
+				// TODO is it valid to have more than one?
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put" + ex.getMessage(), ex);
+			return null;
+		}
 	}
 
 }

@@ -156,7 +156,7 @@ public class CompetitionWorkflow extends Workflow {
 	}
 
 	private void checkStats(IMatchGroup m, ICompetition comp) {
-		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_STATS_TO_FETCH);
+		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_STATS_AVAILABLE);
 			 
 		if (rule.test()) {
 			// fetch match

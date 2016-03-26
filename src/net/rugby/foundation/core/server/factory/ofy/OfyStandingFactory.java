@@ -66,7 +66,7 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 					Standing s = it.next();
 					if (s.getId() != standing.getId()) {
 						deleteFromPersistentDatastore(s);
-						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Deleted duplicate standing object for team " + standing.getTeam().getDisplayName() + " in round " + standing.getRound().getName());						
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE, "Deleted duplicate standing object for team " + standing.getTeam().getDisplayName() + " in round " + standing.getRound().getName());						
 					}
 				}
 			}

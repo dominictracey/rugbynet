@@ -163,16 +163,16 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 			// check it's matches to see if they are all fetched
 			r.setWorkflowStatus(WorkflowStatus.FETCHED);
 
-			for (IMatchGroup m : r.getMatches()) {
-				if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
-					r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
-					break;
-				} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
-					r.setWorkflowStatus(WorkflowStatus.PENDING);
-					// don't break in case there are tasks pending
-				}
-				// ignore if match is NO_STATS - the round can still be in FETCHED state
-			}
+//			for (IMatchGroup m : r.getMatches()) {
+//				if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.TASKS_PENDING) {
+//					r.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+//					break;
+//				} else if (m.getWorkflowStatus() == IMatchGroup.WorkflowStatus.PENDING) {
+//					r.setWorkflowStatus(WorkflowStatus.PENDING);
+//					// don't break in case there are tasks pending
+//				}
+//				// ignore if match is NO_STATS - the round can still be in FETCHED state
+//			}
 			putToPersistentDatastore(r); 	
 		}
 		
@@ -215,6 +215,13 @@ public class TestRoundFactory extends BaseCachingFactory<IRound> implements IRou
 	protected IRound putToPersistentDatastore(IRound t) {
 		// TODO Auto-generated method stub
 		return t;
+	}
+
+
+	@Override
+	public IRound getForUR(Long compId, int uROrdinal) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

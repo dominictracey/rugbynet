@@ -20,8 +20,10 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -77,6 +79,8 @@ public class EditRound extends Composite {
 	}
 
 	@UiField
+	HTMLPanel roundPanel;
+	@UiField
 	Button save;
 	@UiField
 	Button fetch;
@@ -86,6 +90,9 @@ public class EditRound extends Composite {
 	TextBox name;
 	@UiField
 	TextBox abbr;
+	@UiField 
+	Anchor roundPipelineLink;
+	
 	@UiField 
 	CellTable<IStanding> standingTable;
 	
@@ -125,6 +132,15 @@ public class EditRound extends Composite {
 			standingTable.setRowCount(standings.size());
 			standingTable.setVisibleRange(0, standings.size());
 			standingTable.setRowData(0, standings);
+		}
+		
+		if (round.getWeekendProcessingPipelineId() != null && !round.getWeekendProcessingPipelineId().isEmpty()) {
+			roundPipelineLink.setVisible(true);
+			roundPipelineLink.setHref("/_ah/pipeline/status?root=" + round.getWeekendProcessingPipelineId());
+			roundPipelineLink.setText("Round processing pipeline");
+			roundPipelineLink.setTarget("_blank");			
+		} else {
+			roundPipelineLink.setVisible(false);
 		}
 	}
 

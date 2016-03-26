@@ -7,18 +7,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.tools.cloudstorage.RetriesExhaustedException;
-import com.google.appengine.tools.pipeline.JobSetting;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
-
 import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.ratingseries.ProcessRatingSeries;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.tools.cloudstorage.RetriesExhaustedException;
+import com.google.appengine.tools.pipeline.JobSetting;
+import com.google.appengine.tools.pipeline.PipelineService;
+import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 
 /**
  * @author home
@@ -79,7 +79,7 @@ public class ProcessSeriesOrchestration extends OrchestrationCore<ISeriesConfigu
 			}
 
 			try {
-				pipelineId = service.startNewPipeline(new ProcessRatingSeries(), sc, new JobSetting.MaxAttempts(3));
+				pipelineId = service.startNewPipeline(new ProcessRatingSeries(), sc.getId(), null, null, new JobSetting.MaxAttempts(3));
 			} catch (RetriesExhaustedException ree) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Giving up", ree);
 				service.deletePipelineRecords(sc.getPipelineId(), true, false);
