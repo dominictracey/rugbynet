@@ -18,6 +18,8 @@ import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -42,14 +44,15 @@ PromoteViewPresenter<IBlurb>
 	private MenuItemDelegate menuItemDelegate;
 	protected Timer t = null;
 
+
 	public PromoteActivity(PromotePlace place, ClientFactory clientFactory) {
 		selectionModel = new SelectionModel<IBlurb>();
 
 		this.clientFactory = clientFactory;
 		view = clientFactory.getPromoteView();
-		
+
 		this.place = place;
-		
+
 	}
 
 	@Override
@@ -127,36 +130,36 @@ PromoteViewPresenter<IBlurb>
 		return menuItemDelegate;
 	}
 
-	
+
 	@Override
 	public void onCancelConfigClicked() {
 		//((DialogBox) clientFactory.getSeriesConfigrPopupView()).hide();
-		
+
 	}
 
 	@Override
 	public void onSaveConfigClicked(IBlurb player) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void DeleteBlurb(IBlurb blurb) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
 	@Override
 	public void Deactivate(List<IBlurb> blurbs) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void createDigestEmail() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -174,7 +177,7 @@ PromoteViewPresenter<IBlurb>
 				view.showList(result);
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -204,7 +207,7 @@ PromoteViewPresenter<IBlurb>
 	@Override
 	public void deleteSelected() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -226,7 +229,7 @@ PromoteViewPresenter<IBlurb>
 				view.showPreview(result);
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -242,7 +245,7 @@ PromoteViewPresenter<IBlurb>
 				Bootbox.alert("Digest email queued for sending to " + result + " users.");
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -272,7 +275,7 @@ PromoteViewPresenter<IBlurb>
 			}
 		});
 	}
-	
+
 	private List<Long> getBlurbIds() {
 		List<Long> retval = new ArrayList<Long>();
 		for (IBlurb b : selectionModel.selectedItems) {
@@ -309,11 +312,60 @@ PromoteViewPresenter<IBlurb>
 			@Override
 			public void onSuccess(List<Long> result) {
 				Bootbox.alert("Buffered " + (blurbIds.size() - result.size()) + " tweets.");
-				
+
 				//@TODO allow user to edit players without twitter handles to add them in for next time.
 			}
 		});
-		
+
 	}
 
+	@Override
+	public void onBulkUploadSaved(String text) {
+		String[] emails = text.split("[\n| |\t]");
+		RegExp p = RegExp.compile("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b");
+		List<String> emailsValid = new ArrayList<String>(emails.length);
+
+
+		for (String s: emails){
+			MatchResult m = p.exec(s.toUpperCase());
+			if (m != null){
+				Notify.notify(s);
+				emailsValid.add(s);
+
+			}
+			else{
+				Notify.notify("Bad");
+
+
+			}	
+		}
+
+		clientFactory.getRpcService().bulkUploadEmails(emailsValid, new AsyncCallback<List<String>>() {
+			int successCount = 0;
+			int failCount = 0;
+			@Override
+			public void onSuccess(List<String> result) {
+				for(String r: result){	
+					if(r.contains("success")){
+						successCount ++;
+					}
+					if(r.contains("already in use")){
+						failCount ++;
+					}
+				}
+				Bootbox.alert("Bulk user email upload results: " + result + " Succeeded: " + successCount + " Failed: " + failCount);
+			}
+			@Override
+			public void onFailure(Throwable caught) {		
+				Window.alert("Failed to fetch blurb list");
+			}
+
+
+		});
+
+	}
 }
+
+
+
+

@@ -53,13 +53,14 @@ import com.google.appengine.api.utils.SystemProperty;
  * @author home
  *
  */
+
 public class AccountManager implements IAccountManager {
 
 	private IAppUserFactory auf;
 	private UserEmailer userEmailer = null;
 	private IConfigurationFactory ccf;
 	private String charEncoding = "UTF-8";
-	
+
 	@Inject
 	public AccountManager(IAppUserFactory auf, IConfigurationFactory ccf) {
 		this.auf = auf;
@@ -136,7 +137,7 @@ public class AccountManager implements IAccountManager {
 					}
 
 					u.setOptOutCode(randomPassword());
-					
+
 					if (attributes != null)
 						u = addJSONAttributes(u,attributes);
 
@@ -157,28 +158,28 @@ public class AccountManager implements IAccountManager {
 		if (u.isNative()) {
 			sendValidationEmail(u, destination);
 		}
-		
+
 		return info;
 
 	}
-	
+
 	protected void sendValidationEmail(IAppUser u, String destination) {
 		if (userEmailer == null) {
 			userEmailer = new UserEmailer();
 		}
-		
+
 		String dest = "";
 		try {
 			dest = URLEncoder.encode(destination, charEncoding);
 		} catch (UnsupportedEncodingException e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,e.getLocalizedMessage());
 		}
-				
+
 		// chop the /s/ from the end of the BaseToptenUrl
 		String linkTarget = ccf.get().getBaseToptenUrl() + "s/#Profile:" + Keys.action + "=" + Actions.validateEmail + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.validationCode + "=" + u.getEmailValidationCode() + "&" + Keys.destination + "=" + dest;
 		boolean configured = userEmailer.configure("Account verification link from The Rugby Net", "Account Services", "Click here to activate your account", linkTarget, "If the link above doesn't work, you can enter your validation code (" + u.getEmailValidationCode() +") in the sign up window.", "", u);
 		if (configured) {
-	        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent email validation link " + u.getEmailValidationCode() + " to " + u.getEmailAddress());
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent email validation link " + u.getEmailValidationCode() + " to " + u.getEmailAddress());
 			userEmailer.send();
 		}
 	}
@@ -199,7 +200,7 @@ public class AccountManager implements IAccountManager {
 		loginInfo.setLastClubhouseId(u.getLastClubhouseId());
 		loginInfo.setLastCompetitionId(u.getLastCompetitionId());
 		loginInfo.setMustChangePassword(u.isMustChangePassword());
-		
+
 		if (u instanceof ITopTenUser) {
 			loginInfo.setTopTenContentContributor(((ITopTenUser)u).isTopTenContentContributor());
 			loginInfo.setTopTenContentEditor(((ITopTenUser)u).isTopTenContentEditor());
@@ -207,7 +208,7 @@ public class AccountManager implements IAccountManager {
 
 		loginInfo.setCompList(u.getCompList());
 		loginInfo.setOptOut(u.getOptOut());
-		
+
 		// see if they have done the draft and round picks yet.
 		//ArrayList<Group> groups = getGroupsByGroupType(GroupType.MY);
 		//	  for (int i=0; i<10; i++) {
@@ -285,7 +286,7 @@ public class AccountManager implements IAccountManager {
 		// is the nickname valid?
 		auf.setNickName(screenName);
 		IAppUser u = auf.get();
-		
+
 		String error = "";
 		if (u != null && !u.getId().equals(au.getId()) ) {
 			// already in use
@@ -294,7 +295,7 @@ public class AccountManager implements IAccountManager {
 			au.setNickname(screenName);
 			auf.put(au);
 		}
-		
+
 
 		HttpSession session = request.getSession();
 		LoginInfo info = getLoginInfo(au);
@@ -302,9 +303,9 @@ public class AccountManager implements IAccountManager {
 		if (!error.isEmpty()) {
 			info.setStatus(error);
 		}
-		
+
 		session.setAttribute("loginInfo", info);
-		
+
 		return info;
 	}
 
@@ -436,7 +437,7 @@ public class AccountManager implements IAccountManager {
 
 			u.setLastLogin(new Date());
 			auf.put(u);
-			
+
 			if ((providerType.equals(LoginInfo.ProviderType.facebook) || providerType.equals(LoginInfo.ProviderType.oauth2)) && destination != null) {
 				destination = Base64Helper.decode(destination);
 			}
@@ -526,7 +527,7 @@ public class AccountManager implements IAccountManager {
 		hash = DigestUtils.md5Hex(newPassword);
 		u.setPwHash(hash);
 		u.setMustChangePassword(false);
-		
+
 		// they had to have gotten an email for this. There is a flow that they can get here without doing the email validation link so...
 		u.setEmailValidated(true);
 		u.setLastLogin(new Date());
@@ -596,18 +597,18 @@ public class AccountManager implements IAccountManager {
 			if (userEmailer == null) {
 				userEmailer = new UserEmailer();
 			}
-			
+
 			String dest = "";
 			try {
 				dest = URLEncoder.encode(destination, charEncoding);
 			} catch (UnsupportedEncodingException e) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,e.getLocalizedMessage());
 			}
-					
+
 			String linkTarget = ccf.get().getBaseToptenUrl() + "s/#Profile:" + Keys.action + "=" + Actions.changePassword + "&" + Keys.email + "=" + u.getEmailAddress() + "&" + Keys.temporaryPassword + "=" + password + "&" + Keys.destination + "=" + dest;
 			boolean configured = userEmailer.configure("Password reset link from The Rugby Net", "Account Services", "Click here to create a new password", linkTarget, "If the link above doesn't work, you can enter your temporary password (<bold>" + password +"</bold>) in the change password page.", "", u);
 			if (configured) {
-		        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent password change link " + password + " to " + u.getEmailAddress());
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Sent password change link " + password + " to " + u.getEmailAddress());
 				userEmailer.send();
 			}	
 
@@ -633,7 +634,7 @@ public class AccountManager implements IAccountManager {
 					user.setEmailStatus(EmailStatus.VALIDATED);
 					user.setLastLogin(new Date());
 					auf.put(user);
-					
+
 					// and they are logged on now
 					LoginInfo loginInfo = getLoginInfo(user);
 					assert(loginInfo != null);
@@ -665,4 +666,43 @@ public class AccountManager implements IAccountManager {
 		}
 		return null;
 	}
+
+	@Override
+	public String createDigestAccount(String e) {
+
+		try {
+			//check if email is already in our database
+			auf.setEmail(e);
+			if (auf.get() == null){
+				//user is not in the database
+				//create a new appUser object
+				auf.setId(null);
+				IAppUser user = auf.get();
+				//setup the appUser
+				user.setEmailAddress(e);
+				user.setEmailStatus(EmailStatus.DIGEST);
+				user.setPwHash("###");
+				user.setMustChangePassword(true);
+				user.setOptOutCode(randomPassword());
+				user.setEmailValidated(true);
+				user.setNative(true);
+				//save the appUser to the Datastore
+				user = auf.put(user);
+
+				if (user.getNickname() == null || user.getNickname().isEmpty()) {
+					user.setNickname("user"+user.getId().toString());
+					user = auf.put(user);
+				} 
+				return e+": success";
+			} else {
+
+				return e+": already in use";
+			}
+		}
+		catch (Throwable ex) {
+			Logger.getLogger("Core Service").log(Level.SEVERE, ex.getMessage(), ex);
+			return "Failed";
+		}
+	}
 }
+
