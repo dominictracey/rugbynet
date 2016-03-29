@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.rugby.foundation.admin.server.workflow.ResultWithLog;
 
-public class ProcessMatchResult extends ResultWithLog implements Serializable {
+public class MS0ProcessMatchResult extends ResultWithLog implements Serializable {
 
 
 	/**
@@ -14,12 +14,12 @@ public class ProcessMatchResult extends ResultWithLog implements Serializable {
 	private static final long serialVersionUID = -732033730743570348L;
 	public Long matchId;
 	
-	public ProcessMatchResult(Long matchId, List<String> log)  {
+	public MS0ProcessMatchResult(Long matchId, List<String> log)  {
 		this.matchId = matchId;
 		this.log = log;
 	}
 
-	public ProcessMatchResult() {
+	public MS0ProcessMatchResult() {
 
 	}
 }

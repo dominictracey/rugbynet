@@ -6,18 +6,16 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.joda.time.DateTime;
-
 import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
+import net.rugby.foundation.model.shared.Group.GroupType;
 import net.rugby.foundation.model.shared.IGroup;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.Group.GroupType;
 
 public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMatchGroupFactory {
 
@@ -301,6 +299,13 @@ public class TestMatchGroupFactory extends BaseMatchGroupFactory implements IMat
 	protected List<IMatchGroup> getMatchesForVirualCompFromPersistentDatastore(
 			int ordinal, Long virtualCompId) {
 		// @REX implement
+		return null;
+	}
+
+
+	@Override
+	public List<IMatchGroup> getFutureMatchesForTeam(Long id) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

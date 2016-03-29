@@ -14,6 +14,8 @@ import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 
+import org.joda.time.DateTime;
+
 /**
  * @author home
  *
@@ -45,7 +47,7 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 
 			// don't fetch until we have final score
 			if (!target.getWorkflowStatus().equals(WorkflowStatus.FINAL)) {
-				log += "failed: match must be in FINAL state. Currently in " + target.getWorkflowStatus().toString();
+				log += "Rule failed: match must be in FINAL state. Currently in " + target.getWorkflowStatus().toString();
 				return false;
 			}
 
@@ -56,7 +58,8 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 
 			if (fetcher.hasFlopped()) {
 				fetch = true;
-				log += "**STATS READY**";
+				DateTime now = new DateTime();
+				log += "Stats ready at " + now.toString();;
 				Logger.getLogger(RuleMatchStatsToFetch.class.getName()).log(Level.INFO,"Ready to look for results for match " + target.getDisplayName() +"("+ target.getId() + ")");
 
 			}

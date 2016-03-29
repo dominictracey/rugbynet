@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -18,6 +16,7 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingGroup;
@@ -26,12 +25,13 @@ import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Position;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
+
+import org.joda.time.DateTime;
 
 import com.google.inject.Inject;
 
@@ -429,7 +429,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 				for (ITeamGroup team : hostComp.getTeams()) {
 					// remove TBC and TBD
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Team series, adding team " + team.getDisplayName());
-					if (!team.getDisplayName().equals("TBC") && !team.getDisplayName().equals("TBD")) {
+					if (!team.getDisplayName().contains("TBC") && !team.getDisplayName().contains("TBD")) {
 						teams.add(team);
 					}
 				}

@@ -13,10 +13,10 @@ public class MS8Rated extends ResultWithLog implements Serializable  {
 	 * 
 	 */
 	private static final long serialVersionUID = -732033730743570348L;
-	public Long matchId;
+	public Long targetId;
 	public ProcessRatingSeriesResult processSubTreeResults;
-	public MS8Rated(Long matchId, List<String> log)  {
-		this.matchId = matchId;
+	public MS8Rated(Long targetId, List<String> log)  {
+		this.targetId = targetId;
 		this.log = log;
 	}
 

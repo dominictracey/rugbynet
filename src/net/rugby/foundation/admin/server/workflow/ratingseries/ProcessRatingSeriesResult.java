@@ -11,7 +11,6 @@ public class ProcessRatingSeriesResult extends ResultWithLog implements Serializ
 	private static final long serialVersionUID = 6754812367918042664L;
 
 	public String jobId;
-	public Boolean success;
 	
 	public ProcessRatingSeriesResult(Boolean success, String jobId)  {
 		this.jobId = jobId;

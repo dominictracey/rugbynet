@@ -44,6 +44,10 @@ public class RuleMatchToRate extends CoreRule<IMatchGroup> {
 			
 			ISeriesConfiguration sc = scf.getByCompAndMode(r.getCompId(), RatingMode.BY_MATCH);
 			
+			if (sc != null) {
+				log = "Series " + sc.getDisplayName() + " ready to process.";
+			}
+			
 			return sc != null;
 		}
 		

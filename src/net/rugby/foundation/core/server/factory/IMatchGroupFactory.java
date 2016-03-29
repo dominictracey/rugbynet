@@ -3,7 +3,6 @@ package net.rugby.foundation.core.server.factory;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.MatchGroup;
 
 public interface IMatchGroupFactory  extends ICachingFactory<IMatchGroup> {
 
@@ -17,5 +16,7 @@ public interface IMatchGroupFactory  extends ICachingFactory<IMatchGroup> {
 	List<? extends IMatchGroup> getMatchesWithPipelines();
 
 	List<IMatchGroup> getMatchesForVirualComp(int ordinal, Long virtualCompId);
+
+	List<IMatchGroup> getFutureMatchesForTeam(Long id);
 
 }

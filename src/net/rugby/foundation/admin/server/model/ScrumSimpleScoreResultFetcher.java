@@ -19,12 +19,12 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
-import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 
 public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
@@ -153,8 +153,8 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 	protected IMatchResult createResult(IMatchGroup match) {
 		SimpleScoreMatchResult result = new SimpleScoreMatchResult();
 
-		homeTeamName = match.getHomeTeam().getDisplayName();
-		visitTeamName = match.getVisitingTeam().getDisplayName();
+		homeTeamName = match.getHomeTeam().getScrumName();
+		visitTeamName = match.getVisitingTeam().getScrumName();
 
 		result.setMatchID(match.getId());
 		result.setRecordedDate(new Date());

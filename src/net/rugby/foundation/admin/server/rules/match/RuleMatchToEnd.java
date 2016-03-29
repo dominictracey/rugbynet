@@ -39,12 +39,12 @@ public class RuleMatchToEnd extends CoreRule<IMatchGroup> {
 		if (target != null) {
 			cal.setTime(target.getDate());
 			cal.add(Calendar.MINUTE, END_OFFSET);
-	   		log = "RuleMatchToEnd for Match " + target.getDisplayName() + " (" + target.getId().toString() + ") time: " + target.getDate().toString() + " offset " + cal.getTime().toString() + " now " + now.toString();
+	   		//log = "RuleMatchToEnd for Match " + target.getDisplayName() + " (" + target.getId().toString() + ") time: " + target.getDate().toString() + " offset " + cal.getTime().toString() + " now " + now.toString();
 
 			if (now.after(cal.getTime())) {
 				retval = true;
-				log += "**END NEEDED**";
-				Logger.getLogger(RuleMatchToFetch.class.getName()).log(Level.INFO,"Ready to end match " + target.getDisplayName() +"("+ target.getId() + ")");
+				log += "End needed at " + now.toString();
+				Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Ready to end match " + target.getDisplayName() +"("+ target.getId() + ")");
 			}
 			
 			System.out.println(log);

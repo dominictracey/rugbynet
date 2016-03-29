@@ -13,6 +13,8 @@ public class TeamGroup extends Group implements ITeamGroup {
 	private String pool;
 	private String abbr;
 	private String shortName;
+	private String scrumName;
+	private String espnName;
 	private String twitter;
 	private String twitterChannel;
 	private String color;
@@ -171,8 +173,27 @@ public class TeamGroup extends Group implements ITeamGroup {
 		return this.twitterChannel;
 	}
 
-//	@Override
-//	public void setDisplayName(String displayName) {
-//		this.displayName = displayName;
-//	}
+	@Override
+	public String getScrumName() {
+		if (scrumName != null && !scrumName.isEmpty())
+			return scrumName;
+		else 
+			return displayName;
+	}
+	@Override
+	public void setScrumName(String scrumName) {
+		this.scrumName = scrumName;
+	}
+	@Override
+	public String getEspnName() {
+		if (espnName != null && !espnName.isEmpty())
+			return espnName;
+		else 
+			return displayName;
+	}
+	@Override
+	public void setEspnName(String espnName) {
+		this.espnName = espnName;
+	}
+
 }

@@ -7,24 +7,24 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
 import net.rugby.foundation.core.server.factory.BaseMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.Round;
+
+import org.joda.time.DateTime;
+
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Serializable,IMatchGroupFactory {
 
@@ -206,6 +206,41 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 		} catch (Throwable ex) {
 
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getMatchesForVirualCompFromPersistentDatastore", ex);
+			return null;
+		}
+	}
+
+
+
+	@Override
+	public List<IMatchGroup> getFutureMatchesForTeam(Long id) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			List<IMatchGroup> list = new ArrayList<IMatchGroup>();
+			
+			Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("homeTeamID", id).filter("status", "SCHEDULED");
+
+			Iterator<MatchGroup> it = qg.list().iterator();
+			while (it.hasNext()) {
+				IMatchGroup g = (IMatchGroup)it.next();
+				g.setHomeTeam(tf.get(g.getHomeTeamId()));
+				g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
+				list.add(g);
+			}
+			
+			qg = ofy.query(MatchGroup.class).filter("visitingTeamID", id).filter("status", "SCHEDULED");
+
+			it = qg.list().iterator();
+			while (it.hasNext()) {
+				IMatchGroup g = (IMatchGroup)it.next();
+				g.setHomeTeam(tf.get(g.getHomeTeamId()));
+				g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
+				list.add(g);
+			}
+			
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getFutureMatchesForTeam", ex);
 			return null;
 		}
 	}

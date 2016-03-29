@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.rugby.foundation.admin.server.workflow.ResultWithLog;
 
-public class StandingsResult extends ResultWithLog implements Serializable {
+public class RS3StandingsResult extends ResultWithLog implements Serializable {
 
 
 	/**
@@ -14,12 +14,12 @@ public class StandingsResult extends ResultWithLog implements Serializable {
 	private static final long serialVersionUID = -732033730743570348L;
 	public Long roundId;
 	
-	public StandingsResult(Long roundId, List<String> log)  {
+	public RS3StandingsResult(Long roundId, List<String> log)  {
 		this.roundId = roundId;
 		this.log = log;
 	}
 
-	public StandingsResult() {
+	public RS3StandingsResult() {
 		
 	}
 }

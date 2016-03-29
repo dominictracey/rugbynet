@@ -2,12 +2,10 @@ package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
-
 
 import com.googlecode.objectify.annotation.Entity;
 

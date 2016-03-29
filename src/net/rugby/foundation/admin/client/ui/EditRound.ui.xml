@@ -20,7 +20,8 @@
 	<g:HTMLPanel ui:field="roundPanel">
 				Id: <g:Label ui:field='id'></g:Label><br/>
 				Name: <g:TextBox ui:field='name'></g:TextBox><br/>
-				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
+				Abbr: <g:TextBox ui:field='abbr'></g:TextBox>
+				Workflow Status: <g:ListBox ui:field='workFlowStatus'></g:ListBox><br/>
 				Standings before round started:		
 				<g:ScrollPanel  width="100%" height ="600px">	
 					<c:CellTable ui:field="standingTable" addStyleNames="{style.standingFlexTable}" width="100%"/>	    

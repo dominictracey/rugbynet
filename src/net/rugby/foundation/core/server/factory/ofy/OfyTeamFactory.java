@@ -5,17 +5,16 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.BaseTeamFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
+
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory, Serializable {
 	/**
@@ -40,8 +39,10 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 	@Override
 	public ITeamGroup putToPersistentDatastore(ITeamGroup team) {
 		if (team == null) {
-			team = new TeamGroup();
-			team.setShortName("TDB");
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Don't call TeamFactory.put with null parameter please, Use create()");
+			return null;
+//			team = new TeamGroup();
+//			team.setShortName("TDB");
 		}
 		Objectify ofy = DataStoreFactory.getOfy();
 		ofy.put(team);
@@ -93,7 +94,7 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			HashMap<Long, String> map = new HashMap<Long, String>();
-			
+
 			Query<Group> team = ofy.query(Group.class).filter("groupType", "TEAM");
 
 			if (team.count() > 0) {
@@ -103,14 +104,14 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 					}
 				}
 			}
-			
+
 			return map;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getTeamLogoStyleMapFromPersistentDatastore", ex);
 			return null;
 		}
 	}
-	
+
 	@Override
 	public ITeamGroup getTeamBySnakeCaseDisplayName(String snakeCaseName) {
 		Objectify ofy = DataStoreFactory.getOfy();
@@ -121,5 +122,30 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 		}
 
 		return null;
+	}
+
+	@Override
+	public ITeamGroup getTeamByScrumName(String teamName) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Group> team = ofy.query(Group.class).filter("scrumName", teamName);
+
+			if (team.count() == 0) {
+				team = ofy.query(Group.class).filter("displayName", teamName);
+			}
+			
+			if (team.list().size() > 1) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"We have more than one team group in the dataBase that have either the same displayName or the same scrumName. This is most likely a Bad Thing(tm)!");
+			}
+			
+			if (team.count() > 0) {
+				return (ITeamGroup)team.list().get(0);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getTeamLogoStyleMapFromPersistentDatastore", ex);
+			return null;
+		}
 	}
 }

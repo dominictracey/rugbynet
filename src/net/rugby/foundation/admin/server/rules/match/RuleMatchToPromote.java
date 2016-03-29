@@ -26,6 +26,12 @@ public class RuleMatchToPromote extends CoreRule<IMatchGroup> {
 	@Override
 	public Boolean test() {
 	
-		return target.getGuid() != null && !target.getGuid().isEmpty();
+		boolean retval = target.getGuid() != null && !target.getGuid().isEmpty();
+		
+		if (retval) {
+			log = "Top Ten list ready for promotion.";
+		}
+		
+		return retval;
 	}
 }

@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.rugby.foundation.admin.server.workflow.weekend.ProcessRound;
+import net.rugby.foundation.admin.server.workflow.weekend.RJ0ProcessRound;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
@@ -70,7 +70,7 @@ public class UtilRoundWorkflowServlet extends HttpServlet {
 						JobSetting backOffFactor = new JobSetting.BackoffFactor(1);
 						JobSetting backOffSeconds = new JobSetting.BackoffSeconds(30*60); // retry every 30 minutes
 						JobSetting maxAttempts = new JobSetting.MaxAttempts(200); // about 4 days
-						pipelineId = service.startNewPipeline(new ProcessRound(), r.getId(), backOffFactor, backOffSeconds, maxAttempts);
+						pipelineId = service.startNewPipeline(new RJ0ProcessRound(), r.getId(), backOffFactor, backOffSeconds, maxAttempts);
 
 						r.setWeekendProcessingPipelineId(pipelineId);
 						rf.put(r);

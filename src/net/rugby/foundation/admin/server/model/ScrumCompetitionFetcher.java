@@ -22,10 +22,10 @@ import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 
 
 public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
@@ -204,7 +204,7 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 	}
 
 	private ITeamGroup getTeam(String teamName) {
-		ITeamGroup t = tf.getTeamByName(teamName);
+		ITeamGroup t = tf.getTeamByScrumName(teamName);
 		if (t == null) {
 			t = tf.create();
 			t.setDisplayName(teamName);
@@ -544,5 +544,11 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime().toString() + "**" + m.getDisplayName();
+	}
+
+	@Override
+	public Boolean updateMatch(IMatchGroup match) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

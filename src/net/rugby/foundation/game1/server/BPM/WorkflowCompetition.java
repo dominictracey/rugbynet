@@ -9,18 +9,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.backends.BackendServiceFactory;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Builder;
-
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.rules.IRule;
 import net.rugby.foundation.admin.server.workflow.IWorkflow;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
-import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.game1.server.BPM.Game1OrchestrationActions.ClubhouseActions;
@@ -41,6 +34,13 @@ import net.rugby.foundation.game1.shared.IMatchEntry;
 import net.rugby.foundation.game1.shared.IRoundEntry;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
+
+import com.google.appengine.api.backends.BackendServiceFactory;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 
 /**
  * @author home
@@ -85,14 +85,14 @@ public class WorkflowCompetition implements IWorkflow {
 	 * @param wfc There is only one instance of the {@link <WorkflowConfiguration> [WorkflowConfiguration]}. It contains a list of ids of underway competitions.
 	 * <br/>
 	 */
-	private void process(IWorkflowConfiguration wfc) {
+	private void process(ICoreConfiguration wfc) {
 
 		boolean sanityCheck = true;
 		
 		// keep track of which leagues we've deleted so we don't try to redelete them.
 		Set<Long> leagueIdsDeleted = new HashSet<Long>();
 		
-		for (Long cid : wfc.getUnderwayCompetitions()) {
+		for (Long cid : wfc.getCompsUnderway()) {
 			
 			ICompetition c = cf.get(cid);
 			

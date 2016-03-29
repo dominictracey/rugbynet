@@ -828,9 +828,14 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	@Override
 	public void setUrl(String url, Boolean flushFromCache) {
 		this.url = url;
-		if (urlCache != null) {
-			urlCache.clear(url);
+		
+		if (flushFromCache) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "The UrlCacher actually flushes automatically every 5 minutes so this doesn't actually work. " + url);
 		}
+		// we now have all IUrlCached objects expire after 5 minutes
+//		if (urlCache != null) {
+//			urlCache.clear(url);
+//		}
 	}
 	@Override
 	public boolean process() {

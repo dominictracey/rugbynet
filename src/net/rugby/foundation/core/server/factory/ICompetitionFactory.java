@@ -29,4 +29,6 @@ public interface ICompetitionFactory extends ICachingFactory<ICompetition>{
 
 	Boolean addRound(Long compId, int uri, String name);
 
+	List<ICompetition> getVirtualComps();
+
 }

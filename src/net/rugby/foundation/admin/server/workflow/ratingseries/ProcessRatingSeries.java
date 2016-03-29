@@ -91,7 +91,7 @@ public class ProcessRatingSeries extends Job3<MS8Rated, Long, Long, Long> implem
 			// also, if we have a matchId, force the target round to be the round containing the match
 			UniversalRound target = seriesConfig.getTargetRound();
 			IMatchGroup match = null;
-			if (matchId != null) {
+			if (matchId != null && matchId != 0L) {
 				match = mf.get(matchId);
 				this.urf = injector.getInstance(IUniversalRoundFactory.class);
 				this.rf = injector.getInstance(IRoundFactory.class);

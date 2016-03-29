@@ -18,6 +18,10 @@ public interface IMatchGroup extends IGroup  {
 	public enum Status {SCHEDULED, FINAL_HOME_WIN, FINAL_HOME_WIN_OT, FINAL_VISITOR_WIN, FINAL_VISITOR_WIN_OT, FINAL_DRAW, FINAL_DRAW_OT, UNDERWAY_FIRST_HALF, HALFTIME, UNDERWAY_SECOND_HALF, COMPLETE_AWAITING_RESULTS, POSTPONED, RESCHEDULED, CANCELED, UNREPORTED}
 	public enum WorkflowStatus {PENDING, LINKED, LINEUPS, UNDERWAY, OVER, FINAL, FETCHED, RATED, PROMOTED, COMPLETE, ERROR, NO_STATS } 
 	
+	/**
+	 * sets the displayName to homeTeam.getDisplayName() vs. visitingTeam.getDisplayName()
+	 * or to TBD vs TBD if no teams are assigned
+	 */
 	public abstract void setDisplayName();
 	
 	public abstract ITeamGroup getHomeTeam();
@@ -49,6 +53,7 @@ public interface IMatchGroup extends IGroup  {
 	public abstract WorkflowStatus getWorkflowStatus();
 	public abstract void setWorkflowStatus(WorkflowStatus status);
 	
+
 	public abstract String getDisplayName();
 	public abstract void setDisplayName(String displayName);
 	/**

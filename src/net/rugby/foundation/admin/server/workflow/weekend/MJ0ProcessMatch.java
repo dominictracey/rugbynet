@@ -10,7 +10,7 @@ import net.rugby.foundation.admin.server.workflow.weekend.results.MS6Final;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS7StatsFetched;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS9Promoted;
-import net.rugby.foundation.admin.server.workflow.weekend.results.ProcessMatchResult;
+import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -23,7 +23,7 @@ import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class ProcessMatch extends Job3<ProcessMatchResult, Long, Long, String> implements Serializable {
+public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, String> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
@@ -32,13 +32,13 @@ public class ProcessMatch extends Job3<ProcessMatchResult, Long, Long, String> i
 	transient private IMatchGroupFactory mf;
 	transient private IMatchGroup match;
 
-	public ProcessMatch() {
+	public MJ0ProcessMatch() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
 
 
 	@Override
-	public Value<ProcessMatchResult> run(Long matchId, Long ratingGroupId, String matchName) throws Exception {
+	public Value<MS0ProcessMatchResult> run(Long matchId, Long ratingGroupId, String matchName) throws Exception {
 
 		try {
 			if (injector == null) {
@@ -47,7 +47,7 @@ public class ProcessMatch extends Job3<ProcessMatchResult, Long, Long, String> i
 
 			this.mf = injector.getInstance(IMatchGroupFactory.class);
 
-			ProcessMatchResult result = new ProcessMatchResult();
+			MS0ProcessMatchResult result = new MS0ProcessMatchResult();
 
 			// valid round?
 			match = mf.get(matchId);
@@ -98,7 +98,7 @@ public class ProcessMatch extends Job3<ProcessMatchResult, Long, Long, String> i
 			Value<MS9Promoted> promoted = futureCall(new MJ8PromoteMatch(), immediate(matchId), immediate(label), rated, nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 
 			// finalization
-			FutureValue<ProcessMatchResult> retval = futureCall(new MJ9CompileMatchLog(), underway, over, finalized, fetched, rated, promoted);
+			FutureValue<MS0ProcessMatchResult> retval = futureCall(new MJ9CompileMatchLog(), underway, over, finalized, fetched, rated, promoted);
 
 			return retval;
 

@@ -4,14 +4,13 @@
  */
 package net.rugby.foundation.admin.server.orchestration;
 
-import com.google.appengine.api.taskqueue.TaskOptions;
-
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.CompActions;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.model.shared.ICompetition;
+
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 
 /**
@@ -56,10 +55,10 @@ public class CompetitionCompleteOrchestration extends OrchestrationCore<ICompeti
 				target.setUnderway(false);
 				cf.put(target);
 				
-				// take it out of the workflow configuration as well
-				IWorkflowConfiguration wfc = wfcf.get();
-				wfc.getUnderwayCompetitions().remove(target.getId());
-				wfcf.put(wfc);
+//				// take it out of the workflow configuration as well
+//				IWorkflowConfiguration wfc = wfcf.get();
+////				wfc.getUnderwayCompetitions().remove(target.getId());
+//				wfcf.put(wfc);
 			}
 		}
 	}

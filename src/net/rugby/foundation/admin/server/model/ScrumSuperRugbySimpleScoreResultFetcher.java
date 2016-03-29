@@ -36,7 +36,7 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 	public IMatchResult _getResult(IMatchGroup match, boolean save)  {
 		IMatchResult result = createResult(match);
 		
-		String resultURL = comp.getForeignURL() + "?template=results";
+		String resultURL = comp.getForeignURL() + "?noredir=1;template=results";
 		
 		Date dateRead = null;
         boolean found = false;
@@ -197,10 +197,6 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 	
 	@Override
 	public Boolean isAvailable(IMatchGroup match) {
-		// get the latest version of the results template
-		if (comp != null && uc != null) {
-			uc.clear(comp.getForeignURL() + "?template=results");
-		}
 		return _getResult(match, false) != null;
 	}
 

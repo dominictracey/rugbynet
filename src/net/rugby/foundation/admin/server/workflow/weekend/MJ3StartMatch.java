@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.MatchRule;
 import net.rugby.foundation.admin.server.rules.IRule;
@@ -15,6 +13,9 @@ import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
+
+import org.joda.time.DateTime;
+
 import com.google.appengine.tools.pipeline.Job2;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
@@ -67,7 +68,7 @@ public class MJ3StartMatch extends Job2<MS4Underway, Long, String> implements Se
 			
 			// first check if we are already further along than this
 			if (match.getWorkflowStatus().ordinal() > fromState.ordinal()) {
-				retval.log.add("OK");
+				retval.log.add(this.getClass().getSimpleName() + " ...OK");
 				retval.success = true;
 				return immediate(retval);
 			}

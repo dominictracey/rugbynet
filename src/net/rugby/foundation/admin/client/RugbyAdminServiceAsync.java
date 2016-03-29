@@ -3,10 +3,7 @@ package net.rugby.foundation.admin.client;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
-import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
@@ -14,23 +11,26 @@ import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
-import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
-import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.UniversalRound;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
 public interface RugbyAdminServiceAsync {
@@ -53,10 +53,10 @@ public interface RugbyAdminServiceAsync {
 
 	/**
 	 * @param teamGroup
+	 * @param saveMatches - when the displayName is changed, would you like us to go and update all this team's pending matches' displayNames?
 	 * @param asyncCallback
 	 */
-	public void saveTeam(ITeamGroup teamGroup,
-			AsyncCallback<ITeamGroup> asyncCallback);
+	public void saveTeam(ITeamGroup teamGroup, boolean saveMatches, AsyncCallback<ITeamGroup> asyncCallback);
 	/**
 	 * @param teamId
 	 * @param asyncCallback
@@ -210,4 +210,5 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<Integer> asyncCallback);
 	public void twitter(List<Long> blurbIds,
 			AsyncCallback<List<Long>> asyncCallback);
+	public void saveRound(IRound r, AsyncCallback<IRound> asyncCallback);
 }

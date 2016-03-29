@@ -48,6 +48,7 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 
 			// just let failure cascade to the end so it can finish
 			if (prior == null || prior.success == false) {
+				retval.log.add(this.getClass().getSimpleName() + " ...FAIL");
 				retval.success = false;
 				return immediate(retval);
 			}
@@ -67,7 +68,7 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 
 			// first check if we are already further along than this
 			if (match.getWorkflowStatus().ordinal() > fromState.ordinal()) {
-				retval.log.add("OK");
+				retval.log.add(this.getClass().getSimpleName() + " ...OK");
 				retval.success = true;
 				return immediate(retval);
 			}
@@ -78,7 +79,8 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 			if (rule.test()) {
 				// update state
 				Value<MS7StatsFetched> val = futureCall(new FetchMatchStats(), immediate(match.getId()));
-				
+				retval.log.add(rule.getLog());
+				retval.log.add("Fetch match stats initiated at " + DateTime.now().toString());
 				// this happens inside fetchstats.CompileMatchStats
 //				match.setWorkflowStatus(toState);
 //				mf.put(match);
@@ -89,10 +91,11 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 			} else {
 				// if it was more than 3 days ago, give up and mark the match NO_STATS
 				DateTime now = new DateTime();
-				now.minusDays(3);
+				now = now.minusDays(3);
 				if (now.isAfter(new DateTime(match.getDate()))) {
 					match.setWorkflowStatus(WorkflowStatus.NO_STATS);
 					mf.put(match);
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "No stats available for " + match.getDisplayName() + " giving up. NO_STATS");
 					retval.log.add("No stats available for " + match.getDisplayName() + " giving up. NO_STATS");
 					retval.success = false;
 					return immediate(retval);

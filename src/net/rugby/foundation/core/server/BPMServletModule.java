@@ -1,6 +1,8 @@
 package net.rugby.foundation.core.server;
 
 import net.rugby.foundation.admin.server.RugbyAdminServiceImpl;
+import net.rugby.foundation.admin.server.workflow.servelets.CronMidweekFinalizeServlet;
+import net.rugby.foundation.admin.server.workflow.servelets.CronMidweekInitServlet;
 import net.rugby.foundation.admin.server.workflow.servelets.CronWeekendFinalizeServlet;
 import net.rugby.foundation.admin.server.workflow.servelets.CronWeekendInitServlet;
 import net.rugby.foundation.admin.server.workflow.servelets.UtilRoundWorkflowServlet;
@@ -44,6 +46,8 @@ public class BPMServletModule extends ServletModule {
 		// admin only
 		serve("/cron/weekend/process").with(CronWeekendInitServlet.class);
 		serve("/cron/weekend/finalize").with(CronWeekendFinalizeServlet.class);
+		serve("/cron/midweek/process").with(CronMidweekInitServlet.class);
+		serve("/cron/midweek/finalize").with(CronMidweekFinalizeServlet.class);
 		serve("/admin/weekend/cancel").with(UtilWeekendCancelServlet.class);
 		serve("/admin/workflow/round").with(UtilRoundWorkflowServlet.class);
 		serve("/admin/orchestration/*").with(net.rugby.foundation.engine.server.OrchestrationServlet.class);

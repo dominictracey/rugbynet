@@ -50,10 +50,11 @@ public class MJ7MatchSeriesProcess extends Job4<MS8Rated, Long, Long, String, Re
 		try {
 
 			MS8Rated retval = new MS8Rated();
-			retval.matchId = matchId;
+			retval.targetId = matchId;
 
 			// just let failure cascade to the end so it can finish
 			if (prior == null || prior.success == false) {
+				retval.log.add(this.getClass().getSimpleName() + " ...FAIL");
 				retval.success = false;
 				return immediate(retval);
 			}
@@ -75,7 +76,7 @@ public class MJ7MatchSeriesProcess extends Job4<MS8Rated, Long, Long, String, Re
 
 			// first check if we are already further along than this
 			if (match.getWorkflowStatus().ordinal() > fromState.ordinal()) {
-				retval.log.add("OK");
+				retval.log.add(this.getClass().getSimpleName() + " ...OK");
 				retval.success = true;
 				return immediate(retval);
 			}
@@ -119,7 +120,7 @@ public class MJ7MatchSeriesProcess extends Job4<MS8Rated, Long, Long, String, Re
 				}	
 
 				MS8Rated retval = new MS8Rated();
-				retval.matchId = matchId;
+				retval.targetId = matchId;
 				retval.success = false;
 				retval.log.add(ex.getLocalizedMessage());
 				return immediate(retval);

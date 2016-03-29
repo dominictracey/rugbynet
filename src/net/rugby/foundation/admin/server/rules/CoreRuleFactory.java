@@ -3,23 +3,25 @@
  */
 package net.rugby.foundation.admin.server.rules;
 
-import com.google.inject.Inject;
-
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchStatsToFetch;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToEnd;
-import net.rugby.foundation.admin.server.rules.match.RuleMatchToFetch;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToFinalScore;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToLock;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToPromote;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToRate;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
+
+import com.google.inject.Inject;
 
 /**
  * @author home
@@ -33,14 +35,19 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 	private IResultFetcherFactory srff;
 	private ISeriesConfigurationFactory scf;
 	private IPlayerFactory pf;
+	private IUniversalRoundFactory urf;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	public CoreRuleFactory(IPlayerMatchStatsFetcherFactory pmsff, IRoundFactory rf, IResultFetcherFactory srff, ISeriesConfigurationFactory scf, IPlayerFactory pf) {
+	public CoreRuleFactory(IPlayerMatchStatsFetcherFactory pmsff, IRoundFactory rf, IResultFetcherFactory srff, ISeriesConfigurationFactory scf, 
+			IPlayerFactory pf, IUniversalRoundFactory urf, IConfigurationFactory ccf) {
 		this.pmsff = pmsff;
 		this.rf = rf;
 		this.srff = srff;
 		this.scf = scf;
 		this.pf = pf;
+		this.urf = urf;
+		this.ccf = ccf;
 	}
 	
 	/* (non-Javadoc)
@@ -52,7 +59,8 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 			return new RuleCompComplete(target);
 		} else if (rule == CompRule.COMP_INCREMENT_NEXT_ROUND) {
 			return new RuleCompIncrementNextRound(target);
-		} 
+		}
+		
 		return null;
 	}
 
@@ -61,9 +69,13 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 	 */
 	@Override
 	public IRule<IRound> get(IRound target, RoundRule rule) {
-		if (rule == RoundRule.ROUND_COMPLETE) {
+		if (rule == RoundRule.ROUND_FETCHED) {
+			return new RuleRoundFetched(target);
+		} else if (rule == RoundRule.ROUND_RATED) {
+			return new RuleRoundRated(target);
+		} else if (rule == RoundRule.ROUND_COMPLETE) {
 			return new RuleRoundComplete(target);
-		} 
+		}
 		return null;
 	}
 
@@ -80,21 +92,20 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 			return new RuleMatchToFinalScore(target, rf, srff);
 		} else if (rule == MatchRule.MATCH_STATS_AVAILABLE) {
 			return new RuleMatchStatsToFetch(target, pmsff, pf);
-		} else if (rule == MatchRule.MATCH_TO_FETCH) {
-			return new RuleMatchToFetch(target);
 		} else if (rule == MatchRule.MATCH_TO_RATE) {
 			return new RuleMatchToRate(target, rf, scf);
 		} else if (rule == MatchRule.MATCH_TO_PROMOTE) {
 			return new RuleMatchToPromote(target);
-		} else if (rule == MatchRule.STALE_MATCH_NEED_ATTENTION) {
-			return new RuleMatchStaleNeedsAttention(target);
-		} else if (rule == MatchRule.STALE_MATCH_TO_MARK_UNREPORTED) {
-			return new RuleMatchStaleMarkUnreported(target);
 		} 
-		 
 		return null;
 	}
 	
-
+	@Override
+	public IRule<ISeriesConfiguration> get(ISeriesConfiguration target, SeriesConfigurationRule rule) {
+		if (rule == SeriesConfigurationRule.READY_TO_PROCESS) {
+			return new RuleSeriesReadyToProcess(target, urf, rf, ccf);
+		} 
+		return null;
+	}
 
 }

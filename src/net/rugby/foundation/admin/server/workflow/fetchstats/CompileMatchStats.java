@@ -2,9 +2,6 @@ package net.rugby.foundation.admin.server.workflow.fetchstats;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.google.appengine.tools.pipeline.Job5;
-import com.google.appengine.tools.pipeline.Value;
-import com.google.inject.Injector;
 
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS7StatsFetched;
 import net.rugby.foundation.core.server.BPMServletContextListener;
@@ -13,6 +10,10 @@ import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+
+import com.google.appengine.tools.pipeline.Job5;
+import com.google.appengine.tools.pipeline.Value;
+import com.google.inject.Injector;
 
 public class CompileMatchStats extends Job5<MS7StatsFetched, Long, Long, List<Long>, List<Long>, String> {
 
@@ -85,6 +86,8 @@ public class CompileMatchStats extends Job5<MS7StatsFetched, Long, Long, List<Lo
 		MS7StatsFetched wrapper = new MS7StatsFetched();
 		wrapper.fetchSubTreeResults = retval;
 		wrapper.matchId = match.getId();
+		wrapper.log.addAll(retval.log);
+		
 		wrapper.success = true;
 		
 		return (Value<MS7StatsFetched>)immediate(wrapper);

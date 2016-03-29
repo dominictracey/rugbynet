@@ -41,12 +41,12 @@ public class RuleMatchToLock extends CoreRule<IMatchGroup> {
 		if (target != null) {
 			cal.setTime(target.getDate());
 			cal.add(Calendar.HOUR, LOCK_OFFSET);
-	   		log = "RuleMatchToLock for Match " + target.getDisplayName() + " (" + target.getId().toString() + ") time: " + target.getDate().toString() + " offset " + cal.getTime().toString() + " now " + now.toString();
+	   		//log = "RuleMatchToLock for Match " + target.getDisplayName() + " (" + target.getId().toString() + ") time: " + target.getDate().toString() + " offset " + cal.getTime().toString() + " now " + now.toString();
 
 			if (now.after(cal.getTime()) && (target.getLocked() == null || !target.getLocked())) {
 				lock = true;
-				log += "**LOCK NEEDED**";
-				Logger.getLogger(RuleMatchToFetch.class.getName()).log(Level.INFO,"Ready to lock match " + target.getDisplayName() +"("+ target.getId() + ")");
+				log += "lock needed at " + now.toString();
+				Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Ready to lock match " + target.getDisplayName() +"("+ target.getId() + ")");
 			}
 			
 			System.out.println(log);

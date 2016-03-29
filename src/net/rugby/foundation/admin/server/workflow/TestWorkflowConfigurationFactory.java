@@ -3,9 +3,6 @@
  */
 package net.rugby.foundation.admin.server.workflow;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.WorkflowConfiguration;
 
@@ -22,10 +19,7 @@ public class TestWorkflowConfigurationFactory implements
 	@Override
 	public IWorkflowConfiguration get() {
 		IWorkflowConfiguration wfc = new WorkflowConfiguration();
-		List<Long> underwayCompetitions = new ArrayList<Long>();
-		underwayCompetitions.add(1L);	
-		underwayCompetitions.add(2L);
-		wfc.setUnderwayCompetitions(underwayCompetitions);
+
 		return wfc;
 	}
 

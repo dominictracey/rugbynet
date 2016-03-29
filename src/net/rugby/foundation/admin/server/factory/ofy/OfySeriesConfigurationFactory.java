@@ -172,11 +172,11 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 			if (retval.size() == 1) {
 				return retval.get(0);
 			} else {
-				// TODO is it valid to have more than one?
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Series Configuration Factory call to getByCompAndMode with compId " + compId + " and mode " + mode.name() + " has more than one result. This is invalid so we are returning null.");
 				return null;
 			}
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "put" + ex.getMessage(), ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getByCompAndMode" + ex.getMessage(), ex);
 			return null;
 		}
 	}

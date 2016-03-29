@@ -9,8 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.rugby.foundation.admin.server.AdminEmailer;
-import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats;
-import net.rugby.foundation.admin.server.workflow.weekend.results.ProcessRoundResult;
+import net.rugby.foundation.admin.server.workflow.weekend.results.R0ProcessRoundResult;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -18,9 +17,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IRound;
 
-import com.google.appengine.tools.cloudstorage.RetriesExhaustedException;
 import com.google.appengine.tools.pipeline.JobInfo;
-import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
@@ -66,7 +63,7 @@ public class CronWeekendFinalizeServlet extends HttpServlet {
 						JobInfo.State state = jobInfo.getJobState();
 						// check if it is complete
 						if (JobInfo.State.COMPLETED_SUCCESSFULLY == state){
-							ProcessRoundResult result = (ProcessRoundResult)jobInfo.getOutput();
+							R0ProcessRoundResult result = (R0ProcessRoundResult)jobInfo.getOutput();
 
 
 							//email the results to the admins
@@ -94,6 +91,7 @@ public class CronWeekendFinalizeServlet extends HttpServlet {
 					r.setWeekendProcessingPipelineId(null);
 					rf.put(r);
 
+					// Now we can run our regional lists...
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Successful shutdown of pipelineId: " + pipelineId);
 				}
 			}

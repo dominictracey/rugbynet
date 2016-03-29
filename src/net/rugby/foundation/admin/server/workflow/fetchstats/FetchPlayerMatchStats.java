@@ -3,12 +3,15 @@ package net.rugby.foundation.admin.server.workflow.fetchstats;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.admin.client.place.AdminTaskPlace;
+import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -34,6 +37,7 @@ public class FetchPlayerMatchStats extends Job5<Long, Long, Long, Home_or_Visito
 	protected transient Integer slot;
 	protected transient String url;
 	private transient IPlayerFactory pf;
+	private IConfigurationFactory ccf;
 	
 	
 	public FetchPlayerMatchStats() {
@@ -121,8 +125,24 @@ public class FetchPlayerMatchStats extends Job5<Long, Long, Long, Home_or_Visito
 			atf.put(task);
 			stats.getBlockingTaskIds().add(task.getId());
 			pmsf.put(stats);
-//			match.setWorkflowStatus(WorkflowStatus.BLOCKED);
-//			mgf.put(match);
+
+			// send an admin email
+			this.ccf = injector.getInstance(IConfigurationFactory.class);
+			AdminTaskPlace atp = new AdminTaskPlace();
+			atp.setFilter("ALL");
+			atp.setTaskId(task.getId().toString());
+			String taskUrl = ccf.get().getBaseToptenUrl() + "#AdminTaskPlace:" + atp.getToken();
+			
+			AdminEmailer emailer = new AdminEmailer();
+			emailer.setSubject("TASK: Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot);
+			StringBuilder message = new StringBuilder();
+			message.append("<h3>Workflow halted</h3>");
+			message.append("a href=\"" + taskUrl + " target=\"blank\">" + player.getDisplayName() + " in " + match.getDisplayName() + "<br/>");
+			message.append("a href=\"" + match.getForeignUrl() + " target=\"blank\">" + match.getDisplayName() + " on ESPN.<br/>");
+			
+			emailer.setMessage(message.toString());
+			emailer.send();
+			
 			return x;
 		}
 	}

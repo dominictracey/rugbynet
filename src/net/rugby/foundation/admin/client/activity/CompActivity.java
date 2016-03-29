@@ -86,11 +86,11 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	protected List<IRound> rounds = new ArrayList<IRound>();
 	private PlayerListView<IPlayerRating> plv;
 	private AdminCompPlace place;
-	private boolean waiting = false; // used to see if matchStats fetching is complete
-	private boolean ready = false;
+	//	private boolean waiting = false; // used to see if matchStats fetching is complete
+	//	private boolean ready = false;
 
 	private MenuItemDelegate menuItemDelegate = null;
-	
+
 	public CompActivity(AdminCompPlace place, ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
 		view = clientFactory.getCompView();
@@ -360,8 +360,8 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	 * @see net.rugby.foundation.admin.client.ui.EditTeam.Presenter#saveTeamInfo(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void saveTeamInfo(ITeamGroup teamGroup) {
-		clientFactory.getRpcService().saveTeam(teamGroup, new AsyncCallback<ITeamGroup>() {
+	public void saveTeamInfo(ITeamGroup teamGroup, boolean saveMatches) {
+		clientFactory.getRpcService().saveTeam(teamGroup, saveMatches, new AsyncCallback<ITeamGroup>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -372,7 +372,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			@Override
 			public void onSuccess(ITeamGroup result) {
 
-				view.showStatus("team info saved");
+				Notify.notify(result.getDisplayName() + " saved. When you are done saving teams, remember to flush the memcache before doing other things.");
 
 			}
 		});			
@@ -658,16 +658,13 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			@Override
 			public void onSuccess(final String result) {
 				em.setPipelineId(result);
-				waiting = true;
-				ready = true;
-
 				Timer t = new Timer() {
 					@Override
 					public void run() {
 						checkPipelineStatus(result);
 					}
 				};
-				
+
 				t.schedule(5000);
 
 			}
@@ -677,7 +674,6 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						waiting = false;
 						Window.alert("Problem checking pipeline status for " + id);					
 					}
 
@@ -700,11 +696,11 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 							}
 
 						});
-						
+
 						// do we have to check again?
 						if (result.equals("COMPLETED")) {
 							em.setPipelineId(null);
-							
+
 						} else {
 							// call ourselves recursively until we finish
 							Timer t = new Timer() {
@@ -713,7 +709,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 									checkPipelineStatus(id);
 								}
 							};
-							
+
 							t.schedule(5000);
 						}
 
@@ -748,15 +744,15 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	public void showEditPlayer(IPlayerRating player) {
 		if (ensureSingleMatch(player)) {
 			clientFactory.getPlayerPopupView().setPresenter(this);
-			
+
 			clientFactory.getRpcService().getPlayer(player.getMatchStats().get(0).getPlayerId(), new AsyncCallback<IPlayer>() {
-	
+
 				@Override
 				public void onFailure(Throwable caught) {
-	
+
 					Window.alert("Player info not fetched for editing: " + caught.getMessage());
 				}
-	
+
 				@Override
 				public void onSuccess(IPlayer result) {
 					if (result.getBlockingTaskIds() == null || result.getBlockingTaskIds().isEmpty()) {
@@ -1065,7 +1061,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			}
 		});
 	}
-	
+
 	@Override
 	public void onFlushRawScoresButtonClicked(ScrumMatchRatingEngineSchema20130713 schema) {
 		clientFactory.getMatchRatingEngineSchemaPopupView().setPresenter((MatchRatingEngineSchemaPopupViewPresenter<ScrumMatchRatingEngineSchema20130713>) this);
@@ -1345,10 +1341,10 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 				public void onFailure(Throwable caught) {
 					Window.alert("Failed to fetch team match stats to edit");
 				}
-	
+
 				@Override
 				public void onSuccess(ITeamMatchStats result) {
-	
+
 					clientFactory.getTeamMatchStatsPopupView().setTarget(result);
 					((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
 				}
@@ -1367,25 +1363,36 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			return true;
 	}
 
-
-
-	// @REX doesn't save Round info, only standings
 	@Override
-	public void saveRound(final IRound r, List<IStanding> ss) {
-		clientFactory.getRpcService().saveStandings(r.getId(), ss, new AsyncCallback<List<IStanding>>() {
+	public void saveRound(final IRound r, final List<IStanding> ss) {
+		clientFactory.getRpcService().saveRound(r, new AsyncCallback<IRound>() { 
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Troubles saving standings: " + caught.getLocalizedMessage());
+				// TODO Auto-generated method stub
 
 			}
 
 			@Override
-			public void onSuccess(List<IStanding> result) {
-				er.ShowRound(r,result);		
-			}
+			public void onSuccess(IRound result) {
+				clientFactory.getRpcService().saveStandings(r.getId(), ss, new AsyncCallback<List<IStanding>>() {
 
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert("Troubles saving standings: " + caught.getLocalizedMessage());
+
+					}
+
+					@Override
+					public void onSuccess(List<IStanding> result) {
+						er.ShowRound(r,result);	
+					}
+
+				});
+
+			}
 		});
+
 
 	}
 
@@ -1445,14 +1452,14 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	@Override
 	public void cleanUp() {
 		getMenuItemDelegate().cleanUp();
-		
+
 	}
-	
+
 	private MenuItemDelegate getMenuItemDelegate() {
 		if (menuItemDelegate == null) {
 			menuItemDelegate = new MenuItemDelegate(clientFactory);
 		}
-		
+
 		return menuItemDelegate;
 	}
 
@@ -1481,7 +1488,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			}
 
 		});
-		
+
 	}
 
 
@@ -1491,7 +1498,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 		clientFactory.getAddRoundPopup().setComp(comp);
 		clientFactory.getAddRoundPopup().setPresenter((AddRoundPopupPresenter) this);
 		clientFactory.getAddRoundPopup().center();
-		
+
 	}
 
 
@@ -1503,7 +1510,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Problems adding round");
-				
+
 			}
 
 			@Override
@@ -1515,9 +1522,9 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 					Window.alert("No good. Check the logs or try again. Maybe that round already exists? Try reloading maybe?");
 				}
 			}
-			
+
 		});
-		
+
 	}
 
 
@@ -1525,7 +1532,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	@Override
 	public void cancelAddRound() {
 		clientFactory.getAddRoundPopup().hide();
-		
+
 	}
 
 
@@ -1545,7 +1552,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 				if (result != null)
 				{
 					Window.alert("Match	Added");	
-//					em.ShowMatch(result);
+					//					em.ShowMatch(result);
 					clientFactory.getAddMatchPopup().hide();
 				} else {
 					Window.alert("Match not added. See server log for details");
@@ -1560,11 +1567,11 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	@Override
 	public void cancelAddMatch() {
 		clientFactory.getAddMatchPopup().hide();
-		
+
 	}
 
 
 
 
-	
+
 }

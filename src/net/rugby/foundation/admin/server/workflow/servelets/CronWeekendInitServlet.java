@@ -8,14 +8,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joda.time.DateTime;
-
-import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats;
-import net.rugby.foundation.admin.server.workflow.weekend.ProcessRound;
+import net.rugby.foundation.admin.server.workflow.weekend.RJ0ProcessRound;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IRound;
+
+import org.joda.time.DateTime;
 
 import com.google.appengine.tools.cloudstorage.RetriesExhaustedException;
 import com.google.appengine.tools.pipeline.JobSetting;
@@ -58,9 +57,9 @@ public class CronWeekendInitServlet extends HttpServlet {
 				String pipelineId = "";
 				try {
 					JobSetting backOffFactor = new JobSetting.BackoffFactor(1);
-					JobSetting backOffSeconds = new JobSetting.BackoffSeconds(30*60); // retry every 30 minutes
-					JobSetting maxAttempts = new JobSetting.MaxAttempts(200); // about 4 days
-					pipelineId = service.startNewPipeline(new ProcessRound(), r.getId(), backOffFactor, backOffSeconds, maxAttempts);
+					JobSetting backOffSeconds = new JobSetting.BackoffSeconds(30); // give the backend a bit to come online
+					JobSetting maxAttempts = new JobSetting.MaxAttempts(3); // If it doesn't go, don't keep messing about
+					pipelineId = service.startNewPipeline(new RJ0ProcessRound(), r.getId(), backOffFactor, backOffSeconds, maxAttempts);
 				} catch (RetriesExhaustedException ree) {
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Round processing failure - retry maximum reached", ree);
 				}

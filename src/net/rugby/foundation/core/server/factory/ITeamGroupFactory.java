@@ -17,4 +17,13 @@ public interface ITeamGroupFactory extends ICachingFactory<ITeamGroup> {
 
 	ITeamGroup getTeamBySnakeCaseDisplayName(String snakeCaseName);
 
+	/**
+	 * Sometimes scrum.com has weird names: there is a character encoding problem with Stade Francais, for instance. 
+	 * Also the new Super Rugby teams are Argentina Super Rugby Team, etc.
+	 * 
+	 * @param teamName as it appears on espn. 
+	 * @return our version of the IMatchGroup
+	 */
+	ITeamGroup getTeamByScrumName(String teamName);
+
 }

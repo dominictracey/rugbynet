@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
@@ -18,9 +16,11 @@ import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
+import net.rugby.foundation.model.shared.IRound;
+
+import org.joda.time.DateTime;
 
 import com.google.appengine.tools.pipeline.Job3;
 import com.google.appengine.tools.pipeline.Value;
@@ -54,6 +54,7 @@ public class MJ5FetchScore extends Job3<MS6Final, Long, String, ResultWithLog> i
 
 			// just let failure cascade to the end so it can finish
 			if (prior == null || prior.success == false) {
+				retval.log.add(this.getClass().getSimpleName() + " ...FAIL");
 				retval.success = false;
 				return immediate(retval);
 			}
@@ -76,7 +77,7 @@ public class MJ5FetchScore extends Job3<MS6Final, Long, String, ResultWithLog> i
 
 			// first check if we are already further along than this
 			if (match.getWorkflowStatus().ordinal() > fromState.ordinal()) {
-				retval.log.add("OK");
+				retval.log.add(this.getClass().getSimpleName() + " ...OK");
 				retval.success = true;
 				return immediate(retval);
 			}
@@ -92,11 +93,11 @@ public class MJ5FetchScore extends Job3<MS6Final, Long, String, ResultWithLog> i
 				match.setWorkflowStatus(toState);
 				mf.put(match);
 				retval.log.add(rule.getLog());
-				retval.log.add(match.getDisplayName() + " ended at " + DateTime.now().toString());
+				retval.log.add(match.getDisplayName() + " final score " + match.getSimpleScoreMatchResult().getHomeScore() + "-" + match.getSimpleScoreMatchResult().getVisitScore() + " collected at " + DateTime.now().toString());
 				retval.success = true;
 				return immediate(retval);
 			} else {
-				throw new RetryRequestException(match.getDisplayName() + " still underway at " + DateTime.now().toString());
+				throw new RetryRequestException("Still no score available for " + match.getDisplayName() + " at " + DateTime.now().toString());
 			}
 
 		} catch (Exception ex) {			

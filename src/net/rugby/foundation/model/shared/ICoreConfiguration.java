@@ -38,6 +38,10 @@ public interface ICoreConfiguration extends IHasId {
 	boolean deleteComp(Long compId);
 	Environment getEnvironment();
 	void setEnvironment(Environment environment);
+	/**
+	 * 
+	 * @return protocol://fqdn/ (e.g. http://www.rugby.net/)
+	 */
 	String getBaseToptenUrl();
 	String getFacebookAppid();
 	void removeCompUnderway(Long compId);

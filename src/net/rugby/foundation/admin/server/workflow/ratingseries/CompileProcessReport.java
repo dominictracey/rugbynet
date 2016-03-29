@@ -117,16 +117,19 @@ public class CompileProcessReport extends Job4<MS8Rated, List<ProcessRatingQuery
 
 			MS8Rated wrapper = new MS8Rated();
 			wrapper.processSubTreeResults = retval;
+			wrapper.log.addAll(retval.log);
 			wrapper.success = false;
 
 			// update the generating match's status
-			if (matchId != null) {
+			if (matchId != null && matchId != 0L) {
 				IMatchGroup m = mf.get(matchId);
 				if (m != null && m.getGuid() != null && !m.getGuid().isEmpty()) {
 					wrapper.success = true;
 					m.setWorkflowStatus(WorkflowStatus.RATED);
 					mf.put(m);
 				}
+			} else {
+				wrapper.success = retval.success; // fucking stupid and confusing
 			}
 
 			return immediate(wrapper);
