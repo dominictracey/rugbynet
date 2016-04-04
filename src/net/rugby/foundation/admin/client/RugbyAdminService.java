@@ -160,5 +160,6 @@ public interface RugbyAdminService extends RemoteService {
 	Integer archive(List<Long> blurbIds);
 	Integer facebook(List<Long> blurbIds);
 	List<Long> twitter(List<Long> blurbIds);
+	List<String> bulkUploadEmails(List<String> emailsValid);
 	
 }
