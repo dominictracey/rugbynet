@@ -3,12 +3,6 @@ package net.rugby.foundation.admin.client.ui.seriesconfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.InlineRadio;
-import org.gwtbootstrap3.client.ui.Label;
-import org.gwtbootstrap3.client.ui.ListBox;
-import org.gwtbootstrap3.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
@@ -18,6 +12,14 @@ import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
+
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.InlineRadio;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.TextBox;
+
+import com.google.gwt.user.client.ui.Widget;
 
 public class SeriesConfigPopupViewFieldDefinitions<T> {
 	private static List<FieldDefinition<ISeriesConfiguration>> fieldDefinitions =
@@ -186,7 +188,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				public Widget render(ISeriesConfiguration c) {
 
 					int i = 0;
-
+					clear();
 					while (i < w.getItemCount()) {
 						if (c.getCountryIds().contains(Long.valueOf(w.getValue(i)))) {
 							w.setItemSelected(i, true);
@@ -198,7 +200,7 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 
 				@Override
 				public void clear() {
-					for (int i=0; i<w.getVisibleItemCount(); ++i) {
+					for (int i=0; i<w.getItemCount(); ++i) {
 						w.setItemSelected(i, false);
 					}
 				}

@@ -1,7 +1,5 @@
 package net.rugby.foundation.admin.server.model;
 
-import org.joda.time.DateTime;
-
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingSeries;
@@ -21,10 +19,10 @@ public interface IRatingSeriesManager {
 	 * @param rs
 	 * @return pipeline handle of created workflow
 	 */
-//	public abstract String process(IRatingSeries rs);
 
-	Boolean readyForNewGroup(ISeriesConfiguration config);
-
-	public abstract IRatingGroup doRatingGroup(IRatingSeries series, UniversalRound time);
+	/**
+	 * @return a properly configured RatingGroup placed in the RatingSeries specified by the SeriesConfiguration for the given time
+	 */
+	public abstract IRatingGroup getRatingGroup(ISeriesConfiguration sc, UniversalRound time);
 
 }

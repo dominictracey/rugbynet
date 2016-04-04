@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.BaseRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
@@ -17,7 +18,9 @@ import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.RatingGroup;
+import net.rugby.foundation.model.shared.Round;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 public class OfyRatingGroupFactory extends BaseRatingGroupFactory implements IRatingGroupFactory, Serializable {
@@ -89,5 +92,26 @@ public class OfyRatingGroupFactory extends BaseRatingGroupFactory implements IRa
 		return new RatingGroup();
 	}
 
+	@Override
+	public IRatingGroup getForUR(Long ratingSeriesId, int universalRoundOrdinal) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+
+			// Find the round
+			Query<RatingGroup> qr = ofy.query(RatingGroup.class).filter("ratingSeriesId", ratingSeriesId).filter("universalRoundOrdinal", universalRoundOrdinal);
+
+			if (qr.count() == 0) {
+				return null;
+			} else if (qr.count() > 1) {
+				throw new Exception("More than one ratingGroup matches the parameters ratingSeriesId=" + ratingSeriesId + " and universalRoundOrdinal " + universalRoundOrdinal + ". This is a Bad Thing.");
+			} else {
+				return get(qr.get().getId());  // build the ratingGroup
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+
+	}
 
 }

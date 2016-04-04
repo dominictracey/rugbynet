@@ -3,34 +3,7 @@
 	<inherits name="com.google.gwt.http.HTTP"/>
 	<inherits name="net.rugby.foundation.model.Model"/>
 
-<!-- 	<inherits name="org.gwtbootstrap3.extras.respond.Respond"/> -->
 	<inherits name="org.gwtbootstrap3.GwtBootstrap3NoTheme"/>
-
-<!-- 		<inherits name="org.gwtbootstrap3.GwtBootstrap3"/> -->
-
-<!--     <public path='theme'> -->
-<!--         <include name='/core/theme/css/*.css'/> -->
-<!--         <include name='/core/theme/js/*.js'/> -->
-<!--     </public> -->
-
-<!--     <stylesheet src='/core/theme/css/bootstrap-overrides.css'/> -->
-<!--     <stylesheet src='/core/theme/css/theme/default.css'/> -->
-    
-    <!-- bootstrap -->
-<!-- <stylesheet src='/core/theme/css/bootstrap.css'/> -->
-<!-- <stylesheet src='/core/theme/css/bootstrap-overrides.css'/> -->
-
-<!-- theme -->
-<!-- <stylesheet src='/core/theme/css/theme/default.css' /> -->
-
-<!-- libraries -->
-<!-- <stylesheet src='/core/theme/css/font-awesome.css' /> -->
-<!-- <stylesheet src='/core/theme/css/elements/dashboard.css' /> -->
-<!-- <stylesheet src='/core/theme/css/elements/notify.css' /> -->
-<!-- <stylesheet src='/core/theme/css/elements/bootstrap_calendar.css' /> -->
-<!-- <stylesheet src='/core/theme/css/elements/pizza.css' /> -->
-
-<!--     <script src='/core/theme/js/theme.js'/> -->
     
 	<entry-point class="net.rugby.foundation.core.client.Core"/>
 	<source path='client'/>

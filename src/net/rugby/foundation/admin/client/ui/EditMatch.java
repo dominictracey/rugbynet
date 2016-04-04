@@ -173,6 +173,8 @@ public class EditMatch extends Composite {
 		
 		if (match.getForeignId() != null) {
 			scrumId.setText(match.getForeignId().toString());
+		} else {
+			scrumId.setText("");
 		}
 
 		

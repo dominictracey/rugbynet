@@ -6,15 +6,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
-import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.BaseTeamFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Group.GroupType;
-import net.rugby.foundation.model.shared.DataStoreFactory;
-import net.rugby.foundation.model.shared.Group;
 import net.rugby.foundation.model.shared.IGroup;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
@@ -320,6 +314,12 @@ public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactor
 	@Override
 	public ITeamGroup getTeamBySnakeCaseDisplayName(String snakeCaseName) {
 		// TODO Write test cases here
+		return null;
+	}
+
+	@Override
+	public ITeamGroup getTeamByScrumName(String teamName) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

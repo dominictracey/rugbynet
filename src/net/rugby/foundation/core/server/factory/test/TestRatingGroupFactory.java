@@ -78,4 +78,10 @@ public class TestRatingGroupFactory extends BaseRatingGroupFactory implements IR
 		return true;
 	}
 
+	@Override
+	public IRatingGroup getForUR(Long ratingSeriesId, int universalRoundOrdinal) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

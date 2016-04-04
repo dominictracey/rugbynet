@@ -43,9 +43,9 @@ public class AdminEmailer {
 //	                         new InternetAddress("info@rugby.net", "The Rugby Net"));
 			msg.setFrom(new InternetAddress("dominic.tracey@gmail.com", "rugby.net "));
 			msg.addRecipient(Message.RecipientType.TO,
-					new InternetAddress("dominic.tracey@gmail.com", "Dominic Tracey"));
-			msg.addRecipient(Message.RecipientType.TO,
-					new InternetAddress("tom.lovering@gmail.com", "Tom Lovering"));
+					new InternetAddress("dominic.tracey@rugby.net", "Dominic Tracey"));
+//			msg.addRecipient(Message.RecipientType.TO,
+//					new InternetAddress("tom.lovering@gmail.com", "Tom Lovering"));
 			msg.addRecipient(Message.RecipientType.TO,
 					new InternetAddress("caleb.tracey@gmail.com", "Caleb Tracey"));
 	        msg.addRecipient(Message.RecipientType.TO,

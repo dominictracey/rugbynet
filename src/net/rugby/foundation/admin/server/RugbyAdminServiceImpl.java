@@ -1,12 +1,13 @@
 package net.rugby.foundation.admin.server;
 
+import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -42,8 +43,8 @@ import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.util.DigestEmailer;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
-import net.rugby.foundation.admin.server.workflow.fetchstats.FetchTeamMatchStats;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchTeamMatchStats;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
@@ -81,15 +82,10 @@ import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.game1.server.factory.IEntryFactory;
 import net.rugby.foundation.game1.server.factory.IMatchEntryFactory;
 import net.rugby.foundation.game1.server.factory.IRoundEntryFactory;
-import net.rugby.foundation.game1.shared.IEntry;
-import net.rugby.foundation.game1.shared.IMatchEntry;
-import net.rugby.foundation.game1.shared.IRoundEntry;
-import net.rugby.foundation.game1.shared.MatchEntry;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
 import net.rugby.foundation.model.shared.Country;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IAppUser;
-import net.rugby.foundation.model.shared.IAppUser.EmailStatus;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
@@ -100,13 +96,13 @@ import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IMatchResult.ResultType;
-import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IServerPlace;
@@ -116,10 +112,10 @@ import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.PlayerRating;
+import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
-import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
@@ -137,12 +133,9 @@ import com.google.appengine.tools.pipeline.NoSuchObjectException;
 import com.google.appengine.tools.pipeline.OrphanedObjectException;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import static com.google.appengine.api.taskqueue.TaskOptions.Builder.*;
 
 
 @Singleton
@@ -652,10 +645,20 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	 * @see net.rugby.foundation.admin.client.RugbyAdminService#saveTeam(net.rugby.foundation.model.shared.TeamGroup)
 	 */
 	@Override
-	public ITeamGroup saveTeam(ITeamGroup teamGroup) {
+	public ITeamGroup saveTeam(ITeamGroup teamGroup, boolean saveMatches) {
 		try {
 			if (checkAdmin()) {
 				tf.put(teamGroup);
+				
+				if (saveMatches) {
+					// The displayName of the team has been changed. Loop through all the future matches we have scheduled for this team and update its displayName.
+					List<IMatchGroup> matches = mf.getFutureMatchesForTeam(teamGroup.getId());
+					
+					for (IMatchGroup m : matches) {
+						m.setDisplayName();
+						mf.put(m);
+					}
+				}
 				return teamGroup;
 			} else {
 				return null;
@@ -765,60 +768,60 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 				// for every entry, if for the first round of the competition, they don't have a picklist,
 				// create one with picks for all the winning teams.
-				List<Long> compIds = wfcf.get().getUnderwayCompetitions();
-				for (Long compId: compIds) {
-					ICompetition comp = cf.get(compId);
-					IRound r = comp.getPrevRound();
-					if (r != null) {
-						ef.setRoundAndComp(null, comp);
-						List<IEntry> entries = ef.getEntries();
-						for (IEntry e: entries) {
-							IRoundEntry re = e.getRoundEntries().get(r.getId());
-							if (re == null) {  // @REX shouldn't the factory or entity do this?!
-								re = ref.getNew();
-
-								// last match of the round is the tiebreaker
-								re.setTieBreakerMatchId(r.getMatches().get(r.getMatches().size()-1).getId()); 
-
-								re.setRoundId(r.getId());
-
-								e.getRoundEntries().put(r.getId(),re);	
-							}
-							if (re != null) {
-								Map<Long,IMatchEntry> pickMap = re.getMatchPickMap();
-
-								if (pickMap == null || pickMap.isEmpty()) {
-									// need to fix
-									e.getRoundEntries().get(r.getId()).setMatchPickMap(new HashMap<Long,IMatchEntry>());
-
-									for (IMatchGroup m: r.getMatches()) {
-										if (!m.getLocked()) {
-											IMatchEntry me = new MatchEntry();
-											me.setMatchId(m.getId());
-
-											if (m.getStatus() == Status.FINAL_HOME_WIN) {
-												me.setTeamPicked(m.getHomeTeam());
-												me.setTeamPickedId(m.getHomeTeamId());
-											} else {
-												me.setTeamPicked(m.getVisitingTeam());
-												me.setTeamPickedId(m.getVisitingTeamId());
-											}
-
-											me = mef.put(me);
-											e.getRoundEntries().get(r.getId()).getMatchPickMap().put(m.getId(), me);
-
-										} else {
-											changes.add("Couldn't add round 1 pick list to entry " + e.getName() + " -- match " + m.getDisplayName() + " (" + m.getId()+ ") is locked.");
-										}
-									}
-
-									ef.put(e);
-									changes.add("Added round 1 pick list to entry " + e.getName());
-								}
-							}
-						}
-					}
-				}
+//				List<Long> compIds = wfcf.get().getUnderwayCompetitions();
+//				for (Long compId: compIds) {
+//					ICompetition comp = cf.get(compId);
+//					IRound r = comp.getPrevRound();
+//					if (r != null) {
+//						ef.setRoundAndComp(null, comp);
+//						List<IEntry> entries = ef.getEntries();
+//						for (IEntry e: entries) {
+//							IRoundEntry re = e.getRoundEntries().get(r.getId());
+//							if (re == null) {  // @REX shouldn't the factory or entity do this?!
+//								re = ref.getNew();
+//
+//								// last match of the round is the tiebreaker
+//								re.setTieBreakerMatchId(r.getMatches().get(r.getMatches().size()-1).getId()); 
+//
+//								re.setRoundId(r.getId());
+//
+//								e.getRoundEntries().put(r.getId(),re);	
+//							}
+//							if (re != null) {
+//								Map<Long,IMatchEntry> pickMap = re.getMatchPickMap();
+//
+//								if (pickMap == null || pickMap.isEmpty()) {
+//									// need to fix
+//									e.getRoundEntries().get(r.getId()).setMatchPickMap(new HashMap<Long,IMatchEntry>());
+//
+//									for (IMatchGroup m: r.getMatches()) {
+//										if (!m.getLocked()) {
+//											IMatchEntry me = new MatchEntry();
+//											me.setMatchId(m.getId());
+//
+//											if (m.getStatus() == Status.FINAL_HOME_WIN) {
+//												me.setTeamPicked(m.getHomeTeam());
+//												me.setTeamPickedId(m.getHomeTeamId());
+//											} else {
+//												me.setTeamPicked(m.getVisitingTeam());
+//												me.setTeamPickedId(m.getVisitingTeamId());
+//											}
+//
+//											me = mef.put(me);
+//											e.getRoundEntries().get(r.getId()).getMatchPickMap().put(m.getId(), me);
+//
+//										} else {
+//											changes.add("Couldn't add round 1 pick list to entry " + e.getName() + " -- match " + m.getDisplayName() + " (" + m.getId()+ ") is locked.");
+//										}
+//									}
+//
+//									ef.put(e);
+//									changes.add("Added round 1 pick list to entry " + e.getName());
+//								}
+//							}
+//						}
+//					}
+//				}
 
 				return changes;
 			} else {
@@ -1015,7 +1018,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					if (task.getPromise() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();
 						try {
-							service.submitPromisedValue(task.getPromise(), player);
+							service.submitPromisedValue(task.getPromise(), player.getId());
 						} catch (NoSuchObjectException ex) {
 							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 						} catch (OrphanedObjectException ex) {
@@ -1024,6 +1027,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					}
 
 					atf.complete(task);
+					player.getBlockingTaskIds().remove(task.getId());
 					player.getTaskIds().remove(task.getId());
 					pf.put(player);
 				}
@@ -1294,7 +1298,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					if (task.getPromise() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();
 						try {
-							service.submitPromisedValue(task.getPromise(), stats);
+							service.submitPromisedValue(task.getPromise(), stats.getId());
 						} catch (NoSuchObjectException e) {
 							e.printStackTrace();
 						} catch (OrphanedObjectException e) {
@@ -1522,7 +1526,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				String pipelineId = "";
 
 				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-				pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), team, match, hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
+				pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), match.getId(), hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
 				while (true) {
@@ -1562,7 +1566,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					if (task.getPromise() != null) {
 						PipelineService service = PipelineServiceFactory.newPipelineService();
 						try {
-							service.submitPromisedValue(task.getPromise(), tms);
+							service.submitPromisedValue(task.getPromise(), tms.getId());
 						} catch (NoSuchObjectException e) {
 							e.printStackTrace();
 						} catch (OrphanedObjectException e) {
@@ -2770,6 +2774,22 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
+
+	public IRound saveRound(IRound r) {
+		try {
+			if (checkAdmin()) {
+			
+				rf.put(r);
+				
+				return r;
+			}
+		 	return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+		
 	public List<String> bulkUploadEmails(List<String> emailsValid) {
 		try {
 			if (checkAdmin()) {

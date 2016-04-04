@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.tools.pipeline.Job4;
+import com.google.appengine.tools.pipeline.Job3;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
@@ -16,12 +16,14 @@ import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
+import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
-public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatchGroup, Home_or_Visitor, String> {
+public class FetchTeamMatchStats extends Job3<Long, Long, Home_or_Visitor, String> {
 
 	/**
 	 * 
@@ -40,8 +42,8 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 
 	private transient ITeamGroup team;
 	private transient IMatchGroup match;
-	private transient Home_or_Visitor home_or_visitor;
-	private transient String url;
+	private transient IMatchGroupFactory mgf;
+
 	
 	public FetchTeamMatchStats() {
 
@@ -51,16 +53,30 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 
 
 	@Override
-	public Value<ITeamMatchStats> run(ITeamGroup team, IMatchGroup match, Home_or_Visitor home_or_visitor, String url) {
+	public Value<Long> run(Long matchId, Home_or_Visitor home_or_visitor, String url) throws Exception {
 
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 		Injector injector = BPMServletContextListener.getInjectorForNonServlets();
 
 		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
 		this.atf = injector.getInstance(IAdminTaskFactory.class);
-
+		this.mgf = injector.getInstance(IMatchGroupFactory.class);
+		
 		boolean found = false;
-
+		boolean block = false; // some items we actually need to continue the workflow so an admin will have to come and resolve manually
+		
+		match = mgf.get(matchId);
+		
+		if (match == null) {
+			throw new Exception("Bad matchId: " + matchId);
+		} 
+		
+		if (home_or_visitor == Home_or_Visitor.HOME) {
+			team = match.getHomeTeam();
+		} else {
+			team = match.getVisitingTeam();
+		}
+		
 		IUrlCacher urlCache = new UrlCacher(url);
 		List<String> lines = urlCache.get();
 		String line;
@@ -73,8 +89,8 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 
 		try {
 			if (lines == null) {
-				errMess = "No lines read from foreign URL";
-				return bail(tms,team,match);
+				throw new Exception("No match stats available");
+				//return bail(tms,team,match);
 			}
 
 			Iterator<String> it = lines.iterator();
@@ -315,7 +331,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 						}
 					} else {
 						errMess += ("Failed to find Rucks won");
-						
+						block = true;
 					}
 
 					line = it.next();
@@ -334,7 +350,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 						}
 					} else {
 						errMess += ("Failed to find Mauls won");
-						
+						block = true;
 					}
 
 					trip = getTriplet(it);
@@ -395,7 +411,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 						}
 					} else {
 						errMess += ("Failed to find Scrums on own feed");
-						
+						block = true;
 					}
 
 					trip = getTriplet(it);
@@ -413,7 +429,7 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 						}
 					} else {
 						errMess += ("Failed to find Lineouts on own throw");
-						
+						block = true;
 					}
 
 					// Discipline
@@ -454,13 +470,13 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 			}	
 		} catch (Exception ex) {
 			errMess += ex.getLocalizedMessage();
-			return bail(tms,team,match);
+			return bail(tms,team,match, block);
 		}
 		if (found == true) {
 			tmsf.put(tms);
-			return immediate(tms);
+			return immediate(tms.getId());
 		} else {
-			return bail(tms,team,match);
+			return bail(tms,team,match,block);
 		}
 			
 	}
@@ -504,31 +520,26 @@ public class FetchTeamMatchStats extends Job4<ITeamMatchStats, ITeamGroup, IMatc
 		return triplet;
 	}
 
-	Value<ITeamMatchStats> bail(ITeamMatchStats tms, ITeamGroup team, IMatchGroup match) {
+	protected Value<Long> bail(ITeamMatchStats tms, ITeamGroup team, IMatchGroup match, boolean block) {
 		// save what we have so far
 		tmsf.put(tms);
 
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, errMess);
-		PromisedValue<ITeamMatchStats> x = newPromise(ITeamMatchStats.class);
+		PromisedValue<Long> x = newPromise(Long.class);
 		Home_or_Visitor hov = Home_or_Visitor.HOME;
 		if (!match.getHomeTeamId().equals(team.getId()))
 			hov = Home_or_Visitor.VISITOR;
 		IAdminTask task = atf.getNewEditTeamMatchStatsTask("Problem getting team match stats in match " + tms.getMatchId(), errMess, team, match, hov, tms, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
 		atf.put(task);
-		return x;
-	}
-	
-	public Value<ITeamMatchStats> handleFailure(Throwable e) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Exception thrown fetching team match stats: " + e.getLocalizedMessage());
-		//still didn't find, need human to get this going.
-		PromisedValue<ITeamMatchStats> x = newPromise(ITeamMatchStats.class);
-		String teamName = "unknown";
-		if (team != null) {
-			teamName = team.getDisplayName();
-		}
-		IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find match stats for " + teamName, "Nothing saved for player", null, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
-		atf.put(task);
-
+		
+//		if (match.getWorkflowStatus() != WorkflowStatus.BLOCKED && block) {
+//			match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+//			mgf.put(match);
+//		} else if (match.getWorkflowStatus() != WorkflowStatus.TASKS_PENDING) {
+//			match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
+//			mgf.put(match);
+//		}
+		
 		return x;
 	}
 

@@ -26,7 +26,6 @@ public interface ITeamGroup extends IGroup {
 	 * @return
 	 */
 	public abstract String getShortName();
-
 	public abstract void setShortName(String shortName);
 
 //	public abstract Long getId();
@@ -52,5 +51,18 @@ public interface ITeamGroup extends IGroup {
 	public abstract String getTwitterChannel();
 	public abstract String setTwitterChannel(String twitterChannel);
 	
+	/**
+	 * 
+	 * @return the name that matches what the old scrum uses, or the displayName if it's null
+	 */
+	public abstract String getScrumName();
+	public abstract void setScrumName(String scrumName);
+	
+	/**
+	 * 
+	 * @return the name that matches what the new look espn.co.uk uses, or the displayName if it's null
+	 */
+	public abstract String getEspnName();
+	public abstract void setEspnName(String espnName);
 	
 }

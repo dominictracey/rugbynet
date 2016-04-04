@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-<!-- <filter> -->
-<!-- <filter-name>appstats</filter-name> -->
-<!-- <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class> -->
-<!-- </filter> -->
-
-<!-- <filter-mapping> -->
-<!-- <filter-name>appstats</filter-name> -->
-<!-- <url-pattern>/*</url-pattern> -->
-<!-- </filter-mapping> -->
 
 <filter>
 	<filter-name>guiceFilter</filter-name>
@@ -23,29 +14,6 @@
 	<listener-class>net.rugby.foundation.core.server.BPMServletContextListener</listener-class>
 </listener>
 
-<!-- <servlet> -->
-<!-- <servlet-name>playersServiceServlet</servlet-name> -->
-<!-- <servlet-class>net.rugby.foundation.server.PlayersServiceImpl</servlet-class> -->
-<!-- </servlet> -->
-
-<!-- Data API -->
-<servlet>
-	<servlet-name>RemoteApiServlet</servlet-name>
-<!-- 	<display-name>Remote API</display-name> -->
-	<servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
-	<load-on-startup>1</load-on-startup>
-</servlet>
-
-
-<!-- <servlet-mapping> -->
-<!-- <servlet-name>playersServiceServlet</servlet-name> -->
-<!-- <url-pattern>/PlayerListMVP/PlayersService</url-pattern> -->
-<!-- </servlet-mapping> -->
-
-<servlet-mapping>
-	<servlet-name>RemoteApiServlet</servlet-name>
-	<url-pattern>/remote_api</url-pattern>
-</servlet-mapping>
 
 <!-- pipeline -->
 <servlet>
@@ -57,16 +25,6 @@
 	<servlet-name>PipelineServlet</servlet-name>
 	<url-pattern>/_ah/pipeline/*</url-pattern>
 </servlet-mapping>
-
-<!-- <servlet> -->
-<!-- <servlet-name>appstats</servlet-name> -->
-<!-- <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class> -->
-<!-- </servlet> -->
-
-<!-- <servlet-mapping> -->
-<!-- <servlet-name>appstats</servlet-name> -->
-<!-- <url-pattern>/appstats/*</url-pattern> -->
-<!-- </servlet-mapping> -->
 
 <servlet>
     <servlet-name>SystemServiceServlet</servlet-name>
@@ -86,6 +44,7 @@
 	<welcome-file>index.jsp</welcome-file>
 </welcome-file-list>
  	
+<!-- SECURITY -->
 <security-constraint>
 	<web-resource-collection>
 		<url-pattern>/Admin.html</url-pattern>
@@ -94,17 +53,8 @@
 		<role-name>admin</role-name>
 	</auth-constraint>
 </security-constraint>
-<!--  -->
-<!-- <security-constraint> -->
-<!-- 	<web-resource-collection> -->
-<!-- 		<url-pattern>/topten.html</url-pattern> -->
-<!-- 	</web-resource-collection> -->
-<!-- 	<auth-constraint> -->
-<!-- 		<role-name>admin</role-name> -->
-<!-- 	</auth-constraint> -->
-<!-- </security-constraint> -->
 
-<!-- 
+
 <security-constraint>
 	<web-resource-collection>
 		<url-pattern>/appstats/*</url-pattern>
@@ -122,7 +72,34 @@
 		<role-name>admin</role-name>
 	</auth-constraint>
 </security-constraint>
- -->
+
+<security-constraint>
+	<web-resource-collection>
+		<url-pattern>/admin/*</url-pattern>
+	</web-resource-collection>
+	<auth-constraint>
+		<role-name>admin</role-name>
+	</auth-constraint>
+</security-constraint>
+ 
+ <security-constraint>
+	<web-resource-collection>
+		<url-pattern>/cron/*</url-pattern>
+	</web-resource-collection>
+	<auth-constraint>
+		<role-name>admin</role-name>
+	</auth-constraint>
+</security-constraint>
+
+ <security-constraint>
+	<web-resource-collection>
+		<url-pattern>/engine/*</url-pattern>
+	</web-resource-collection>
+	<auth-constraint>
+		<role-name>admin</role-name>
+	</auth-constraint>
+</security-constraint>
+
 <servlet>
   <servlet-name>bouncehandler</servlet-name>
   <servlet-class>net.rugby.foundation.core.server.mail.BounceHandlerServlet</servlet-class>
@@ -131,6 +108,7 @@
   <servlet-name>bouncehandler</servlet-name>
   <url-pattern>/_ah/bounce</url-pattern>
 </servlet-mapping>
+
 <security-constraint>
   <web-resource-collection>
     <web-resource-name>bounce</web-resource-name>
@@ -141,6 +119,15 @@
   </auth-constraint>
 </security-constraint>
 
+<security-constraint>
+  <web-resource-collection>
+    <web-resource-name>cleanUp</web-resource-name>
+    <url-pattern>/admin/cleanUp/*</url-pattern>
+  </web-resource-collection>
+  <auth-constraint>
+    <role-name>admin</role-name>
+  </auth-constraint>
+</security-constraint>
 
 
 <session-config>

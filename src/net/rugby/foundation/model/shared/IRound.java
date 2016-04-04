@@ -6,15 +6,13 @@ package net.rugby.foundation.model.shared;
 import java.util.ArrayList;
 import java.util.Date;
 
-import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
-
 /**
  * @author home
  *
  */
 public interface IRound extends IHasId {
 
-	public enum WorkflowStatus {PENDING, TASKS_PENDING, FETCHED} 
+	public enum WorkflowStatus {PENDING, FETCHED, RATED, COMPLETE, ERROR} 
 
 	public abstract Long getId();
 
@@ -66,5 +64,8 @@ public interface IRound extends IHasId {
 	int getUrOrdinal();
 
 	void setUrOrdinal(int universalRound);
+
+	public abstract void setWeekendProcessingPipelineId(String pipelineId);
+	public abstract String getWeekendProcessingPipelineId();
 
 }

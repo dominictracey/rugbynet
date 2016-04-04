@@ -53,7 +53,7 @@ public class RerunRatingOrchestration extends OrchestrationCore<IRatingQuery> {
 			String pipelineId = "";
 
 			try {
-				pipelineId = service.startNewPipeline(new ProcessRatingQuery(), rq, new JobSetting.MaxAttempts(3));
+				pipelineId = service.startNewPipeline(new ProcessRatingQuery(), rq.getId(), new JobSetting.MaxAttempts(3));
 			} catch (RetriesExhaustedException ree) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Giving up", ree);
 				return;

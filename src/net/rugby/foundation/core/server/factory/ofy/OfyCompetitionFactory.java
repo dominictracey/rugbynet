@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IClubhouseFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -29,7 +27,10 @@ import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.Round;
 import net.rugby.foundation.model.shared.UniversalRound;
+
+import org.joda.time.DateTime;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -283,6 +284,20 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 					}
 				}
 			}
+			
+			// the top 14 had some ghost rounds created (rounds in the DB with compId set, but they weren't in the comp.getRounds())
+			// the matchIds in these rounds seemed to not exist so just delete them.
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Round> rq = ofy.query(Round.class).filter("compId", comp.getId());
+			for (Round r: rq.list()) {
+				if (!comp.getRoundIds().contains(r.getId())) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Deleting bad round " + r.getName() + " with UROrd " + r.getUrOrdinal());
+					rf.delete(r);
+				}
+			}
+			
+			
+			
 			put(comp);
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Repaired comp by adding teamIds for comp " + comp.getLongName());
 
@@ -369,6 +384,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 					globalComp.setCompType(CompetitionType.GLOBAL);
 					globalComp.setAbbr("Global");
 					globalComp.setUnderway(true);
+					globalComp.setWeightingFactor(4F);
 					ofy.put(globalComp);
 				}
 			}
@@ -465,6 +481,29 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			return false;
 		}
 	}
+
+	@Override
+	public List<ICompetition> getVirtualComps() {
+
+		List<ICompetition> list = new ArrayList<ICompetition>();
+		Objectify ofy = DataStoreFactory.getOfy();
+		Query<Competition> cq = ofy.query(Competition.class).filter("compType", "GLOBAL").filter("foreignID", null);
+		for (Competition c : cq) {	
+			list.add(get(c.getId()));
+		}
+
+		cq = ofy.query(Competition.class).filter("compType", "EUROPE").filter("foreignID", null);
+		for (Competition c : cq) {	
+			list.add(get(c.getId()));
+		}
+		
+		cq = ofy.query(Competition.class).filter("compType", "SOUTHERN_HEMISPHERE").filter("foreignID", null);
+		for (Competition c : cq) {	
+			list.add(get(c.getId()));
+		}
+		
+		return list;
+	}	
 
 
 }

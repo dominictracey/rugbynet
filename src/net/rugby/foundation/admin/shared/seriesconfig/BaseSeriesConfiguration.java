@@ -8,8 +8,6 @@ import java.util.List;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import com.googlecode.objectify.annotation.Entity;
-
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -18,6 +16,8 @@ import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
+
+import com.googlecode.objectify.annotation.Entity;
 
 @Entity
 public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializable {
@@ -261,6 +261,10 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	@Override
 	public void setTargetRound(UniversalRound targetRound) {
 		this.targetRound = targetRound;
+		if (targetRound != null) {
+			this.targetRoundOrdinal = targetRound.ordinal;
+		}
+			
 	}
 	@Override
 	public int getTargetRoundOrdinal() {

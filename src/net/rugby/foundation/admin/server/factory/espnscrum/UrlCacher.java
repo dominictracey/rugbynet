@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
@@ -68,7 +69,10 @@ public class UrlCacher implements IUrlCacher {
 					out.close();
 					bos.close();
 
-					syncCache.put(url, yourBytes);
+					// have these expire every 5 minutes
+					Expiration expiration = Expiration.byDeltaSeconds(300);
+					
+					syncCache.put(url, yourBytes, expiration);
 				} else {
 
 					// send back the cached version

@@ -6,6 +6,9 @@ package net.rugby.foundation.admin.client.ui;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -29,7 +32,7 @@ public class EditTeam extends Composite {
 	}
 
 	public interface Presenter {
-		void saveTeamInfo(ITeamGroup teamGroup);
+		void saveTeamInfo(ITeamGroup teamGroup, boolean updateMatches);
 	} 
 	
 	public EditTeam() {
@@ -41,6 +44,10 @@ public class EditTeam extends Composite {
 	@UiField
 	TextBox displayName;
 	@UiField
+	TextBox espnName;
+	@UiField
+	TextBox scrumName;
+	@UiField
 	TextBox shortName;
 	@UiField
 	TextBox abbr;
@@ -51,6 +58,8 @@ public class EditTeam extends Composite {
 	@UiField
 	TextBox color;
 
+	private String _displayName = "";
+	private boolean updateMatches = false;
 	
 	ITeamGroup teamGroup = null;
 	private Presenter listener;
@@ -60,24 +69,51 @@ public class EditTeam extends Composite {
 		((TeamGroup)teamGroup).setDisplayName(displayName.getText());
 		teamGroup.setShortName(shortName.getText());
 		teamGroup.setAbbr(abbr.getText());
+		teamGroup.setEspnName(espnName.getText());
+		teamGroup.setScrumName(scrumName.getText());
 		teamGroup.setTwitter(twitter.getText());
 		teamGroup.setTwitterChannel(twitterChannel.getText());
 		teamGroup.setColor(color.getText());
-		listener.saveTeamInfo(teamGroup);
+		
+		setUpdateMatches(false);
+		if (!displayName.getText().equals(_displayName)) {
+			Bootbox.confirm("You've updated the team's displayName, would you like to update the displayName of all this team's future matches?", new ConfirmCallback() {
+			    @Override
+			    public void callback(boolean result) {
+			      setUpdateMatches(result);
+			      listener.saveTeamInfo(teamGroup, updateMatches);
+			    }
+			  });
+		} else {
+			listener.saveTeamInfo(teamGroup, updateMatches);
+		}
 	}
 
 	public void ShowTeam(ITeamGroup result) {
 		teamGroup = result;
-		displayName.setText(result.getDisplayName());
-		shortName.setText(result.getShortName());
-		abbr.setText(result.getAbbr());
-		twitter.setText(result.getTwitter());
-		twitterChannel.setText(result.getTwitterChannel());
-		color.setText(result.getColor());
+		if (result != null) {
+			_displayName = result.getDisplayName();
+			displayName.setText(result.getDisplayName());
+			shortName.setText(result.getShortName());
+			espnName.setText(result.getEspnName());
+			scrumName.setText(result.getScrumName());
+			abbr.setText(result.getAbbr());
+			twitter.setText(result.getTwitter());
+			twitterChannel.setText(result.getTwitterChannel());
+			color.setText(result.getColor());
+		}
 	}
 
 	public void SetPresenter(Presenter p) {
 		listener = p;
+	}
+
+	public boolean isUpdateMatches() {
+		return updateMatches;
+	}
+
+	public void setUpdateMatches(boolean updateMatches) {
+		this.updateMatches = updateMatches;
 	}
 
 }

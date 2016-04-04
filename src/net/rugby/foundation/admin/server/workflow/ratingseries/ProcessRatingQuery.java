@@ -30,31 +30,27 @@ import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
-import com.google.appengine.tools.pipeline.ImmediateValue;
 import com.google.appengine.tools.pipeline.Job1;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements Serializable {
+public class ProcessRatingQuery extends Job1<ProcessRatingQueryResult, Long> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
 	private static Injector injector = null;
 
-	private IRatingQueryFactory rqf;
-	private IMatchRatingEngineSchemaFactory mresf;
-	private IQueryRatingEngineFactory qref;
-	private IPlayerRatingFactory prf;
-	private ITopTenListFactory ttlf;
-	private IRoundFactory rf;
-	private IUniversalRoundFactory urf;
-	private IMatchGroupFactory mgf;
-	private ICompetitionFactory cf;
-
-
-
-	private ITeamGroupFactory tgf;
+	transient private IRatingQueryFactory rqf;
+	transient private IMatchRatingEngineSchemaFactory mresf;
+	transient private IQueryRatingEngineFactory qref;
+	transient private IPlayerRatingFactory prf;
+	transient private ITopTenListFactory ttlf;
+	transient private IRoundFactory rf;
+	transient private IUniversalRoundFactory urf;
+	transient private IMatchGroupFactory mgf;
+	transient private ICompetitionFactory cf;
+	transient private ITeamGroupFactory tgf;
 
 
 	public ProcessRatingQuery() {
@@ -62,7 +58,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	}
 
 	@Override
-	public Value<Boolean> run(IRatingQuery rq) {
+	public Value<ProcessRatingQueryResult> run(Long rqid) {
 
 		IMatchGroup match = null;  // to support delayed guid linking
 		IRatingQuery preQuery = null; // for tracking player movement
@@ -71,16 +67,16 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			injector = BPMServletContextListener.getInjectorForNonServlets();
 		}
 
+		this.prf = injector.getInstance(IPlayerRatingFactory.class);
 		this.rqf = injector.getInstance(IRatingQueryFactory.class);
 		this.mresf = injector.getInstance(IMatchRatingEngineSchemaFactory.class);
 		this.qref = injector.getInstance(IQueryRatingEngineFactory.class);
-		this.prf = injector.getInstance(IPlayerRatingFactory.class);
 		this.ttlf = injector.getInstance(ITopTenListFactory.class);
-		this.rf = injector.getInstance(IRoundFactory.class);
-		this.urf = injector.getInstance(IUniversalRoundFactory.class);
-		this.mgf = injector.getInstance(IMatchGroupFactory.class);
-		this.cf = injector.getInstance(ICompetitionFactory.class);
-		this.tgf = injector.getInstance(ITeamGroupFactory.class);
+		
+		IRatingQuery rq = rqf.get(rqid);
+		
+		ProcessRatingQueryResult retval = new ProcessRatingQueryResult();
+		retval.queryId = rq.getId();
 		
 		// first see if we are re-running, in which case clear out any ratings already in place
 		if (!rq.getStatus().equals(Status.NEW)) {
@@ -93,6 +89,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				}
 				rq.setTopTenListId(null);
 			}
+			
+			retval.log.add("Re-running rating query " + rq.getLabel());
 		}
 
 		rq.setStatus(Status.RUNNING);
@@ -109,31 +107,49 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		IQueryRatingEngine mre = qref.get(mres, rq);
 		assert (mre != null);
 
-		boolean ok = false;
+		retval.success = false;
 		boolean inForm = false;
 		boolean bestYear = false;
 		boolean impact = false;
 		
 		try {
-			ok = mre.setQuery(rq);
+			retval.success = mre.setQuery(rq);
 
-			if (ok) {
+			if (retval.success) {
 				mre.generate(mres,rq.getScaleStanding(),rq.getScaleComp(),rq.getScaleTime(), rq.getScaleMinutesPlayed(), false);
+				retval.log.add("Running rating query " + rq.getLabel());
+				//rq.Status is set by the engine
+				if (rq.getStatus() == Status.COMPLETE) {
+					retval.success = true;
+				} else {
+					retval.success = false; // might have ERROR
+				}
 			} else {
 				// stats aren't ready
 				rq.setStatus(Status.NEW);
 				rqf.put(rq);
+				retval.log.add("Attempt to run rating query " + rq.getLabel() + " before stats are ready.");
 			}
 		} catch (Exception ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem generating ratings", ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem generating ratings for " + rq.getLabel(), ex);
 			rq.setStatus(Status.ERROR);
 			rqf.put(rq);
-			ok = false;
+			retval.success = false;
+			retval.log.add("Running rating query " + rq.getLabel() + " had errors. See server logs.");
 		}
 		
-		if (ok) {
+		if (retval.success) {
+			
+			
+			
+			this.rf = injector.getInstance(IRoundFactory.class);
+			this.urf = injector.getInstance(IUniversalRoundFactory.class);
+			this.mgf = injector.getInstance(IMatchGroupFactory.class);
+			this.cf = injector.getInstance(ICompetitionFactory.class);
+			this.tgf = injector.getInstance(ITeamGroupFactory.class);
+			
 			// the engine will set the status to complete if successful
-			IRatingQuery procked = rqf.get(rq.getId());
+			//IRatingQuery procked = rqf.get(rq.getId());
 
 			// now create the TTL
 			String title = "Top Ten ";
@@ -159,6 +175,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 						title += context;
 					} else {
 						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match in setting title for RQ " + rq.getId() + " teamIds " + rq.getTeamIds().toString());
+						retval.success = false;
+						retval.log.add("Could not find match in setting title for RQ " + rq.getId() + " teamIds " + rq.getTeamIds().toString());
 					}
 				}
 			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_POSITION)) {
@@ -402,10 +420,12 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				mgf.put(match);
 			}
 			
-			return new ImmediateValue<Boolean>(procked.getStatus().equals(Status.COMPLETE));
+			retval.log.add("Created top ten list " + ttl.getTitle());
+			
+			
 		}
 		
-		return new ImmediateValue<Boolean>(false);
+		return immediate(retval);
 
 	}
 

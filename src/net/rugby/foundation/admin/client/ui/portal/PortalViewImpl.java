@@ -24,7 +24,7 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.CheckBoxButton;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -65,7 +65,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@UiField ListBox team;
 	@UiField ListBox schema;
 
-	@UiField CheckBoxButton timeSeries;
+	@UiField Button timeSeries;
 	@UiField Button query;
 	@UiField Button clear;
 	@UiField Button delete;
@@ -572,9 +572,9 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@UiHandler("timeSeries")
 	void onTimeSeriesClick(ClickEvent e) {
 
-		timeSeries.setActive(!timeSeries.isActive());
+		//timeSeries.setActive(!timeSeries.isActive());
 
-		setTimeSeries(timeSeries.isActive()); 
+		setTimeSeries(!timeSeries.isActive()); 
 	}
 
 	private void setTimeSeries(boolean timeSeriesOn) {
@@ -591,8 +591,6 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 			compLabel.setText("Competition");
 			roundLabel.setVisible(true);
 		}
-
-		listener.setTimeSeries(timeSeriesOn);
 	}
 
 

@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
-import net.rugby.foundation.admin.server.factory.IMatchRatingEngineSchemaFactory;
-import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -20,21 +16,22 @@ import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Position;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
+
+import org.joda.time.DateTime;
 
 import com.google.inject.Inject;
 
@@ -44,8 +41,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	private IRatingMatrixFactory rmf;
 	private IRatingQueryFactory rqf;
 	private IRatingGroupFactory rgf;
-	private IQueryRatingEngineFactory qref;
-	private IMatchRatingEngineSchemaFactory mresf;
+
 
 	//protected IRatingSeries rs;
 	protected ISeriesConfiguration sc;
@@ -56,14 +52,12 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 	@Inject
 	public RatingSeriesManager(ISeriesConfigurationFactory scf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IRatingQueryFactory rqf, 
-			IQueryRatingEngineFactory qref, IMatchRatingEngineSchemaFactory rsef, IUniversalRoundFactory urf, IRoundFactory rf, ICompetitionFactory cf) {
+			IUniversalRoundFactory urf, IRoundFactory rf, ICompetitionFactory cf) {
 		this.scf = scf;
 		this.rsf = rsf;
 		this.rgf = rgf;
 		this.rmf = rmf;
 		this.rqf = rqf;
-		this.qref = qref;
-		this.mresf = rsef;
 		this.urf = urf;
 		this.rf = rf;
 		this.cf = cf;
@@ -97,6 +91,11 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			rsf.put(series);
 			sc.setSeries(series);
 			sc.setSeriesId(series.getId());
+			if (sc.getTargetRound() == null) {
+				UniversalRound now = urf.getCurrent();
+				sc.setTargetRound(now);
+				sc.setTargetRoundOrdinal(now.ordinal);
+			}
 			scf.put(sc);
 
 			return series;
@@ -106,86 +105,92 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 	}
 
-	@Override
-	public Boolean readyForNewGroup(ISeriesConfiguration config) {	
-
-		this.sc = config;
-
-		// return true if
-		//	1) Series has been created
-		//	2) Series has a target UniversalRound specified
-		//	3) target UR is not in future
-		//	4) The comps configured for this series have all of the stats all fetched for the target UR
-		//  5) The group exists for the target round, but the matrices aren't right
-		assert config.getPipelineId() != null;
-		IRatingSeries series = config.getSeries();
-		if (series == null) {
-			return false;
-		}
-
-		int targetURordinal = config.getTargetRound().ordinal;
-
-		// does the group already exist?
-		for (IRatingGroup g : series.getRatingGroups()) {
-			if (g.getUniversalRoundOrdinal() == targetURordinal) {
-				// make sure we aren't adding a new matrix to the target group
-				if (g.getRatingMatrixIds().size() != series.getActiveCriteria().size())
-					return true;
-				else {
-					
-					// need to create any matrices?
-					List<Criteria> missing = new ArrayList<Criteria>();
-					missing.addAll(series.getActiveCriteria());
-					for (IRatingMatrix rm : g.getRatingMatrices()) {
-						missing.remove(rm.getCriteria());
-					}
-					if (missing.size() > 0)
-						return true;
-					
-					// need to remove any matrices?
-					List<Criteria> extra = new ArrayList<Criteria>();
-					for (IRatingMatrix rm : g.getRatingMatrices()) {
-						extra.add(rm.getCriteria());
-					}
-					
-					extra.removeAll(series.getActiveCriteria());
-					if (extra.size() > 0)
-						return true;
-
-					
-				}
-			}
-		}
-
-		int currentURordinal = urf.getCurrent().ordinal;
-
-		// can't do a future round
-		if (targetURordinal > currentURordinal) {
-			return false;
-		}
-
-		// can't do it if the necessary rounds are not in the FETCHED state
-		// it is ok if the comp doesn't have a round for the target UR.
-		// note this isn't true for when we are doing match review
-		if (!config.getMode().equals(RatingMode.BY_MATCH) && !config.getMode().equals(RatingMode.BY_POSITION) && !config.getMode().equals(RatingMode.BY_COMP) && !config.getMode().equals(RatingMode.BY_TEAM)) {
-			for (Long cid : config.getCompIds()) {
-				ICompetition c = cf.get(cid);
-				// get the round for the target UniversalRound
-				for (IRound r : c.getRounds()) {
-					if (urf.get(r).ordinal == targetURordinal) {
-						if (r.getWorkflowStatus() == null) {
-							throw new RuntimeException(r.getName() + " in comp " + c.getShortName() + " does not have a valid workflow status.");
-						}
-						if (!r.getWorkflowStatus().equals(IRound.WorkflowStatus.FETCHED)) {
-							return false;
-						}
-					}
-				}
-			}
-		}
-
-		return true;
-	}
+//	@Override
+//	public Boolean readyForGroupUpdateOrCreation(ISeriesConfiguration config) {	
+//
+//		this.sc = config;
+//
+//		// return true if
+//		//	1) Series has been created
+//		//	2) Series has a target UniversalRound specified
+//		//	3) target UR is not in future
+//		//	4) The comps configured for this series have all of the stats all fetched for the target UR
+//		//  5) The group exists for the target round, but the matrices aren't right
+//		assert config.getPipelineId() != null;
+//		IRatingSeries series = config.getSeries();
+//		if (series == null) {
+//			series = initialize(config);
+//		}
+//
+//		int targetURordinal = config.getTargetRound().ordinal;
+//
+//		IRatingGroup g = rgf.getForUR(series.getId(), targetURordinal);
+//		
+//		// does the group already exist?
+//		if (g != null) {
+//			// make sure we aren't adding a new matrix to the target group
+//			if (g.getRatingMatrixIds().size() != series.getActiveCriteria().size())
+//				return true;
+//			else {
+//				
+//				// need to create any matrices?
+//				List<Criteria> missing = new ArrayList<Criteria>();
+//				missing.addAll(series.getActiveCriteria());
+//				for (IRatingMatrix rm : g.getRatingMatrices()) {
+//					missing.remove(rm.getCriteria());
+//				}
+//				if (missing.size() > 0)
+//					return true;
+//				
+//				// need to remove any matrices?
+//				List<Criteria> extra = new ArrayList<Criteria>();
+//				for (IRatingMatrix rm : g.getRatingMatrices()) {
+//					extra.add(rm.getCriteria());
+//				}
+//				
+//				extra.removeAll(series.getActiveCriteria());
+//				if (extra.size() > 0)
+//					return true;
+//
+//				
+//			}
+//		} else {
+//			
+//		}
+//		
+//
+//		int currentURordinal = urf.getCurrent().ordinal;
+//
+//		// can't do a future round
+//		if (targetURordinal > currentURordinal) {
+//			return false;
+//		}
+//
+//		// can't do it if the necessary rounds are not in the FETCHED state
+//		// it is ok if the comp doesn't have a round for the target UR.
+//		// note this isn't true for when we are doing match review
+//		// THIS IS DEAD CODE AS OF 3/24/2016, ISN'T IT?
+//		if (!config.getMode().equals(RatingMode.BY_MATCH) && !config.getMode().equals(RatingMode.BY_POSITION) && !config.getMode().equals(RatingMode.BY_COMP) && !config.getMode().equals(RatingMode.BY_TEAM)) {
+//			for (Long cid : config.getCompIds()) {
+//				ICompetition c = cf.get(cid);
+//				// get the round for the target UniversalRound
+//				for (IRound r : c.getRounds()) {
+//					if (urf.get(r).ordinal == targetURordinal) {
+//						if (r.getWorkflowStatus() == null) {
+//							throw new RuntimeException(r.getName() + " in comp " + c.getShortName() + " does not have a valid workflow status.");
+//						}
+//						if (!r.getWorkflowStatus().equals(IRound.WorkflowStatus.FETCHED)) {
+//							return false;
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//
+//
+//		return true;
+//	}
 
 
 	/*
@@ -196,18 +201,22 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	 * (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.model.IRatingSeriesManager#doRatingGroup(net.rugby.foundation.model.shared.IRatingSeries, net.rugby.foundation.model.shared.UniversalRound)
 	 */
-	public IRatingGroup doRatingGroup(IRatingSeries rs, UniversalRound time ) {
+	@Override
+	public IRatingGroup getRatingGroup(ISeriesConfiguration sc, UniversalRound time ) {
 
-		IRatingGroup rg = null;
-		// graft new Matrix or create new Group?
-		for (IRatingGroup g : rs.getRatingGroups()) {
-			if (g.getUniversalRoundOrdinal() == time.ordinal) {
-				rg = g;
-				//assert g.getRatingMatrixIds().size() != rs.getActiveCriteria().size();
-				break;
-			}
+		this.sc = sc;
+		
+		if (sc.getSeries() == null) {
+			sc.setSeries(initialize(sc));
+			sc.setSeriesId(sc.getSeries().getId());
+			scf.put(sc);
 		}
-
+		
+		IRatingSeries rs = sc.getSeries();
+		
+		// graft new Matrix or create new Group?
+		IRatingGroup rg = rgf.getForUR(rs.getId(), time.ordinal);
+		
 		if (rg == null) {
 			rg = rgf.create();
 			rg.setRatingSeries(rs);
@@ -420,7 +429,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 				for (ITeamGroup team : hostComp.getTeams()) {
 					// remove TBC and TBD
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Team series, adding team " + team.getDisplayName());
-					if (!team.getDisplayName().equals("TBC") && !team.getDisplayName().equals("TBD")) {
+					if (!team.getDisplayName().contains("TBC") && !team.getDisplayName().contains("TBD")) {
 						teams.add(team);
 					}
 				}

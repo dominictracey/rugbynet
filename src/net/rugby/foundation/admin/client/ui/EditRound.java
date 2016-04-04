@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 import net.rugby.foundation.model.shared.IStanding;
 
 import com.google.gwt.cell.client.FieldUpdater;
@@ -20,8 +21,11 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -77,6 +81,8 @@ public class EditRound extends Composite {
 	}
 
 	@UiField
+	HTMLPanel roundPanel;
+	@UiField
 	Button save;
 	@UiField
 	Button fetch;
@@ -86,12 +92,17 @@ public class EditRound extends Composite {
 	TextBox name;
 	@UiField
 	TextBox abbr;
+	@UiField
+	ListBox workFlowStatus;
+	@UiField 
+	Anchor roundPipelineLink;
+	
 	@UiField 
 	CellTable<IStanding> standingTable;
 	
 	IRound round = null;
 	private RoundPresenter listener;
-	private List<IStanding> standings;
+	//private List<IStanding> standings;
 	
 	
 	@UiHandler("save")
@@ -103,6 +114,10 @@ public class EditRound extends Composite {
 		for (IStanding s : standingTable.getVisibleItems()) {
 			ss.add(s);
 		}
+		
+		int selected = workFlowStatus.getSelectedIndex();
+		round.setWorkflowStatus(WorkflowStatus.valueOf(WorkflowStatus.class,workFlowStatus.getItemText(selected)));
+
 		listener.saveRound(round, ss);
 	}
 	
@@ -118,13 +133,34 @@ public class EditRound extends Composite {
 	
 	public void ShowRound(IRound round, List<IStanding> standings) {
 		this.round = round;
-		this.standings = standings;
+		//this.standings = standings;
 		name.setText(round.getName());
 		abbr.setText(round.getAbbr());
+		
+		workFlowStatus.clear();
+		int selectedIndex = 0;
+		for (WorkflowStatus s : WorkflowStatus.values()) {
+			workFlowStatus.addItem(s.toString());
+			if (round.getWorkflowStatus().equals(s)) {
+				selectedIndex = workFlowStatus.getItemCount()-1;
+			}
+		}
+		
+		workFlowStatus.setSelectedIndex(selectedIndex);
+		
 		if (standings != null) {
 			standingTable.setRowCount(standings.size());
 			standingTable.setVisibleRange(0, standings.size());
 			standingTable.setRowData(0, standings);
+		}
+		
+		if (round.getWeekendProcessingPipelineId() != null && !round.getWeekendProcessingPipelineId().isEmpty()) {
+			roundPipelineLink.setVisible(true);
+			roundPipelineLink.setHref("/_ah/pipeline/status?root=" + round.getWeekendProcessingPipelineId());
+			roundPipelineLink.setText("Round processing pipeline");
+			roundPipelineLink.setTarget("_blank");			
+		} else {
+			roundPipelineLink.setVisible(false);
 		}
 	}
 

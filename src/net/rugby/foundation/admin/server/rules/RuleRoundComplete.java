@@ -6,8 +6,8 @@ package net.rugby.foundation.admin.server.rules;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 
 /**
  * @author home
@@ -27,20 +27,14 @@ public class RuleRoundComplete extends CoreRule<IRound> {
 	 */
 	@Override
 	public Boolean test() {
-		boolean all = true;
-		for (IMatchGroup m : target.getMatches()) {
-			if (m.getSimpleScoreMatchResult() == null)  {
-				all = false;
-				break;
-			}
-		}	
+		boolean rated = target.getWorkflowStatus() == WorkflowStatus.COMPLETE;
 		
-		if (all) {
-			Logger.getLogger(RuleRoundComplete.class.getName()).log(Level.WARNING,"Round is complete " + target.getName() +"("+ target.getId() + ")");
+		if (rated) {
+			Logger.getLogger(RuleRoundComplete.class.getName()).log(Level.WARNING,"Round is fully processed " + target.getName() +"("+ target.getId() + ")");
 
 		}
 		
-		return all;
+		return rated;
 	}
 
 }

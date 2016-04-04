@@ -96,7 +96,7 @@ public class FetchMatchStatsOrchestration extends OrchestrationCore<IMatchGroup>
 
 						//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
 						try {
-							pipelineId = service.startNewPipeline(new FetchMatchStats(), match, new JobSetting.MaxAttempts(3));
+							pipelineId = service.startNewPipeline(new FetchMatchStats(), match.getId(), new JobSetting.MaxAttempts(3));
 						} catch (RetriesExhaustedException ree) {
 							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Bad stuff", ree);
 						}

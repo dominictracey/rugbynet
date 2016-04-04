@@ -10,5 +10,5 @@ public interface IRoundFactory extends ICachingFactory<IRound> {
 	 */
 	IRound find(IRound round);
 	void invalidate(Long roundId);
-
+	IRound getForUR(Long compId, int uROrdinal);
 }
