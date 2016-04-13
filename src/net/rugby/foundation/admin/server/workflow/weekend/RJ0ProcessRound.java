@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.ratingseries.CheckRatingGroup;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
@@ -37,6 +38,8 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 	transient private IRound round;
 	transient private ISeriesConfigurationFactory scf;
 
+	private IAdminTaskFactory atf;
+
 	public RJ0ProcessRound() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 	}
@@ -52,6 +55,7 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 
 			this.rf = injector.getInstance(IRoundFactory.class);
 			this.scf = injector.getInstance(ISeriesConfigurationFactory.class);
+			this.atf = injector.getInstance(IAdminTaskFactory.class);
 			
 			// valid round?
 			round = rf.get(roundId);

@@ -98,6 +98,11 @@ public class FetchMatchStats extends Job1<MS7StatsFetched, Long> implements Seri
 		List<Value<Long>> homePlayers = new ArrayList<Value<Long>>();
 		List<Value<Long>> visitorPlayers = new ArrayList<Value<Long>>();
 
+		// job settings controlling retries
+		JobSetting nowBackOffFactor = new JobSetting.BackoffFactor(2);
+		JobSetting nowBackOffSeconds = new JobSetting.BackoffSeconds(10); // retry at 10, 200 and 4000 seconds?
+		JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(7); // 
+					
 		int count = 0;
 		for (NameAndId info : homeIds) {
 			// first see if we have it in the database
@@ -107,7 +112,7 @@ public class FetchMatchStats extends Job1<MS7StatsFetched, Long> implements Seri
 			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
 				homePlayers.add(immediate(dbPlayer.getId()));
 			} else {
-				Value<Long> homePlayerId = futureCall(new FetchPlayerByScrumId(), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match.getId()));
+				Value<Long> homePlayerId = futureCall(new FetchPlayerByScrumId(), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 				homePlayers.add(homePlayerId);
 			}
 		}
@@ -121,7 +126,7 @@ public class FetchMatchStats extends Job1<MS7StatsFetched, Long> implements Seri
 			if (dbPlayer != null && dbPlayer.getScrumId() != null) {
 				visitorPlayers.add(immediate(dbPlayer.getId()));
 			} else {
-				Value<Long> visitPlayerId = futureCall(new FetchPlayerByScrumId(), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match.getId()));
+				Value<Long> visitPlayerId = futureCall(new FetchPlayerByScrumId(), immediate(info.name),  immediate(url), immediate(info.id), immediate(1L), immediate(match.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 				visitorPlayers.add(visitPlayerId);
 			}
 		}	   
@@ -131,7 +136,7 @@ public class FetchMatchStats extends Job1<MS7StatsFetched, Long> implements Seri
 
 		count = 0;
 		for (Value<Long> fp : homePlayers) {
-			FutureValue<Long> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match.getId()), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
+			FutureValue<Long> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match.getId()), immediate(Home_or_Visitor.HOME), immediate(count++), immediate(url), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 			
 			homePlayerMatchStats.add(stats);
 
@@ -140,7 +145,7 @@ public class FetchMatchStats extends Job1<MS7StatsFetched, Long> implements Seri
 
 		count = 0;
 		for (Value<Long> fp : visitorPlayers) {
-			FutureValue<Long> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match.getId()), immediate(Home_or_Visitor.VISITOR), immediate(count++), immediate(url), new JobSetting.BackoffSeconds(5), new JobSetting.MaxAttempts(2));
+			FutureValue<Long> stats = futureCall(new FetchPlayerMatchStats(), fp, immediate(match.getId()), immediate(Home_or_Visitor.VISITOR), immediate(count++), immediate(url), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 			visitorPlayerMatchStats.add(stats);
 
 		}

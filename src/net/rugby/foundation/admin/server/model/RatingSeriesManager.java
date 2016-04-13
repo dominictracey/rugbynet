@@ -218,6 +218,10 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		IRatingGroup rg = rgf.getForUR(rs.getId(), time.ordinal);
 		
 		if (rg == null) {
+			
+			// first, cull out older groups so we don't go past the memcache limit of 1Mb
+			cullOldRatingGroups(rs);
+			
 			rg = rgf.create();
 			rg.setRatingSeries(rs);
 			assert(rs.getId() != null);
@@ -256,6 +260,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			rs.getRatingGroupIds().add(index, rg.getId());
 			rs.getRatingGroups().add(index, rg);
 			rsf.put(rs);
+
 		} else { // graft new matrix(ices) and prune dead ones
 			
 			List<Criteria> missing = new ArrayList<Criteria>();
@@ -299,6 +304,70 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		}
 		return rg;
 	}
+
+	/**
+	 * So we have run into problems when we get up around 50 or so RatingGroups. Cull them so we have no more that 25 RGs:
+	 * 		- Every week for the last 16 weeks
+	 * 		- Every other week for the prior 12 weeks
+	 * 		- Every fourth week for the prior 24 weeks
+	 * 		- Remove everything older
+	 * 
+	 * Algorithm: =if($G$42-A56<$G$43,1,if($G$42-A56<$G$44,MOD(A56,2),if($G$42-A56<$G$45,MOD(A56,4),0)))
+	 * 		https://docs.google.com/spreadsheets/d/1TgEUXWRLXHf225OexK4hMsauayCIasZ-l5jzZ1IiaSs/edit#gid=0
+	 * 
+	 * @param rs
+	 */
+	private final int EVERY_WEEK_CUTOFF = 16;
+	private final int EVERY_OTHER_WEEK_CUTOFF = 12;
+	private final int EVERY_FOURTH_WEEK_CUTOFF = 24;
+	private void cullOldRatingGroups(IRatingSeries rs) {
+		
+		if (rs.getMode() == RatingMode.BY_MATCH) {
+			// don't flush the match series
+			return;
+		}
+		
+		if (rs.getRatingGroups().size() < 28) {
+			return;
+		}
+		
+		UniversalRound nowUR = urf.getCurrent();
+		
+		int everyWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF;
+		int everyOtherWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF - EVERY_OTHER_WEEK_CUTOFF;
+		int everyFourthWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF - EVERY_OTHER_WEEK_CUTOFF - EVERY_FOURTH_WEEK_CUTOFF;
+		
+		List<IRatingGroup> toDelete = new ArrayList<IRatingGroup>();
+		for (IRatingGroup rg : rs.getRatingGroups()) {
+			if (rg.getUniversalRoundOrdinal() < everyFourthWeekCutoff) {
+				// delete very old
+				toDelete.add(rg);
+			} else if (rg.getUniversalRoundOrdinal() < everyOtherWeekCutoff) {
+				// delete every fourth one
+				if ((rg.getUniversalRoundOrdinal() % 4) != 1) {
+					toDelete.add(rg);
+				}
+			} else if (rg.getUniversalRoundOrdinal() < everyWeekCutoff) {
+				// delete every fourth one
+				if ((rg.getUniversalRoundOrdinal() % 2) != 1) {
+					toDelete.add(rg);
+				}
+			}
+		}
+		
+		for (IRatingGroup rg : toDelete) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Removing rating group from RatingSeries " + rs.getDisplayName() + " for " + rg.getUniversalRound().longDesc);
+			rs.getRatingGroups().remove(rg);
+			rs.getRatingGroupIds().remove(rg);
+		}
+		
+		assert(rs.getRatingGroupIds().size() == rs.getRatingGroups().size());
+		assert(rs.getRatingGroupIds().size() <= 28);
+		
+		
+		rsf.put(rs);
+	}
+
 
 	private List<Long> findRoundsForRatingMatrices(IRatingMatrix rm) {
 		List<Long> rids = new ArrayList<Long>();
@@ -401,9 +470,19 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rqf.put(rq);
 					rm.getRatingQueries().add(rq);
 					rm.getRatingQueryIds().add(rq.getId());
-					rmf.put(rm);
+					//rmf.put(rm);
 				}
 			}
+			
+			// have to save them again outside the above loop so they get memcached right :-/
+			for (IRatingQuery q : rm.getRatingQueries()) {
+				q.setRatingMatrix(rm);
+				rqf.put(q);
+			}
+			
+			// finally, save the matrix
+			rmf.put(rm);
+			
 		} else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_TEAM) {
 			
 			// first get a list of teams
@@ -522,6 +601,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		IRatingQuery rq = rqf.create();
 		rq.setStatus(Status.NEW);
 		rq.setRatingMatrix(rm);
+		rq.setRatingMatrixId(rm.getId());
 		rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
 		return rq;
 	}

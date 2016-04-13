@@ -3,10 +3,6 @@ package net.rugby.foundation.core.server.factory.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-
-import com.google.inject.Inject;
-
 import net.rugby.foundation.core.server.factory.BaseRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
@@ -15,6 +11,10 @@ import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.RatingMatrix;
+
+import org.joda.time.DateTime;
+
+import com.google.inject.Inject;
 
 public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements IRatingMatrixFactory {
 
@@ -40,8 +40,8 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 		if (id.equals(77100L)) {  // DEFAULT IS LATEST AND ROUND?
 			rm.setRatingGroupId(76001L);
 			//rm.setRatingGroup(rgf.get(76001L));
-			rm.getRoundIds().add(7L);
-			rm.getRoundIds().add(6L);
+//			rm.getRoundIds().add(7L);
+//			rm.getRoundIds().add(6L);
 			rm.setCriteria(Criteria.ROUND);
 			rm.setGenerated(DateTime.now().toDate());
 			rm.getRatingQueryIds().add(7710001L);
@@ -67,8 +67,8 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 		} else if (id.equals(77101L)) {
 			rm.setRatingGroupId(76001L);
 			//rm.setRatingGroup(rgf.get(76001L));
-			rm.getRoundIds().add(7L);
-			rm.getRoundIds().add(6L);
+//			rm.getRoundIds().add(7L);
+//			rm.getRoundIds().add(6L);
 			rm.setCriteria(Criteria.IN_FORM);
 			rm.setGenerated(DateTime.now().toDate());
 			rm.getRatingQueryIds().add(7710101L);
@@ -95,7 +95,7 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 		} else if (id.equals(77000L)) {
 			rm.setRatingGroupId(76000L);
 			//rm.setRatingGroup(rgf.get(76000L));
-			rm.getRoundIds().add(6L);
+//			rm.getRoundIds().add(6L);
 			rm.setCriteria(Criteria.ROUND);
 			rm.setGenerated(DateTime.now().toDate());
 			rm.getRatingQueryIds().add(7700001L);
@@ -121,7 +121,7 @@ public class TestRatingMatrixFactory extends BaseRatingMatrixFactory implements 
 		} else if (id.equals(77001L)) {
 			rm.setRatingGroupId(76000L);
 			//rm.setRatingGroup(rgf.get(76000L));
-			rm.getRoundIds().add(6L);
+//			rm.getRoundIds().add(6L);
 			rm.setCriteria(Criteria.IN_FORM);
 			rm.setGenerated(DateTime.now().toDate());
 			rm.getRatingQueryIds().add(7700101L);

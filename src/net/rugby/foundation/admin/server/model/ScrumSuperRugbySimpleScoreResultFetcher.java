@@ -89,6 +89,7 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
             	}
             }
             
+            String matchLine = "";
             if (foundDate) {
 	            while (it.hasNext() && !found) {
 	            	line = it.next();
@@ -102,6 +103,9 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 	               		if (line.contains("<!--")) {
 	               			line = it.next();
 	               		}
+	               		
+	               		matchLine = line;
+	               		
 	               		// get the match URL and id saved
 	               		saveMatchInfo(match, line);
 	               		

@@ -160,7 +160,7 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 	@Override
 	public ISeriesConfiguration getByCompAndMode(Long compId, RatingMode mode) {
 		try {
-			Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("hostCompId", compId).filter("mode", mode);
+			Query<BaseSeriesConfiguration> qs = ofy.query(BaseSeriesConfiguration.class).filter("hostCompId", compId).filter("mode", mode).filter("live", true);
 			
 			List<ISeriesConfiguration> retval = new ArrayList<ISeriesConfiguration>();
 			retval.addAll(qs.list());
