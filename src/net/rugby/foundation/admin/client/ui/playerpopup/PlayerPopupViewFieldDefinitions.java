@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
+
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -634,7 +637,71 @@ public class PlayerPopupViewFieldDefinitions<T> {
 			
 	      });
     	}
-    }
+    	fieldDefinitions.add(new FieldDefinition<IPlayer>() {
+    		//twitterNotAvailable
+	        private CheckBox w;
+	        
+	        @Override
+	        public void bind (Widget in)
+	        {
+	        	w = (CheckBox) in;
+	        }
+	        
+	        @Override
+			public Widget render(IPlayer c) {
+	        	w.setValue(c.getTwitterNotAvailable());
+	        		
+	        	return w;
+	        }
+
+			@Override
+			public void clear() {
+				w.setValue(false);
+			}
+			
+			@Override
+			public IPlayer update(IPlayer p) {
+				p.setTwitterNotAvailable(w.getValue());
+
+				return p;
+			}
+			
+	      });
+    	
+    fieldDefinitions.add(new FieldDefinition<IPlayer>() {
+		//twitterGoogle
+        private Anchor w;
+        
+        @Override
+        public void bind (Widget in)
+        {
+        	w = (Anchor) in;
+        }
+        
+        @Override
+		public Widget render(IPlayer c) {
+        	w.setText("Google");
+    		String target;
+    		target = "https://www.google.com/search?sourceid=chrome-psyapi2&ion=1&espv=2&ie=UTF-8&q="+ URL.encode(c.getDisplayName() + " rugby twitter ");
+    		w.setHref(target);
+    		w.setTarget("_blank");
+        	return w;
+        }
+
+		@Override
+		public void clear() {
+			w.setText(null);
+		}
+		
+		@Override
+		public IPlayer update(IPlayer p) {
+
+			return p;
+		}
+		
+      });
+	}
+    
 
     public List<FieldDefinition<IPlayer>> getFieldDefinitions() {
       return fieldDefinitions;

@@ -73,6 +73,7 @@ public interface IPlayer extends IHasId {
 	public abstract void setTaskIds(List<Long> taskIds);
 	public abstract List<Long> getBlockingTaskIds();
 	public abstract void setBlockingTaskIds(List<Long> taskIds);
-	
+	public abstract Boolean getTwitterNotAvailable();
+	public abstract void setTwitterNotAvailable(Boolean twitterNotAvailable);
 	
 }

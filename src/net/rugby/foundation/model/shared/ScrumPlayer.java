@@ -41,6 +41,8 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	private List<Long> taskIds;
 	@Unindexed
 	private List<Long> blockingTaskIds;
+
+	private Boolean twitterNotAvailable;
 	
 	@Override
 	public Long getId() {
@@ -209,6 +211,16 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	@Override
 	public void setBlockingTaskIds(List<Long> taskIds) {
 		this.blockingTaskIds = taskIds;
+	}
+
+	@Override
+	public Boolean getTwitterNotAvailable() {
+		return twitterNotAvailable;
+	}
+
+	@Override
+	public void setTwitterNotAvailable(Boolean twitterNotAvailable) {
+		this.twitterNotAvailable = twitterNotAvailable;
 	}
 
 }

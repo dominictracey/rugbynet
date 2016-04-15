@@ -2,6 +2,8 @@ package net.rugby.foundation.admin.client.ui.playerpopup;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
+
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
 
 import com.google.gwt.core.client.GWT;
@@ -44,6 +46,8 @@ public class PlayerPopupViewImpl<T> extends DialogBox implements PlayerPopupView
 	@UiField TextBox shortName;
 	@UiField Anchor scrumLink;
 	@UiField TextBox twitter;
+	@UiField CheckBox twitterNotAvailable;
+	@UiField Anchor twitterGoogle;
 	
 	@UiField Button saveButton;
 	@UiField Button cancelButton;
@@ -67,6 +71,8 @@ public class PlayerPopupViewImpl<T> extends DialogBox implements PlayerPopupView
 		fieldDefinitions.get(12).bind(shortName); 
 		fieldDefinitions.get(13).bind(scrumLink);
 		fieldDefinitions.get(14).bind(twitter);
+		fieldDefinitions.get(15).bind(twitterNotAvailable);
+		fieldDefinitions.get(16).bind(twitterGoogle);
 	}
 
 	private Presenter<T> presenter;

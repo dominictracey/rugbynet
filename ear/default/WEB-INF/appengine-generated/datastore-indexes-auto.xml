@@ -1,8 +1,8 @@
-<!-- Indices written at Tue, 29 Mar 2016 13:54:44 EDT -->
+<!-- Indices written at Fri, 15 Apr 2016 13:09:57 EDT -->
 
 <datastore-indexes>
 
-    <!-- Used 1 time in query history -->
+    <!-- Used 6 times in query history -->
     <datastore-index kind="BaseSeriesConfiguration" ancestor="false" source="auto">
         <property name="live" direction="asc"/>
         <property name="displayName" direction="asc"/>

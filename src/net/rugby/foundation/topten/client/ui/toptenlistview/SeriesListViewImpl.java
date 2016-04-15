@@ -695,6 +695,16 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				b.addStyleName("greenBadge");
 				b.setText("Success");
 				columnBadge.add(b);
+			}
+			if (p.getTwitterHandle() == null && p.getTwitterNotAvailable()){
+				Badge b = new Badge();
+				Span spanLink = new Span("&nbsp;");
+				Span spanField = new Span("&nbsp;");
+				columnLink.add(spanLink);
+				columnField.add(spanField);
+				b.addStyleName("redBadge");
+				b.setText("No Twitter");
+
 			} else {
 				Badge b = new Badge();
 				b.addStyleName("redBadge");
@@ -760,15 +770,15 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 								@Override
 								public void onFailure(Throwable caught) {
 									// TODO Auto-generated method stub
-									
+
 								}
 
 								@Override
 								public void onSuccess(String result) {
 									Notify.notify(result);
-									
+
 								}
-								
+
 							});
 
 						}
