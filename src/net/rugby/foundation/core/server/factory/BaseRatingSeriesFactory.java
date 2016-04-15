@@ -7,15 +7,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
@@ -23,6 +20,10 @@ import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.RatingMode;
+
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.inject.Inject;
 
 public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRatingSeries> implements IRatingSeriesFactory {
 	
@@ -63,14 +64,30 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 				}
 			}
 			
+			List<Long> badRatingGroupIds = new ArrayList<Long>();
 			if (rs.getRatingGroupIds() != null && !rs.getRatingGroupIds().isEmpty()) {
 				assert (rs.getRatingGroups() != null);
 				if (!rs.getRatingGroups().isEmpty()) {
 					rs.getRatingGroups().clear();
 				}
 				for (Long rgid : rs.getRatingGroupIds()){
-					// this will populate down to the RatingQuery
-					rs.getRatingGroups().add(rgf.get(rgid));
+					// check for bad groups
+					IRatingGroup rg = rgf.get(rgid);
+					if (rg == null) {
+						badRatingGroupIds.add(rgid);
+					} else {
+						// this will populate down to the RatingQuery
+						rs.getRatingGroups().add(rg);
+					}
+				}
+				
+				if (badRatingGroupIds.size() > 0) {
+					// now just drop any groups that are dangling IDs
+					for (Long badId : badRatingGroupIds) {
+						rs.getRatingGroupIds().remove(badId);
+					}
+					
+					putToPersistentDatastore(rs);
 				}
 			}
 			

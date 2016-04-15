@@ -21,9 +21,9 @@ public interface IRatingMatrix extends IHasId {
 
 	public abstract void setRatingGroup(IRatingGroup ratingGroup);
 
-	public abstract List<Long> getRoundIds();
+//	public abstract List<Long> getRoundIds();
 
-	public abstract List<IRound> getRounds();
+	//public abstract List<IRound> getRounds();
 
 	public abstract List<Long> getRatingQueryIds();
 
@@ -33,7 +33,7 @@ public interface IRatingMatrix extends IHasId {
 	
 	public abstract void setCriteria(Criteria crit);
 
-	void setRoundIds(List<Long> roundIds);
+//	void setRoundIds(List<Long> roundIds);
 
 	void setRatingQueries(List<IRatingQuery> ratingQueries);
 

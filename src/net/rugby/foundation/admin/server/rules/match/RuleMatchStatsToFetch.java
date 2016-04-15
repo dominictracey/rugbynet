@@ -54,7 +54,7 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 
 			IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(pf.create(), target, Home_or_Visitor.HOME, 0, target.getForeignUrl());
 			// make sure we get the latest and greatest
-			fetcher.setUrl(target.getForeignUrl(), true);
+			fetcher.setUrl(target.getForeignUrl());
 
 			if (fetcher.hasFlopped()) {
 				fetch = true;

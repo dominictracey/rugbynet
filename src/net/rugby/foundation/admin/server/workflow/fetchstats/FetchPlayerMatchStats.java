@@ -131,14 +131,14 @@ public class FetchPlayerMatchStats extends Job5<Long, Long, Long, Home_or_Visito
 			AdminTaskPlace atp = new AdminTaskPlace();
 			atp.setFilter("ALL");
 			atp.setTaskId(task.getId().toString());
-			String taskUrl = ccf.get().getBaseToptenUrl() + "#AdminTaskPlace:" + atp.getToken();
+			String taskUrl = ccf.get().getBaseToptenUrl() + "Admin.html#AdminTaskPlace:" + atp.getToken();
 			
 			AdminEmailer emailer = new AdminEmailer();
 			emailer.setSubject("TASK: Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + slot);
 			StringBuilder message = new StringBuilder();
 			message.append("<h3>Workflow halted</h3>");
-			message.append("a href=\"" + taskUrl + " target=\"blank\">" + player.getDisplayName() + " in " + match.getDisplayName() + "<br/>");
-			message.append("a href=\"" + match.getForeignUrl() + " target=\"blank\">" + match.getDisplayName() + " on ESPN.<br/>");
+			message.append("<a href=\"" + taskUrl + "\" target=\"blank\">" + player.getDisplayName() + " in " + match.getDisplayName() + "</a><br/>");
+			message.append("<a href=\"" + match.getForeignUrl() + " target=\"blank\">" + match.getDisplayName() + " on ESPN.</a><br/>");
 			
 			emailer.setMessage(message.toString());
 			emailer.send();

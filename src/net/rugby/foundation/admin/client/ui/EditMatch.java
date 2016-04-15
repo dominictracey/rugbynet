@@ -171,7 +171,7 @@ public class EditMatch extends Composite {
 		
 		workFlowStatus.setSelectedIndex(selectedIndex);
 		
-		if (match.getForeignId() != null) {
+		if (match.getForeignId() != null || !match.getForeignId().equals(0L)) {
 			scrumId.setText(match.getForeignId().toString());
 		} else {
 			scrumId.setText("");

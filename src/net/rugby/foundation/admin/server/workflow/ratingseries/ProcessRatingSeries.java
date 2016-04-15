@@ -128,7 +128,7 @@ public class ProcessRatingSeries extends Job3<MS8Rated, Long, Long, Long> implem
 			if (ratingGroupId != null) {
 				group = rgf.get(ratingGroupId);
 			} else {
-				rm.getRatingGroup(seriesConfig, target);
+				group = rm.getRatingGroup(seriesConfig, target);
 			}
 			
 			if (group != null) {
@@ -150,7 +150,7 @@ public class ProcessRatingSeries extends Job3<MS8Rated, Long, Long, Long> implem
 										rqf.put(rq);
 								}
 								if (rq.getStatus() == IRatingQuery.Status.NEW) {
-									FutureValue<ProcessRatingQueryResult> retval = futureCall(new ProcessRatingQuery(), immediate(rq.getId()));
+									FutureValue<ProcessRatingQueryResult> retval = futureCall(new ProcessRatingQuery(), immediate(rq.getId()), immediate(series.getId()));
 									_successes.add(retval);
 								}
 							}
