@@ -28,5 +28,9 @@ public interface IAdminTaskFactory {
 	IAdminTask complete(IAdminTask task);
 	List<? extends IAdminTask> delete(List<IAdminTask> selectedItems);
 	List<? extends IAdminTask> getForPipeline(String fetchMatchStatsPipelineId);
+	IAdminTask getNewEditPlayerTwitterTask(String summary, String details,
+			IPlayer player, Long topTenItemId, Long topTenListId,
+			boolean sendEmail, String pipelineRoot, String pipelineJob,
+			String promiseHandle);
 
 }

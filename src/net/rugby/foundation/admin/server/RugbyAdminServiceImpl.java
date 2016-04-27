@@ -50,6 +50,7 @@ import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.RatingActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.SeriesActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.UserActions;
+import net.rugby.foundation.admin.shared.EditPlayersTwitterAdminTask;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.IDigestEmail;
@@ -79,6 +80,7 @@ import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.promote.IPromoter;
 import net.rugby.foundation.game1.server.factory.IEntryFactory;
 import net.rugby.foundation.game1.server.factory.IMatchEntryFactory;
 import net.rugby.foundation.game1.server.factory.IRoundEntryFactory;
@@ -117,6 +119,8 @@ import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -181,6 +185,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IDigestEmailFactory def;
 	private DigestEmailer digestEmailer;
 	private IAccountManager am;
+	private IPromoter promoter;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -204,7 +209,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IContentFactory ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
 			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
 			IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf,
-			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def, IAccountManager am) {
+			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def, IAccountManager am, IPromoter promoter) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -244,6 +249,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.spf = spf;
 			this.def = def;
 			this.am = am;
+			this.promoter = promoter;
 
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
@@ -649,11 +655,11 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				tf.put(teamGroup);
-				
+
 				if (saveMatches) {
 					// The displayName of the team has been changed. Loop through all the future matches we have scheduled for this team and update its displayName.
 					List<IMatchGroup> matches = mf.getFutureMatchesForTeam(teamGroup.getId());
-					
+
 					for (IMatchGroup m : matches) {
 						m.setDisplayName();
 						mf.put(m);
@@ -768,60 +774,60 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 				// for every entry, if for the first round of the competition, they don't have a picklist,
 				// create one with picks for all the winning teams.
-//				List<Long> compIds = wfcf.get().getUnderwayCompetitions();
-//				for (Long compId: compIds) {
-//					ICompetition comp = cf.get(compId);
-//					IRound r = comp.getPrevRound();
-//					if (r != null) {
-//						ef.setRoundAndComp(null, comp);
-//						List<IEntry> entries = ef.getEntries();
-//						for (IEntry e: entries) {
-//							IRoundEntry re = e.getRoundEntries().get(r.getId());
-//							if (re == null) {  // @REX shouldn't the factory or entity do this?!
-//								re = ref.getNew();
-//
-//								// last match of the round is the tiebreaker
-//								re.setTieBreakerMatchId(r.getMatches().get(r.getMatches().size()-1).getId()); 
-//
-//								re.setRoundId(r.getId());
-//
-//								e.getRoundEntries().put(r.getId(),re);	
-//							}
-//							if (re != null) {
-//								Map<Long,IMatchEntry> pickMap = re.getMatchPickMap();
-//
-//								if (pickMap == null || pickMap.isEmpty()) {
-//									// need to fix
-//									e.getRoundEntries().get(r.getId()).setMatchPickMap(new HashMap<Long,IMatchEntry>());
-//
-//									for (IMatchGroup m: r.getMatches()) {
-//										if (!m.getLocked()) {
-//											IMatchEntry me = new MatchEntry();
-//											me.setMatchId(m.getId());
-//
-//											if (m.getStatus() == Status.FINAL_HOME_WIN) {
-//												me.setTeamPicked(m.getHomeTeam());
-//												me.setTeamPickedId(m.getHomeTeamId());
-//											} else {
-//												me.setTeamPicked(m.getVisitingTeam());
-//												me.setTeamPickedId(m.getVisitingTeamId());
-//											}
-//
-//											me = mef.put(me);
-//											e.getRoundEntries().get(r.getId()).getMatchPickMap().put(m.getId(), me);
-//
-//										} else {
-//											changes.add("Couldn't add round 1 pick list to entry " + e.getName() + " -- match " + m.getDisplayName() + " (" + m.getId()+ ") is locked.");
-//										}
-//									}
-//
-//									ef.put(e);
-//									changes.add("Added round 1 pick list to entry " + e.getName());
-//								}
-//							}
-//						}
-//					}
-//				}
+				//				List<Long> compIds = wfcf.get().getUnderwayCompetitions();
+				//				for (Long compId: compIds) {
+				//					ICompetition comp = cf.get(compId);
+				//					IRound r = comp.getPrevRound();
+				//					if (r != null) {
+				//						ef.setRoundAndComp(null, comp);
+				//						List<IEntry> entries = ef.getEntries();
+				//						for (IEntry e: entries) {
+				//							IRoundEntry re = e.getRoundEntries().get(r.getId());
+				//							if (re == null) {  // @REX shouldn't the factory or entity do this?!
+				//								re = ref.getNew();
+				//
+				//								// last match of the round is the tiebreaker
+				//								re.setTieBreakerMatchId(r.getMatches().get(r.getMatches().size()-1).getId()); 
+				//
+				//								re.setRoundId(r.getId());
+				//
+				//								e.getRoundEntries().put(r.getId(),re);	
+				//							}
+				//							if (re != null) {
+				//								Map<Long,IMatchEntry> pickMap = re.getMatchPickMap();
+				//
+				//								if (pickMap == null || pickMap.isEmpty()) {
+				//									// need to fix
+				//									e.getRoundEntries().get(r.getId()).setMatchPickMap(new HashMap<Long,IMatchEntry>());
+				//
+				//									for (IMatchGroup m: r.getMatches()) {
+				//										if (!m.getLocked()) {
+				//											IMatchEntry me = new MatchEntry();
+				//											me.setMatchId(m.getId());
+				//
+				//											if (m.getStatus() == Status.FINAL_HOME_WIN) {
+				//												me.setTeamPicked(m.getHomeTeam());
+				//												me.setTeamPickedId(m.getHomeTeamId());
+				//											} else {
+				//												me.setTeamPicked(m.getVisitingTeam());
+				//												me.setTeamPickedId(m.getVisitingTeamId());
+				//											}
+				//
+				//											me = mef.put(me);
+				//											e.getRoundEntries().get(r.getId()).getMatchPickMap().put(m.getId(), me);
+				//
+				//										} else {
+				//											changes.add("Couldn't add round 1 pick list to entry " + e.getName() + " -- match " + m.getDisplayName() + " (" + m.getId()+ ") is locked.");
+				//										}
+				//									}
+				//
+				//									ef.put(e);
+				//									changes.add("Added round 1 pick list to entry " + e.getName());
+				//								}
+				//							}
+				//						}
+				//					}
+				//				}
 
 				return changes;
 			} else {
@@ -893,7 +899,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 								} catch (NoSuchObjectException nsox) {
 									// it's ok, just was a dangling reference in the match record
 								}
-							
+
 								List<? extends IAdminTask> tasks = atf.getForPipeline(id);
 								atf.delete((List<IAdminTask>) tasks);
 							}
@@ -1030,6 +1036,33 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					player.getBlockingTaskIds().remove(task.getId());
 					player.getTaskIds().remove(task.getId());
 					pf.put(player);
+				} else if (task != null && task.getAction().equals(IAdminTask.Action.EDITPLAYERTWITTER)) {
+					if (task.getPromise() != null) {
+						PipelineService service = PipelineServiceFactory.newPipelineService();
+						try {
+							service.submitPromisedValue(task.getPromise(), player.getId());
+						} catch (NoSuchObjectException ex) {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+						} catch (OrphanedObjectException ex) {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+						}
+					}
+
+					atf.complete(task);
+					player.getBlockingTaskIds().remove(task.getId());
+					player.getTaskIds().remove(task.getId());
+					pf.put(player);
+					if (player.getTwitterHandle() != null && !player.getTwitterHandle().isEmpty()){
+						ITopTenItem tti = null;
+						ITopTenList ttl = ttlf.get(((EditPlayersTwitterAdminTask)task).getTopTenListId());
+						for (ITopTenItem _tti : ttl.getList()){
+							if (_tti.getPlayerId().equals(player.getId())){
+								tti = _tti;
+								break;
+							}
+						}
+						promoter.promoteItem(tti, ttl);
+					}
 				}
 				return player;
 			} else {
@@ -2778,18 +2811,18 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public IRound saveRound(IRound r) {
 		try {
 			if (checkAdmin()) {
-			
+
 				rf.put(r);
-				
+
 				return r;
 			}
-		 	return null;			
+			return null;			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 			return null;
 		}
 	}
-		
+
 	public List<String> bulkUploadEmails(List<String> emailsValid) {
 		try {
 			if (checkAdmin()) {

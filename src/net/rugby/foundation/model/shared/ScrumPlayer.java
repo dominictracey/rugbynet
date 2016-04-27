@@ -221,6 +221,9 @@ public class ScrumPlayer implements IPlayer, Serializable {
 	@Override
 	public void setTwitterNotAvailable(Boolean twitterNotAvailable) {
 		this.twitterNotAvailable = twitterNotAvailable;
+		if (twitterNotAvailable){
+			setTwitterHandle(null);
+		}
 	}
 
 }

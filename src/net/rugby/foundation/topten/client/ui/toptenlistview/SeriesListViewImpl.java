@@ -50,6 +50,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -665,6 +666,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	}
 	protected List<IPlayer> playerList = null;
 	protected Map<IPlayer, TextBox> playerMap = new HashMap<IPlayer, TextBox>();
+	protected Map<IPlayer, CheckBox> checkBoxMap = new HashMap<IPlayer, CheckBox>();
 
 	@Override
 	public void showPromoteResults(List<IPlayer> result) {
@@ -674,18 +676,24 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			Row row = new Row();
 			Column columnLabel = new Column("MD-3");
 			Column columnBadge = new Column("MD-1");
+			Column columnCheckbox = new Column("md-2");
 			Column columnLink = new Column("md-1");
-			Column columnField = new Column("md-6");
+			Column columnField = new Column("md-4");
+
 			columnBadge.addStyleName("col-md-2");
 			columnLink.addStyleName("col-md-1");
-			columnField.addStyleName("col-md-6");
+			columnField.addStyleName("col-md-4");
+			columnCheckbox.addStyleName("col-md-2");
 			columnLabel.add(new Span(p.getDisplayName()));
 			columnLabel.addStyleName("col-md-3");
 			columnLabel.addStyleName("twitterDialougeRow");
+
 			row.add(columnLabel);
 			row.add(columnBadge);
+			row.add(columnCheckbox);
 			row.add(columnLink);
 			row.add(columnField);
+
 			if (p.getTwitterHandle() != null && !p.getTwitterHandle().isEmpty()){
 				Badge b = new Badge();
 				Span spanLink = new Span("&nbsp;");
@@ -695,8 +703,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				b.addStyleName("greenBadge");
 				b.setText("Success");
 				columnBadge.add(b);
-			}
-			if (p.getTwitterHandle() == null && p.getTwitterNotAvailable()){
+			} else if (p.getTwitterNotAvailable() != null && p.getTwitterNotAvailable().equals(true)){
 				Badge b = new Badge();
 				Span spanLink = new Span("&nbsp;");
 				Span spanField = new Span("&nbsp;");
@@ -704,11 +711,16 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				columnField.add(spanField);
 				b.addStyleName("redBadge");
 				b.setText("No Twitter");
-
+				columnBadge.add(b);
 			} else {
 				Badge b = new Badge();
 				b.addStyleName("redBadge");
 				b.setText("Fail");
+				CheckBox checkBox = new CheckBox();
+				checkBoxMap.put(p, checkBox);
+				checkBox.setText("No Twitter");
+				columnCheckbox.add(checkBox);
+
 				Button button = new Button();
 				button.setIcon(IconType.SEARCH);
 				Anchor a = new Anchor();
@@ -737,13 +749,23 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@UiHandler("promoteSave")
 	protected void onPromoteSaveClicked (ClickEvent event) {
 		for (final IPlayer p: playerList){
-			if (playerMap.containsKey(p)){
+			if (playerMap.containsKey(p) || checkBoxMap.containsKey(p)){
 				TextBox tb = playerMap.get(p);
-				String twitter = tb.getText();
+				CheckBox cb = checkBoxMap.get(p);
+				final String twitter = tb.getText();
+				final Boolean noTwitter = cb.getValue();
+
+				Boolean dirty = false;
+
 				if (twitter != null && !twitter.isEmpty()) {
-
-
 					p.setTwitterHandle(twitter);
+					dirty = true;
+				}
+				if (noTwitter != null && noTwitter.equals(true)){
+					p.setTwitterNotAvailable(noTwitter);
+					dirty = true;
+				}
+				if (dirty) {
 					clientFactory.getRpcService().savePlayer(p, new AsyncCallback<Boolean>() {
 
 						@Override
@@ -754,35 +776,39 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 						@Override
 						public void onSuccess(Boolean result) {
-							Notify.notify(p.getDisplayName() + " saved!");
-							ITopTenItem tti = null;
-							//list.getList();
-							//Look through the Top Ten List for the tti that has a playerId equal to the id of the player.
-							for (ITopTenItem i: list.getList()){
-								if (i.getPlayerId().equals(p.getId())){
-									tti=i;
-									break;
+							if (twitter.isEmpty() && noTwitter.equals(true)){
+								Notify.notify(p.getDisplayName() + " no twitter");
+							} else {
+								Notify.notify(p.getDisplayName() + " saved!");
+								ITopTenItem tti = null;
+								//list.getList();
+								//Look through the Top Ten List for the tti that has a playerId equal to the id of the player.
+								if (!twitter.isEmpty() && noTwitter.equals(false)){
+									for (ITopTenItem i: list.getList()){
+										if (i.getPlayerId().equals(p.getId())){
+											tti=i;
+											break;
+										}
+										//Notify.notify(tti.getPlayer().getDisplayName());
+									}
+									clientFactory.getRpcService().sendTweet(tti, list, new AsyncCallback<String>(){
+
+										@Override
+										public void onFailure(Throwable caught) {
+											// TODO Auto-generated method stub
+
+										}
+
+										@Override
+										public void onSuccess(String result) {
+											Notify.notify(result);
+
+										}
+
+									});
 								}
-								//Notify.notify(tti.getPlayer().getDisplayName());
 							}
-							clientFactory.getRpcService().sendTweet(tti, list, new AsyncCallback<String>(){
-
-								@Override
-								public void onFailure(Throwable caught) {
-									// TODO Auto-generated method stub
-
-								}
-
-								@Override
-								public void onSuccess(String result) {
-									Notify.notify(result);
-
-								}
-
-							});
-
 						}
-
 					});
 				}
 			}

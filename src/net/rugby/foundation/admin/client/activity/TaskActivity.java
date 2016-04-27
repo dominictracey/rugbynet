@@ -150,7 +150,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 		this.target = target;
 		this.index = i;
 		Notify.notify(target.getSummary());
-		if (target.getAction().equals(IAdminTask.Action.EDITPLAYER)) {	
+		if (target.getAction().equals(IAdminTask.Action.EDITPLAYER) || target.getAction().equals(IAdminTask.Action.EDITPLAYERTWITTER)) {	
 			assert (target instanceof EditPlayerAdminTask);
 			clientFactory.getPlayerPopupView().setPresenter(this);
 			clientFactory.getRpcService().getPlayer(((EditPlayerAdminTask)target).getPlayerId(), new AsyncCallback<IPlayer>() {

@@ -5,20 +5,26 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.MatchRule;
 import net.rugby.foundation.admin.server.rules.IRule;
 import net.rugby.foundation.admin.server.workflow.ResultWithLog;
 import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS9Promoted;
+import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
+import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.promote.IPromoter;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.topten.model.shared.ITopTenItem;
+import net.rugby.foundation.topten.model.shared.ITopTenList;
+import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
 import org.joda.time.DateTime;
 
@@ -37,6 +43,9 @@ public class MJ8PromoteMatch extends Job3<MS9Promoted, Long, String, ResultWithL
 	transient private ICoreRuleFactory crf;
 	transient private IPlaceFactory spf;
 	transient private IPromoter promoter;
+	transient private IAdminTaskFactory atf;
+	transient private IPlayerFactory pf;
+	transient private ITopTenListFactory ttlf;
 
 	public MJ8PromoteMatch() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -66,6 +75,9 @@ public class MJ8PromoteMatch extends Job3<MS9Promoted, Long, String, ResultWithL
 			this.crf = injector.getInstance(ICoreRuleFactory.class);
 			this.spf = injector.getInstance(IPlaceFactory.class);
 			this.promoter = injector.getInstance(IPromoter.class);
+			this.atf = injector.getInstance(IAdminTaskFactory.class);
+			this.pf = injector.getInstance(IPlayerFactory.class);
+			this.ttlf = injector.getInstance(ITopTenListFactory.class);
 			
 			IMatchGroup match = mf.get(matchId);
 
@@ -89,13 +101,26 @@ public class MJ8PromoteMatch extends Job3<MS9Promoted, Long, String, ResultWithL
 				if (place != null && place.getListId() != null) {
 					List<IPlayer> result = promoter.promoteList(place.getListId());
 					
-					//TODO Create admin tasks for players without twitter handles. Should probably implement an IPlayer.hasTwitterHandle field first
-					
+					//TODO Create admin tasks for players without twitter handles and who have twitterNotAvailable = false or null. 
+					ITopTenList ttl = ttlf.get(place.getListId());
 					for (IPlayer p : result) {
 						if (p.getTwitterHandle() != null && !p.getTwitterHandle().isEmpty()) {
 							retval.log.add("Match List tweet to " + p.getDisplayName());
-						} else {
+						} else if (p.getTwitterNotAvailable() == null || p.getTwitterNotAvailable().equals(false)) {
 							retval.log.add("Need twitter handle for " + p.getDisplayName());
+							Long ttiId = null;
+							for (ITopTenItem tti : ttl.getList()){
+								if (tti.getPlayerId().equals(p.getId())){
+									ttiId = tti.getId();
+									break;
+								}
+							}
+							IAdminTask task = atf.getNewEditPlayerTwitterTask("Need twitter handle for " + p.getDisplayName(), "", p, ttiId, ttl.getId(), true, null,null,null);
+							atf.put(task);
+							p.getTaskIds().add(task.getId());
+							pf.put(p);
+						} else {
+							retval.log.add("No twitter handle for " + p.getDisplayName());
 						}
 					}
 				}

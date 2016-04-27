@@ -58,7 +58,7 @@ public class TwitterPromoter implements IPromoter {
 
 			if (ttl != null) {
 				for (ITopTenItem tti : ttl.getList()) {
-					if (cc.getEnvironment().equals(Environment.PROD)) {
+					if (cc.getEnvironment().equals(Environment.PROD) || cc.getEnvironment().equals(Environment.LOCAL)) {
 						retval += promoteItem(tti, ttl);
 					}
 					playerList.add(tti.getPlayer());

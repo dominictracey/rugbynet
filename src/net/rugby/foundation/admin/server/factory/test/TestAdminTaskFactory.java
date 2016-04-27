@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.google.inject.Inject;
-
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
@@ -23,6 +21,8 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+
+import com.google.inject.Inject;
 
 public class TestAdminTaskFactory implements IAdminTaskFactory {
 	
@@ -117,4 +117,15 @@ public class TestAdminTaskFactory implements IAdminTaskFactory {
 	public List<? extends IAdminTask> getForPipeline(String fetchMatchStatsPipelineId) {
 		return new ArrayList<IAdminTask>();
 	}
+
+	@Override
+	public IAdminTask getNewEditPlayerTwitterTask(String summary,
+			String details, IPlayer player, Long topTenItemId,
+			Long topTenListId, boolean sendEmail, String pipelineRoot,
+			String pipelineJob, String promiseHandle) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }
