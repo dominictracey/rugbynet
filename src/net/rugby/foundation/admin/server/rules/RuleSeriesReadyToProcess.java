@@ -39,7 +39,7 @@ public class RuleSeriesReadyToProcess extends CoreRule<ISeriesConfiguration >imp
 		if (target != null) {
 		
 			for (Long compId : target.getCompIds()) {
-				log += "Checking " + compId;
+				log += "Checking " + compId + "</br>";
 				if (!isReady(compId)) {					
 					ready = false;
 					break;
@@ -47,7 +47,7 @@ public class RuleSeriesReadyToProcess extends CoreRule<ISeriesConfiguration >imp
 			}
 			
 			if (ready) {
-				log += (target.getDisplayName()+ " is ready to be processed.");
+				log += (target.getDisplayName()+ " is ready to be processed.</br>");
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,target.getDisplayName() + " is ready to have its series processed.<br/>");
 	
 			}
@@ -63,7 +63,7 @@ public class RuleSeriesReadyToProcess extends CoreRule<ISeriesConfiguration >imp
 		boolean retval = false; 
 
 		UniversalRound now = urf.getCurrent();
-		int ordinal = now.ordinal;
+		int ordinal = now.ordinal - 1;  //somehow this seemed one ahead
 		int counter = 0;
 		
 		boolean found = false;

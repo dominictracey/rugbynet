@@ -1,6 +1,5 @@
 package net.rugby.foundation.model.shared;
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.Group.GroupType;
@@ -32,5 +31,8 @@ public interface IGroup extends IHasId {
 	public abstract void add(IPlayer p);
 	
 	public abstract String getSnakeCaseDisplayName();
+
+	public abstract Long getSponsorId();
+	public abstract void setSponsorId(Long sponsorId);
 	
 }

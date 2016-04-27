@@ -26,7 +26,7 @@ public class Group implements Serializable, IGroup {
 	protected Date createdDate;
 	protected Date lastModifiedDate;
 	protected String snakeCaseDisplayName;
-
+	protected Long sponsorId;
 
 	//if you change here, also change mapping in Browse.java :(
 	public enum GroupType { ADHOC, TEAM, POSITION, MATCH, FEATURED, NONE, MY }
@@ -115,6 +115,17 @@ public class Group implements Serializable, IGroup {
 		//so no URL encoding is applied. Dominic's fault.
 		snakeCaseDisplayName = nonSpaced;
 		return null; //So that factory can notice need to put to database
+	}
+
+
+	@Override
+	public Long getSponsorId() {
+		return sponsorId;
+	}
+
+	@Override
+	public void setSponsorId(Long sponsorId) {
+		this.sponsorId = sponsorId;
 	}
 
 }

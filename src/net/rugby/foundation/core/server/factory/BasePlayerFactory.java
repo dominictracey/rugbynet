@@ -36,7 +36,7 @@ public abstract class BasePlayerFactory extends BaseCachingFactory<IPlayer> impl
 	
 	protected abstract IPlayer getFromPersistentDatastoreByScrumId(Long id);
 	
-	private String getScrumCacheId(Long id) {
+	protected String getScrumCacheId(Long id) {
 		return prefix + id.toString();
 	}
 }

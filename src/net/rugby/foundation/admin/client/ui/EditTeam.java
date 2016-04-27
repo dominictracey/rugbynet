@@ -57,6 +57,8 @@ public class EditTeam extends Composite {
 	TextBox twitterChannel;
 	@UiField
 	TextBox color;
+	@UiField
+	TextBox sponsorId;
 
 	private String _displayName = "";
 	private boolean updateMatches = false;
@@ -74,6 +76,10 @@ public class EditTeam extends Composite {
 		teamGroup.setTwitter(twitter.getText());
 		teamGroup.setTwitterChannel(twitterChannel.getText());
 		teamGroup.setColor(color.getText());
+		// todo type check
+		if (!sponsorId.getText().isEmpty() && sponsorId.getText().matches("[0-9]+")) { 
+			teamGroup.setSponsorId(Long.parseLong(sponsorId.getText()));
+		}
 		
 		setUpdateMatches(false);
 		if (!displayName.getText().equals(_displayName)) {
@@ -101,6 +107,7 @@ public class EditTeam extends Composite {
 			twitter.setText(result.getTwitter());
 			twitterChannel.setText(result.getTwitterChannel());
 			color.setText(result.getColor());
+			sponsorId.setText(result.getSponsorId().toString());
 		}
 	}
 
