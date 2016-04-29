@@ -76,6 +76,31 @@
         "body" : "autoTemplate(backendResponse)"
       }
     },
+    "topten.series.position" : {
+      "path" : "series/position/get",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ "replace this with your web client application ID" ],
+      "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
+      "rosyMethod" : "net.rugby.foundation.topten.server.rest.TopTenV1.getGraphableSeries",
+      "request" : {
+        "parameters" : {
+          "compId" : {
+            "type" : "int64",
+            "required" : true
+          },
+          "position" : {
+            "type" : "int32",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
     "topten.competition.getAll" : {
       "path" : "competitions",
       "httpMethod" : "GET",
@@ -105,31 +130,6 @@
       "response" : {
         "body" : "autoTemplate(backendResponse)"
       }
-    },
-    "topten.series.position" : {
-      "path" : "series/position/get",
-      "httpMethod" : "GET",
-      "authLevel" : "NONE",
-      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
-      "audiences" : [ "replace this with your web client application ID" ],
-      "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
-      "rosyMethod" : "net.rugby.foundation.topten.server.rest.TopTenV1.getGraphableSeries",
-      "request" : {
-        "parameters" : {
-          "compId" : {
-            "type" : "int64",
-            "required" : true
-          },
-          "position" : {
-            "type" : "int32",
-            "required" : true
-          }
-        },
-        "body" : "empty"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
     }
   },
   "descriptor" : {
@@ -141,12 +141,12 @@
           "environment" : {
             "$ref" : "Environment"
           },
-          "competitionMap" : {
-            "$ref" : "JsonMap"
-          },
           "defaultCompId" : {
             "type" : "string",
             "format" : "int64"
+          },
+          "competitionMap" : {
+            "$ref" : "JsonMap"
           },
           "compsUnderway" : {
             "type" : "array",
@@ -227,14 +227,14 @@
           "longName" : {
             "type" : "string"
           },
+          "compType" : {
+            "$ref" : "CompetitionType"
+          },
           "seriesMap" : {
             "$ref" : "JsonMap"
           },
           "abbr" : {
             "type" : "string"
-          },
-          "compType" : {
-            "$ref" : "CompetitionType"
           },
           "underway" : {
             "type" : "boolean"
@@ -349,18 +349,11 @@
             "type" : "string",
             "format" : "date-time"
           },
-          "ordinal" : {
-            "type" : "integer"
+          "workflowStatus" : {
+            "$ref" : "WorkflowStatus"
           },
           "urOrdinal" : {
             "type" : "integer"
-          },
-          "matchIDs" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "format" : "int64"
-            }
           },
           "computed" : {
             "type" : "string",
@@ -370,11 +363,18 @@
             "type" : "string",
             "format" : "int64"
           },
-          "workflowStatus" : {
-            "$ref" : "WorkflowStatus"
+          "ordinal" : {
+            "type" : "integer"
           },
           "weekendProcessingPipelineId" : {
             "type" : "string"
+          },
+          "matchIDs" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "int64"
+            }
           },
           "abbr" : {
             "type" : "string"
@@ -401,27 +401,11 @@
           "displayName" : {
             "type" : "string"
           },
-          "homeTeam" : {
-            "$ref" : "ITeamGroup"
-          },
-          "visitingTeam" : {
-            "$ref" : "ITeamGroup"
-          },
-          "foreignId" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "foreignUrl" : {
-            "type" : "string"
-          },
-          "fetchMatchStatsPipelineId" : {
-            "type" : "string"
-          },
-          "guid" : {
-            "type" : "string"
-          },
           "workflowStatus" : {
             "$ref" : "WorkflowStatus"
+          },
+          "simpleScoreMatchResult" : {
+            "$ref" : "ISimpleScoreMatchResult"
           },
           "homeTeamId" : {
             "type" : "string",
@@ -431,16 +415,32 @@
             "type" : "string",
             "format" : "int64"
           },
-          "simpleScoreMatchResult" : {
-            "$ref" : "ISimpleScoreMatchResult"
+          "roundId" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "guid" : {
+            "type" : "string"
+          },
+          "homeTeam" : {
+            "$ref" : "ITeamGroup"
           },
           "simpleScoreMatchResultId" : {
             "type" : "string",
             "format" : "int64"
           },
-          "roundId" : {
+          "foreignId" : {
             "type" : "string",
             "format" : "int64"
+          },
+          "fetchMatchStatsPipelineId" : {
+            "type" : "string"
+          },
+          "visitingTeam" : {
+            "$ref" : "ITeamGroup"
+          },
+          "foreignUrl" : {
+            "type" : "string"
           },
           "members" : {
             "type" : "array",
@@ -469,6 +469,23 @@
         "type" : "string",
         "enum" : [ "SCHEDULED", "FINAL_HOME_WIN", "FINAL_HOME_WIN_OT", "FINAL_VISITOR_WIN", "FINAL_VISITOR_WIN_OT", "FINAL_DRAW", "FINAL_DRAW_OT", "UNDERWAY_FIRST_HALF", "HALFTIME", "UNDERWAY_SECOND_HALF", "COMPLETE_AWAITING_RESULTS", "POSTPONED", "RESCHEDULED", "CANCELED", "UNREPORTED" ]
       },
+      "WorkflowStatus" : {
+        "id" : "WorkflowStatus",
+        "type" : "string",
+        "enum" : [ "PENDING", "LINKED", "LINEUPS", "UNDERWAY", "OVER", "FINAL", "FETCHED", "RATED", "PROMOTED", "COMPLETE", "ERROR", "NO_STATS" ]
+      },
+      "ISimpleScoreMatchResult" : {
+        "id" : "ISimpleScoreMatchResult",
+        "type" : "object",
+        "properties" : {
+          "visitScore" : {
+            "type" : "integer"
+          },
+          "homeScore" : {
+            "type" : "integer"
+          }
+        }
+      },
       "ITeamGroup" : {
         "id" : "ITeamGroup",
         "type" : "object",
@@ -488,10 +505,10 @@
           "twitterChannel" : {
             "type" : "string"
           },
-          "scrumName" : {
+          "espnName" : {
             "type" : "string"
           },
-          "espnName" : {
+          "scrumName" : {
             "type" : "string"
           },
           "abbr" : {
@@ -552,6 +569,29 @@
           "displayName" : {
             "type" : "string"
           },
+          "imageUri" : {
+            "type" : "string"
+          },
+          "numCaps" : {
+            "type" : "integer"
+          },
+          "surName" : {
+            "type" : "string"
+          },
+          "scrumId" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "birthDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "twitterHandle" : {
+            "type" : "string"
+          },
+          "foreignUrl" : {
+            "type" : "string"
+          },
           "countryId" : {
             "type" : "string",
             "format" : "int64"
@@ -569,29 +609,6 @@
               "type" : "string",
               "format" : "int64"
             }
-          },
-          "foreignUrl" : {
-            "type" : "string"
-          },
-          "scrumId" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "birthDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "imageUri" : {
-            "type" : "string"
-          },
-          "numCaps" : {
-            "type" : "integer"
-          },
-          "surName" : {
-            "type" : "string"
-          },
-          "twitterHandle" : {
-            "type" : "string"
           },
           "id" : {
             "type" : "string",
@@ -630,23 +647,6 @@
         "id" : "GroupType",
         "type" : "string",
         "enum" : [ "ADHOC", "TEAM", "POSITION", "MATCH", "FEATURED", "NONE", "MY" ]
-      },
-      "WorkflowStatus" : {
-        "id" : "WorkflowStatus",
-        "type" : "string",
-        "enum" : [ "PENDING", "LINKED", "LINEUPS", "UNDERWAY", "OVER", "FINAL", "FETCHED", "RATED", "PROMOTED", "COMPLETE", "ERROR", "NO_STATS" ]
-      },
-      "ISimpleScoreMatchResult" : {
-        "id" : "ISimpleScoreMatchResult",
-        "type" : "object",
-        "properties" : {
-          "homeScore" : {
-            "type" : "integer"
-          },
-          "visitScore" : {
-            "type" : "integer"
-          }
-        }
       },
       "CompetitionType" : {
         "id" : "CompetitionType",
@@ -687,6 +687,33 @@
           },
           "width" : {
             "type" : "integer"
+          }
+        }
+      },
+      "RoundNode" : {
+        "id" : "RoundNode",
+        "type" : "object",
+        "properties" : {
+          "round" : {
+            "type" : "integer"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "playerMatches" : {
+            "$ref" : "JsonMap"
+          }
+        }
+      },
+      "RoundNodeCollection" : {
+        "id" : "RoundNodeCollection",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "RoundNode"
+            }
           }
         }
       },
@@ -743,33 +770,6 @@
             "type" : "boolean"
           }
         }
-      },
-      "RoundNode" : {
-        "id" : "RoundNode",
-        "type" : "object",
-        "properties" : {
-          "round" : {
-            "type" : "integer"
-          },
-          "label" : {
-            "type" : "string"
-          },
-          "playerMatches" : {
-            "$ref" : "JsonMap"
-          }
-        }
-      },
-      "RoundNodeCollection" : {
-        "id" : "RoundNodeCollection",
-        "type" : "object",
-        "properties" : {
-          "items" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "RoundNode"
-            }
-          }
-        }
       }
     },
     "methods" : {
@@ -788,6 +788,11 @@
           "$ref" : "ICompetition"
         }
       },
+      "net.rugby.foundation.topten.server.rest.TopTenV1.getGraphableSeries" : {
+        "response" : {
+          "$ref" : "RoundNodeCollection"
+        }
+      },
       "net.rugby.foundation.topten.server.rest.TopTenV1.getallcompetition" : {
         "response" : {
           "$ref" : "ICompetitionCollection"
@@ -796,11 +801,6 @@
       "net.rugby.foundation.topten.server.rest.TopTenV1.getcontent" : {
         "response" : {
           "$ref" : "Content"
-        }
-      },
-      "net.rugby.foundation.topten.server.rest.TopTenV1.getGraphableSeries" : {
-        "response" : {
-          "$ref" : "RoundNodeCollection"
         }
       }
     }

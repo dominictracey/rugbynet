@@ -405,13 +405,13 @@ public class TopTenV1 {
 				
 		//yellow card
 		if (pms.getYellowCards() > 0) {
-			pm.notes.put(count.toString(), pms.getYellowCards() + "yellow card");
+			pm.notes.put(count.toString(), pms.getYellowCards() + " yellow card");
 			count++;
 		}
 		
 		//red card
 		if (pms.getRedCards() > 1) {
-			pm.notes.put(count.toString(), pms.getRedCards() + "red card");
+			pm.notes.put(count.toString(), pms.getRedCards() + " red card");
 			count++;
 		}
 	}
