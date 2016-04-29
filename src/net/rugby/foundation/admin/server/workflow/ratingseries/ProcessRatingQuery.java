@@ -188,6 +188,8 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 			// the engine will set the status to complete if successful
 			//IRatingQuery procked = rqf.get(rq.getId());
 
+			Long sponsorId = null;
+					
 			// now create the TTL
 			String title = "Top Ten ";
 			String context = "";
@@ -301,6 +303,7 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 				assert(rq.getTeamIds().size() == 1);
 				
 				ITeamGroup team = tgf.get(rq.getTeamIds().get(0));
+				sponsorId = team.getSponsorId();
 				
 				// is this In Form, Best or Impact?
 				if (rm.getCriteria().equals(Criteria.IN_FORM)) {
@@ -434,13 +437,10 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 			}
 			
 
-			
-			Long sponsorId = null;
-			if (rs.getSponsorId() != null) {
-				sponsorId = rs.getSponsorId();
-			} else if (rs.getHostComp() != null && rs.getHostComp().getSponsorId() != null) {
-				sponsorId = rs.getHostComp().getSponsorId();
+			if (sponsorId == null) {
+				sponsorId = getSponsorId(rs, rq); 
 			}
+			
 			
 			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", rs.getHostCompId(), rq.getRoundIds(), 10, sponsorId);
 			data.setContext(context);
@@ -462,6 +462,26 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 		
 		return immediate(retval);
 
+	}
+
+	private Long getSponsorId(IRatingSeries rs, IRatingQuery rq) {
+		try {
+		Long sponsorId = null;
+		if (rs.getSponsorId() != null) {
+			sponsorId = rs.getSponsorId();
+		} else if (rs.getHostComp() != null && rs.getHostComp().getSponsorId() != null) {
+			sponsorId = rs.getHostComp().getSponsorId();
+		}
+		
+		return sponsorId;
+		} catch (Throwable ex) {
+			String queryName = "UNKNOWN";
+			if (rq != null && rq.getLabel() != null)  {
+				queryName = rq.getLabel();
+			}
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting sponsor for rating query " + queryName, ex);
+			return null;
+		}
 	}
 
 	

@@ -2,6 +2,7 @@ package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import javax.persistence.Id;
 
 import com.googlecode.objectify.annotation.Entity;
@@ -52,28 +53,30 @@ public abstract class Position implements Serializable {
 	//			SCRUMHALF, FLYHALF, LEFTWING, INSIDECENTER, OUTSIDECENTER, RIGHTWING, FULLBACK }
 
 	public enum position { 
-		NONE ("None", "---", "Unused"), 
-		PROP ("Prop", "PRP", "Props"), 
-		HOOKER ("Hooker", "HKR", "Hookers"), 
-		LOCK ("Lock", "LCK", "Locks"), 
-		FLANKER ("Flanker", "FLK", "Flankers"), 
-		NUMBER8 ("Number 8", "NO8", "No.8s"), 
-		SCRUMHALF ("Scrumhalf", "SCR", "Scrumhalves"), 
-		FLYHALF ("Flyhalf", "FLY", "Flyhalves"), 
-		CENTER ("Centre", "CTR", "Centres"), 
-		WING ("Wing", "WNG", "Wings"), 
-		FULLBACK ("Fullback", "FUL", "Fullbacks"), 
-		RESERVE ("Reserve", "RES", "Reserves");
+		NONE ("None", "---", "Unused", "position-none"), 
+		PROP ("Prop", "PRP", "Props", "position-prop"), 
+		HOOKER ("Hooker", "HKR", "Hookers", "position-hooker"), 
+		LOCK ("Lock", "LCK", "Locks", "position-lock"), 
+		FLANKER ("Flanker", "FLK", "Flankers", "position-flanker"), 
+		NUMBER8 ("Number 8", "NO8", "No.8s", "position-number8"), 
+		SCRUMHALF ("Scrumhalf", "SCR", "Scrumhalves", "position-scrumhalf"), 
+		FLYHALF ("Flyhalf", "FLY", "Flyhalves", "position-flyhalf"), 
+		CENTER ("Centre", "CTR", "Centres", "position-centre"), 
+		WING ("Wing", "WNG", "Wings", "position-wing"), 
+		FULLBACK ("Fullback", "FUL", "Fullbacks", "position-fullback"), 
+		RESERVE ("Reserve", "RES", "Reserves", "position-reserve");
 		
 		private String enUsName;
 		private String abbr;
 		private String plural;
-
-		private position(String enUSname, String abbr, String plural)
+		private String style;
+		
+		private position(String enUSname, String abbr, String plural, String style)
 		{
 			this.enUsName = enUSname;
 			this.abbr = abbr;
 			this.plural = plural;
+			this.style = style;
 		}
 
 		public position getNext() {
@@ -97,6 +100,10 @@ public abstract class Position implements Serializable {
 		
 		public String getPlural() {
 			return plural;
+		}
+
+		public String getStyle() {
+			return style;
 		}
 
 //		public int getNumberRequired(Stage.stageType stage, int round)  { 

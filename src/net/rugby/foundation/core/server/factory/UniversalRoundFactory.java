@@ -6,13 +6,13 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.UniversalRound;
+
 import org.joda.time.DateTime;
 import org.joda.time.Weeks;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.UniversalRound;
 
 
 public class UniversalRoundFactory extends BaseCachingFactory<UniversalRound> implements IUniversalRoundFactory {
@@ -42,7 +42,7 @@ public class UniversalRoundFactory extends BaseCachingFactory<UniversalRound> im
 		
 		int ordinal = weeks.getWeeks();
 		DateTimeFormatter fmtShort = DateTimeFormat.forStyle("M-").withLocale(Locale.UK);
-		UniversalRound retval = new UniversalRound(ordinal, midnight.getYear() + "-" + midnight.getWeekOfWeekyear(), midnight.toString(fmtShort), "Week starting " + midnight.toString(fmtShort), midnight.toDate());		
+		UniversalRound retval = new UniversalRound(ordinal, midnight.getYear() + "-" + midnight.getWeekOfWeekyear(), midnight.toString(fmtShort), "Week of " + midnight.toString(fmtShort), midnight.toDate());		
 		
 		return retval;
 	}
@@ -55,7 +55,7 @@ public class UniversalRoundFactory extends BaseCachingFactory<UniversalRound> im
 		time = time.plusWeeks(ordinal);
 
 		DateTimeFormatter fmtShort = DateTimeFormat.forStyle("M-").withLocale(Locale.UK);
-		UniversalRound retval = new UniversalRound(ordinal, time.getYear() + "-" + time.getWeekOfWeekyear(), time.toString(fmtShort) + "", "Week starting " + time.toString(fmtShort), time.toDate());
+		UniversalRound retval = new UniversalRound(ordinal, time.getYear() + "-" + time.getWeekOfWeekyear(), time.toString(fmtShort) + "", "Week of " + time.toString(fmtShort), time.toDate());
 				
 
 		return retval;
