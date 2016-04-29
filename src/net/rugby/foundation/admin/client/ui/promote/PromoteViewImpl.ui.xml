@@ -41,6 +41,8 @@
 				<b:Button type="PRIMARY" size="LARGE" ui:field="archive">Archive</b:Button>
 				<b:Button type="PRIMARY" size="LARGE" ui:field="facebook">Facebook</b:Button>
 				<b:Button type="PRIMARY" size="LARGE" ui:field="twitter">Twitter</b:Button>
+				<b:Button dataTarget="#bulkUsersModal" dataToggle="MODAL" type="PRIMARY"
+				size="LARGE" ui:field="bulkUpload">Bulk User Upload</b:Button>
 			<g:FlexTable addStyleNames="{style.playersViewPlayersFlexTable}"
 
 				ui:field="blurbTable" />
@@ -127,6 +129,16 @@
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="PRIMARY" dataDismiss="MODAL">Dismiss</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+		<b:Modal title= "Enter emails to add to Mailing List" closable="true" fade="true"
+			dataBackdrop="STATIC" dataKeyboard="true" b:id="bulkUsersModal" ui:field="bulkUsersModal">
+			<b:ModalBody>
+				<b:TextArea ui:field="bulkUsers"></b:TextArea>
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button type="DANGER" ui:field="bulkUploadSave">Upload</b:Button>
+				<b:Button type="PRIMARY" dataDismiss="MODAL">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 	</g:VerticalPanel>

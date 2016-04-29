@@ -6,17 +6,17 @@ package net.rugby.foundation.admin.server.orchestration;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.CompActions;
+import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
+import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
+import net.rugby.foundation.admin.shared.OrchestrationConfiguration;
+import net.rugby.foundation.model.shared.DataStoreFactory;
+
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
-
-import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
-import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.OrchestrationConfiguration;
-import net.rugby.foundation.admin.shared.AdminOrchestrationActions.CompActions;
-import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
-import net.rugby.foundation.model.shared.DataStoreFactory;
 
 /**
  * @author home
@@ -110,13 +110,13 @@ public class OfyOrchestrationConfigurationFactory implements
 		if (all.isEmpty()) {
 			compId = null;
 			if (wfcf.get() != null) {
-				for (Long underwayId : wfcf.get().getUnderwayCompetitions()) {
-					id = null;
-					IOrchestrationConfiguration oc = get();
-					oc.setCompID(underwayId);
-					put(oc);
-					all.add(oc);
-				}
+//				for (Long underwayId : wfcf.get().getUnderwayCompetitions()) {
+//					id = null;
+//					IOrchestrationConfiguration oc = get();
+//					oc.setCompID(underwayId);
+//					put(oc);
+//					all.add(oc);
+//				}
 			}
 		}
 		return all;

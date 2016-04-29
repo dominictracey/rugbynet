@@ -6,15 +6,15 @@ package net.rugby.foundation.admin.server.orchestration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.admin.server.AdminEmailer;
+import net.rugby.foundation.admin.server.workflow.ratingseries.ProcessRatingQuery;
+import net.rugby.foundation.model.shared.IRatingQuery;
+
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.tools.cloudstorage.RetriesExhaustedException;
 import com.google.appengine.tools.pipeline.JobSetting;
 import com.google.appengine.tools.pipeline.PipelineService;
 import com.google.appengine.tools.pipeline.PipelineServiceFactory;
-
-import net.rugby.foundation.admin.server.AdminEmailer;
-import net.rugby.foundation.admin.server.workflow.ratingseries.ProcessRatingQuery;
-import net.rugby.foundation.model.shared.IRatingQuery;
 
 /**
  * @author home
@@ -53,7 +53,7 @@ public class RerunRatingOrchestration extends OrchestrationCore<IRatingQuery> {
 			String pipelineId = "";
 
 			try {
-				pipelineId = service.startNewPipeline(new ProcessRatingQuery(), rq, new JobSetting.MaxAttempts(3));
+				pipelineId = service.startNewPipeline(new ProcessRatingQuery(), rq.getId(), rq.getRatingMatrix().getRatingGroup().getRatingSeriesId(), new JobSetting.MaxAttempts(3));
 			} catch (RetriesExhaustedException ree) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Giving up", ree);
 				return;

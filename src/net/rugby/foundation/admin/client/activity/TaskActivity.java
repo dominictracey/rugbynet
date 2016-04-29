@@ -2,13 +2,6 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.DialogBox;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
@@ -26,6 +19,16 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
+import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.DialogBox;
 
 public class TaskActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
@@ -146,7 +149,8 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 	public void showTask(int i, IAdminTask target) {
 		this.target = target;
 		this.index = i;
-		if (target.getAction().equals(IAdminTask.Action.EDITPLAYER)) {	
+		Notify.notify(target.getSummary());
+		if (target.getAction().equals(IAdminTask.Action.EDITPLAYER) || target.getAction().equals(IAdminTask.Action.EDITPLAYERTWITTER)) {	
 			assert (target instanceof EditPlayerAdminTask);
 			clientFactory.getPlayerPopupView().setPresenter(this);
 			clientFactory.getRpcService().getPlayer(((EditPlayerAdminTask)target).getPlayerId(), new AsyncCallback<IPlayer>() {

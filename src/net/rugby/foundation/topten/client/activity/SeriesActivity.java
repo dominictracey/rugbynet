@@ -20,6 +20,7 @@ import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
@@ -645,15 +646,16 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 	@Override
 	public void promote(ITopTenList list) {
-		clientFactory.getRpcService().sendTweets(list.getId(), new AsyncCallback<String>(){
+		clientFactory.getRpcService().sendTweets(list.getId(), new AsyncCallback<List<IPlayer>>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed tweeting");
 			}
 
 			@Override
-			public void onSuccess(String result) {
-				Bootbox.alert(result);
+			public void onSuccess(List<IPlayer> result) {
+				view.showPromoteResults(result);
+				
 			}
 		});
 		
@@ -663,6 +665,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	public void showFacebookComments(boolean show) {
 		clientFactory.showFacebookComments(show);		
 	}
+
 	
 
 }

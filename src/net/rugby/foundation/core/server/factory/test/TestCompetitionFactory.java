@@ -19,9 +19,9 @@ import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.IClubhouse;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
-import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 import com.google.inject.Inject;
 
@@ -417,6 +417,12 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 
 	@Override
 	public Boolean addRound(Long compId, int uri, String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ICompetition> getVirtualComps() {
 		// TODO Auto-generated method stub
 		return null;
 	}

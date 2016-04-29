@@ -126,4 +126,10 @@ public class TestSeriesConfigurationFactory extends BaseCachingFactory<ISeriesCo
 		return null;
 	}
 
+	@Override
+	public ISeriesConfiguration getByCompAndMode(Long compId, RatingMode byMatch) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -12,9 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import net.rugby.foundation.admin.server.AdminTestModule;
-import net.rugby.foundation.admin.server.workflow.matchrating.FetchPlayerByScrumId;
-import net.rugby.foundation.admin.server.workflow.matchrating.FetchPlayerMatchStats;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchPlayerByScrumId;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchPlayerMatchStats;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.core.server.CoreTestModule;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
@@ -192,7 +192,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(),"Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 14505L, 1L, null);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -236,7 +236,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Neil Best", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 15048L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(),"Neil Best", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 15048L, 1L, null);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -279,7 +279,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		ICompetition comp = cf.get(1L);
 
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), /*pf,*/ comp, "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 92047L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerByScrumId(), "Hugo Southwell", "http://www.espnscrum.com/anglo-welsh-cup-2012-13/rugby/match/168022.html", 92047L, 1L, null);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -329,7 +329,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		IPlayer p = pf.get(9001014L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 14, url);//, 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p.getId(), match.getId(),Home_or_Visitor.HOME, 14, url);//, 14505L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -376,7 +376,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		IPlayer p = pf.get(9002011L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.VISITOR, 11, url);//, 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p.getId(), match.getId(),Home_or_Visitor.VISITOR, 11, url);//, 14505L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -423,7 +423,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		IPlayer p = pf.get(9002017L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.VISITOR, 17, url);//, 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p.getId(), match.getId(),Home_or_Visitor.VISITOR, 17, url);//, 14505L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -471,7 +471,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		IPlayer p = pf.get(9002018L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.VISITOR, 18, url);//, 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p.getId(), match.getId(),Home_or_Visitor.VISITOR, 18, url);//, 14505L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -519,7 +519,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		IPlayer p = pf.get(9001018L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 18, url);//, 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p.getId(), match.getId(),Home_or_Visitor.HOME, 18, url);//, 14505L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -567,7 +567,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		IPlayer p = pf.get(9001007L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 7, url);//, 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p.getId(), match.getId(),Home_or_Visitor.HOME, 7, url);//, 14505L, 1L);
 
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;
@@ -616,7 +616,7 @@ public class PlayerWorkFlowTester extends PipelineTest {
 		IPlayer p = pf.get(9001021L);
 		
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p, match, Home_or_Visitor.HOME, 21, url);//, 14505L, 1L);
+		String pipelineId = service.startNewPipeline(new FetchPlayerMatchStats(), p.getId(), match.getId(),Home_or_Visitor.HOME, 21, url);//, 14505L, 1L);
 	
 		// Later, check on the status and get the final output
 		JobInfo jobInfo;

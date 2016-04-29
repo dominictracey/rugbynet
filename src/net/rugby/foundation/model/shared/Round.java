@@ -27,6 +27,7 @@ public class Round implements Serializable, IRound {
 	private Long compId;
 	protected WorkflowStatus workflowStatus;
 	protected int urOrdinal;
+	private String weekendProcessingPipelineId;
 	
 	public Round() {
 		
@@ -270,6 +271,19 @@ public class Round implements Serializable, IRound {
 	@Override
 	public void setUrOrdinal(int universalRound) {
 		this.urOrdinal = universalRound;
+	}
+
+
+	@Override
+	public void setWeekendProcessingPipelineId(String pipelineId) {
+		this.weekendProcessingPipelineId = pipelineId;
+		
+	}
+
+
+	@Override
+	public String getWeekendProcessingPipelineId() {
+		return weekendProcessingPipelineId;
 	}
 
 }

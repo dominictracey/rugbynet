@@ -1,6 +1,5 @@
 package net.rugby.foundation.admin.server.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +101,7 @@ public class SingleTableStandingsFetcher implements IStandingsFetcher {
 
 	private void searchTeamStanding(IStanding standing) {
 		//String standingString = standingLine.split("<|/|>")[2];
-		standing.setStanding(standingsMap.get(standing.getTeam().getDisplayName()));
+		standing.setStanding(standingsMap.get(standing.getTeam().getEspnName()));
 		
 		//
 	//	standing.setStanding(standingVal);

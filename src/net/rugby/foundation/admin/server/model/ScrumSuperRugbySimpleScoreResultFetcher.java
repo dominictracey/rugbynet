@@ -15,9 +15,11 @@ import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
-import net.rugby.foundation.model.shared.IMatchGroup.Status;
+
+import org.joda.time.DateTime;
 
 public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreResultFetcher implements IResultFetcher {
 
@@ -27,9 +29,14 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 
 	@Override
 	public IMatchResult getResult(IMatchGroup match)  {
+		return _getResult(match, true);
+	}
+	
+
+	public IMatchResult _getResult(IMatchGroup match, boolean save)  {
 		IMatchResult result = createResult(match);
 		
-		String resultURL = comp.getForeignURL() + "?template=results";
+		String resultURL = comp.getForeignURL() + "?noredir=1;template=results";
 		
 		Date dateRead = null;
         boolean found = false;
@@ -42,6 +49,10 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
         	List<String> lines = uc.get();
             String line;
 
+            if (lines == null) {
+            	Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Couldn't get results page at " + resultURL);
+            	return null;
+            }
             Iterator<String> it = lines.iterator();
             
 			// it seems like some matches don't get played on the days when they are originally scheduled so we should
@@ -78,8 +89,10 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
             	}
             }
             
+            String matchLine = "";
             if (foundDate) {
-	            while ((line = it.next()) != null && !found) {
+	            while (it.hasNext() && !found) {
+	            	line = it.next();
 	            	if( line.contains("fixtureTblContent")) {
 	            		line = it.next();  // there are multiple
 	            		line = it.next();  // </td>
@@ -90,6 +103,9 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 	               		if (line.contains("<!--")) {
 	               			line = it.next();
 	               		}
+	               		
+	               		matchLine = line;
+	               		
 	               		// get the match URL and id saved
 	               		saveMatchInfo(match, line);
 	               		
@@ -106,21 +122,27 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 			            		String foundHomeName = homeTeamStuff.split("&nbsp;")[0];
 			            		if (foundHomeName.equals(homeTeamName)) {
 			            			((ISimpleScoreMatchResult)result).setHomeScore(Integer.parseInt(homeTeamStuff.split("&nbsp;|-")[1].trim()));
-			            		}
 			            		
-			            		//line = it.next(); //24&nbsp;Worcester Warriors</a>
-			            		String foundVisitName = line.split("&nbsp;|<")[3];
-			            		if (foundVisitName.equals(visitTeamName)) {
-			            			((ISimpleScoreMatchResult)result).setVisitScore(Integer.parseInt(homeTeamStuff.split("&nbsp;|-")[2].trim()));
-			               			if (((ISimpleScoreMatchResult)result).getVisitScore() > ((ISimpleScoreMatchResult)result).getHomeScore())
-			               				result.setStatus(Status.FINAL_VISITOR_WIN);
-			               			else if (((ISimpleScoreMatchResult)result).getVisitScore() < ((ISimpleScoreMatchResult)result).getHomeScore())
-			               				result.setStatus(Status.FINAL_HOME_WIN);
-			               			else if (((ISimpleScoreMatchResult)result).getVisitScore() == ((ISimpleScoreMatchResult)result).getHomeScore())
-			               				result.setStatus(Status.FINAL_DRAW);
-			            			found = true;
+			            		
+				            		//line = it.next(); //24&nbsp;Worcester Warriors</a>
+				            		String foundVisitName = line.split("&nbsp;|<")[3];
+				            		if (foundVisitName.equals(visitTeamName)) {
+				            			((ISimpleScoreMatchResult)result).setVisitScore(Integer.parseInt(homeTeamStuff.split("&nbsp;|-")[2].trim()));
+				               			if (((ISimpleScoreMatchResult)result).getVisitScore() > ((ISimpleScoreMatchResult)result).getHomeScore())
+				               				result.setStatus(Status.FINAL_VISITOR_WIN);
+				               			else if (((ISimpleScoreMatchResult)result).getVisitScore() < ((ISimpleScoreMatchResult)result).getHomeScore())
+				               				result.setStatus(Status.FINAL_HOME_WIN);
+				               			else if (((ISimpleScoreMatchResult)result).getVisitScore() == ((ISimpleScoreMatchResult)result).getHomeScore())
+				               				result.setStatus(Status.FINAL_DRAW);
+				            			found = true;
+				            		}
 			            		}
-			 
+			            	} else if( line.contains("fixtureTableDate")) {
+			            		// give up if we get to more than a week or so before the adjusted match date
+			            		DateTime date = readDate(line,it);
+			            		if (date != null && date.plusDays(14).isBefore(new DateTime(matchDate))) {
+			            			return null;
+			            		}
 			            	}
 		            	}
 	            	}
@@ -132,7 +154,7 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
             return null;
         }
 		
-        if (found) {
+        if (found && save) {
 			mrf.put(result);
 			match.setSimpleScoreMatchResultId(result.getId());
 			match.setSimpleScoreMatchResult((ISimpleScoreMatchResult) result);
@@ -141,7 +163,9 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 			mf.put(match);
         
         	return result;
-        } else
+        } else if (found && !save) {
+        	return result;
+        } else 
         	return null;
 	}
 
@@ -155,6 +179,29 @@ public class ScrumSuperRugbySimpleScoreResultFetcher extends ScrumSimpleScoreRes
 				match.setForeignId(Long.parseLong(foreignUrl.split("[/|.]")[4]));
 			}
 		}
+	}
+	
+	private DateTime readDate(String line, Iterator<String> it) {
+		try {
+			DateTime dateRead = null;
+			if( line.contains("fixtureTableDate")) {
+	    		line = it.next();
+	    		String date = line.split("<|>")[0].trim();
+	    		if (!date.isEmpty()) {
+	        		DateFormat dateFormatter = new SimpleDateFormat("MMM dd, yyyy");
+	        		dateRead = new DateTime(dateFormatter.parse(date));
+	    		}
+	    	}
+			return dateRead;
+		 } catch (ParseException e) {
+			 Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage(),e);
+			 return null;
+		 }
+	}
+	
+	@Override
+	public Boolean isAvailable(IMatchGroup match) {
+		return _getResult(match, false) != null;
 	}
 
 

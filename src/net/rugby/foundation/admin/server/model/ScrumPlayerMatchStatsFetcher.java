@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -53,7 +53,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		urlCache.setUrl(url);
 		List<String> lines = urlCache.get();
 		String line;
-		
+
 		// fix the timeline before we get started processing the list	
 		List<String> timeline = lines;
 		if(isUpsideDown(timeline)) {
@@ -62,9 +62,9 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 			timeline = flipList(timeline);
 			timeline = flipRows(timeline);
 			timeline = addHeader(timeline);
-//			writeListToFile(timeline, "WithHeader");
+			//			writeListToFile(timeline, "WithHeader");
 			lines = replaceTimeline(timeline, lines);
-//			writeListToFile(lines, "CompleteFile");
+			//			writeListToFile(lines, "CompleteFile");
 		}	
 
 		if (lines == null) {
@@ -180,47 +180,51 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		else
 			return null;
 	}
-	
+
 	private boolean isUpsideDown(List<String> eles) {
-		Iterator<String> iter = eles.iterator();
-		String line = iter.next();
-		// first get here:
-	   //   <div class="tabbertab">
-	   //    <h2>Timeline</h2>
-		while (iter.hasNext()) {
-			if (line.contains("tabbertab"))
-			{
-				line = iter.next();
-				if (line.contains("Timeline"))
-				{
-					break;
-				}
-			}
-			line = iter.next();
-		}
-		
-		String tdClass = "liveTblTextBlk";
-		int timeEle = 0;
-		while (iter.hasNext()) {
-			line = iter.next();
-			if (line != null && line.length() > -1) {
-				if (line.contains(tdClass)) {
-					if (!line.split("<|>")[2].contains("+")) {
-						timeEle = Integer.parseInt(line.split("<|>")[2]);
-					} else {
-						timeEle = Integer.parseInt(line.split("<|>")[2].split("[+]")[0]) + Integer.parseInt(line.split("<|>")[2].split("[+]")[1]);
+		if (eles != null) {
+			Iterator<String> iter = eles.iterator();
+			if (iter.hasNext()) {
+				String line = iter.next();
+				// first get here:
+				//   <div class="tabbertab">
+				//    <h2>Timeline</h2>
+				while (iter.hasNext()) {
+					if (line.contains("tabbertab"))
+					{
+						line = iter.next();
+						if (line.contains("Timeline"))
+						{
+							break;
+						}
 					}
-					if (timeEle > 0) {
-						return true;
-					} else if (timeEle == 0) {
-						return false;
+					line = iter.next();
+				}
+
+				String tdClass = "liveTblTextBlk";
+				int timeEle = 0;
+				while (iter.hasNext()) {
+					line = iter.next();
+					if (line != null && line.length() > -1) {
+						if (line.contains(tdClass)) {
+							if (!line.split("<|>")[2].contains("+")) {
+								timeEle = Integer.parseInt(line.split("<|>")[2]);
+							} else {
+								timeEle = Integer.parseInt(line.split("<|>")[2].split("[+]")[0]) + Integer.parseInt(line.split("<|>")[2].split("[+]")[1]);
+							}
+							if (timeEle > 0) {
+								return true;
+							} else if (timeEle == 0) {
+								return false;
+							}
+						}
 					}
 				}
 			}
 		}
 		return false;
 	}
-	
+
 	private List<String> extractTimelineTable(List<String> toProcess) {
 		List<String> subLines = new ArrayList<String>();
 		int start = 0;
@@ -240,7 +244,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		}
 		return subLines;
 	}
-			
+
 	private List<String> flipList(List<String> lines) {
 		ListIterator<String> iter = lines.listIterator(lines.size());
 		List<String> newList = new ArrayList<String>();
@@ -250,7 +254,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		}
 		return newList;
 	}
-	
+
 	private List<String> flipRows(List<String> toProcess) {
 		List<String> processed = new ArrayList<String>();
 		List<String> flippedRow = new ArrayList<String>();
@@ -267,20 +271,20 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 			} 
 			if(start < end) {
 				processed = toProcess.subList(start, end);
-				
+
 				ListIterator<String> tdIter = processed.listIterator(processed.size());
 				while(tdIter.hasPrevious()) {
 					flippedRow.add(tdIter.previous());
 				}
-//				writeListToFile(flippedRow, "flipedRows" + i);
+				//				writeListToFile(flippedRow, "flipedRows" + i);
 				goodList.addAll(flippedRow);
 				flippedRow.clear();
 			}
 		}
-//		writeListToFile(goodList, "goodList");
+		//		writeListToFile(goodList, "goodList");
 		return goodList;
 	}
-		
+
 	private List<String> processHeader(List<String> toProcess) {
 		List<String> processed = new ArrayList<String>();
 		for(int i = 0; i < 8; i++) {
@@ -288,14 +292,14 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		}
 		return processed;
 	}
-	
+
 	private List<String> addHeader(List<String> toProcess) {
 		List<String> newList = new ArrayList<String>();
 		newList.addAll(header);
 		newList.addAll(toProcess);
 		return newList;
 	}
-	
+
 	private List<String> replaceTimeline(List<String> timeline, List<String> wholeList) {
 		// find the timeline in the big list and replace it with the flipped list.
 		List<String> modified = new ArrayList<String>();
@@ -318,31 +322,31 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 				modified.add(wholeList.get(x));
 			}
 		}
-		
+
 		modified.addAll(start -1,  timeline);
-		
+
 		return modified;
-		
+
 	}
-			
-//	private void writeListToFile(List<String> subLines, String filename) {
-//		if(subLines != null && subLines.size() > 0) {
-//			Iterator<String> iter = subLines.iterator();
-//			PrintWriter writer;
-//			try {
-//				writer = new PrintWriter("C:\\users\\seanm\\Development\\JAVA_SRC\\TEMP_FILES\\" + filename + ".html", "UTF-8");
-//				while(iter.hasNext()) {
-//					writer.println(iter.next());
-//				}
-//				writer.close();
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			} catch (UnsupportedEncodingException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-		
+
+	//	private void writeListToFile(List<String> subLines, String filename) {
+	//		if(subLines != null && subLines.size() > 0) {
+	//			Iterator<String> iter = subLines.iterator();
+	//			PrintWriter writer;
+	//			try {
+	//				writer = new PrintWriter("C:\\users\\seanm\\Development\\JAVA_SRC\\TEMP_FILES\\" + filename + ".html", "UTF-8");
+	//				while(iter.hasNext()) {
+	//					writer.println(iter.next());
+	//				}
+	//				writer.close();
+	//			} catch (FileNotFoundException e) {
+	//				e.printStackTrace();
+	//			} catch (UnsupportedEncodingException e) {
+	//				e.printStackTrace();
+	//			}
+	//		}
+	//	}
+
 	private void configureStats(IPlayerMatchStats cursor) {
 		stats = cursor;
 		if (match != null) {
@@ -364,7 +368,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		stats.setSlot(slot);
 
 	}
-	
+
 	private IPlayerMatchStats noRunOn() {
 		stats = pmsf.create();
 		stats.setMatchId(match.getId()); // native ID, not scrum's
@@ -383,7 +387,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		pmsf.put(stats);
 		return stats;
 	}
-	
+
 	private IPlayerMatchStats getPlayerStats(Iterator<String> it, IPlayerMatchStats stats) {
 		//now read the player
 		String line = getNext(it);  //<tr>
@@ -612,7 +616,7 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 			return true;
 		}
 	}
-		
+
 	private String findName(String line) {
 		// it can be in a few different places in the strtok
 		String[] split = line.split("<|>| - ");
@@ -625,10 +629,10 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		}
 		return null;
 	}
-	
-	
+
+
 	/**
-     * @param pms - Reserve player we are trying to determine a position for
+	 * @param pms - Reserve player we are trying to determine a position for
 	 * @param offList - The players who came off the field as he went on
 	 * @return - The "best fit" position, meaning each slot has a "first choice" (jersey 16 => hooker, jerseys 17,18 => prop, etc). If there wasn't one of them we go through the second choices for that jersey. If we can't find anything we return position.NONE
 	 */
@@ -822,6 +826,18 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 		this.url = url;
 	}
 	@Override
+	public void setUrl(String url, Boolean flushFromCache) {
+		this.url = url;
+		
+		if (flushFromCache) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "The UrlCacher actually flushes automatically every 5 minutes so this doesn't actually work. " + url);
+		}
+		// we now have all IUrlCached objects expire after 5 minutes
+//		if (urlCache != null) {
+//			urlCache.clear(url);
+//		}
+	}
+	@Override
 	public boolean process() {
 		if (stats == null) {
 			populateStats();
@@ -844,4 +860,36 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 	public IPlayerMatchStats getStats() {
 		return stats;
 	}
+
+	@Override
+	public Boolean hasFlopped() {
+		urlCache.setUrl(url);
+		List<String> lines = urlCache.get();
+
+		List<String> timeline = lines;
+
+		boolean flopped = !isUpsideDown(timeline);
+
+		boolean present = false;
+		Iterator<String> it = lines.iterator();
+		String line = it.next();
+		int countTabs = 0;
+		while (it.hasNext() && !present && countTabs < 5) {
+			line = getNext(it);
+			// 
+			if (line.contains("tabbertab")) {
+				line = getNext(it);
+				if (line.contains("Match stats")) {
+					present = true;
+				}
+				countTabs++;
+			}
+		}
+
+		// also include a check as to whether the stats are actually there.
+		// if the second tab says "Other Scores", they're not.
+
+		return flopped && present;
+	}
 }
+

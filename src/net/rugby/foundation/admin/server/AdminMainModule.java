@@ -22,7 +22,6 @@ import net.rugby.foundation.admin.server.factory.ofy.OfyBlurbFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfyDigestEmailFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfyMatchRatingEngineSchemaFactory;
 import net.rugby.foundation.admin.server.factory.ofy.OfySeriesConfigurationFactory;
-import net.rugby.foundation.admin.server.factory.test.TestSeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationConfigurationFactory;
 import net.rugby.foundation.admin.server.orchestration.IOrchestrationFactory;
 import net.rugby.foundation.admin.server.orchestration.OfyOrchestrationConfigurationFactory;

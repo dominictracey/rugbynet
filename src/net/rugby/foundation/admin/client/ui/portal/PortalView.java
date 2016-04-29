@@ -2,19 +2,18 @@ package net.rugby.foundation.admin.client.ui.portal;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.IsWidget;
-
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayerRating;
-import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
+
+import com.google.gwt.user.client.ui.IsWidget;
 
 public interface PortalView<T extends IPlayerRating> extends IsWidget {
 	public interface PortalViewPresenter<T> {
@@ -33,7 +32,7 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 
 		void portalViewCompPopulate(Long id);
 		
-		void setTimeSeries(boolean isTrue);
+		//void setTimeSeries(boolean isTrue);
 
 		void rerunQuery(IRatingQuery rq);
 

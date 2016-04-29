@@ -246,7 +246,7 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 					}
 				}
 
-				sb.appendHtmlConstant("<div class=\"addthis_toolbox addthis_default_style addthis_32x32_style rugbyNetAddThis\" addthis:url=\"" + clientFactory.getCoreConfig().getBaseToptenUrl() + guid + "\" addthis:title=\"" + tweet + "\">"
+				sb.appendHtmlConstant("<div class=\"addthis_toolbox addthis_default_style addthis_32x32_style rugbyNetAddThis\" addthis:url=\"" + clientFactory.getCoreConfig().getBaseToptenUrl() + "s/" + guid + "\" addthis:title=\"" + tweet + "\">"
 						//						+ "<a class=\"addthis_button_email\"></a>"
 						+ "<a class=\"addthis_button_facebook\"></a>"
 						+ "<a class=\"addthis_button_twitter\"></a>"

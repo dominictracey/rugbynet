@@ -1,11 +1,15 @@
 package net.rugby.foundation.admin.client.activity;
 
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.ui.SmartBar;
+
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.ui.SmartBar;
 
 public class MenuItemDelegate implements SmartBar.Presenter {
 
@@ -41,22 +45,28 @@ public class MenuItemDelegate implements SmartBar.Presenter {
 
 	@Override
 	public void cleanUp() {
-		if (Window.confirm("This will delete all PlayerRatings, RatingQueries and Fetcher Pipelines. Proceed?")) {			
-			clientFactory.getRpcService().cleanUp(new AsyncCallback<String>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					Window.alert("Problem with clean up:" + caught.getLocalizedMessage());
-					
-				}
-
-				@Override
-				public void onSuccess(String result) {
-					Window.alert(result);
-				}
+		Bootbox.confirm("This will remove admin detail information from PlayerRatings and flush all Fetcher Pipelines. Proceed?", new ConfirmCallback() {	
+			@Override
+			public void callback(boolean result) {
 				
-			});
-		}
+				if (result) {
+					clientFactory.getRpcService().cleanUp(new AsyncCallback<String>() {
+		
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Problem with clean up:" + caught.getLocalizedMessage());
+							
+						}
+		
+						@Override
+						public void onSuccess(String result) {
+							Notify.notify("Clean up underway");
+						}
+						
+					});
+				}
+			}
+		});
 		
 	}
 

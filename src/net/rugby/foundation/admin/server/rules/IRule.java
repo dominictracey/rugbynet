@@ -11,4 +11,5 @@ package net.rugby.foundation.admin.server.rules;
 public interface IRule<T> {
 	void setTarget(T t);
 	Boolean test();
+	String getLog();
 }

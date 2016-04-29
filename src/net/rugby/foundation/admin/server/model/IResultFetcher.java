@@ -13,6 +13,11 @@ public interface IResultFetcher {
 	public void setComp(ICompetition comp);
 	public void setRound(IRound round);
 	
+	/**
+	 * 
+	 * @param match
+	 * @return the match result or null if not found
+	 */
 	public IMatchResult getResult(IMatchGroup match);
 	
 	/**
@@ -21,4 +26,10 @@ public interface IResultFetcher {
 	 */
 	public Map<String, IMatchGroup> getMatches(String url, Map<String, ITeamGroup> teams);
 
+	/**
+	 * 
+	 * @param match
+	 * @return true if the match has a listing in the espn result view
+	 */
+	public Boolean isAvailable(IMatchGroup match);
 }

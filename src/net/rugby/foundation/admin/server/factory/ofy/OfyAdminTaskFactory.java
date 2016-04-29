@@ -4,16 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.google.inject.Inject;
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.AdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
+import net.rugby.foundation.admin.shared.EditPlayersTwitterAdminTask;
 import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IAdminTask.Action;
@@ -31,8 +27,13 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
+import com.google.inject.Inject;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
+
 public class OfyAdminTaskFactory implements IAdminTaskFactory {
-	
+
 	private final long DEFAULTADMINID = 0L;
 
 	private IPlayerFactory pf;
@@ -41,7 +42,7 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 	private Objectify ofy;
 	private ITeamGroupFactory tf;
 	private ITeamMatchStatsFactory tmsf;
-	
+
 	@Inject
 	public OfyAdminTaskFactory(IPlayerFactory pf, IMatchGroupFactory mgf, IPlayerMatchStatsFactory pmsf, ITeamGroupFactory tf, ITeamMatchStatsFactory tmsf) {
 		this.pf = pf;
@@ -51,7 +52,7 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 		this.tmsf = tmsf;
 		this.ofy = DataStoreFactory.getOfy();
 	}
-	
+
 	@Override
 	public IAdminTask get(Long id) {
 		IAdminTask task = ofy.get(new Key<AdminTask>(AdminTask.class, id));
@@ -61,17 +62,17 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 
 	@Override
 	public List<? extends IAdminTask> getAllOpen() {
-		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("status", Status.OPEN).order("created");
+		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("status", Status.OPEN).order("-created");
 		return qat.list();
 	}
-	
+
 
 	@Override
 	public IAdminTask getNewEditPlayerMatchStatsTask(String summary, String details,
 			IPlayer player, IMatchGroup match, Home_or_Visitor hov,
 			Integer slot, IPlayerMatchStats pms, boolean sendEmail,
 			String pipelineRoot, String pipelineJob, String promiseHandle) {
-		
+
 		return new EditPlayerMatchStatsAdminTask(null, Action.EDITPLAYERMATCHSTATS, DEFAULTADMINID, new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob, player, match, pms);
 	}
 
@@ -79,12 +80,12 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 	public IAdminTask getNewEditPlayerTask(String summary, String details,
 			IPlayer player, boolean sendEmail, String pipelineRoot,
 			String pipelineJob, String promiseHandle) {
-		
+
 		Long id = null;
 		if (player != null) {
 			id = player.getId();
 		}
-		
+
 		return new EditPlayerAdminTask(null, Action.EDITPLAYER, DEFAULTADMINID, new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob, id, player);
 	}
 
@@ -105,7 +106,7 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 	@Override
 	public List<? extends IAdminTask> delete(List<IAdminTask> selectedItems) {
 		ofy.delete(selectedItems);
-		
+
 		return getAllOpen();
 	}
 
@@ -114,16 +115,30 @@ public class OfyAdminTaskFactory implements IAdminTaskFactory {
 			String details, ITeamGroup team, IMatchGroup match,
 			Home_or_Visitor hov, ITeamMatchStats tms, boolean sendEmail,
 			String pipelineRoot, String pipelineJob, String promiseHandle) {
-		
+
 		return new EditTeamMatchStatsAdminTask(null, Action.EDITTEAMMATCHSTATS, DEFAULTADMINID,
-				 new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob,
-				 team, match, tms);
+				new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob,
+				team, match, tms);
 	}
 
 	@Override
 	public List<? extends IAdminTask> getForPipeline(String fetchMatchStatsPipelineId) {
 		Query<AdminTask> qat = ofy.query(AdminTask.class).filter("pipelineRoot", fetchMatchStatsPipelineId);
 		return qat.list();
+	}
+
+	@Override
+	public IAdminTask getNewEditPlayerTwitterTask(String summary, String details,
+			IPlayer player, Long topTenItemId, Long topTenListId, boolean sendEmail, String pipelineRoot,
+			String pipelineJob, String promiseHandle) {
+		Long id = null;
+		if (player != null) {
+			id = player.getId();
+		}
+
+		return new EditPlayersTwitterAdminTask(null, Action.EDITPLAYERTWITTER, DEFAULTADMINID, new Date(), null, Status.OPEN, Priority.MAJOR, summary, details, new ArrayList<String>(), promiseHandle, pipelineRoot, pipelineJob, id, player, topTenListId, topTenItemId);
+
+
 	}
 
 }

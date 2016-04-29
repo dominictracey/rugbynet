@@ -50,7 +50,7 @@
     
     <datastore-index kind="AdminTask" ancestor="false" source="manual">
         <property name="status" direction="asc"/>
-        <property name="created" direction="asc"/>
+        <property name="created" direction="desc"/>
     </datastore-index>
     
     <datastore-index kind="TopTenList" ancestor="false" source="manual">
@@ -62,6 +62,16 @@
     <datastore-index kind="TopTenList" ancestor="false" source="auto">
         <property name="live" direction="asc"/>
         <property name="published" direction="desc"/>
+    </datastore-index>
+    
+    <datastore-index kind="Group" ancestor="false" source="auto">
+        <property name="status" direction="asc"/>
+        <property name="visitingTeamId" direction="desc"/>
+    </datastore-index>
+    
+    <datastore-index kind="Group" ancestor="false" source="auto">
+        <property name="status" direction="asc"/>
+        <property name="homeTeamId" direction="desc"/>
     </datastore-index>
     
 </datastore-indexes>

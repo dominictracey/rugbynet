@@ -77,9 +77,8 @@
 			</g:HTMLPanel>
 			<!-- <g:VerticalPanel> -->
 			<!-- <g:HorizontalPanel> -->
-			<b:ButtonGroup dataToggle="BUTTONS">
-				<b:CheckBoxButton ui:field="timeSeries" />
-			</b:ButtonGroup>
+
+			<b:Button dataToggle="BUTTON" ui:field="timeSeries" />
 
 			<b:Button ui:field="query">Query</b:Button>
 			<b:Button ui:field="clear">Clear</b:Button>

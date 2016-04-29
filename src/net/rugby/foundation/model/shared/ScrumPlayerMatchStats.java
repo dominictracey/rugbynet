@@ -69,7 +69,10 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 	private String name;
 	private String teamAbbr;
 
-
+	@Unindexed
+	private List<Long> taskIds;
+	@Unindexed
+	private List<Long> blockingTaskIds;
 
 	//@REX should implement to be able to save list of Longs.
 	@Transient
@@ -600,4 +603,30 @@ public class ScrumPlayerMatchStats implements Serializable, IPlayerMatchStats {
 		}
 	}
 
+
+	@Override
+	public List<Long> getTaskIds() {
+		if (taskIds == null) {
+			taskIds = new ArrayList<Long>();
+		}
+		return taskIds;
+	}
+
+	@Override
+	public void setTaskIds(List<Long> taskIds) {
+		this.taskIds = taskIds;
+	}
+
+	@Override
+	public List<Long> getBlockingTaskIds() {
+		if (blockingTaskIds == null) {
+			blockingTaskIds = new ArrayList<Long>();
+		}
+		return blockingTaskIds;
+	}
+
+	@Override
+	public void setBlockingTaskIds(List<Long> taskIds) {
+		this.blockingTaskIds = taskIds;
+	}
 }

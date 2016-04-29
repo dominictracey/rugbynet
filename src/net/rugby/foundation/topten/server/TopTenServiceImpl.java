@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.promote.IPromoter;
 import net.rugby.foundation.model.shared.IAppUser;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -41,6 +43,7 @@ import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
+import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITopTenUser;
 import net.rugby.foundation.model.shared.LoginInfo;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -74,7 +77,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	private INoteFactory nf;
 	private IPlayerFactory pf;
 	private ITeamGroupFactory tgf;
-	private int bufferCount;
+	private IPromoter twitter;
 
 	private static final long serialVersionUID = 1L;
 	public TopTenServiceImpl() {
@@ -85,7 +88,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 	@Inject
 	public void setFactories(ITopTenListFactory ttlf, IAppUserFactory auf, IContentFactory ctf, IPlayerRatingFactory prf,
 			IRatingSeriesFactory rsf, IRatingQueryFactory rqf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf, IPlaceFactory spf,
-			INoteFactory nf, IPlayerFactory pf, ITeamGroupFactory tgf, IConfigurationFactory ccf) {
+			INoteFactory nf, IPlayerFactory pf, ITeamGroupFactory tgf, IConfigurationFactory ccf, IPromoter twitter) {
 		try {
 			this.ttlf = ttlf;
 			this.auf = auf;
@@ -100,6 +103,7 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			this.pf = pf;
 			this.tgf = tgf;
 			this.ccf = ccf;
+			this.twitter = twitter;
 
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
@@ -577,117 +581,25 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 		}
 	}
 
-	private final static String BUFFER_CREATE_URL = "https://api.bufferapp.com/1/updates/create.json";
 
 	@Override
-	public String sendTweets(Long ttlId) {
+	public List<IPlayer> sendTweets(Long ttlId) {
 		if (isAdmin()) {
-			try {				
-				ITopTenList ttl = ttlf.get(ttlId);
-				String retval = "<h3>Tweet results for " + ttl.getTitle() + "</h3>";
-
-				if (ttl != null) {
-					for (ITopTenItem tti : ttl.getList()) {
-						retval += sendTweet(tti, ttl);
-					}
-				}
-				
-				retval += "<hr>Buffer count: " + bufferCount;
-				return retval;
-			}  catch (Throwable e) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
-				return null;
-			}
+			return twitter.promoteList(ttlId);
 		} else {
-			return "Not logged in as admin. Please contact info@rugby.net immediately.";
+			return null;
 		}
 	}
 	
-	private String sendTweet(ITopTenItem tti, ITopTenList ttl) {
+	@Override
+	public String sendTweet(ITopTenItem tti, ITopTenList ttl) {
 		if (isAdmin()) {
-			try {
-
-				if (tti.getPlayer().getTwitterHandle() == null || tti.getPlayer().getTwitterHandle().isEmpty()) {
-					return tti.getPlayer().getDisplayName() + ": no twitter handle<br>";
-				}
-				String charset = java.nio.charset.StandardCharsets.UTF_8.name();
-
-				String listDesc = ttl.getTwitterDescription();
-				if (listDesc == null || listDesc.isEmpty()) {
-					listDesc = ttl.getTitle();
-				}
-
-				String guid = "";
-				// this will always drive users to the feature, even if they share the series link (a good thing?)
-				if (tti.getFeatureGuid() == null) {
-					guid = tti.getPlaceGuid();
-				} else {
-					guid = tti.getFeatureGuid();
-				}
-
-				String tweet = "";
-
-				// #1 gets a dot
-				if (tti.getOrdinal() == 1) {
-					tweet += ".";
-				}
-
-				tweet += tti.getTweet() + " is #" + tti.getOrdinal() + " on @TheRugbyNet " + listDesc;
-				if (tti.getTwitterChannel() != null && !tti.getTwitterChannel().isEmpty() && tweet.length() < 115 - tti.getTwitterChannel().length()) {
-					tweet += " " + tti.getTwitterChannel();
-				}				
-
-				StringBuilder params = new StringBuilder();
-				params.append("access_token=1/4266c2423560ded98f0b532cac894c07");
-				params.append("&profile_ids[]=53f4ab03c4320ad025b8ee70");
-				params.append("&text=" + URLEncoder.encode(tweet,charset));
-				params.append("&shorten=false");
-				params.append("&profile_service=facebook");
-				String link = ccf.get().getBaseToptenUrl() + "s/" + guid;
-				params.append("&media[link]=" + URLEncoder.encode(link,charset));
-				//params.append("media[title]=" + URLEncoder.encode(b.getLinkText(),charset));
-
-				byte[] postData = params.toString().getBytes(charset);
-				int    postDataLength = postData.length;
-
-				URL url = new URL(BUFFER_CREATE_URL);
-				HttpURLConnection conn= (HttpURLConnection) url.openConnection();           
-				conn.setDoOutput(true);
-				conn.setInstanceFollowRedirects( false );
-				conn.setRequestMethod( "POST" );
-				conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
-				conn.setRequestProperty( "charset", charset);
-				conn.setRequestProperty( "Content-Length", Integer.toString(postDataLength));
-				conn.setUseCaches( false );
-
-				DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-				wr.write(postData);
-				Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
-
-				StringBuilder sb = new StringBuilder();
-				for (int c; (c = in.read()) >= 0;)
-					sb.append((char)c);
-				String response = sb.toString();
-
-				JSONObject json = new JSONObject(response);
-				bufferCount = json.getInt("buffer_count");
-				if (json.getBoolean("success")) {
-					return tti.getPlayer().getDisplayName() + ": success<br>\n";
-				} else {
-					return tti.getPlayer().getDisplayName() + ": failed<br>\n";
-				}
-
-			} catch (IOException ex) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-				return ex.getMessage();
-			}  catch (JSONException ex) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
-				return ex.getMessage();
-			}
+			return twitter.promoteItem(tti, ttl);
 		} else {
-			return "Not logged in as admin. Please contact info@rugby.net immediately.";
+			return null;
 		}
 	}
+
 
 	private boolean isAdmin() {
 		IAppUser u = getAppUser();
@@ -695,6 +607,21 @@ public class TopTenServiceImpl extends RemoteServiceServlet implements TopTenLis
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Boolean savePlayer(IPlayer p) {
+		if (isAdmin()) {
+			try {				
+				pf.put(p);
+				return true;
+			}  catch (Throwable e) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getLocalizedMessage(),e);
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 }

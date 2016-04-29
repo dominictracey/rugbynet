@@ -2,13 +2,6 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.DialogBox;
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.PortalPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
@@ -23,17 +16,25 @@ import net.rugby.foundation.admin.client.ui.portal.PortalView.PortalViewPresente
 import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView.TeamMatchStatsPopupViewPresenter;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.core.client.Core;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
+
+import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.DialogBox;
 
 public class PortalActivity extends AbstractActivity implements  
 AdminView.Presenter, PlayerPopupView.Presenter<IPlayer>, SmartBar.Presenter,
@@ -50,7 +51,7 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	private PortalView<IPlayerRating> view;
 	private EditTTLInfo ttltext;
 
-	protected boolean isTimeSeries= false;
+	//protected boolean isTimeSeries= false;
 	private MenuItemDelegate menuItemDelegate;
 
 
@@ -583,7 +584,6 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	public void submitPortalQuery(List<Long> compIds, List<Long> roundIds, List<position> posis, List<Long> countryIds, List<Long> teamIds, Long schemaId,
 			Boolean scaleTime, Boolean scaleComp, Boolean scaleStanding, Boolean scaleMinutesPlayed ,Boolean instrument) {
 
-		//if (!isTimeSeries) {
 		clientFactory.getRpcService().createRatingQuery(compIds, roundIds, posis, countryIds, teamIds, schemaId,
 				scaleTime, scaleComp, scaleStanding, scaleMinutesPlayed, instrument, new AsyncCallback<IRatingQuery>() {
 
@@ -593,12 +593,10 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 			}
 
 			@Override
-			public void onSuccess(IRatingQuery result) {
-				//clientFactory.getPortalView().setRatingQuery(result);	
+			public void onSuccess(IRatingQuery result) {				//clientFactory.getPortalView().setRatingQuery(result);	
 				goTo(new PortalPlace("queryId=" + result.getId().toString()));
 			}
 		});
-		//}
 
 	}
 
@@ -643,11 +641,11 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 			}
 		});			
 	}
-
-	@Override
-	public void setTimeSeries(boolean isTrue) {
-		isTimeSeries = isTrue;		
-	}
+//
+//	@Override
+//	public void setTimeSeries(boolean isTrue) {
+//		isTimeSeries = isTrue;		
+//	}
 
 
 	@Override

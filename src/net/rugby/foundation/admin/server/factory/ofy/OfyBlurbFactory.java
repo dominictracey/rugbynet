@@ -6,19 +6,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.inject.Inject;
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
 import net.rugby.foundation.admin.server.factory.IBlurbFactory;
 import net.rugby.foundation.admin.shared.Blurb;
 import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
-import net.rugby.foundation.model.shared.IServerPlace;
-import net.rugby.foundation.model.shared.ServerPlace;
+
+import com.google.inject.Inject;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 public class OfyBlurbFactory extends BaseCachingFactory<IBlurb> implements IBlurbFactory {
 

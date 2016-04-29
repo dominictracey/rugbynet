@@ -3,8 +3,6 @@
  */
 package net.rugby.foundation.admin.shared;
 
-import java.util.List;
-
 /**
  * @author home
  *
@@ -15,9 +13,8 @@ public interface IWorkflowConfiguration {
 
 	public abstract void setId(Long id);
 
-	public abstract List<Long> getUnderwayCompetitions();
+	public abstract void setMidweekPipelineId(String pipelineId);
 
-	public abstract void setUnderwayCompetitions(
-			List<Long> underwayCompetitions);
+	public abstract String getMidweekPipelineId();
 
 }

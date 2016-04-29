@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
@@ -14,6 +16,7 @@ import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRound;
@@ -93,7 +96,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
-		url.setText("http://www.espnscrum.com/premiership-2012-13/rugby/series/166258.html");
+		url.setText("http://en.espn.co.uk/super-rugby-2016/rugby/series/276687.html");
 
 		resultType.clear();
 		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {
@@ -493,7 +496,29 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 						if (round.getText().contains(rid)) {
 							round.removeItems();
 							for (IMatchGroup mg : result) {
-								TreeItem ti = round.addTextItem(mg.getDisplayName() + "|" + mg.getId());
+								Div div  = new Div();
+								Icon icon = new Icon();
+								icon.setType(IconType.CIRCLE);
+								if (mg.getWorkflowStatus() == null || mg.getWorkflowStatus().ordinal() < WorkflowStatus.FINAL.ordinal()) {
+									icon.setColor("lightgrey");
+								} else if (mg.getWorkflowStatus() == (WorkflowStatus.FINAL)) {
+									icon.setColor("lightblue");
+								} else if (mg.getWorkflowStatus() == (WorkflowStatus.FETCHED)) {
+									icon.setColor("blue");
+								} else if (mg.getWorkflowStatus() == (WorkflowStatus.RATED)) {
+									icon.setColor("lightgreen");
+								} else if (mg.getWorkflowStatus() == (WorkflowStatus.PROMOTED)) {
+									icon.setColor("green");
+								} else if (mg.getWorkflowStatus() == (WorkflowStatus.ERROR)) {
+									icon.setColor("red");
+								} else if (mg.getWorkflowStatus().equals(WorkflowStatus.NO_STATS)) {
+									icon.setColor("black");
+								}
+								div.add(icon.asWidget());
+								Span span = new Span(mg.getDisplayName() + "|" + mg.getId());
+								div.add(span);
+								TreeItem ti = round.addItem(div);
+								//TreeItem ti = round.addTextItem(mg.getDisplayName() + "| " + mg.getId());
 								ti.addTextItem(mg.getDate().toString());
 								if (mg.getLocked() != null) {
 									if (mg.getLocked()) {

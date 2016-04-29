@@ -7,17 +7,17 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.inject.Inject;
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
-
 import net.rugby.foundation.core.server.factory.BasePlayerFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.ScrumPlayer;
+
+import com.google.inject.Inject;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 /**
  * @author home
@@ -47,6 +47,10 @@ public class OfyPlayerFactory extends BasePlayerFactory implements IPlayerFactor
 			}
 			Objectify ofy = DataStoreFactory.getOfy();
 			ofy.put(player);
+			
+			// drop any cached scrumId version of the player
+			dropFromCache(getScrumCacheId(player.getScrumId()).toString());
+			
 			return player;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);

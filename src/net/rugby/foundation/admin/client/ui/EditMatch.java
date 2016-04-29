@@ -7,6 +7,8 @@ import java.util.Date;
 
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
+import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -85,6 +87,8 @@ public class EditMatch extends Composite {
 	@UiField
 	ListBox status;
 	@UiField
+	ListBox workFlowStatus;
+	@UiField
 	CheckBox locked;
 	@UiField
 	TextBox homeScore;
@@ -94,6 +98,8 @@ public class EditMatch extends Composite {
 	Button saveScore;
 	@UiField
 	Anchor pipelineLink;
+	@UiField
+	Anchor scrumLink;
 
 	IMatchGroup matchGroup = null;
 	private Presenter listener;
@@ -108,6 +114,9 @@ public class EditMatch extends Composite {
 		}
 		int selected = status.getSelectedIndex();
 		matchGroup.setStatus(Status.valueOf(Status.class, status.getItemText(selected)));
+		selected = workFlowStatus.getSelectedIndex();
+		matchGroup.setWorkflowStatus(WorkflowStatus.valueOf(WorkflowStatus.class,workFlowStatus.getItemText(selected)));
+		
 		listener.saveMatchInfo(matchGroup);
 	}
 
@@ -150,11 +159,25 @@ public class EditMatch extends Composite {
 			}
 		}
 
-		if (match.getForeignId() != null) {
+		status.setSelectedIndex(selectedIndex);
+		
+		workFlowStatus.clear();
+		for (WorkflowStatus s : WorkflowStatus.values()) {
+			workFlowStatus.addItem(s.toString());
+			if (match.getWorkflowStatus().equals(s)) {
+				selectedIndex = workFlowStatus.getItemCount()-1;
+			}
+		}
+		
+		workFlowStatus.setSelectedIndex(selectedIndex);
+		
+		if (match.getForeignId() != null || !match.getForeignId().equals(0L)) {
 			scrumId.setText(match.getForeignId().toString());
+		} else {
+			scrumId.setText("");
 		}
 
-		status.setSelectedIndex(selectedIndex);
+		
 		locked.setValue(match.getLocked());
 		if (match.getLocked()) {
 			lock.setText("Unlock");
@@ -173,6 +196,10 @@ public class EditMatch extends Composite {
 		pipelineLink.setHref("/_ah/pipeline/status.html?root=" + match.getFetchMatchStatsPipelineId());
 		pipelineLink.setTarget("top");
 		pipelineLink.setText("Fetch Match Stats Pipeline Status");
+		
+		scrumLink.setHref(match.getForeignUrl());
+		scrumLink.setTarget("_blank");
+		scrumLink.setText(match.getDisplayName() + " on espn.co.uk");
 	}
 
 	public void SetPresenter(Presenter p) {

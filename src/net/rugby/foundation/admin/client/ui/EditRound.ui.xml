@@ -17,10 +17,11 @@
   </ui:style>
 
 
-	<g:HTMLPanel>
+	<g:HTMLPanel ui:field="roundPanel">
 				Id: <g:Label ui:field='id'></g:Label><br/>
 				Name: <g:TextBox ui:field='name'></g:TextBox><br/>
-				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
+				Abbr: <g:TextBox ui:field='abbr'></g:TextBox>
+				Workflow Status: <g:ListBox ui:field='workFlowStatus'></g:ListBox><br/>
 				Standings before round started:		
 				<g:ScrollPanel  width="100%" height ="600px">	
 					<c:CellTable ui:field="standingTable" addStyleNames="{style.standingFlexTable}" width="100%"/>	    
@@ -28,6 +29,7 @@
 		<g:Button styleName="{style.important}" ui:field="fetch">Fetch</g:Button>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 		<g:Button styleName="{style.important}" ui:field="addMatch">Add Match</g:Button>
+		<g:Anchor ui:field="roundPipelineLink">Round Processing Pipeline UI</g:Anchor>
 	</g:HTMLPanel>
 	
 

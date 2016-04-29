@@ -2,7 +2,7 @@ package net.rugby.foundation.admin.server.factory;
 
 import java.util.List;
 
-import net.rugby.foundation.admin.server.workflow.matchrating.GenerateMatchRatings.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -28,5 +28,9 @@ public interface IAdminTaskFactory {
 	IAdminTask complete(IAdminTask task);
 	List<? extends IAdminTask> delete(List<IAdminTask> selectedItems);
 	List<? extends IAdminTask> getForPipeline(String fetchMatchStatsPipelineId);
+	IAdminTask getNewEditPlayerTwitterTask(String summary, String details,
+			IPlayer player, Long topTenItemId, Long topTenListId,
+			boolean sendEmail, String pipelineRoot, String pipelineJob,
+			String promiseHandle);
 
 }

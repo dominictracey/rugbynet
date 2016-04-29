@@ -62,12 +62,19 @@ public class AdminTaskPlace extends Place {
 //	}
 
 	
+	public AdminTaskPlace() {
+		
+	}
+
 	public String getToken() {
 		token = "";
 		
 		if (!taskId.isEmpty()) {
 			token += "taskId=";
 			token += taskId;
+			if (!filter.isEmpty()) {
+				token += "&";
+			}
 		}
 		
 		if (!filter.isEmpty()) {
@@ -101,5 +108,13 @@ public class AdminTaskPlace extends Place {
 			return new AdminTaskPlace(token);
 		}
 
+	}
+
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
+	}
+
+	public void setFilter(String filter) {
+		this.filter = filter;
 	}
 }

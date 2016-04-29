@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.model.shared.IHasId;
+
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import net.rugby.foundation.model.shared.IHasId;
 
 
 public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFactory<T> {
@@ -239,7 +240,7 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 	 * @param content - value to store or null to delete key
 	 * @return false on exception caught
 	 */
-	public boolean putItem(String divKey, T content) {
+	public boolean putItem(Object divKey, T content) {
 		try {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.delete(divKey);
@@ -276,4 +277,20 @@ public abstract class BaseCachingFactory<T extends IHasId> implements ICachingFa
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 		}	
 	}
+	
+	/**
+	 * 
+	 */
+	public void dropFromCache(String id) {
+		try {
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+
+			if (syncCache.contains(id)) {
+				syncCache.delete(id);
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+		}	
+	}
+	
 }

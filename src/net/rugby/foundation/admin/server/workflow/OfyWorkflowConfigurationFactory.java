@@ -3,16 +3,12 @@
  */
 package net.rugby.foundation.admin.server.workflow;
 
-import java.util.List;
+import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
+import net.rugby.foundation.admin.shared.WorkflowConfiguration;
+import net.rugby.foundation.model.shared.DataStoreFactory;
 
 import com.google.inject.Inject;
 import com.googlecode.objectify.Objectify;
-
-import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
-import net.rugby.foundation.admin.shared.WorkflowConfiguration;
-import net.rugby.foundation.core.server.factory.ICompetitionFactory;
-import net.rugby.foundation.model.shared.DataStoreFactory;
-import net.rugby.foundation.model.shared.ICompetition;
 
 /**
  * @author home
@@ -22,11 +18,9 @@ public class OfyWorkflowConfigurationFactory implements
 		IWorkflowConfigurationFactory {
 	
 	private Objectify ofy;
-	private ICompetitionFactory cf;
 
 	@Inject
-	public void setFactories(ICompetitionFactory cf) {
-		this.cf = cf;
+	public void setFactories() {
 		
 	}
 	
@@ -46,11 +40,6 @@ public class OfyWorkflowConfigurationFactory implements
 		// if there isn't one, create one with all the underway comps
 		if (wfc == null) {
 			wfc = new WorkflowConfiguration();
-			
-			List<ICompetition> list = cf.getUnderwayComps();
-			for (ICompetition comp : list) {
-				wfc.getUnderwayCompetitions().add(comp.getId());
-			}
 			put(wfc);
 		}
 		return wfc;

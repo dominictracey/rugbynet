@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
@@ -20,9 +21,11 @@ import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
+import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingQuery.Status;
+import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.RatingMode;
@@ -30,31 +33,29 @@ import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
-import com.google.appengine.tools.pipeline.ImmediateValue;
-import com.google.appengine.tools.pipeline.Job1;
+import com.google.appengine.tools.pipeline.Job2;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements Serializable {
+public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Long> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
 	private static Injector injector = null;
 
-	private IRatingQueryFactory rqf;
-	private IMatchRatingEngineSchemaFactory mresf;
-	private IQueryRatingEngineFactory qref;
-	private IPlayerRatingFactory prf;
-	private ITopTenListFactory ttlf;
-	private IRoundFactory rf;
-	private IUniversalRoundFactory urf;
-	private IMatchGroupFactory mgf;
-	private ICompetitionFactory cf;
+	transient private IRatingQueryFactory rqf;
+	transient private IMatchRatingEngineSchemaFactory mresf;
+	transient private IQueryRatingEngineFactory qref;
+	transient private IPlayerRatingFactory prf;
+	transient private ITopTenListFactory ttlf;
+	transient private IRoundFactory rf;
+	transient private IUniversalRoundFactory urf;
+	transient private IMatchGroupFactory mgf;
+	transient private ICompetitionFactory cf;
+	transient private ITeamGroupFactory tgf;
 
-
-
-	private ITeamGroupFactory tgf;
+	private IRatingSeriesFactory rsf;
 
 
 	public ProcessRatingQuery() {
@@ -62,7 +63,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 	}
 
 	@Override
-	public Value<Boolean> run(IRatingQuery rq) {
+	public Value<ProcessRatingQueryResult> run(Long rqid, Long rsid) {
 
 		IMatchGroup match = null;  // to support delayed guid linking
 		IRatingQuery preQuery = null; // for tracking player movement
@@ -71,16 +72,48 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			injector = BPMServletContextListener.getInjectorForNonServlets();
 		}
 
+		this.prf = injector.getInstance(IPlayerRatingFactory.class);
 		this.rqf = injector.getInstance(IRatingQueryFactory.class);
 		this.mresf = injector.getInstance(IMatchRatingEngineSchemaFactory.class);
 		this.qref = injector.getInstance(IQueryRatingEngineFactory.class);
-		this.prf = injector.getInstance(IPlayerRatingFactory.class);
 		this.ttlf = injector.getInstance(ITopTenListFactory.class);
-		this.rf = injector.getInstance(IRoundFactory.class);
-		this.urf = injector.getInstance(IUniversalRoundFactory.class);
-		this.mgf = injector.getInstance(IMatchGroupFactory.class);
-		this.cf = injector.getInstance(ICompetitionFactory.class);
-		this.tgf = injector.getInstance(ITeamGroupFactory.class);
+		this.rsf = injector.getInstance(IRatingSeriesFactory.class);
+		
+		ProcessRatingQueryResult retval = new ProcessRatingQueryResult();
+		
+		
+		IRatingSeries rs = rsf.get(rsid);
+		
+		// traverse to find the rq. don't trust the one in memcache you get from rqf.get()
+
+		IRatingGroup rg = null;
+		IRatingMatrix rm = null;
+		IRatingQuery rq = null;
+		
+		boolean found = false;
+		for (IRatingGroup g: rs.getRatingGroups()) {
+			for (IRatingMatrix m : g.getRatingMatrices()) {
+				for (IRatingQuery q : m.getRatingQueries()) {
+					if (q.getId().equals(rqid)) {
+						found = true;
+						rg = g;
+						rm = m;
+						rq = q;
+						break;
+					}
+				}
+			}
+		}
+		
+		if (!found) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Passed in a bad RatingQuery ID (" + rqid + ") that we couldn't find in the RatingSeries.");
+			retval.log.add("Passed in a bad RatingQuery ID (" + rqid + ") to ProcessRatingQuery that we couldn't find in the RatingSeries.");
+			retval.success = false;
+			retval.queryId = rqid;
+			return immediate(retval);
+		}
+		
+		retval.queryId = rq.getId();
 		
 		// first see if we are re-running, in which case clear out any ratings already in place
 		if (!rq.getStatus().equals(Status.NEW)) {
@@ -93,6 +126,8 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				}
 				rq.setTopTenListId(null);
 			}
+			
+			retval.log.add("Re-running rating query " + rq.getLabel());
 		}
 
 		rq.setStatus(Status.RUNNING);
@@ -109,41 +144,61 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 		IQueryRatingEngine mre = qref.get(mres, rq);
 		assert (mre != null);
 
-		boolean ok = false;
+		retval.success = false;
 		boolean inForm = false;
 		boolean bestYear = false;
 		boolean impact = false;
 		
 		try {
-			ok = mre.setQuery(rq);
+			retval.success = mre.setQuery(rq);
 
-			if (ok) {
+			if (retval.success) {
 				mre.generate(mres,rq.getScaleStanding(),rq.getScaleComp(),rq.getScaleTime(), rq.getScaleMinutesPlayed(), false);
+				retval.log.add("Running rating query " + rq.getLabel());
+				//rq.Status is set by the engine
+				if (rq.getStatus() == Status.COMPLETE) {
+					retval.success = true;
+				} else {
+					retval.success = false; // might have ERROR
+				}
 			} else {
 				// stats aren't ready
 				rq.setStatus(Status.NEW);
 				rqf.put(rq);
+				retval.log.add("Attempt to run rating query " + rq.getLabel() + " before stats are ready.");
 			}
 		} catch (Exception ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem generating ratings", ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem generating ratings for " + rq.getLabel(), ex);
 			rq.setStatus(Status.ERROR);
 			rqf.put(rq);
-			ok = false;
+			retval.success = false;
+			retval.log.add("Running rating query " + rq.getLabel() + " had errors. See server logs.");
 		}
 		
-		if (ok) {
+		if (retval.success) {
+			
+			
+			
+			this.rf = injector.getInstance(IRoundFactory.class);
+			this.urf = injector.getInstance(IUniversalRoundFactory.class);
+			this.mgf = injector.getInstance(IMatchGroupFactory.class);
+			this.cf = injector.getInstance(ICompetitionFactory.class);
+			this.tgf = injector.getInstance(ITeamGroupFactory.class);
+			
 			// the engine will set the status to complete if successful
-			IRatingQuery procked = rqf.get(rq.getId());
+			//IRatingQuery procked = rqf.get(rq.getId());
 
+			Long sponsorId = null;
+					
 			// now create the TTL
 			String title = "Top Ten ";
 			String context = "";
 			
-			if (rq.getRatingMatrix() == null && rq.getRatingMatrixId() != null) {
+			if (rm == null && rq.getRatingMatrixId() != null) {
 				rq = rqf.buildUplinksForQuery(rq);
 			}
 			
-			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH)) {
+			if (rs.getMode().equals(RatingMode.BY_MATCH)) {
 				title += "Players from ";
 				IRound r = rf.get(rq.getRoundIds().get(0));
 
@@ -159,23 +214,25 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 						title += context;
 					} else {
 						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not find match in setting title for RQ " + rq.getId() + " teamIds " + rq.getTeamIds().toString());
+						retval.success = false;
+						retval.log.add("Could not find match in setting title for RQ " + rq.getId() + " teamIds " + rq.getTeamIds().toString());
 					}
 				}
-			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_POSITION)) {
+			} else if (rs.getMode().equals(RatingMode.BY_POSITION)) {
 				// is this In Form or Last Round?
-				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
+				if (rm.getCriteria().equals(Criteria.IN_FORM)) {
 					title += "In Form ";
 					inForm = true;
-				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.BEST_YEAR)) {
+				} else if (rm.getCriteria().equals(Criteria.BEST_YEAR)) {
 					bestYear = true;
-				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.AVERAGE_IMPACT)) {
+				} else if (rm.getCriteria().equals(Criteria.AVERAGE_IMPACT)) {
 					title += "Impact ";
 					impact = true;
 				}
 				
 				title += rq.getPositions().get(0).getPlural();
 				
-				Long hostId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId();
+				Long hostId = rs.getHostCompId();
 				if (hostId != null) {
 					ICompetition hostComp = cf.get(hostId);
 					if (hostComp.getTTLTitleDesc() != null && !hostComp.getTTLTitleDesc().isEmpty()) {
@@ -219,10 +276,10 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				
 				if (inForm || bestYear || impact) {
 					// figure out the last list for this position
-					//rq.getRatingMatrix().getRatingQueries().indexOf(rq); // << This breaks on rerun, need to code by hand
+					//rm.getRatingQueries().indexOf(rq); // << This breaks on rerun, need to code by hand
 					int queryIndex = -1;
 					int j = 0;
-					for (IRatingQuery q : rq.getRatingMatrix().getRatingQueries()) {
+					for (IRatingQuery q : rm.getRatingQueries()) {
 						if (q.getId().equals(rq.getId())) {
 							queryIndex = j;
 							break;
@@ -230,31 +287,31 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 						++j;
 					}
 					
-					if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().size() > 1 && queryIndex != -1) {
+					if (rs.getRatingGroups().size() > 1 && queryIndex != -1) {
 						// we want to look back one ratingGroup - since new ones are added to the front of the list we look at index=1
-						Criteria criteria = rq.getRatingMatrix().getCriteria();
-						for (IRatingMatrix rm: rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().get(1).getRatingMatrices()) {
+						Criteria criteria = rm.getCriteria();
+						for (IRatingMatrix m: rs.getRatingGroups().get(1).getRatingMatrices()) {
 							if (rm.getCriteria().equals(criteria)) {
-								preQuery = rm.getRatingQueries().get(queryIndex);
+								preQuery = m.getRatingQueries().get(queryIndex);
 								break;
 							}
 						}
-						
 					}
 				}
 				
-			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_TEAM)) {
+			} else if (rs.getMode().equals(RatingMode.BY_TEAM)) {
 				assert(rq.getTeamIds().size() == 1);
 				
 				ITeamGroup team = tgf.get(rq.getTeamIds().get(0));
+				sponsorId = team.getSponsorId();
 				
 				// is this In Form, Best or Impact?
-				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
+				if (rm.getCriteria().equals(Criteria.IN_FORM)) {
 					title += "In Form ";
 					inForm = true;
-				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.BEST_YEAR)) {
+				} else if (rm.getCriteria().equals(Criteria.BEST_YEAR)) {
 					bestYear = true;
-				} else if (rq.getRatingMatrix().getCriteria().equals(Criteria.AVERAGE_IMPACT)) {
+				} else if (rm.getCriteria().equals(Criteria.AVERAGE_IMPACT)) {
 					title += "Impact ";
 					impact = true;
 				}
@@ -263,7 +320,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				
 				if (rq.getCompIds().size() < 2) {
 					// only include the name of the host comp if it is not virtual
-					Long hostId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId();
+					Long hostId = rs.getHostCompId();
 					if (hostId != null) {
 						ICompetition hostComp = cf.get(hostId);
 						if (hostComp.getTTLTitleDesc() != null && !hostComp.getTTLTitleDesc().isEmpty()) {
@@ -308,10 +365,10 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				
 				if (inForm || bestYear || impact) {
 					// figure out the last list for this position
-					//rq.getRatingMatrix().getRatingQueries().indexOf(rq); // << This breaks on rerun, need to code by hand
+					//rm.getRatingQueries().indexOf(rq); // << This breaks on rerun, need to code by hand
 					int queryIndex = -1;
 					int j = 0;
-					for (IRatingQuery q : rq.getRatingMatrix().getRatingQueries()) {
+					for (IRatingQuery q : rm.getRatingQueries()) {
 						if (q.getId().equals(rq.getId())) {
 							queryIndex = j;
 							break;
@@ -319,20 +376,19 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 						++j;
 					}
 					
-					if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().size() > 1 && queryIndex != -1) {
+					if (rs.getRatingGroups().size() > 1 && queryIndex != -1) {
 						// we want to look back one ratingGroup - since new ones are added to the front of the list we look at index=1
-						Criteria criteria = rq.getRatingMatrix().getCriteria();
-						for (IRatingMatrix rm: rq.getRatingMatrix().getRatingGroup().getRatingSeries().getRatingGroups().get(1).getRatingMatrices()) {
+						Criteria criteria = rm.getCriteria();
+						for (IRatingMatrix m: rs.getRatingGroups().get(1).getRatingMatrices()) {
 							if (rm.getCriteria().equals(criteria)) {
-								preQuery = rm.getRatingQueries().get(queryIndex);
+								preQuery = m.getRatingQueries().get(queryIndex);
 								break;
 							}
 						}
-						
 					}
 				}
 				
-			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_COMP)) {
+			} else if (rs.getMode().equals(RatingMode.BY_COMP)) {
 				// BY_COMP can be either:
 				//			a Round List "Top Ten Performances in Round 8 of the Aviva Premiership"
 				//			an overall In Form list "Top Ten In Form Players through Round 8 of the Aviva Premiership"
@@ -344,7 +400,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				
 				// is this In Form or Last Round?
 				inForm = false;
-				if (rq.getRatingMatrix().getCriteria().equals(Criteria.IN_FORM)) {
+				if (rm.getCriteria().equals(Criteria.IN_FORM)) {
 					title += "In Form Players ";
 					inForm = true;
 				} else {
@@ -352,9 +408,9 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 				}
 				
 				// the round we are talking about is the UR of the Rating Group
-				UniversalRound ur = rq.getRatingMatrix().getRatingGroup().getUniversalRound();
+				UniversalRound ur = rg.getUniversalRound();
 				
-				if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getCompIds().size() > 1) {
+				if (rs.getCompIds().size() > 1) {
 					//global - need to go by UR				
 					if (inForm) {
 						title += "Through " + ur.longDesc;
@@ -363,7 +419,7 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 					}
 				} else {
 					// comp specific
-					Long compId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getCompIds().get(0);
+					Long compId = rs.getCompIds().get(0);
 					ICompetition comp = cf.get(compId);
 					
 					for (IRound r : comp.getRounds()) {
@@ -381,15 +437,12 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			}
 			
 
-			
-			Long sponsorId = null;
-			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getSponsorId() != null) {
-				sponsorId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getSponsorId();
-			} else if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostComp() != null && rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostComp().getSponsorId() != null) {
-				sponsorId = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostComp().getSponsorId();
+			if (sponsorId == null) {
+				sponsorId = getSponsorId(rs, rq); 
 			}
 			
-			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", rq.getRatingMatrix().getRatingGroup().getRatingSeries().getHostCompId(), rq.getRoundIds(), 10, sponsorId);
+			
+			TopTenSeedData data = new TopTenSeedData(rq.getId(), title, "", rs.getHostCompId(), rq.getRoundIds(), 10, sponsorId);
 			data.setContext(context);
 			ITopTenList ttl = ttlf.create(data, preQuery);
 			
@@ -397,16 +450,38 @@ public class ProcessRatingQuery extends Job1<Boolean, IRatingQuery> implements S
 			ttlf.put(ttl);
 			
 			// if this is a match list, link the ttl guid to the match so we can support the result panel in the UI
-			if (rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode().equals(RatingMode.BY_MATCH) && match != null) {
+			if (rs.getMode().equals(RatingMode.BY_MATCH) && match != null) {
 				match.setGuid(ttl.getGuid());
 				mgf.put(match);
 			}
 			
-			return new ImmediateValue<Boolean>(procked.getStatus().equals(Status.COMPLETE));
+			retval.log.add("Created top ten list " + ttl.getTitle());
+			
+			
 		}
 		
-		return new ImmediateValue<Boolean>(false);
+		return immediate(retval);
 
+	}
+
+	private Long getSponsorId(IRatingSeries rs, IRatingQuery rq) {
+		try {
+		Long sponsorId = null;
+		if (rs.getSponsorId() != null) {
+			sponsorId = rs.getSponsorId();
+		} else if (rs.getHostComp() != null && rs.getHostComp().getSponsorId() != null) {
+			sponsorId = rs.getHostComp().getSponsorId();
+		}
+		
+		return sponsorId;
+		} catch (Throwable ex) {
+			String queryName = "UNKNOWN";
+			if (rq != null && rq.getLabel() != null)  {
+				queryName = rq.getLabel();
+			}
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting sponsor for rating query " + queryName, ex);
+			return null;
+		}
 	}
 
 	

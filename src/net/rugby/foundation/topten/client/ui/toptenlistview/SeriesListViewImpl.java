@@ -1,11 +1,15 @@
 package net.rugby.foundation.topten.client.ui.toptenlistview;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -19,23 +23,34 @@ import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Badge;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelFooter;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -105,6 +120,15 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@UiField 
 	protected Button promote;
 
+	// promote results
+	@UiField
+	protected Modal promoteModal;
+	@UiField
+	protected Button promoteSave;
+	@UiField
+	protected Div promoteHtml;
+
+
 	protected Long compId;
 	protected Long seriesId;
 	protected Long groupId;
@@ -167,7 +191,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	void onPromoteButtonClicked(ClickEvent event) {	
 		presenter.promote(list);
 	}
-	
+
 	@Override
 	public void setSeries(final IRatingSeries result) {
 		series = result;
@@ -272,7 +296,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			setQuery(null);
 			setItemId(null);
 		}
-		
+
 		weekButton.setText(group.getLabel());
 
 		criteriaGroup.setVisible(false);
@@ -355,19 +379,19 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 				if (q.getTopTenListId() != null) {
 					AnchorListItem nl = new AnchorListItem(q.getLabel());
 					final IRatingQuery _query = q;
-	
+
 					nl.addClickHandler(new ClickHandler() {
-	
+
 						@Override
 						public void onClick(ClickEvent event) {
-	
+
 							setQuery(null);
 							queryId = _query.getId();
 							setList(null);
 							setItemId(null);
 							presenter.gotoPlace(getPlace());
 						}
-	
+
 					});
 					matrixDropDown.add(nl);
 				}
@@ -391,7 +415,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 		this.query = query;
 		if (query != null) {
 			queryId = query.getId();
-			
+
 			presenter.process(getPlace());
 		} else {
 			queryId = null;
@@ -506,7 +530,7 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 			} else {
 				createFeature.setText("Create Feature");
 			}
-			
+
 			if (series != null && series.getMode() == RatingMode.BY_POSITION) {
 				lastPosition = query.getRatingMatrix().getRatingQueries().indexOf(query);
 			}
@@ -639,6 +663,158 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 	@Override
 	public Criteria getLastCriteria() {
 		return lastCriteria;
+	}
+	protected List<IPlayer> playerList = null;
+	protected Map<IPlayer, TextBox> playerMap = new HashMap<IPlayer, TextBox>();
+	protected Map<IPlayer, CheckBox> checkBoxMap = new HashMap<IPlayer, CheckBox>();
+
+	@Override
+	public void showPromoteResults(List<IPlayer> result) {
+		playerList = result; 
+		promoteHtml.clear();
+		for (IPlayer p: result){
+			Row row = new Row();
+			Column columnLabel = new Column("MD-3");
+			Column columnBadge = new Column("MD-1");
+			Column columnCheckbox = new Column("md-2");
+			Column columnLink = new Column("md-1");
+			Column columnField = new Column("md-4");
+
+			columnBadge.addStyleName("col-md-2");
+			columnLink.addStyleName("col-md-1");
+			columnField.addStyleName("col-md-4");
+			columnCheckbox.addStyleName("col-md-2");
+			columnLabel.add(new Span(p.getDisplayName()));
+			columnLabel.addStyleName("col-md-3");
+			columnLabel.addStyleName("twitterDialougeRow");
+
+			row.add(columnLabel);
+			row.add(columnBadge);
+			row.add(columnCheckbox);
+			row.add(columnLink);
+			row.add(columnField);
+
+			if (p.getTwitterHandle() != null && !p.getTwitterHandle().isEmpty()){
+				Badge b = new Badge();
+				Span spanLink = new Span("&nbsp;");
+				Span spanField = new Span("&nbsp;");
+				columnLink.add(spanLink);
+				columnField.add(spanField);
+				b.addStyleName("greenBadge");
+				b.setText("Success");
+				columnBadge.add(b);
+			} else if (p.getTwitterNotAvailable() != null && p.getTwitterNotAvailable().equals(true)){
+				Badge b = new Badge();
+				Span spanLink = new Span("&nbsp;");
+				Span spanField = new Span("&nbsp;");
+				columnLink.add(spanLink);
+				columnField.add(spanField);
+				b.addStyleName("redBadge");
+				b.setText("No Twitter");
+				columnBadge.add(b);
+			} else {
+				Badge b = new Badge();
+				b.addStyleName("redBadge");
+				b.setText("Fail");
+				CheckBox checkBox = new CheckBox();
+				checkBoxMap.put(p, checkBox);
+				checkBox.setText("No Twitter");
+				columnCheckbox.add(checkBox);
+
+				Button button = new Button();
+				button.setIcon(IconType.SEARCH);
+				Anchor a = new Anchor();
+				a.setText("Google");
+				String target;
+
+				target = "https://www.google.com/search?sourceid=chrome-psyapi2&ion=1&espv=2&ie=UTF-8&q="+ URL.encode(p.getDisplayName() + " rugby twitter ");
+				a.setHref(target);
+				a.setTarget("_blank");
+
+				TextBox tb = new TextBox();
+				playerMap.put(p, tb);
+				tb.setName(p.getDisplayName());
+				tb.setPlaceholder("@twitter");
+				columnBadge.add(b);
+				columnLink.add(a);
+				columnField.add(tb);
+			}
+
+			promoteHtml.add(row);
+
+		}
+		promoteModal.show();
+
+	}
+	@UiHandler("promoteSave")
+	protected void onPromoteSaveClicked (ClickEvent event) {
+		for (final IPlayer p: playerList){
+			if (playerMap.containsKey(p) || checkBoxMap.containsKey(p)){
+				TextBox tb = playerMap.get(p);
+				CheckBox cb = checkBoxMap.get(p);
+				final String twitter = tb.getText();
+				final Boolean noTwitter = cb.getValue();
+
+				Boolean dirty = false;
+
+				if (twitter != null && !twitter.isEmpty()) {
+					p.setTwitterHandle(twitter);
+					dirty = true;
+				}
+				if (noTwitter != null && noTwitter.equals(true)){
+					p.setTwitterNotAvailable(noTwitter);
+					dirty = true;
+				}
+				if (dirty) {
+					clientFactory.getRpcService().savePlayer(p, new AsyncCallback<Boolean>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							// TODO Auto-generated method stub
+
+						}
+
+						@Override
+						public void onSuccess(Boolean result) {
+							if (twitter.isEmpty() && noTwitter.equals(true)){
+								Notify.notify(p.getDisplayName() + " no twitter");
+							} else {
+								Notify.notify(p.getDisplayName() + " saved!");
+								ITopTenItem tti = null;
+								//list.getList();
+								//Look through the Top Ten List for the tti that has a playerId equal to the id of the player.
+								if (!twitter.isEmpty() && noTwitter.equals(false)){
+									for (ITopTenItem i: list.getList()){
+										if (i.getPlayerId().equals(p.getId())){
+											tti=i;
+											break;
+										}
+										//Notify.notify(tti.getPlayer().getDisplayName());
+									}
+									clientFactory.getRpcService().sendTweet(tti, list, new AsyncCallback<String>(){
+
+										@Override
+										public void onFailure(Throwable caught) {
+											// TODO Auto-generated method stub
+
+										}
+
+										@Override
+										public void onSuccess(String result) {
+											Notify.notify(result);
+
+										}
+
+									});
+								}
+							}
+						}
+					});
+				}
+			}
+
+		}
+		promoteModal.hide();
 	}
 
 }

@@ -19,12 +19,12 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
-import net.rugby.foundation.model.shared.MatchGroup;
-import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.SimpleScoreMatchResult;
 
 public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
@@ -153,8 +153,8 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 	protected IMatchResult createResult(IMatchGroup match) {
 		SimpleScoreMatchResult result = new SimpleScoreMatchResult();
 
-		homeTeamName = match.getHomeTeam().getDisplayName();
-		visitTeamName = match.getVisitingTeam().getDisplayName();
+		homeTeamName = match.getHomeTeam().getScrumName();
+		visitTeamName = match.getVisitingTeam().getScrumName();
 
 		result.setMatchID(match.getId());
 		result.setRecordedDate(new Date());
@@ -187,7 +187,7 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 		try {
 			Map<String, IMatchGroup> result = new HashMap<String, IMatchGroup>();
 
-			String resultURL = url + "?template=results";
+			String resultURL = url + "?noredir=1;template=results";
 
 			IUrlCacher urlCache = new UrlCacher(resultURL);
 			List<String> lines = urlCache.get();
@@ -410,6 +410,12 @@ public class ScrumSimpleScoreResultFetcher implements IResultFetcher {
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime().toString() + "**" + m.getDisplayName();
+	}
+
+	@Override
+	public Boolean isAvailable(IMatchGroup match) {
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Don't use the base class ScrumSimpleScoreResultFetcher to check isAvailable, use the Super Rugby one." );
+		return null;
 	}
 
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
-import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
@@ -12,24 +11,24 @@ import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.admin.shared.IWorkflowConfiguration;
 import net.rugby.foundation.admin.shared.TopTenSeedData;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
+import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
-import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
-import net.rugby.foundation.model.shared.IMatchGroup.Status;
-import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.UniversalRound;
-import net.rugby.foundation.topten.model.shared.ITopTenList;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -46,7 +45,7 @@ public interface RugbyAdminService extends RemoteService {
 	Map<String, IOrchestrationConfiguration> saveOrchestrationConfiguration(	Map<String, IOrchestrationConfiguration> configs);
 
 	List<IMatchGroup> getMatches(Long roundId);;
-	ITeamGroup saveTeam(ITeamGroup teamGroup);
+	ITeamGroup saveTeam(ITeamGroup teamGroup, boolean saveMatches);
 	ITeamGroup getTeam(Long teamId);
 	IPlayer getPlayer(Long id);
 	IPlayer savePlayer(IPlayer player, IAdminTask task);
@@ -160,4 +159,6 @@ public interface RugbyAdminService extends RemoteService {
 	Integer archive(List<Long> blurbIds);
 	Integer facebook(List<Long> blurbIds);
 	List<Long> twitter(List<Long> blurbIds);
+	IRound saveRound(IRound r);
+	List<String> bulkUploadEmails(List<String> emailsValid);
 }

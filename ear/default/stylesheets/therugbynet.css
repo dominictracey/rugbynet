@@ -577,8 +577,14 @@ input.joinLink {
 .ITA {
 	background-image: url("/resources/teams/ITA/200.png");
 }
+.JAG {
+	background-image: url("/resources/teams/JAG/200.png");
+}
 .JPN {
 	background-image: url("/resources/teams/JPN/200.png");
+}
+.KIN {
+	background-image: url("/resources/teams/KIN/200.png");
 }
 .LEI {
 	background-image: url("/resources/teams/LEI/200.png");
@@ -676,6 +682,9 @@ input.joinLink {
 .SUA {
 	background-image: url("/resources/teams/SUA/200.png");
 }
+.SUN {
+	background-image: url("/resources/teams/SUN/200.png");
+}
 .TGA {
 	background-image: url("/resources/teams/TGA/200.png");
 }
@@ -748,3 +757,12 @@ header{ background-color:#FFF}
 #draggablePanelList .panel-heading {
         cursor: move;
  }
+.redBadge {
+	background-color: red;
+}
+.greenBadge{
+	background-color: green;
+}
+.twitterDialougeRow{
+	min-height: 32px;
+}

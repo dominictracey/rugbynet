@@ -12,7 +12,7 @@
       <task-age-limit>2d</task-age-limit>
     </retry-parameters>
   </queue>
-    <queue>
+   <queue>
     <name>backup</name>
     <rate>10/s</rate>
     <bucket-size>40</bucket-size>
@@ -22,5 +22,12 @@
       <task-retry-limit>3</task-retry-limit>
       <task-age-limit>2d</task-age-limit>
     </retry-parameters>
+  </queue>
+   <queue>
+    <name>workflow</name>
+    <rate>50/s</rate>
+    <bucket-size>40</bucket-size>
+    <max-concurrent-requests>10</max-concurrent-requests>
+    <target>engine</target>
   </queue>
 </queue-entries>

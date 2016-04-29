@@ -1,8 +1,9 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:d="urn:import:com.google.gwt.user.datepicker.client" >
-
+    xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+    
     <ui:style>
     .playersViewButtonHPanel {
       margin: 5px 0px 0x 5px;
@@ -151,6 +152,16 @@ Twitter:
 
                         <g:TextBox ui:field="twitter" >
                         </g:TextBox>
+                    </td>
+                </tr>
+                <tr>
+
+                    <td>
+	<b:CheckBox ui:field="twitterNotAvailable">Twitter Not Available</b:CheckBox>
+                    </td>
+
+                    <td>
+	<g:Anchor ui:field='twitterGoogle'></g:Anchor><br/>			
                     </td>
                 </tr>    
                                 <tr>

@@ -3,10 +3,17 @@ package net.rugby.foundation.admin.client.ui.playerlistview;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Badge;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.html.Span;
 
+import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.cell.client.Cell.Context;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HTML;
@@ -92,89 +99,236 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerRating> {
 
 			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
 
+				boolean clickable = false;
+				
 				public Widget render(IPlayerRating c) {
-					String name = c.getMatchStats().get(0).getName();
-					return new HTML(name);
+					if (!c.getPlayer().getBlockingTaskIds().isEmpty()) {
+						Badge b = new Badge();
+						b.setText(c.getMatchStats().get(0).getName());						
+						b.addStyleName("badgeRed");
+						clickable = true;
+						return b;
+					} else if (!c.getPlayer().getTaskIds().isEmpty()) {
+						Badge b = new Badge();
+						b.setText(c.getMatchStats().get(0).getName());						
+						b.addStyleName("badgeOrange");
+						clickable = true;
+						return b;
+					} else {
+						String name = c.getMatchStats().get(0).getName();
+						return new HTML(name);
+					}
 				}
 
-//				public boolean isClickable() {
-//					return true;
-//				}
+				public boolean isClickable() {
+					return clickable;
+				}
 
 
 		        
+//				@Override
+//				public Column<IPlayerRating, ?> getColumn() {
+//					Column<IPlayerRating, ?> col = new TextColumn<IPlayerRating>() {
+//						@Override
+//						public String getValue(IPlayerRating c) {
+//							String name = c.getMatchStats().get(0).getName();
+//							return name;
+//						}
+//					};
+//					col.setSortable(true);
+//					return col;
+//				}
+//			});
 				@Override
-				public Column<IPlayerRating, ?> getColumn() {
-					Column<IPlayerRating, ?> col = new TextColumn<IPlayerRating>() {
-						@Override
-						public String getValue(IPlayerRating c) {
-							String name = c.getMatchStats().get(0).getName();
-							return name;
-						}
-					};
-					col.setSortable(true);
-					return col;
-				}
-			});
+				public Column<IPlayerRating, SafeHtml> getColumn() {
 
-			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
-				public Widget render(IPlayerRating c) {
-					String name = c.getMatchStats().get(0).getId().toString();
-					return new HTML(name);
-				}
-
-				public boolean isClickable() {
-					return true;
-				}
-
-				@Override
-				public Column<IPlayerRating, ?> getColumn() {
-					return new TextColumn<IPlayerRating>() {
-						@Override
-						public String getValue(IPlayerRating c) {
-							String name = c.getMatchStats().get(0).getId().toString();
-							return name;
-						}
-					};
-				}
-			});
-
-			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
-
-				public Widget render(IPlayerRating c) {
-					String name = "-";
-					if (c.getRating() != null && c.getRating() != null) {
-						name = c.getRating().toString();
-					}
-					Widget w = new HTML(name);
-					Tooltip tooltip = new Tooltip();
-				    tooltip.setWidget(w);
-				    tooltip.setText(c.getDetails());
-				    tooltip.setPlacement(Placement.RIGHT);
-				    tooltip.reconfigure();
-					return w;
-				}     
-
-				public boolean isClickable() {
-					return true;
-				}
-
-				@Override
-				public Column<IPlayerRating, ?> getColumn() {
-					Column<IPlayerRating, ?> col = new TextColumn<IPlayerRating>() {
-						@Override
-						public String getValue(IPlayerRating c) {
-							String name = "--";
-							if (c.getRating() != null && c.getRating() != null) {
-								name = c.getRating().toString();
+				    return new Column<IPlayerRating, SafeHtml>(new com.google.gwt.cell.client.SafeHtmlCell()) {
+			
+				    	
+				        @Override
+				        public SafeHtml getValue(final IPlayerRating c) {
+				        	if (!c.getPlayer().getBlockingTaskIds().isEmpty()) {
+								Badge b = new Badge();
+								b.setText(c.getMatchStats().get(0).getName());						
+								b.addStyleName("badgeRed");								
+								 SafeHtmlBuilder sb = new SafeHtmlBuilder();
+						         sb.appendHtmlConstant(b.toString());
+						         return sb.toSafeHtml();
+							} else if (!c.getPlayer().getTaskIds().isEmpty()) {
+								Badge b = new Badge();
+								b.setText(c.getMatchStats().get(0).getName());						
+								b.addStyleName("badgeOrange");								
+								SafeHtmlBuilder sb = new SafeHtmlBuilder();
+								sb.appendHtmlConstant(b.toString());
+								return sb.toSafeHtml();
+							} else {
+								Span s = new Span(c.getMatchStats().get(0).getName());							
+								SafeHtmlBuilder sb = new SafeHtmlBuilder();
+								sb.appendHtmlConstant(s.toString());
+								return sb.toSafeHtml();
 							}
-							return name;
-						}
-					};
-					col.setSortable(true);
-					return col;
+				        }
+				        
+				        @Override
+					    public void onBrowserEvent(Context context, Element parent, IPlayerRating playerRating, NativeEvent event) {
+					        if (playerRating == null)
+					            return;
+
+					        super.onBrowserEvent(context, parent, playerRating, event);
+					        if ("click".equals(event.getType())) {
+					        	listener.showEditPlayer(playerRating);
+					  
+					        }
+					    }
+				    };
 				}
 			});
+
+			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+//				private boolean clickable = false;
+//				public Widget render(IPlayerRating c) {
+//					if (!c.getMatchStats().get(0).getBlockingTaskIds().isEmpty()) {
+//						Badge b = new Badge();
+//						b.setText(c.getMatchStats().get(0).getName());						
+//						b.addStyleName("badgeRed");
+//						clickable = true;
+//						return b;
+//					} else if (!c.getMatchStats().get(0).getTaskIds().isEmpty()) {
+//						Badge b = new Badge();
+//						b.setText(c.getMatchStats().get(0).getName());						
+//						b.addStyleName("badgeOrange");
+//						clickable = true;
+//						return b;
+//					} else {
+//						String name = c.getMatchStats().get(0).getId().toString();
+//						return new HTML(name);
+//					}
+//				}
+//
+//				public boolean isClickable() {
+//					return clickable;
+//				}
+
+//				@Override
+//				public Column<IPlayerRating, ?> getColumn() {
+//					return new TextColumn<IPlayerRating>() {
+//						@Override
+//						public String getValue(IPlayerRating c) {
+//							String name = c.getMatchStats().get(0).getId().toString();
+//							return name;
+//						}
+//						
+//						@Override
+//						public Widget render(IPlayerRating c) {
+//							if (!c.getMatchStats().get(0).getBlockingTaskIds().isEmpty()) {
+//								Badge b = new Badge();
+//								b.setText(c.getMatchStats().get(0).getName());						
+//								b.addStyleName("badgeRed");
+//								clickable = true;
+//								return b;
+//							} else if (!c.getMatchStats().get(0).getTaskIds().isEmpty()) {
+//								Badge b = new Badge();
+//								b.setText(c.getMatchStats().get(0).getName());						
+//								b.addStyleName("badgeOrange");
+//								clickable = true;
+//								return b;
+//							} else {
+//								String name = c.getMatchStats().get(0).getId().toString();
+//								return new HTML(name);
+//							}
+//						}
+//					};
+//				}
+				
+				@Override
+				public Column<IPlayerRating, SafeHtml> getColumn() {
+
+				    return new Column<IPlayerRating, SafeHtml>(new com.google.gwt.cell.client.SafeHtmlCell()) {
+			
+				    	
+				        @Override
+				        public SafeHtml getValue(final IPlayerRating c) {
+				        	if (!c.getMatchStats().get(0).getBlockingTaskIds().isEmpty()) {
+								Badge b = new Badge();
+								b.setText("BLOCK");						
+								b.addStyleName("badgeRed");								
+								 SafeHtmlBuilder sb = new SafeHtmlBuilder();
+						         sb.appendHtmlConstant(b.toString());
+						         return sb.toSafeHtml();
+							} else if (!c.getMatchStats().get(0).getTaskIds().isEmpty()) {
+								Badge b = new Badge();
+								b.setText("WARN");						
+								b.addStyleName("badgeOrange");								
+								SafeHtmlBuilder sb = new SafeHtmlBuilder();
+								sb.appendHtmlConstant(b.toString());
+								return sb.toSafeHtml();
+							} else {
+								Badge b = new Badge();
+								b.setText("OK");						
+								b.addStyleName("badgeGreen");								
+								SafeHtmlBuilder sb = new SafeHtmlBuilder();
+								sb.appendHtmlConstant(b.toString());
+								return sb.toSafeHtml();
+							}
+				        }
+				        
+				        @Override
+					    public void onBrowserEvent(Context context, Element parent, IPlayerRating playerRating, NativeEvent event) {
+					        if (playerRating == null)
+					            return;
+
+					        super.onBrowserEvent(context, parent, playerRating, event);
+					        if ("click".equals(event.getType())) {
+					        	listener.showEditStats(playerRating);
+					  
+					        }
+					    }
+				    };
+				}
+
+				@Override
+				public Widget render(IPlayerRating t) {
+					// TODO Auto-generated method stub
+					return null;
+				}   
+			});
+
+//			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
+//
+//				public Widget render(IPlayerRating c) {
+//					String name = "-";
+//					if (c.getRating() != null && c.getRating() != null) {
+//						name = c.getRating().toString();
+//					}
+//					Widget w = new HTML(name);
+//					Tooltip tooltip = new Tooltip();
+//				    tooltip.setWidget(w);
+//				    tooltip.setText(c.getDetails());
+//				    tooltip.setPlacement(Placement.RIGHT);
+//				    tooltip.reconfigure();
+//					return w;
+//				}     
+//
+//				public boolean isClickable() {
+//					return true;
+//				}
+//
+//				@Override
+//				public Column<IPlayerRating, ?> getColumn() {
+//					Column<IPlayerRating, ?> col = new TextColumn<IPlayerRating>() {
+//						@Override
+//						public String getValue(IPlayerRating c) {
+//							String name = "--";
+//							if (c.getRating() != null && c.getRating() != null) {
+//								name = c.getRating().toString();
+//							}
+//							return name;
+//						}
+//					};
+//					col.setSortable(true);
+//					return col;
+//				}
+//			});
 
 
 			columnDefinitions.add(new ColumnDefinition<IPlayerRating>() {
@@ -456,7 +610,7 @@ public class PlayerListViewColumnDefinitions<T extends IPlayerRating> {
 		headers.add( "Slot");
 		headers.add( "Name");
 		headers.add( "Stats");
-		headers.add( "Rating");		
+		//headers.add( "Rating");		
 		headers.add( "Pos");
 		headers.add( "T/A");
 		headers.add( "Pts");

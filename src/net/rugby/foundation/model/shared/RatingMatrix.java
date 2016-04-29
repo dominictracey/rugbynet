@@ -26,9 +26,9 @@ public class RatingMatrix implements IRatingMatrix, Serializable {
 	@Transient
 	protected IRatingGroup ratingGroup;
 	
-	protected List<Long> roundIds;
-	@Transient
-	protected List<IRound> rounds;
+//	protected List<Long> roundIds;
+//	@Transient
+//	protected List<IRound> rounds;
 	
 	protected List<Long> ratingQueryIds;
 	@Transient
@@ -38,8 +38,8 @@ public class RatingMatrix implements IRatingMatrix, Serializable {
 	
 	public RatingMatrix()
 	{
-		roundIds = new ArrayList<Long>();
-		rounds = new ArrayList<IRound>();
+//		roundIds = new ArrayList<Long>();
+//		rounds = new ArrayList<IRound>();
 		ratingQueryIds = new ArrayList<Long>();
 		ratingQueries = new ArrayList<IRatingQuery>();
 	}
@@ -103,17 +103,17 @@ public class RatingMatrix implements IRatingMatrix, Serializable {
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IRatingMatrix#getRoundIds()
 	 */
-	@Override
-	public List<Long> getRoundIds() {
-		return roundIds;
-	}
+//	@Override
+//	public List<Long> getRoundIds() {
+//		return roundIds;
+//	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IRatingMatrix#getRounds()
 	 */
-	@Override
-	public List<IRound> getRounds() {
-		return rounds;
-	}
+//	@Override
+//	public List<IRound> getRounds() {
+//		return rounds;
+//	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IRatingMatrix#getRatingQueryIds()
 	 */
@@ -139,10 +139,10 @@ public class RatingMatrix implements IRatingMatrix, Serializable {
 		listCalcCriteria = crit;
 	}
 
-	@Override
-	public void setRoundIds(List<Long> roundIds) {
-		this.roundIds = roundIds;
-	}
+//	@Override
+//	public void setRoundIds(List<Long> roundIds) {
+//		this.roundIds = roundIds;
+//	}
 
 	@Override
 	public void setRatingQueries(List<IRatingQuery> ratingQueries) {

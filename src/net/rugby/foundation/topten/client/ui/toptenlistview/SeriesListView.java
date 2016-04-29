@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.model.shared.Criteria;
+import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
@@ -90,5 +91,6 @@ public interface SeriesListView<T extends IRatingSeries> extends IsWidget
 	void showButtons(boolean show);
 	int getLastPosition();
 	Criteria getLastCriteria();
+	void showPromoteResults(List<IPlayer> result);
 	
 }

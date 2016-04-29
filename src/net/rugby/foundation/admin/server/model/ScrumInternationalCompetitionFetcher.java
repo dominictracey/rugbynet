@@ -24,9 +24,9 @@ import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
-//import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.MatchGroup;
+//import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 
 public class ScrumInternationalCompetitionFetcher implements IForeignCompetitionFetcher {
 
@@ -360,4 +360,10 @@ public class ScrumInternationalCompetitionFetcher implements IForeignCompetition
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime().toString() + "**" + m.getDisplayName();
     }
+
+	@Override
+	public Boolean updateMatch(IMatchGroup match) {
+		assert(false);  // this one isn't used any more?
+		return null;
+	}
 }

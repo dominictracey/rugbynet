@@ -5,8 +5,6 @@ package net.rugby.foundation.admin.shared;
 
 import java.util.List;
 
-import com.googlecode.objectify.annotation.Subclass;
-
 import net.rugby.foundation.admin.server.orchestration.AdminOrchestrationTargets;
 import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
@@ -19,6 +17,8 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
+
+import com.googlecode.objectify.annotation.Subclass;
 
 /**
  * @author home
@@ -104,6 +104,8 @@ public class CompetitionWorkflow extends Workflow {
 					// getting really stale? (mark as unreported)
 					checkStaleGiveUp(m,c);
 					
+					// time to get all stats?
+					checkStats(m,c);
 				}
 			}		
 			
@@ -145,15 +147,23 @@ public class CompetitionWorkflow extends Workflow {
 	 * @param r - Round to check for results on
 	 */
 	private void checkResults(IMatchGroup m, ICompetition comp) {
-		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_TO_FETCH);
+//		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_TO_FETCH);
+//			 
+//		if (rule.test()) {
+//			// fetch match
+//			queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.FETCH, AdminOrchestrationTargets.Targets.MATCH, m, comp, log);
+//		}						
+	}
+
+	private void checkStats(IMatchGroup m, ICompetition comp) {
+		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_STATS_AVAILABLE);
 			 
 		if (rule.test()) {
 			// fetch match
-			queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.FETCH, AdminOrchestrationTargets.Targets.MATCH, m, comp, log);
+			queuer.SpawnMatchOrchestration(AdminOrchestrationActions.MatchActions.FETCHSTATS, AdminOrchestrationTargets.Targets.MATCH, m, comp, log);
 		}						
 	}
-
-
+	
 	private void checkLocks(IMatchGroup m, ICompetition comp) {
 		IRule<IMatchGroup> rule = crf.get(m, MatchRule.MATCH_TO_LOCK);
  

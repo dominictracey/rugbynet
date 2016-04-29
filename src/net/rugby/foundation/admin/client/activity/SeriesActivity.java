@@ -3,6 +3,16 @@ package net.rugby.foundation.admin.client.activity;
 import java.util.Date;
 import java.util.List;
 
+import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.place.SeriesPlace;
+import net.rugby.foundation.admin.client.ui.AdminView;
+import net.rugby.foundation.admin.client.ui.SmartBar;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupView.Presenter;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView;
+import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView.SeriesConfigurationViewPresenter;
+import net.rugby.foundation.admin.shared.IAdminTask;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -11,27 +21,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.DialogBox;
-import net.rugby.foundation.admin.client.ClientFactory;
-import net.rugby.foundation.admin.client.place.SeriesPlace;
-import net.rugby.foundation.admin.client.ui.AdminView;
-import net.rugby.foundation.admin.client.ui.SmartBar;
-import net.rugby.foundation.admin.client.ui.playermatchstatspopup.PlayerMatchStatsPopupView.PlayerMatchStatsPopupViewPresenter;
-import net.rugby.foundation.admin.client.ui.playerpopup.PlayerPopupView;
-import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigPopupView.Presenter;
-import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView;
-import net.rugby.foundation.admin.client.ui.seriesconfiguration.SeriesConfigurationView.SeriesConfigurationViewPresenter;
-import net.rugby.foundation.admin.client.ui.task.TaskView;
-import net.rugby.foundation.admin.client.ui.task.TaskView.TaskViewPresenter;
-import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPopupView.TeamMatchStatsPopupViewPresenter;
-import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
-import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
-import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
-import net.rugby.foundation.admin.shared.IAdminTask;
-import net.rugby.foundation.admin.shared.ISeriesConfiguration;
-import net.rugby.foundation.model.shared.IPlayer;
-import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.IPlayerRating;
-import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 public class SeriesActivity extends AbstractActivity implements  
 AdminView.Presenter,  

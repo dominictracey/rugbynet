@@ -8,6 +8,7 @@ import net.rugby.foundation.admin.shared.Blurb;
 import net.rugby.foundation.admin.shared.DigestEmail;
 import net.rugby.foundation.admin.shared.EditPlayerAdminTask;
 import net.rugby.foundation.admin.shared.EditPlayerMatchStatsAdminTask;
+import net.rugby.foundation.admin.shared.EditPlayersTwitterAdminTask;
 import net.rugby.foundation.admin.shared.EditTeamMatchStatsAdminTask;
 import net.rugby.foundation.admin.shared.OrchestrationConfiguration;
 import net.rugby.foundation.admin.shared.WorkflowConfiguration;
@@ -16,8 +17,9 @@ import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.model.shared.fantasy.MyGroup;
 import net.rugby.foundation.topten.model.shared.Note;
 import net.rugby.foundation.topten.model.shared.NoteRef;
-import net.rugby.foundation.topten.model.shared.TopTenList;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
+import net.rugby.foundation.topten.model.shared.TopTenList;
+
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
 
@@ -69,6 +71,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(EditPlayerAdminTask.class);
 			ObjectifyService.register(EditPlayerMatchStatsAdminTask.class);
 			ObjectifyService.register(EditTeamMatchStatsAdminTask.class);
+			ObjectifyService.register(EditPlayersTwitterAdminTask.class);
 			ObjectifyService.register(ScrumMatchRatingEngineSchema.class);
 			ObjectifyService.register(ScrumMatchRatingEngineSchema20130713.class);
 			ObjectifyService.register(BaseSeriesConfiguration.class);

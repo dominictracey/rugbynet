@@ -28,6 +28,8 @@ public abstract class BaseConfigurationFactory extends BaseCachingFactory<ICoreC
 			ICoreConfiguration cc = getFromPersistentDatastore(0L);
 			id = cc.getId();
 			cc.setCurrentUROrdinal(urf.get(new DateTime()).ordinal);
+			// now we have to put it in memcache
+			putItem(cc.getId(),cc);
 			return cc;
 		}
 	}

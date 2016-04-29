@@ -102,7 +102,7 @@ public class PoolTableStandingsFetcher implements IStandingsFetcher {
 
 	private void searchTeamStanding(IStanding standing) {
 		//String standingString = standingLine.split("<|/|>")[2];
-		standing.setStanding(standingsMap.get(standing.getTeam().getDisplayName()));
+		standing.setStanding(standingsMap.get(standing.getTeam().getEspnName()));
 		
 		//
 	//	standing.setStanding(standingVal);
