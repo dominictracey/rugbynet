@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<html>
+<head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,15 +28,9 @@
 <meta name="Author" content="The Rugby Net">
 <meta name="Copyright"
 	content="Copyright 2016, The Rugby Net, Inc.>
-<meta name="google-site-verification" content="UlslUtViFtnEFDorsx8irllq-I5bqyXWLxAH9HeVbsI" />
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js'></script> 
-<link rel="stylesheet" type="text/css" href="/stylesheets/therugbynet.css">
-<link rel="stylesheet" type="text/css" href="/stylesheets/home.css">
-<!-- bootstrap -->
-<link href="/theme/css/bootstrap.css" rel="stylesheet" />
-
+<meta name="
+	google-site-verification" content="UlslUtViFtnEFDorsx8irllq-I5bqyXWLxAH9HeVbsI" />
+<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
 <!-- New Google Analytics -->
 <script>
 	(function(i, s, o, g, r, a, m) {
@@ -67,126 +63,18 @@
 	src="http://s7.addthis.com/js/250/addthis_widget.js"></script>
 <!-- ADDTHIS BUTTON END -->
 <!-- page level ads -->
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script async
+	src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
-  (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-9355939918394201",
-    enable_page_level_ads: true
-  });
+	(adsbygoogle = window.adsbygoogle || []).push({
+		google_ad_client : "ca-pub-9355939918394201",
+		enable_page_level_ads : true
+	});
 </script>
-<style>
-body {
-	font: 10px sans-serif;
-}
-
-.axis path,.axis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
-}
-
-.x.axis path {
-	display: none;
-}
-
-.line {
-	fill: none;
-	stroke: steelblue;
-	stroke-width: 1.5px;
-}
-
-.overlay {
-	fill: none;
-	pointer-events: all;
-}
-
-.focus circle {
-	fill: none;
-	stroke: steelblue;
-}
-
-.svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    padding-bottom: 100%; /* aspect ratio */
-    vertical-align: top;
-    overflow: hidden;
-}
-.svg-content-responsive {
-    display: inline-block;
-    position: absolute;
-    top: 10px;
-    left: 0;
-}
-
-.point-out {
-	stroke-width: 2;
-	fill: white;
-	stroke: red;
-	stroke-opacity: .1;
-}
-
-.point-in {
-	stroke-width: 3;
-	fill: white;
-	stroke: red;
-	stroke-opacity: .7;
-}
-
-.point-on {
-	stroke-width: 2;
-	fill: white;
-	stroke: red;
-	stroke-opacity: .5;
-}
-
-div.tooltip {
-	position: absolute;
-	text-align: center;
-	width: 275px;
-	height: 350px;
-	padding: 2px;
-	margin: 5px;
-	font: 12px sans-serif;
-	background: white;
-	border: 2px;
-	border-style: solid;
-	border-color: darkgrey;
-	border-radius: 8px;
-	pointer-events: none;
-}
-
-div {
-	border-color: #cccccc;
-}
-
-li {
-	text-align: left;
-}
-
-div.positionButton {
-	display: inline-block;
-}
-
-#buttonBar {
-	padding: 20px;
-	padding-left: 50px;
-}
-
-div#title {
-	padding-left: 50px;
-}
-
-div#wtf {
-	padding-left: 50px;
-	font-size:1em;
-}
-
-</style>
+</head>
 <body>
 
-<header id="header">
+	<header id="header">
 		<div class="container-fluid">
 			<div class="row  hidden-xs">
 				<div class=" col-sm-3 logo">
@@ -195,7 +83,8 @@ div#wtf {
 				</div>
 				<div class=" col-sm-3 logo pull-right">
 					<a class="no-horizontal-padding hidden-xs" href="/s/vAvk8bxrOY5"><img
-						src="/resources/comps/SR/200R.png" alt="The Rugby Net" class="logo"></a>
+						src="/resources/comps/SR/200R.png" alt="The Rugby Net"
+						class="logo"></a>
 				</div>
 			</div>
 			<div class="row hidden-sm hidden-md hidden-lg">
@@ -205,62 +94,60 @@ div#wtf {
 				</div>
 				<div class=" col-xs-3 logo">
 					<a class="no-horizontal-padding" href="/s/vAvk8bxrOY5"><img
-						src="/resources/comps/SR/200.png" alt="The Rugby Net" class="logo" style="height:40px;width:40px;"></a>
+						src="/resources/comps/SR/200.png" alt="The Rugby Net" class="logo"
+						style="height: 40px; width: 40px;"></a>
 				</div>
 			</div>
 		</div>
 
 	</header>
-	<div id="title"><h3>Top Rated Players by Position throughout Super Rugby 2016</h3></div>
-	
-	<div id="buttonBar">
-	<div id="prop" class="positionButton">
-		<input id="0" name="prop" type="button" value="Prop" class="btn btn-primary"
-			onclick="updateData(0)" />
+
+	<div class="container">
+		<div class="row>">
+			<div id="chart" class="span12"
+				style="position: relative; height: 700px;"></div>
+
+			<script>
+				var graphConfig = {
+					"ticks" : 3,
+					"locale" : "en-gb",
+					"client": "positionGraph"
+				}
+
+				if (!(getURLParameter('compId') === undefined)) {
+					graphConfig.compId = getURLParameter('compId');
+				} else {
+					graphConfig.compId = 5157858798731264;
+				}
+
+				if (!(getURLParameter('pos') === undefined)) {
+					graphConfig.startPos = getURLParameter('pos');
+				} else {
+					graphConfig.startPos = 4;
+				}
+
+				function getURLParameter(name) {
+					return decodeURIComponent((new RegExp('[?|&]' + name + '='
+							+ '([^&;]+?)(&|#|;|$)').exec(location.search) || [
+							, "" ])[1].replace(/\+/g, '%20'))
+							|| null;
+				}
+			</script>
+			<script data-main="/scripts/therugbynet-demo.js"
+				src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.js">
+				
+			</script>
+		</div>
+		<div class="row">
+			<div id="wtf" class="span12" style="padding:30px;">
+				For details on how The Rugby Net computes player ratings, <a
+					href="/s/vAvk8bxrOY5#Content:contentId=5171798064758784">click
+					here</a>!
+			</div>
+		</div>
 	</div>
-	<div id="hooker" class="positionButton">
-		<input id="1" name="hooker" type="button" value="Hooker" class="btn btn-primary"
-			onclick="updateData(1)" />
-	</div>
-		<div id="lock" class="positionButton">
-		<input id="2" name="lock" type="button" value="Lock" class="btn btn-primary"
-			onclick="updateData(2)" />
-	</div>
-	<div id="flanker" class="positionButton">
-		<input id="3" name="flanker" type="button" value="Flanker" class="btn btn-primary"
-			onclick="updateData(3)" />
-	</div>
-	<div id="number8" class="positionButton">
-		<input id="4" name="number8" type="button" value="Number 8" class="btn btn-primary"
-			onclick="updateData(4)" />
-	</div>	
-	<div id="scrumhalf" class="positionButton">
-		<input id="5" name="scrumhalf" type="button" value="Scrumhalf" class="btn btn-primary"
-			onclick="updateData(5)" />
-	</div>
-	<div id="flyhalf" class="positionButton">
-		<input id="6" name="flyhalf" type="button" value="Flyhalf" class="btn btn-primary"
-			onclick="updateData(6)" />
-	</div>
-	<div id="centre" class="positionButton">
-		<input id="7" name="centre" type="button" value="Centre" class="btn btn-primary"
-			onclick="updateData(7)" />
-	</div>
-	<div id="wing" class="positionButton">
-		<input id="8" name="wing" type="button" value="Wing" class="btn btn-primary"
-			onclick="updateData(8)" />
-	</div>
-	<div id="fullback" class="positionButton">
-		<input id="9" name="fullback" type="button" value="Fullback" class="btn btn-primary"
-			onclick="updateData(9)" />
-	</div>
-	</div
-	<br/>
-<!-- 	<section id='chart'></section> -->
-	<div id="chart"></div>
-	<div id="wtf">For details on how The Rugby Net computes player ratings, <a href="/s/vAvk8bxrOY5#Content:contentId=5171798064758784">click here</a>!</div>
 	<hr/>
-		<footer>
+	<footer>
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-sm-3 text-center pd10">
@@ -268,313 +155,25 @@ div#wtf {
 					player ratings from match statistics.
 				</div>
 				<div class="col-sm-6 text-center pd10">
-					<a href="/sitemap/GLOBAL">Site Map</a> |<a href="privacy.html"> Privacy Policy</a> | <a
-						href="http://dev.rugby.net/s/LxYBXPMW2NN#Content:contentId=238601">Work with Us </a> | <a href="mailto:info@rugby.net">Contact Us</a><br> &copy;
-					The Rugby Net, Inc. 2016
+					<a href="/sitemap/GLOBAL">Site Map</a> |<a href="privacy.html">
+						Privacy Policy</a> | <a
+						href="http://dev.rugby.net/s/LxYBXPMW2NN#Content:contentId=238601">Work
+						with Us </a> | <a href="mailto:info@rugby.net">Contact Us</a><br>
+					&copy; The Rugby Net, Inc. 2016
 				</div>
 				<div class="col-sm-3">
-				<span style="vertical-align:middle;">
-					Stay updated! Follow us:  </span>
+					<span style="vertical-align: middle;"> Stay updated! Follow
+						us: </span>
 					<!-- Go to www.addthis.com/dashboard to customize your tools -->
-<div class="addthis_horizontal_follow_toolbox"></div>
-<!-- 					<div class="addthis_toolbox addthis_default_style addthis_32x32_style rugbyNetAddThis" addthis:url="http://www.rugby.net/" addthis:title="The Rugby Net"></div> -->
-<!-- 					<a href="http://facebook.com/TheRugbyNet"><img -->
-<!-- 						src="../icons/f1.png" alt="" /></a> <a href="http://twitter.com/TheRugbyNet"><img -->
-<!-- 						src="../icons/t1.png" alt="" /></a> -->
+					<div class="addthis_horizontal_follow_toolbox"></div>
+					<!-- 					<div class="addthis_toolbox addthis_default_style addthis_32x32_style rugbyNetAddThis" addthis:url="http://www.rugby.net/" addthis:title="The Rugby Net"></div> -->
+					<!-- 					<a href="http://facebook.com/TheRugbyNet"><img -->
+					<!-- 						src="../icons/f1.png" alt="" /></a> <a href="http://twitter.com/TheRugbyNet"><img -->
+					<!-- 						src="../icons/t1.png" alt="" /></a> -->
 
 				</div>
 			</div>
 		</div>
 	</footer>
-<script>
-
-var margin = {top: 20, right: 80, bottom: 30, left: 50};
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
-// 		width = 2048 - margin.left - margin.right,
-// 		height = 1024 - margin.top - margin.bottom;
-
-//var xAxisLabels = {};
-// var width = document.body.clientWidth;
-// var height = document.body.clientHeight; 
-
-var parseDate = d3.time.format("%Y%m%d").parse,
-	bisectRound = d3.bisector(function(d) { return d.round; }).left;
-
-var x = d3.scale.linear()
-    .range([0, width]);
-
-var ranking_y = d3.scale.linear()
-    .range([0, height]);
-
-var color = d3.scale.category10();
-
-
-
-var yAxis = d3.svg.axis()
-    .scale(ranking_y)
-    .orient("left")
-    .tickValues([1,5,10,15,20,25,30]);
-
-var line = d3.svg.line()
-    .interpolate("linear")
-    .x(function(d) { return x(d.round); })
-    .y(function(d) { return ranking_y(d.ranking); });
-
- var target = document.getElementById('chart');
-var svg = d3.select("#chart").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
-// d3.select("div#chart")
-// .append("div")
-// .classed("svg-container", true) //container class to make it responsive
-// .append("svg")
-// //responsive SVG needs these 2 attributes and no width and height attr
-// .attr("preserveAspectRatio", "xMinYMin meet")
-// .attr("viewBox", "-40 -10 1200 800")
-// //class to make it responsive
-// .classed("svg-content-responsive", true); 
-
-//var svg = d3.select('svg');
-
-//trigger loader
-// loader settings
-var opts = {
-  lines: 9, // The number of lines to draw
-  length: 9, // The length of each line
-  width: 5, // The line thickness
-  radius: 14, // The radius of the inner circle
-  color: '#EE3124', // #rgb or #rrggbb or array of colors
-  speed: 1.9, // Rounds per second
-  trail: 40, // Afterglow percentage
-  className: 'spinner', // The CSS class to assign to the spinner
-};
-
-
-
-
-updateData(null,null);
-
-//** Update data section (Called from the onclick)
-function updateData(pos,compId) {
-	var spinner = new Spinner(opts).spin(target);
-	for (i=0;i<10;i++) {
-		var button = document.getElementById(i);
-		button.className = "btn btn-primary disabled";
-	}
-	var button = document.getElementById(pos);
-	
-	if (button !== null) {
-		button.className = "btn btn-danger disabled";
-	}
-	
-	if (pos == null) {
-		pos = getURLParameter('pos');
-		
-		if (!(/^\d$/.test(pos)))  {
-			pos = 4;
-		}
-	} else {
-		ganew('send', 'event', 'graph', 'click', pos, '1');		
-	}
-	
-
-	
-	if (compId == null) {
-		compId = getURLParameter('compId');
-		
-		if (!(/^\d$/.test(pos)))  {
-			compId = 5095957750349824;
-		}
-	}
-
-	url = "https://fantasyrugbyengine-hrd-prod.appspot.com/_ah/api/topten/v1/series/position/get?compId=" + compId + "&position=" + pos;
-//	url = "/_ah/api/topten/v1/series/position/get?compId=" + compId + "&position=" + pos;
-		
-d3.json(url, function(error, data) {
-  if (error) throw error;
-
-	//stop spin.js loader
-  	spinner.stop();
-  	for (i=0;i<10;i++) {
-		var button = document.getElementById(i);
-		button.className = button.className.substring(0,button.className.indexOf("disabled")); //"btn btn-primary disabled";
-	}
-  
-  	var xLabs = {};
-	var playerLists = data.items.map(function(d) { return  {round: d.round, values: d.playerMatches }});
-	var xAxisLabels = data.items.map(function(d) { xLabs[d.round] = d.label; return {key:d.round, value:d.label}});
-	
-	var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom")
-    .tickFormat(function(d,i) { 
-    	var val = xLabs[d];
-    	 return val;
-    });
-	
-	// we only care about the names of the players in the most recent round
-	var keys = d3.keys(playerLists[0].values); //map(function(d) { return d3.keys(d)});
-
-  color.domain(keys);
-
-
-  var players = color.domain().map(function(name) {
-    return {
-      name: name,
-      values: playerLists.map(function(d) {
-    	var retval = {round: d.round};  
-      	if (name in d.values) {
-    	   retval = {round: d.round, rating: +d.values[name].rating, ranking: +d.values[name].ranking, teamAbbr: d.values[name].teamAbbr, label: d.values[name].label, homeTeamAbbr: d.values[name].homeTeamAbbr, visitingTeamAbbr: d.values[name].visitingTeamAbbr, homeTeamScore: d.values[name].homeTeamScore, visitingTeamScore: d.values[name].visitingTeamScore, matchDate: d.values[name].matchDate, position: d.values[name].position, matchRating: d.values[name].matchRating, minutesPlayed: d.values[name].minutesPlayed, notes: d.values[name].notes };
-      	}
-        return retval;      })
-    };
-  });
-
-  x.domain(d3.extent(data.items, function(d) { return d.round; }));
-
-  ranking_y.domain([
-    d3.min(players, function(c) { return d3.min(c.values, function(v) { return v.ranking; }); }),
-    d3.max(players, function(c) { return d3.max(c.values, function(v) { return v.ranking; }); })
-  ]);
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", -27)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Ranking");
-
-  var div = d3.select("body").append("div")
-  	.attr("class","tooltip")
-  	.style("opacity", 0);
-  
-  var toClear = svg.selectAll(".rating").remove();
-  
-  var rating = svg.selectAll(".rating")
-      .data(players)
-    .enter().append("g")
-      .attr("class", "rating");
-
-  rating.append("path")
-      .attr("class", "line")
-      .attr("d", function(d) { return line(d.values); })
-      .style("stroke", function(d) { return color(d.name); })
-      .style("stroke-width", 3)
-      .style("stroke-opacity",.1);
-
-  rating.append("text")
-      .datum(function(d) { return {name: d.name, value: d.values[0]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.round) + "," + ranking_y(d.value.ranking) + ")"; })
-      .attr("x", 7)
-      .attr("dy", ".35em")
-      .text(function(d) { return d.name; });
-  
-  var point = rating.append("g")
-  		.attr("class", "line-point");
-  
-  		point.selectAll("circle")
-  		.data(function(d,i) { return d.values;})
-  		.enter().append("circle")
-  		.attr("transform", function(d,i) { return "translate(" + x(d.round) + "," + ranking_y(d.ranking) + ")"; })
-  		.attr("r",5) 		
-  		.attr("class", "point-out")
-  		.on("mouseover",  function(d,i) { mouseover(x(d.round),ranking_y(d.ranking), this); } )
-  		.on("mouseout", mouseout);
-  		
-  		function mouseover(px, py, _this) {
-
-  			
-  			d3.select(_this.parentNode)
-				.selectAll(".point-out")
-				.attr("class", "point-on")
-  			
-  			d3.select(_this)
-  				//.attr("r",15)
-  				.attr("class", "point-in")
-
-  			d3.selectAll(".line")
-				.style("stroke-width", 3)
-				.style("stroke-opacity",.1);
-  			
-  			d3.select(_this.parentNode.parentNode)
-  				.select(".line")
-  				.style("stroke-width", 5)
-  				.style("stroke-opacity",.7);
-  			
-  			div.transition()		
-            .duration(200)		
-            .style("opacity", .9);		
-       
-  			var html = "<div style=\"border-bottom-style:solid;border-bottom-width:1px;display:inline-block;width:100%;padding-bottom:10px;\"><div class=\"teamlogo-small " + _this.__data__.teamAbbr + "\" style=\"width:60px;height:50px;float:left;display:inline-block;padding-left:25px;\"></div><div style=\"display:inline-block;padding-top:5px;\"><h4>" + _this.__data__.ranking + ". " + _this.parentNode.__data__.name + "</h4></div></div>"
-  						+ "<div style=\"border-bottom-style:solid;border-bottom-width:1px;\"><div class=\"teamlogo-small " + _this.__data__.homeTeamAbbr + "\" style=\"width:65px;height:65px;float:left;display:inline-block;padding-left:15px;padding-top:15px;\"></div><div style=\"display:inline-block;\"> <h3>" + _this.__data__.homeTeamScore + " - " + _this.__data__.visitingTeamScore + "</h3></div><div class=\"teamlogo-small " + _this.__data__.visitingTeamAbbr + "\" style=\"width:65px;height:65px;float:right;display:inline-block;padding-right:15px;padding-top:15px;\"></div>"
-  						+ "<div style=\"padding-bottom:20px;\"><br/><b>" + _this.__data__.label + "</b><br/>" + _this.__data__.matchDate + "</div></div>" 
-  						+ "<div style=\"border-bottom-style:solid;border-bottom-width:1px;min-height:80px;\"><div style=\"width:60px;height:60px;float:left;display:inline-block;padding-left:10px;padding-top:15px;text-align:left;\">Position:<br/><img class=\"" + _this.__data__.position + "\" style=\"width:100%;height:100%;\"></div><div style=\"display:inline-block;border-style: solid;border-width: 1px;padding:10px;margin:0px;background-color:#efefef;\"> <h4>Match Rating</h4><h4>" + _this.__data__.matchRating + "</h4></div><div style=\"width:60px;height:60px;float:right;display:inline-block;padding-right:15px;padding-top:15px;border-left:1px;\">Minutes:<h4>" + _this.__data__.minutesPlayed + "</h4></div></div>"
-  						+ "<div>" + buildNotes(_this.__data__.notes) + "</div>";
-  			div.html(html)	
-            .style("left", (d3.event.pageX) + "px")		
-            .style("top", (d3.event.pageY - 28) + "px");	
-        	
-//   			svg.select(".details")
-//   				.text("Cheese")
-//   				.attr("visible", true)
-//   				.attr("transform", function(d,i) { return "translate(" +px + "," + py + ")"; })
-  			
-  		}
-  		
-  		function mouseout() { 
-  			d3.select(this.parentNode)
-			.selectAll(".point-on")
-			.attr("class", "point-out")
-			//.attr("r",10);
-  			
-  			d3.select(this)
-  				.attr("class","point-out")
-  			//	.attr("r",15);
-
-//   			d3.select(this.parentNode.parentNode)
-// 				.select(".line")
-// 				.style("stroke-width", 3)
-// 				.style("stroke-opacity",.1);
-  			
-  			div.transition()		
-            	.duration(500)		
-            	.style("opacity", 0);	
-  		}
-  		
-  		function buildNotes(notes) {
-  			var retval = "<div style=\"float: left;display:inline-block;padding-left:0px;width: 45%;font-size:.85em;\"><ul>",
-  				count = 0;
-  			for (var key in notes) {
-  				retval += "<li>" + notes[key] + "</li>";
- 				count++;
-  				if (count > 2) {
-  					retval += "</ul></div><div style=\"float: right;display:inline-block;padding-right:0px;width: 45%;font-size:.85em;\"><ul>";
-  					count = 0;
-  				}
-  			}
-  			
-  			return retval + "</ul></div>";
-  			//return "<div style=\"float: left;display:inline-block;\"><ul><li>1 Try</li><li>12 tackles</li><li>32 metres run</li></ul></div><div style=\"float: right;display:inline-block;\"><ul><li>4 lineouts</li><li>2 penalties</li><li>1 turnover conceded</li></ul></div>";
-  		}
-
-});
-}
-
-function getURLParameter(name) {
-	  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
-}
-
-ganew('send', 'pageview');
-</script>
+</body>
+</html>

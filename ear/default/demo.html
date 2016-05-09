@@ -4,13 +4,23 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<head>
-<script data-main="/scripts/therugbynet-demo.js"
-	src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.js"></script>
-</head>
 <body>
-	<div style="width:800px;height:200px;">
-		<div id="chart" style="min-height: 500px;"></div>
-	</div>
+
+		<div id="chart" style="position:relative;width:1200px;height:700px;"></div>
+
+	<script>
+	var graphConfig = {
+			"ticks": 5,
+			"locale": "en-gb",
+//			"compId": 5066549580791808,
+			"compId": 5157858798731264,
+			"startPos": 5,
+			"client": "demo-fixed"
+// 			"width": 625,
+// 			"height":565
+		}
+	</script>
+	<script data-main="/scripts/therugbynet-demo.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.js">
+	</script>
 </body>
 </html>
