@@ -19,4 +19,6 @@ public interface IMatchGroupFactory  extends ICachingFactory<IMatchGroup> {
 
 	List<IMatchGroup> getFutureMatchesForTeam(Long id);
 
+	IMatchGroup getMatchByEspnId(Long espnId);
+
 }

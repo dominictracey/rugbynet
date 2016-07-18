@@ -247,4 +247,18 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 
 
 
+	@Override
+	public IMatchGroup getMatchByEspnId(Long espnId) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("foreignId", espnId);			
+			return qg.get();
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getByEspnId", ex);
+			return null;
+		}
+	}
+
+
+
 }

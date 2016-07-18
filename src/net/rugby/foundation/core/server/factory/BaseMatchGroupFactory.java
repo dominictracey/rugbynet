@@ -4,21 +4,16 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.tools.pipeline.NoSuchObjectException;
-import com.google.appengine.tools.pipeline.PipelineService;
-import com.google.appengine.tools.pipeline.PipelineServiceFactory;
-import com.google.inject.Inject;
-import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
-import net.rugby.foundation.core.server.factory.IMatchResultFactory;
-import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
-import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
-import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.MatchGroup;
+
+import com.google.appengine.tools.pipeline.NoSuchObjectException;
+import com.google.appengine.tools.pipeline.PipelineService;
+import com.google.appengine.tools.pipeline.PipelineServiceFactory;
+import com.google.inject.Inject;
 
 public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGroup> implements IMatchGroupFactory {
 	/**
@@ -180,4 +175,5 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 	}
 
 	protected abstract List<IMatchGroup> getMatchesForVirualCompFromPersistentDatastore(int ordinal, Long virtualCompId);
+	
 }

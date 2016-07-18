@@ -13,11 +13,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.google.inject.Inject;
-
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -28,6 +23,11 @@ import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.inject.Inject;
 
 public class TwitterPromoter implements IPromoter {
 
@@ -150,6 +150,9 @@ public class TwitterPromoter implements IPromoter {
 				sb.append((char)c);
 			String response = sb.toString();
 
+			Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,response);
+			
 			JSONObject json = new JSONObject(response);
 			bufferCount = json.getInt("buffer_count");
 			if (json.getBoolean("success")) {

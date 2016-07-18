@@ -180,7 +180,7 @@ public class ScrumPlayer implements IPlayer, Serializable {
 
 	@Override
 	public String getForeignUrl() {
-		return "http://www.espnscrum.com/scrum/rugby/player/" + scrumId.toString() + ".html";
+		return "http://en.espn.co.uk/scrum/rugby/player/" + scrumId.toString() + ".html";
 	}
 	@Override
 	public String getTwitterHandle() {

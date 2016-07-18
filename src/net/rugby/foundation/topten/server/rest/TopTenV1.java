@@ -8,14 +8,15 @@ import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
-import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
-import net.rugby.foundation.core.server.factory.IRoundFactory;
-import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
-import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.Content;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.IMatchGroup;
+import net.rugby.foundation.model.shared.IPlayer;
+import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.ScrumPlayer;
+import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.topten.server.factory.IRoundNodeFactory;
 
 import com.google.api.server.spi.config.Api;
@@ -34,16 +35,12 @@ import com.google.inject.Injector;
 public class TopTenV1 {
 	private ICompetitionFactory cf;
 	private IConfigurationFactory ccf;
-	private IRatingSeriesFactory rsf;
-	private IPlayerRatingFactory prf;
-	private IPlayerMatchStatsFactory pmsf;
-	private IMatchGroupFactory mgf;
-	private IRoundFactory rf;
-	private IPlayerFactory pf;
-	private ITeamGroupFactory tf;
-	private IUniversalRoundFactory urf;
 	private IRoundNodeFactory rnf;
-
+	private IMatchGroupFactory mgf;
+	private IPlayerMatchStatsFactory pmsf;
+	private ITeamMatchStatsFactory tmsf;
+	private IPlayerFactory pf;
+	
 	private static Injector injector = null;
 
 	public TopTenV1() {
@@ -53,15 +50,11 @@ public class TopTenV1 {
 
 		this.cf = injector.getInstance(ICompetitionFactory.class);
 		this.ccf = injector.getInstance(IConfigurationFactory.class);
-		this.rsf = injector.getInstance(IRatingSeriesFactory.class);
-		this.prf = injector.getInstance(IPlayerRatingFactory.class);
-		this.pmsf = injector.getInstance(IPlayerMatchStatsFactory.class);
-		this.mgf = injector.getInstance(IMatchGroupFactory.class);
-		this.rf = injector.getInstance(IRoundFactory.class);
-		this.pf = injector.getInstance(IPlayerFactory.class);
-		this.tf = injector.getInstance(ITeamGroupFactory.class);
-		this.urf = injector.getInstance(IUniversalRoundFactory.class);
 		this.rnf = injector.getInstance(IRoundNodeFactory.class);
+		this.mgf = injector.getInstance(IMatchGroupFactory.class);
+		this.pmsf = injector.getInstance(IPlayerMatchStatsFactory.class);
+		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
+		this.pf = injector.getInstance(IPlayerFactory.class);
 	}
 
 	@ApiMethod(name = "content.getcontent", httpMethod = "GET")
@@ -93,60 +86,44 @@ public class TopTenV1 {
 
 		return ccf.get();
 	}
-
-//	final String GRAPHABLE_SERIES_CACHE_KEY = "graphableSeriesCacheKey";
 	
 	@ApiMethod(name = "series.position", path="series/position/get", httpMethod="GET")
 	public List<RoundNode> getGraphableSeries(@Named("compId") Long compId, @Named("position") int positionOrdinal) {
-//		GraphableSeries retval = getFromCache(compId,positionOrdinal);
-//		
-//		if (retval != null && retval.roundNodes != null && retval.roundNodes.size() > 0 && retval.roundNodes.get(0).playerMatches != null && retval.roundNodes.get(0).playerMatches.keySet().size()>30) {
-//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Dropping position " + positionOrdinal + " from cache. Has length of " + retval.roundNodes.get(0).playerMatches.keySet().size());
-//			dropFromCache(getCacheKey(compId,positionOrdinal));	
-//			retval = null;
-//		}
-//		
-//		if (retval == null) {
-//			retval = buildPage(compId, positionOrdinal);
-//
-//			putToCache(getCacheKey(compId,positionOrdinal),retval);
-//		}
-//		
-//		
-//
-//		return retval.roundNodes;
 		return rnf.get(compId,positionOrdinal);
 		
 	}
-
-//	private GraphableSeries buildPage(Long compId, int positionOrdinal) {
-//		GraphableSeries retval = new GraphableSeries();
-//		// get the position series for the comp
-//		IRatingSeries s = rsf.get(compId, RatingMode.BY_POSITION);
-//
-//		if (s == null) {
-//			return retval;
-//		}
-//
-//		if (!rnMapMap.containsKey(compId)) {
-//			rnMapMap.put(compId, new HashMap<Integer,RoundNode>());
-//		}
-//		
-//		// for each RatingGroup of the comp, add a new GraphableSeries to the retval
-//		IRatingGroup g = s.getRatingGroups().get(0); //latest is first
-//		// use the in form matrix (or the BEST_YEAR for the global comp)
-//		for (IRatingMatrix m : g.getRatingMatrices()) {
-//			if (m.getCriteria().equals(Criteria.IN_FORM) || m.getCriteria().equals(Criteria.BEST_YEAR)) {
-//				
-//				// now the position selected
-//				populateGS(compId, retval, m.getRatingQueries().get(positionOrdinal),g, positionOrdinal);
-//
-//			}
-//		}
-//		return retval;
-//	}
-
-
-
 	
+	@ApiMethod(name = "match.getByEspnId", path="match/getByEspnId", httpMethod="GET")
+	public IMatchGroup getMatchByEspnId(@Named("espnId") Long espnId) {
+		return mgf.getMatchByEspnId(espnId);
+		
+	}
+
+	@ApiMethod(name = "match.getScrumPlayerMatchStats", path="match/getScrumPlayerMatchStats", httpMethod="GET")
+	public List<IPlayerMatchStats> getScrumPlayerMatchStats(@Named("matchId") Long matchId) {
+		return pmsf.getByMatchId(matchId);
+		
+	}
+
+	@ApiMethod(name = "match.putScrumPlayerMatchStats", path="match/putScrumPlayerMatchStats", httpMethod="PUT")
+	public IPlayerMatchStats putScrumPlayerMatchStats(ScrumPlayerMatchStats pms) {
+		pmsf.put(pms);
+
+		return pms;
+		
+	}
+	
+	@ApiMethod(name = "player.getByEspnId", path="player/getByEspnId", httpMethod="GET")
+	public IPlayer getPlayerByEspnId(@Named("espnId") Long espnId) {
+		return pf.getByScrumId(espnId);
+		
+	}
+	
+	@ApiMethod(name = "player.putPlayer", path="match/putPlayer", httpMethod="PUT")
+	public IPlayer putPlayer(ScrumPlayer p) {
+		pf.put(p);
+
+		return p;
+		
+	}
 }

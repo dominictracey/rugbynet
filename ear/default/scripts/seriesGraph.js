@@ -308,16 +308,6 @@ require(["d3"], function(d3) {
 				.style("opacity", .9)
 				.style("left", function() { return getPopupLeft(d3.event.pageX) + "px";})   // + "px")		
 				.style("top",  function() { return getPopupTop(d3.event.pageY) + "px";})  // ( - 28) + "px");			
-//
-//				.style("left", function() { return getPopupLeft(px) + "px";})   //(d3.event.pageX) + "px")		
-//				.style("top",  function() { return getPopupTop(py) + "px";})  // (d3.event.pageY - 28) + "px");			
-
-				console.log("Move popup for click at SVG(" + px + "," + py + ") WIN(" + d3.event.pageX + "," + d3.event.pageY + ")to topW " + getPopupTop(d3.event.pageY) + " and leftW " + getPopupLeft(d3.event.pageX));
-//				.style("left", function() { return getPopupLeft(d3.select("#chart")) + "px";})   //(d3.event.pageX) + "px")		
-//				.style("top",  function() { return getPopupTop(d3.select("#chart")) + "px";})  // (d3.event.pageY - 28) + "px");			
-
-				
-				//pointyBit.attr("points", getPointyBitsCoords(d3.event.pageX, d3.event.pageY, px, py));
 
 				pointyBit.transition()	
 				.duration(200)	
@@ -412,7 +402,7 @@ require(["d3"], function(d3) {
 				nubY = py-offsetV;
 			
 				var coords = x_side  + "," + top + " " + x_side + "," + bottom + " " + px + "," + py;
-				console.log("pointyBits coords: " + coords);
+				//console.log("pointyBits coords: " + coords);
 				return coords;
 			}
 

@@ -1,6 +1,7 @@
 package net.rugby.foundation.model.shared;
 
 import java.util.Date;
+
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -257,7 +258,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public void setForeignId(Long foreignId) {
 		this.foreignId = foreignId;
-		this.foreignUrl = "http://www.espnscrum.com/scrum/rugby/current/match/" + foreignId.toString() + ".html?view=scorecard";
+		this.foreignUrl = "http://en.espn.co.uk/scrum/rugby/match/" + foreignId.toString() + ".html?view=scorecard";
 	}
 
 	@Override
