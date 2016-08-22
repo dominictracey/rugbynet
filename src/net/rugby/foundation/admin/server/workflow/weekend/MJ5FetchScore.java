@@ -77,7 +77,7 @@ public class MJ5FetchScore extends Job3<MS6Final, Long, String, ResultWithLog> i
 
 			// first check if we are already further along than this
 			if (match.getWorkflowStatus().ordinal() > fromState.ordinal()) {
-				retval.log.add(this.getClass().getSimpleName() + " ...OK");
+				retval.log.add(this.getClass().getSimpleName() + " ...OK\n");
 				retval.success = true;
 				return immediate(retval);
 			}
