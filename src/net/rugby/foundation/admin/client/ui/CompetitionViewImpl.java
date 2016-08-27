@@ -96,7 +96,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
-		url.setText("http://en.espn.co.uk/super-rugby-2016/rugby/series/276687.html");
+		url.setText("http://www.espn.co.uk/rugby/fixtures/_/date/20160902/league/267979");
 
 		resultType.clear();
 		for (int i=0; i<ICompetition.CompetitionType.values().length; ++i) {

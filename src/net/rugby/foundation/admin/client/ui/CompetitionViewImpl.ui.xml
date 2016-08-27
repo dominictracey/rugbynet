@@ -59,6 +59,7 @@ Status
                         <strong>
 Import Comp:&nbsp;
                         </strong>
+                        provide first day of comp from Fixtures and Results e.g. (<i>http://www.espn.co.uk/rugby/fixtures/_/date/20160902/league/270559</i>)
                     </g:HTML>
 
                     <g:HorizontalPanel styleName="{style.newpanel}" >

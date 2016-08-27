@@ -10,6 +10,7 @@ import net.rugby.foundation.admin.server.factory.IQueryRatingEngineFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.EspnCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.ScrumPlayerMatchStatsFetcherFactory;
@@ -49,7 +50,7 @@ public class AdminMainModule extends AbstractModule {
 		bind(IOrchestrationFactory.class).to(OrchestrationFactory.class);
 		bind(ICoreRuleFactory.class).to(CoreRuleFactory.class);
 		bind(IResultFetcherFactory.class).to(ScrumResultFetcherFactory.class);
-		bind(IForeignCompetitionFetcherFactory.class).to(ScrumCompetitionFetcherFactory.class);
+		bind(IForeignCompetitionFetcherFactory.class).to(EspnCompetitionFetcherFactory.class);
 		bind(IWorkflowFactory.class).to(OfyWorkflowFactory.class);
 		bind(IAdminTaskFactory.class).to(OfyAdminTaskFactory.class);
 		bind(IPlayerMatchStatsFetcherFactory.class).to(ScrumPlayerMatchStatsFetcherFactory.class);

@@ -230,6 +230,9 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 						teams.add(t);
 					}
 					view.showTeams(result);
+					Notify.notify("Teams with green names will be created. This is often a bad thing. If they should already be in the DB, stop now. Go find them in another comp and change their names so they match the ESPN ones. And flush memcache. And then re-run until they are not green.");
+				} else {
+					view.showStatus("Something is wrong. The node.js server down prolly.");
 				}
 
 			}
