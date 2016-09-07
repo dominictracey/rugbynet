@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -55,17 +56,19 @@ public class EspnCompetitionFetcher implements IForeignCompetitionFetcher {
 	private IMatchGroupFactory mf;
 	private IResultFetcherFactory srff;
 	private ITeamGroupFactory tf;
+	private IConfigurationFactory ccf;
 
 	@SuppressWarnings("unused")
 	private EspnCompetitionFetcher() {
 		// use the quasi-injector
 	}
 
-	public EspnCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory srff, ITeamGroupFactory tf) {
+	public EspnCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory srff, ITeamGroupFactory tf, IConfigurationFactory ccf) {
 		this.rf = rf;
 		this.mf = mf;
 		this.srff = srff;
 		this.tf = tf;
+		this.ccf = ccf;
 	}
 
 	@Override
@@ -189,7 +192,7 @@ public class EspnCompetitionFetcher implements IForeignCompetitionFetcher {
 			
 			String charset = java.nio.charset.StandardCharsets.UTF_8.name();
 
-			URL url = new URL("http://localhost:8080/admin/scraper/comp/" + espnLeagueId + "/teams");
+			URL url = new URL(ccf.get().getBaseNodeUrl() + "admin/scraper/comp/" + espnLeagueId + "/teams");
 			HttpURLConnection conn= (HttpURLConnection) url.openConnection();           
 			conn.setDoOutput(true);
 			conn.setInstanceFollowRedirects( false );
@@ -397,8 +400,8 @@ public class EspnCompetitionFetcher implements IForeignCompetitionFetcher {
 		
 		try {
 			String charset = java.nio.charset.StandardCharsets.UTF_8.name();
-	
-			URL url = new URL("http://localhost:8080/admin/scraper/comp/" + espnLeagueId + "/date/" + dateString + "/matches");
+			
+			URL url = new URL(ccf.get().getBaseNodeUrl() + "admin/scraper/comp/" + espnLeagueId + "/date/" + dateString + "/matches");
 			HttpURLConnection conn= (HttpURLConnection) url.openConnection();           
 			conn.setDoOutput(true);
 			conn.setInstanceFollowRedirects( false );

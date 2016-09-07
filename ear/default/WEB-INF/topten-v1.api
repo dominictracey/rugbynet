@@ -276,6 +276,9 @@
           "currentUROrdinal" : {
             "type" : "integer"
           },
+          "baseNodeUrl" : {
+            "type" : "string"
+          },
           "id" : {
             "type" : "string",
             "format" : "int64"
@@ -295,16 +298,22 @@
         "id" : "ICompetition",
         "type" : "object",
         "properties" : {
+          "shortName" : {
+            "type" : "string"
+          },
           "id" : {
             "type" : "string",
             "format" : "int64"
           },
-          "shortName" : {
+          "longName" : {
             "type" : "string"
           },
           "end" : {
             "type" : "string",
             "format" : "date-time"
+          },
+          "imageUrl" : {
+            "type" : "string"
           },
           "rounds" : {
             "type" : "array",
@@ -312,11 +321,9 @@
               "$ref" : "IRound"
             }
           },
-          "imageUrl" : {
-            "type" : "string"
-          },
-          "longName" : {
-            "type" : "string"
+          "begin" : {
+            "type" : "string",
+            "format" : "date-time"
           },
           "teams" : {
             "type" : "array",
@@ -326,10 +333,6 @@
           },
           "abbr" : {
             "type" : "string"
-          },
-          "begin" : {
-            "type" : "string",
-            "format" : "date-time"
           },
           "seriesMap" : {
             "$ref" : "JsonMap"
@@ -423,36 +426,26 @@
         "id" : "IRound",
         "type" : "object",
         "properties" : {
-          "name" : {
-            "type" : "string"
-          },
-          "id" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "end" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "computed" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "abbr" : {
-            "type" : "string"
-          },
-          "begin" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "workflowStatus" : {
-            "$ref" : "WorkflowStatus"
-          },
           "matches" : {
             "type" : "array",
             "items" : {
               "$ref" : "IMatchGroup"
             }
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "end" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "begin" : {
+            "type" : "string",
+            "format" : "date-time"
           },
           "matchIDs" : {
             "type" : "array",
@@ -460,6 +453,10 @@
               "type" : "string",
               "format" : "int64"
             }
+          },
+          "computed" : {
+            "type" : "string",
+            "format" : "date-time"
           },
           "compId" : {
             "type" : "string",
@@ -471,15 +468,16 @@
           "weekendProcessingPipelineId" : {
             "type" : "string"
           },
+          "abbr" : {
+            "type" : "string"
+          },
+          "workflowStatus" : {
+            "$ref" : "WorkflowStatus"
+          },
           "ordinal" : {
             "type" : "integer"
           }
         }
-      },
-      "WorkflowStatus" : {
-        "id" : "WorkflowStatus",
-        "type" : "string",
-        "enum" : [ "PENDING", "FETCHED", "RATED", "COMPLETE", "ERROR" ]
       },
       "IMatchGroup" : {
         "id" : "IMatchGroup",
@@ -501,10 +499,10 @@
           "groupInfo" : {
             "type" : "string"
           },
-          "foreignUrl" : {
+          "guid" : {
             "type" : "string"
           },
-          "guid" : {
+          "foreignUrl" : {
             "type" : "string"
           },
           "homeTeam" : {
@@ -573,31 +571,31 @@
         "id" : "ITeamGroup",
         "type" : "object",
         "properties" : {
+          "shortName" : {
+            "type" : "string"
+          },
           "color" : {
             "type" : "string"
           },
           "pool" : {
             "type" : "string"
           },
-          "shortName" : {
-            "type" : "string"
-          },
           "groupInfo" : {
-            "type" : "string"
-          },
-          "abbr" : {
-            "type" : "string"
-          },
-          "twitter" : {
-            "type" : "string"
-          },
-          "espnName" : {
             "type" : "string"
           },
           "twitterChannel" : {
             "type" : "string"
           },
           "scrumName" : {
+            "type" : "string"
+          },
+          "espnName" : {
+            "type" : "string"
+          },
+          "abbr" : {
+            "type" : "string"
+          },
+          "twitter" : {
             "type" : "string"
           },
           "displayName" : {
@@ -629,6 +627,21 @@
         "id" : "IPlayer",
         "type" : "object",
         "properties" : {
+          "shortName" : {
+            "type" : "string"
+          },
+          "position" : {
+            "$ref" : "position"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "givenName" : {
+            "type" : "string"
+          },
+          "country" : {
+            "$ref" : "ICountry"
+          },
           "weight" : {
             "type" : "number",
             "format" : "float"
@@ -637,20 +650,23 @@
             "type" : "number",
             "format" : "float"
           },
-          "givenName" : {
-            "type" : "string"
+          "countryId" : {
+            "type" : "string",
+            "format" : "int64"
           },
-          "position" : {
-            "$ref" : "position"
+          "taskIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "int64"
+            }
           },
-          "country" : {
-            "$ref" : "ICountry"
-          },
-          "displayName" : {
-            "type" : "string"
-          },
-          "shortName" : {
-            "type" : "string"
+          "blockingTaskIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "format" : "int64"
+            }
           },
           "scrumId" : {
             "type" : "string",
@@ -678,24 +694,6 @@
           "twitterNotAvailable" : {
             "type" : "boolean"
           },
-          "countryId" : {
-            "type" : "string",
-            "format" : "int64"
-          },
-          "taskIds" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "format" : "int64"
-            }
-          },
-          "blockingTaskIds" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "format" : "int64"
-            }
-          },
           "id" : {
             "type" : "string",
             "format" : "int64"
@@ -711,20 +709,20 @@
         "id" : "ICountry",
         "type" : "object",
         "properties" : {
-          "name" : {
-            "type" : "string"
-          },
           "id" : {
             "type" : "string",
             "format" : "int64"
           },
+          "name" : {
+            "type" : "string"
+          },
           "abbr" : {
             "type" : "string"
           },
-          "irb" : {
+          "nickName" : {
             "type" : "string"
           },
-          "nickName" : {
+          "irb" : {
             "type" : "string"
           }
         }
@@ -745,6 +743,11 @@
             "type" : "integer"
           }
         }
+      },
+      "WorkflowStatus" : {
+        "id" : "WorkflowStatus",
+        "type" : "string",
+        "enum" : [ "PENDING", "LINKED", "LINEUPS", "UNDERWAY", "OVER", "FINAL", "FETCHED", "RATED", "PROMOTED", "COMPLETE", "ERROR", "NO_STATS" ]
       },
       "CompetitionType" : {
         "id" : "CompetitionType",
@@ -943,23 +946,26 @@
         "id" : "IPlayerMatchStats",
         "type" : "object",
         "properties" : {
-          "runs" : {
-            "type" : "integer"
-          },
           "position" : {
             "$ref" : "position"
           },
-          "name" : {
-            "type" : "string"
+          "runs" : {
+            "type" : "integer"
           },
           "id" : {
             "type" : "string",
             "format" : "int64"
           },
+          "name" : {
+            "type" : "string"
+          },
           "slot" : {
             "type" : "integer"
           },
           "kicks" : {
+            "type" : "integer"
+          },
+          "tries" : {
             "type" : "integer"
           },
           "playerId" : {
@@ -969,9 +975,6 @@
           "matchId" : {
             "type" : "string",
             "format" : "int64"
-          },
-          "tries" : {
-            "type" : "integer"
           },
           "teamId" : {
             "type" : "string",
@@ -1065,12 +1068,6 @@
             "type" : "string",
             "format" : "int64"
           },
-          "timeOff" : {
-            "type" : "integer"
-          },
-          "timeOn" : {
-            "type" : "integer"
-          },
           "playerId" : {
             "type" : "string",
             "format" : "int64"
@@ -1078,6 +1075,12 @@
           "matchId" : {
             "type" : "string",
             "format" : "int64"
+          },
+          "timeOff" : {
+            "type" : "integer"
+          },
+          "timeOn" : {
+            "type" : "integer"
           },
           "playingTime" : {
             "type" : "integer"

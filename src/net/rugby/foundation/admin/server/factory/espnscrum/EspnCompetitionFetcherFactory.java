@@ -8,6 +8,7 @@ import net.rugby.foundation.admin.server.model.EspnCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.ScrumInternationalCompetitionFetcher;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -20,14 +21,16 @@ public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcher
 	private IResultFetcherFactory rff;
 	private ITeamGroupFactory tf;
     private IUrlCacher uc;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf, IUrlCacher uc) {
+	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf, IUrlCacher uc, IConfigurationFactory ccf) {
 		this.rf  = rf;
 		this.mf = mf;
 		this.rff = rff;
 		this.tf = tf;
 		this.uc = uc;
+		this.ccf = ccf;
 	}
 
 	/* (non-Javadoc)
@@ -38,7 +41,7 @@ public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcher
 		
 		assert(rf!=null);
 		
-		IForeignCompetitionFetcher scf =  new EspnCompetitionFetcher(rf,mf,rff, tf);
+		IForeignCompetitionFetcher scf =  new EspnCompetitionFetcher(rf,mf,rff, tf, ccf);
 		scf.setURL(url);
 		return scf;
 		
