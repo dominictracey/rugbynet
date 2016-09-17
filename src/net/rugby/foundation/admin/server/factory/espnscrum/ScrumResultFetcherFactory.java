@@ -6,10 +6,12 @@ import java.util.logging.Logger;
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.admin.server.model.EspnSimpleScoreFetcher;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.model.ScrumSimpleScoreResultFetcher;
 import net.rugby.foundation.admin.server.model.ScrumSuperRugbySimpleScoreResultFetcher;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -23,9 +25,11 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 	private IMatchGroupFactory mf;
 	private IMatchResultFactory mrf;
 	private IUrlCacher uc;
+	private IConfigurationFactory ccf;
 
 	@Inject
-	public void setFactories(ICompetitionFactory cf, IMatchGroupFactory mf, IMatchResultFactory mrf, IUrlCacher uc) {
+	public void setFactories(IConfigurationFactory ccf, ICompetitionFactory cf, IMatchGroupFactory mf, IMatchResultFactory mrf, IUrlCacher uc) {
+		this.ccf = ccf;
 		this.cf = cf;
 		this.mf = mf;
 		this.mrf = mrf;
@@ -39,37 +43,42 @@ public class ScrumResultFetcherFactory implements IResultFetcherFactory {
 			comp = cf.get(sourceCompID);
 		}
 
-		if (comp == null) {
-			//Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized compId specified: " + sourceCompID);
-			return new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
-		}
-
-		if (resultType == ResultType.SIMPLE_SCORE) {
-
-			IResultFetcher fetcher = null;
-			if (comp != null && !comp.getLongName().contains("Super Rugby")) {
-				fetcher =  new ScrumSimpleScoreResultFetcher(mf,mrf, uc);
-			} else {
-				fetcher =  new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
-			}
-
-			if (comp != null) {
-				fetcher.setComp(comp);
-				fetcher.setRound(comp.getPrevRound());
-			}
-
-			return fetcher;
-		} else if (resultType == ResultType.MATCHES) {
-			IResultFetcher fetcher = new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
-			if (comp != null) {
-				fetcher.setComp(comp);
-				fetcher.setRound(round);
-			}
-			return fetcher;
-		} else {
-			Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized resultType requested " + resultType.toString());
-			return null;
-		}
+		IResultFetcher fetcher =  new EspnSimpleScoreFetcher(ccf, mf,mrf);
+		fetcher.setComp(comp);
+		
+		return fetcher;
+		
+//		if (comp == null) {
+//			//Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized compId specified: " + sourceCompID);
+//			return new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
+//		}
+//
+//		if (resultType == ResultType.SIMPLE_SCORE) {
+//
+//			IResultFetcher fetcher = null;
+//			if (comp != null && !comp.getLongName().contains("Super Rugby")) {
+//				fetcher =  new ScrumSimpleScoreResultFetcher(mf,mrf, uc);
+//			} else {
+//				fetcher =  new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
+//			}
+//
+//			if (comp != null) {
+//				fetcher.setComp(comp);
+//				fetcher.setRound(comp.getPrevRound());
+//			}
+//
+//			return fetcher;
+//		} else if (resultType == ResultType.MATCHES) {
+//			IResultFetcher fetcher = new ScrumSuperRugbySimpleScoreResultFetcher(mf,mrf,uc);
+//			if (comp != null) {
+//				fetcher.setComp(comp);
+//				fetcher.setRound(round);
+//			}
+//			return fetcher;
+//		} else {
+//			Logger.getLogger("Result Fetcher").log(Level.SEVERE, "Unrecognized resultType requested " + resultType.toString());
+//			return null;
+//		}
 	}
 
 }

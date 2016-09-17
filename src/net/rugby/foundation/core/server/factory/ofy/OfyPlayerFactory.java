@@ -117,7 +117,4 @@ public class OfyPlayerFactory extends BasePlayerFactory implements IPlayerFactor
 		}
 	}
 
-
-
-
 }

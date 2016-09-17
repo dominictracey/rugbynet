@@ -212,5 +212,6 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<List<Long>> asyncCallback);
 	public void saveRound(IRound r, AsyncCallback<IRound> asyncCallback);
 	public void bulkUploadEmails(List<String> emailsValid, AsyncCallback<List<String>> asyncCallback);
+	public void FetchLineups(Long id, AsyncCallback<IMatchGroup> asyncCallback);
 
 }

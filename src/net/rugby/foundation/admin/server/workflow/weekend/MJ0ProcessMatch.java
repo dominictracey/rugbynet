@@ -11,6 +11,7 @@ import net.rugby.foundation.admin.server.workflow.weekend.results.MS7StatsFetche
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS9Promoted;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
+import net.rugby.foundation.admin.server.workflow.weekend.results.MS3LineupsAnnounced;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -46,7 +47,7 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 			}
 
 			this.mf = injector.getInstance(IMatchGroupFactory.class);
-
+			
 			MS0ProcessMatchResult result = new MS0ProcessMatchResult();
 
 			// valid round?
@@ -73,14 +74,17 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 			JobSetting nowBackOffSeconds = new JobSetting.BackoffSeconds(10); // retry at 10, 200 and 4000 seconds?
 			JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(3); // 
 
-			// make sure we start at LINEUPS (since we haven't implemented that yet
-			if (match.getWorkflowStatus() == null || match.getWorkflowStatus().ordinal() < WorkflowStatus.LINEUPS.ordinal()) {
-				match.setWorkflowStatus(WorkflowStatus.LINEUPS);
+			// make sure we start at PENDING
+			if (match.getWorkflowStatus() == null || match.getWorkflowStatus().ordinal() < WorkflowStatus.PENDING.ordinal()) {
+				match.setWorkflowStatus(WorkflowStatus.PENDING);
 				mf.put(match);
 			}
 			
 			// start the match
-			Value<MS4Underway> underway = futureCall(new MJ3StartMatch(), immediate(matchId), immediate(label), waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);
+			Value<MS3LineupsAnnounced> lineups = futureCall(new MJ2Lineups(), immediate(matchId), immediate(label), waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);
+			
+			// start the match
+			Value<MS4Underway> underway = futureCall(new MJ3StartMatch(), immediate(matchId), immediate(label), lineups, waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);
 			
 			// end the match
 			Value<MS5Over> over = futureCall(new MJ4EndMatch(), immediate(matchId), immediate(label), underway, waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);

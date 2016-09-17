@@ -43,11 +43,11 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 
 		if (target != null) {
 
-			log = "RuleMatchStatsToFetch for Match " + target.getDisplayName() + " (" + target.getId().toString() + ")";
+			log = "RuleMatchStatsToFetch for Match " + target.getDisplayName() + " (" + target.getId().toString() + ")\n";
 
 			// don't fetch until we have final score
 			if (!target.getWorkflowStatus().equals(WorkflowStatus.FINAL)) {
-				log += "Rule failed: match must be in FINAL state. Currently in " + target.getWorkflowStatus().toString();
+				log += "Rule failed: match must be in FINAL state. Currently in " + target.getWorkflowStatus().toString() + "\n";
 				return false;
 			}
 
@@ -59,7 +59,7 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 			if (fetcher.hasFlopped()) {
 				fetch = true;
 				DateTime now = new DateTime();
-				log += "Stats ready at " + now.toString();;
+				log += "Stats ready at " + now.toString() + "\n";
 				Logger.getLogger(RuleMatchStatsToFetch.class.getName()).log(Level.INFO,"Ready to look for results for match " + target.getDisplayName() +"("+ target.getId() + ")");
 
 			}

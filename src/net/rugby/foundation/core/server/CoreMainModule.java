@@ -11,6 +11,7 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
+import net.rugby.foundation.core.server.factory.ILineupSlotFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
@@ -32,6 +33,7 @@ import net.rugby.foundation.core.server.factory.ofy.OfyCompetitionFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyContentFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyCountryFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyLineupSlotFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchResultFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlaceFactory;
@@ -81,6 +83,7 @@ public class CoreMainModule extends AbstractModule {
 		bind(IPlaceFactory.class).to(OfyPlaceFactory.class);
 		bind(ISponsorFactory.class).to(OfySponsorFactory.class);
 		bind(IContentFactory.class).to(OfyContentFactory.class);
+		bind(ILineupSlotFactory.class).to(OfyLineupSlotFactory.class);
 	}
 }
 

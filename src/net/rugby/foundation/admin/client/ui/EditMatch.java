@@ -43,6 +43,8 @@ public class EditMatch extends Composite {
 		 */
 		void lockMatch(boolean lock, IMatchGroup matchGroup);
 
+		void fetchLineups(IMatchGroup matchGroup);
+		
 		/**
 		 * @param matchGroup
 		 */
@@ -70,6 +72,8 @@ public class EditMatch extends Composite {
 	Button save;
 	@UiField
 	Button lock;
+	@UiField
+	Button fetchLineups;
 	@UiField
 	Button fetchScore;
 	@UiField
@@ -125,6 +129,11 @@ public class EditMatch extends Composite {
 		listener.lockMatch(!matchGroup.getLocked(), matchGroup);
 	}
 
+	@UiHandler("fetchLineups")
+	void onClickFetchLineups(ClickEvent e) {
+		listener.fetchLineups(matchGroup);
+	}
+	
 	@UiHandler("fetchScore")
 	void onClickFetchScore(ClickEvent e) {
 		listener.fetchScore(matchGroup);

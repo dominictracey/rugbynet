@@ -252,7 +252,15 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 		try {
 			Objectify ofy = DataStoreFactory.getOfy();
 			Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("foreignId", espnId);			
-			return qg.get();
+			IMatchGroup m = qg.get(); 
+			if (m != null) {
+				m.setHomeTeam(tf.get(m.getHomeTeamId()));
+				m.setVisitingTeam(tf.get(m.getVisitingTeamId()));
+				
+				//m.setRoundId(null);   //hmmm
+			}
+			
+			return m;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getByEspnId", ex);
 			return null;

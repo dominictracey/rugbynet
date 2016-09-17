@@ -46,6 +46,8 @@ public class EditTeam extends Composite {
 	@UiField
 	TextBox espnName;
 	@UiField
+	TextBox espnId;
+	@UiField
 	TextBox scrumName;
 	@UiField
 	TextBox shortName;
@@ -72,6 +74,7 @@ public class EditTeam extends Composite {
 		teamGroup.setShortName(shortName.getText());
 		teamGroup.setAbbr(abbr.getText());
 		teamGroup.setEspnName(espnName.getText());
+		teamGroup.setForeignId(Long.parseLong(espnId.getText()));
 		teamGroup.setScrumName(scrumName.getText());
 		teamGroup.setTwitter(twitter.getText());
 		teamGroup.setTwitterChannel(twitterChannel.getText());
@@ -102,6 +105,7 @@ public class EditTeam extends Composite {
 			displayName.setText(result.getDisplayName());
 			shortName.setText(result.getShortName());
 			espnName.setText(result.getEspnName());
+			espnId.setText(result.getForeignId().toString());
 			scrumName.setText(result.getScrumName());
 			abbr.setText(result.getAbbr());
 			twitter.setText(result.getTwitter());

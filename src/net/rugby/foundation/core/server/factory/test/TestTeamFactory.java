@@ -323,5 +323,11 @@ public class TestTeamFactory extends BaseTeamFactory implements ITeamGroupFactor
 		return null;
 	}
 
+	@Override
+	public ITeamGroup getTeamByForeignId(Long foreignId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

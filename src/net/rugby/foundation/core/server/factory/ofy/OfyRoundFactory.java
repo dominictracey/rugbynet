@@ -15,6 +15,7 @@ import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.Round;
 
@@ -201,7 +202,9 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 	@Override
 	public IRound create() {
 		try {
-			return new Round();
+			IRound r = new Round();
+			r.setWorkflowStatus(WorkflowStatus.PENDING);
+			return r;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;

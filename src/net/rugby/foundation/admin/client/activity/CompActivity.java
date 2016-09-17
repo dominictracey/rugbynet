@@ -40,6 +40,7 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -1571,6 +1572,32 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	public void cancelAddMatch() {
 		clientFactory.getAddMatchPopup().hide();
 
+	}
+
+
+
+	@Override
+	public void fetchLineups(IMatchGroup matchGroup) {
+		clientFactory.getRpcService().FetchLineups(matchGroup.getId(), new AsyncCallback<IMatchGroup>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Troubles fetching lineups for match: " + caught.getLocalizedMessage(), NotifyType.DANGER);
+
+			}
+
+			@Override
+			public void onSuccess(IMatchGroup result) {
+				if (result != null)
+				{
+					em.ShowMatch(result);
+					Notify.notify("Lineups fetched", NotifyType.SUCCESS);	
+				} else {
+					Notify.notify("Lineups not fetched", NotifyType.WARNING);
+				}
+			}
+
+		});
 	}
 
 

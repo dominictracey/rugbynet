@@ -16,6 +16,7 @@
 				</td></tr></table>
 				ESPN Name: <g:TextBox ui:field='espnName'></g:TextBox> <small>if different than displayName.</small><br/>
 				Scrum Name: <g:TextBox ui:field='scrumName'></g:TextBox> <small>Used in old scrum results (fetch results) and fixtures (import comp) templates (if different than displayName).</small><br/>
+				ESPN Id: <g:TextBox ui:field='espnId'></g:TextBox> <small>Id of team on ESPN</small><br/>
 				Short Name:  <g:TextBox ui:field='shortName'></g:TextBox><br/>
 				Abbr: <g:TextBox ui:field='abbr'></g:TextBox><br/>
 				Twitter handle (@): <g:TextBox ui:field='twitter'></g:TextBox><br/>

@@ -53,10 +53,12 @@ public class MatchGroup extends Group implements IMatchGroup {
 		if (o != null) {
 			if (o instanceof MatchGroup) {
 				MatchGroup m = (MatchGroup)o;
-				return (m.getDisplayName().equals(getDisplayName()) &&
-						m.getHomeTeam().equals(getHomeTeam()) &&
-						m.getVisitingTeam().equals(getVisitingTeam()) &&
-						m.getDate().equals(getDate()));
+				if (m.getDisplayName() != null && m.getHomeTeam() != null && m.getVisitingTeam() != null && m.getDate() != null) {
+					return (m.getDisplayName().equals(getDisplayName()) &&
+							m.getHomeTeam().equals(getHomeTeam()) &&
+							m.getVisitingTeam().equals(getVisitingTeam()) &&
+							m.getDate().equals(getDate()));
+				}
 			}
 		}
 		

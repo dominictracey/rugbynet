@@ -24,7 +24,7 @@ public class Standing implements Serializable, IStanding {
 	@Transient 
 	private ITeamGroup team;
 	private Integer standing;
-	
+	private Long foreignId;
 
 	public Standing() {
 		
@@ -120,5 +120,13 @@ public class Standing implements Serializable, IStanding {
 	@Override
 	public void setTeam(ITeamGroup team) {
 		this.team = team;
+	}
+	@Override
+	public Long getForeignId() {
+		return foreignId;
+	}
+	@Override
+	public void setForeignId(Long foreignId) {
+		this.foreignId = foreignId;
 	}
 }

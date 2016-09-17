@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.MatchRule;
 import net.rugby.foundation.admin.server.rules.IRule;
+import net.rugby.foundation.admin.server.workflow.ResultWithLog;
 import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS4Underway;
 import net.rugby.foundation.core.server.BPMServletContextListener;
@@ -17,11 +18,12 @@ import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import org.joda.time.DateTime;
 
 import com.google.appengine.tools.pipeline.Job2;
+import com.google.appengine.tools.pipeline.Job3;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class MJ3StartMatch extends Job2<MS4Underway, Long, String> implements Serializable {
+public class MJ3StartMatch extends Job3<MS4Underway, Long, String, ResultWithLog> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
@@ -36,19 +38,18 @@ public class MJ3StartMatch extends Job2<MS4Underway, Long, String> implements Se
 
 	
 	@Override
-	public Value<MS4Underway> run(Long matchId, String label) throws RetryRequestException {
+	public Value<MS4Underway> run(Long matchId, String label, ResultWithLog prior) throws RetryRequestException {
 
 		try {
 			
-			// this is currently the first child job, so no need to check prior - if we add jobs before this, be sure to add in code here:
-//			MS4Underway retval = new MS4Underway();
-//			retval.matchId = matchId;
-//
-//			// just let failure cascade to the end so it can finish
-//			if (prior == null || prior.success == false) {
-//				retval.success = false;
-//				return immediate(retval);
-//			}
+			MS4Underway retval = new MS4Underway();
+			retval.matchId = matchId;
+
+			// just let failure cascade to the end so it can finish
+			if (prior == null || prior.success == false) {
+				retval.success = false;
+				return immediate(retval);
+			}
 			
 			if (injector == null) {
 				injector = BPMServletContextListener.getInjectorForNonServlets();
@@ -63,7 +64,6 @@ public class MJ3StartMatch extends Job2<MS4Underway, Long, String> implements Se
 			WorkflowStatus toState = WorkflowStatus.UNDERWAY;
 			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_TO_LOCK);		
 			
-			MS4Underway retval = new MS4Underway();
 			retval.matchId = matchId;
 			
 			// first check if we are already further along than this

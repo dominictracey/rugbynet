@@ -144,7 +144,28 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 				return null;
 			}
 		} catch (Throwable ex) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getTeamLogoStyleMapFromPersistentDatastore", ex);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getTeamByScrumName", ex);
+			return null;
+		}
+	}
+
+	@Override
+	public ITeamGroup getTeamByForeignId(Long foreignId) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Group> team = ofy.query(Group.class).filter("foreignId", foreignId);
+
+			if (team.list().size() > 1) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"We have more than one team group in the dataBase that have either the same foreignId. This is most likely a Bad Thing(tm)!");
+			}
+			
+			if (team.count() > 0) {
+				return (ITeamGroup)team.list().get(0);
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getTeamByForeignId", ex);
 			return null;
 		}
 	}

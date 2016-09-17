@@ -32,8 +32,10 @@ import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.ILineupFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
+import net.rugby.foundation.admin.server.model.ILineupFetcher;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
 import net.rugby.foundation.admin.server.model.IStandingsFetcher;
@@ -64,6 +66,7 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
+import net.rugby.foundation.core.server.factory.ILineupSlotFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
@@ -93,6 +96,7 @@ import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
+import net.rugby.foundation.model.shared.ILineupSlot;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
@@ -186,6 +190,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private DigestEmailer digestEmailer;
 	private IAccountManager am;
 	private IPromoter promoter;
+	private ILineupFetcherFactory luff;
+	private ILineupSlotFactory lsf;
 
 	private static final long serialVersionUID = 1L;
 	public RugbyAdminServiceImpl() {
@@ -209,7 +215,8 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IContentFactory ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
 			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
 			IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf,
-			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def, IAccountManager am, IPromoter promoter) {
+			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def, IAccountManager am, IPromoter promoter,
+			ILineupFetcherFactory luff, ILineupSlotFactory lsf) {
 		try {
 			this.auf = auf;
 			this.ocf = ocf;
@@ -250,7 +257,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.def = def;
 			this.am = am;
 			this.promoter = promoter;
-
+			this.luff = luff;
+			this.lsf = lsf;
+			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 		}
@@ -2833,6 +2842,48 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 				}
 				return retval;
+			}
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public IMatchGroup FetchLineups(Long id) {
+		try {
+			if (checkAdmin()) {
+				IMatchGroup m = mf.get(id);
+				if (m != null) {
+					IRound r = rf.get(m.getRoundId());
+					if (r != null) {
+						ICompetition c = cf.get(r.getCompId());
+						if (c != null) {
+							
+							ILineupFetcher luf = luff.getLineupFetcher(c.getCompType());
+							luf.setComp(c);
+							luf.setMatch(m);
+							List<ILineupSlot> homeLineup = luf.get(true);
+							List<ILineupSlot> visitingLineup = luf.get(false);
+							
+							if (homeLineup.size() > 0 && visitingLineup.size() > 0) {
+								for (ILineupSlot lus : homeLineup) {
+									lsf.put(lus);
+								}
+								
+								for (ILineupSlot lus : visitingLineup) {
+									lsf.put(lus);
+								}
+								
+								m.setWorkflowStatus(WorkflowStatus.LINEUPS);
+								mf.put(m);
+								
+								return m;
+							}
+						}
+					}
+				}
 			}
 			return null;			
 		} catch (Throwable ex) {

@@ -101,6 +101,8 @@ public class DataStoreFactory {
 			ObjectifyService.register(RoundNode.class);
 			ObjectifyService.register(PlayerMatch.class);
 			
+			ObjectifyService.register(LineupSlot.class);
+			
 		}
 		
 		return ofy;

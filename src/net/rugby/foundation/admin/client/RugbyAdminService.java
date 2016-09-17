@@ -161,4 +161,5 @@ public interface RugbyAdminService extends RemoteService {
 	List<Long> twitter(List<Long> blurbIds);
 	IRound saveRound(IRound r);
 	List<String> bulkUploadEmails(List<String> emailsValid);
+	IMatchGroup FetchLineups(Long id);
 }

@@ -26,6 +26,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
@@ -40,9 +42,10 @@ import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.MatchGroup;
+import net.rugby.foundation.model.shared.TeamGroup;
 
 
-public class EspnCompetitionFetcher implements IForeignCompetitionFetcher {
+public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompetitionFetcher {
 
 	private Map<String, ITeamGroup> teamMap = new HashMap<String, ITeamGroup>();
 	private Map<String, IMatchGroup> matchMap = new HashMap<String, IMatchGroup>();
@@ -189,34 +192,26 @@ public class EspnCompetitionFetcher implements IForeignCompetitionFetcher {
 			espnLeagueId = Long.parseLong(toks[toks.length-1]);
 			
 			assert (espnLeagueId != null);
-			
-			String charset = java.nio.charset.StandardCharsets.UTF_8.name();
 
-			URL url = new URL(ccf.get().getBaseNodeUrl() + "admin/scraper/comp/" + espnLeagueId + "/teams");
-			HttpURLConnection conn= (HttpURLConnection) url.openConnection();           
-			conn.setDoOutput(true);
-			conn.setInstanceFollowRedirects( false );
-			conn.setRequestMethod( "GET" );
-			conn.setRequestProperty( "charset", charset);
-			conn.setUseCaches( false );
-			conn.setConnectTimeout(30000); // 30 second timeout
+			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + espnLeagueId + "/teams");
 			
-			Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
-			StringBuilder sb = new StringBuilder();
-			for (int c; (c = in.read()) >= 0;)
-				sb.append((char)c);
-			String response = sb.toString();
-
-			Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,response);
-			
-			JSONObject json = new JSONObject(response);
-			JSONArray retval = json.getJSONArray("Items");			
+			JSONArray retval = get();		
 			
 			for (int i=0; i<retval.length(); ++i) {
-				String name = retval.getJSONObject(i).getString("name");
-				ITeamGroup t = getTeam(name);
-				teamMap.put(name, t);
+				ObjectMapper mapper = new ObjectMapper();
+				ITeamGroup t = mapper.readValue(retval.getJSONObject(i).toString(), TeamGroup.class);
+				ITeamGroup existing = tf.getTeamByScrumName(t.getEspnName());
+				if (existing != null) {
+					if (existing.getForeignId() == null || existing.getForeignId() == 0L) {
+						// self-cleaning oven to add espnId
+						existing.setForeignId(t.getForeignId());
+						tf.put(existing);
+					}
+					t = existing;
+				}
+//				String name = retval.getJSONObject(i).getString("name");
+//				ITeamGroup t = getTeam(name);
+				teamMap.put(t.getDisplayName(), t);
 			}
 			
 		} catch (Throwable e) {
@@ -361,7 +356,7 @@ public class EspnCompetitionFetcher implements IForeignCompetitionFetcher {
 		return roundMap;
 	}
 
-	int NUM_DAYS_IN_A_COMP = 21;
+	int NUM_DAYS_IN_A_COMP = 5;
 	@Override
 	public Map<String, IMatchGroup> getMatches(String baseUrl, Map<String, ITeamGroup> teams) {
 
@@ -398,32 +393,16 @@ public class EspnCompetitionFetcher implements IForeignCompetitionFetcher {
 
 	private void getCompsForWeek(Long espnLeagueId2, String dateString) {
 		
-		try {
-			String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+		try {			
+			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + espnLeagueId + "/date/" + dateString + "/matches");
 			
-			URL url = new URL(ccf.get().getBaseNodeUrl() + "admin/scraper/comp/" + espnLeagueId + "/date/" + dateString + "/matches");
-			HttpURLConnection conn= (HttpURLConnection) url.openConnection();           
-			conn.setDoOutput(true);
-			conn.setInstanceFollowRedirects( false );
-			conn.setRequestMethod( "GET" );
-			conn.setUseCaches( false );
-			conn.setConnectTimeout(30000); // 30 second timeout
-			
-			Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
-			StringBuilder sb = new StringBuilder();
-			for (int c; (c = in.read()) >= 0;)
-				sb.append((char)c);
-			String response = sb.toString();
-	
-			Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,response);
-			
-			JSONObject json = new JSONObject(response);
-			JSONArray retval = json.getJSONArray("Items");			
+			JSONArray retval = get();			
 			
 			for (int i=0; i<retval.length(); ++i) {
 				
 				IMatchGroup m = getMatch(retval.getJSONObject(i));
+//				ObjectMapper mapper = new ObjectMapper();
+//				IMatchGroup m = mapper.readValue(retval.getJSONObject(i).toString(), MatchGroup.class);
 				matchMap.put(m.getForeignId().toString(), m);
 			}
 		
