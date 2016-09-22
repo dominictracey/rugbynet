@@ -31,12 +31,13 @@ import net.rugby.foundation.model.shared.ITeamMatchStats;
 
 import com.google.appengine.tools.pipeline.Job1;
 import com.google.appengine.tools.pipeline.Job2;
+import com.google.appengine.tools.pipeline.Job3;
 import com.google.appengine.tools.pipeline.Job6;
 import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
-public class ESPN6FetchTeamMatchStats extends Job2<Long, IMatchGroup, Home_or_Visitor> {
+public class ESPN6FetchTeamMatchStats extends Job3<Long, IMatchGroup, Home_or_Visitor, Long> {
 	private static Injector injector = null;
 
 	private transient ITeamMatchStatsFactory tmsf;
@@ -57,8 +58,15 @@ public class ESPN6FetchTeamMatchStats extends Job2<Long, IMatchGroup, Home_or_Vi
 	 */
 	private static final long serialVersionUID = 3101992931956737933L;
 
+	/***
+	 * 
+	 * @param match
+	 * @param hov
+	 * @param blockingTMSid - as of 9/22/16 we were having concurrency problems of calling node-horseman multiple times. This parameter is ignored, but allows us to call in a serial manner.
+	 * @return
+	 */
 	@Override
-	public Value<Long> run(IMatchGroup match, Home_or_Visitor hov) {
+	public Value<Long> run(IMatchGroup match, Home_or_Visitor hov, Long blockingTMSid) {
 		
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 		if (injector == null) {

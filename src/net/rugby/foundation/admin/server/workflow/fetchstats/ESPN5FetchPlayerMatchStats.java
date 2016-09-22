@@ -130,7 +130,15 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, Long> {
 				stats.setName(lus.getForeignPlayerName());
 				stats.setSlot(lus.getSlot());
 				stats.setMatchId(match.getId());
-				stats.setName("");
+				// @REX this field is not an object so it may be unset and we are introducing a bug by assuming it is set
+				if (lus.getHome()) {
+					stats.setTeamId(match.getHomeTeamId());
+					stats.setTeamAbbr(match.getHomeTeam().getAbbr());
+				} else {
+					stats.setTeamId(match.getVisitingTeamId());
+					stats.setTeamAbbr(match.getVisitingTeam().getAbbr());
+				}
+				
 			}
 			pmsf.put(stats);
 

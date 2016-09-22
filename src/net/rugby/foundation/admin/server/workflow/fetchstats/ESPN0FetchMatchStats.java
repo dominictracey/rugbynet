@@ -74,8 +74,8 @@ public class ESPN0FetchMatchStats extends FetchMatchStats {
 
 		Logger.getLogger("FetchedPlayer").log(Level.INFO,"Starting generate match ratings for match " + match.getDisplayName());
 
-		FutureValue<Long> homeTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.HOME));
-		FutureValue<Long> visitorTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.VISITOR));
+		FutureValue<Long> homeTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.HOME), null);
+		FutureValue<Long> visitorTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.VISITOR), homeTeamStats);
 		
 		// job settings controlling retries
 		JobSetting nowBackOffFactor = new JobSetting.BackoffFactor(2);

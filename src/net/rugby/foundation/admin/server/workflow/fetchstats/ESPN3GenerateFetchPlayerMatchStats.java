@@ -116,22 +116,26 @@ public class ESPN3GenerateFetchPlayerMatchStats extends Job1<List<Long>, MS3Line
 		}
 
 		Logger.getLogger("FetchPlayerMatchStats").log(Level.INFO,"Starting fetching PMSs for match " + match.getDisplayName());
-
+		
 		// job settings controlling retries
 		JobSetting nowBackOffFactor = new JobSetting.BackoffFactor(2);
 		JobSetting nowBackOffSeconds = new JobSetting.BackoffSeconds(10); // retry at 10, 200 and 4000 seconds?
 		JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(7); // 
 		
+		// add in a call for one player to get the player's stats all in memcache. This is a workaround for the node-horseman concurrency problem.
+		FutureValue<Long> first = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(homeLineup.get(0).getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
+		
 		List<Value<Long>> retval = new ArrayList<Value<Long>>();
 		for (ILineupSlot lus: homeLineup) {
-			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
+			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts, waitFor(first));
 			retval.add(pmsId);
 		}
 		
 		for (ILineupSlot lus: visitLineup) {
-			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
+			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts, waitFor(first));
 			retval.add(pmsId);
 		}
+		
 				
 		return futureList(retval);
 

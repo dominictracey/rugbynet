@@ -1574,7 +1574,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				String pipelineId = "";
 
 				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-				pipelineId = service.startNewPipeline(new ESPN6FetchTeamMatchStats(), match, hov, new JobSetting.MaxAttempts(3));
+				pipelineId = service.startNewPipeline(new ESPN6FetchTeamMatchStats(), match, hov, null, new JobSetting.MaxAttempts(3));
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
 				while (true) {
