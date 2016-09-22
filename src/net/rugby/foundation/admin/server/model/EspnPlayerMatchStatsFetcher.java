@@ -53,24 +53,30 @@ public class EspnPlayerMatchStatsFetcher extends JsonFetcher implements IPlayerM
 			
 			ObjectMapper mapper = new ObjectMapper();		
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			stats = mapper.readValue(json.getJSONObject(0).toString(), ScrumPlayerMatchStats.class);
-		
-			// populate the non-ESPN fields
-			stats.setMatchId(match.getId());
-			stats.setPlayerId(player.getId());
-			stats.setCountryId(player.getCountryId());
+			if (json != null && json.getJSONObject(0) != null)  {
+				stats = mapper.readValue(json.getJSONObject(0).toString(), ScrumPlayerMatchStats.class);
 			
-			if (hov == Home_or_Visitor.HOME) {
-				stats.setTeamAbbr(match.getHomeTeam().getAbbr());
-				stats.setTeamId(match.getHomeTeam().getId());
+				// populate the non-ESPN fields
+				stats.setMatchId(match.getId());
+				stats.setPlayerId(player.getId());
+				stats.setCountryId(player.getCountryId());
+				
+				if (hov == Home_or_Visitor.HOME) {
+					stats.setTeamAbbr(match.getHomeTeam().getAbbr());
+					stats.setTeamId(match.getHomeTeam().getId());
+				} else {
+					stats.setTeamAbbr(match.getVisitingTeam().getAbbr());
+					stats.setTeamId(match.getVisitingTeam().getId());
+				}
+				
+				stats.setSlot(slot);
+							
+				return retval;
 			} else {
-				stats.setTeamAbbr(match.getVisitingTeam().getAbbr());
-				stats.setTeamId(match.getVisitingTeam().getId());
+				// problem with json 
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "No JSON response from scraper");
+				return false;
 			}
-			
-			stats.setSlot(slot);
-						
-			return retval;
 			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);

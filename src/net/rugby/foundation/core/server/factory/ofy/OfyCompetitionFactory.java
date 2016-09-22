@@ -3,8 +3,10 @@ package net.rugby.foundation.core.server.factory.ofy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -130,6 +132,11 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 						c.getComponentCompIds().add(cid);
 					}
 			}
+			
+			// must have a weighting value
+			if (c.getWeightingFactor() == null) {
+				c.setWeightingFactor(1.0F);
+			}
 
 			return c;
 		} catch (Throwable ex) {
@@ -205,18 +212,18 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 
 			ofy.put(c);
 
-			//			// now update the memcache version
-			//			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			//			syncCache.delete(c.getId());
-			//			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			//			ObjectOutput out = new ObjectOutputStream(bos);   
-			//			out.writeObject(c);
-			//			byte[] yourBytes = bos.toByteArray(); 
-			//
-			//			out.close();
-			//			bos.close();
-			//
-			//			syncCache.put(id, yourBytes);
+			//update core configuration
+//			ICoreConfiguration conf = ccf.get();
+//			conf.deleteComp(c.getId());
+//			if (c.getUnderway()) {
+//				conf.addCompUnderway(c.getId());
+//			} else if (c.getShowToClient()) {
+//				conf.addCompForClient(c.getId());
+//			} else {
+//				conf.getAllComps().add(c.getId());
+//			}
+//			ccf.put(conf);
+			
 
 			return c;
 		} catch (Throwable ex) {
@@ -252,7 +259,7 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 		try {
 			List<ICompetition> list = new ArrayList<ICompetition>();
 			Objectify ofy = DataStoreFactory.getOfy();
-			Query<Competition> cq = ofy.query(Competition.class);
+			Query<Competition> cq = ofy.query(Competition.class).order("-weightingFactor");
 			for (Competition c : cq) {
 
 				// never let a competition out the door that you get back from Objectify. Always call get() or 
@@ -407,16 +414,16 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 	}
 
 	@Override
-	public List<ICompetition> getClientComps() {
+	public List<Long> getClientComps() {
 		try {
-			List<ICompetition> list = new ArrayList<ICompetition>();
+			List<Long> list = new ArrayList<Long>();
 			Objectify ofy = DataStoreFactory.getOfy();
-			Query<Competition> cq = ofy.query(Competition.class).filter("underway", true).filter("showInClient", true).order("-weightingFactor");
+			Query<Competition> cq = ofy.query(Competition.class).filter("underway", true).filter("showToClient", true).order("-weightingFactor");
 			for (Competition c : cq) {
 
 				// never let a competition out the door that you get back from Objectify. Always call get() or 
 				// Bad Things (tm) will happen.
-				list.add(get(c.getId()));
+				list.add(c.getId());
 			}
 
 			return list;
@@ -503,7 +510,56 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 		}
 		
 		return list;
-	}	
+	}
+
+	@Override
+	public Map<Long, String> getAllCompIds() {
+		try {
+			Map<Long, String> map = new HashMap<Long, String>();
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Competition> cq = ofy.query(Competition.class).order("-weightingFactor");
+			for (Competition c : cq) {
+				map.put(c.getId(), c.getLongName());
+			}
+			return map;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	@Override
+	public List<Long> getUnderwayCompIds() {
+		try {
+			List<Long> list = new ArrayList<Long>();
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Competition> cq = ofy.query(Competition.class).filter("underway",true).order("-weightingFactor");
+			for (Competition c : cq) {
+				list.add(0,c.getId());
+			}
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
+	@Override
+	public Map<Long, Float> getAllCompWeights() {
+		try {
+			Map<Long, Float> map = new HashMap<Long, Float>();
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Competition> cq = ofy.query(Competition.class).order("-weightingFactor");
+			for (Competition c : cq) {
+				map.put(c.getId(), c.getWeightingFactor());
+			}
+			return map;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
+	}
+
 
 
 }

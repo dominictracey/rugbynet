@@ -8,13 +8,17 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewColumnDefinitions;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListViewImpl;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -93,6 +97,8 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	private SmartBar smartBar;
 
 	private Image waitCursor;
+
+	private ICoreConfiguration config;
 
 	public CompetitionViewImpl() {
 		initWidget(binder.createAndBindUi(this));
@@ -230,11 +236,11 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 								listener.compClicked(editComp, Long.parseLong(event.getSelectedItem().getText().split("\\|")[1]));
 							}							
 						} else if (depth == 2) {  //teams or rounds clicked
-							//						if (event.getSelectedItem().getText().equals("teams")) {
-							//							listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-							//						}	else {
-							//							//listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
-							//						}							
+													if (event.getSelectedItem().getText().equals("teams")) {
+														listener.teamsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+													}	else {
+														listener.roundsClicked(Long.parseLong(event.getSelectedItem().getParentItem().getText().split("\\|")[1]));
+													}							
 						} else if (depth == 3) { // specific team or round clicked
 							if (event.getSelectedItem().getParentItem().getText().equals("teams")) {
 								editArea.clear();
@@ -375,6 +381,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public void addComps(List<ICompetition> result) {
 
 		try {
+			Notify.notify("Don't call addComps please!", NotifyType.DANGER);
 			compTree.removeItems();
 			base = new TreeItem();
 			base.setText("Competitions");
@@ -629,4 +636,70 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	public SmartBar getSmartBar() {
 		return smartBar;
 	}
+
+	@Override
+	public void addCompNames(ICoreConfiguration result, Filter filter) {
+		try {
+			config = result;
+			compTree.removeItems();
+			base = new TreeItem();
+			base.setText("Competitions");
+			root = new TreeItem();
+			root.setText("Competition");
+			compTree.addItem(base);
+			base.addItem(root);
+			root.addItem(teams);
+			root.addItem(rounds);	
+			root.addItem(matches);
+
+			if (compMap == null) {
+				compMap = new HashMap<String,ICompetition>();
+			}
+			
+			List<Long> list = null;
+			
+			if (filter == Filter.ALL) {
+				list = result.getAllComps();
+			} else if (filter == Filter.UNDERWAY) {
+				list = result.getCompsUnderway();
+			} else if (filter == Filter.CLIENT) {
+				list = result.getCompsForClient();
+			}
+ 			for (Long cid : list) {
+
+				TreeItem ti = base.addTextItem(config.getCompetitionMap().get(cid) + "|" + cid);
+				ti.addTextItem("teams");
+				//addTeams(c.getId(), c.getTeams());
+				ti.addTextItem("rounds");
+				//addRounds(c,c.getRounds());
+//				for (IRound r : c.getRounds()) {
+//					try {
+//						addRound(c.getId(),r.getId(),r.getMatches());
+//						for (IMatchGroup m: r.getMatches()) {
+//							try {
+//								List<IMatchResult> results = new ArrayList<IMatchResult>();
+//								ISimpleScoreMatchResult score = m.getSimpleScoreMatchResult();
+//								if (score != null) {
+//									results.add((IMatchResult) m.getSimpleScoreMatchResult());
+//								}
+//								if (!results.isEmpty()) {
+//									addResults(c.getId(), r, m, results);
+//								}
+//							} catch (Throwable ex) {
+//								clientFactory.console("Problem with match " + m.getDisplayName());		
+//							}
+//						}
+//					} catch (Throwable ex) {
+//						clientFactory.console("Problem with Round " + r.getName());		
+//					}
+//				}
+			}
+		} catch (Throwable ex) {
+			clientFactory.console("CompViewImpl:AddComps " + ex.getMessage());		
+		}
+		showWait(false);
+		isInitialized = true;
+	}
+		
+	
 }

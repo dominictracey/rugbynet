@@ -1,6 +1,8 @@
 package net.rugby.foundation.admin.client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.ui.AddMatchPopup;
@@ -101,6 +103,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	private List<ColumnDefinition<IPlayerRating>> ratingListViewColumnDefinitions =  null;
 	private PromoteView<IBlurb> promoteListView = null;
 	private PromoteViewColumnDefinitions<IBlurb> promoteViewColumnDefinitions =  null;
+	private Map<Long,ICompetition> compMap = new HashMap<Long,ICompetition>();
 	
 	private AddRoundPopup addRoundPopup = null;
 	
@@ -126,6 +129,30 @@ public class ClientFactoryImpl implements ClientFactory {
 	@Override
 	public RugbyAdminServiceAsync getRpcService() {
 		return rpcService;
+	}
+	
+	@Override
+	public void getCompAsync(Long compId, final AsyncCallback<ICompetition> callback) {
+		
+		if (compMap.containsKey(compId)) {
+			callback.onSuccess(compMap.get(compId));
+		} else {
+			rpcService.getComp(compId, new AsyncCallback<ICompetition>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);				
+				}
+
+				@Override
+				public void onSuccess(ICompetition result) {
+					callback.onSuccess(result);
+					
+				}
+				
+			});
+		}
+
 	}
 	
 	@Override

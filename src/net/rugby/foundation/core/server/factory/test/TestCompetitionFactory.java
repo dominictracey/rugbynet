@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory;
 import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.CompRule;
@@ -38,7 +39,7 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 	 * 
 	 */
 	private static final long serialVersionUID = 788805092578913470L;
-	private Long id;
+//	private Long id;
 	private final IRoundFactory rf;
 	private ICoreRuleFactory crf;
 	private ITeamGroupFactory tf;
@@ -405,12 +406,12 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 	}
 
 	@Override
-	public List<ICompetition> getClientComps() {
-		List<ICompetition> list = new ArrayList<ICompetition>();
+	public List<Long> getClientComps() {
+		List<Long> list = new ArrayList<Long>();
 
-		list.add(get(1L));
+		list.add(1L);
 
-		list.add(get(2L));
+		list.add(2L);
 
 		return list;
 	}
@@ -423,6 +424,24 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 
 	@Override
 	public List<ICompetition> getVirtualComps() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Long, String> getAllCompIds() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Long> getUnderwayCompIds() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Long, Float> getAllCompWeights() {
 		// TODO Auto-generated method stub
 		return null;
 	}

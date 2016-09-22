@@ -1,4 +1,12 @@
-<!-- Indices written at Fri, 16 Sep 2016 14:20:20 EDT -->
+<!-- Indices written at Tue, 20 Sep 2016 12:06:48 EDT -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 6 times in query history -->
+    <datastore-index kind="Competition" ancestor="false" source="auto">
+        <property name="showToClient" direction="asc"/>
+        <property name="underway" direction="asc"/>
+        <property name="weightingFactor" direction="desc"/>
+    </datastore-index>
+
+</datastore-indexes>

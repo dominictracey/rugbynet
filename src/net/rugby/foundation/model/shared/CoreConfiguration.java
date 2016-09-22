@@ -25,6 +25,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	
 	@Transient
 	private HashMap<Long, HashMap<RatingMode,Long>> seriesMap = new HashMap<Long, HashMap<RatingMode,Long>>();
+	@Transient
 	private List<Long> compsUnderway = new ArrayList<Long>();
 	
 	// default compId
@@ -35,8 +36,10 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	public enum Environment { LOCAL, DEV, BETA, PROD }
 	private Environment environment;
 
+	@Transient
 	private List<Long> compsForClient = new ArrayList<Long>();
-	
+	@Transient
+	private List<Long> compsAll = new ArrayList<Long>();
 	@Transient
 	protected int currentUROrdinal = -1;
 	
@@ -628,6 +631,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 			}
 			
 			compsForClient.remove(compId);
+			compsAll.remove(compId);
 			
 			return true;
 		}
@@ -726,6 +730,11 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	@Override
 	public void setCurrentUROrdinal(int currentUROrdinal) {
 		this.currentUROrdinal = currentUROrdinal;
+	}
+
+	@Override
+	public List<Long> getAllComps() {
+		return compsAll;
 	}
 
 

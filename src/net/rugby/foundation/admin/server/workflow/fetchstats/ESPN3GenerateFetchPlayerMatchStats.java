@@ -124,12 +124,12 @@ public class ESPN3GenerateFetchPlayerMatchStats extends Job1<List<Long>, MS3Line
 		
 		List<Value<Long>> retval = new ArrayList<Value<Long>>();
 		for (ILineupSlot lus: homeLineup) {
-			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
+			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 			retval.add(pmsId);
 		}
 		
 		for (ILineupSlot lus: visitLineup) {
-			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
+			FutureValue<Long> pmsId = futureCall(new ESPN5FetchPlayerMatchStats(), immediate(lus.getId()), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 			retval.add(pmsId);
 		}
 				

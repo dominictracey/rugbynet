@@ -20,6 +20,7 @@ import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -377,8 +378,19 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 
 	@Override
 	public void onRefetchEditTeamMatchStatsClicked(ITeamMatchStats target) {
-		Window.alert("Not implemented");
-		
+		clientFactory.getRpcService().refetchTeamMatchStats(target, new AsyncCallback<ITeamMatchStats>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Failed to fetch Team Match Stats, see logs for details", NotifyType.DANGER);
+			}
+
+			@Override
+			public void onSuccess(ITeamMatchStats result) {
+				clientFactory.getTeamMatchStatsPopupView().setTarget(result);
+				((DialogBox)clientFactory.getTeamMatchStatsPopupView()).center();
+				Notify.notify("Team match stats successfully refetched for " + result.getTeamAbbr(), NotifyType.SUCCESS);
+			}
+		});
 	}
 	
 	@Override

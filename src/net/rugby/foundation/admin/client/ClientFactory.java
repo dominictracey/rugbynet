@@ -1,6 +1,7 @@
 package net.rugby.foundation.admin.client;
 
 import java.util.List;
+import java.util.Map;
 
 import net.rugby.foundation.admin.client.ui.AddMatchPopup;
 import net.rugby.foundation.admin.client.ui.AddRoundPopup;
@@ -35,6 +36,7 @@ import net.rugby.foundation.model.shared.UniversalRound;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * ClientFactory helpful to use a factory or dependency injection framework like GIN to obtain 
@@ -111,4 +113,6 @@ public interface ClientFactory extends EditContentPresenter {
 	AddMatchPopup getAddMatchPopup();
 
 	PromoteView<IBlurb> getPromoteView();
+
+	void getCompAsync(Long compId, AsyncCallback<ICompetition> callback);
 }

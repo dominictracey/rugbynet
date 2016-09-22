@@ -58,4 +58,5 @@ public interface ICoreConfiguration extends IHasId {
 	void setCurrentUROrdinal(int currentUROrdinal);
 	int getCurrentUROrdinal();
 	String getBaseNodeUrl();
+	public abstract List<Long> getAllComps();
 }

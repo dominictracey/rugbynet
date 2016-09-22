@@ -96,6 +96,7 @@ public interface RugbyAdminServiceAsync {
 	
 	public void getComp(Long compId, AsyncCallback<ICompetition> asyncCallback);
 	public void setCompAsDefault(Long compId, AsyncCallback<Boolean> asyncCallback);
+	public void setCompAsGlobal(Long compId, AsyncCallback<Boolean> asyncCallback);
 	public void testMatchStats(Long matchId, AsyncCallback<List<IPlayerMatchStats>> asyncCallback);
 	
 	public void getPlayerMatchInfo(Long matchId, AsyncCallback<List<IPlayerRating>> asyncCallback);

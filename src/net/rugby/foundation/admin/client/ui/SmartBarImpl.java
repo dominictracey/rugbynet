@@ -40,6 +40,7 @@ public class SmartBarImpl extends Composite implements SmartBar {
 	@UiField MenuItem compMenuNew;
 	@UiField MenuItem compMenuAll;
 	@UiField MenuItem compMenuUnderway;
+	@UiField MenuItem compMenuClient;
 	@UiField MenuBar compBar;
 	@UiField MenuItem orchMenuShow;
 	@UiField MenuBar orchBar;
@@ -92,6 +93,12 @@ public class SmartBarImpl extends Composite implements SmartBar {
 			@Override
 			public void execute() {
 				listener.goTo(new AdminCompPlace(Filter.UNDERWAY));
+			}
+		});
+		compMenuClient.setCommand(new Command() {
+			@Override
+			public void execute() {
+				listener.goTo(new AdminCompPlace(Filter.CLIENT));
 			}
 		});
 		portalMenuShow.setCommand(new Command() {

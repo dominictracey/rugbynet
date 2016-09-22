@@ -45,6 +45,7 @@ import net.rugby.foundation.admin.server.orchestration.OrchestrationHelper;
 import net.rugby.foundation.admin.server.util.CountryLoader;
 import net.rugby.foundation.admin.server.util.DigestEmailer;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
+import net.rugby.foundation.admin.server.workflow.fetchstats.ESPN6FetchTeamMatchStats;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchTeamMatchStats;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
@@ -858,21 +859,26 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 				comp = cf.put(comp);
 
-				ICoreConfiguration cc = ccf.get();
-				// add or remove from CoreConfiguration map depending on the Underway flag
-				if (comp.getUnderway()) {
-					cc.addCompUnderway(comp.getId());
-				} else {
-					cc.removeCompUnderway(comp.getId());
-				}
-
-				if (comp.getShowToClient()) {
-					cc.addCompForClient(comp.getId());
-				} else {
-					cc.removeCompForClient(comp.getId());
-				}
-
-				ccf.put(cc);
+//				ICoreConfiguration cc = ccf.get();
+//				// add or remove from CoreConfiguration map depending on the Underway flag
+//				if (comp.getUnderway()) {
+//					cc.addCompUnderway(comp.getId());
+//				} else {
+//					cc.removeCompUnderway(comp.getId());
+//				}
+//
+//				if (comp.getShowToClient()) {
+//					cc.addCompForClient(comp.getId());
+//				} else {
+//					cc.removeCompForClient(comp.getId());
+//				}
+//
+//				ccf.put(cc);
+				
+				//refresh the core config
+				ICoreConfiguration config = ccf.get();
+				ccf.dropFromCache(config.getId());
+				config = ccf.get();
 
 				return comp;
 			} else {
@@ -1568,7 +1574,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				String pipelineId = "";
 
 				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
-				pipelineId = service.startNewPipeline(new FetchTeamMatchStats(), match.getId(), hov, match.getForeignUrl(), new JobSetting.MaxAttempts(3));
+				pipelineId = service.startNewPipeline(new ESPN6FetchTeamMatchStats(), match, hov, new JobSetting.MaxAttempts(3));
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
 
 				while (true) {
@@ -1865,6 +1871,28 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 	}
 
+	@Override
+	public Boolean setCompAsGlobal(Long compId) {
+		try {
+			if (checkAdmin()) {
+				ICoreConfiguration cc = ccf.get();
+				cc.setGlobalCompId(compId);
+				cc = ccf.put(cc);
+				if (cc != null && cc.getGlobalCompId() != null) {
+					return cc.getGlobalCompId().equals(compId);
+				} else {
+					return false;
+				}
+			} else {
+				return null;
+			}
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	
 	@Override
 	public IContent createContent(Long id, String content) {
 		try {

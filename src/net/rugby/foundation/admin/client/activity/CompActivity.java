@@ -25,6 +25,7 @@ import net.rugby.foundation.admin.client.ui.teammatchstatspopup.TeamMatchStatsPo
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -75,7 +76,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	private EditComp ec = null;  //@REX stupid
 	private EditRound er = null; //@REX and yet I continue doing it...
 
-	private List<ICompetition> comps = null;
+	
 	private EditMatch em;
 
 	private Long currentCompId = null;
@@ -114,7 +115,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 
 				if (!view.isAllSetup()) {
-					clientFactory.getRpcService().getComps(place.getFilter(), new AsyncCallback<List<ICompetition>>() {
+					clientFactory.getRpcService().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -122,9 +123,9 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 						}
 
 						@Override
-						public void onSuccess(List<ICompetition> result) {
-							comps = result;
-							view.addComps(result);
+						public void onSuccess(ICoreConfiguration result) {
+							//comps = result;
+							view.addCompNames(result,place.getFilter());
 							clientFactory.getRpcService().getContentList(true, new AsyncCallback<List<IContent>>() {
 
 								@Override
@@ -299,63 +300,71 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	public void roundClicked(final EditRound editRound, final Long compId, final Long roundId) {
 		this.er = editRound;
 		er.SetPresenter(this);
-		ICompetition comp = null;
-		IRound round = null;
+		
 		// find the round 
-		for (ICompetition c : comps) {
-			if (c.getId().equals(compId)) {
-				comp = c;
-				break;
-			}
-		}
-
-		if (comp == null) {
-			Window.alert("Could not find comp matching this round.");
-			return;
-		}
-
-		for (IRound r : comp.getRounds()) {
-			if (r.getId().equals(roundId)) {
-				round = r;
-				break;
-			}
-		}
-
-		if (round == null) {
-			Window.alert("Could not find round in the comp.");
-			return;
-		}
-		final IRound fRound = round;
-
-		clientFactory.getRpcService().getMatches(roundId, new AsyncCallback<List<IMatchGroup>>() {
+		clientFactory.getCompAsync(compId, new AsyncCallback<ICompetition>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-
-
+				Notify.notify("Could not find comp matching this round.", NotifyType.DANGER);
+				
 			}
 
 			@Override
-			public void onSuccess(List<IMatchGroup> result) {
-
-				view.addRound(compId, roundId, result);
-				clientFactory.getRpcService().getStandings(roundId, new AsyncCallback<List<IStanding>>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-
+			public void onSuccess(ICompetition comp) {
+				IRound round = null;
+				if (comp == null) {
+					Notify.notify("Could not find comp matching this round.", NotifyType.DANGER);
+				} else {
+					for (IRound r : comp.getRounds()) {
+						if (r.getId().equals(roundId)) {
+							round = r;
+							break;
+						}
 					}
 
-					@Override
-					public void onSuccess(List<IStanding> result) {
-						er.ShowRound(fRound,result);
+					if (round == null) {
+						Notify.notify("Could not find round in the comp.", NotifyType.DANGER);
+						return;
 					}
+					final IRound fRound = round;
 
-				});
+					clientFactory.getRpcService().getMatches(roundId, new AsyncCallback<List<IMatchGroup>>() {
 
+						@Override
+						public void onFailure(Throwable caught) {
+
+
+						}
+
+						@Override
+						public void onSuccess(List<IMatchGroup> result) {
+
+							view.addRound(compId, roundId, result);
+							clientFactory.getRpcService().getStandings(roundId, new AsyncCallback<List<IStanding>>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									Notify.notify("Could not find standings for round " + roundId, NotifyType.DANGER);
+
+								}
+
+								@Override
+								public void onSuccess(List<IStanding> result) {
+									er.ShowRound(fRound,result);
+								}
+
+							});
+
+						}
+					});		
+				}
+				
 			}
-		});			
+			
+		});
+
+	
 	}
 
 
@@ -455,16 +464,27 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	 * @see net.rugby.foundation.admin.client.ui.CompetitionView.Presenter#compClicked(long)
 	 */
 	@Override
-	public void compClicked(final EditComp editComp, long compId) {
+	public void compClicked(final EditComp editComp, final long compId) {
 		//final EditComp.Presenter presenter = this;  // there must be a way to do this...
 		ec = editComp;
 		ec.SetPresenter(this);	
 
-		for (ICompetition comp : comps) {
-			if (comp.getId().equals(compId)) {
+
+		clientFactory.getCompAsync( compId, new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Could not find competition with id " + compId);
+				
+			}
+
+			@Override
+			public void onSuccess(ICompetition comp) {
 				ec.ShowComp(comp);
 			}
-		}
+			
+		});
+		
 
 	}
 
@@ -486,7 +506,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 				//ec.SetPresenter(presenter);
 				if (result != null)
 					//Window.alert("Comp saved");
-					Notify.notify("Comp " + result.getLongName() + " saved.");
+					Notify.notify("Comp " + result.getLongName() + " saved.", NotifyType.SUCCESS);
 				else
 					Window.alert("Comp not saved");
 
@@ -1305,28 +1325,27 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 
 	@Override
-	public void setCompAsDefault(ICompetition comp) {
-		clientFactory.getRpcService().setCompAsDefault(comp.getId(), new AsyncCallback<Boolean>() {
+	public void setCompAsGlobal(ICompetition comp) {
+		clientFactory.getRpcService().setCompAsGlobal(comp.getId(), new AsyncCallback<Boolean>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Set comp as default failure: " + caught.getLocalizedMessage());
+				Notify.notify("Set comp as global failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
 
 			}
 
 			@Override
 			public void onSuccess(Boolean result) {
 				if (result) {
-					Window.alert("Comp set as default. Don't forget to flush memcache!");
+					Notify.notify("Comp set as global. Don't forget to flush memcache!", NotifyType.SUCCESS);
 				} else {
-					Window.alert("Comp not set as default. See logs for details");
+					Notify.notify("Comp not set as global. See logs for details",NotifyType.DANGER);
 				}
 
 			}
 
 		}); 
 	}
-
 
 
 	@Override
@@ -1475,7 +1494,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Troubles creating virtual comp: " + caught.getLocalizedMessage());
+				Notify.notify("Troubles creating virtual comp: " + caught.getLocalizedMessage(), NotifyType.DANGER);
 
 			}
 
@@ -1483,9 +1502,9 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			public void onSuccess(ICompetition result) {
 				if (result != null)
 				{
-					Window.alert("Comp	Added");	
-					comps.add(result);
-					view.addComps(comps);
+					Notify.notify("New virtual comp added. Refresh to view", NotifyType.SUCCESS);	
+
+					//view.addComp(result);
 				} else {
 					Window.alert("Comp not added. See server log for details");
 				}
@@ -1583,7 +1602,6 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				Notify.notify("Troubles fetching lineups for match: " + caught.getLocalizedMessage(), NotifyType.DANGER);
-
 			}
 
 			@Override
@@ -1599,6 +1617,74 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 		});
 	}
+
+
+
+	@Override
+	public void teamsClicked(final long compId) {
+		clientFactory.getCompAsync(compId, new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Troubles fetching teams for comp: " + caught.getLocalizedMessage(), NotifyType.DANGER);
+			}
+
+			@Override
+			public void onSuccess(ICompetition result) {
+				clientFactory.getCompView().addTeams(compId, result.getTeams());				
+			}
+			
+		});
+		
+	}
+
+
+
+	@Override
+	public void roundsClicked(long compId) {
+		clientFactory.getCompAsync(compId, new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Troubles fetching rounds for comp: " + caught.getLocalizedMessage(), NotifyType.DANGER);
+			}
+
+			@Override
+			public void onSuccess(ICompetition result) {
+				clientFactory.getCompView().addRounds(result, result.getRounds());				
+			}
+			
+		});
+		
+	}
+
+
+
+	@Override
+	public void setCompAsDefault(ICompetition comp) {
+		clientFactory.getRpcService().setCompAsDefault(comp.getId(), new AsyncCallback<Boolean>() {
+
+		@Override
+		public void onFailure(Throwable caught) {
+			Notify.notify("Set comp as default failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
+
+		}
+
+		@Override
+		public void onSuccess(Boolean result) {
+			if (result) {
+				Notify.notify("Comp set as default. Don't forget to flush memcache!", NotifyType.SUCCESS);
+			} else {
+				Notify.notify("Comp not set as default. See logs for details",NotifyType.DANGER);
+			}
+
+		}
+
+	}); 
+		
+	}
+
+
 
 
 

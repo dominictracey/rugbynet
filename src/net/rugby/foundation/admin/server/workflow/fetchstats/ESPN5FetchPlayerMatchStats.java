@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Hom
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.ILineupSlotFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -26,7 +27,7 @@ import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
-public class ESPN5FetchPlayerMatchStats extends Job1<Long, ILineupSlot> {
+public class ESPN5FetchPlayerMatchStats extends Job1<Long, Long> {
 	private static Injector injector = null;
 	private transient IPlayerMatchStatsFetcherFactory pmsff;
 	private transient IPlayerMatchStatsFactory pmsf;
@@ -40,7 +41,7 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, ILineupSlot> {
 //	protected transient String url;
 	private transient IPlayerFactory pf;
 	private IConfigurationFactory ccf;
-	
+	private ILineupSlotFactory lusf;
 	
 	public ESPN5FetchPlayerMatchStats() {
 
@@ -52,7 +53,7 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, ILineupSlot> {
 	private static final long serialVersionUID = 3101992931956737933L;
 
 	@Override
-	public Value<Long> run(ILineupSlot lus) {
+	public Value<Long> run(Long lusId) {
 
 
 //		this.hov = hov;
@@ -68,6 +69,9 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, ILineupSlot> {
 		this.atf = injector.getInstance(IAdminTaskFactory.class);
 		this.mgf = injector.getInstance(IMatchGroupFactory.class);
 		this.pf = injector.getInstance(IPlayerFactory.class);
+		this.lusf = injector.getInstance(ILineupSlotFactory.class);
+		
+		ILineupSlot lus = lusf.get(lusId);
 		
 		if (lus == null || lus.getPlayerId() == null || lus.getMatchId() == null) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Bad LineupSlot info. Not enough info to fetch playerMatchStats - bailing!!");
