@@ -107,4 +107,14 @@ public abstract class BaseTeamMatchStatsFactory extends BaseCachingFactory<ITeam
 			return null;
 		}
 	}
+	
+	protected void flushByMatchId(Long matchId)
+	{
+		try {
+			super.deleteItemFromMemcache(getScrumCacheId(matchId,Home_or_Visitor.HOME));
+			super.deleteItemFromMemcache(getScrumCacheId(matchId,Home_or_Visitor.VISITOR));
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "FlushByMatchId" + ex.getMessage(), ex);
+		}
+	}
 }

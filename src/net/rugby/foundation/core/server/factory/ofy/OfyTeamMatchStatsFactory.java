@@ -62,6 +62,8 @@ public class OfyTeamMatchStatsFactory extends BaseTeamMatchStatsFactory implemen
 			ScrumTeamMatchStats existing = ofy.query(ScrumTeamMatchStats.class).filter("teamId", tms.getTeamId()).filter("matchId", tms.getMatchId()).get();
 
 			if (existing != null) {
+				// remove from cache too
+				super.flushByMatchId(tms.getMatchId());
 				ofy.delete(existing);
 			}
 

@@ -5,20 +5,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.core.JsonParser;
-
 public class JsonFetcher implements IJsonFetcher {
 	protected URL url;
 	protected String errorMessage;
-	protected String warningMessage;
+	protected List<String> warningMessages = new ArrayList<String>();
 	protected String errorCode;
-	protected String warningCode;
+	protected List<String> warningCodes = new ArrayList<String>();
 	
 	public JSONArray get() {
 		try {
@@ -48,15 +48,22 @@ public class JsonFetcher implements IJsonFetcher {
 			
 			if (json.has("error") && !json.isNull("error")) {
 				JSONObject errorObj = json.getJSONObject("error");
-				errorMessage = errorObj.getString("mssage");
+				errorMessage = errorObj.getString("message");
 				errorCode = errorObj.getString("value");
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,errorCode + ":" + errorMessage);
+				return null;
 			}
 			
 			
 			if (json.has("warning") && !json.isNull("warning")) {
-				JSONObject warningObj = json.getJSONObject("warning");
-				warningMessage = warningObj.getString("message");
-				warningCode = warningObj.getString("value");
+				JSONArray warningArray = json.getJSONArray("warnings");
+				for (int i = 0; i < warningArray.length(); ++i) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, warningArray.getJSONObject(i).getString("value") + " : " + warningArray.getJSONObject(i).getString("message"));
+					warningMessages.add(warningArray.getJSONObject(i).getString("message"));
+					warningCodes.add(warningArray.getJSONObject(i).getString("value"));
+				}
+				
+				
 			}
 			
 			return retval;
@@ -87,8 +94,8 @@ public class JsonFetcher implements IJsonFetcher {
 	 * @see net.rugby.foundation.admin.server.model.IJsonFetcher#getWarningMessage()
 	 */
 	@Override
-	public String getWarningMessage() {
-		return warningMessage;
+	public List<String> getWarningMessages() {
+		return warningMessages;
 	}
 
 	/* (non-Javadoc)
@@ -103,8 +110,8 @@ public class JsonFetcher implements IJsonFetcher {
 	 * @see net.rugby.foundation.admin.server.model.IJsonFetcher#getWarningCode()
 	 */
 	@Override
-	public String getWarningCode() {
-		return warningCode;
+	public List<String> getWarningCodes() {
+		return warningCodes;
 	}
 	
 }

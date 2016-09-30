@@ -35,6 +35,10 @@ public class EspnTeamMatchStatsFetcher extends JsonFetcher implements ITeamMatch
 	private ITeamMatchStatsFactory tmsf;
 	private IMatchGroupFactory mf;
 		
+	public final static String TEAM_STATS_FETCHER_NO_JSON = "12000";
+	public final static String TEAM_STATS_FETCHER_INVALID_JSON = "12001";
+	public final static String TEAM_STATS_FETCHER_EXCEPTION_RAISED = "12002";
+	
 	public EspnTeamMatchStatsFetcher(ITeamGroupFactory tf, ITeamMatchStatsFactory tmsf, IMatchGroupFactory mf, IConfigurationFactory ccf) {
 		this.tf = tf;
 		this.ccf = ccf;
@@ -48,17 +52,16 @@ public class EspnTeamMatchStatsFetcher extends JsonFetcher implements ITeamMatch
 	@Override
 	public ITeamMatchStats get(IMatchGroup match, ICompetition comp, Boolean home) {
 		try {
-			String sHome = home ? "/homeTeamStats" : "/awayTeamStats";
+			String sHome = home ? "/teamStats/home" : "/teamStats/visitor";
 			
 			url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/match/" + match.getForeignId() + sHome);
-	
-			int c = 0;
 			
 			JSONArray json = get();			
 
 			ITeamMatchStats tms = null;
-			
-			if (json != null) {
+			if (errorCode != null) {
+				return null;
+			} else if (json != null) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 				tms = mapper.readValue(json.getJSONObject(0).toString(), ScrumTeamMatchStats.class);
@@ -71,7 +74,7 @@ public class EspnTeamMatchStatsFetcher extends JsonFetcher implements ITeamMatch
 					 tms.setMatchId(match.getId());
 					 tms.setTeamAbbr(t.getAbbr());
 					 tmsf.put(tms);
-				}
+				} 
 			}
 
 			

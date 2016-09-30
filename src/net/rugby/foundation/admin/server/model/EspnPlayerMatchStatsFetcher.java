@@ -47,7 +47,7 @@ public class EspnPlayerMatchStatsFetcher extends JsonFetcher implements IPlayerM
 			JSONArray json = get();			
 			boolean retval = true;
 			
-			if ((errorMessage != null && !errorMessage.isEmpty()) || (warningMessage != null && !warningMessage.isEmpty())) {
+			if ((errorMessage != null && !errorMessage.isEmpty()) || (warningMessages != null && !warningMessages.isEmpty())) {
 				retval = false;
 			}
 			

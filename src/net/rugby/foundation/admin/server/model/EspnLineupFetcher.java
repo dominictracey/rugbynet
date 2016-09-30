@@ -31,6 +31,9 @@ public class EspnLineupFetcher extends JsonFetcher implements ILineupFetcher {
 	
 	protected String errorMessage;
 		
+	public final static String LINEUP_FETCHER_ERROR_CODE_NO_JSON_RETURNED = "14000";
+	public final static String LINEUP_FETCHER_ERROR_CODE_EXCEPTION_THROWN = "14001";
+	
 	public EspnLineupFetcher(ILineupSlotFactory lsf, IConfigurationFactory ccf, IPlayerFactory pf, IMatchGroupFactory mf) {
 		this.lsf = lsf;
 		this.ccf = ccf;
@@ -44,7 +47,7 @@ public class EspnLineupFetcher extends JsonFetcher implements ILineupFetcher {
 	@Override
 	public List<ILineupSlot> get(boolean home) {
 		try {
-			String sHome = home ? "/lineUps/home" : "/lineUps/visitor";
+			String sHome = home ? "/lineUps/true" : "/lineUps/false";
 			
 			url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/match/" + match.getForeignId() + sHome);
 			
@@ -78,6 +81,7 @@ public class EspnLineupFetcher extends JsonFetcher implements ILineupFetcher {
 				
 				return retval;
 			} else {
+				errorCode = LINEUP_FETCHER_ERROR_CODE_NO_JSON_RETURNED;
 				errorMessage = "No JSON in response to " + url.toString();
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "No JSON in response to " + url.toString());
 				return null;
@@ -85,6 +89,7 @@ public class EspnLineupFetcher extends JsonFetcher implements ILineupFetcher {
 			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			errorCode = LINEUP_FETCHER_ERROR_CODE_EXCEPTION_THROWN;
 			errorMessage = ex.getLocalizedMessage();
 			return null;
 		}

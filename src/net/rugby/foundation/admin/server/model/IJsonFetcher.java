@@ -1,13 +1,15 @@
 package net.rugby.foundation.admin.server.model;
 
+import java.util.List;
+
 public interface IJsonFetcher {
 
 	String getErrorMessage();
 
-	String getWarningMessage();
-
 	String getErrorCode();
 
-	String getWarningCode();
+	List<String> getWarningCodes();
+
+	List<String> getWarningMessages();
 
 }
