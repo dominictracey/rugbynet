@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS4Underway;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS5Over;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS6Final;
@@ -34,7 +36,7 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 	transient private IMatchGroup match;
 
 	public MJ0ProcessMatch() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -56,6 +58,8 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 				result.matchId = matchId;
 				result.log.add("No match could be found matching matchId " + matchId);
 				return immediate(result);
+			} else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": Starting processing for match " + match.getDisplayName());
 			}
 
 			String label = match.getDisplayName();
@@ -72,12 +76,19 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 			// done or fail
 			JobSetting nowBackOffFactor = new JobSetting.BackoffFactor(2);
 			JobSetting nowBackOffSeconds = new JobSetting.BackoffSeconds(10); // retry at 10, 200 and 4000 seconds?
-			JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(3); // 
+			JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(7); // 
 
 			// make sure we start at PENDING
 			if (match.getWorkflowStatus() == null || match.getWorkflowStatus().ordinal() < WorkflowStatus.PENDING.ordinal()) {
 				match.setWorkflowStatus(WorkflowStatus.PENDING);
 				mf.put(match);
+			}
+			
+			// if the match is in the past, there is no point in waiting a half hour between retries...
+			if (match.getDate().before(DateTime.now().toDate())) {
+				waitBackOffFactor = nowBackOffFactor;
+				waitBackOffSeconds = nowBackOffSeconds;
+				waitMaxAttempts = nowMaxAttempts;
 			}
 			
 			// start the match

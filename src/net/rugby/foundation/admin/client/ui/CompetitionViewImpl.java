@@ -60,6 +60,7 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 
 	@UiField TextBox url;
 	@UiField ListBox resultType;	
+	@UiField TextBox weeks;
 	@UiField Button save;
 	@UiField Button fetch;
 	@UiField VerticalPanel treePane;
@@ -139,11 +140,11 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 	void onFetchClick(ClickEvent e) {	
 		CompetitionType compType = CompetitionType.values()[resultType.getSelectedIndex()];
 		if (step == Step.TEAMS) {
-			listener.fetchTeamsClicked(url.getText(), compType);
+			listener.fetchTeamsClicked(url.getText(), weeks.getText(), compType);
 			step=Step.MATCHES;
 			fetch.setText("Fetch Matches");
 		} else if (step == Step.MATCHES) {
-			listener.fetchMatchesClicked(teamMap, compType);
+			listener.fetchMatchesClicked(teamMap, null, Integer.parseInt(weeks.getText()), 0, compType);
 			step=Step.ROUNDS;
 			fetch.setText("Fetch Rounds");
 		} else if (step == Step.ROUNDS) {
@@ -356,6 +357,20 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 		}
 	}
 
+	@Override
+	public void addMatches(Map<String, IMatchGroup> mgs) {
+		if (matchMap == null) {
+			matchMap = new HashMap<String, IMatchGroup>();
+		}
+		matchMap.putAll(mgs);
+
+		for (IMatchGroup m : matchMap.values()) {
+			matches.addTextItem(m.getDisplayName());
+			if (m.getId() == null) {
+				matches.getChild(matches.getChildCount()-1).getElement().addClassName("gnu");
+			}
+		}		
+	}
 
 	/**
 	 * when the user clicks Fetch Competition button, the server goes and gets the comp info 

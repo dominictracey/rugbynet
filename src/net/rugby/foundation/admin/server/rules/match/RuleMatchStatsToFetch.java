@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
+import net.rugby.foundation.admin.server.model.EspnPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.rules.CoreRule;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
@@ -39,6 +40,7 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 	 */
 	@Override
 	public Boolean test() {
+		
 		boolean fetch = false;
 
 		if (target != null) {
@@ -53,6 +55,11 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 
 
 			IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(pf.create(), target, Home_or_Visitor.HOME, 0, target.getForeignUrl());
+			
+			if (fetcher instanceof EspnPlayerMatchStatsFetcher) {
+				return true;  // don't think the new React presentation has a flopping?
+			}
+			
 			// make sure we get the latest and greatest
 			fetcher.setUrl(target.getForeignUrl());
 

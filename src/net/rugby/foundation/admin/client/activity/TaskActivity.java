@@ -150,7 +150,7 @@ PlayerMatchStatsPopupViewPresenter<IPlayerMatchStats>, TeamMatchStatsPopupViewPr
 	public void showTask(int i, IAdminTask target) {
 		this.target = target;
 		this.index = i;
-		Notify.notify(target.getSummary());
+		Notify.notify(target.getDetails());
 		if (target.getAction().equals(IAdminTask.Action.EDITPLAYER) || target.getAction().equals(IAdminTask.Action.EDITPLAYERTWITTER)) {	
 			assert (target instanceof EditPlayerAdminTask);
 			clientFactory.getPlayerPopupView().setPresenter(this);

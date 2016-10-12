@@ -35,6 +35,8 @@ public class EspnTeamMatchStatsFetcher extends JsonFetcher implements ITeamMatch
 	private ITeamMatchStatsFactory tmsf;
 	private IMatchGroupFactory mf;
 		
+	private ITeamMatchStats tms = null;
+	
 	public final static String TEAM_STATS_FETCHER_NO_JSON = "12000";
 	public final static String TEAM_STATS_FETCHER_INVALID_JSON = "12001";
 	public final static String TEAM_STATS_FETCHER_EXCEPTION_RAISED = "12002";
@@ -50,18 +52,18 @@ public class EspnTeamMatchStatsFetcher extends JsonFetcher implements ITeamMatch
 	 * @see net.rugby.foundation.admin.server.model.ILineupFetcher#get(boolean)
 	 */
 	@Override
-	public ITeamMatchStats get(IMatchGroup match, ICompetition comp, Boolean home) {
+	public boolean process(IMatchGroup match, ICompetition comp, Boolean home) {
 		try {
 			String sHome = home ? "/teamStats/home" : "/teamStats/visitor";
 			
-			url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/match/" + match.getForeignId() + sHome);
-			
+			if (match.getForeignLeagueId() == null) {
+				url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/match/" + match.getForeignId() + sHome);
+			} else {
+				url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + match.getForeignLeagueId() + "/match/" + match.getForeignId() + sHome);
+			}
 			JSONArray json = get();			
 
-			ITeamMatchStats tms = null;
-			if (errorCode != null) {
-				return null;
-			} else if (json != null) {
+			if (json != null) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 				tms = mapper.readValue(json.getJSONObject(0).toString(), ScrumTeamMatchStats.class);
@@ -75,17 +77,48 @@ public class EspnTeamMatchStatsFetcher extends JsonFetcher implements ITeamMatch
 					 tms.setTeamAbbr(t.getAbbr());
 					 tmsf.put(tms);
 				} 
+			} else {
+				tms = emptyTMS(match, comp, home);
 			}
 
 			
-			return tms;
+			return errorCode == null;
 			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			errorCode = "TSMF.process";
 			errorMessage = ex.getLocalizedMessage();
-			return null;
+			tms = emptyTMS(null, null, false);
+			return false;
 		}
 		
+	}
+
+	@Override
+	public ITeamMatchStats getStats() {
+		return tms;
+	}
+	
+	private ITeamMatchStats emptyTMS(IMatchGroup m, ICompetition c, Boolean home) {
+		ITeamMatchStats blank = tmsf.create();
+		blank.setIsHome(home);
+		if (m != null) {
+			blank.setMatchId(m.getId());
+		
+			if (home) {
+				if (m.getHomeTeam() != null) {
+					blank.setTeamAbbr(m.getHomeTeam().getAbbr());
+				}
+				blank.setTeamId(m.getHomeTeamId());
+			} else {
+				if (m.getVisitingTeam() != null) {
+					blank.setTeamAbbr(m.getVisitingTeam().getAbbr());
+				}
+				blank.setTeamId(m.getVisitingTeamId());
+			}
+		}
+		
+		return blank;
 	}
 	
 }

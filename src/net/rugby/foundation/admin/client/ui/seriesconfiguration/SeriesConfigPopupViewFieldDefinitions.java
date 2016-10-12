@@ -8,6 +8,7 @@ import net.rugby.foundation.admin.client.ui.FieldDefinition;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IRatingQuery.MinMinutes;
 import net.rugby.foundation.model.shared.RatingMode;
@@ -39,7 +40,8 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 	//	@UiField CheckBox average;
 	//	
 	//	@UiField CheckBox live;
-	protected List<ICompetition> compList = null;
+	//protected List<ICompetition> compList = null;
+	protected ICoreConfiguration config = null;
 	protected List<ICountry> countryList = null;
 	protected List<UniversalRound> urList = null;
 
@@ -120,10 +122,15 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				{
 					w = (ListBox) in;
 
-					assert (compList != null);
-					for (ICompetition c : compList) {
-						w.addItem(c.getShortName(), c.getId().toString());
+//					assert (compList != null);
+//					for (ICompetition c : compList) {
+//						w.addItem(c.getShortName(), c.getId().toString());
+//					}
+					assert (config != null); 
+					for (Long id : config.getCompsUnderway()) {
+						w.addItem(config.getCompetitionMap().get(id), id.toString());
 					}
+					
 
 				}
 
@@ -297,8 +304,12 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 				{
 					w = (ListBox) in;
 
-					for (ICompetition c : compList) {
-						w.addItem(c.getShortName(), c.getId().toString());
+//					for (ICompetition c : compList) {
+//						w.addItem(c.getShortName(), c.getId().toString());
+//					}
+					assert (config != null); 
+					for (Long id : config.getCompsUnderway()) {
+						w.addItem(config.getCompetitionMap().get(id), id.toString());
 					}
 
 				}
@@ -769,14 +780,14 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 	public List<FieldDefinition<ISeriesConfiguration>> getFieldDefinitions() {
 		return fieldDefinitions;
 	}
-
-	public List<ICompetition> getCompList() {
-		return compList;
-	}
-
-	public void setCompList(List<ICompetition> compList) {
-		this.compList = compList;
-	}
+//
+//	public List<ICompetition> getCompList() {
+//		return compList;
+//	}
+//
+//	public void setCompList(List<ICompetition> compList) {
+//		this.compList = compList;
+//	}
 
 	public List<ICountry> getCountryList() {
 		return countryList;
@@ -792,5 +803,13 @@ public class SeriesConfigPopupViewFieldDefinitions<T> {
 
 	public void setUrList(List<UniversalRound> urList) {
 		this.urList = urList;
+	}
+
+	public void setConfig(ICoreConfiguration config) {
+		this.config = config;
+	}
+
+	public ICoreConfiguration getConfig() {
+		return config;
 	}
 }

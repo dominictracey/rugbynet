@@ -60,8 +60,11 @@ public class EspnSimpleScoreFetcher extends JsonFetcher implements IResultFetche
 		try {
 			IMatchResult result = null;
 			
-			url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/match/" + match.getForeignId() + "/result");
-			
+			if (match.getForeignLeagueId() == null) {
+				url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/match/" + match.getForeignId() + "/result");
+			} else {
+				url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + match.getForeignLeagueId() + "/match/" + match.getForeignId() + "/result");
+			}
 			JSONArray json = get();			
 			
 			if (json != null) {

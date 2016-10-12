@@ -50,6 +50,10 @@ public class GraphSeriesServlet extends HttpServlet {
 			DateTime timestamp = new DateTime();
 			resp.setContentType("text/html");
 			String sCompId = req.getParameter("compId");
+			if (sCompId.isEmpty()) {
+				showUsage(resp);
+				return;
+			}
 			Long compId = Long.parseLong(sCompId);
 			if (compId != null) {
 				ICompetition c = cf.get(compId);

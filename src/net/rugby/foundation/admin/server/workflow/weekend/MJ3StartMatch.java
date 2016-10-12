@@ -33,7 +33,7 @@ public class MJ3StartMatch extends Job3<MS4Underway, Long, String, ResultWithLog
 	transient private ICoreRuleFactory crf;
 
 	public MJ3StartMatch() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	
@@ -60,6 +60,10 @@ public class MJ3StartMatch extends Job3<MS4Underway, Long, String, ResultWithLog
 			
 			IMatchGroup match = mf.get(matchId);
 			
+			if (match != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": checking for match start for " + match.getDisplayName());
+			}
+			
 			WorkflowStatus fromState = WorkflowStatus.LINEUPS;
 			WorkflowStatus toState = WorkflowStatus.UNDERWAY;
 			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_TO_LOCK);		
@@ -84,9 +88,11 @@ public class MJ3StartMatch extends Job3<MS4Underway, Long, String, ResultWithLog
 				retval.log.add(rule.getLog());
 				retval.log.add(match.getDisplayName() + " locked at " + DateTime.now().toString());
 				retval.success = true;
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": match has started: " + match.getDisplayName());
+
 				return immediate(retval);
 			} else {
-				throw new RetryRequestException(match.getDisplayName() + " not started at " + DateTime.now().toString());
+				throw new RetryRequestException(match.getDisplayName() + " not started at " + DateTime.now().toString() + ". Waiting for kickoff at " + match.getDate().toString());
 			}
 	
 		} catch (Exception ex) {			

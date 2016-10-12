@@ -25,7 +25,7 @@ public class CreateGraphRoundNode extends Job4<String, Long, String, Integer, St
 	transient private ICompetitionFactory cf;
 
 	public CreateGraphRoundNode() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	

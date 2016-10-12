@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import net.rugby.foundation.admin.server.factory.espnscrum.ILineupFetcherFactory;
 import net.rugby.foundation.admin.server.model.ILineupFetcher;
+import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS3LineupsAnnounced;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -46,7 +49,7 @@ public class ESPN2FetchLineups extends Job1<MS3LineupsAnnounced, Long> implement
 
 	
 	public ESPN2FetchLineups() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -55,9 +58,10 @@ public class ESPN2FetchLineups extends Job1<MS3LineupsAnnounced, Long> implement
 	 * params String compName
 	 * 			Long scrumId
 	 * 			Long adminID
+	 * @throws RetryRequestException 
 	 */		
 	@Override
-	public Value<MS3LineupsAnnounced> run(Long matchId) {
+	public Value<MS3LineupsAnnounced> run(Long matchId) throws RetryRequestException {
 
 		if (injector == null) {
 			injector = BPMServletContextListener.getInjectorForNonServlets();
@@ -77,6 +81,8 @@ public class ESPN2FetchLineups extends Job1<MS3LineupsAnnounced, Long> implement
 			MS3LineupsAnnounced wrapper = new MS3LineupsAnnounced();
 			wrapper.fetchSubTreeResults = retval;
 			return immediate(wrapper);
+		} else {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": Checking " + match.getDisplayName() + " for lineups.");
 		}
 		
 		if (match.getForeignUrl() == null) {
@@ -99,19 +105,25 @@ public class ESPN2FetchLineups extends Job1<MS3LineupsAnnounced, Long> implement
 		fetcher.setMatch(match);
 		
 		List<ILineupSlot> homeLineup = fetcher.get(true);
-		List<ILineupSlot> visitingLineup = fetcher.get(false);
+		
 		
 		// did we get an error?
 		if (fetcher.getErrorCode() != null && !fetcher.getErrorCode().isEmpty()) {
+			
+			throw new RetryRequestException("Error fetching lineups for " + match.getDisplayName() + " at " + DateTime.now().toString() + ". Error message: " + fetcher.getErrorCode() + ": " + fetcher.getErrorMessage());
 			// Something bad happened in the fetching
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"An error was returned trying to get line-ups for " + match.getDisplayName() + ": " + fetcher.getErrorCode() + " " + fetcher.getErrorMessage());
-			GenerateFetchLineupsResults retval = new GenerateFetchLineupsResults(null, null, "");
-			retval.log.add("An error was returned trying to get line-ups for " + match.getDisplayName() + ": " + fetcher.getErrorCode() + " " + fetcher.getErrorMessage());
-			MS3LineupsAnnounced wrapper = new MS3LineupsAnnounced();
-			wrapper.fetchSubTreeResults = retval;
-			return immediate(wrapper);
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"An error was returned trying to get line-ups for " + match.getDisplayName() + ": " + fetcher.getErrorCode() + " " + fetcher.getErrorMessage());
+//			GenerateFetchLineupsResults retval = new GenerateFetchLineupsResults(null, null, "");
+//			retval.log.add("An error was returned trying to get line-ups for " + match.getDisplayName() + ": " + fetcher.getErrorCode() + " " + fetcher.getErrorMessage());
+//			MS3LineupsAnnounced wrapper = new MS3LineupsAnnounced();
+//			wrapper.fetchSubTreeResults = retval;
+//			return immediate(wrapper);
 		}
 		
+		List<ILineupSlot> visitingLineup = fetcher.get(false);
+		if (fetcher.getErrorCode() != null && !fetcher.getErrorCode().isEmpty()) {	
+			throw new RetryRequestException("Error fetching lineups for " + match.getDisplayName() + " at " + DateTime.now().toString() + ". Error message: " + fetcher.getErrorCode() + ": " + fetcher.getErrorMessage());
+		}
 		// @REX can we get warnings here?
 
 		// job settings controlling retries

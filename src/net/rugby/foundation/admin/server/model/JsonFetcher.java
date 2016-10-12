@@ -51,11 +51,10 @@ public class JsonFetcher implements IJsonFetcher {
 				errorMessage = errorObj.getString("message");
 				errorCode = errorObj.getString("value");
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,errorCode + ":" + errorMessage);
-				return null;
 			}
 			
 			
-			if (json.has("warning") && !json.isNull("warning")) {
+			if (json.has("warnings") && !json.isNull("warnings")) {
 				JSONArray warningArray = json.getJSONArray("warnings");
 				for (int i = 0; i < warningArray.length(); ++i) {
 					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, warningArray.getJSONObject(i).getString("value") + " : " + warningArray.getJSONObject(i).getString("message"));

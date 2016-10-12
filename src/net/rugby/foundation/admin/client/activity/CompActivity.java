@@ -1,6 +1,8 @@
 package net.rugby.foundation.admin.client.activity;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +43,7 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
@@ -48,6 +51,7 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -92,6 +96,8 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	//	private boolean ready = false;
 
 	private MenuItemDelegate menuItemDelegate = null;
+	private int weeks;
+	private int fetchCompWeeks;
 
 	public CompActivity(AdminCompPlace place, ClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
@@ -215,9 +221,11 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	}
 
 	@Override
-	public void fetchTeamsClicked(String url, CompetitionType compType) {
+	public void fetchTeamsClicked(String url, String weeks, CompetitionType compType) {
 		this.url = url;
-		clientFactory.getRpcService().fetchTeams(url, compType, new AsyncCallback<Map<String, ITeamGroup>>() {
+		this.fetchCompWeeks = Integer.parseInt(weeks);
+
+		clientFactory.getRpcService().fetchTeams(url, weeks, compType, new AsyncCallback<Map<String, ITeamGroup>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -226,13 +234,16 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			}
 
 			@Override
-			public void onSuccess(Map<String, ITeamGroup> result) {
-				if (result != null) {
-					for (ITeamGroup t: result.values()) {
+			public void onSuccess(final Map<String, ITeamGroup> teamMap) {
+				if (teamMap != null) {
+					for (ITeamGroup t: teamMap.values()) {
 						teams.add(t);
 					}
-					view.showTeams(result);
-					Notify.notify("Teams with green names will be created. This is often a bad thing. If they should already be in the DB, stop now. Go find them in another comp and change their names so they match the ESPN ones. And flush memcache. And then re-run until they are not green.");
+					view.showTeams(teamMap);
+					Notify.notify("Teams with green names will be created. This is often a bad thing. If they should already be in the DB, stop now. Go find them in another comp and change their names so they match the ESPN ones. And flush memcache. And then re-run until they are not green.",NotifyType.WARNING);
+
+					
+						
 				} else {
 					view.showStatus("Something is wrong. The node.js server down prolly.");
 				}
@@ -241,21 +252,135 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 		});		
 	}
 
+	/**
+	 * Recursively calls itself, fetching the number of weeks worth of matches
+	 */
 	@Override
-	public void fetchMatchesClicked(Map<String,ITeamGroup> teams, CompetitionType compType) {
-		clientFactory.getRpcService().fetchMatches(url, teams, compType, new AsyncCallback<Map<String,IMatchGroup>>() {
+	public void fetchMatchesClicked(final Map<String,ITeamGroup> teamMap, final Map<String, IMatchGroup> matchMap, final int numWeeks, final int currWeek, final CompetitionType compType) {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showStatus(caught.getMessage());
+		if (currWeek == 0) {
+			boolean hasNew = false;
+			for (ITeamGroup t : teamMap.values()) {
+				if (t.getId() == null) {
+					hasNew = true;
+					break;
+				}
 			}
+			if (hasNew) {
+				
+				Bootbox.confirm("Do you want to save the newly created teams (in green)?", new ConfirmCallback() {
+					@Override
+					public void callback(boolean result) {
+						if (result) {
+							
+							clientFactory.getRpcService().saveTeams(teamMap, new AsyncCallback<Map<String,ITeamGroup>>() {
 
-			@Override
-			public void onSuccess(Map<String, IMatchGroup> result) {
-				view.showMatches(result);
+								@Override
+								public void onFailure(Throwable caught) {
+									Notify.notify("Failed to save teams",NotifyType.DANGER);
+								}
 
+								@Override
+								public void onSuccess(Map<String, ITeamGroup> result) {
+									Notify.notify("Saved new teams",NotifyType.SUCCESS);
+								
+									teams.clear();
+									for (ITeamGroup t: result.values()) {
+										teams.add(t);
+									}
+									
+									view.showTeams(result);
+									
+									if (currWeek < numWeeks) {
+										final int _currWeek = currWeek;
+										Map<String, IMatchGroup> _matchMap = matchMap;
+										if (matchMap == null) {
+											_matchMap =  new HashMap<String, IMatchGroup>();
+										}
+								 		clientFactory.getRpcService().fetchMatches(url, currWeek, teamMap, _matchMap, compType, new AsyncCallback<Map<String,IMatchGroup>>() {
+								
+											@Override
+											public void onFailure(Throwable caught) {
+												view.showStatus(caught.getMessage());
+												Notify.notify("Problem fetching matches " + caught.getLocalizedMessage(), NotifyType.DANGER);
+											}
+								
+											@Override
+											public void onSuccess(Map<String, IMatchGroup> result) {
+												Notify.notify("Found " + result.size() + " matches through week " + _currWeek, NotifyType.SUCCESS);
+												view.addMatches(result);
+												fetchMatchesClicked(teamMap, result, numWeeks, _currWeek +1, compType);
+											}
+										});	
+									} else {
+										view.showMatches(matchMap);
+										Notify.notify("Done! Found " + matchMap.size() + " matches for competition!", NotifyType.SUCCESS);
+											
+									}
+								}
+							});
+						}
+					}
+				});
+			} else {
+				if (currWeek < numWeeks) {
+					final int _currWeek = currWeek;
+					Map<String, IMatchGroup> _matchMap = matchMap;
+					if (matchMap == null) {
+						_matchMap =  new HashMap<String, IMatchGroup>();
+					}
+			 		clientFactory.getRpcService().fetchMatches(url, currWeek, teamMap, _matchMap, compType, new AsyncCallback<Map<String,IMatchGroup>>() {
+			
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showStatus(caught.getMessage());
+							Notify.notify("Problem fetching matches " + caught.getLocalizedMessage(), NotifyType.DANGER);
+						}
+			
+						@Override
+						public void onSuccess(Map<String, IMatchGroup> result) {
+							Notify.notify("Found " + result.size() + " matches through week " + _currWeek, NotifyType.SUCCESS);
+							view.addMatches(result);
+							fetchMatchesClicked(teamMap, result, numWeeks, _currWeek +1, compType);
+						}
+					});	
+				} else {
+					view.showMatches(matchMap);
+					Notify.notify("Done! Found " + matchMap.size() + " matches for competition!", NotifyType.SUCCESS);
+						
+				}
 			}
-		});		
+		} else {
+			if (currWeek < numWeeks) {
+				final int _currWeek = currWeek;
+				Map<String, IMatchGroup> _matchMap = matchMap;
+				if (matchMap == null) {
+					_matchMap =  new HashMap<String, IMatchGroup>();
+				}
+		 		clientFactory.getRpcService().fetchMatches(url, currWeek, teamMap, _matchMap, compType, new AsyncCallback<Map<String,IMatchGroup>>() {
+		
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showStatus(caught.getMessage());
+						Notify.notify("Problem fetching matches " + caught.getLocalizedMessage(), NotifyType.DANGER);
+					}
+		
+					@Override
+					public void onSuccess(Map<String, IMatchGroup> result) {
+						Notify.notify("Found " + result.size() + " matches through week " + _currWeek, NotifyType.SUCCESS);
+						view.addMatches(result);
+						fetchMatchesClicked(teamMap, result, numWeeks, _currWeek +1, compType);
+					}
+				});	
+			} else {
+				view.showMatches(matchMap);
+				Notify.notify("Done! Found " + matchMap.size() + " matches for competition!", NotifyType.SUCCESS);
+					
+			}
+		}
+		
+		
+		
 	}
 
 	@Override
@@ -570,16 +695,16 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			@Override
 			public void onFailure(Throwable caught) {
 
-				Window.alert("Match not saved " + caught.getMessage());
+				Notify.notify("Match not saved " + caught.getMessage(), NotifyType.DANGER);
 			}
 
 			@Override
 			public void onSuccess(IMatchGroup result) {
 				//ec.SetPresenter(presenter);
 				if (result != null)
-					Window.alert("Match saved");
+					Notify.notify("Match saved", NotifyType.SUCCESS);
 				else
-					Window.alert("Comp not saved");
+					Notify.notify("Match not saved", NotifyType.WARNING);
 
 
 			}
@@ -648,8 +773,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-
-				view.showStatus("Match score not fetched: " + caught.getMessage());
+				Notify.notify("Match score not fetched: " + caught.getMessage(), NotifyType.DANGER);
 			}
 
 			@Override
@@ -657,8 +781,9 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 				//editMatchInit(em, plv, result.getId(), result.getRoundId(), currentCompId);
 				if (result != null) {
 					em.ShowMatch(result);
+					Notify.notify("Score fetched",NotifyType.SUCCESS);
 				} else {
-					Window.alert("Something happened getting match score");
+					Notify.notify("Something happened getting match score", NotifyType.WARNING);
 				}
 
 			}
@@ -1299,27 +1424,34 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 
 	@Override
-	public void deleteComp(ICompetition comp) {
-		clientFactory.getRpcService().deleteComp(comp.getId(), new AsyncCallback<Boolean>() {
-
+	public void deleteComp(final ICompetition comp) {
+		Bootbox.confirm("Are you sure you want to delete this competition?", new ConfirmCallback() {
 			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Comp deletion failure: " + caught.getLocalizedMessage());
-
-			}
-
-			@Override
-			public void onSuccess(Boolean result) {
+			public void callback(boolean result) {
 				if (result) {
-					Window.alert("Comp deleted. Don't forget to flush memcache!");
-				} else {
-					Window.alert("Comp not deleted. See logs for details");
+					clientFactory.getRpcService().deleteComp(comp.getId(), new AsyncCallback<Boolean>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Comp deletion failure: " + caught.getLocalizedMessage());
+
+						}
+
+						@Override
+						public void onSuccess(Boolean result) {
+							if (result) {
+								Window.alert("Comp deleted. Don't forget to flush memcache!");
+							} else {
+								Window.alert("Comp not deleted. See logs for details");
+							}
+
+						}
+
+					}); 
+					
 				}
-
 			}
-
-		}); 
-
+		});
 	}
 
 
@@ -1339,7 +1471,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 				if (result) {
 					Notify.notify("Comp set as global. Don't forget to flush memcache!", NotifyType.SUCCESS);
 				} else {
-					Notify.notify("Comp not set as global. See logs for details",NotifyType.DANGER);
+					Notify.notify("Comp not set as global. See logs for details",NotifyType.WARNING);
 				}
 
 			}
@@ -1362,7 +1494,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			clientFactory.getRpcService().getTeamMatchStats(pmr.getMatchStats().get(0).getMatchId(), pmr.getMatchStats().get(0).getTeamId(), new AsyncCallback<ITeamMatchStats>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Window.alert("Failed to fetch team match stats to edit");
+					Notify.notify("Failed to fetch team match stats to edit",NotifyType.DANGER);
 				}
 
 				@Override
@@ -1402,13 +1534,13 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Window.alert("Troubles saving standings: " + caught.getLocalizedMessage());
-
+						Notify.notify("Troubles saving standings: " + caught.getLocalizedMessage(), NotifyType.DANGER);
 					}
 
 					@Override
 					public void onSuccess(List<IStanding> result) {
 						er.ShowRound(r,result);	
+						Notify.notify("Round saved",NotifyType.SUCCESS);
 					}
 
 				});
@@ -1427,13 +1559,13 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
-
+				Notify.notify("Troubles fetching standings: " + caught.getLocalizedMessage(), NotifyType.DANGER);
 			}
 
 			@Override
 			public void onSuccess(List<IStanding> result) {
 				er.ShowRound(round,result);		
+				Notify.notify("Standings fetched", NotifyType.SUCCESS);
 			}
 
 		});
@@ -1448,13 +1580,13 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Troubles fetching standings: " + caught.getLocalizedMessage());
+				Notify.notify("Troubles fetching standings: " + caught.getLocalizedMessage(), NotifyType.DANGER);
 
 			}
 
 			@Override
 			public void onSuccess(IMatchGroup result) {
-				Window.alert("Score saved");	
+				Notify.notify("Score saved", NotifyType.SUCCESS);	
 				em.ShowMatch(result);
 			}
 
@@ -1561,8 +1693,8 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 
 	@Override
-	public void addMatch(Round round, Long homeTeamId, Long visitingTeamId) {
-		clientFactory.getRpcService().AddMatchToRound(round, homeTeamId, visitingTeamId, new AsyncCallback<IMatchGroup>() {
+	public void addMatch(Round round, Long homeTeamId, Long visitingTeamId, Long espnMatchId, Long espnLeagueId) {
+		clientFactory.getRpcService().AddMatchToRound(round, homeTeamId, visitingTeamId, espnMatchId, espnLeagueId, new AsyncCallback<IMatchGroup>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1664,24 +1796,50 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	public void setCompAsDefault(ICompetition comp) {
 		clientFactory.getRpcService().setCompAsDefault(comp.getId(), new AsyncCallback<Boolean>() {
 
-		@Override
-		public void onFailure(Throwable caught) {
-			Notify.notify("Set comp as default failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
-
-		}
-
-		@Override
-		public void onSuccess(Boolean result) {
-			if (result) {
-				Notify.notify("Comp set as default. Don't forget to flush memcache!", NotifyType.SUCCESS);
-			} else {
-				Notify.notify("Comp not set as default. See logs for details",NotifyType.DANGER);
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Set comp as default failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
+	
 			}
-
-		}
+	
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Notify.notify("Comp set as default. Don't forget to flush memcache!", NotifyType.SUCCESS);
+				} else {
+					Notify.notify("Comp not set as default. See logs for details",NotifyType.DANGER);
+				}
+	
+			}
 
 	}); 
 		
+	}
+
+
+
+	@Override
+	public void showWorkflowLog(IMatchGroup match) {
+
+			clientFactory.getRpcService().getMatchWorkflowLog(match.getId(), new AsyncCallback<List<String>>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Notify.notify("Fetch log failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
+		
+				}
+		
+				@Override
+				public void onSuccess(List<String> result) {
+					if (result == null) {
+						Notify.notify("No workflow log found.", NotifyType.WARNING);
+					} else {
+						Window.alert(result.toString());
+					}
+		
+				}
+			});
+
 	}
 
 

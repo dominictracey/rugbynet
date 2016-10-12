@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.ratingseries.CheckRatingGroup;
+import net.rugby.foundation.admin.server.workflow.ratingseries.UpdateGraphRoundNodes;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
 import net.rugby.foundation.admin.server.workflow.weekend.results.R0ProcessRoundResult;
@@ -41,7 +42,7 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 	private IAdminTaskFactory atf;
 
 	public RJ0ProcessRound() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	
@@ -63,6 +64,7 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 				R0ProcessRoundResult result = new R0ProcessRoundResult();
 				result.roundId = roundId;
 				result.log.add("No round could be found matching roundId " + roundId);
+				result.success = false;
 				return immediate(result);
 			}
 			
@@ -70,7 +72,16 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 			FutureList<MS0ProcessMatchResult> matchResults = new FutureList<MS0ProcessMatchResult>(_matchResults);
 			
 			ISeriesConfiguration sc = scf.getByCompAndMode(round.getCompId(), RatingMode.BY_MATCH);
-			Value<Long> groupId = futureCall(new CheckRatingGroup(), immediate(sc.getId()), immediate(round.getUrOrdinal()), immediate(round.getName()));
+			Value<Long> groupId = null;
+			if (sc != null) {
+				groupId = futureCall(new CheckRatingGroup(), immediate(sc.getId()), immediate(round.getUrOrdinal()), immediate(round.getName()));
+			} else {
+				R0ProcessRoundResult result = new R0ProcessRoundResult();
+				result.roundId = roundId;
+				result.log.add("No BY_MATCH rating series could be found matching roundId " + roundId);
+				result.success = false;
+				return immediate(result);
+			}
 			
 			JobSetting backOffFactor = new JobSetting.BackoffFactor(1);
 			JobSetting backOffSeconds = new JobSetting.BackoffSeconds(10*60); // retry every 10 minutes
@@ -84,9 +95,14 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 			List<Value<MS8Rated>> seriesResults = new ArrayList<Value<MS8Rated>>();
 			//Value<MS8Rated> roundSeriesResults = 
 			seriesResults.add(futureCall(new RJ4RoundSeriesProcess(), immediate(roundId), immediate(RatingMode.BY_COMP), immediate(round.getName()),  matchResults));
-			seriesResults.add(futureCall(new RJ4RoundSeriesProcess(), immediate(roundId), immediate(RatingMode.BY_POSITION), immediate(round.getName()), matchResults));
+			Value<MS8Rated> positionSeriesOutput = futureCall(new RJ4RoundSeriesProcess(), immediate(roundId), immediate(RatingMode.BY_POSITION), immediate(round.getName()), matchResults);
+			seriesResults.add(positionSeriesOutput);
 			seriesResults.add(futureCall(new RJ4RoundSeriesProcess(), immediate(roundId), immediate(RatingMode.BY_TEAM), immediate(round.getName()), matchResults));
 			
+			// once the position series is updated, also update the graphs
+			FutureValue<List<String>> deleteOldGraphOutput = futureCall(new UpdateGraphRoundNodes(), immediate(round.getCompId()), immediate("delete"), immediate("delete old position graphs for " + round.getName()), waitFor(positionSeriesOutput));
+			FutureValue<List<String>> updateGraphOutput = futureCall(new UpdateGraphRoundNodes(), immediate(round.getCompId()), immediate("create"), immediate("create new position graph for " + round.getName()), waitFor(deleteOldGraphOutput));
+
 			IRound r = null;
 			// get the standings for the next round when they are done
 			// might have to skip some real world weeks to get to the next comp round 
@@ -110,7 +126,7 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 			}
 			
 			// compile the log to email to the admins in the WeekendFinalizeServlet
-			FutureValue<R0ProcessRoundResult> retval = futureCall(new RJ9CompileRoundLog(), immediate(roundId), matchResults, futureList(seriesResults), standingsResult);
+			FutureValue<R0ProcessRoundResult> retval = futureCall(new RJ9CompileRoundLog(), immediate(roundId), matchResults, futureList(seriesResults), standingsResult, updateGraphOutput);
 			
 			return retval;
 			

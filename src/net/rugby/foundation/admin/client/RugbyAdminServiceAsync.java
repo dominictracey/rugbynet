@@ -36,9 +36,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface RugbyAdminServiceAsync {
 	public void fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, CompetitionType compType, AsyncCallback<ICompetition> cb);
 	public void saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams, AsyncCallback<ICompetition> cb);
-	public void fetchTeams(String url, CompetitionType compType, AsyncCallback<Map<String, ITeamGroup>> cb);
+	public void fetchTeams(String url, String weeks, CompetitionType compType, AsyncCallback<Map<String, ITeamGroup>> cb);
+	public void saveTeams(Map<String, ITeamGroup> teams, AsyncCallback<Map<String, ITeamGroup>> cb);
 	public void fetchRounds(String url, Map<String, IMatchGroup> matches, CompetitionType compType, AsyncCallback<List<IRound> > cb);
 	public void fetchMatches(String url, Map<String, ITeamGroup> teams, CompetitionType compType, AsyncCallback<Map<String, IMatchGroup>> cb);
+	public void fetchMatches(String url, int offsetWeeks, Map<String, ITeamGroup> teams, Map<String, IMatchGroup> matches, CompetitionType compType, AsyncCallback<Map<String, IMatchGroup>> cb);
 	public void  getComps(Filter filter, AsyncCallback<List<ICompetition>> cb);
 	public void saveWorkflowConfig(IWorkflowConfiguration wfc, AsyncCallback<IWorkflowConfiguration> asyncCallback);
 	public void getOrchestrationConfiguration(AsyncCallback<Map<String, IOrchestrationConfiguration>> asyncCallback);
@@ -167,7 +169,7 @@ public interface RugbyAdminServiceAsync {
 	public void checkPipelineStatus(String id, Long matchId,
 			AsyncCallback<String> asyncCallback);
 	public void AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId,
-			AsyncCallback<IMatchGroup> asyncCallback);
+			Long espnMatchId, Long espnLeagueId, AsyncCallback<IMatchGroup> asyncCallback);
 	public void cleanUp(AsyncCallback<String> asyncCallback);
 	
 	//RatingSeries
@@ -214,5 +216,7 @@ public interface RugbyAdminServiceAsync {
 	public void saveRound(IRound r, AsyncCallback<IRound> asyncCallback);
 	public void bulkUploadEmails(List<String> emailsValid, AsyncCallback<List<String>> asyncCallback);
 	public void FetchLineups(Long id, AsyncCallback<IMatchGroup> asyncCallback);
+	public void getMatchWorkflowLog(Long id, AsyncCallback<List<String>> asyncCallback);
+
 
 }

@@ -254,6 +254,9 @@ public class Round implements Serializable, IRound {
 
 	@Override
 	public WorkflowStatus getWorkflowStatus() {
+		if (workflowStatus == null) {
+			workflowStatus = WorkflowStatus.PENDING;
+		}
 		return workflowStatus;
 	}
 

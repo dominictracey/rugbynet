@@ -31,7 +31,7 @@ public class MJ9CompileMatchLog extends Job6<MS0ProcessMatchResult, MS4Underway,
 	transient private IMatchGroupFactory mf;
 	
 	public MJ9CompileMatchLog() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -65,6 +65,9 @@ public class MJ9CompileMatchLog extends Job6<MS0ProcessMatchResult, MS4Underway,
 			List<ResultWithLog> logs = new ArrayList<ResultWithLog>();
 			retval.success = true;
 	
+			IMatchGroup match = mf.get(underway.matchId);
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Compiling match log output for " + match.getDisplayName());
+			
 			if (underway != null) {
 				logs.add(underway);
 				if (!underway.success)
@@ -96,10 +99,15 @@ public class MJ9CompileMatchLog extends Job6<MS0ProcessMatchResult, MS4Underway,
 					retval.success = false;
 			}
 
-			IMatchGroup match = mf.get(underway.matchId);
 			
-			retval.log.add(match.getDisplayName());
+			
+			retval.log.add(match.getDisplayName() + "\n");			
 			retval.log.addAll(ResultWithLog.aggregate(logs));
+			
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Log output for " + match.getDisplayName() + ": " + retval.log);
+			
+			match.setWorkflowLog(retval.log);
+			mf.put(match);
 			
 			AdminEmailer emailer = new AdminEmailer();
 			emailer.setSubject(match.getDisplayName() + " workflow results");

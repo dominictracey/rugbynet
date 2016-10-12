@@ -101,11 +101,11 @@ public class CompileLineups extends Job6<MS3LineupsAnnounced, Long, List<Long>, 
 				}
 			}
 		}
-		
-		// all AdminTasks have been completed when we get here so update the WorkflowState
-		match.setWorkflowStatus(WorkflowStatus.LINEUPS);
-		mf.put(match);
-		log.add("Stats fetched for " + match.getDisplayName());
+//		
+//		// all AdminTasks have been completed when we get here so update the WorkflowState
+//		match.setWorkflowStatus(WorkflowStatus.LINEUPS);
+//		mf.put(match);
+//		log.add("Stats fetched for " + match.getDisplayName());
 
 		
 		GenerateFetchLineupsResults retval = new GenerateFetchLineupsResults(hLUSs, vLUSs, job);

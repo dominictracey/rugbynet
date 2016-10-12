@@ -34,7 +34,6 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 	 */
 	private static final long serialVersionUID = 5536925770981961238L;
 
-
 	@Override
 	protected IMatchGroup getFromPersistentDatastore(Long id) {
 		if (id == null) {
@@ -95,6 +94,8 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			g.setHomeTeam(tf.get(g.getHomeTeamId()));
 			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 			if (g.equals(match)) {
+				Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"MatchGroupFactory.find() Found an existing match for " + g.getDisplayName());
 				return g; // will have an id since it came out of the db
 			}
 		}

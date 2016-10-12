@@ -1,11 +1,5 @@
 package net.rugby.foundation.admin.server.model;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,7 +8,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,8 +22,6 @@ import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
-import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
-import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -38,17 +29,15 @@ import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
-import net.rugby.foundation.model.shared.IMatchResult.ResultType;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
-import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
 
 
 public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompetitionFetcher {
 
 	private Map<String, ITeamGroup> teamMap = new HashMap<String, ITeamGroup>();
-	private Map<String, IMatchGroup> matchMap = new HashMap<String, IMatchGroup>();
+	//private Map<String, IMatchGroup> matchMap = new HashMap<String, IMatchGroup>();
 	private List<IRound> roundMap = new ArrayList<IRound>();
 
 	// http://www.espn.co.uk/rugby/fixtures/_/date/20160902/league/267979
@@ -60,6 +49,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	private IResultFetcherFactory srff;
 	private ITeamGroupFactory tf;
 	private IConfigurationFactory ccf;
+	private String startDate;
 
 	@SuppressWarnings("unused")
 	private EspnCompetitionFetcher() {
@@ -77,56 +67,20 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	@Override
 	public ICompetition getCompetition(String homePage, List<IRound> rounds, List<ITeamGroup> teams) {
 		ICompetition comp = new Competition();
+		comp.setTeams(teams);
+		comp.setRounds(rounds);
+		
 		comp.setForeignURL(homePage);
 		comp.setWeightingFactor(1f);
-		if (homePage.split("[/|.]").length > 7) {
-			int i = 0;
-			boolean found = false;
-			String parts[] = homePage.split("[/|.]");
-			while (i < parts.length && found == false) {
-				if (parts[i].equals("series"))
-					found = true;
-				++i;
-			}
-			if (found)
-				comp.setForeignID(Long.parseLong(parts[i]));
-			else {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Couldn't get scrum id from " + homePage + " (couldn't find series token)");
-			}
+		if (espnLeagueId != null) {
+			comp.setForeignID(espnLeagueId);
 		} else {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Couldn't get scrum id from " + homePage + " (too short)");
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Didn't have the ESPN league Id saved off");
 		}
 
 		comp.setTeams(teams);
 
 		try {
-//			//            URL url = new URL(homePage);
-//			//            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-//			homePage += "?noredir=1";
-//			IUrlCacher urlCache = new UrlCacher(homePage);
-//			List<String> lines = urlCache.get();
-//			String line = "";
-//			Iterator<String> it = lines.iterator();
-//			if (it.hasNext()) {
-//				line = it.next();
-//			}
-//			boolean longNameFound = false;
-//			boolean shortNameFound = false;
-//
-//			while (it.hasNext()) {
-//				line = it.next();
-//				if( line.contains("scrumTitle") && longNameFound == false) {
-//					comp.setLongName(line.split("<|>")[2]);
-//					longNameFound = true;
-//				} else if ( line.contains("ScrumSectionHeader\">About") && !shortNameFound) {
-//					line = it.next();
-//					line = it.next();
-//					if (line.split("<|>").length > 1) {
-//						comp.setShortName(line.split("<|>")[1]);
-//						shortNameFound = true;
-//					}
-//				}
-//			}
 
 			comp.setShortName("change me");
 			comp.setLongName("change me");
@@ -200,7 +154,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			for (int i=0; i<retval.length(); ++i) {
 				ObjectMapper mapper = new ObjectMapper();
 				ITeamGroup t = mapper.readValue(retval.getJSONObject(i).toString(), TeamGroup.class);
-				ITeamGroup existing = tf.getTeamByScrumName(t.getEspnName());
+				ITeamGroup existing = tf.getTeamByScrumName(t.getScrumName());
 				if (existing != null) {
 					if (existing.getForeignId() == null || existing.getForeignId() == 0L) {
 						// self-cleaning oven to add espnId
@@ -240,7 +194,15 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	@Override
 	public void setURL(String url) {
 		homePage = url;
-
+		String toks[] = homePage.split("/");
+		espnLeagueId = Long.parseLong(toks[toks.length-1]);
+		
+		assert (espnLeagueId != null);
+		
+		
+		// the date of the first match is in there
+		startDate = toks[toks.length-3];
+		assert startDate != null;
 	}
 
 	@Override
@@ -356,65 +318,67 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 		return roundMap;
 	}
 
-	int NUM_DAYS_IN_A_COMP = 5;
 	@Override
-	public Map<String, IMatchGroup> getMatches(String baseUrl, Map<String, ITeamGroup> teams) {
+	public Map<String, IMatchGroup> getMatches(String urlDate, int offsetWeeks, Map<String, ITeamGroup> teams, Map<String, IMatchGroup> matches) {
 
 		try {
 			teamMap = teams;
-			
 			//http://www.espn.co.uk/rugby/fixtures/_/date/20160820/league/270559
-			// the last token of the url is the league id
-			String toks[] = homePage.split("/");
-			espnLeagueId = Long.parseLong(toks[toks.length-1]);
+			
+			if (urlDate == null || urlDate.isEmpty()) {
+				urlDate = startDate;
+			}
 			
 			assert (espnLeagueId != null);
-			
-			
-			// the date of the first match is in there
-			String dateFirst = toks[toks.length-3];
-			
-			
+	
 			DateTimeFormatter fmt = DateTimeFormat.forPattern("YYYYMMdd");
-			DateTime dt = DateTime.parse(dateFirst,fmt);
-			for (int i=0; i<NUM_DAYS_IN_A_COMP; ++i) {
-				String dateString = fmt.print(dt);
-				getCompsForWeek(espnLeagueId, dateString);
-				dt = dt.plusDays(1);
-			}
+			DateTime dt = DateTime.parse(urlDate,fmt);
+			dt = dt.plusWeeks(offsetWeeks);
+			String dateString = fmt.print(dt);
+			Map<String, IMatchGroup> tempMatchMap = getCompsForWeek(espnLeagueId, dateString);
+			matches.putAll(tempMatchMap);
+			return matches;
 			
 		} catch (Throwable e) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage());
 			return null;
 		} 
-
-		return matchMap;
 	}
 
-	private void getCompsForWeek(Long espnLeagueId2, String dateString) {
+	private Map<String, IMatchGroup> getCompsForWeek(Long espnLeagueId2, String dateString) {
 		
-		try {			
-			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + espnLeagueId + "/date/" + dateString + "/matches");
+		try {		
+			Map<String, IMatchGroup> tempMatchMap = new HashMap<String, IMatchGroup>();
+			url = new URL(ccf.get().getBaseNodeUrl() + "v0.9/admin/scraper/league/" + espnLeagueId + "/date/" + dateString + "/matches");
 			
 			JSONArray retval = get();			
 			
-			for (int i=0; i<retval.length(); ++i) {
-				
-				IMatchGroup m = getMatch(retval.getJSONObject(i));
-//				ObjectMapper mapper = new ObjectMapper();
-//				IMatchGroup m = mapper.readValue(retval.getJSONObject(i).toString(), MatchGroup.class);
-				matchMap.put(m.getForeignId().toString(), m);
+			if (errorMessage != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, errorMessage);
+				return null;
+			} else {
+				if (retval != null) {
+					for (int i=0; i<retval.length(); ++i) {					
+						IMatchGroup m = getMatch(retval.getJSONObject(i), espnLeagueId2);
+						tempMatchMap.put(m.getForeignId().toString(), m);
+						//matchMap.put(m.getForeignId().toString(), m);
+					}
+					return tempMatchMap;
+				} else {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Items array from REST server is null...");
+					return null;
+				}
 			}
-		
-		
+			
+			
 		} catch (Throwable e) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage());
-			return;
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage(),e);
+			return null;
 		} 
 		
 	}
 
-	private IMatchGroup getMatch(JSONObject jsonObject) {
+	private IMatchGroup getMatch(JSONObject jsonObject, Long compForeignId) {
 		IMatchGroup m = mf.getMatchByEspnId(Long.parseLong(jsonObject.getString("espnId")));
 		if (m == null) {
 			m = mf.create();
@@ -433,38 +397,43 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			m.setVisitingTeam(vt);
 			m.setDate(new org.joda.time.DateTime(jsonObject.getString("date")).toDate());
 			m.setDisplayName(m.getHomeTeam().getDisplayName() + " vs. " + m.getVisitingTeam().getDisplayName());
+			// http://www.espn.co.uk/rugby/match?gameId=290011&league=267979
+			m.setForeignUrl("http://www.espn.co.uk/rugby/match?gameId=" + m.getForeignId() + "&league=" + compForeignId);
 		}
 		return m;
 	}
-
-	private Date getDate(String day, String month, String year, String hour, String minute, String zone) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MMMM/dd hh:mm z");
-		String date = year+"/"+month+"/"+day+" "+hour+":"+minute+" "+zone;
-		java.util.Date utilDate = null;
-		try {
-			utilDate = formatter.parse(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		System.out.println("date:" + date);
-		System.out.println("utilDate:" + utilDate);
-
-		return utilDate;
-	}
-
-	private String getMatchMapKey(IMatchGroup m) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(m.getDate());
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime().toString() + "**" + m.getDisplayName();
-	}
+//
+//	private Date getDate(String day, String month, String year, String hour, String minute, String zone) {
+//		SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MMMM/dd hh:mm z");
+//		String date = year+"/"+month+"/"+day+" "+hour+":"+minute+" "+zone;
+//		java.util.Date utilDate = null;
+//		try {
+//			utilDate = formatter.parse(date);
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println("date:" + date);
+//		System.out.println("utilDate:" + utilDate);
+//
+//		return utilDate;
+//	}
+//
+//	private String getMatchMapKey(IMatchGroup m) {
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(m.getDate());
+//		cal.set(Calendar.HOUR_OF_DAY, 0);
+//		cal.set(Calendar.MINUTE, 0);
+//		cal.set(Calendar.SECOND, 0);
+//		cal.set(Calendar.MILLISECOND, 0);
+//		return cal.getTime().toString() + "**" + m.getDisplayName();
+//	}
+//
 
 	@Override
-	public Boolean updateMatch(IMatchGroup match) {
-		// TODO Auto-generated method stub
+	public Map<String, IMatchGroup> getMatches(String url, Map<String, ITeamGroup> teams) {
 		return null;
+
 	}
+	
+
 }

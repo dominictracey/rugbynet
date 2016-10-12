@@ -36,6 +36,10 @@ public class ESPN0FetchMatchStats extends FetchMatchStats {
 	private ICompetitionFactory cf;
 	private IRoundFactory rf;
 
+	public ESPN0FetchMatchStats() {
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
+	}
+	
 	@Override
 	public Value<MS7StatsFetched> run(Long matchId) {
 
@@ -72,7 +76,7 @@ public class ESPN0FetchMatchStats extends FetchMatchStats {
 
 		//String url = match.getForeignUrl(); //+"?view=scorecard";
 
-		Logger.getLogger("FetchedPlayer").log(Level.INFO,"Starting generate match ratings for match " + match.getDisplayName());
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Starting generate match ratings for match " + match.getDisplayName());
 
 		FutureValue<Long> homeTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.HOME), null);
 		FutureValue<Long> visitorTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.VISITOR), homeTeamStats);

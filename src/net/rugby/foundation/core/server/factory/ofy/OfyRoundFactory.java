@@ -99,7 +99,11 @@ public class OfyRoundFactory extends BaseCachingFactory<IRound> implements IRoun
 					for (IMatchGroup g : r.getMatches()) {
 						g.setRoundId(r.getId());
 						g = gf.put(g);
-						((Round)r).getMatchIDs().add(g.getId());
+						if (g != null) {
+							((Round)r).getMatchIDs().add(g.getId());
+						} else {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "There was a problem saving a match in Round " + r.getAbbr() + ", it was dropped from the round.");
+						}
 					}
 				} else {
 					r.setMatches(new ArrayList<IMatchGroup>());

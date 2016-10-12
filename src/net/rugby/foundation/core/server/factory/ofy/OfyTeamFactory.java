@@ -99,7 +99,7 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 
 			if (team.count() > 0) {
 				for (Group t : team.list()) {
-					if (!((ITeamGroup)t).getAbbr().isEmpty()) {
+					if (((ITeamGroup)t).getAbbr() != null && !((ITeamGroup)t).getAbbr().isEmpty()) {
 						map.put(t.getId(), ((ITeamGroup)t).getAbbr());
 					}
 				}

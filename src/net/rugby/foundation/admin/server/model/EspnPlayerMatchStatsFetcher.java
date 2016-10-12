@@ -22,7 +22,6 @@ import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 public class EspnPlayerMatchStatsFetcher extends JsonFetcher implements IPlayerMatchStatsFetcher {
 
 	private IPlayerMatchStats stats;
-	private String errorMessage;
 	private String XXXurl;
 	private Integer slot;
 	private Home_or_Visitor hov;
@@ -36,18 +35,25 @@ public class EspnPlayerMatchStatsFetcher extends JsonFetcher implements IPlayerM
 		this.ccf = ccf;
 		this.rf = rf;
 		this.cf = cf;
+		
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.WARNING);
 	}
 	
 	@Override
 	public boolean process() {
 		try {
 			ICompetition c = cf.get(rf.get(match.getRoundId()).getCompId());
-			url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + c.getForeignID() + "/match/" + match.getForeignId() + "/player/" + player.getScrumId() + "/playerMatchStats");
+			if (match.getForeignLeagueId() == null) {
+				url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + c.getForeignID() + "/match/" + match.getForeignId() + "/player/" + player.getScrumId() + "/playerMatchStats");
+			} else {
+				url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + match.getForeignLeagueId() + "/match/" + match.getForeignId() + "/player/" + player.getScrumId() + "/playerMatchStats");
+				
+			}
 			
 			JSONArray json = get();			
 			boolean retval = true;
 			
-			if ((errorMessage != null && !errorMessage.isEmpty()) || (warningMessages != null && !warningMessages.isEmpty())) {
+			if (errorMessage != null && !errorMessage.isEmpty()) {
 				retval = false;
 			}
 			
@@ -144,19 +150,19 @@ public class EspnPlayerMatchStatsFetcher extends JsonFetcher implements IPlayerM
 
 	@Override
 	public String getUrl() {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "This method doesn't return anything useful, the url of the REST service is set internally.");
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE, "This method doesn't return anything useful, the url of the REST service is set internally.");
 		return XXXurl;
 	}
 	
 	@Override
 	public void setUrl(String url) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "This method doesn't do anything, the url of the REST service is set internally.");
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE, "This method doesn't do anything, the url of the REST service is set internally.");
 		this.XXXurl = url;
 	}
 
 	@Override
 	public void setUrl(String url, Boolean flushFromCache) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "This method doesn't do anything, the url of the REST service is set internally.");
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINE, "This method doesn't do anything, the url of the REST service is set internally.");
 		this.XXXurl = url;
 	}
 

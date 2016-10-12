@@ -52,7 +52,8 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 
 			if (g.getHomeTeam() == null || g.getVisitingTeam() == null) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Illegal call to put() with teams not set properly");
-				return null; 			}
+				return null; 			
+			}
 
 			if (g.getHomeTeam().getId() == null) {
 				tf.put(g.getHomeTeam());

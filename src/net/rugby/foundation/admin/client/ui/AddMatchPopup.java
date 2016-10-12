@@ -9,6 +9,8 @@ import net.rugby.foundation.model.shared.Round;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -33,7 +35,7 @@ public class AddMatchPopup extends DialogBox {
 
 	public interface AddMatchPopupPresenter {
 		void cancelAddMatch();
-		void addMatch(Round round, Long homeTeamId, Long visitingTeamId);
+		void addMatch(Round round, Long homeTeamId, Long visitingTeamId, Long lEspnMatchId, Long lEspnLeagueId);
 	} 
 
 	public AddMatchPopup() {
@@ -46,7 +48,8 @@ public class AddMatchPopup extends DialogBox {
 	@UiField Button cancel;
 	@UiField TextBox homeTeamId;
 	@UiField TextBox visitingTeamId;
-	
+	@UiField TextBox espnMatchId;
+	@UiField TextBox espnLeagueId;
 
 	private AddMatchPopupPresenter listener;
 
@@ -59,7 +62,22 @@ public class AddMatchPopup extends DialogBox {
 
 	@UiHandler("save")
 	void onClickSave(ClickEvent e) {
-		listener.addMatch(round, Long.parseLong(homeTeamId.getValue()), Long.parseLong(visitingTeamId.getValue()));
+		Long lEspnMatchId = null;
+		if (espnMatchId.getText().matches( "[0-9]+")) {
+			lEspnMatchId = Long.parseLong(espnMatchId.getText().trim());
+		} else {
+			Notify.notify("Invalid ESPN Match Id. Please fix.");
+			return;
+		}
+		
+		Long lEspnLeagueId = null;
+		if (espnLeagueId.getText().matches( "[0-9]+")) {
+			lEspnLeagueId = Long.parseLong(espnLeagueId.getText().trim());
+		} else if (!espnLeagueId.getText().isEmpty()){
+			Notify.notify("Invalid ESPN League Id. Please fix or clear.");
+			return;
+		}
+		listener.addMatch(round, Long.parseLong(homeTeamId.getValue()), Long.parseLong(visitingTeamId.getValue()), lEspnMatchId, lEspnLeagueId);
 	}
 
 

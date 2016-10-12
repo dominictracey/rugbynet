@@ -105,13 +105,21 @@ public class EditTeam extends Composite {
 			displayName.setText(result.getDisplayName());
 			shortName.setText(result.getShortName());
 			espnName.setText(result.getEspnName());
-			espnId.setText(result.getForeignId().toString());
+			if (result.getForeignId() != null) {
+				espnId.setText(result.getForeignId().toString());
+			} else {
+				espnId.setText("");
+			}
 			scrumName.setText(result.getScrumName());
 			abbr.setText(result.getAbbr());
 			twitter.setText(result.getTwitter());
 			twitterChannel.setText(result.getTwitterChannel());
 			color.setText(result.getColor());
-			sponsorId.setText(result.getSponsorId().toString());
+			if (result.getSponsorId() != null) {
+				sponsorId.setText(result.getSponsorId().toString());
+			} else {
+				sponsorId.setText("");
+			}
 		}
 	}
 

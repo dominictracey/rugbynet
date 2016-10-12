@@ -24,6 +24,7 @@ import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IBlurb;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -115,4 +116,6 @@ public interface ClientFactory extends EditContentPresenter {
 	PromoteView<IBlurb> getPromoteView();
 
 	void getCompAsync(Long compId, AsyncCallback<ICompetition> callback);
+
+	void getCoreConfigurationAsync(boolean reload, AsyncCallback<ICoreConfiguration> cb);
 }

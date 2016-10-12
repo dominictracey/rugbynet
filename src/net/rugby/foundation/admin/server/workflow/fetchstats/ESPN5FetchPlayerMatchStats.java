@@ -1,13 +1,17 @@
 package net.rugby.foundation.admin.server.workflow.fetchstats;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.joda.time.DateTime;
 
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
+import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
@@ -44,7 +48,7 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, Long> {
 	private ILineupSlotFactory lusf;
 	
 	public ESPN5FetchPlayerMatchStats() {
-
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	/**
@@ -53,7 +57,7 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, Long> {
 	private static final long serialVersionUID = 3101992931956737933L;
 
 	@Override
-	public Value<Long> run(Long lusId) {
+	public Value<Long> run(Long lusId) throws RetryRequestException {
 
 
 //		this.hov = hov;
@@ -76,6 +80,8 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, Long> {
 		if (lus == null || lus.getPlayerId() == null || lus.getMatchId() == null) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Bad LineupSlot info. Not enough info to fetch playerMatchStats - bailing!!");
 			return null;
+		} else {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": Generating jobs for lineup entry: " + lus.getForeignPlayerName());
 		}
 		
 		IPlayer player = pf.get(lus.getPlayerId());
@@ -108,40 +114,43 @@ public class ESPN5FetchPlayerMatchStats extends Job1<Long, Long> {
 		if (fetcher.process()) {
 			stats = fetcher.getStats();
 			pmsf.put(stats);
-			String errMess = fetcher.getErrorMessage();
-			if (errMess != null && !errMess.isEmpty()) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Non-blocking issue in getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + errMess);
-				IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Non-blocking issue in getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName(), errMess, player, match, hov, lus.getSlot(), null, true, null, null, null);		
-				atf.put(task);
-				stats.getTaskIds().add(task.getId());
+			List<String> warningMessages = fetcher.getWarningMessages();
+			if (warningMessages != null && !warningMessages.isEmpty()) {
+				for (String mess: warningMessages) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Non-blocking issue in getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + mess);
+					IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Non-blocking issue in getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName(), mess, player, match, hov, lus.getSlot(), stats, true, null, null, null);		
+					atf.put(task);
+					stats.getTaskIds().add(task.getId());
+				}
 				pmsf.put(stats);
-//				if (!match.getWorkflowStatus().equals(WorkflowStatus.BLOCKED)) {
-//					match.setWorkflowStatus(WorkflowStatus.TASKS_PENDING);
-//					mgf.put(match);
-//				}
 			}
-			return immediate(stats.getId());
+			return immediate(stats.getId());  // Ok - possibly with warnings
 		} else { // blocking process
 			stats = fetcher.getStats();
 			if (stats == null) {
-				// at least we have the matchId and playerId?
-				stats = pmsf.create();
-				stats.setPlayerId(player.getId());
-				stats.setName(lus.getForeignPlayerName());
-				stats.setSlot(lus.getSlot());
-				stats.setMatchId(match.getId());
-				// @REX this field is not an object so it may be unset and we are introducing a bug by assuming it is set
-				if (lus.getHome()) {
-					stats.setTeamId(match.getHomeTeamId());
-					stats.setTeamAbbr(match.getHomeTeam().getAbbr());
-				} else {
-					stats.setTeamId(match.getVisitingTeamId());
-					stats.setTeamAbbr(match.getVisitingTeam().getAbbr());
-				}
-				
+//				// at least we have the matchId and playerId?
+//				stats = pmsf.create();
+//				stats.setPlayerId(player.getId());
+//				stats.setName(lus.getForeignPlayerName());
+//				stats.setSlot(lus.getSlot());
+//				stats.setMatchId(match.getId());
+//				// @REX this field is not an object so it may be unset and we are introducing a bug by assuming it is set
+//				if (lus.getHome()) {
+//					stats.setTeamId(match.getHomeTeamId());
+//					stats.setTeamAbbr(match.getHomeTeam().getAbbr());
+//				} else {
+//					stats.setTeamId(match.getVisitingTeamId());
+//					stats.setTeamAbbr(match.getVisitingTeam().getAbbr());
+//				}
+				throw new RetryRequestException("No stats found for " + player.getDisplayName() + " at " + DateTime.now().toString());
+
 			}
 			pmsf.put(stats);
 
+			// we for sure should have an error
+			assert fetcher.getErrorCode() != null;
+			assert fetcher.getErrorMessage() != null;
+			
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());
 			PromisedValue<Long> x = newPromise(Long.class);
 			IAdminTask task = atf.getNewEditPlayerMatchStatsTask("Problem getting player match stats for " + player.getDisplayName() + " in match " + match.getDisplayName() + " in slot " + lus.getSlot(), fetcher.getErrorMessage(), player, match, hov, lus.getSlot(), stats, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		

@@ -61,7 +61,7 @@ public class EditMatch extends Composite {
 
 		void saveScore(Long matchId, int hS, int vS, Status status);
 
-
+		void showWorkflowLog(IMatchGroup match);
 	} 
 
 	public EditMatch() {
@@ -100,6 +100,8 @@ public class EditMatch extends Composite {
 	TextBox visitorScore;
 	@UiField
 	Button saveScore;
+	@UiField
+	Button showLog;
 	@UiField
 	Anchor pipelineLink;
 	@UiField
@@ -153,7 +155,11 @@ public class EditMatch extends Composite {
 	void onClickShowVisitingTeamMatchStats(ClickEvent e) {
 		listener.showVisitingTeamMatchStats(matchGroup);
 	}
-
+	
+	@UiHandler("showLog")
+	void onClickShowLog(ClickEvent e) {
+		listener.showWorkflowLog(matchGroup);
+	}
 	public void ShowMatch(IMatchGroup match) {
 		matchGroup = match;
 

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.model.IStandingsFetcher;
+import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
 import net.rugby.foundation.admin.server.workflow.weekend.results.RS3StandingsResult;
@@ -39,7 +40,7 @@ public class RJ2FetchStandings extends Job3<RS3StandingsResult, Long, List<MS0Pr
 	transient private IStandingFactory sf;
 	
 	public RJ2FetchStandings() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	/**
@@ -60,12 +61,13 @@ public class RJ2FetchStandings extends Job3<RS3StandingsResult, Long, List<MS0Pr
 			this.sf = injector.getInstance(IStandingFactory.class);
 			
 			IRound r = rf.get(roundId);
-
+			
 			RS3StandingsResult retval = new RS3StandingsResult();
 			retval.log.add("Standings Fetcher");
 			retval.roundId = roundId;
 			retval.success = true;			
 			if (r != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": Fetching standings for " + r.getName());
 				IStandingsFetcher fetcher = sfff.getFetcher(r);
 				if (fetcher != null) {
 					if (r.getCompId() != null) {
@@ -77,23 +79,26 @@ public class RJ2FetchStandings extends Job3<RS3StandingsResult, Long, List<MS0Pr
 							
 							// with the new espn.co.uk tables, we are seeing the new comps (as of SR 2016) 
 							// not working with the old template syntax. Allow over-ride from admin.html
-							if (c.getTableURL() != null && !c.getTableURL().isEmpty()) {
-								fetcher.setUrl(c.getTableURL());
-							} else {
-								fetcher.setUrl(c.getForeignURL()+"?template=pointstable");
-							}
+//							if (c.getTableURL() != null && !c.getTableURL().isEmpty()) {
+//								fetcher.setUrl(c.getTableURL());
+//							} else {
+//								fetcher.setUrl(c.getForeignURL()+"?template=pointstable");
+//							}
 							
 							Iterator<ITeamGroup> it = c.getTeams().iterator();
 							while (it.hasNext()) {
 								ITeamGroup t = it.next();
 								if (!t.getDisplayName().contains("TBD") && !t.getDisplayName().contains("TBC")) {
 									IStanding s = fetcher.getStandingForTeam(t);
+									assert(s.getRoundId() != null);
 									if (s != null) {
 										sf.put(s);
 										retval.log.add("Found standing " + s.getStanding() + " for team " + t.getDisplayName());
+										Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Found standing " + s.getStanding() + " for team " + t.getDisplayName());
 									} else {
 										retval.log.add("No standing found for team " + t.getDisplayName());
 										retval.success = false;
+										throw new RetryRequestException("No standing found for " + t.getDisplayName());
 									}
 								}
 							}

@@ -1,5 +1,9 @@
 package net.rugby.foundation.admin.server.workflow.fetchstats;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,9 +13,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.admin.server.factory.espnscrum.UrlCacher;
+import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
@@ -47,9 +54,12 @@ public class FetchPlayerByScrumId extends Job5<Long, String, String, Long, Long,
 	 * params String compName
 	 * 			Long scrumId
 	 * 			Long adminID
+	 * @throws RetryRequestException 
+	 * @throws IOException 
+	 * @throws MalformedURLException 
 	 */		
 	@Override
-	public Value<Long> run(String playerName, String referringURL, Long scrumPlayerId, Long adminId, Long matchId) {
+	public Value<Long> run(String playerName, String referringURL, Long scrumPlayerId, Long adminId, Long matchId) throws RetryRequestException, MalformedURLException, IOException {
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINER);
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.FINER, "Looking for " + playerName);
 		
@@ -79,27 +89,42 @@ public class FetchPlayerByScrumId extends Job5<Long, String, String, Long, Long,
 			if (playerId != null) {
 				return playerId;
 			} else {
-				//still didn't find, need human to get this going.
-				
-				// all we know is the scrumId
-				IPlayer p = pf.create();
-				p.setScrumId(scrumPlayerId);
-				p.setDisplayName(playerName);
-				p.setCountry(cf.getByName("None"));
-				pf.put(p);
-				PromisedValue<Long> x = newPromise(Long.class);
-				IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", p, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
-				atf.put(task);
-				p.getBlockingTaskIds().add(task.getId());
-				pf.put(p);
-//				match.setWorkflowStatus(WorkflowStatus.BLOCKED);
-//				mgf.put(match);
-				return x;
+				// maybe is 404 (fail) or maybe timed out (retry).
+				String url = "http://www.espnscrum.com/scrum" + "/rugby/player/" + scrumPlayerId + ".html";
+				if (getResponseCode(url) == 404) {
+					//still didn't find, need human to get this going.
+					IPlayer p = pf.create();
+					p.setScrumId(scrumPlayerId);
+					p.setDisplayName(playerName);
+					p.setGivenName(playerName.split(" ")[0].trim());
+					p.setSurName(playerName.substring(p.getGivenName().length()).trim());
+					setShortName(p, playerName);
+					p.setCountry(cf.getByName("None"));
+					pf.put(p);
+					PromisedValue<Long> x = newPromise(Long.class);
+					IAdminTask task = atf.getNewEditPlayerTask("Something bad happened trying to find " + playerName + " using referring URL " + referringURL, "Nothing saved for player", p, true, getPipelineKey().toString(), getJobKey().toString(), x.getHandle());
+					atf.put(task);
+					p.getBlockingTaskIds().add(task.getId());
+					pf.put(p);
+//					match.setWorkflowStatus(WorkflowStatus.BLOCKED);
+//					mgf.put(match);
+					return x;					
+				} else {
+					throw new RetryRequestException("Didn't find player information for " + playerName + " from " + match.getDisplayName() + " at " + DateTime.now().toString() + " using url " + url);
+				}
+
 			}
 
 		}
 	}
 
+	private int getResponseCode(String urlString) throws MalformedURLException, IOException {
+	    URL u = new URL(urlString); 
+	    HttpURLConnection huc =  (HttpURLConnection)  u.openConnection(); 
+	    huc.setRequestMethod("GET"); 
+	    huc.connect(); 
+	    return huc.getResponseCode();
+	}
 
 	/*
 	 * So we need to get at least a name, country and birthdate to let the workflow continue. Otherwise send a promised value.
@@ -337,9 +362,9 @@ public class FetchPlayerByScrumId extends Job5<Long, String, String, Long, Long,
 		//e.g. Full name Jonathan James Vaughan Davies ==> JJV Davies
 		// also have to deal with Bismarck Wilhelm du Plessis ==> BW du Plessis
 		String shortName = "";
-		int size = fullName.split("[ |-]").length - player.getSurName().split(" ").length;
+		int size = fullName.split("[ |-]+").length - player.getSurName().split(" ").length;
 		for (int i=0; i<size; ++i) {
-			shortName += fullName.split("[ |-]")[i].substring(0, 1);
+			shortName += fullName.split("[ |-]+")[i].substring(0, 1);
 		}
 		shortName += " " + player.getSurName();
 		player.setShortName(shortName);

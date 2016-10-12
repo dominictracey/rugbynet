@@ -891,5 +891,23 @@ public class ScrumPlayerMatchStatsFetcher implements IPlayerMatchStatsFetcher {
 
 		return flopped && present;
 	}
+
+	@Override
+	public String getErrorCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getWarningCodes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getWarningMessages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
 

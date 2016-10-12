@@ -12,6 +12,10 @@
 			<b:TextBox ui:field='homeTeamId'></b:TextBox>
 			<b:Label>Visiting Team Id</b:Label>
 			<b:TextBox ui:field='visitingTeamId'></b:TextBox>
+			<b:Label>ESPN match Id</b:Label>
+			<b:TextBox ui:field='espnMatchId'></b:TextBox>
+			<b:Label>Espn League Id (leave blank for containing comp's espn league id)</b:Label>
+			<b:TextBox ui:field='espnLeagueId'></b:TextBox>
 			<b:Nav>
 				<b:ButtonGroup ui:field='buttonBar'>
 					<b:Button ui:field="save">Save</b:Button>

@@ -50,7 +50,7 @@ public class ESPN3GenerateFetchPlayerMatchStats extends Job1<List<Long>, MS3Line
 
 	
 	public ESPN3GenerateFetchPlayerMatchStats() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -80,6 +80,8 @@ public class ESPN3GenerateFetchPlayerMatchStats extends Job1<List<Long>, MS3Line
 				lineup.fetchSubTreeResults.visitLineup == null || lineup.fetchSubTreeResults.visitLineup.isEmpty()) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Invalid lineups provided.");
 			return immediate(null);
+		} else {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": Generating jobs for lineups." );
 		}
 		
 		List<Long> homeLineupIds = lineup.fetchSubTreeResults.homeLineup;

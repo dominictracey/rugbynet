@@ -28,6 +28,7 @@
 		<g:Button styleName="{style.important}" ui:field="fetchScore">Fetch Score</g:Button>
 		<g:Button styleName="{style.important}" ui:field="fetchMatchStats">Fetch Match Stats</g:Button>		
 		<g:Button styleName="{style.important}" ui:field="showHomeTeamMatchStats">Home Team Match Stats</g:Button>		
-		<g:Button styleName="{style.important}" ui:field="showVisitingTeamMatchStats">Visiting Team Match Stats</g:Button>		
+		<g:Button styleName="{style.important}" ui:field="showVisitingTeamMatchStats">Visiting Team Match Stats</g:Button>	
+		<g:Button styleName="{style.important}" ui:field="showLog">Log</g:Button>	
 					</g:HTMLPanel>
 </ui:UiBinder> 

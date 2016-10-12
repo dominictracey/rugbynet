@@ -84,6 +84,18 @@ ResultType:&nbsp;
                         </g:ListBox>
                     </g:HorizontalPanel>
 
+                     <g:HorizontalPanel styleName="{style.newpanel}" >
+
+                        <g:Label>
+Number of Weeks:&nbsp;
+                        </g:Label>
+
+                        <g:TextBox
+                            styleName="{style.urlbox}"
+                            ui:field="weeks" >
+                        </g:TextBox>
+                    </g:HorizontalPanel>
+                    
                     <g:HorizontalPanel styleName="{style.newpanel}" >
 
                         <g:Button ui:field="fetch" >

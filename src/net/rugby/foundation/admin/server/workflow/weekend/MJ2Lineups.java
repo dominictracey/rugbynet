@@ -33,7 +33,7 @@ public class MJ2Lineups extends Job2<MS3LineupsAnnounced, Long, String> implemen
 	transient private ICoreRuleFactory crf;
 
 	public MJ2Lineups() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	
@@ -51,6 +51,8 @@ public class MJ2Lineups extends Job2<MS3LineupsAnnounced, Long, String> implemen
 //				retval.success = false;
 //				return immediate(retval);
 //			}
+			MS3LineupsAnnounced retval = new MS3LineupsAnnounced();
+			retval.matchId = matchId;
 			
 			if (injector == null) {
 				injector = BPMServletContextListener.getInjectorForNonServlets();
@@ -62,14 +64,19 @@ public class MJ2Lineups extends Job2<MS3LineupsAnnounced, Long, String> implemen
 			
 			IMatchGroup match = mf.get(matchId);
 
+			if (match == null) {
+				retval.log.add(this.getClass().getSimpleName() + " ...FAIL ( bad match)");
+				retval.success = false;
+				return immediate(retval);
+			} else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": checking for lineups for match " + match.getDisplayName());
+			}
 			
 			WorkflowStatus fromState = WorkflowStatus.PENDING;
 //			WorkflowStatus toState = WorkflowStatus.LINEUPS;
-			IRule<IMatchGroup> rule = crf.get(match, MatchRule.LINEUPS_AVAILABLE);		
+			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_LINEUPS_AVAILABLE);		
 			
-			MS3LineupsAnnounced retval = new MS3LineupsAnnounced();
-
-			retval.matchId = matchId;
+			
 			
 			// first check if we are already further along than this
 			if (match.getWorkflowStatus().ordinal() > fromState.ordinal()) {
@@ -83,29 +90,31 @@ public class MJ2Lineups extends Job2<MS3LineupsAnnounced, Long, String> implemen
 			// 			
 			if (rule.test()) {
 				Value<MS3LineupsAnnounced> val = futureCall(new ESPN2FetchLineups(), immediate(match.getId()));
-				retval.log.add(rule.getLog());
-				retval.log.add("Fetch match stats initiated at " + DateTime.now().toString());
+				//val.log.add(rule.getLog());
+				//val.log.add("Fetch lineups initiated at " + DateTime.now().toString());
 				// this happens inside fetchstats.CompileLineups
 //				match.setWorkflowStatus(toState);
 //				mf.put(match);
 //				
 //				retval.log.add(rule.getLog());
 //				retval.log.add(match.getDisplayName() + " fetched stats " + DateTime.now().toString());
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": lineups available and fetching triggered for: " + match.getDisplayName());
+
 				return val;
 			} else {
 				// if it was more than 3 days ago, give up and mark the match NO_STATS
-				DateTime now = new DateTime();
-				now = now.minusDays(3);
-				if (now.isAfter(new DateTime(match.getDate()))) {
-					match.setWorkflowStatus(WorkflowStatus.NO_STATS);
-					mf.put(match);
-					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "No stats available for " + match.getDisplayName() + " giving up. NO_STATS");
-					retval.log.add("No stats available for " + match.getDisplayName() + " giving up. NO_STATS");
-					retval.success = false;
-					return immediate(retval);
-				} else {
+//				DateTime now = new DateTime();
+//				now = now.minusDays(3);
+//				if (now.isAfter(new DateTime(match.getDate()))) {
+//					match.setWorkflowStatus(WorkflowStatus.NO_STATS);
+//					mf.put(match);
+//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "No stats available for " + match.getDisplayName() + " giving up. NO_STATS");
+//					retval.log.add("No stats available for " + match.getDisplayName() + " giving up. NO_STATS");
+//					retval.success = false;
+//					return immediate(retval);
+//				} else {
 					throw new RetryRequestException(match.getDisplayName() + " still waiting for stats at " + DateTime.now().toString());
-				}
+//				}
 			}
 	
 		} catch (Exception ex) {			

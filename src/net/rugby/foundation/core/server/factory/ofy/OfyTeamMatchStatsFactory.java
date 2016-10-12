@@ -79,9 +79,13 @@ public class OfyTeamMatchStatsFactory extends BaseTeamMatchStatsFactory implemen
 	@Override
 	public boolean deleteFromPersistentDatastore(ITeamMatchStats t) {
 		try {
-			Objectify ofy = DataStoreFactory.getOfy();
-			ofy.delete(t);
-			return true;
+			if (t != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+				ofy.delete(t);
+				return true;
+			} else {
+				return false;
+			}
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return false;

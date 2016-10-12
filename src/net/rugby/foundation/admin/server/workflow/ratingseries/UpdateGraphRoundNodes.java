@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.RetryRequestException;
+import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.Position;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.server.factory.IRoundNodeFactory;
 import net.rugby.foundation.topten.server.rest.RoundNode;
 
@@ -28,8 +31,10 @@ public class UpdateGraphRoundNodes extends Job3<List<String>, Long, String, Stri
 	transient private IRoundNodeFactory rnf;
 	transient private ICompetitionFactory cf;
 
+	private ISeriesConfigurationFactory scf;
+
 	public UpdateGraphRoundNodes() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	
@@ -44,9 +49,21 @@ public class UpdateGraphRoundNodes extends Job3<List<String>, Long, String, Stri
 
 			this.cf = injector.getInstance(ICompetitionFactory.class);
 			this.rnf = injector.getInstance(IRoundNodeFactory.class);
+			this.scf = injector.getInstance(ISeriesConfigurationFactory.class);
+			
+			
+			// make sure we actually have a position series first
+			ISeriesConfiguration sc = scf.getByCompAndMode(compId, RatingMode.BY_POSITION);
+			if (sc == null) {
+				List<String> retval = new ArrayList<String>();
+				retval.add("No BY_POSITION series found for comp.");
+				return immediate(retval);
+			}
 			
 			ICompetition c = cf.get(compId);
 			List<Value<String>> _retval = new ArrayList<Value<String>>();
+			
+			
 
 			if ("create".equals(action)) {
 				

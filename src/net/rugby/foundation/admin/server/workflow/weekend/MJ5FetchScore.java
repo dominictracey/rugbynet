@@ -40,7 +40,7 @@ public class MJ5FetchScore extends Job3<MS6Final, Long, String, ResultWithLog> i
 	private IRoundFactory rf;
 
 	public MJ5FetchScore() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -69,8 +69,13 @@ public class MJ5FetchScore extends Job3<MS6Final, Long, String, ResultWithLog> i
 			this.crf = injector.getInstance(ICoreRuleFactory.class);
 			
 			IMatchGroup match = mf.get(matchId);
-			IRound r = rf.get(match.getRoundId());
 
+			if (match != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": checking for match result for " + match.getDisplayName());
+			}
+			
+			IRound r = rf.get(match.getRoundId());
+			
 			WorkflowStatus fromState = WorkflowStatus.OVER;
 			WorkflowStatus toState = WorkflowStatus.FINAL;
 			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_TO_FINAL);		
@@ -95,6 +100,8 @@ public class MJ5FetchScore extends Job3<MS6Final, Long, String, ResultWithLog> i
 				retval.log.add(rule.getLog());
 				retval.log.add(match.getDisplayName() + " final score " + match.getSimpleScoreMatchResult().getHomeScore() + "-" + match.getSimpleScoreMatchResult().getVisitScore() + " collected at " + DateTime.now().toString());
 				retval.success = true;
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": fetched match result for " + match.getDisplayName());
+
 				return immediate(retval);
 			} else {
 				throw new RetryRequestException("Still no score available for " + match.getDisplayName() + " at " + DateTime.now().toString());

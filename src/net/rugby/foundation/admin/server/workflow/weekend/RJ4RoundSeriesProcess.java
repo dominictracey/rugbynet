@@ -12,6 +12,7 @@ import net.rugby.foundation.admin.server.rules.IRule;
 import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.server.workflow.ratingseries.CheckRatingGroup;
 import net.rugby.foundation.admin.server.workflow.ratingseries.ProcessRatingSeries;
+import net.rugby.foundation.admin.server.workflow.ratingseries.UpdateGraphRoundNodes;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
@@ -23,6 +24,8 @@ import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.model.shared.UniversalRound;
 
+import com.google.appengine.tools.pipeline.FutureList;
+import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.Job4;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
@@ -50,7 +53,7 @@ public class RJ4RoundSeriesProcess extends Job4<MS8Rated, Long, RatingMode, Stri
 	private IUniversalRoundFactory urf;
 
 	public RJ4RoundSeriesProcess() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -134,7 +137,10 @@ public class RJ4RoundSeriesProcess extends Job4<MS8Rated, Long, RatingMode, Stri
 						Value<Long> positionGroupId = null;
 
 						positionGroupId = futureCall(new CheckRatingGroup(), immediate(sc.getId()), immediate(round.getUrOrdinal()), immediate(round.getName()));
-						return futureCall(new ProcessRatingSeries(), immediate(sc.getId()), immediate(0L), positionGroupId); 
+						
+						Value<MS8Rated> playerRatingOutput = futureCall(new ProcessRatingSeries(), immediate(sc.getId()), immediate(0L), positionGroupId);
+
+						return playerRatingOutput; 
 					}
 				} else if (mode == RatingMode.BY_TEAM) {
 					sc = scf.getByCompAndMode(r.getCompId(), RatingMode.BY_TEAM);

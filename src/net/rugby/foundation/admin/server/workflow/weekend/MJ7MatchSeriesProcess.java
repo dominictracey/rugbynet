@@ -40,7 +40,7 @@ public class MJ7MatchSeriesProcess extends Job4<MS8Rated, Long, Long, String, Re
 	private IRoundFactory rf;
 
 	public MJ7MatchSeriesProcess() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -69,7 +69,10 @@ public class MJ7MatchSeriesProcess extends Job4<MS8Rated, Long, Long, String, Re
 			this.rf = injector.getInstance(IRoundFactory.class);
 			
 			IMatchGroup match = mf.get(matchId);
-
+			if (match != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": checking to process series for " + match.getDisplayName());
+			}
+			
 			WorkflowStatus fromState = WorkflowStatus.FETCHED;
 			//WorkflowStatus toState = WorkflowStatus.RATED;  // << set in ratingseries.CompileProcessReport
 			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_TO_RATE);		
@@ -87,7 +90,8 @@ public class MJ7MatchSeriesProcess extends Job4<MS8Rated, Long, Long, String, Re
 			if (rule.test()) {
 				IRound r = rf.get(match.getRoundId());			
 				ISeriesConfiguration sc = scf.getByCompAndMode(r.getCompId(), RatingMode.BY_MATCH);
-				
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": triggered series processing for " + match.getDisplayName());
+
 				return futureCall(new ProcessRatingSeries(), immediate(sc.getId()), immediate(matchId), immediate(groupId)); 
 				// update state
 //				match.setWorkflowStatus(toState);

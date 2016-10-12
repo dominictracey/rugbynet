@@ -91,7 +91,7 @@ public class EspnSingleTableStandingsFetcher extends JsonFetcher implements ISta
 			String id = c.getId().toString() + "-" + r.getId().toString();
 			value = (byte[])syncCache.get(id);
 			if (value == null) {
-				mr = fetchStats(r,c);
+				mr = fetchStandings(r,c);
 
 				if (mr != null) {
 					ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -130,25 +130,29 @@ public class EspnSingleTableStandingsFetcher extends JsonFetcher implements ISta
 		}
 	}
 
-	private Map<Long, IStanding> fetchStats(IRound r, ICompetition c) {
+	private Map<Long, IStanding> fetchStandings(IRound r, ICompetition c) {
 		try {
 			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + c.getForeignID() + "/standings/roundId/" + r.getId());
 			
 			JSONArray json = get();			
 			Map<Long, IStanding> retval = new HashMap<Long, IStanding>();
 			
-			ObjectMapper mapper = new ObjectMapper();
-			for (int i=0; i<json.length(); ++i) {
-				
-				IStanding s = mapper.readValue(json.getJSONObject(i).toString(), Standing.class);
-				ITeamGroup t = tf.getTeamByForeignId(s.getForeignId());
-				s.setTeam(t);
-				s.setTeamId(t.getId());
-				s.setRound(r);
-				retval.put(t.getId(), s);
-			}
-			
-			return retval;
+			if (errorCode == null || errorCode.isEmpty()) {
+				ObjectMapper mapper = new ObjectMapper();
+				for (int i=0; i<json.length(); ++i) {
+					
+					IStanding s = mapper.readValue(json.getJSONObject(i).toString(), Standing.class);
+					ITeamGroup t = tf.getTeamByForeignId(s.getForeignId());
+					s.setTeam(t);
+					s.setTeamId(t.getId());
+					s.setRound(r);
+					s.setRoundId(r.getId());
+					retval.put(t.getId(), s);
+				}
+				return retval;
+			} else {
+				return null;
+			}	
 			
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);

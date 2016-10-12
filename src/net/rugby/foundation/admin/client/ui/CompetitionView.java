@@ -29,14 +29,15 @@ public interface CompetitionView extends IsWidget {
 	void setPresenter(Presenter listener);
 	void showTeams(Map<String, ITeamGroup> teams);
 	void showRounds(List<IRound>  result);
+	void addMatches(Map<String, IMatchGroup> mgs);
 	void showMatches(Map<String, IMatchGroup> matches);
 	void showCompetition(ICompetition result);
 	void showStatus(String message);
 	
 	public interface Presenter {
 		void fetchCompetitionClicked(List<IRound> roundMap, CompetitionType compType);
-		void fetchTeamsClicked(String text, CompetitionType compType);
-		void fetchMatchesClicked(Map<String,ITeamGroup> teams, CompetitionType compType);
+		void fetchTeamsClicked(String text, String weeks, CompetitionType compType);
+		void fetchMatchesClicked(Map<String,ITeamGroup> teams, Map<String, IMatchGroup> matchMap, int numWeeks, int currWeek, CompetitionType compType);
 		void fetchRoundsClicked(Map<String, IMatchGroup> matches, CompetitionType compType);
 
 		void saveCompetitionClicked(ICompetition comp, Map<String,ITeamGroup> teams);
@@ -117,5 +118,6 @@ public interface CompetitionView extends IsWidget {
 
 	SmartBar getSmartBar();
 	void addCompNames(ICoreConfiguration result, Filter filter);
+
 
 }

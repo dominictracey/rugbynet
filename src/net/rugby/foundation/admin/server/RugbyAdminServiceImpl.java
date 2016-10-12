@@ -199,6 +199,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			queuer = new OrchestrationHelper();
 
+			Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 		}
@@ -260,7 +261,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			this.promoter = promoter;
 			this.luff = luff;
 			this.lsf = lsf;
-			
+
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
 		}
@@ -319,31 +320,35 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchCompetition. url: " + url);
 				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
 
 				ICompetition comp = fetcher.getCompetition(url, rounds, teams);
 
 				// do we have this in our database?
-				List<ICompetition> comps = cf.getAllComps();
-				ICompetition compDB = null;
-				for (ICompetition dBComp : comps) {
-					if (dBComp.getLongName() != null && dBComp.getLongName().equals(comp.getLongName())) {
-						compDB = dBComp;			
-					}
-				}
+				//				List<ICompetition> comps = cf.getAllComps();
+				//				ICompetition compDB = null;
+				//				for (ICompetition dBComp : comps) {
+				//					if (dBComp.getLongName() != null && dBComp.getLongName().equals(comp.getLongName())) {
+				//						compDB = dBComp;			
+				//					}
+				//				}
+				//
+				//				if (compDB != null) {
+				//					return compDB;
+				//				} else {
+				//					// add the rounds for them
+				//					ArrayList<Long> rids = new ArrayList<Long>();
+				//					for (IRound r : rounds) {
+				//						rids.add(r.getId());
+				//					}
+				//					comp.setRoundIds(rids);
+				//					comp.setRounds(rounds);
+				//					return comp;
+				//				}
 
-				if (compDB != null) {
-					return compDB;
-				} else {
-					// add the rounds for them
-					ArrayList<Long> rids = new ArrayList<Long>();
-					for (IRound r : rounds) {
-						rids.add(r.getId());
-					}
-					comp.setRoundIds(rids);
-					comp.setRounds(rounds);
-					return comp;
-				}
+				return comp;
+
 			} else {
 				return null;
 			}
@@ -359,19 +364,24 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ICompetition saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams) {
 		try {
 			if (checkAdmin()) {
-				cf.put(comp);
-
-				// there should just be one...
-				ICoreConfiguration c = ccf.get();
-
-				c.addCompetition(comp.getId(), comp.getShortName());
-				if (comp.getUnderway()) {
-					c.addCompUnderway(comp.getId());
+				if (comp != null) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "saveCompetition. comp: " + comp.getLongName());
 				} else {
-					c.removeCompUnderway(comp.getId());
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "saveCompetition. comp: null");
 				}
-				//c.setDefaultCompId(comp.getId());
-				ccf.put(c);
+				comp = cf.put(comp);
+
+				//				// there should just be one...
+				//				ICoreConfiguration c = ccf.get();
+				//
+				//				c.addCompetition(comp.getId(), comp.getShortName());
+				//				if (comp.getUnderway()) {
+				//					c.addCompUnderway(comp.getId());
+				//				} else {
+				//					c.removeCompUnderway(comp.getId());
+				//				}
+				//				//c.setDefaultCompId(comp.getId());
+				//				ccf.put(c);
 
 				//add it to the workflow configuration as well
 				//		IWorkflowConfiguration wfc = wfcf.get();
@@ -414,14 +424,14 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 
 	@Override
-	public Map<String, ITeamGroup> fetchTeams(String url, CompetitionType compType) {
+	public Map<String, ITeamGroup> fetchTeams(String urlDate, String weeks, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
-
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchTeams. urlDate: " + urlDate);
 				CountryLoader cloader = new CountryLoader();
 				cloader.Run(countryf);
 
-				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(urlDate, compType);
 
 				Map<String, ITeamGroup> teams = fetcher.getTeams();
 
@@ -470,6 +480,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<IRound> fetchRounds(String url, Map<String,IMatchGroup> matches, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchRounds. url: " + url);
 				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
 
 				List<IRound>  rounds = fetcher.getRounds(url, matches);
@@ -507,26 +518,16 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 
 	@Override
-	public Map<String, IMatchGroup> fetchMatches(String url, Map<String,ITeamGroup> teams, CompetitionType compType) {
+	public Map<String, IMatchGroup> fetchMatches(String url, int weeksOffset, Map<String,ITeamGroup> teams, Map<String,IMatchGroup> matches, CompetitionType compType) {
 		try {
 			if (checkAdmin()) {
-				//				IForeignCompetitionFetcher fetcher = new ScrumCompetitionFetcher(rf,mf, srff, tf);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchMatches. url: " + url);
+
 				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(url, compType);
-				Map<String, IMatchGroup> matches = fetcher.getMatches(url, teams);
-				Map<String, IMatchGroup> dupes = new HashMap<String, IMatchGroup>();
-
-				if (matches != null) {
-					for (IMatchGroup m: matches.values()) {
-						IMatchGroup found = mf.find(m);
-						if (found != null) {
-							dupes.put(found.getDisplayName(), found);
-						}
-					}
-				}
-
-				// swap out the copies with the real ones.
-				for (String name: dupes.keySet()) {
-					matches.put(name, dupes.get(name));
+				Map<String, IMatchGroup> updatedMatches = fetcher.getMatches("", weeksOffset, teams, matches);
+				//updatedMatches = deduplicateMatches(updatedMatches);  //too dangerous for deleting crufty comps
+				if (updatedMatches != null) {
+					matches.putAll(updatedMatches);
 				}
 
 				return matches;
@@ -539,19 +540,64 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 	}
 
-	//
-	//	@Override
-	//	public Map<String, IMatchGroup> saveMatches(Map<String, IMatchGroup> matches) {
-	//		return matches; //deprecated
-	//		//		ofy.put(matches.values());
-	//		//		return matches;
-	//	}
+	private Map<String, IMatchGroup> deduplicateMatches(Map<String, IMatchGroup> matches) {
+		Map<String, IMatchGroup> dupes = new HashMap<String, IMatchGroup>();
+
+		if (matches != null) {
+			for (IMatchGroup m: matches.values()) {
+				IMatchGroup found = mf.find(m);
+				if (found != null) {
+					dupes.put(found.getDisplayName(), found);
+				}
+			}
+		}
+
+		// swap out the copies with the real ones.
+		for (String name: dupes.keySet()) {
+			matches.put(name, dupes.get(name));
+		}
+
+		return matches;
+	}
+	@Override
+	public Map<String, ITeamGroup> saveTeams(Map<String, ITeamGroup> teams) {
+		try {
+			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "SaveTeams. ");
+				int count = 0;
+				// make sure our teams have all been saved.
+				for (String key : teams.keySet()) {
+					if (teams.get(key).getId() == null) {
+						ITeamGroup t = tf.put(teams.get(key));
+						assert (t.getId() != null);
+						//update map version
+						teams.put(t.getDisplayName(), t);
+						++count;
+
+					}
+				}
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Added " + count + " new teams.");
+			}
+			return teams;
+
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public Map<String, IMatchGroup> fetchMatches(String url, Map<String, ITeamGroup> teams, CompetitionType compType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 	@Override
 	public List<ICompetition> getComps(Filter filter) {
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "getComps. filter: " + filter);
 				List<ICompetition> compList = new ArrayList<ICompetition>();
 
 				if (filter == null) {
@@ -597,6 +643,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		Map<String, IOrchestrationConfiguration> newMap = new HashMap<String, IOrchestrationConfiguration>();
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "getOrchestrationConfiguration.");
 				List<IOrchestrationConfiguration> list = ocf.getAll();
 
 
@@ -623,6 +670,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			Map<String, IOrchestrationConfiguration> configs) {
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "saveOrchestrationConfiguration.");
 				for (IOrchestrationConfiguration oc : configs.values()) {
 					ocf.put(oc);
 				}
@@ -644,6 +692,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<IMatchGroup> getMatches(Long roundId) {
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "getMatches. roundId: " + roundId);
 				List<IMatchGroup> ms = mf.getMatchesForRound(roundId);
 
 				return ms;
@@ -664,6 +713,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public ITeamGroup saveTeam(ITeamGroup teamGroup, boolean saveMatches) {
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "saveTeam. teamGroup: " + teamGroup != null ? teamGroup.getDisplayName():"null");
 				tf.put(teamGroup);
 
 				if (saveMatches) {
@@ -859,22 +909,22 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 				comp = cf.put(comp);
 
-//				ICoreConfiguration cc = ccf.get();
-//				// add or remove from CoreConfiguration map depending on the Underway flag
-//				if (comp.getUnderway()) {
-//					cc.addCompUnderway(comp.getId());
-//				} else {
-//					cc.removeCompUnderway(comp.getId());
-//				}
-//
-//				if (comp.getShowToClient()) {
-//					cc.addCompForClient(comp.getId());
-//				} else {
-//					cc.removeCompForClient(comp.getId());
-//				}
-//
-//				ccf.put(cc);
-				
+				//				ICoreConfiguration cc = ccf.get();
+				//				// add or remove from CoreConfiguration map depending on the Underway flag
+				//				if (comp.getUnderway()) {
+				//					cc.addCompUnderway(comp.getId());
+				//				} else {
+				//					cc.removeCompUnderway(comp.getId());
+				//				}
+				//
+				//				if (comp.getShowToClient()) {
+				//					cc.addCompForClient(comp.getId());
+				//				} else {
+				//					cc.removeCompForClient(comp.getId());
+				//				}
+				//
+				//				ccf.put(cc);
+
 				//refresh the core config
 				ICoreConfiguration config = ccf.get();
 				ccf.dropFromCache(config.getId());
@@ -1892,7 +1942,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 	}
 
-	
+
 	@Override
 	public IContent createContent(Long id, String content) {
 		try {
@@ -1992,6 +2042,9 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				for (IStanding s: standings) {
+					if (s.getRoundId() == null && s.getRound() != null) {
+						s.setRoundId(s.getRound().getId());
+					}
 					sf.put(s);
 				}
 				return sf.getForRound(rf.get(roundId));
@@ -2162,7 +2215,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public IMatchGroup AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId) {
+	public IMatchGroup AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId, Long espnMatchId, Long espnLeagueId) {
 		try {
 			if (checkAdmin()) {
 				IRound r = rf.get(round.getId());
@@ -2171,6 +2224,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				//mg.setDisplayName("Change me");
 				mg.setHomeTeamId(homeTeamId);
 				mg.setVisitingTeamId(visitTeamId);
+				mg.setForeignId(espnMatchId);
+				mg.setForeignLeagueId(espnLeagueId);
+				//http://www.espn.co.uk/rugby/match?gameId=289721&league=289234
+				mg.setForeignUrl("http://www.espn.co.uk/rugby/match?gameId=" + espnMatchId + "&league=" + espnLeagueId);
 				if (homeTeamId != null && visitTeamId != null) {
 					mg.setHomeTeam(tf.get(homeTeamId));
 					mg.setVisitingTeam(tf.get(visitTeamId));
@@ -2888,25 +2945,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					if (r != null) {
 						ICompetition c = cf.get(r.getCompId());
 						if (c != null) {
-							
-							ILineupFetcher luf = luff.getLineupFetcher(c.getCompType());
+
+							ILineupFetcher luf = luff.getLineupFetcher(c.getCompType());						
 							luf.setComp(c);
 							luf.setMatch(m);
 							List<ILineupSlot> homeLineup = luf.get(true);
 							List<ILineupSlot> visitingLineup = luf.get(false);
-							
+
 							if (homeLineup.size() > 0 && visitingLineup.size() > 0) {
 								for (ILineupSlot lus : homeLineup) {
 									lsf.put(lus);
 								}
-								
+
 								for (ILineupSlot lus : visitingLineup) {
 									lsf.put(lus);
 								}
-								
+
 								m.setWorkflowStatus(WorkflowStatus.LINEUPS);
 								mf.put(m);
-								
+
 								return m;
 							}
 						}
@@ -2919,6 +2976,23 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;
 		}
 	}
+
+	@Override
+	public List<String> getMatchWorkflowLog(Long id) {
+		try {
+			if (checkAdmin()) {
+				IMatchGroup m = mf.get(id);
+				if (m != null) {
+					return m.getWorkflowLog();
+				}
+			}
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
 
 
 

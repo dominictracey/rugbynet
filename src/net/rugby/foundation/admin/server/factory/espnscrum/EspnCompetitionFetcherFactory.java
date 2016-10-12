@@ -1,13 +1,14 @@
 package net.rugby.foundation.admin.server.factory.espnscrum;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.inject.Inject;
 
 import net.rugby.foundation.admin.server.factory.IForeignCompetitionFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.model.EspnCompetitionFetcher;
 import net.rugby.foundation.admin.server.model.IForeignCompetitionFetcher;
-import net.rugby.foundation.admin.server.model.ScrumCompetitionFetcher;
-import net.rugby.foundation.admin.server.model.ScrumInternationalCompetitionFetcher;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -20,16 +21,16 @@ public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcher
 	private IMatchGroupFactory mf;
 	private IResultFetcherFactory rff;
 	private ITeamGroupFactory tf;
-    private IUrlCacher uc;
 	private IConfigurationFactory ccf;
 
+	private Map<String, IForeignCompetitionFetcher> fetcherMap = new HashMap<String, IForeignCompetitionFetcher>();
+	
 	@Inject
-	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf, IUrlCacher uc, IConfigurationFactory ccf) {
+	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf, IConfigurationFactory ccf) {
 		this.rf  = rf;
 		this.mf = mf;
 		this.rff = rff;
 		this.tf = tf;
-		this.uc = uc;
 		this.ccf = ccf;
 	}
 
@@ -41,10 +42,16 @@ public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcher
 		
 		assert(rf!=null);
 		
-		IForeignCompetitionFetcher scf =  new EspnCompetitionFetcher(rf,mf,rff, tf, ccf);
-		scf.setURL(url);
-		return scf;
-		
+		if (fetcherMap.containsKey(url)) {
+			return fetcherMap.get(url);
+		} else {
+			IForeignCompetitionFetcher scf =  new EspnCompetitionFetcher(rf,mf,rff, tf, ccf);
+			if (url != null && !url.isEmpty()) {
+				scf.setURL(url);
+			}
+			fetcherMap.put(url, scf);
+			return scf;
+		}
 
 	}
 

@@ -146,7 +146,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	private final static String LOCAL_BASE_NODE_URL = "http://127.0.0.1:8080/";
 	private final static String DEV_BASE_NODE_URL = "http://nodejs-1378.appspot.com/";
 	private final static String BETA_BASE_NODE_URL = "http:/nodejs-1378.appspot.com/";
-	private final static String PROD_BASE_NODE_URL = "http://nodejs-1378.appspot.com/";
+	private final static String PROD_BASE_NODE_URL = "http://nodejs-rugby-prod.appspot.com/";
 	// Facebook
 //	private final static String FB_LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/fb/topten.html";
 //	private final static String FB_DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/fb/topten.html";
