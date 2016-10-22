@@ -6,6 +6,7 @@ import net.rugby.foundation.admin.server.workflow.servelets.CronMidweekInitServl
 import net.rugby.foundation.admin.server.workflow.servelets.CronWeekendFinalizeServlet;
 import net.rugby.foundation.admin.server.workflow.servelets.CronWeekendInitServlet;
 import net.rugby.foundation.admin.server.workflow.servelets.GraphSeriesServlet;
+import net.rugby.foundation.admin.server.workflow.servelets.UtilFirebaseSyncServlet;
 import net.rugby.foundation.admin.server.workflow.servelets.UtilRoundWorkflowServlet;
 import net.rugby.foundation.admin.server.workflow.servelets.UtilWeekendCancelServlet;
 import net.rugby.foundation.core.server.mail.UnsubscribeServlet;
@@ -56,6 +57,7 @@ public class BPMServletModule extends ServletModule {
 		//serve("/admin/workflow/*").with(net.rugby.foundation.engine.server.WorkflowServlet.class);
 		serve("/admin/cleanUp").with(CleanupServlet.class);
 		serve("/admin/rugbyAdminService").with(RugbyAdminServiceImpl.class);
+		serve("/admin/firebase/sync").with(UtilFirebaseSyncServlet.class);
 	}
 }
 

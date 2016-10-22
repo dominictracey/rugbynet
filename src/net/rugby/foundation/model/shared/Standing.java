@@ -13,18 +13,18 @@ public class Standing implements Serializable, IStanding {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2506411242133263344L;
+	protected static final long serialVersionUID = 2506411242133263344L;
 	
 	@Id
-	private Long id;
-	private Long roundId;
+	protected Long id;
+	protected Long roundId;
 	@Transient
-	private IRound round;
-	private Long teamId;
+	protected IRound round;
+	protected Long teamId;
 	@Transient 
-	private ITeamGroup team;
-	private Integer standing;
-	private Long foreignId;
+	protected ITeamGroup team;
+	protected Integer standing;
+	protected Long foreignId;
 
 	public Standing() {
 		

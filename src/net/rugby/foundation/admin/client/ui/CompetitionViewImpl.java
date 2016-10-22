@@ -521,8 +521,12 @@ public class CompetitionViewImpl extends Composite implements CompetitionView {
 								Div div  = new Div();
 								Icon icon = new Icon();
 								icon.setType(IconType.CIRCLE);
-								if (mg.getWorkflowStatus() == null || mg.getWorkflowStatus().ordinal() < WorkflowStatus.FINAL.ordinal()) {
+								if (mg.getWorkflowStatus() == null || mg.getWorkflowStatus().ordinal() < WorkflowStatus.LINEUPS.ordinal()) {
 									icon.setColor("lightgrey");
+								} else if (mg.getWorkflowStatus() == (WorkflowStatus.LINEUPS)) {
+									icon.setColor("darkgrey");
+								} else if (mg.getWorkflowStatus() == (WorkflowStatus.UNDERWAY)) {
+									icon.setColor("magenta");
 								} else if (mg.getWorkflowStatus() == (WorkflowStatus.FINAL)) {
 									icon.setColor("lightblue");
 								} else if (mg.getWorkflowStatus() == (WorkflowStatus.FETCHED)) {

@@ -48,7 +48,7 @@ public class CronWeekendFinalizeServlet extends HttpServlet {
 		String pipelineId = "";
 		resp.setContentType("text/html");
 		try {		
-			// Look at all the underway comps, find this weekend's round for them (assume it's Thursday during the day) and start a new ProcessRound pipeline
+			// Look at all the underway comps, find this weekend's round for them (assume it's Thursday during the day) and delete ProcessRound pipeline
 			ICoreConfiguration cc = ccf.get();
 			for (Long cid: cc.getCompsUnderway()) {
 				IRound r = rf.getForUR(cid, cc.getCurrentUROrdinal());

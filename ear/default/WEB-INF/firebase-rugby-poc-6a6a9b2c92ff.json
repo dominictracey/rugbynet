@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "fir-rugby-poc",
+  "private_key_id": "6a6a9b2c92ff9d85941d45dc9a7502c41f5e313c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCu0EOXAAP6BgaQ\n0DiNOO4MHBxE0HBq7t6+yemzS4aeRmXTYIbjoPAC4la5wQ2DSuThj/ZWyh4ffAyk\nUuUKYsvOQ6N38+vppUj3/Mk389GnjkkWH1o7gptzaNnYRH0jGdqZiZk1LLjQEPXP\nYqQOGjZtPiWnNFcEWrV5ilzpnD2fzfdmedULLStJ20ipuRmIuBcp1eoxGxw6FilF\n7+RsZ2/ev8BzlVd+c3KWKsoejkC1bWekctQbsv4tcnu4ChlQ3Yh1AIOXkR72Pqc0\nvSGupSL5evhN/Irw7JjgCXZ1EGyLuZhKAF2vLeCtgkxeUbZYGv7oOXj7HdKmzC83\nihVmtxf3AgMBAAECggEBAIRguY4zOM+wmHA4/VoT7k/FSbLilP6k/JBFnm9jlgFt\nFdbHld3yFU5Zz4rColT19fTJa6W1ULJO4dPd4gvHXMZJehRv5gn8XBFOn6F7RRw5\nJydVfqLp+IWgtLaMxqY6Acua4yXdQ+ZrsXjmHY2AVA7NrP29KNfnSN1M5acR5aiI\ns24H0+Fj+wfjkbDcAH1BTjQMcvuGZewN5BF4wLbviHd8tZVRpQDr7Y0+VbRS9t+8\nf2tohiw72/AewH+qI0CawsFu4pljWcb/RE5exbP406HtrQ3m77XXWFQO+Qn18TjN\n+y0T+TJGGds03XSojiHAZ5b0iGaynIZQqdY6xxqEt+ECgYEA2l20/c/6I4aOXW+l\ni3PwU3+A4HThE8ApxADPgHplQx84pw6E1uhww/ccvq0SOrADgLNNOsGIpJksuAs1\nu080X7uYJ4p+TH5WkoFtJ0v15p+NkxQfgrqxOn6M8uQ97A2bX2j+0BXhYzdpWLh5\n369Aac+G0BY6ymXVBATJpm7AObUCgYEAzPEGCGUGMQfU4rP4b4Q2cf2tikg9FFPw\nJncDnbM9dT0eLBlSpC+p15KiUpLtjaGc1Hm4a0DGlgPNrJLhL6uL90kMudmAFLXi\nXnTxKqykgiPm6/cNWPJfhy0kjC+KXxKkZurKbeTnUsOKqN02jXXq0GaG4PWVnosj\nCOk7N3UwpnsCgYBFMdJrZx7taPLt2rYLdYae/tU4yvCTkJ3rdRJLtP0ngtox3aDs\ndKVfA4wBQ9h17lZ9ztNXHgKNndgUzcCOBTAkcc5qITGaTaJjNE4BWMmn9cEn7QV7\nKGuGjJlfUkHo7frhBeVQzM4p4WIpcfN0lRUFMnSWtaSVhCU268l2SrvwzQKBgQCz\nPvtvzCwmJhtkTNQ1dQXJnX5zO8twRBn/Coj3HRXbvKDvIRbO04FRMscWQbvT7E4m\n6G8MH5OREbKKBc0+zGOW3SVsR3dmpc5fnxhvoqAf0xbduy7JZPN4X1tf4RS9Iqj3\n+tMiWtqX4L8eApz8DO5bZ9EAYMuD5121JYjNcIokkQKBgHYM9+Nnjel7sYNcnfVs\nDwxNYEsgiOQNdJc35q/PuSIb3K2BQWn/nIaxYaEG2WCa1LMy56Ss46/osE2TvYxJ\n+Fg2ABQT0bWZ/6857+dQhGKF7kJZGgnjRA2APFRnjbqc9ax0V8ighufC9QnbcsV+\nXThqNU4BL/xRAYbv+CcAL/uK\n-----END PRIVATE KEY-----\n",
+  "client_email": "syncservlet@fir-rugby-poc.iam.gserviceaccount.com",
+  "client_id": "116641392060430254136",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/syncservlet%40fir-rugby-poc.iam.gserviceaccount.com"
+}

@@ -90,14 +90,14 @@ public class Competition implements Serializable, ICompetition {
 		this.teams = teams;
 	}
 
-	
-	public List<Long> getRoundIDs() {
-		return roundIDs;
-	}
-
-	public void setRoundIDs(List<Long> roundIDs) {
-		this.roundIDs = roundIDs;
-	}
+//	
+//	public List<Long> getRoundIDs() {
+//		return roundIDs;
+//	}
+//
+//	public void setRoundIDs(List<Long> roundIDs) {
+//		this.roundIDs = roundIDs;
+//	}
 	
 	@Override
 	public int getNextRoundIndex() {

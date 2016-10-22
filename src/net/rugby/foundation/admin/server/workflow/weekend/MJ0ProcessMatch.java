@@ -85,13 +85,13 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 			}
 			
 			// if the match is in the past, there is no point in waiting a half hour between retries...
-			if (match.getDate().before(DateTime.now().toDate())) {
+			if (match.getDate().before(DateTime.now().minusDays(1).toDate())) {
 				waitBackOffFactor = nowBackOffFactor;
 				waitBackOffSeconds = nowBackOffSeconds;
 				waitMaxAttempts = nowMaxAttempts;
 			}
 			
-			// start the match
+			// fetch lineups
 			Value<MS3LineupsAnnounced> lineups = futureCall(new MJ2Lineups(), immediate(matchId), immediate(label), waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);
 			
 			// start the match

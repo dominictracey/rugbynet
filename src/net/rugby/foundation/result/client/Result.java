@@ -203,7 +203,9 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 				String header = "<b>Final</b>";
 				if (m.getStatus().equals(Status.SCHEDULED))
 					header = format.format(m.getDate());
-				else if (!m.getStatus().toString().contains("FINAL")) {
+				else if (m.getStatus() == Status.POSTPONED) {
+					header = "PPD";
+				} else if (!m.getStatus().toString().contains("FINAL")) {
 					header = "";
 				}
 				MatchScore score = new MatchScore();

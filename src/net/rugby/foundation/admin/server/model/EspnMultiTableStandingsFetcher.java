@@ -13,7 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
@@ -23,12 +25,12 @@ import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.ICompetition;
-import net.rugby.foundation.model.shared.IHasId;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Standing;
-import net.rugby.foundation.model.shared.TeamGroup;
+import net.rugby.foundation.model.shared.StandingFull;
 
 public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStandingsFetcher  {
 
@@ -75,7 +77,7 @@ public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStan
 
 	@Override
 	public void setUrl(String url) {
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "This method doesn't do anything useful, the url of the REST service is set internally.");
+		//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "This method doesn't do anything useful, the url of the REST service is set internally.");
 	}
 	
 	/***
@@ -132,22 +134,29 @@ public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStan
 
 	private Map<Long, IStanding> fetchStandings(IRound r, ICompetition c) {
 		try {
-			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + c.getForeignID() + "/standings/roundId/" + r.getId());
+			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + c.getForeignID() + "/poolStandings");
 			
 			JSONArray json = get();			
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, json.toString());
 			Map<Long, IStanding> retval = new HashMap<Long, IStanding>();
 			
 			if (errorCode == null || errorCode.isEmpty()) {
 				ObjectMapper mapper = new ObjectMapper();
+				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 				for (int i=0; i<json.length(); ++i) {
-					
-					IStanding s = mapper.readValue(json.getJSONObject(i).toString(), Standing.class);
-					ITeamGroup t = tf.getTeamByForeignId(s.getForeignId());
-					s.setTeam(t);
-					s.setTeamId(t.getId());
-					s.setRound(r);
-					s.setRoundId(r.getId());
-					retval.put(t.getId(), s);
+					JSONObject pool = json.getJSONObject(i);
+					String poolName = pool.getString("name");
+					JSONArray poolArray = pool.getJSONArray("standings");
+					for (int j=0; j<poolArray.length(); ++j) {
+						IStandingFull s = mapper.readValue(poolArray.getJSONObject(j).toString(), StandingFull.class);
+						ITeamGroup t = tf.getTeamByForeignId(s.getForeignId());
+						s.setTeam(t);
+						s.setTeamId(t.getId());
+						s.setRound(r);
+						s.setRoundId(r.getId());
+						s.setPool(poolName);
+						retval.put(t.getId(), s);
+					}
 				}
 				return retval;
 			} else {

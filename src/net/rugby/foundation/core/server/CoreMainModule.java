@@ -24,6 +24,7 @@ import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ISponsorFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyClubhouseFactory;
@@ -46,6 +47,7 @@ import net.rugby.foundation.core.server.factory.ofy.OfyRawScoreFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfySponsorFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyStandingFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
 import com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet;
@@ -84,6 +86,7 @@ public class CoreMainModule extends AbstractModule {
 		bind(ISponsorFactory.class).to(OfySponsorFactory.class);
 		bind(IContentFactory.class).to(OfyContentFactory.class);
 		bind(ILineupSlotFactory.class).to(OfyLineupSlotFactory.class);
+		bind(IStandingFullFactory.class).to(OfyStandingFullFactory.class);
 	}
 }
 
