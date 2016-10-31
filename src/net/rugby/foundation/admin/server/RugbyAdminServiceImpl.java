@@ -1599,6 +1599,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		}
 	}
 
+
 	/**
 	 * Trying a different approach here, just try to re-run a new Pipeline with just the fetching task in it.
 	 */
@@ -1611,21 +1612,24 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 
 				Country c = new Country(5000L, "None", "NONE", "---", "Unassigned");
 				countryf.put(c);
-
 				PipelineService service = PipelineServiceFactory.newPipelineService();
 
 				IMatchGroup match = mf.get(tms.getMatchId());
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "refetchTeamMatchStats. team: " + team.getDisplayName() + " in match " + match.getDisplayName());
 
 				Home_or_Visitor hov = Home_or_Visitor.VISITOR;
 				if (match.getHomeTeamId().equals(team.getId())) {
 					hov = Home_or_Visitor.HOME;
 				}
 
+				// delete the old one
+				tmsf.delete(tms);
+				
 				String pipelineId = "";
 
 				//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
 				pipelineId = service.startNewPipeline(new ESPN6FetchTeamMatchStats(), match, hov, null, new JobSetting.MaxAttempts(3));
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "pipelineId: " + pipelineId);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "pipelineId: " + pipelineId);
 
 				while (true) {
 					Thread.sleep(2000);
@@ -1633,7 +1637,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 					switch (jobInfo.getJobState()) {
 					case COMPLETED_SUCCESSFULLY:
 						//service.deletePipelineRecords(pipelineId);
-						return getTeamMatchStats(match.getId(),tms.getTeamId()); // (List<IPlayerMatchStats>) jobInfo.getOutput();
+						return getTeamMatchStats(match.getId(),team.getId()); // (List<IPlayerMatchStats>) jobInfo.getOutput();
 					case RUNNING:
 						break;
 					case STOPPED_BY_ERROR:
@@ -1654,7 +1658,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			return null;
 		}
 	}
-
+	
 	@Override
 	public ITeamMatchStats saveTeamMatchStats(ITeamMatchStats tms, IAdminTask task) {
 		try {
