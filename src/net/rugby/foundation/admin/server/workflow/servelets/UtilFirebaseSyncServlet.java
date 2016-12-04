@@ -27,7 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-// /cron/weekendInit
+// /admin/firebase/sync
 @Singleton
 public class UtilFirebaseSyncServlet extends HttpServlet {
 
@@ -74,8 +74,10 @@ public class UtilFirebaseSyncServlet extends HttpServlet {
 	        // Note: Ensure that the [PRIVATE_KEY_FILENAME].json has read
 	        // permissions set.
 	        FirebaseOptions options = new FirebaseOptions.Builder()
-	            .setServiceAccount(getServletContext().getResourceAsStream("/WEB-INF/firebase-rugby-poc-6a6a9b2c92ff.json"))
-	            .setDatabaseUrl("https://fir-rugby-poc.firebaseio.com/")
+//	            .setServiceAccount(getServletContext().getResourceAsStream("/WEB-INF/firebase-rugby-poc-6a6a9b2c92ff.json"))
+	            .setServiceAccount(getServletContext().getResourceAsStream("/WEB-INF/rugby-forum-poc-2b7d9fe3169c.json"))
+	            //	            .setDatabaseUrl("https://fir-rugby-poc.firebaseio.com/")
+	            .setDatabaseUrl("https://rugby-forum-poc.firebaseio.com/")
 	            .build();
 
 	        try {

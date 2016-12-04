@@ -28,14 +28,19 @@ public class OfyMatchResultFactory extends BaseCachingFactory<IMatchResult> impl
 
 	@Override
 	protected IMatchResult getFromPersistentDatastore(Long id) {
-		if (id != null) {
-			Objectify ofy = DataStoreFactory.getOfy();
-			IMatchResult retval = ofy.get(new Key<SimpleScoreMatchResult>(SimpleScoreMatchResult.class,id));
-			return retval;
-		} else
+		try {
+			if (id != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+				IMatchResult retval = ofy.get(new Key<SimpleScoreMatchResult>(SimpleScoreMatchResult.class,id));
+				return retval;
+			} else
+				return null;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
+		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.core.server.factory.IMatchResultFactory#put(net.rugby.foundation.model.shared.IMatchResult)
 	 */

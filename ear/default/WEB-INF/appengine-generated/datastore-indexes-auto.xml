@@ -1,8 +1,8 @@
-<!-- Indices written at Fri, 21 Oct 2016 22:37:01 EDT -->
+<!-- Indices written at Mon, 21 Nov 2016 23:13:36 EST -->
 
 <datastore-indexes>
 
-    <!-- Used 1 time in query history -->
+    <!-- Used 113 times in query history -->
     <datastore-index kind="Competition" ancestor="false" source="auto">
         <property name="showToClient" direction="asc"/>
         <property name="underway" direction="asc"/>

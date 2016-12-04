@@ -8,6 +8,7 @@ import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.Content;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -15,6 +16,7 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
+import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.ScrumPlayer;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
 import net.rugby.foundation.topten.server.factory.IRoundNodeFactory;
@@ -40,6 +42,7 @@ public class TopTenV1 {
 	private IPlayerMatchStatsFactory pmsf;
 	private ITeamMatchStatsFactory tmsf;
 	private IPlayerFactory pf;
+	private IStandingFactory sf;
 	
 	private static Injector injector = null;
 
@@ -55,6 +58,7 @@ public class TopTenV1 {
 		this.pmsf = injector.getInstance(IPlayerMatchStatsFactory.class);
 		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
 		this.pf = injector.getInstance(IPlayerFactory.class);
+		this.sf =injector.getInstance(IStandingFactory.class);
 	}
 
 	@ApiMethod(name = "content.getcontent", httpMethod = "GET")
@@ -125,5 +129,15 @@ public class TopTenV1 {
 
 		return p;
 		
+	}
+	
+	@ApiMethod(name = "competition.getStandings", path="competitions/getStandings", httpMethod="GET")
+	public List<IStanding> getStandings(@Named("compId") Long compId, @Named("roundId") Long roundId) {
+		ICompetition c = cf.get(compId);
+		List<IStanding> retval = sf.getForRound(c.getNextRound());
+		if (retval == null || retval.isEmpty()) {
+			retval = sf.getForRound(c.getPrevRound());
+		}
+		return retval;
 	}
 }

@@ -47,7 +47,8 @@ public class EspnLineupFetcher extends JsonFetcher implements ILineupFetcher {
 	@Override
 	public List<ILineupSlot> get(boolean home) {
 		try {
-			String sHome = home ? "/lineUps/true" : "/lineUps/false";
+			//String sHome = home ? "/lineUps/true" : "/lineUps/false";
+			String sHome = home ? "/players/true" : "/players/false";
 			if (match.getForeignLeagueId() == null) {
 				url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/match/" + match.getForeignId() + sHome);
 			} else {
