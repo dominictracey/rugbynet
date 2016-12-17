@@ -34,7 +34,6 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 	 */
 	private static final long serialVersionUID = 5536925770981961238L;
 
-
 	@Override
 	protected IMatchGroup getFromPersistentDatastore(Long id) {
 		if (id == null) {
@@ -50,7 +49,14 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			if (g.getSimpleScoreMatchResultId() != null) {
 				IMatchResult mr = mrf.get(g.getSimpleScoreMatchResultId());
 //@JsonIgnore				mr.setMatch(g);
-				g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);  // @REX need to sort this out before other types of results are added
+				if (mr != null) {
+					g.setSimpleScoreMatchResult((ISimpleScoreMatchResult)mr);  // @REX need to sort this out before other types of results are added
+				} else {
+					g.setSimpleScoreMatchResultId(null);
+					g.setSimpleScoreMatchResult(null);
+					// @REX should save to self-clean oven?
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "The resultId for match " + g.getDisplayName() + " (" + g.getId() + ") is invalid. There is no SimpleMatchResult in the database with that id.");
+				}
 
 			}
 
@@ -95,6 +101,8 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			g.setHomeTeam(tf.get(g.getHomeTeamId()));
 			g.setVisitingTeam(tf.get(g.getVisitingTeamId()));
 			if (g.equals(match)) {
+				Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"MatchGroupFactory.find() Found an existing match for " + g.getDisplayName());
 				return g; // will have an id since it came out of the db
 			}
 		}
@@ -241,6 +249,28 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 			return list;
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getFutureMatchesForTeam", ex);
+			return null;
+		}
+	}
+
+
+
+	@Override
+	public IMatchGroup getMatchByEspnId(Long espnId) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<MatchGroup> qg = ofy.query(MatchGroup.class).filter("foreignId", espnId);			
+			IMatchGroup m = qg.get(); 
+			if (m != null) {
+				m.setHomeTeam(tf.get(m.getHomeTeamId()));
+				m.setVisitingTeam(tf.get(m.getVisitingTeamId()));
+				
+				//m.setRoundId(null);   //hmmm
+			}
+			
+			return m;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"getByEspnId", ex);
 			return null;
 		}
 	}

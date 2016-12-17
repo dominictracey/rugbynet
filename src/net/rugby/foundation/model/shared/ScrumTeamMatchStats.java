@@ -1,7 +1,9 @@
 package net.rugby.foundation.model.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Id;
 
@@ -75,6 +77,12 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 	private Integer penaltiesConceded;
 	private Integer yellowCards;
 	private Integer redCards;
+	
+
+	@Unindexed
+	private List<Long> taskIds;
+	@Unindexed
+	private List<Long> blockingTaskIds;
 	
 	public ScrumTeamMatchStats() {
 		tries = 0;                
@@ -646,6 +654,25 @@ public class ScrumTeamMatchStats implements Serializable, ITeamMatchStats {
 		yellowCards += s.getYellowCards();          
 		redCards += s.getRedCards();             	
 		
+	}
+	@Override
+	public List<Long> getTaskIds() {
+		if (taskIds == null) {
+			taskIds = new ArrayList<Long>();
+		}
+		return taskIds;
+	}
+	@Override
+	public void setTaskIds(List<Long> taskIds) {
+		this.taskIds = taskIds;
+	}
+
+	@Override
+	public List<Long> getBlockingTaskIds() {
+		if (blockingTaskIds == null) {
+			blockingTaskIds = new ArrayList<Long>();
+		}
+		return blockingTaskIds;
 	}
 	
 }

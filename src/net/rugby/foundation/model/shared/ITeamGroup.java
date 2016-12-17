@@ -64,5 +64,9 @@ public interface ITeamGroup extends IGroup {
 	 */
 	public abstract String getEspnName();
 	public abstract void setEspnName(String espnName);
+
+	Long getForeignId();
+
+	void setForeignId(Long foreignId);
 	
 }

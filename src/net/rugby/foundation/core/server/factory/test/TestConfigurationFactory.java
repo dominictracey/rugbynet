@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.BaseConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.CoreConfiguration;
 import net.rugby.foundation.model.shared.CoreConfiguration.Environment;
@@ -19,8 +20,8 @@ import net.rugby.foundation.model.shared.ICoreConfiguration;
 public class TestConfigurationFactory extends BaseConfigurationFactory {
 
 	@Inject
-	public TestConfigurationFactory(ICompetitionFactory cf, IUniversalRoundFactory urf) {
-		super(cf, urf);
+	public TestConfigurationFactory(ICompetitionFactory cf, IUniversalRoundFactory urf, IRatingSeriesFactory rsf) {
+		super(cf, urf, rsf);
 
 	}
 

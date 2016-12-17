@@ -48,7 +48,7 @@ public class MJ8PromoteMatch extends Job3<MS9Promoted, Long, String, ResultWithL
 	transient private ITopTenListFactory ttlf;
 
 	public MJ8PromoteMatch() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -80,7 +80,9 @@ public class MJ8PromoteMatch extends Job3<MS9Promoted, Long, String, ResultWithL
 			this.ttlf = injector.getInstance(ITopTenListFactory.class);
 			
 			IMatchGroup match = mf.get(matchId);
-
+			if (match != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": checking for match promoting for " + match.getDisplayName());
+			}
 			WorkflowStatus fromState = WorkflowStatus.RATED;
 			WorkflowStatus toState = WorkflowStatus.PROMOTED;
 			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_TO_PROMOTE);		
@@ -130,6 +132,8 @@ public class MJ8PromoteMatch extends Job3<MS9Promoted, Long, String, ResultWithL
 				retval.log.add(rule.getLog());
 				retval.log.add(match.getDisplayName() + " promotion complete at " + DateTime.now().toString());
 				retval.success = true;
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": completing promoting for " + match.getDisplayName());
+
 				return immediate(retval);
 			} else {
 				throw new RetryRequestException(match.getDisplayName() + " still underway at " + DateTime.now().toString());

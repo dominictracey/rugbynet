@@ -62,7 +62,7 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				//id
+				// summary
 				public Widget render(final T c) {
 					String pos = c.getSummary();
 					return new HTML(pos);
@@ -80,7 +80,7 @@ public class TaskViewColumnDefinitions<T extends IAdminTask> {
 			});
 
 			columnDefinitions.add(new ColumnDefinition<T>() {
-				// summary
+				// details
 				public Widget render(T c) {
 					String pos = c.getDetails();
 					return new HTML(pos);

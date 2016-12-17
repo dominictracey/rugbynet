@@ -9,6 +9,7 @@ import net.rugby.foundation.admin.client.ClientFactory.GetUniversalRoundsListCal
 import net.rugby.foundation.admin.client.ui.FieldDefinition;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.model.shared.ICompetition;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.UniversalRound;
 
@@ -18,12 +19,16 @@ import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -77,12 +82,12 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 				@Override
 				public void onCountryListFetched(List<ICountry> countryList) {
 					fieldDefinitions.setCountryList(countryList);
-					clientFactory.getCompListAsync(new GetCompListCallback() {
+					clientFactory.getCoreConfigurationAsync(true, new AsyncCallback<ICoreConfiguration>() {
 	
 						@Override
-						public void onCompListFetched(List<ICompetition> compList) {
+						public void onSuccess(ICoreConfiguration coreConfig) {
 							
-							fieldDefinitions.setCompList(compList);
+							fieldDefinitions.setConfig(coreConfig);
 
 							clientFactory.getUniversalRoundsListAsync(52, new GetUniversalRoundsListCallback() {
 
@@ -108,6 +113,11 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 									fieldDefinitions.getFieldDefinitions().get(i++).bind(minMinutes);
 								}
 							});
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Notify.notify("Failed to load core configuration so can't display series configurationd dialog", NotifyType.DANGER);
 						}
 					});
 				}
@@ -164,12 +174,12 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 				public void onCountryListFetched(List<ICountry> countries) {
 					fieldDefinitions.setCountryList(countries);
 					
-					clientFactory.getCompListAsync(new GetCompListCallback() {
+					clientFactory.getCoreConfigurationAsync(true, new AsyncCallback<ICoreConfiguration>() {
 	
 						@Override
-						public void onCompListFetched(List<ICompetition> comps) {
+						public void onSuccess(ICoreConfiguration coreConfig) {
 							
-							fieldDefinitions.setCompList(comps);
+							fieldDefinitions.setConfig(coreConfig);
 							
 							clientFactory.getUniversalRoundsListAsync(52, new GetUniversalRoundsListCallback() {
 
@@ -184,16 +194,21 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 								}
 							});
 						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Notify.notify("Failed to load core configuration so can't display series configurationd dialog", NotifyType.DANGER);
+						}
 					});
 				}
 			});
-		} else if (fieldDefinitions.getCompList() == null) {
-			clientFactory.getCompListAsync(new GetCompListCallback() {
+		} else if (fieldDefinitions.getConfig() == null) {
+			clientFactory.getCoreConfigurationAsync(true, new AsyncCallback<ICoreConfiguration>() {
 				
 				@Override
-				public void onCompListFetched(List<ICompetition> comps) {
+				public void onSuccess(ICoreConfiguration coreConfig) {
 					
-					fieldDefinitions.setCompList(comps);
+					fieldDefinitions.setConfig(coreConfig);
 					clientFactory.getUniversalRoundsListAsync(52, new GetUniversalRoundsListCallback() {
 
 						@Override
@@ -206,6 +221,12 @@ public class SeriesConfigPopupViewImpl<T> extends DialogBox implements SeriesCon
 							}
 						}
 					});
+				}
+
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Notify.notify("Failed to load core configuration so can't display series configurationd dialog", NotifyType.DANGER);
 				}
 			});
 		} else if (fieldDefinitions.getUrList() == null) {

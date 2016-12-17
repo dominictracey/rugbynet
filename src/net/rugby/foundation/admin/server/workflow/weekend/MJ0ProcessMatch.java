@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS4Underway;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS5Over;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS6Final;
@@ -11,6 +13,7 @@ import net.rugby.foundation.admin.server.workflow.weekend.results.MS7StatsFetche
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS9Promoted;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
+import net.rugby.foundation.admin.server.workflow.weekend.results.MS3LineupsAnnounced;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -33,7 +36,7 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 	transient private IMatchGroup match;
 
 	public MJ0ProcessMatch() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -46,7 +49,7 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 			}
 
 			this.mf = injector.getInstance(IMatchGroupFactory.class);
-
+			
 			MS0ProcessMatchResult result = new MS0ProcessMatchResult();
 
 			// valid round?
@@ -55,6 +58,8 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 				result.matchId = matchId;
 				result.log.add("No match could be found matching matchId " + matchId);
 				return immediate(result);
+			} else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": Starting processing for match " + match.getDisplayName());
 			}
 
 			String label = match.getDisplayName();
@@ -71,16 +76,26 @@ public class MJ0ProcessMatch extends Job3<MS0ProcessMatchResult, Long, Long, Str
 			// done or fail
 			JobSetting nowBackOffFactor = new JobSetting.BackoffFactor(2);
 			JobSetting nowBackOffSeconds = new JobSetting.BackoffSeconds(10); // retry at 10, 200 and 4000 seconds?
-			JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(3); // 
+			JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(7); // 
 
-			// make sure we start at LINEUPS (since we haven't implemented that yet
-			if (match.getWorkflowStatus() == null || match.getWorkflowStatus().ordinal() < WorkflowStatus.LINEUPS.ordinal()) {
-				match.setWorkflowStatus(WorkflowStatus.LINEUPS);
+			// make sure we start at PENDING
+			if (match.getWorkflowStatus() == null || match.getWorkflowStatus().ordinal() < WorkflowStatus.PENDING.ordinal()) {
+				match.setWorkflowStatus(WorkflowStatus.PENDING);
 				mf.put(match);
 			}
 			
+			// if the match is in the past, there is no point in waiting a half hour between retries...
+			if (match.getDate().before(DateTime.now().minusDays(1).toDate())) {
+				waitBackOffFactor = nowBackOffFactor;
+				waitBackOffSeconds = nowBackOffSeconds;
+				waitMaxAttempts = nowMaxAttempts;
+			}
+			
+			// fetch lineups
+			Value<MS3LineupsAnnounced> lineups = futureCall(new MJ2Lineups(), immediate(matchId), immediate(label), waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);
+			
 			// start the match
-			Value<MS4Underway> underway = futureCall(new MJ3StartMatch(), immediate(matchId), immediate(label), waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);
+			Value<MS4Underway> underway = futureCall(new MJ3StartMatch(), immediate(matchId), immediate(label), lineups, waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);
 			
 			// end the match
 			Value<MS5Over> over = futureCall(new MJ4EndMatch(), immediate(matchId), immediate(label), underway, waitBackOffFactor, waitBackOffSeconds, waitMaxAttempts);

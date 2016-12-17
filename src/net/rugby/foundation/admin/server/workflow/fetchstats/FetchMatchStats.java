@@ -30,9 +30,9 @@ public class FetchMatchStats extends Job1<MS7StatsFetched, Long> implements Seri
 
 	public enum Home_or_Visitor { HOME, VISITOR }
 
-	private static Injector injector = null;
-	transient private IPlayerFactory pf;
-	transient private IMatchGroupFactory mgf;
+	protected static Injector injector = null;
+	transient protected IPlayerFactory pf;
+	protected transient IMatchGroupFactory mgf;
 
 	
 	public FetchMatchStats() {

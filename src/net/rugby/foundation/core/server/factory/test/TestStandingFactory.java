@@ -116,4 +116,10 @@ public class TestStandingFactory extends BaseCachingFactory<IStanding> implement
 		}
 		return list;
 	}
+
+	@Override
+	public List<IStanding> getLatestForComp(Long compId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

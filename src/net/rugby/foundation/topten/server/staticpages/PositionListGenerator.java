@@ -1,5 +1,8 @@
 package net.rugby.foundation.topten.server.staticpages;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
@@ -8,8 +11,6 @@ import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
-import net.rugby.foundation.model.shared.Position;
-import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
 
@@ -33,6 +34,11 @@ public class PositionListGenerator {
 "			</div>" +
 "				<div class=''>" +
 "					<div class='list-group'>";
+		
+		if (compId == null) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "No global competition set in core configuration");
+			return "<-- no global competition set in the core configuration -->";
+		}
 		
 		// first see if we have an in form position series for the comp
 		IRatingSeries rs = rsf.get(compId, RatingMode.BY_POSITION);

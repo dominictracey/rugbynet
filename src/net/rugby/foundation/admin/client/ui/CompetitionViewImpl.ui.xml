@@ -59,6 +59,7 @@ Status
                         <strong>
 Import Comp:&nbsp;
                         </strong>
+                        provide first day of comp from Fixtures and Results <br/>e.g. (<i>http://www.espn.co.uk/rugby/fixtures/_/date/20160902/league/270559</i>)
                     </g:HTML>
 
                     <g:HorizontalPanel styleName="{style.newpanel}" >
@@ -83,6 +84,18 @@ ResultType:&nbsp;
                         </g:ListBox>
                     </g:HorizontalPanel>
 
+                     <g:HorizontalPanel styleName="{style.newpanel}" >
+
+                        <g:Label>
+Number of Weeks:&nbsp;
+                        </g:Label>
+
+                        <g:TextBox
+                            styleName="{style.urlbox}"
+                            ui:field="weeks" >
+                        </g:TextBox>
+                    </g:HorizontalPanel>
+                    
                     <g:HorizontalPanel styleName="{style.newpanel}" >
 
                         <g:Button ui:field="fetch" >

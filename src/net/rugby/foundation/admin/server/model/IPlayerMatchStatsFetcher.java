@@ -6,7 +6,7 @@ import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 
 
-public interface IPlayerMatchStatsFetcher {
+public interface IPlayerMatchStatsFetcher extends IJsonFetcher {
 
 	public boolean process();
 	void set(IPlayerMatchStats stats);

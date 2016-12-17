@@ -26,4 +26,6 @@ public interface ITeamGroupFactory extends ICachingFactory<ITeamGroup> {
 	 */
 	ITeamGroup getTeamByScrumName(String teamName);
 
+	ITeamGroup getTeamByForeignId(Long foreignId);
+
 }

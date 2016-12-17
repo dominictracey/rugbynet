@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
+import net.rugby.foundation.admin.server.model.EspnPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.rules.CoreRule;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
@@ -39,27 +40,33 @@ public class RuleMatchStatsToFetch extends CoreRule<IMatchGroup> {
 	 */
 	@Override
 	public Boolean test() {
+		
 		boolean fetch = false;
 
 		if (target != null) {
 
-			log = "RuleMatchStatsToFetch for Match " + target.getDisplayName() + " (" + target.getId().toString() + ")";
+			log = "RuleMatchStatsToFetch for Match " + target.getDisplayName() + " (" + target.getId().toString() + ")\n";
 
 			// don't fetch until we have final score
 			if (!target.getWorkflowStatus().equals(WorkflowStatus.FINAL)) {
-				log += "Rule failed: match must be in FINAL state. Currently in " + target.getWorkflowStatus().toString();
+				log += "Rule failed: match must be in FINAL state. Currently in " + target.getWorkflowStatus().toString() + "\n";
 				return false;
 			}
 
 
 			IPlayerMatchStatsFetcher fetcher = pmsff.getResultFetcher(pf.create(), target, Home_or_Visitor.HOME, 0, target.getForeignUrl());
+			
+			if (fetcher instanceof EspnPlayerMatchStatsFetcher) {
+				return true;  // don't think the new React presentation has a flopping?
+			}
+			
 			// make sure we get the latest and greatest
 			fetcher.setUrl(target.getForeignUrl());
 
 			if (fetcher.hasFlopped()) {
 				fetch = true;
 				DateTime now = new DateTime();
-				log += "Stats ready at " + now.toString();;
+				log += "Stats ready at " + now.toString() + "\n";
 				Logger.getLogger(RuleMatchStatsToFetch.class.getName()).log(Level.INFO,"Ready to look for results for match " + target.getDisplayName() +"("+ target.getId() + ")");
 
 			}

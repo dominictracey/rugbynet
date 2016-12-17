@@ -19,6 +19,8 @@ import net.rugby.foundation.topten.model.shared.Note;
 import net.rugby.foundation.topten.model.shared.NoteRef;
 import net.rugby.foundation.topten.model.shared.TopTenItem;
 import net.rugby.foundation.topten.model.shared.TopTenList;
+import net.rugby.foundation.topten.server.rest.RoundNode;
+import net.rugby.foundation.topten.server.rest.RoundNode.PlayerMatch;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
@@ -82,6 +84,7 @@ public class DataStoreFactory {
 			ObjectifyService.register(TopTenList.class);
 			ObjectifyService.register(TopTenItem.class);
 			ObjectifyService.register(Standing.class);
+			ObjectifyService.register(StandingFull.class);
 			ObjectifyService.register(RatingQuery.class);
 			ObjectifyService.register(Note.class);
 			ObjectifyService.register(NoteRef.class);
@@ -95,7 +98,12 @@ public class DataStoreFactory {
 			ObjectifyService.register(ServerPlace.class);
 			ObjectifyService.register(Sponsor.class);
 			
-			//ObjectifyService.register(Feature.class);
+			// REST components
+			ObjectifyService.register(RoundNode.class);
+			ObjectifyService.register(PlayerMatch.class);
+			
+			ObjectifyService.register(LineupSlot.class);
+			
 		}
 		
 		return ofy;

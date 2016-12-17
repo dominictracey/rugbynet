@@ -13,10 +13,16 @@ public abstract class ResultWithLog implements Serializable {
 	public Boolean success = false;
 	public static List<String> aggregate(List<ResultWithLog> logs) {
 		List<String> retval = new ArrayList<String>();
+		
 		for (ResultWithLog r : logs) {
+			StringBuilder builder = new StringBuilder();
 			if (r != null) {
-				retval.addAll(r.log);
+				for (String s : r.log) {
+					builder.append(s);
+					builder.append('\n');
+				}
 			}
+			retval.add(builder.toString());
 		}
 		
 		return retval;

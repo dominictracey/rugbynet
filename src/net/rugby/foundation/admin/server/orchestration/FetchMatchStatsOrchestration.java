@@ -18,6 +18,7 @@ import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.model.IResultFetcher;
+import net.rugby.foundation.admin.server.workflow.fetchstats.ESPN0FetchMatchStats;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.admin.shared.IOrchestrationConfiguration;
@@ -96,7 +97,7 @@ public class FetchMatchStatsOrchestration extends OrchestrationCore<IMatchGroup>
 
 						//pipelineId = service.startNewPipeline(new GenerateMatchRatings(pf, tmsf, pmsf, countryf, mref, pmrf), match, new JobSetting.MaxAttempts(1));
 						try {
-							pipelineId = service.startNewPipeline(new FetchMatchStats(), match.getId(), new JobSetting.MaxAttempts(3));
+							pipelineId = service.startNewPipeline(new ESPN0FetchMatchStats(), match.getId(), new JobSetting.MaxAttempts(3));
 						} catch (RetriesExhaustedException ree) {
 							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Bad stuff", ree);
 						}

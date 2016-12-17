@@ -2,14 +2,13 @@ package net.rugby.foundation.topten.client.ui;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Column;
-import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.html.Span;
-
 import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
 import net.rugby.foundation.topten.client.ClientFactory;
-import net.rugby.foundation.topten.model.shared.ITopTenItem;
+
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
@@ -18,7 +17,6 @@ import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
-
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -26,8 +24,8 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.CellPreviewEvent;
-import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
+import com.google.gwt.view.client.ListDataProvider;
 
 
 public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox implements RatingPopupView<T> 
@@ -131,7 +129,7 @@ public class RatingPopupViewImpl<T extends IPlayerRating> extends DialogBox impl
 				boolean isClick = "click".equals(event.getNativeEvent().getType());
 				if (isClick) {
 					if (event.getValue() != null && event.getValue().getScrumId() != null) {
-						clientFactory.showExternalLink("http://www.espn.co.uk/rugby/playerstats?gameId=" + event.getValue().getScrumId());
+						clientFactory.showExternalLink("http://en.espn.co.uk/scrum/rugby/match/" + event.getValue().getScrumId() + ".html");
 					}
 					
 				}

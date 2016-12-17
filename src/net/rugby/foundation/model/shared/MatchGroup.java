@@ -1,10 +1,13 @@
 package net.rugby.foundation.model.shared;
 
 import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.googlecode.objectify.annotation.Subclass;
+import com.googlecode.objectify.annotation.Unindexed;
 
 @Subclass
 public class MatchGroup extends Group implements IMatchGroup {
@@ -37,11 +40,15 @@ public class MatchGroup extends Group implements IMatchGroup {
 
 	private Long roundId; //parent object id
 	private Long foreignId;
+	private Long foreignLeagueId;
 	private String foreignUrl;
 	
 	protected String fetchMatchStatsPipelineId;
 	
 	protected String guid;
+	
+	@Unindexed
+	private List<String> workflowLog;
 
 	@Override
 	public boolean equals(Object o) {
@@ -52,10 +59,12 @@ public class MatchGroup extends Group implements IMatchGroup {
 		if (o != null) {
 			if (o instanceof MatchGroup) {
 				MatchGroup m = (MatchGroup)o;
-				return (m.getDisplayName().equals(getDisplayName()) &&
-						m.getHomeTeam().equals(getHomeTeam()) &&
-						m.getVisitingTeam().equals(getVisitingTeam()) &&
-						m.getDate().equals(getDate()));
+				if (m.getDisplayName() != null && m.getHomeTeam() != null && m.getVisitingTeam() != null && m.getDate() != null) {
+					return (m.getDisplayName().equals(getDisplayName()) &&
+							m.getHomeTeam().equals(getHomeTeam()) &&
+							m.getVisitingTeam().equals(getVisitingTeam()) &&
+							m.getDate().equals(getDate()));
+				}
 			}
 		}
 		
@@ -257,7 +266,7 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public void setForeignId(Long foreignId) {
 		this.foreignId = foreignId;
-		this.foreignUrl = "http://www.espnscrum.com/scrum/rugby/current/match/" + foreignId.toString() + ".html?view=scorecard";
+		this.foreignUrl = "http://en.espn.co.uk/scrum/rugby/match/" + foreignId.toString() + ".html?view=scorecard";
 	}
 
 	@Override
@@ -306,5 +315,22 @@ public class MatchGroup extends Group implements IMatchGroup {
 		this.guid = guid;
 	}
 
+	@Override
+	public void setWorkflowLog(List<String> log) {
+		this.workflowLog = log;	
+	}
+	
+	@Override
+	public List<String> getWorkflowLog() {
+		return workflowLog;
+	}
+	@Override
+	public Long getForeignLeagueId() {
+		return foreignLeagueId;
+	}
+	@Override
+	public void setForeignLeagueId(Long foreignLeagueId) {
+		this.foreignLeagueId = foreignLeagueId;
+	}
 
 }

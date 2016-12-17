@@ -12,6 +12,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -186,5 +187,6 @@ public class UrlCacher implements IUrlCacher {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
 
 }

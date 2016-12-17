@@ -36,6 +36,7 @@ public class EditComp extends Composite {
 		void deleteComp(ICompetition comp);
 		void setCompAsDefault(ICompetition comp);
 		void addRound(ICompetition comp);
+		void setCompAsGlobal(ICompetition comp);
 	} 
 	
 	public EditComp() {
@@ -59,6 +60,8 @@ public class EditComp extends Composite {
 	@UiField
 	TextBox twitter;
 	@UiField
+	TextBox espnId;
+	@UiField
 	TextBox ccid;
 	@UiField
 	CheckBox underway;
@@ -72,6 +75,8 @@ public class EditComp extends Composite {
 	@UiField
 	Button setAsDefault;
 	@UiField
+	Button setAsGlobal;
+	@UiField
 	Button addRound;
 	
 	ICompetition comp = null;
@@ -84,9 +89,13 @@ public class EditComp extends Composite {
 		comp.setAbbr(abbr.getText());
 		comp.setTTLTitleDesc(ttlDesc.getText());
 		comp.setTwitter(twitter.getText());
-		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
+		if (!espnId.getText().isEmpty())
+			comp.setForeignID(Long.parseLong(espnId.getText()));
+		if (!ccid.getText().isEmpty())
+			comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		comp.setUnderway(underway.getValue());
-		comp.setWeightingFactor(Float.parseFloat(weightingFactor.getText()));
+		if (!weightingFactor.getText().isEmpty())
+			comp.setWeightingFactor(Float.parseFloat(weightingFactor.getText()));
 		comp.setShowToClient(showInClient.getValue());
 		comp.setTableURL(tableUrl.getText());
 //		if (!compType.isItemSelected(-1)) {
@@ -103,6 +112,8 @@ public class EditComp extends Composite {
 		comp.setTTLTitleDesc(ttlDesc.getText());
 		comp.setTwitter(twitter.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
+		if (espnId.getText() != null && !espnId.getText().isEmpty())
+			comp.setForeignID(Long.parseLong(espnId.getText()));
 		comp.setUnderway(underway.getValue());
 		comp.setShowToClient(showInClient.getValue());
 		comp.setTableURL(tableUrl.getText());
@@ -124,17 +135,27 @@ public class EditComp extends Composite {
 		listener.setCompAsDefault(comp);
 	}
 	
+	@UiHandler("setAsGlobal")
+	void onClickSetAsGlobal(ClickEvent e) {
+		listener.setCompAsGlobal(comp);
+	}
+	
 	public void ShowComp(ICompetition comp) {
 		this.comp = comp;
 		longName.setText(comp.getLongName());
 		shortName.setText(comp.getShortName());
-		ccid.setText(comp.getCompClubhouseId().toString());
+		if (comp.getCompClubhouseId() != null)
+			ccid.setText(comp.getCompClubhouseId().toString());
+		if (comp.getForeignID() != null)
+			espnId.setText(comp.getForeignID().toString());
 		abbr.setText(comp.getAbbr());
 		ttlDesc.setText(comp.getTTLTitleDesc());
 		twitter.setText(comp.getTwitter());
 		underway.setValue(comp.getUnderway());
 		showInClient.setValue(comp.getShowToClient());
 		tableUrl.setText(comp.getTableURL());
+		if (comp.getForeignID() != null)
+			espnId.setText(comp.getForeignID().toString());
 		
 		if (comp.getWeightingFactor() != null) {
 			weightingFactor.setValue(comp.getWeightingFactor().toString());

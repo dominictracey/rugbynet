@@ -74,4 +74,8 @@
         <property name="homeTeamId" direction="desc"/>
     </datastore-index>
     
+    <datastore-index kind="RoundNode" ancestor="false" source="auto">
+        <property name="compId" direction="asc"/>
+        <property name="positionOrdinal" direction="desc"/>
+    </datastore-index>
 </datastore-indexes>

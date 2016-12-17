@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "rugby-forum-poc",
+  "private_key_id": "2b7d9fe3169cff675b89a5d563aebbfb9a8b591e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC+M1lkznQgW8SM\n7XqgE8LJDU8Vy0FlBIEaGOJlff5BpsVq/w6NfWYqY0c8irTihEE6rnkRfZjQ3VAs\nDj7lBknfnFtzObjXgnvkdXo+h9Lt2gv0oFkiddm7ojfAYDzRsKkcSnfsycFg6O9A\nYCFZDgsqUQwEnMYacLNUs7a38x30LqVQRVsUTwIg6L0wC1L7zdDPvQnhTmFg4vj5\nd6IDXFfrEiLvi7QKGixDVwpVZD7YGr7NtTe8323c7nrYsEl+9mx5O5CsOUu7kx8l\nEZwpsCNyruPVhC3grO41uEollIhSssGf9tdfTLcScwrENuee47V2QIbh1+YjBxPS\nqmA6f7FNAgMBAAECggEAFYx5x0sAqx3ageDx8KrseZzRZfW2Pfypp8xD8h25LbT4\nTuwAuRUI+ypuSrSoU7WKMlzMCKhDJP6984/Vnlr9CaGMVtymTXxSDwskQ2teAWaf\nziJQlu/lMDXrvRbqLROnxTXGqoQdLZ6WZKO/g3hs2Wl/RBKC+0Hjf2gw/lxD+4MP\nLbGTfsynVu941siP9e+PI2kNeeWFKCI7PvQZA4j9UJBaxrfL5s38HU/zmxiVtNzc\nr5UjkGxO7ZjsPeaoSq9YAyncdk9GTEiQb/ZgM4CW2tmi5MdZugu+S/uCuPBaKUGO\nQZos9jxx2yAapTVLLIVjS5G0eENZHzUeezoTi3n4gQKBgQDyRdLCiYhB8At4aPU5\nwxhg+KFGndkWZcGYkEJeaMkxAkpB9U+v3OSdwX4PxddXWCRsB78QPA46C+6Rip0Y\nYFc0FpI1Q1/IIF2jX41Ga1+rgnUoqEOxGkinnGlT93CxKaHHsbdwB/roGGEmr+ml\nVSno3aBsovn12HdOdQUBE5acYQKBgQDI+jeHQW+wT4WZPYE7GKkgKZLR0KVsKS4E\nWRhNt/M2k+g1ItR1CYc89MuapBfBJQ7r+ov054gqaDnOPuh3gxqPFJKu8bPO/Z08\n3YUoIhEV3hK19M2FGuGgWtc6tQzf5Zo3S9dCpGYLQmgGcXa5EkzR+ewxwsCD+fGG\n8tBFNJScbQKBgHoR3lCwtVvr1Au2bqDNATKS88e97szPNo1lWltxVrX/3mR/csg8\nd2BZRugxmf/jZG6eNJG8gLqUmn7wpZjLqgSPvtlhehg+3o9brLYnkcu77sYuifTp\nNmRlddid20UYofAZRkEHdE+PQRwaFJJ+Z6ByUsuKDoHlsK9yXLQfJ4rhAoGACdv0\ng2cbYovUIvtYbpy8Fz7S3AYfR1oRztbMEWv3u3KwDoNB5ufrwXrEzjZEkA4QWFU3\nLnF5RZNNWqfNYaeF0wUQWRK0XnAkmYrIcHqTWf5F7rUuq9vwu5wZOOEO26D42sOW\nsMc91kmQrtg8GcIjEJ3xD1Pde9v0FEmvG+YDcFUCgYEAval/fOYnz/wlIMCUypYI\nZbOWzd6av4q0bhWfl2rFZWoqOM/I0eR+K+PjBSmx+hqy6kU4OgWp777ex2XLtzdV\nwjrHlqBCqN1DqfZyXTZe/PJv7U7MarOYk4lQASCg5GPaPkDwzbVtSNDjERJevrNy\n/cVR1H2ablDuK845dIiKvr4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "forum-app@rugby-forum-poc.iam.gserviceaccount.com",
+  "client_id": "113388478714452503672",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/forum-app%40rugby-forum-poc.iam.gserviceaccount.com"
+}

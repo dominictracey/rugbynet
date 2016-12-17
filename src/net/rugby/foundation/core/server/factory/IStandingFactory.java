@@ -9,5 +9,8 @@ public interface IStandingFactory extends ICachingFactory<IStanding> {
 
 	List<IStanding> getForRound(IRound r);
 
+	List<IStanding> getLatestForComp(Long compId);
+
+
 
 }

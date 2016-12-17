@@ -6,10 +6,11 @@ import net.rugby.foundation.core.server.promote.IPromoter;
 import net.rugby.foundation.core.server.promote.TwitterPromoter;
 import net.rugby.foundation.topten.server.factory.INoteFactory;
 import net.rugby.foundation.topten.server.factory.INoteRefFactory;
+import net.rugby.foundation.topten.server.factory.IRoundNodeFactory;
 import net.rugby.foundation.topten.server.factory.ITopTenListFactory;
-import net.rugby.foundation.topten.server.factory.ofy.OfyNoteFactory;
 import net.rugby.foundation.topten.server.factory.test.TestNoteFactory;
 import net.rugby.foundation.topten.server.factory.test.TestNoteRefFactory;
+import net.rugby.foundation.topten.server.factory.test.TestRoundNodeFactory;
 import net.rugby.foundation.topten.server.factory.test.TestTopTenListFactory;
 import net.rugby.foundation.topten.server.utilities.INotesCreator;
 import net.rugby.foundation.topten.server.utilities.ISocialMediaDirector;
@@ -38,6 +39,8 @@ public class TopTenTestModule extends AbstractModule {
 		bind(TopTenNotesCreator.class);
 		bind(TriesScoredNotesCreator.class);
 		bind(TacklesNotesCreator.class);
+		bind(IRoundNodeFactory.class).to(TestRoundNodeFactory.class);
+//		bind(IPlayerMatchFactory.class).to(TestPlayerMatchFactory.class);
 	}
 	
 }

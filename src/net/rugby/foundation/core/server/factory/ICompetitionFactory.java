@@ -1,6 +1,7 @@
 package net.rugby.foundation.core.server.factory;
 
 import java.util.List;
+import java.util.Map;
 
 import net.rugby.foundation.model.shared.ICompetition;
 
@@ -25,10 +26,17 @@ public interface ICompetitionFactory extends ICachingFactory<ICompetition>{
 	
 	ICompetition getGlobalComp();
 	
-	List<ICompetition> getClientComps();
+	List<Long> getClientComps();
 
 	Boolean addRound(Long compId, int uri, String name);
 
 	List<ICompetition> getVirtualComps();
+
+	Map<Long, String> getAllCompIds();
+
+	List<Long> getUnderwayCompIds();
+
+	Map<Long, Float> getAllCompWeights();
+
 
 }

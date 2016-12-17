@@ -22,4 +22,8 @@ public interface IStanding extends IHasId {
 
 	void setTeam(ITeamGroup team);
 
+	Long getForeignId();
+
+	void setForeignId(Long foreignId);
+
 }

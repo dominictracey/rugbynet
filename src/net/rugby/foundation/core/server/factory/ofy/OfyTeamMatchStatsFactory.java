@@ -62,6 +62,8 @@ public class OfyTeamMatchStatsFactory extends BaseTeamMatchStatsFactory implemen
 			ScrumTeamMatchStats existing = ofy.query(ScrumTeamMatchStats.class).filter("teamId", tms.getTeamId()).filter("matchId", tms.getMatchId()).get();
 
 			if (existing != null) {
+				// remove from cache too
+				super.flushByMatchId(tms.getMatchId());
 				ofy.delete(existing);
 			}
 
@@ -77,9 +79,13 @@ public class OfyTeamMatchStatsFactory extends BaseTeamMatchStatsFactory implemen
 	@Override
 	public boolean deleteFromPersistentDatastore(ITeamMatchStats t) {
 		try {
-			Objectify ofy = DataStoreFactory.getOfy();
-			ofy.delete(t);
-			return true;
+			if (t != null) {
+				Objectify ofy = DataStoreFactory.getOfy();
+				ofy.delete(t);
+				return true;
+			} else {
+				return false;
+			}
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return false;

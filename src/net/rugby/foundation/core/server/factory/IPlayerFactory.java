@@ -6,5 +6,4 @@ public interface IPlayerFactory extends ICachingFactory<IPlayer> {
 	
 	IPlayer getByScrumId(Long id);
 
-
 }

@@ -772,8 +772,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 			//					compId = r.getCompId();
 			//				} else {
 			//					if (!r.getCompId().equals(compId)) {
-			//						//throw new RuntimeException("Currently don't support cross competition Top Ten Lists");
-			return ccf.get().getGlobalCompId();
+			throw new RuntimeException("Need to have set a host compId for the proposed top ten list...");
+			//return ccf.get().getGlobalCompId();
 			//					}
 			//				}
 			//			}

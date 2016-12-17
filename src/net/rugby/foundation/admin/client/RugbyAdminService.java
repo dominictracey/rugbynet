@@ -30,15 +30,18 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema20130713;
 import net.rugby.foundation.model.shared.UniversalRound;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("rugbyAdminService")
 public interface RugbyAdminService extends RemoteService {
 	ICompetition fetchCompetition(String url, List<IRound> rounds, List<ITeamGroup> teams, CompetitionType compType);
 	ICompetition saveCompetition(ICompetition comp, Map<String,ITeamGroup> teams);
-	Map<String, ITeamGroup> fetchTeams(String url, CompetitionType compType);
+	Map<String, ITeamGroup> fetchTeams(String url, String weeks, CompetitionType compType);
+	Map<String, ITeamGroup> saveTeams(Map<String, ITeamGroup> teams);
 	List<IRound>  fetchRounds(String url, Map<String, IMatchGroup> matches, CompetitionType compType);
 	Map<String, IMatchGroup> fetchMatches(String url, Map<String, ITeamGroup> teams, CompetitionType compType);
+	Map<String, IMatchGroup> fetchMatches(String urlDate, int weeksOffset, Map<String, ITeamGroup> teams, Map<String, IMatchGroup> matches, CompetitionType compType);
 	List<ICompetition> getComps(Filter filter);
 	IWorkflowConfiguration saveWorkflowConfig(IWorkflowConfiguration wfc);
 	Map<String, IOrchestrationConfiguration> getOrchestrationConfiguration();
@@ -74,6 +77,7 @@ public interface RugbyAdminService extends RemoteService {
 	 */
 	ICompetition getComp(Long compId);
 	Boolean setCompAsDefault(Long compId);
+	Boolean setCompAsGlobal(Long compId);
 	Boolean deleteComp(Long id);
 	
 	/**
@@ -135,7 +139,7 @@ public interface RugbyAdminService extends RemoteService {
 	Boolean deleteRatingQuery(IRatingQuery query);
 	IRatingQuery rerunRatingQuery(Long id);
 	String checkPipelineStatus(String id, Long matchId);
-	IMatchGroup AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId);
+	IMatchGroup AddMatchToRound(IRound round, Long homeTeamId, Long visitTeamId, Long espnMatchId, Long espnLeagueId);
 	String cleanUp();
 	
 	// rating series
@@ -161,4 +165,7 @@ public interface RugbyAdminService extends RemoteService {
 	List<Long> twitter(List<Long> blurbIds);
 	IRound saveRound(IRound r);
 	List<String> bulkUploadEmails(List<String> emailsValid);
+	IMatchGroup FetchLineups(Long id);
+	List<String> getMatchWorkflowLog(Long id);
+	
 }

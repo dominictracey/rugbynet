@@ -1,6 +1,11 @@
 package net.rugby.foundation.admin.client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.ui.AddMatchPopup;
@@ -52,6 +57,7 @@ import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.ICountry;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
@@ -101,6 +107,9 @@ public class ClientFactoryImpl implements ClientFactory {
 	private List<ColumnDefinition<IPlayerRating>> ratingListViewColumnDefinitions =  null;
 	private PromoteView<IBlurb> promoteListView = null;
 	private PromoteViewColumnDefinitions<IBlurb> promoteViewColumnDefinitions =  null;
+	private Map<Long,ICompetition> compMap = new HashMap<Long,ICompetition>();
+	
+	private ICoreConfiguration config = null;
 	
 	private AddRoundPopup addRoundPopup = null;
 	
@@ -126,6 +135,55 @@ public class ClientFactoryImpl implements ClientFactory {
 	@Override
 	public RugbyAdminServiceAsync getRpcService() {
 		return rpcService;
+	}
+	
+	@Override
+	public void getCompAsync(Long compId, final AsyncCallback<ICompetition> callback) {
+		
+		if (compMap.containsKey(compId)) {
+			callback.onSuccess(compMap.get(compId));
+		} else {
+			rpcService.getComp(compId, new AsyncCallback<ICompetition>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);				
+				}
+
+				@Override
+				public void onSuccess(ICompetition result) {
+					callback.onSuccess(result);
+					
+				}
+				
+			});
+		}
+
+	}
+	
+	@Override
+	public void getCoreConfigurationAsync(boolean reload, final AsyncCallback<ICoreConfiguration> cb) {
+		if (config == null || reload) {
+			rpcService.getConfiguration(new AsyncCallback<ICoreConfiguration>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Notify.notify("Failure fetching Core Configuration: " + caught.getLocalizedMessage(), NotifyType.DANGER);
+					cb.onFailure(caught);
+					
+				}
+
+				@Override
+				public void onSuccess(ICoreConfiguration result) {
+					config = result;
+					cb.onSuccess(result);
+				}
+				
+			});
+		} else {
+			assert (config != null);
+			cb.onSuccess(config);
+		}
 	}
 	
 	@Override

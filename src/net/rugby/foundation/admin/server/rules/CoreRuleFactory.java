@@ -6,6 +6,8 @@ package net.rugby.foundation.admin.server.rules;
 import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
 import net.rugby.foundation.admin.server.factory.ISeriesConfigurationFactory;
+import net.rugby.foundation.admin.server.factory.espnscrum.ILineupFetcherFactory;
+import net.rugby.foundation.admin.server.rules.match.RuleMatchLineupsAvailable;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchStatsToFetch;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToEnd;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToFinalScore;
@@ -13,6 +15,7 @@ import net.rugby.foundation.admin.server.rules.match.RuleMatchToLock;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToPromote;
 import net.rugby.foundation.admin.server.rules.match.RuleMatchToRate;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -37,10 +40,12 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 	private IPlayerFactory pf;
 	private IUniversalRoundFactory urf;
 	private IConfigurationFactory ccf;
+	private ILineupFetcherFactory lff;
+	private ICompetitionFactory cf;
 
 	@Inject
 	public CoreRuleFactory(IPlayerMatchStatsFetcherFactory pmsff, IRoundFactory rf, IResultFetcherFactory srff, ISeriesConfigurationFactory scf, 
-			IPlayerFactory pf, IUniversalRoundFactory urf, IConfigurationFactory ccf) {
+			IPlayerFactory pf, IUniversalRoundFactory urf, IConfigurationFactory ccf, ILineupFetcherFactory lff, ICompetitionFactory cf) {
 		this.pmsff = pmsff;
 		this.rf = rf;
 		this.srff = srff;
@@ -48,6 +53,8 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 		this.pf = pf;
 		this.urf = urf;
 		this.ccf = ccf;
+		this.lff = lff;
+		this.cf = cf;
 	}
 	
 	/* (non-Javadoc)
@@ -84,7 +91,9 @@ public class CoreRuleFactory implements ICoreRuleFactory {
 	 */
 	@Override
 	public IRule<IMatchGroup> get(IMatchGroup target, MatchRule rule) {
-		if (rule == MatchRule.MATCH_TO_LOCK) {
+		if (rule == MatchRule.MATCH_LINEUPS_AVAILABLE) {
+			return new RuleMatchLineupsAvailable(target, lff, cf, rf);
+		} else if (rule == MatchRule.MATCH_TO_LOCK) {
 			return new RuleMatchToLock(target);
 		} else if (rule == MatchRule.MATCH_TO_END) {
 			return new RuleMatchToEnd(target);

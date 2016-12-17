@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.rugby.foundation.admin.client.ClientFactory;
+import net.rugby.foundation.admin.client.place.AdminCompPlace.Filter;
 import net.rugby.foundation.admin.client.ui.playerlistview.PlayerListView;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
+import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.IPlayerRating;
@@ -27,14 +29,15 @@ public interface CompetitionView extends IsWidget {
 	void setPresenter(Presenter listener);
 	void showTeams(Map<String, ITeamGroup> teams);
 	void showRounds(List<IRound>  result);
+	void addMatches(Map<String, IMatchGroup> mgs);
 	void showMatches(Map<String, IMatchGroup> matches);
 	void showCompetition(ICompetition result);
 	void showStatus(String message);
 	
 	public interface Presenter {
 		void fetchCompetitionClicked(List<IRound> roundMap, CompetitionType compType);
-		void fetchTeamsClicked(String text, CompetitionType compType);
-		void fetchMatchesClicked(Map<String,ITeamGroup> teams, CompetitionType compType);
+		void fetchTeamsClicked(String text, String weeks, CompetitionType compType);
+		void fetchMatchesClicked(Map<String,ITeamGroup> teams, Map<String, IMatchGroup> matchMap, int numWeeks, int currWeek, CompetitionType compType);
 		void fetchRoundsClicked(Map<String, IMatchGroup> matches, CompetitionType compType);
 
 		void saveCompetitionClicked(ICompetition comp, Map<String,ITeamGroup> teams);
@@ -71,6 +74,8 @@ public interface CompetitionView extends IsWidget {
 		void editMatchInit(EditMatch editMatch, PlayerListView<IPlayerRating> editMatchStats, long matchId, long roundId, long compId);
 		
 		void virtualCompClicked();
+		void teamsClicked(long parseLong);
+		void roundsClicked(long parseLong);
 
 	}
 
@@ -112,5 +117,7 @@ public interface CompetitionView extends IsWidget {
 	void setSchemaList(List<ScrumMatchRatingEngineSchema> result);
 
 	SmartBar getSmartBar();
+	void addCompNames(ICoreConfiguration result, Filter filter);
+
 
 }

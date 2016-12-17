@@ -49,3 +49,6 @@ ear/engine/PlayerListMVP
 ear/engine/result
 ear/lib
 ear/default/WEB-INF/appengine-generated
+ear/test/**
+
+

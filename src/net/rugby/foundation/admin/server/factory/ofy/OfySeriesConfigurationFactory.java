@@ -123,7 +123,8 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 			for (ISeriesConfiguration sc : retval) {
 				sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
 				sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
-				sc.setSeries(sf.get(sc.getSeriesId()));
+//				if (sc.getSeriesId() != null)
+//					sc.setSeries(sf.get(sc.getSeriesId()));
 			}
 			return retval;
 		} catch (Throwable ex) {
@@ -167,7 +168,8 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 			for (ISeriesConfiguration sc : retval) {
 				sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
 				sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
-				sc.setSeries(sf.get(sc.getSeriesId()));
+				if (sc.getSeriesId() != null)
+					sc.setSeries(sf.get(sc.getSeriesId()));
 			}
 			if (retval.size() == 1) {
 				return retval.get(0);

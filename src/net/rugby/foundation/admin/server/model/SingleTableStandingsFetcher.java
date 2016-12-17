@@ -80,7 +80,7 @@ public class SingleTableStandingsFetcher implements IStandingsFetcher {
 
 		for (int i = 0; i < wholeFile.size(); i++) {
 			String line = wholeFile.get(i);
-			if (line.contains("data-mobile-force-responsive=")) {
+			if (line.contains("responsive-table-wrap")) {
 				StandingsTableLine = line;
 				break;
 			}

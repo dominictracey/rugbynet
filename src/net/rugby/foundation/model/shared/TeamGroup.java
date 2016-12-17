@@ -18,7 +18,16 @@ public class TeamGroup extends Group implements ITeamGroup {
 	private String twitter;
 	private String twitterChannel;
 	private String color;
-	
+	private Long foreignId;
+	@Override
+	public Long getForeignId() {
+		return foreignId;
+	}
+	@Override
+	public void setForeignId(Long foreignId) {
+		this.foreignId = foreignId;
+	}
+
 	public TeamGroup() {
 		setGroupType(GroupType.TEAM);
 	}

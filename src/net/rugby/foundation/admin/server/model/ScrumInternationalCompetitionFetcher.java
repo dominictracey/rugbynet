@@ -362,8 +362,11 @@ public class ScrumInternationalCompetitionFetcher implements IForeignCompetition
     }
 
 	@Override
-	public Boolean updateMatch(IMatchGroup match) {
-		assert(false);  // this one isn't used any more?
+	public Map<String, IMatchGroup> getMatches(String urlDate, int offsetWeeks, Map<String, ITeamGroup> teams,
+			Map<String, IMatchGroup> matches) {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 }

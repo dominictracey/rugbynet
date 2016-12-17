@@ -32,7 +32,7 @@ public class MJ4EndMatch extends Job3<MS5Over, Long, String, ResultWithLog> impl
 	transient private ICoreRuleFactory crf;
 
 	public MJ4EndMatch() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -59,7 +59,10 @@ public class MJ4EndMatch extends Job3<MS5Over, Long, String, ResultWithLog> impl
 			this.crf = injector.getInstance(ICoreRuleFactory.class);
 
 			IMatchGroup match = mf.get(matchId);
-
+			if (match != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": checking for match end for " + match.getDisplayName());
+			}
+			
 			WorkflowStatus fromState = WorkflowStatus.UNDERWAY;
 			WorkflowStatus toState = WorkflowStatus.OVER;
 			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_TO_END);		
@@ -81,6 +84,9 @@ public class MJ4EndMatch extends Job3<MS5Over, Long, String, ResultWithLog> impl
 				retval.log.add(rule.getLog());
 				retval.log.add(match.getDisplayName() + " ended at " + DateTime.now().toString());
 				retval.success = true;
+
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": match has ended: " + match.getDisplayName());
+				
 				return immediate(retval);
 			} else {
 				throw new RetryRequestException(match.getDisplayName() + " still underway at " + DateTime.now().toString());

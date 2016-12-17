@@ -14,11 +14,12 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.model.shared.IRound;
 
 import com.google.appengine.tools.pipeline.Job4;
+import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
 //@Singleton
-public class RJ9CompileRoundLog extends Job4<R0ProcessRoundResult, Long, List<MS0ProcessMatchResult>, List<MS8Rated>, RS3StandingsResult> implements Serializable {
+public class RJ9CompileRoundLog extends Job5<R0ProcessRoundResult, Long, List<MS0ProcessMatchResult>, List<MS8Rated>, RS3StandingsResult, List<String>> implements Serializable {
 
 	private static final long serialVersionUID = 483113213168220162L;
 
@@ -27,7 +28,7 @@ public class RJ9CompileRoundLog extends Job4<R0ProcessRoundResult, Long, List<MS
 	transient private IRoundFactory rf;
 
 	public RJ9CompileRoundLog() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -42,7 +43,7 @@ public class RJ9CompileRoundLog extends Job4<R0ProcessRoundResult, Long, List<MS
 	}
 	
 	@Override
-	public Value<R0ProcessRoundResult> run(Long roundId, List<MS0ProcessMatchResult> matchResults, List<MS8Rated> roundSeriesResults, RS3StandingsResult sr) {
+	public Value<R0ProcessRoundResult> run(Long roundId, List<MS0ProcessMatchResult> matchResults, List<MS8Rated> roundSeriesResults, RS3StandingsResult sr, List<String> graphUpdateOutput) {
 
 		try {
 			if (injector == null) {

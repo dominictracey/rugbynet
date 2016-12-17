@@ -11,6 +11,7 @@ import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IContentFactory;
 import net.rugby.foundation.core.server.factory.ICountryFactory;
+import net.rugby.foundation.core.server.factory.ILineupSlotFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlaceFactory;
@@ -23,6 +24,7 @@ import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ISponsorFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyClubhouseFactory;
@@ -32,6 +34,7 @@ import net.rugby.foundation.core.server.factory.ofy.OfyCompetitionFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyConfigurationFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyContentFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyCountryFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyLineupSlotFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyMatchResultFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlaceFactory;
@@ -44,6 +47,7 @@ import net.rugby.foundation.core.server.factory.ofy.OfyRawScoreFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyRoundFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfySponsorFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyStandingFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyTeamMatchStatsFactory;
 import com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet;
@@ -81,6 +85,8 @@ public class CoreMainModule extends AbstractModule {
 		bind(IPlaceFactory.class).to(OfyPlaceFactory.class);
 		bind(ISponsorFactory.class).to(OfySponsorFactory.class);
 		bind(IContentFactory.class).to(OfyContentFactory.class);
+		bind(ILineupSlotFactory.class).to(OfyLineupSlotFactory.class);
+		bind(IStandingFullFactory.class).to(OfyStandingFullFactory.class);
 	}
 }
 

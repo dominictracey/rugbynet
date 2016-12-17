@@ -4,6 +4,7 @@
 package net.rugby.foundation.model.shared;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -76,5 +77,13 @@ public interface IMatchGroup extends IGroup  {
 	public abstract String getGuid();
 
 	public abstract void setGuid(String guid);
+
+	public abstract void setWorkflowLog(List<String> log);
+
+	List<String> getWorkflowLog();
+
+	Long getForeignLeagueId();
+
+	void setForeignLeagueId(Long foreignLeagueId);
 	
 }

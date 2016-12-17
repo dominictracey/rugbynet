@@ -11,6 +11,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 
+import com.google.appengine.tools.pipeline.Job4;
 import com.google.appengine.tools.pipeline.Job5;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
@@ -31,7 +32,7 @@ public class CompileMatchStats extends Job5<MS7StatsFetched, Long, Long, List<Lo
 	}
 
 	@Override
-	public Value<MS7StatsFetched> run(Long hsId, Long vsId, List<Long> hpsIds, List<Long> vpsIds, String job) {
+	public Value<MS7StatsFetched> run(Long hsId, Long vsId, List<Long> psIds, List<Long> junk, String job) {
 		Injector injector = BPMServletContextListener.getInjectorForNonServlets();
 
 		this.mf = injector.getInstance(IMatchGroupFactory.class);
@@ -44,7 +45,7 @@ public class CompileMatchStats extends Job5<MS7StatsFetched, Long, Long, List<Lo
 		ITeamMatchStats hs = tmsf.get(hsId);
 		IMatchGroup match = null;
 		if (hs == null) {
-			GenerateFetchMatchResults retval = new GenerateFetchMatchResults(hsId, vsId, hpsIds, vpsIds, job);
+			GenerateFetchMatchResults retval = new GenerateFetchMatchResults(hsId, vsId, psIds, null, job);
 			
 			MS7StatsFetched wrapper = new MS7StatsFetched();
 			wrapper.fetchSubTreeResults = retval;
@@ -81,7 +82,7 @@ public class CompileMatchStats extends Job5<MS7StatsFetched, Long, Long, List<Lo
 //			log.add("Done fetching stats for matches in " + round.getName());
 //		}
 		
-		GenerateFetchMatchResults retval = new GenerateFetchMatchResults(hsId, vsId, hpsIds, vpsIds, job);
+		GenerateFetchMatchResults retval = new GenerateFetchMatchResults(hsId, vsId, psIds, junk, job);
 		retval.log.addAll(log);
 		MS7StatsFetched wrapper = new MS7StatsFetched();
 		wrapper.fetchSubTreeResults = retval;

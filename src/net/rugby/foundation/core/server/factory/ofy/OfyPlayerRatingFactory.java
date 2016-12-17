@@ -6,14 +6,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.joda.time.DateTime;
-
-import com.google.appengine.api.datastore.QueryResultIterable;
-import com.google.inject.Inject;
-import com.googlecode.objectify.Query;
-import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
@@ -25,8 +17,12 @@ import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.PlayerRating;
-import net.rugby.foundation.model.shared.RatingQuery;
-import net.rugby.foundation.model.shared.PlayerRating.RatingComponent;
+
+import com.google.appengine.api.datastore.QueryResultIterable;
+import com.google.inject.Inject;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> implements IPlayerRatingFactory {
 
@@ -125,7 +121,10 @@ public class OfyPlayerRatingFactory extends BaseCachingFactory<IPlayerRating> im
 					r.setPlayer(pf.get(r.getPlayerId()));
 				}
 				for (Long pmsid : r.getMatchStatIds()) {
-					r.addMatchStats(pmsf.get(pmsid));
+					IPlayerMatchStats pms = pmsf.get(pmsid);
+					if (pms != null) {
+						r.addMatchStats(pms);
+					}
 				}
 			}
 			return list;

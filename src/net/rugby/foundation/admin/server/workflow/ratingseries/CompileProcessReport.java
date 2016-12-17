@@ -19,6 +19,8 @@ import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRatingSeries;
+import net.rugby.foundation.model.shared.RatingMode;
+import net.rugby.foundation.topten.server.factory.IRoundNodeFactory;
 
 import org.joda.time.DateTime;
 
@@ -130,6 +132,13 @@ public class CompileProcessReport extends Job4<MS8Rated, List<ProcessRatingQuery
 				}
 			} else {
 				wrapper.success = retval.success; // fucking stupid and confusing
+			}
+			
+			// also, if this is a BY_POSITION series, drop the cached versions of the RoundNode lists to force the new one to be created.
+			if (sc.getMode().equals(RatingMode.BY_POSITION)) {
+				IRoundNodeFactory rnf = injector.getInstance(IRoundNodeFactory.class);
+				for (int i = 0; i<10; ++i)
+					rnf.dropListFromCache(sc.getHostCompId(),i);
 			}
 
 			return immediate(wrapper);

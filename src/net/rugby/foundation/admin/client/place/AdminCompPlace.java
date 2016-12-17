@@ -13,7 +13,7 @@ import com.google.gwt.place.shared.Prefix;
 public class AdminCompPlace extends Place {
   
 	private String token;
-	public enum Filter { ALL, UNDERWAY }
+	public enum Filter { ALL, UNDERWAY, CLIENT }
 	private Filter filter;
 	private String seps = "[=&]";
 	

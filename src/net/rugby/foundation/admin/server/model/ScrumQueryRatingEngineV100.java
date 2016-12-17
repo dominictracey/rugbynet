@@ -139,7 +139,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 
 	public ScrumQueryRatingEngineV100() {
-
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 	public ScrumQueryRatingEngineV100(IPlayerFactory pf, IMatchGroupFactory mf, IPlayerRatingFactory prf, IRoundFactory rf, IStandingFactory sf, 
@@ -1219,7 +1219,7 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		for (IPlayerMatchStats pms : playerStats) {
 			if (pms.getPosition() == position.RESERVE || pms.getTimePlayed() == null) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Trying to invoke engine with PlayerMatchStats for " + pms.getName() + " from team " + pms.getTeamAbbr() + " but his position in RESERVE or timePlayed not set. A task was probably missed. Match stats dropped.");
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"Trying to invoke engine with PlayerMatchStats for " + pms.getName() + " from team " + pms.getTeamAbbr() + " but his position in RESERVE or timePlayed not set. A task was probably missed. Match stats dropped.");
 				// what we need is a link to the admin console that allows you to address this:
 				// /Admin.html?editPlayerMatchStats=3904809234234
 				// or even a RESTful thimgie
@@ -1234,8 +1234,9 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 		
 		// if we didn't find stats for one of the teams, return false
 		if (teamchecker != null) {
-			for (Boolean b : teamchecker.values()) {
-				if (!b) {
+			for (Long tid : query.getTeamIds()) {
+				if (!teamchecker.get(tid)) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "No stats available for team id " + tid + " in query " + query.getLabel() + ". Aborting rating engine initialization.");
 					return false;
 				}
 			}
@@ -1412,8 +1413,14 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 		if (pmsl != null && !pmsl.isEmpty()) {
 			retval = addPlayerStats(pmsl);
+			
 			if (retval) {
 				retval = addTeamStats(tmsf.query(q));
+				if (!retval) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Failed to set team match stats for query " + q.getLabel());
+				}
+			} else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Failed to set player match stats for query " + q.getLabel());
 			}
 		}
 		return retval;

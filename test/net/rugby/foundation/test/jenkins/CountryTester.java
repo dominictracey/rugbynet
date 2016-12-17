@@ -69,8 +69,6 @@ public class CountryTester {
 		c = cf.getById(5001L);
 		assertTrue(c != null);
 		assertTrue(c.getAbbr().equals("NZL"));
-
-		assertTrue(27 == 27);
 	}
 
 	@Test

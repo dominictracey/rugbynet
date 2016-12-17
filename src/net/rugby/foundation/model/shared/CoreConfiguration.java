@@ -25,6 +25,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	
 	@Transient
 	private HashMap<Long, HashMap<RatingMode,Long>> seriesMap = new HashMap<Long, HashMap<RatingMode,Long>>();
+	@Transient
 	private List<Long> compsUnderway = new ArrayList<Long>();
 	
 	// default compId
@@ -35,8 +36,10 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	public enum Environment { LOCAL, DEV, BETA, PROD }
 	private Environment environment;
 
+	@Transient
 	private List<Long> compsForClient = new ArrayList<Long>();
-	
+	@Transient
+	private List<Long> compsAll = new ArrayList<Long>();
 	@Transient
 	protected int currentUROrdinal = -1;
 	
@@ -140,6 +143,10 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	private final static String BETA_BASE_TOPTEN_URL = "http://beta.rugby.net/";
 	private final static String PROD_BASE_TOPTEN_URL = "http://www.rugby.net/";
 	
+	private final static String LOCAL_BASE_NODE_URL = "http://127.0.0.1:8080/";
+	private final static String DEV_BASE_NODE_URL = "http://nodejs-1378.appspot.com/";
+	private final static String BETA_BASE_NODE_URL = "http:/nodejs-1378.appspot.com/";
+	private final static String PROD_BASE_NODE_URL = "http://nodejs-rugby-prod.appspot.com/";
 	// Facebook
 //	private final static String FB_LOCAL_BASE_TOPTEN_URL = "http://127.0.0.1:8888/fb/topten.html";
 //	private final static String FB_DEV_BASE_TOPTEN_URL = "http://dev.rugby.net/fb/topten.html";
@@ -624,6 +631,7 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 			}
 			
 			compsForClient.remove(compId);
+			compsAll.remove(compId);
 			
 			return true;
 		}
@@ -656,6 +664,20 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 		}
 	}
 	
+	@Override
+	public String getBaseNodeUrl() {
+		if (environment == Environment.PROD) {
+			return PROD_BASE_NODE_URL;
+		} else if (environment == Environment.BETA){
+			return BETA_BASE_NODE_URL;
+		} else if (environment == Environment.DEV){
+			return DEV_BASE_NODE_URL;
+		} else if (environment == Environment.LOCAL){
+			return LOCAL_BASE_NODE_URL;
+		} else {
+			throw (new RuntimeException("Environment not set"));
+		}
+	}
 //	@Override
 //	public String getBaseToptenUrlForFacebook() {
 //		if (environment == Environment.PROD) {
@@ -708,6 +730,11 @@ public class CoreConfiguration extends HasInfo implements ICoreConfiguration, Se
 	@Override
 	public void setCurrentUROrdinal(int currentUROrdinal) {
 		this.currentUROrdinal = currentUROrdinal;
+	}
+
+	@Override
+	public List<Long> getAllComps() {
+		return compsAll;
 	}
 
 

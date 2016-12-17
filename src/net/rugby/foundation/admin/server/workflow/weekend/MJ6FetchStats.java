@@ -9,7 +9,7 @@ import net.rugby.foundation.admin.server.rules.ICoreRuleFactory.MatchRule;
 import net.rugby.foundation.admin.server.rules.IRule;
 import net.rugby.foundation.admin.server.workflow.ResultWithLog;
 import net.rugby.foundation.admin.server.workflow.RetryRequestException;
-import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats;
+import net.rugby.foundation.admin.server.workflow.fetchstats.ESPN0FetchMatchStats;
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS7StatsFetched;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
@@ -33,7 +33,7 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 	transient private ICoreRuleFactory crf;
 
 	public MJ6FetchStats() {
-		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
+		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.INFO);
 	}
 
 
@@ -61,7 +61,10 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 			this.crf = injector.getInstance(ICoreRuleFactory.class);
 
 			IMatchGroup match = mf.get(matchId);
-
+			if (match != null) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": checking for match stats for " + match.getDisplayName());
+			}
+			
 			WorkflowStatus fromState = WorkflowStatus.FINAL;
 			//WorkflowStatus toState = WorkflowStatus.FETCHED;   // << set in fetchstats.CompileMatchStats
 			IRule<IMatchGroup> rule = crf.get(match, MatchRule.MATCH_STATS_AVAILABLE);		
@@ -78,7 +81,8 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 			// 			
 			if (rule.test()) {
 				// update state
-				Value<MS7StatsFetched> val = futureCall(new FetchMatchStats(), immediate(match.getId()));
+				//Value<MS7StatsFetched> val = futureCall(new FetchMatchStats(), immediate(match.getId()));
+				Value<MS7StatsFetched> val = futureCall(new ESPN0FetchMatchStats(), immediate(match.getId()));
 				retval.log.add(rule.getLog());
 				retval.log.add("Fetch match stats initiated at " + DateTime.now().toString());
 				// this happens inside fetchstats.CompileMatchStats
@@ -87,6 +91,7 @@ public class MJ6FetchStats extends Job3<MS7StatsFetched, Long, String, ResultWit
 //				
 //				retval.log.add(rule.getLog());
 //				retval.log.add(match.getDisplayName() + " fetched stats " + DateTime.now().toString());
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, this.getJobDisplayName() + ": Match stats ready and fetching triggered for " + match.getDisplayName());
 				return val;
 			} else {
 				// if it was more than 3 days ago, give up and mark the match NO_STATS
