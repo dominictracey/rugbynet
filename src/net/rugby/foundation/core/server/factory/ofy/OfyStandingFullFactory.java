@@ -2,6 +2,7 @@ package net.rugby.foundation.core.server.factory.ofy;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -16,8 +17,8 @@ public class OfyStandingFullFactory extends OfyStandingFactory implements IStand
 	private static final long serialVersionUID = -3011818629485838725L;
 
 	@Inject
-	public OfyStandingFullFactory(IRoundFactory rf, ITeamGroupFactory tf) {
-		super(rf, tf);
+	public OfyStandingFullFactory(IRoundFactory rf, ITeamGroupFactory tf, ICompetitionFactory cf) {
+		super(rf, tf, cf);
 	}
 	
 	@Override

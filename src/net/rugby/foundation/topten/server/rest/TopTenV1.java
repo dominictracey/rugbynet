@@ -58,7 +58,7 @@ public class TopTenV1 {
 		this.pmsf = injector.getInstance(IPlayerMatchStatsFactory.class);
 		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
 		this.pf = injector.getInstance(IPlayerFactory.class);
-		this.sf =injector.getInstance(IStandingFactory.class);
+		this.sf = injector.getInstance(IStandingFactory.class);
 	}
 
 	@ApiMethod(name = "content.getcontent", httpMethod = "GET")
@@ -132,12 +132,14 @@ public class TopTenV1 {
 	}
 	
 	@ApiMethod(name = "competition.getStandings", path="competitions/getStandings", httpMethod="GET")
-	public List<IStanding> getStandings(@Named("compId") Long compId, @Named("roundId") Long roundId) {
-		ICompetition c = cf.get(compId);
-		List<IStanding> retval = sf.getForRound(c.getNextRound());
-		if (retval == null || retval.isEmpty()) {
-			retval = sf.getForRound(c.getPrevRound());
-		}
+	public List<IStanding> getStandings(@Named("compId") Long compId, @Named("uro") Long universalRoundOrdinal) {
+		List<IStanding> retval = sf.getLatestForComp(compId);
 		return retval;
+	}
+	
+	@ApiMethod(name = "match.get", path="match/get", httpMethod="GET")
+	public IMatchGroup getMatch(@Named("id") Long id) {
+		return mgf.get(id);
+		
 	}
 }

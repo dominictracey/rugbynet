@@ -150,12 +150,16 @@ public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStan
 					for (int j=0; j<poolArray.length(); ++j) {
 						IStandingFull s = mapper.readValue(poolArray.getJSONObject(j).toString(), StandingFull.class);
 						ITeamGroup t = tf.getTeamByForeignId(s.getForeignId());
-						s.setTeam(t);
-						s.setTeamId(t.getId());
-						s.setRound(r);
-						s.setRoundId(r.getId());
-						s.setPool(poolName);
-						retval.put(t.getId(), s);
+						if (t != null) {
+							s.setTeam(t);
+							s.setTeamId(t.getId());
+							s.setRound(r);
+							s.setRoundId(r.getId());
+							s.setPool(poolName);
+							retval.put(t.getId(), s);
+						} else {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Couldn't find a team in our database with foreignID " + s.getForeignId() + ". Probably fucking Bristol.");
+						}
 					}
 				}
 				return retval;

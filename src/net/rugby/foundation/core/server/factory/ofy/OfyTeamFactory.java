@@ -156,12 +156,18 @@ public class OfyTeamFactory extends BaseTeamFactory implements ITeamGroupFactory
 			Query<Group> team = ofy.query(Group.class).filter("foreignId", foreignId);
 
 			if (team.list().size() > 1) {
-				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"We have more than one team group in the dataBase that have either the same foreignId. This is most likely a Bad Thing(tm)!");
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"We have more than one team group in the dataBase that have either the same foreignId (" + foreignId + "). This is most likely a Bad Thing(tm)!");
 			}
 			
 			if (team.count() > 0) {
-				return (ITeamGroup)team.list().get(0);
+				if (team.list().get(0).getGroupType() == Group.GroupType.TEAM) {
+					return (ITeamGroup)team.list().get(0);
+				} else {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"TeamFactory.getTeamByForeignId found group of type " + team.list().get(0).getGroupType() + " for id " + foreignId);
+					return null;
+				}
 			} else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING,"TeamFactory.getTeamByForeignId couldn't find a team for id " + foreignId);
 				return null;
 			}
 		} catch (Throwable ex) {

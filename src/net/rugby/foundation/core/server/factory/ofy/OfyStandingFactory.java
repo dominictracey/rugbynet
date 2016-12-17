@@ -18,10 +18,13 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.core.server.factory.BaseCachingFactory;
+import net.rugby.foundation.core.server.factory.BaseStandingFactory;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.DataStoreFactory;
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
@@ -32,7 +35,7 @@ import net.rugby.foundation.model.shared.Standing;
  * @author home
  *
  */
-public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements IStandingFactory, Serializable {
+public class OfyStandingFactory extends BaseStandingFactory implements IStandingFactory, Serializable {
 
 	/**
 	 * 
@@ -40,11 +43,13 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 	private static final long serialVersionUID = 5267158546061782777L;
 	private IRoundFactory rf;
 	private ITeamGroupFactory tf;
+	private ICompetitionFactory cf;
 
 	@Inject
-	public OfyStandingFactory(IRoundFactory rf, ITeamGroupFactory tf) {
+	public OfyStandingFactory(IRoundFactory rf, ITeamGroupFactory tf, ICompetitionFactory cf) {
 		this.rf = rf;
 		this.tf = tf;
+		this.cf = cf;
 	}
 
 	/* (non-Javadoc)
@@ -156,5 +161,38 @@ public class OfyStandingFactory extends BaseCachingFactory<IStanding> implements
 		s.setTeamId(t.getId());
 		s.setStanding(2);
 		return s;
+	}
+
+	@Override
+	public List<IStanding> getLatestForCompFromPersistentDatastore(Long compId) {
+		try {
+			List<IStanding> list = new ArrayList<IStanding>();
+			ICompetition c = cf.get(compId);
+			IRound r = c.getNextRound();
+			
+			Long rid = r == null ? 0L : r.getId();
+			
+			Objectify ofy = DataStoreFactory.getOfy();
+			Query<Standing> qs = ofy.query(Standing.class).filter("roundId", rid).order("standing");
+
+			
+			if (qs.count() == 0 || r == null) {
+				r = c.getPrevRound();
+				if (r != null) {
+					qs = ofy.query(Standing.class).filter("roundId", r.getId()).order("standing");
+				}
+			}
+			
+			if (qs.count() != 0) {
+				for (Standing s : qs) {
+					list.add((IStanding)s);
+				}
+			}
+			
+			return list;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
+			return null;
+		}
 	}
 }
