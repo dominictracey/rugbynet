@@ -143,7 +143,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			
 			// the last token of the url is the league id
 			String toks[] = homePage.split("/");
-			espnLeagueId = Long.parseLong(toks[toks.length-1]);
+			espnLeagueId = Long.parseLong(toks[toks.length-3]);
 			
 			assert (espnLeagueId != null);
 
@@ -201,7 +201,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 		
 		
 		// the date of the first match is in there
-		startDate = toks[toks.length-3];
+		startDate = toks[toks.length-1];
 		assert startDate != null;
 	}
 

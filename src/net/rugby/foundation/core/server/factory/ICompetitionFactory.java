@@ -29,7 +29,8 @@ public interface ICompetitionFactory extends ICachingFactory<ICompetition>{
 	List<Long> getClientComps();
 
 	Boolean addRound(Long compId, int uri, String name);
-
+	Boolean scrapeRound(Long compId, int uri, String name);
+	
 	List<ICompetition> getVirtualComps();
 
 	Map<Long, String> getAllCompIds();
@@ -37,6 +38,8 @@ public interface ICompetitionFactory extends ICachingFactory<ICompetition>{
 	List<Long> getUnderwayCompIds();
 
 	Map<Long, Float> getAllCompWeights();
+
+
 
 
 }

@@ -152,6 +152,7 @@ public interface RugbyAdminService extends RemoteService {
 	ICompetition addVirtualComp();
 	ISeriesConfiguration rollBackSeriesConfiguration(Long id);
 	Boolean addRound(Long compId, int uri, String name);
+	Boolean scrapeRound(Long compId, int uri, String name);
 	
 	// promote
 	List<IBlurb> getAllBlurbs(Boolean active);

@@ -446,5 +446,11 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 		return null;
 	}
 
+	@Override
+	public Boolean scrapeRound(Long compId, int uri, String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

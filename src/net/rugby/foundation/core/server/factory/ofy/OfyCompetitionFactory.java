@@ -560,6 +560,12 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 		}
 	}
 
+	@Override
+	public Boolean scrapeRound(Long compId, int uri, String name) {
+		// TODO SCOTT THIS IS WHERE YOU SHOULD WRITE SOME CODE
+		return null;
+	}
+
 
 
 }

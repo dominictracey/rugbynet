@@ -3,38 +3,21 @@
  */
 package net.rugby.foundation.admin.client.ui;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.ClientFactory.GetUniversalRoundsListCallback;
-import net.rugby.foundation.admin.shared.ISeriesConfiguration;
-import net.rugby.foundation.admin.shared.TopTenSeedData;
-import net.rugby.foundation.core.client.Core;
 import net.rugby.foundation.model.shared.ICompetition;
-import net.rugby.foundation.model.shared.ICoreConfiguration;
-import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.UniversalRound;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonGroup;
-import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.ListBox;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -53,6 +36,7 @@ public class AddRoundPopup extends DialogBox {
 
 	public interface AddRoundPopupPresenter {
 		void addRound(ICompetition comp, int uri, String name);
+		void scrapeRound(ICompetition comp, int uri, String name);
 		void cancelAddRound();
 	} 
 
@@ -63,6 +47,7 @@ public class AddRoundPopup extends DialogBox {
 	}
 
 	@UiField Button save;
+	@UiField Button scrape;
 	@UiField Button cancel;
 	@UiField TextBox name;
 	@UiField ListBox urList;
@@ -95,7 +80,13 @@ public class AddRoundPopup extends DialogBox {
 		listener.addRound(comp, Integer.parseInt(urList.getValue(index),10), name.getValue());
 	}
 
-
+	@UiHandler("scrape")
+	void onClickScrape(ClickEvent e) {
+		int index = urList.getSelectedIndex();
+		//UniversalRound ur = universalRounds.get(index);
+		listener.scrapeRound(comp, Integer.parseInt(urList.getValue(index),10), name.getValue());
+	}
+	
 	@UiHandler("cancel")
 	void onClickCacnel(ClickEvent e) {
 		listener.cancelAddRound();
