@@ -40,7 +40,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	//private Map<String, IMatchGroup> matchMap = new HashMap<String, IMatchGroup>();
 	private List<IRound> roundMap = new ArrayList<IRound>();
 
-	// http://www.espn.co.uk/rugby/fixtures/_/date/20160902/league/267979
+	// http://www.espn.co.uk/rugby/fixtures/_/league/267979/date/20160902
 	private String homePage;
 	protected Long espnLeagueId;
 	//private String resultType;
@@ -349,7 +349,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 		
 		try {		
 			Map<String, IMatchGroup> tempMatchMap = new HashMap<String, IMatchGroup>();
-			url = new URL(ccf.get().getBaseNodeUrl() + "v0.9/admin/scraper/league/" + espnLeagueId + "/date/" + dateString + "/matches");
+			url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + espnLeagueId + "/date/" + dateString + "/matches");
 			
 			JSONArray retval = get();			
 			
