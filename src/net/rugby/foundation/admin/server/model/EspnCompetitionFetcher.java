@@ -1,4 +1,5 @@
 package net.rugby.foundation.admin.server.model;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -22,16 +23,21 @@ import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.rugby.foundation.admin.server.factory.IResultFetcherFactory;
+import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
+import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.factory.UniversalRoundFactory;
 import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.TeamGroup;
+import net.rugby.foundation.model.shared.UniversalRound;
+import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
 
 
 public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompetitionFetcher {
@@ -50,18 +56,23 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	private ITeamGroupFactory tf;
 	private IConfigurationFactory ccf;
 	private String startDate;
+	private ICompetitionFactory cf;
+	private IUniversalRoundFactory urf;
 
 	@SuppressWarnings("unused")
 	private EspnCompetitionFetcher() {
 		// use the quasi-injector
 	}
 
-	public EspnCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory srff, ITeamGroupFactory tf, IConfigurationFactory ccf) {
+	public EspnCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory srff, ITeamGroupFactory tf, 
+			IConfigurationFactory ccf, ICompetitionFactory cf, IUniversalRoundFactory urf) {
 		this.rf = rf;
 		this.mf = mf;
 		this.srff = srff;
 		this.tf = tf;
 		this.ccf = ccf;
+		this.cf = cf;
+		this.urf = urf;
 	}
 
 	@Override
@@ -434,6 +445,66 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 		return null;
 
 	}
-	
 
+	@Override
+	public boolean scrapeRound(ICompetition comp, int uri, String name) {
+			//Create Round
+		IRound r = rf.create();
+		r.setName(name);
+		r.setCompId(comp.getId());
+			// Get universal round using uri
+		UniversalRound ur = urf.get(uri);
+			// Date? Sure.
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("YYYYMMdd");
+		DateTime dt = new DateTime(ur.start.getTime());		
+		String dateString = fmt.print(dt);
+		
+			// Set some additional info for Round
+		r.setBegin(ur.start);
+		r.setUrOrdinal(uri);
+		r.setWorkflowStatus(WorkflowStatus.PENDING);
+		
+			// Fetch JSON from REST Api.
+		try {
+			url = new URL(ccf.get().getBaseNodeUrl() + "v1/admin/scraper/league/" + comp.getForeignID() + "/date/" + dateString + "/matches");
+		} catch (MalformedURLException e) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, e.getMessage());
+			return false;
+		}
+		
+		JSONArray retval = get();	//YAY?		
+		
+		if (errorMessage != null) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, errorMessage);
+			return false;
+		} else {
+			if (retval != null && retval.length() > 0) {
+					// For each match in the JSON results, add them to Round.
+				for (int i=0; i<retval.length(); ++i) {					
+					IMatchGroup m = getMatch(retval.getJSONObject(i), comp.getForeignID());
+					
+					r.getMatchIDs().add(m.getId());
+					r.getMatches().add(m);
+				}
+				
+			} 
+			else if(retval != null && retval.length() < 1){
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Items array is empty. Try fetching again?...");
+				return false;
+			}else {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Items array from REST server is null...");
+				return false;
+			}
+		
+		// Factory stuff
+		rf.put(r);
+		// Add round and roundId to competition.
+		comp.getRoundIds().add(r.getId());
+		comp.getRounds().add(r);
+		cf.put(comp);
+		//Profit
+		return true;
+		//return cf.addRound(comp.getId(), uri, name);
+		}
+	}
 }

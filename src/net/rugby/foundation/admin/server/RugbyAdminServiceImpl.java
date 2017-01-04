@@ -2644,7 +2644,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public Boolean scrapeRound(Long compId, int uri, String name) {
 		try {
 			if (checkAdmin()) {
-				return cf.scrapeRound(compId, uri, name);
+				ICompetition comp = cf.get(compId);
+				
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(comp.getForeignURL(), comp.getCompType());
+				return fetcher.scrapeRound(comp, uri, name);
 			} 
 
 			return null;			

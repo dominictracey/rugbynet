@@ -15,4 +15,5 @@ public interface IForeignCompetitionFetcher {
 	public List<IRound> getRounds(String url, Map<String, IMatchGroup> matches);
 	public Map<String, IMatchGroup> getMatches(String url, Map<String, ITeamGroup> teams);
 	Map<String, IMatchGroup> getMatches(String urlDate, int offsetWeeks, Map<String, ITeamGroup> teams, Map<String, IMatchGroup> matches);
+	public boolean scrapeRound(ICompetition comp, int uri, String name);
 }

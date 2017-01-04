@@ -84,6 +84,7 @@ public class AddRoundPopup extends DialogBox {
 	void onClickScrape(ClickEvent e) {
 		int index = urList.getSelectedIndex();
 		//UniversalRound ur = universalRounds.get(index);
+		int what = Integer.parseInt(urList.getValue(index),10);
 		listener.scrapeRound(comp, Integer.parseInt(urList.getValue(index),10), name.getValue());
 	}
 	
