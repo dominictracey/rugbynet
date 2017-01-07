@@ -206,7 +206,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	public void setURL(String url) {
 		homePage = url;
 		String toks[] = homePage.split("/");
-		espnLeagueId = Long.parseLong(toks[toks.length-1]);
+		espnLeagueId = Long.parseLong(toks[toks.length-3]);
 		
 		assert (espnLeagueId != null);
 		
