@@ -97,6 +97,15 @@ public class Player implements Serializable /*, ClientSerializable*/ {
 		this.position = pos;
 		this.altposition = altpos;
 	}
+		// New constructor for new javascript code
+	public Player(Long id, String givenName, String surName, Position.position[] pos, Integer height, Integer weight) {
+		this.id = id;
+	    this.givenName = givenName;
+	    this.surName = surName;
+		this.altposition = pos;
+		this.height = height;
+		this.weight = weight;
+	}
 	
 	public Player(Long id, Long teamID, String teamName, String teamAbbr, String pool,
 			String givenName, String surName, String displayName,

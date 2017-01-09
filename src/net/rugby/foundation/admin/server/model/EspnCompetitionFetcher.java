@@ -497,14 +497,34 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			}
 		
 		// Factory stuff
+		
+		int insert = 0;
+		for (IRound tempR : comp.getRounds()) {
+			if (tempR.getUrOrdinal() == uri) {
+				return false;
+			} else if (tempR.getUrOrdinal() > uri) {
+				break;
+			} else {
+				insert++;
+			}
+		}
+		DateTime end = new DateTime(ur.start);
+		end.plusDays(2);
+		end.plusHours(23);
+		end.plusMinutes(59);
+		end.plusSeconds(59);
+		r.setEnd(end.toDate());		
+		r.setOrdinal(insert);		
 		rf.put(r);
+		
 		// Add round and roundId to competition.
-		comp.getRoundIds().add(r.getId());
-		comp.getRounds().add(r);
-		cf.put(comp);
+		comp.getRounds().add(insert, r);
+		comp.getRoundIds().add(insert,r.getId());
+		
 		//Profit
+		cf.put(comp);		
+		
 		return true;
-		//return cf.addRound(comp.getId(), uri, name);
 		}
 	}
 }
