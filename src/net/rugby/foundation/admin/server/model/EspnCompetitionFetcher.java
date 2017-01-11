@@ -29,12 +29,14 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.factory.IVenueFactory;
 import net.rugby.foundation.core.server.factory.UniversalRoundFactory;
 import net.rugby.foundation.model.shared.Competition;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.ITeamGroup;
+import net.rugby.foundation.model.shared.IVenue;
 import net.rugby.foundation.model.shared.TeamGroup;
 import net.rugby.foundation.model.shared.UniversalRound;
 import net.rugby.foundation.model.shared.IRound.WorkflowStatus;
@@ -58,6 +60,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	private String startDate;
 	private ICompetitionFactory cf;
 	private IUniversalRoundFactory urf;
+	private IVenueFactory vf;
 
 	@SuppressWarnings("unused")
 	private EspnCompetitionFetcher() {
@@ -65,7 +68,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 	}
 
 	public EspnCompetitionFetcher(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory srff, ITeamGroupFactory tf, 
-			IConfigurationFactory ccf, ICompetitionFactory cf, IUniversalRoundFactory urf) {
+			IConfigurationFactory ccf, ICompetitionFactory cf, IUniversalRoundFactory urf, IVenueFactory vf) {
 		this.rf = rf;
 		this.mf = mf;
 		this.srff = srff;
@@ -73,6 +76,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 		this.ccf = ccf;
 		this.cf = cf;
 		this.urf = urf;
+		this.vf = vf;
 	}
 
 	@Override
@@ -405,11 +409,84 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 				vt = getTeam(jsonObject.getString("visitingTeam"));
 				teamMap.put(vt.getDisplayName(),vt);
 			}
+			
+			// Set Match with a Venue			
+			String location = jsonObject.getString("location");
+			if(location != null){
+				IVenue v = vf.create();
+				String[] locTemp;
+				
+				try {
+					locTemp = location.split(",");
+					
+					if(locTemp.length == 3){
+						v.setVenueName(locTemp[0]);
+						v.setVenueCity(locTemp[1]);
+						v.setVenueCountry(locTemp[2]);
+					}
+					else if(locTemp.length == 2){
+						v.setVenueName(locTemp[0]);
+						v.setVenueCity(locTemp[1]);
+					}
+					else if(locTemp.length == 1){
+						v.setVenueName(locTemp[0]);					
+					}
+					vf.put(v);
+					m.setVenue(v);
+					m.setVenueId(v.getId());
+				} catch (Exception e) {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not split location! " + e.getMessage());
+				}
+			}
+					
 			m.setVisitingTeam(vt);
 			m.setDate(new org.joda.time.DateTime(jsonObject.getString("date")).toDate());
 			m.setDisplayName(m.getHomeTeam().getDisplayName() + " vs. " + m.getVisitingTeam().getDisplayName());
 			// http://www.espn.co.uk/rugby/match?gameId=290011&league=267979
 			m.setForeignUrl("http://www.espn.co.uk/rugby/match?gameId=" + m.getForeignId() + "&league=" + compForeignId);
+		}
+		else{
+			try{
+				m.setDate(new org.joda.time.DateTime(jsonObject.getString("date")).toDate());
+			}catch(Throwable ex){
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not get a date from JSON! " + ex.getMessage());
+			}
+			if(m.getVenueId() == null){
+				// Set Match with a Venue			
+				String location = jsonObject.getString("location");
+				if(location != null && location.length() > 2){
+					
+					String[] locTemp;
+					
+					try {
+						locTemp = location.split(",");
+						IVenue v;
+						if(vf.getByVenueName(locTemp[0].trim()) != null){
+							v = vf.getByVenueName(locTemp[0].trim());
+						}
+						else{
+							v = vf.create();
+						}
+						if(locTemp.length == 3){
+							v.setVenueName(locTemp[0].trim());
+							v.setVenueCity(locTemp[1].trim());
+							v.setVenueCountry(locTemp[2].trim());
+						}
+						else if(locTemp.length == 2){
+							v.setVenueName(locTemp[0].trim());
+							v.setVenueCity(locTemp[1].trim());
+						}
+						else if(locTemp.length == 1){
+							v.setVenueName(locTemp[0].trim());					
+						}
+						vf.put(v);
+						m.setVenue(v);
+						m.setVenueId(v.getId());
+					} catch (Exception e) {
+						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Could not split location! " + e.getMessage());
+					}
+				}
+			}			
 		}
 		return m;
 	}
@@ -481,7 +558,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			if (retval != null && retval.length() > 0) {
 					// For each match in the JSON results, add them to Round.
 				for (int i=0; i<retval.length(); ++i) {					
-					IMatchGroup m = getMatch(retval.getJSONObject(i), comp.getForeignID());
+					IMatchGroup m = getMatch(retval.getJSONObject(i), comp.getForeignID());					
 					
 					r.getMatchIDs().add(m.getId());
 					r.getMatches().add(m);
@@ -497,17 +574,41 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			}
 		
 		// Factory stuff
-		
+			//Check if Competition has an existing Round.
 		int insert = 0;
 		for (IRound tempR : comp.getRounds()) {
 			if (tempR.getUrOrdinal() == uri) {
-				return false;
+				//Added "Manage Round" block
+				int newMatchCnt = 0;				
+				for(IMatchGroup mInRound : tempR.getMatches()){					
+					
+					for(IMatchGroup cur : r.getMatches()){
+						if(cur.getForeignId().equals(mInRound.getForeignId())){
+							mInRound.setDate(cur.getDate());
+							if(mInRound.getVenueId() == null && cur.getVenueId() != null){
+								mInRound.setVenue(cur.getVenue());
+								mInRound.setVenueId(cur.getVenueId());
+							}
+							//mf.put(mInRound);
+						}
+						else if(!tempR.getMatchIDs().contains(cur.getId())){
+							newMatchCnt++;
+							tempR.getMatches().add(cur);
+							tempR.getMatchIDs().add(cur.getId());
+						}
+					}
+				}
+				//rf.put(tempR);
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "There were " + newMatchCnt + " new matches.");
+				cf.put(comp);
+				return true;
 			} else if (tempR.getUrOrdinal() > uri) {
 				break;
 			} else {
 				insert++;
 			}
 		}
+		
 		DateTime end = new DateTime(ur.start);
 		end.plusDays(2);
 		end.plusHours(23);

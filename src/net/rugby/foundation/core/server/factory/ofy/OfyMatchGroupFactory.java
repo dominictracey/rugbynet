@@ -17,6 +17,7 @@ import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
+import net.rugby.foundation.model.shared.IVenue;
 import net.rugby.foundation.model.shared.MatchGroup;
 import net.rugby.foundation.model.shared.Round;
 
@@ -59,6 +60,11 @@ public class OfyMatchGroupFactory extends BaseMatchGroupFactory implements Seria
 				}
 
 			}
+			
+			if(g.getVenueId() != null){
+				IVenue v = vf.get(g.getVenueId());
+				g.setVenue(v);
+			}			
 
 			// self cleaning oven for workflowStatus			
 			if (g.getWorkflowStatus() == null) {

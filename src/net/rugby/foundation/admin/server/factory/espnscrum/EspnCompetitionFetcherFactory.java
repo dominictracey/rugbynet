@@ -15,6 +15,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
+import net.rugby.foundation.core.server.factory.IVenueFactory;
 import net.rugby.foundation.model.shared.ICompetition.CompetitionType;
 
 public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcherFactory {
@@ -28,10 +29,11 @@ public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcher
 	private Map<String, IForeignCompetitionFetcher> fetcherMap = new HashMap<String, IForeignCompetitionFetcher>();
 	private ICompetitionFactory cf;
 	private IUniversalRoundFactory urf;
+	private IVenueFactory vf;
 	
 	@Inject
 	public void setFactories(IRoundFactory rf, IMatchGroupFactory mf, IResultFetcherFactory rff, ITeamGroupFactory tf, IConfigurationFactory ccf, 
-			ICompetitionFactory cf, IUniversalRoundFactory urf) {
+			ICompetitionFactory cf, IUniversalRoundFactory urf, IVenueFactory vf) {
 		this.rf  = rf;
 		this.mf = mf;
 		this.rff = rff;
@@ -39,6 +41,7 @@ public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcher
 		this.ccf = ccf;
 		this.cf = cf;
 		this.urf = urf;
+		this.vf = vf;
 	}
 
 	/* (non-Javadoc)
@@ -52,7 +55,7 @@ public class EspnCompetitionFetcherFactory implements IForeignCompetitionFetcher
 		if (fetcherMap.containsKey(url)) {
 			return fetcherMap.get(url);
 		} else {
-			IForeignCompetitionFetcher scf =  new EspnCompetitionFetcher(rf,mf,rff, tf, ccf, cf, urf);
+			IForeignCompetitionFetcher scf =  new EspnCompetitionFetcher(rf,mf,rff, tf, ccf, cf, urf, vf);
 			if (url != null && !url.isEmpty()) {
 				scf.setURL(url);
 			}

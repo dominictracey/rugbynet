@@ -69,6 +69,10 @@ public interface IMatchGroup extends IGroup  {
 	public abstract void setForeignUrl(String foreignUrl);
 	public abstract void setFetchMatchStatsPipelineId(String pipelineId);
 	public abstract String getFetchMatchStatsPipelineId();
+	public abstract void setVenue(IVenue venue);
+	public abstract IVenue getVenue();
+	public abstract void setVenueId(Long venueId);
+	public abstract Long getVenueId();
 	
 	/**
 	 * 

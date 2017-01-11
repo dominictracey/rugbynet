@@ -43,6 +43,10 @@ public class MatchGroup extends Group implements IMatchGroup {
 	private Long foreignLeagueId;
 	private String foreignUrl;
 	
+	@Transient
+	private IVenue venue;
+	private Long venueId;
+	
 	protected String fetchMatchStatsPipelineId;
 	
 	protected String guid;
@@ -282,6 +286,22 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public void setForeignUrl(String foreignUrl) {
 		this.foreignUrl = foreignUrl;
+	}
+
+	public IVenue getVenue() {
+		return venue;
+	}
+
+	public void setVenue(IVenue venue) {
+		this.venue = venue;
+	}
+
+	public Long getVenueId() {
+		return venueId;
+	}
+
+	public void setVenueId(Long venueId) {
+		this.venueId = venueId;
 	}
 
 	@Override

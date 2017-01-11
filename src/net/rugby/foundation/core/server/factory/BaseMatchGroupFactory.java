@@ -28,10 +28,12 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 	protected IPlayerMatchStatsFactory pmsf;
 	protected IPlayerRatingFactory prf;
 	protected ICompetitionFactory cf;
+	protected IVenueFactory vf;
+	
 
 	@Inject
 	protected void setFactories(IMatchResultFactory mrf, ITeamGroupFactory tf, IRoundFactory rf, ITeamMatchStatsFactory tmsf, IPlayerMatchStatsFactory pmsf,
-			IPlayerRatingFactory prf, ICompetitionFactory cf) {
+			IPlayerRatingFactory prf, ICompetitionFactory cf, IVenueFactory vf) {
 
 		this.tf = tf;
 		this.mrf = mrf;
@@ -40,6 +42,7 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 		this.pmsf = pmsf;
 		this.prf = prf;
 		this.cf = cf;
+		this.vf = vf;
 	}
 
 	@Override
