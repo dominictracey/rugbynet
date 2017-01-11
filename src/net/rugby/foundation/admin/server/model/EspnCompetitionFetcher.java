@@ -594,7 +594,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 							}
 							//mf.put(mInRound);
 						}
-						else if(!tempR.getMatchIDs().contains(cur.getId())){
+						else if(!tempR.getMatchIDs().contains(cur.getId()) && !tempGroupIds.contains(cur.getId())){
 							newMatchCnt++;
 							tempGroups.add(cur);
 							tempGroupIds.add(cur.getId());
