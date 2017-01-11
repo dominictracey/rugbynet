@@ -579,7 +579,10 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 		for (IRound tempR : comp.getRounds()) {
 			if (tempR.getUrOrdinal() == uri) {
 				//Added "Manage Round" block
-				int newMatchCnt = 0;				
+				int newMatchCnt = 0;
+				List<IMatchGroup> tempGroups = new ArrayList<>();
+				List<Long> tempGroupIds = new ArrayList<>();
+				
 				for(IMatchGroup mInRound : tempR.getMatches()){					
 					
 					for(IMatchGroup cur : r.getMatches()){
@@ -593,11 +596,13 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 						}
 						else if(!tempR.getMatchIDs().contains(cur.getId())){
 							newMatchCnt++;
-							tempR.getMatches().add(cur);
-							tempR.getMatchIDs().add(cur.getId());
+							tempGroups.add(cur);
+							tempGroupIds.add(cur.getId());
 						}
 					}
 				}
+				tempR.getMatches().addAll(tempGroups);
+				tempR.getMatchIDs().addAll(tempGroupIds);
 				//rf.put(tempR);
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "There were " + newMatchCnt + " new matches.");
 				cf.put(comp);
