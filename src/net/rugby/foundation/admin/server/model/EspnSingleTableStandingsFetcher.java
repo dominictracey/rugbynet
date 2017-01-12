@@ -143,13 +143,23 @@ public class EspnSingleTableStandingsFetcher extends JsonFetcher implements ISta
 					
 					IStanding s = mapper.readValue(json.getJSONObject(i).toString(), Standing.class);
 					ITeamGroup t = tf.getTeamByForeignId(s.getForeignId());
+					String cheese = json.getJSONObject(i).getString("displayName");
+					
 					if (t != null) {
+						s.setTeam(t);
+						s.setTeamId(t.getId());
+						s.setRound(r);
+						s.setRoundId(r.getId());						
+						retval.put(t.getId(), s);
+					} else if(cheese != null){						
+						t = tf.getTeamByName(cheese);
+						
 						s.setTeam(t);
 						s.setTeamId(t.getId());
 						s.setRound(r);
 						s.setRoundId(r.getId());
 						retval.put(t.getId(), s);
-					} else {
+					}else {
 						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Couldn't find a team in our database with foreignID " + s.getForeignId() + ". Probably fucking Bristol.");
 					}
 				}

@@ -558,8 +558,6 @@ public class OfyCompetitionFactory extends BaseCachingFactory<ICompetition> impl
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);
 			return null;
 		}
-	}
-
-
+	}	
 
 }

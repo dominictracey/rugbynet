@@ -2065,14 +2065,17 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	public List<IStanding> FetchRoundStandings(Long roundId) {
 		try {
 			if (checkAdmin()) {
+				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchRoundStandings. roundId: " + roundId);
 				if (roundId != null) {
 					IRound r = rf.get(roundId);
 					if (r != null) {
 						IStandingsFetcher fetcher = sff.getFetcher(r);
 						if (fetcher != null) {
+							Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchRoundStandings. got fetcher.");
 							if (r.getCompId() != null) {
 								ICompetition c = cf.get(r.getCompId());
 								if (c != null) {
+									Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchRoundStandings. got comp.");
 									fetcher.setComp(c);
 									fetcher.setRound(r);
 									fetcher.setUc(uc);
@@ -2626,6 +2629,25 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 		try {
 			if (checkAdmin()) {
 				return cf.addRound(compId, uri, name);
+			} 
+
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+
+
+	}
+	
+	@Override
+	public Boolean scrapeRound(Long compId, int uri, String name) {
+		try {
+			if (checkAdmin()) {
+				ICompetition comp = cf.get(compId);
+				
+				IForeignCompetitionFetcher fetcher = fcff.getForeignCompetitionFetcher(comp.getForeignURL(), comp.getCompType());
+				return fetcher.scrapeRound(comp, uri, name);
 			} 
 
 			return null;			

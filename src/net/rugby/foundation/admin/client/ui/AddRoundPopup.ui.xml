@@ -17,6 +17,7 @@
 			<b:Nav>
 				<b:ButtonGroup ui:field='buttonBar'>
 					<b:Button ui:field="save">Save</b:Button>
+					<b:Button ui:field="scrape">Scrape</b:Button>
 					<b:Button ui:field="cancel">Cancel</b:Button>
 				</b:ButtonGroup>
 			</b:Nav>

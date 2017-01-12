@@ -25,7 +25,9 @@ import net.rugby.foundation.core.server.factory.ISponsorFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.IVenueFactory;
 import net.rugby.foundation.core.server.factory.ofy.OfyPlaceFactory;
+import net.rugby.foundation.core.server.factory.ofy.OfyVenueFactory;
 import net.rugby.foundation.core.server.factory.test.TestAppUserFactory;
 import net.rugby.foundation.core.server.factory.test.TestClubhouseFactory;
 import net.rugby.foundation.core.server.factory.test.TestClubhouseMembershipFactory;
@@ -47,6 +49,8 @@ import net.rugby.foundation.core.server.factory.test.TestSponsorFactory;
 import net.rugby.foundation.core.server.factory.test.TestStandingFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamFactory;
 import net.rugby.foundation.core.server.factory.test.TestTeamMatchStatsFactory;
+import net.rugby.foundation.core.server.factory.test.TestVenueFactory;
+
 import com.google.inject.AbstractModule;
 
 public class CoreTestModule extends AbstractModule {
@@ -79,6 +83,7 @@ public class CoreTestModule extends AbstractModule {
 		bind(IPlaceFactory.class).to(TestPlaceFactory.class);
 		bind(ISponsorFactory.class).to(TestSponsorFactory.class);
 		bind(IContentFactory.class).to(TestContentFactory.class);
+		bind(IVenueFactory.class).to(TestVenueFactory.class);
 	}
 }
 

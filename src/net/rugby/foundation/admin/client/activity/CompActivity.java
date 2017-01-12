@@ -1685,6 +1685,30 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 
 	@Override
+	public void scrapeRound(ICompetition comp, int uri, String name) {
+		clientFactory.getRpcService().scrapeRound(comp.getId(), uri, name, new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Problems scraping round");
+
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					Window.alert("Success scraping round");
+					clientFactory.getAddRoundPopup().hide();
+				} else {
+					Window.alert("No good. Check the logs or try again. Maybe that round doesn't exist? Try reloading maybe?");
+				}
+			}
+
+		});
+		
+	}
+
+	@Override
 	public void cancelAddRound() {
 		clientFactory.getAddRoundPopup().hide();
 
@@ -1841,6 +1865,8 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			});
 
 	}
+
+
 
 
 

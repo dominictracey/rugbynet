@@ -444,7 +444,6 @@ public class TestCompetitionFactory extends BaseCachingFactory<ICompetition> imp
 	public Map<Long, Float> getAllCompWeights() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
+	}	
 
 }

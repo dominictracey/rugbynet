@@ -191,6 +191,8 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<IRatingQuery> asyncCallback);
 	public void addRound(Long compId, int uri, String name,
 			AsyncCallback<Boolean> asyncCallback);
+	public void scrapeRound(Long compId, int uri, String name,
+			AsyncCallback<Boolean> asyncCallback);
 	public void getAllBlurbs(Boolean active,
 			AsyncCallback<List<IBlurb>> asyncCallback);
 	public void addBlurb(String url, String linkText, String bodyText,

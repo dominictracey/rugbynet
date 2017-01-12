@@ -553,5 +553,11 @@ public class ScrumCompetitionFetcher implements IForeignCompetitionFetcher {
 		return null;
 	}
 
+	@Override
+	public boolean scrapeRound(ICompetition comp, int uri, String name) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 
 }
