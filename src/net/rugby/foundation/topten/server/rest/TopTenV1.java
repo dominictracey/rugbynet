@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.rugby.foundation.admin.server.factory.espnscrum.ILineupFetcherFactory;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
@@ -16,6 +17,7 @@ import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.Content;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
+import net.rugby.foundation.model.shared.ILineupSlot;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
@@ -47,6 +49,7 @@ public class TopTenV1 {
 	private ITeamMatchStatsFactory tmsf;
 	private IPlayerFactory pf;
 	private IStandingFactory sf;
+	private ILineupFetcherFactory lff;
 	
 	protected class TeamMatchStats {
 		public Long id; // matchId
@@ -69,6 +72,7 @@ public class TopTenV1 {
 		this.pf = injector.getInstance(IPlayerFactory.class);
 		this.sf = injector.getInstance(IStandingFactory.class);
 		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
+		this.lff = injector.getInstance(ILineupFetcherFactory.class);
 	}
 
 	@ApiMethod(name = "content.getcontent", httpMethod = "GET")
@@ -161,6 +165,15 @@ public class TopTenV1 {
 		retval.tmsList.add(tms);
 		tms = tmsf.getVisitStats(mgf.get(matchId));
 		retval.tmsList.add(tms);
+		return retval;
+	}
+	
+	@ApiMethod(name = "teamLineups.get", path="teamLineups/get", httpMethod="GET")
+	public List<ILineupSlot> getTeamLineups(@Named("matchId") Long matchId) {
+		List<ILineupSlot> retval = new ArrayList<>();
+		retval = lff.getLineupFetcher(null).get(true);
+		
+		
 		return retval;
 	}
 }
