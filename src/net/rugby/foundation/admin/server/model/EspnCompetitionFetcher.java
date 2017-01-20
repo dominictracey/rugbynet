@@ -539,7 +539,15 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			// Set some additional info for Round
 		r.setBegin(ur.start);
 		r.setUrOrdinal(uri);
+		r.setAbbr(ur.shortDesc);
 		r.setWorkflowStatus(WorkflowStatus.PENDING);
+		DateTime end = new DateTime(ur.start);
+		end.plusDays(2);
+		end.plusHours(23);
+		end.plusMinutes(59);
+		end.plusSeconds(59);
+		r.setEnd(end.toDate());
+		
 		
 			// Fetch JSON from REST Api.
 		try {
@@ -583,6 +591,15 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 				List<IMatchGroup> tempGroups = new ArrayList<>();
 				List<Long> tempGroupIds = new ArrayList<>();
 				
+				if(tempR.getOrdinal() == null){
+					tempR.setOrdinal(insert);
+				}
+				if(tempR.getAbbr() == null){
+					tempR.setAbbr(ur.shortDesc);
+				}
+				if(tempR.getEnd() == null){					
+					tempR.setEnd(end.toDate());
+				}
 				for(IMatchGroup mInRound : tempR.getMatches()){					
 					
 					for(IMatchGroup cur : r.getMatches()){
@@ -614,13 +631,7 @@ public class EspnCompetitionFetcher extends JsonFetcher implements IForeignCompe
 			}
 		}
 		
-		DateTime end = new DateTime(ur.start);
-		end.plusDays(2);
-		end.plusHours(23);
-		end.plusMinutes(59);
-		end.plusSeconds(59);
-		r.setEnd(end.toDate());		
-		r.setOrdinal(insert);		
+		r.setOrdinal(insert);
 		rf.put(r);
 		
 		// Add round and roundId to competition.
