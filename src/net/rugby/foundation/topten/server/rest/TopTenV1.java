@@ -55,6 +55,11 @@ public class TopTenV1 {
 		public Long id; // matchId
 		public List<ITeamMatchStats> tmsList = new ArrayList<ITeamMatchStats>();
 	}
+	protected class PlayerMatchStats {
+		public Long id; // matchId
+		public List<IPlayerMatchStats> players = new ArrayList<IPlayerMatchStats>();
+		//public List<IPlayerMatchStats> teamTwo = new ArrayList<IPlayerMatchStats>();
+	}
 	
 	private static Injector injector = null;
 
@@ -118,9 +123,23 @@ public class TopTenV1 {
 	}
 
 	@ApiMethod(name = "match.getScrumPlayerMatchStats", path="match/getScrumPlayerMatchStats", httpMethod="GET")
-	public List<IPlayerMatchStats> getScrumPlayerMatchStats(@Named("matchId") Long matchId) {
-		return pmsf.getByMatchId(matchId);
+	public PlayerMatchStats getScrumPlayerMatchStats(@Named("matchId") Long matchId) {
+		PlayerMatchStats pms = new PlayerMatchStats();
+		pms.id = matchId;
+		List<IPlayerMatchStats> list = pmsf.getByMatchId(matchId);
 		
+//		Long team = list.get(0).getTeamId();		
+//		for(IPlayerMatchStats cur : list){
+//			if(cur.getTeamId().equals(team)){
+//				pms.teamOne.add(cur);
+//			}
+//			else{
+//				pms.teamTwo.add(cur);
+//			}
+//		}
+		pms.players.addAll(list);
+		
+		return pms;		
 	}
 
 	@ApiMethod(name = "match.putScrumPlayerMatchStats", path="match/putScrumPlayerMatchStats", httpMethod="PUT")
