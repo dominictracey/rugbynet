@@ -60,6 +60,10 @@ public class TopTenV1 {
 		public List<IPlayerMatchStats> players = new ArrayList<IPlayerMatchStats>();
 		//public List<IPlayerMatchStats> teamTwo = new ArrayList<IPlayerMatchStats>();
 	}
+	protected class CompetitionStanding {
+		public Long id; // compId
+		public List<IStanding> standings = new ArrayList<IStanding>();
+	}
 	
 	private static Injector injector = null;
 
@@ -165,9 +169,12 @@ public class TopTenV1 {
 	}
 	
 	@ApiMethod(name = "competition.getStandings", path="competitions/getStandings", httpMethod="GET")
-	public List<IStanding> getStandings(@Named("compId") Long compId, @Named("uro") Long universalRoundOrdinal) {
-		List<IStanding> retval = sf.getLatestForComp(compId);
-		return retval;
+	public CompetitionStanding getStandings(@Named("compId") Long compId) {
+		CompetitionStanding cs = new CompetitionStanding();
+		cs.standings = sf.getLatestForComp(compId);
+		cs.id = compId;
+		
+		return cs;
 	}
 	
 	@ApiMethod(name = "match.get", path="match/get", httpMethod="GET")
