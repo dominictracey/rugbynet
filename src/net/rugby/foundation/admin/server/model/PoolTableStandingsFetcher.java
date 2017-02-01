@@ -8,9 +8,11 @@ import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
 
@@ -19,7 +21,7 @@ public class PoolTableStandingsFetcher implements IStandingsFetcher {
 	private IRound round = null;
 	private ICompetition comp = null;
 	private IUrlCacher urlCacher = null;
-	private IStandingFactory standingFetcher = null;
+	private IStandingFullFactory standingFetcher = null;
 	private List<String> standingTablesList = null;
 	private String url = null;
 	private String StandingsTableLine = "";
@@ -27,7 +29,7 @@ public class PoolTableStandingsFetcher implements IStandingsFetcher {
 	
 	
 	//    @Inject
-	public PoolTableStandingsFetcher(IStandingFactory sf) {
+	public PoolTableStandingsFetcher(IStandingFullFactory sf) {
 		this.standingFetcher = sf;
 	}
 
@@ -42,7 +44,7 @@ public class PoolTableStandingsFetcher implements IStandingsFetcher {
 	}
 
 	@Override
-	public IStanding getStandingForTeam(ITeamGroup team) {
+	public IStandingFull getStandingForTeam(ITeamGroup team) {
 
 		assert (comp != null);
 		assert (round != null);
@@ -56,7 +58,7 @@ public class PoolTableStandingsFetcher implements IStandingsFetcher {
 				processStandingTablesList();
 			}
 
-			IStanding standing = standingFetcher.create();
+			IStandingFull standing = standingFetcher.create();
 			standing.setRound(round);
 			standing.setRoundId(round.getId());
 

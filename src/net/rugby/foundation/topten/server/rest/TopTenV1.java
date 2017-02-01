@@ -13,6 +13,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.Content;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -22,6 +23,7 @@ import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumPlayer;
 import net.rugby.foundation.model.shared.ScrumPlayerMatchStats;
@@ -48,7 +50,7 @@ public class TopTenV1 {
 	private IPlayerMatchStatsFactory pmsf;
 	private ITeamMatchStatsFactory tmsf;
 	private IPlayerFactory pf;
-	private IStandingFactory sf;
+	private IStandingFullFactory sf;
 	private ILineupFetcherFactory lff;
 	
 	protected class TeamMatchStats {
@@ -62,7 +64,7 @@ public class TopTenV1 {
 	}
 	protected class CompetitionStanding {
 		public Long id; // compId
-		public List<IStanding> standings = new ArrayList<IStanding>();
+		public List<IStandingFull> standings = new ArrayList<IStandingFull>();
 	}
 	
 	private static Injector injector = null;
@@ -79,7 +81,7 @@ public class TopTenV1 {
 		this.pmsf = injector.getInstance(IPlayerMatchStatsFactory.class);
 		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
 		this.pf = injector.getInstance(IPlayerFactory.class);
-		this.sf = injector.getInstance(IStandingFactory.class);
+		this.sf = injector.getInstance(IStandingFullFactory.class);
 		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
 		this.lff = injector.getInstance(ILineupFetcherFactory.class);
 	}

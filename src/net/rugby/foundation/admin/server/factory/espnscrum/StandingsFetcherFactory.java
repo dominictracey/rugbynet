@@ -13,6 +13,7 @@ import net.rugby.foundation.admin.server.model.ScrumHeinekenStandingsFetcher;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRound;
@@ -20,12 +21,12 @@ import net.rugby.foundation.model.shared.IRound;
 public class StandingsFetcherFactory implements IStandingsFetcherFactory {
 
 	private ICompetitionFactory cf;
-	private IStandingFactory sf;
+	private IStandingFullFactory sf;
 	private IConfigurationFactory ccf;
 	private ITeamGroupFactory tf;
 
 	@Inject
-	public StandingsFetcherFactory(ICompetitionFactory cf, IStandingFactory sf, IConfigurationFactory ccf, ITeamGroupFactory tf) {
+	public StandingsFetcherFactory(ICompetitionFactory cf, IStandingFullFactory sf, IConfigurationFactory ccf, ITeamGroupFactory tf) {
 		this.cf = cf;
 		this.sf = sf;
 		this.ccf = ccf;
