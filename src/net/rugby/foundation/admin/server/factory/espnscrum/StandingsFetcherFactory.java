@@ -49,7 +49,8 @@ public class StandingsFetcherFactory implements IStandingsFetcherFactory {
 			return new EspnMultiTableStandingsFetcher(ccf, tf);
 		} else if (c != null && (c.getCompType() == ICompetition.CompetitionType.AVIVA_PREMIERSHIP || 
 				 				c.getCompType() == ICompetition.CompetitionType.PRO12 || 
-				 				c.getCompType() == ICompetition.CompetitionType.TOP14)) {
+				 				c.getCompType() == ICompetition.CompetitionType.TOP14 || c.getCompType() == ICompetition.CompetitionType.SIX_NATIONS ||
+				 				c.getCompType() == ICompetition.CompetitionType.RUGBY_CHAMPIONSHIP)) {
 				return new EspnSingleTableStandingsFetcher(ccf, tf);
 		}
 			
