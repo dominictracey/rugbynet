@@ -45,7 +45,7 @@ public class StandingsFetcherFactory implements IStandingsFetcherFactory {
 //		} else 
 			if (c != null && (c.getCompType() == ICompetition.CompetitionType.SUPER_RUGBY ||
 				c.getCompType() == ICompetition.CompetitionType.CHALLENGE_CUP ||
-				c.getCompType() == ICompetition.CompetitionType.CHAMPIONS_CUP)) {
+				c.getCompType() == ICompetition.CompetitionType.CHAMPIONS_CUP || c.getCompType() == ICompetition.CompetitionType.RUGBY_WORLD_CUP)) {
 			return new EspnMultiTableStandingsFetcher(ccf, tf);
 		} else if (c != null && (c.getCompType() == ICompetition.CompetitionType.AVIVA_PREMIERSHIP || 
 				 				c.getCompType() == ICompetition.CompetitionType.PRO12 || 
