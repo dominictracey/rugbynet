@@ -58,8 +58,8 @@ public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStan
 	}
 
 	@Override
-	public IStanding getStandingForTeam(ITeamGroup t) {
-		Map<Long, IStanding> map = getStandings(round, comp);
+	public IStandingFull getStandingForTeam(ITeamGroup t) {
+		Map<Long, IStandingFull> map = getStandings(round, comp);
 		if (map != null) {
 			if (map.containsKey(t.getId())) {
 				return map.get(t.getId());
@@ -85,11 +85,11 @@ public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStan
 	 * @param key
 	 * @return A map with Key: teamId, Value: IStanding object
 	 */
-	protected Map<Long,IStanding> getStandings(IRound r, ICompetition c	) {
+	protected Map<Long,IStandingFull> getStandings(IRound r, ICompetition c	) {
 		try {
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			Map<Long,IStanding> mr = null;
+			Map<Long,IStandingFull> mr = null;
 			String id = c.getId().toString() + "-" + r.getId().toString();
 			value = (byte[])syncCache.get(id);
 			if (value == null) {
@@ -117,7 +117,7 @@ public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStan
 				ObjectInput in = new ObjectInputStream(bis);
 				Object obj = in.readObject();
 				if (obj instanceof Map<?,?>) {  // can't do 'obj instanceof T' *sadfase*
-					mr = (Map<Long,IStanding>)obj;
+					mr = (Map<Long,IStandingFull>)obj;
 				}
 
 				bis.close();
@@ -132,20 +132,20 @@ public class EspnMultiTableStandingsFetcher extends JsonFetcher implements IStan
 		}
 	}
 
-	private Map<Long, IStanding> fetchStandings(IRound r, ICompetition c) {
+	private Map<Long, IStandingFull> fetchStandings(IRound r, ICompetition c) {
 		try {
 			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + c.getForeignID() + "/poolStandings");
 			
 			JSONArray json = get();			
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, json.toString());
-			Map<Long, IStanding> retval = new HashMap<Long, IStanding>();
+			Map<Long, IStandingFull> retval = new HashMap<Long, IStandingFull>();
 			
 			if (errorCode == null || errorCode.isEmpty()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 				for (int i=0; i<json.length(); ++i) {
 					JSONObject pool = json.getJSONObject(i);
-					String poolName = pool.getString("name");
+					String poolName = pool.getString("pool");
 					JSONArray poolArray = pool.getJSONArray("standings");
 					for (int j=0; j<poolArray.length(); ++j) {
 						IStandingFull s = mapper.readValue(poolArray.getJSONObject(j).toString(), StandingFull.class);

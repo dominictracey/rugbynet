@@ -23,6 +23,7 @@ import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingQuery;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Position.position;
@@ -156,9 +157,9 @@ public interface RugbyAdminServiceAsync {
 			AsyncCallback<IContent> asyncCallback);
 	public void getContentList(boolean onlyActive, AsyncCallback<List<IContent>> asyncCallback);
 	public void getConfiguration(AsyncCallback<ICoreConfiguration> asyncCallback);
-	public void getStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
-	public void saveStandings(Long roundId, List<IStanding> standings, AsyncCallback<List<IStanding>> asyncCallback);
-	public void FetchRoundStandings(Long roundId, AsyncCallback<List<IStanding>> asyncCallback);
+	public void getStandings(Long roundId, AsyncCallback<List<IStandingFull>> asyncCallback);
+	public void saveStandings(Long roundId, List<IStandingFull> standings, AsyncCallback<List<IStandingFull>> asyncCallback);
+	public void FetchRoundStandings(Long roundId, AsyncCallback<List<IStandingFull>> asyncCallback);
 	public void SaveScore(Long matchId, int hS, int vS, Status status, AsyncCallback<IMatchGroup> asyncCallback);
 	public void getRatingQuery(long parseLong,
 			AsyncCallback<IRatingQuery> asyncCallback);

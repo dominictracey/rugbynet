@@ -3,23 +3,22 @@ package net.rugby.foundation.core.server.factory;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.rugby.foundation.model.shared.IStanding;
 import net.rugby.foundation.model.shared.IStandingFull;
 
-public abstract class BaseStandingFactory extends BaseCachingFactory<IStanding> implements IStandingFactory {
-	
-	private final String prefix = "STAND-";
+public abstract class BaseStandingFullFactory extends BaseCachingFactory<IStandingFull> implements IStandingFullFactory {
+
+private final String prefix = "STANDFULL-";
 
 	
-	public BaseStandingFactory() {
+	public BaseStandingFullFactory() {
 
 	}
 	
 	@Override
-	public List<IStanding> getLatestForComp(Long compId)
+	public List<IStandingFull> getLatestForComp(Long compId)
 	{
 		try {
-			List<IStanding> list = null;
+			List<IStandingFull> list = null;
 	
 			list = getList(getCacheId(compId));
 			
@@ -41,14 +40,14 @@ public abstract class BaseStandingFactory extends BaseCachingFactory<IStanding> 
 
 	}
 
-	protected abstract List<IStanding> getLatestForCompFromPersistentDatastore(Long compId);
+	protected abstract List<IStandingFull> getLatestForCompFromPersistentDatastore(Long compId);
 	
 	private String getCacheId(Long id) {
 		return prefix + id.toString();
 	}
 	
 	@Override
-	public IStanding put(IStanding t) {
+	public IStandingFull put(IStandingFull t) {
 		super.put(t);
 		
 		// invalidate cached version
@@ -59,5 +58,5 @@ public abstract class BaseStandingFactory extends BaseCachingFactory<IStanding> 
 		
 		return t;
 	}
-	
+
 }

@@ -36,6 +36,7 @@ import net.rugby.foundation.model.shared.IPlayerRating;
 import net.rugby.foundation.model.shared.IRatingEngineSchema;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.Round;
@@ -466,7 +467,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 						public void onSuccess(List<IMatchGroup> result) {
 
 							view.addRound(compId, roundId, result);
-							clientFactory.getRpcService().getStandings(roundId, new AsyncCallback<List<IStanding>>() {
+							clientFactory.getRpcService().getStandings(roundId, new AsyncCallback<List<IStandingFull>>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -475,7 +476,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 								}
 
 								@Override
-								public void onSuccess(List<IStanding> result) {
+								public void onSuccess(List<IStandingFull> result) {
 									er.ShowRound(fRound,result);
 								}
 
@@ -1519,7 +1520,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 	}
 
 	@Override
-	public void saveRound(final IRound r, final List<IStanding> ss) {
+	public void saveRound(final IRound r, final List<IStandingFull> ss) {
 		clientFactory.getRpcService().saveRound(r, new AsyncCallback<IRound>() { 
 
 			@Override
@@ -1530,7 +1531,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 			@Override
 			public void onSuccess(IRound result) {
-				clientFactory.getRpcService().saveStandings(r.getId(), ss, new AsyncCallback<List<IStanding>>() {
+				clientFactory.getRpcService().saveStandings(r.getId(), ss, new AsyncCallback<List<IStandingFull>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -1538,7 +1539,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 					}
 
 					@Override
-					public void onSuccess(List<IStanding> result) {
+					public void onSuccess(List<IStandingFull> result) {
 						er.ShowRound(r,result);	
 						Notify.notify("Round saved",NotifyType.SUCCESS);
 					}
@@ -1555,7 +1556,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 	@Override
 	public void fetchRoundStandings(final IRound round) {
-		clientFactory.getRpcService().FetchRoundStandings(round.getId(), new AsyncCallback<List<IStanding>>() {
+		clientFactory.getRpcService().FetchRoundStandings(round.getId(), new AsyncCallback<List<IStandingFull>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1563,7 +1564,7 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 			}
 
 			@Override
-			public void onSuccess(List<IStanding> result) {
+			public void onSuccess(List<IStandingFull> result) {
 				er.ShowRound(round,result);		
 				Notify.notify("Standings fetched", NotifyType.SUCCESS);
 			}

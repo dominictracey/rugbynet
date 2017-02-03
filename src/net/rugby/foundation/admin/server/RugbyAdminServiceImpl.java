@@ -81,6 +81,7 @@ import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRawScoreFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
@@ -115,6 +116,7 @@ import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISimpleScoreMatchResult;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ITopTenUser;
@@ -174,7 +176,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	private IMatchRatingEngineSchemaFactory mresf;
 	private ITopTenListFactory ttlf;
 	private IContentFactory ctf;
-	private IStandingFactory sf;
+	private IStandingFullFactory sf;
 	private IStandingsFetcherFactory sff;
 	private IUrlCacher uc;
 	private IRatingQueryFactory rqf;
@@ -214,7 +216,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 			IWorkflowConfigurationFactory wfcf, IResultFetcherFactory srff,  
 			IAdminTaskFactory atf, IMatchResultFactory mrf, IRawScoreFactory rwsf,
 			IPlayerMatchStatsFetcherFactory pmsff, IMatchRatingEngineSchemaFactory mresf, ITopTenListFactory ttlf, 
-			IContentFactory ctf, IStandingFactory sf, IStandingsFetcherFactory sff,
+			IContentFactory ctf, IStandingFullFactory sf, IStandingsFetcherFactory sff,
 			IUrlCacher uc, IRatingQueryFactory rqf, IPlayerRatingFactory prf, ISeriesConfigurationFactory scf,
 			IUniversalRoundFactory urf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf, IRatingMatrixFactory rmf,
 			IBlurbFactory bf, IPlaceFactory spf, IDigestEmailFactory def, IAccountManager am, IPromoter promoter,
@@ -2028,7 +2030,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public List<IStanding> getStandings(Long roundId) {
+	public List<IStandingFull> getStandings(Long roundId) {
 		try {
 			if (checkAdmin()) {
 				return sf.getForRound(rf.get(roundId));
@@ -2042,10 +2044,10 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public List<IStanding> saveStandings(Long roundId, List<IStanding> standings) {
+	public List<IStandingFull> saveStandings(Long roundId, List<IStandingFull> standings) {
 		try {
 			if (checkAdmin()) {
-				for (IStanding s: standings) {
+				for (IStandingFull s: standings) {
 					if (s.getRoundId() == null && s.getRound() != null) {
 						s.setRoundId(s.getRound().getId());
 					}
@@ -2062,7 +2064,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 	}
 
 	@Override
-	public List<IStanding> FetchRoundStandings(Long roundId) {
+	public List<IStandingFull> FetchRoundStandings(Long roundId) {
 		try {
 			if (checkAdmin()) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "fetchRoundStandings. roundId: " + roundId);
@@ -2088,7 +2090,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 										fetcher.setUrl(c.getForeignURL()+"?template=pointstable");
 									}
 
-									List<IStanding> standings = new ArrayList<IStanding>();
+									List<IStandingFull> standings = new ArrayList<IStandingFull>();
 									Iterator<ITeamGroup> it = c.getTeams().iterator();
 									while (it.hasNext()) {
 										standings.add(fetcher.getStandingForTeam(it.next()));

@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.memcache.MemcacheService;
@@ -26,8 +27,10 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IHasId;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamGroup;
 import net.rugby.foundation.model.shared.Standing;
+import net.rugby.foundation.model.shared.StandingFull;
 import net.rugby.foundation.model.shared.TeamGroup;
 
 public class EspnSingleTableStandingsFetcher extends JsonFetcher implements IStandingsFetcher  {
@@ -56,8 +59,8 @@ public class EspnSingleTableStandingsFetcher extends JsonFetcher implements ISta
 	}
 
 	@Override
-	public IStanding getStandingForTeam(ITeamGroup t) {
-		Map<Long, IStanding> map = getStandings(round, comp);
+	public IStandingFull getStandingForTeam(ITeamGroup t) {
+		Map<Long, IStandingFull> map = getStandings(round, comp);
 		if (map != null) {
 			if (map.containsKey(t.getId())) {
 				return map.get(t.getId());
@@ -81,13 +84,13 @@ public class EspnSingleTableStandingsFetcher extends JsonFetcher implements ISta
 	/***
 	 * 
 	 * @param key
-	 * @return A map with Key: teamId, Value: IStanding object
+	 * @return A map with Key: teamId, Value: IStandingFull object
 	 */
-	protected Map<Long,IStanding> getStandings(IRound r, ICompetition c	) {
+	protected Map<Long,IStandingFull> getStandings(IRound r, ICompetition c	) {
 		try {
 			byte[] value = null;
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			Map<Long,IStanding> mr = null;
+			Map<Long,IStandingFull> mr = null;
 			String id = c.getId().toString() + "-" + r.getId().toString();
 			value = (byte[])syncCache.get(id);
 			if (value == null) {
@@ -115,7 +118,7 @@ public class EspnSingleTableStandingsFetcher extends JsonFetcher implements ISta
 				ObjectInput in = new ObjectInputStream(bis);
 				Object obj = in.readObject();
 				if (obj instanceof Map<?,?>) {  // can't do 'obj instanceof T' *sadfase*
-					mr = (Map<Long,IStanding>)obj;
+					mr = (Map<Long,IStandingFull>)obj;
 				}
 
 				bis.close();
@@ -130,18 +133,20 @@ public class EspnSingleTableStandingsFetcher extends JsonFetcher implements ISta
 		}
 	}
 
-	private Map<Long, IStanding> fetchStandings(IRound r, ICompetition c) {
+	private Map<Long, IStandingFull> fetchStandings(IRound r, ICompetition c) {
 		try {
-			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + c.getForeignID() + "/standings/roundId/" + r.getId());
+			url = new URL(ccf.get().getBaseNodeUrl() + "/v1/admin/scraper/league/" + c.getForeignID() + "/poolStandings");
 			
-			JSONArray json = get();			
-			Map<Long, IStanding> retval = new HashMap<Long, IStanding>();
+			JSONObject jsonObj = get().getJSONObject(0);
+			JSONArray json = jsonObj.getJSONArray("standings");
+			
+			Map<Long, IStandingFull> retval = new HashMap<Long, IStandingFull>();
 			
 			if (errorCode == null || errorCode.isEmpty()) {
 				ObjectMapper mapper = new ObjectMapper();
 				for (int i=0; i<json.length(); ++i) {
 					
-					IStanding s = mapper.readValue(json.getJSONObject(i).toString(), Standing.class);
+					IStandingFull s = mapper.readValue(json.getJSONObject(i).toString(), StandingFull.class);
 					ITeamGroup t = tf.getTeamByForeignId(s.getForeignId());
 					String cheese = json.getJSONObject(i).getString("displayName");
 					

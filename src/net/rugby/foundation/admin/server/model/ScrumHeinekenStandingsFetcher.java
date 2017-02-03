@@ -7,9 +7,11 @@ import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamGroup;
 
 public class ScrumHeinekenStandingsFetcher implements IStandingsFetcher {
@@ -17,12 +19,12 @@ public class ScrumHeinekenStandingsFetcher implements IStandingsFetcher {
     protected IRound round = null;
     protected ICompetition comp = null;
     protected IUrlCacher urlCacher = null;
-    protected IStandingFactory standingFetcher = null;
+    protected IStandingFullFactory standingFetcher = null;
     protected List<String> standingTablesList = null;
     protected String url = null;
 
 //    @Inject
-	public ScrumHeinekenStandingsFetcher(IStandingFactory sf) {
+	public ScrumHeinekenStandingsFetcher(IStandingFullFactory sf) {
         this.standingFetcher = sf;
     }
 
@@ -37,7 +39,7 @@ public class ScrumHeinekenStandingsFetcher implements IStandingsFetcher {
     }
 
     @Override
-    public IStanding getStandingForTeam(ITeamGroup team) {
+    public IStandingFull getStandingForTeam(ITeamGroup team) {
 
         assert (comp != null);
         assert (round != null);
@@ -51,7 +53,7 @@ public class ScrumHeinekenStandingsFetcher implements IStandingsFetcher {
                 processStandingTablesList();
             }
 
-            IStanding standing = standingFetcher.create();
+            IStandingFull standing = standingFetcher.create();
             standing.setRound(round);
             standing.setRoundId(round.getId());
 
@@ -101,7 +103,7 @@ public class ScrumHeinekenStandingsFetcher implements IStandingsFetcher {
 //        writeListToFile(standingTablesList, "StandingsTables5");
     }
 
-    private void searchTeamStanding(IStanding standing) {
+    private void searchTeamStanding(IStandingFull standing) {
 
         for (int i = 0; i < standingTablesList.size(); i++) {
             String curLine = standingTablesList.get(i);

@@ -1,14 +1,18 @@
 package net.rugby.foundation.model.shared;
 
+import java.io.Serializable;
+
+
 import com.googlecode.objectify.annotation.Subclass;
 
 @Subclass
-public class StandingFull extends Standing implements IStandingFull {
+public class StandingFull extends Standing implements Serializable, IStandingFull {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8101039555938496676L;
+		
 	protected int gamesPlayed;
 	protected int wins;
 	protected int draws;
@@ -30,6 +34,7 @@ public class StandingFull extends Standing implements IStandingFull {
 	
 	protected String pool;
 
+	
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.model.shared.IStandingFull#getGamesPlayed()
 	 */
