@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.espnscrum.ILineupFetcherFactory;
 import net.rugby.foundation.core.server.BPMServletContextListener;
@@ -12,7 +14,7 @@ import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
-import net.rugby.foundation.core.server.factory.IStandingFactory;
+import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFullFactory;
 import net.rugby.foundation.core.server.factory.ITeamMatchStatsFactory;
 import net.rugby.foundation.model.shared.Content;
@@ -22,7 +24,7 @@ import net.rugby.foundation.model.shared.ILineupSlot;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IPlayer;
 import net.rugby.foundation.model.shared.IPlayerMatchStats;
-import net.rugby.foundation.model.shared.IStanding;
+import net.rugby.foundation.model.shared.IRound;
 import net.rugby.foundation.model.shared.IStandingFull;
 import net.rugby.foundation.model.shared.ITeamMatchStats;
 import net.rugby.foundation.model.shared.ScrumPlayer;
@@ -33,8 +35,6 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.inject.Injector;
-
-
 
 @Api(
 		name = "topten",
@@ -52,6 +52,7 @@ public class TopTenV1 {
 	private IPlayerFactory pf;
 	private IStandingFullFactory sf;
 	private ILineupFetcherFactory lff;
+	private IRoundFactory rf;
 	
 	protected class TeamMatchStats {
 		public Long id; // matchId
@@ -66,6 +67,16 @@ public class TopTenV1 {
 		public Long id; // compId
 		public List<IStandingFull> standings = new ArrayList<IStandingFull>();
 	}
+	protected class CompetitionFandR {
+		public Long compId; // compId
+		public List<IMatchGroup> matches = new ArrayList<IMatchGroup>();
+	}
+	protected class UniversalRoundFandR {
+		public int universalRoundOrdinal; 
+		public List<CompetitionFandR> compFandRs = new ArrayList<CompetitionFandR>();
+	}
+	
+	protected Map<String, UniversalRoundFandR> fnrMap = new HashMap<String, UniversalRoundFandR>();
 	
 	private static Injector injector = null;
 
@@ -84,6 +95,7 @@ public class TopTenV1 {
 		this.sf = injector.getInstance(IStandingFullFactory.class);
 		this.tmsf = injector.getInstance(ITeamMatchStatsFactory.class);
 		this.lff = injector.getInstance(ILineupFetcherFactory.class);
+		this.rf = injector.getInstance(IRoundFactory.class);
 	}
 
 	@ApiMethod(name = "content.getcontent", httpMethod = "GET")
@@ -132,7 +144,7 @@ public class TopTenV1 {
 	public PlayerMatchStats getScrumPlayerMatchStats(@Named("matchId") Long matchId) {
 		PlayerMatchStats pms = new PlayerMatchStats();
 		pms.id = matchId;
-		List<IPlayerMatchStats> list = pmsf.getByMatchId(matchId);
+		pms.players = pmsf.getByMatchId(matchId);
 		
 //		Long team = list.get(0).getTeamId();		
 //		for(IPlayerMatchStats cur : list){
@@ -143,7 +155,7 @@ public class TopTenV1 {
 //				pms.teamTwo.add(cur);
 //			}
 //		}
-		pms.players.addAll(list);
+//		pms.players.addAll(list);
 		
 		return pms;		
 	}
@@ -189,10 +201,7 @@ public class TopTenV1 {
 	public TeamMatchStats getTeamMatchStats(@Named("matchId") Long matchId) {
 		TeamMatchStats retval = new TeamMatchStats();
 		retval.id = matchId;
-		ITeamMatchStats tms = tmsf.getHomeStats(mgf.get(matchId));
-		retval.tmsList.add(tms);
-		tms = tmsf.getVisitStats(mgf.get(matchId));
-		retval.tmsList.add(tms);
+		retval.tmsList = tmsf.getForMatch(matchId);
 		return retval;
 	}
 	
@@ -200,8 +209,43 @@ public class TopTenV1 {
 	public List<ILineupSlot> getTeamLineups(@Named("matchId") Long matchId) {
 		List<ILineupSlot> retval = new ArrayList<>();
 		retval = lff.getLineupFetcher(null).get(true);
-		
-		
+				
 		return retval;
+	}
+	
+	
+	@ApiMethod(name = "fixturesAndResults.get", path="fixturesAndResults/get", httpMethod="GET")
+	public UniversalRoundFandR getUniversalRoundFixturesAndResults(@Named("universalRoundOrdinal") int uro, @Named("compIds") String strCompIds) {
+		String key = Integer.toString(uro) + strCompIds;
+		if (fnrMap.containsKey(key)) {
+			return fnrMap.get(key);
+		}
+		
+		List<Long> compIds = null;
+		if (strCompIds == null) {
+			compIds = ccf.get().getCompsForClient();
+		} else {
+			String split[] = strCompIds.split(",");
+			compIds = new ArrayList<Long>();
+			for (int i=0; i < split.length; ++i) {
+				compIds.add(Long.parseLong(split[i]));
+			}
+		}
+
+		UniversalRoundFandR retval = new UniversalRoundFandR();
+		retval.universalRoundOrdinal = uro;
+		for (Long compId : compIds) {
+			IRound r = rf.getForUR(compId, uro);
+			if (r != null) {
+				CompetitionFandR results = new CompetitionFandR();
+				results.compId = compId;
+				results.matches = r.getMatches();
+				retval.compFandRs.add(results);
+			}			
+		}
+		fnrMap.put(key,retval);
+		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"F & R map created and stored for UR " + uro + " and comps " + compIds.toString());
+		
+		return fnrMap.get(key);
 	}
 }

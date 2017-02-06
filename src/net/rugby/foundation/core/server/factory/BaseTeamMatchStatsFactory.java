@@ -69,7 +69,11 @@ public abstract class BaseTeamMatchStatsFactory extends BaseCachingFactory<ITeam
 	protected abstract ITeamMatchStats getFromPersistentDatastoreByMatchId(Long mid, Home_or_Visitor home);
 	
 	private String getScrumCacheId(Long id, Home_or_Visitor home) {
-		return prefix + id.toString() + home.toString();
+		if (home != null) {
+			return prefix + id.toString() + home.toString();
+		} else {
+			return prefix + id.toString();
+		}
 	}
 	
 	@Override
@@ -88,15 +92,8 @@ public abstract class BaseTeamMatchStatsFactory extends BaseCachingFactory<ITeam
 			for (Long rid : rq.getRoundIds()) {
 				IRound r = rf.get(rid);
 				for (IMatchGroup m : r.getMatches()) {
-					ITeamMatchStats h = getHomeStats(m);
-					if (h != null) {
-						tmss.add(h);
-					}
-					
-					ITeamMatchStats v = getVisitStats(m);
-					if (v != null) {
-						tmss.add(v);
-					}
+					List<ITeamMatchStats> tms = getForMatch(m.getId());
+					tmss.addAll(tms);				
 				}
 			}
 			
@@ -113,8 +110,35 @@ public abstract class BaseTeamMatchStatsFactory extends BaseCachingFactory<ITeam
 		try {
 			super.deleteItemFromMemcache(getScrumCacheId(matchId,Home_or_Visitor.HOME));
 			super.deleteItemFromMemcache(getScrumCacheId(matchId,Home_or_Visitor.VISITOR));
+			super.dropFromCache(getScrumCacheId(matchId,null));
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "FlushByMatchId" + ex.getMessage(), ex);
 		}
 	}
+	
+	protected abstract List<ITeamMatchStats> getListFromPersistentDatastoreByMatchId(Long mid);
+		
+	@Override
+	public List<ITeamMatchStats> getForMatch(Long matchId) {
+		try {
+			List<ITeamMatchStats> tmss = null;
+			
+			tmss = getList(getScrumCacheId(matchId,null));
+			
+			if (tmss == null) {
+				tmss = getListFromPersistentDatastoreByMatchId(matchId);
+
+				if (tmss != null) {
+					putList(getScrumCacheId(matchId,null), tmss);
+				} else {
+					return null;
+				}
+			} 
+			return tmss;
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "getForMatch" + ex.getMessage(), ex);
+			return null;
+		}	
+	}
+
 }

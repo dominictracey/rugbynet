@@ -1,12 +1,15 @@
 package net.rugby.foundation.core.server.factory.ofy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.core.server.factory.BaseTeamMatchStatsFactory;
@@ -104,11 +107,30 @@ public class OfyTeamMatchStatsFactory extends BaseTeamMatchStatsFactory implemen
 				s = ofy.query(ScrumTeamMatchStats.class).filter("teamId", m.getVisitingTeamId()).filter("matchId", m.getId()).get();
 			} else {
 				s = ofy.query(ScrumTeamMatchStats.class).filter("teamId", m.getHomeTeamId()).filter("matchId", m.getId()).get();
-			}
+			} 
 
 			return (ITeamMatchStats)s;	
 		} catch (Throwable ex) {
 			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in delete: " + ex.getLocalizedMessage());
+			return null;
+		}
+	}
+
+	@Override
+	protected List<ITeamMatchStats> getListFromPersistentDatastoreByMatchId(Long mid) {
+		try {
+			Objectify ofy = DataStoreFactory.getOfy();
+			IMatchGroup m = mf.get(mid);
+			List<ITeamMatchStats> retval = new ArrayList<ITeamMatchStats>();
+
+			List<ScrumTeamMatchStats> qs = ofy.query(ScrumTeamMatchStats.class).filter("matchId", m.getId()).list();
+			for (ScrumTeamMatchStats tms: qs) {
+				retval.add(tms);
+			}
+			
+			return retval;	
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE,"Problem in getListFromPersistentDatastoreByMatchId: " + ex.getLocalizedMessage());
 			return null;
 		}
 	}

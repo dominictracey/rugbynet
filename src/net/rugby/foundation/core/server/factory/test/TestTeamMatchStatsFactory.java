@@ -2,6 +2,7 @@ package net.rugby.foundation.core.server.factory.test;
 
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -110,6 +111,12 @@ public class TestTeamMatchStatsFactory extends BaseTeamMatchStatsFactory impleme
 			tms.setTeamId(m.getVisitingTeamId());
 		}
 		return tms;
+	}
+
+	@Override
+	protected List<ITeamMatchStats> getListFromPersistentDatastoreByMatchId(Long mid) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

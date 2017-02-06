@@ -161,7 +161,8 @@ public class EditRound extends Composite {
 			roundPipelineLink.setText("Round processing pipeline");
 			roundPipelineLink.setTarget("_blank");			
 		} else {
-			roundPipelineLink.setVisible(false);
+			roundPipelineLink.setVisible(true);
+			roundPipelineLink.setText("Universal round ordinal " + round.getUrOrdinal());
 		}
 	}
 
