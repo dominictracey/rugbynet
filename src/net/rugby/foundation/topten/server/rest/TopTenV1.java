@@ -73,6 +73,7 @@ public class TopTenV1 {
 	}
 	protected class UniversalRoundFandR {
 		public int universalRoundOrdinal; 
+		public String id;
 		public List<CompetitionFandR> compFandRs = new ArrayList<CompetitionFandR>();
 	}
 	
@@ -234,6 +235,7 @@ public class TopTenV1 {
 
 		UniversalRoundFandR retval = new UniversalRoundFandR();
 		retval.universalRoundOrdinal = uro;
+		retval.id = key;
 		for (Long compId : compIds) {
 			IRound r = rf.getForUR(compId, uro);
 			if (r != null) {
