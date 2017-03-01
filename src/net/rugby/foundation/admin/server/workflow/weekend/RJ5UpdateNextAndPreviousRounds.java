@@ -1,18 +1,11 @@
 package net.rugby.foundation.admin.server.workflow.weekend;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.factory.IStandingsFetcherFactory;
 import net.rugby.foundation.admin.server.factory.espnscrum.IUrlCacher;
-import net.rugby.foundation.admin.server.model.IStandingsFetcher;
-import net.rugby.foundation.admin.server.workflow.RetryRequestException;
-import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatchResult;
-import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
-import net.rugby.foundation.admin.server.workflow.weekend.results.RS3StandingsResult;
 import net.rugby.foundation.admin.server.workflow.weekend.results.RS5UpdateNextAndPreviousRoundsResult;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
@@ -20,11 +13,7 @@ import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IStandingFactory;
 import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IRound;
-import net.rugby.foundation.model.shared.IStanding;
-import net.rugby.foundation.model.shared.ITeamGroup;
-
 import com.google.appengine.tools.pipeline.Job1;
-import com.google.appengine.tools.pipeline.Job3;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 

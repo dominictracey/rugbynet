@@ -57,13 +57,17 @@ public class RatingListViewColumnDefinitions<T extends IPlayerRating> {
 					if (c.getRating() != null ) {
 						name = c.getRating().toString();
 					}
+
 					Widget w = new HTML(name);
-					Tooltip tooltip = new Tooltip();
-				    tooltip.setWidget(w);
-				    tooltip.setText(c.getRating().toString());
-				    tooltip.setPlacement(Placement.RIGHT);
-				    tooltip.reconfigure();
+					if (name != null) {
+						Tooltip tooltip = new Tooltip();
+					    tooltip.setWidget(w);
+					    tooltip.setText(name);
+					    tooltip.setPlacement(Placement.RIGHT);
+					    tooltip.reconfigure();
+					}
 					return w;
+					
 				}     
 
 				public boolean isClickable() {

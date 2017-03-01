@@ -24,6 +24,8 @@ import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -154,10 +156,13 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 
 	@Override
 	public void showWait() {
-		// TODO Auto-generated method stub
-
+		Bootbox.dialog(DialogOptions.newOptions("<div class='text-center'><i class='fa fa-spin fa-spinner'></i> Loading...</div>"));
 	}
 
+	@Override
+	public void hideWait() {
+		Bootbox.hideAll();
+	}
 
 	@Override
 	public void setComps(ICoreConfiguration result) {
@@ -166,7 +171,7 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 		comp.clear();
 		comp.addItem("All","-1");
 
-		for (Long id: result.getCompetitionMap().keySet()) {
+		for (Long id: result.getCompsUnderway()) { //.getCompetitionMap().keySet()) {
 			comp.addItem(result.getCompetitionMap().get(id), id.toString());
 		}
 
@@ -192,14 +197,6 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 			}
 
 		});
-		//} else {
-		// populate the comp/round multi-pick list
-		compAndRound.clear();
-		for (Long id: result.getCompetitionMap().keySet()) {
-			listener.portalViewCompPopulate(id);
-			//compAndRound.addItem(result.getCompetitionMap().get(id), id.toString());
-		}
-		//}
 
 	}
 
@@ -565,20 +562,23 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 				schema.setItemSelected(i, true);
 			}
 		}
+		
+		clearCompAndRound();
 
 		return true;
 	}
 
 	@UiHandler("timeSeries")
 	void onTimeSeriesClick(ClickEvent e) {
-
-		//timeSeries.setActive(!timeSeries.isActive());
-
 		setTimeSeries(!timeSeries.isActive()); 
 	}
 
 	private void setTimeSeries(boolean timeSeriesOn) {
 		if (timeSeriesOn) {
+			// populate the comp/round multi-pick list
+			if (compAndRound.getItemCount() == 0) {
+				listener.portalViewCompPopulate();
+			}
 			comp.setVisible(false);
 			round.setVisible(false);
 			compAndRound.setVisible(true);
@@ -597,6 +597,12 @@ public class PortalViewImpl<T extends IPlayerRating> extends Composite implement
 	@Override
 	public List<IPlayerRating> getCurrentList() {
 		return portalList;
+	}
+	
+	private void clearCompAndRound() {
+		for (int i=0; i<compAndRound.getItemCount(); i++) {
+			compAndRound.setItemSelected(i, false);
+		}
 	}
 
 }

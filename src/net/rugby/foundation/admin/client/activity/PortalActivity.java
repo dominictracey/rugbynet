@@ -2,6 +2,10 @@ package net.rugby.foundation.admin.client.activity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import net.rugby.foundation.admin.client.ClientFactory;
 import net.rugby.foundation.admin.client.place.PortalPlace;
 import net.rugby.foundation.admin.client.ui.AdminView;
@@ -29,8 +33,10 @@ import net.rugby.foundation.model.shared.Position.position;
 import net.rugby.foundation.model.shared.ScrumMatchRatingEngineSchema;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -76,7 +82,7 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 
 
 		if (place != null) {
-			clientFactory.getRpcService().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
+			clientFactory.getCoreConfigurationAsync(false, new AsyncCallback<ICoreConfiguration>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					Window.alert("Failed to fetch comps");
@@ -175,8 +181,21 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 														} else if (result.getStatus() == Status.ERROR) {
 															Window.alert("The query has terminated without delivering results. Check the server log for details.");
 														} else if (result.getStatus() == Status.RUNNING || result.getStatus() == Status.NEW) {
-															// keep checking
-															goTo(new PortalPlace("queryId=" + place.getqueryId()));
+															view.showWait();
+															pollForUnderwayQuery(Long.parseLong(place.getqueryId()), new AsyncCallback<IRatingQuery>() {
+
+																@Override
+																public void onFailure(Throwable caught) {
+																	// fail silently - caught is null here
+																}
+
+																@Override
+																public void onSuccess(IRatingQuery result) {
+																	view.hideWait();
+																	goTo(new PortalPlace("queryId=" + place.getqueryId()));
+																}
+																
+															});
 														}
 													}	
 												});
@@ -201,20 +220,44 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	}
 
 
+	private void pollForUnderwayQuery(final Long queryId, final AsyncCallback<IRatingQuery> cb) {
+		clientFactory.getRpcService().getRatingQuery(Long.parseLong(place.getqueryId()), new AsyncCallback<IRatingQuery>() {
 
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify(caught.getMessage(), NotifyType.DANGER);
+			}
 
+			@Override
+			public void onSuccess(IRatingQuery rq) {
+				if (rq.getStatus() == Status.COMPLETE) {
+					cb.onSuccess(rq);
+				} else if (rq.getStatus() == Status.ERROR) {
+					cb.onFailure(null);
+				} else {
+					// hang about a tick and keep polling
+					Timer timer = new Timer() {
+				      @Override
+				      public void run() {
+				    	  pollForUnderwayQuery(queryId, cb);
+				      }
+				    };
+					
+					timer.schedule(1000);
+				}
+			}
+		});
+	}
 
 	@Override
 	public ClientFactory getClientFactory() {
 		return clientFactory;
 	}
 
-
 	@Override
 	public void goTo(Place place) {
 		clientFactory.getPlaceController().goTo(place);
 	}
-
 
 	@Override
 	public void compPicked(Long id) {
@@ -625,27 +668,64 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 	}
 
 	@Override
-	public void portalViewCompPopulate(Long id) {
-		clientFactory.getRpcService().getComp(id, new AsyncCallback<ICompetition>() {
+	public void portalViewCompPopulate() {
+		view.showWait();
+		final PortalView<IPlayerRating> _view = view;
+		
+		clientFactory.getCoreConfigurationAsync(false, new AsyncCallback<ICoreConfiguration>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Problem fetching comp: " + caught.getMessage());
+				Bootbox.alert("Couldn't get configuration for fetching comps");
+			}
+
+			@Override
+			public void onSuccess(ICoreConfiguration conf) {
+				
+				processCompList(conf.getCompsUnderway(), new AsyncCallback<Boolean>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onSuccess(Boolean result) {
+						view.hideWait();
+					}
+					
+				});
+			}
+			
+		});	
+	}
+	
+	protected void processCompList(List<Long> compIds, final AsyncCallback<Boolean> cb) {
+		if (compIds.size() == 0) {
+			cb.onSuccess(true);
+			return;
+		}
+		
+		final Long id = compIds.get(0);
+		compIds.remove(0);
+		final List<Long> _compIds = compIds;
+		clientFactory.getCompAsync(id, new AsyncCallback<ICompetition>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Bootbox.alert("Couldn't get competition for id " + id);
+				cb.onFailure(caught);
 			}
 
 			@Override
 			public void onSuccess(ICompetition result) {
-				if (result != null) {
-					view.setComp(result, true);
-				}
+				view.setComp(result, true);
+				processCompList(_compIds,cb);
 			}
-		});			
+			
+		});
 	}
-//
-//	@Override
-//	public void setTimeSeries(boolean isTrue) {
-//		isTimeSeries = isTrue;		
-//	}
 
 
 	@Override
@@ -683,7 +763,6 @@ PlayerListView.Listener<IPlayerRating>, PlayerListView.RatingListener<IPlayerRat
 				});
 			}
 		}
-
 	}
-
+	
 }

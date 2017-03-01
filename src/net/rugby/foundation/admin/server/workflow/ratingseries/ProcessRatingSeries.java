@@ -15,6 +15,7 @@ import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
+import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.IUniversalRoundFactory;
 import net.rugby.foundation.model.shared.IMatchGroup;
@@ -43,6 +44,8 @@ public class ProcessRatingSeries extends Job3<MS8Rated, Long, Long, Long> implem
 	transient private IRatingGroupFactory rgf;
 	
 	private boolean retryFailedQueries = true;
+
+	private IRatingSeriesFactory rsf;
 
 	public ProcessRatingSeries() {
 		//Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
@@ -76,6 +79,7 @@ public class ProcessRatingSeries extends Job3<MS8Rated, Long, Long, Long> implem
 			this.scf = injector.getInstance(ISeriesConfigurationFactory.class);
 			this.mf = injector.getInstance(IMatchGroupFactory.class);
 			this.rgf = injector.getInstance(IRatingGroupFactory.class);
+			this.rsf = injector.getInstance(IRatingSeriesFactory.class);
 			
 			ISeriesConfiguration seriesConfig = scf.get(seriesConfigId);
 			
@@ -111,7 +115,7 @@ public class ProcessRatingSeries extends Job3<MS8Rated, Long, Long, Long> implem
 			}
 
 			IRatingSeriesManager rm = injector.getInstance(IRatingSeriesManager.class);
-			IRatingSeries series = seriesConfig.getSeries();
+			IRatingSeries series = rsf.get(seriesConfig.getSeriesId());
 			if (series == null) {
 				series = rm.initialize(seriesConfig);
 			} 

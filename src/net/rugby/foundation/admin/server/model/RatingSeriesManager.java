@@ -89,7 +89,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			series.setHostCompId(sc.getHostCompId());
 			rsf.build(series);
 			rsf.put(series);
-			sc.setSeries(series);
+//			sc.setSeries(series);
 			sc.setSeriesId(series.getId());
 			if (sc.getTargetRound() == null) {
 				UniversalRound now = urf.getCurrent();
@@ -100,7 +100,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 			return series;
 		} else {
-			return sc.getSeries();
+			return rsf.get(sc.getSeriesId());
 		}
 
 	}
@@ -206,13 +206,13 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 		this.sc = sc;
 		
-		if (sc.getSeries() == null) {
-			sc.setSeries(initialize(sc));
-			sc.setSeriesId(sc.getSeries().getId());
+		if (sc.getSeriesId() == null) {
+			IRatingSeries rs = initialize(sc);
+			sc.setSeriesId(rs.getId());
 			scf.put(sc);
 		}
 		
-		IRatingSeries rs = sc.getSeries();
+		IRatingSeries rs = rsf.get(sc.getSeriesId());
 		
 		// graft new Matrix or create new Group?
 		IRatingGroup rg = rgf.getForUR(rs.getId(), time.ordinal);

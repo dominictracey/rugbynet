@@ -136,7 +136,7 @@ public class MJ8PromoteMatch extends Job3<MS9Promoted, Long, String, ResultWithL
 
 				return immediate(retval);
 			} else {
-				throw new RetryRequestException(match.getDisplayName() + " still underway at " + DateTime.now().toString());
+				throw new RetryRequestException(match.getDisplayName() + " not ready for promotion at " + DateTime.now().toString() + " (no guid for TTL yet)");
 			}
 
 		} catch (Exception ex) {			

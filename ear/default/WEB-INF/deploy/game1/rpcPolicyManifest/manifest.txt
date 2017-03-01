@@ -1,4 +1,0 @@
-# Module game1
-# RPC service class, partial path of RPC policy file
-net.rugby.foundation.core.client.CoreService, 074482CDA80DB96E48CBC095C10E04EC.gwt.rpc
-net.rugby.foundation.game1.client.Game1Service, 48D5D86D29E04F3FF740E2002A2077A2.gwt.rpc

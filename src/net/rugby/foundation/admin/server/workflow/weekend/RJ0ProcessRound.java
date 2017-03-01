@@ -14,6 +14,7 @@ import net.rugby.foundation.admin.server.workflow.weekend.results.MS0ProcessMatc
 import net.rugby.foundation.admin.server.workflow.weekend.results.MS8Rated;
 import net.rugby.foundation.admin.server.workflow.weekend.results.R0ProcessRoundResult;
 import net.rugby.foundation.admin.server.workflow.weekend.results.RS3StandingsResult;
+import net.rugby.foundation.admin.server.workflow.weekend.results.RS5UpdateNextAndPreviousRoundsResult;
 import net.rugby.foundation.admin.shared.ISeriesConfiguration;
 import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -117,6 +118,7 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 			
 			if (r != null) {
 				standingsResult = futureCall(new RJ2FetchStandings(), immediate(r.getId()), matchResults, futureList(seriesResults));
+				
 			} else {
 				RS3StandingsResult sr = new RS3StandingsResult();
 				sr.log.add("Couldn't find next round.");
@@ -125,8 +127,11 @@ public class RJ0ProcessRound extends Job1<R0ProcessRoundResult, Long> implements
 				standingsResult = immediate(sr);
 			}
 			
+			Value<RS5UpdateNextAndPreviousRoundsResult> nextAndPrevResult = null;
+			nextAndPrevResult = futureCall(new RJ5UpdateNextAndPreviousRounds(), immediate(round.getId()), waitFor(standingsResult));
+			
 			// compile the log to email to the admins in the WeekendFinalizeServlet
-			FutureValue<R0ProcessRoundResult> retval = futureCall(new RJ9CompileRoundLog(), immediate(roundId), matchResults, futureList(seriesResults), standingsResult, updateGraphOutput);
+			FutureValue<R0ProcessRoundResult> retval = futureCall(new RJ9CompileRoundLog(), immediate(roundId), matchResults, futureList(seriesResults), standingsResult, nextAndPrevResult, updateGraphOutput);
 			
 			return retval;
 			

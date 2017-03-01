@@ -626,12 +626,12 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 			//String statsDetails, float backScore, float forwardScore, float rawScore, Long playerMatchStatsId, String matchLabel
 			Integer scaledRating = Math.round(playerScore*scalingFactorMap.get(ALL_SCALE_KEY)/scaleTotalMap.get(ALL_SCALE_KEY)*scaleTotalNumMap.get(ALL_SCALE_KEY)*500);
 			Integer unscaledRating = Math.round(playerScore*scalingFactorMap.get(NO_SCALE_KEY)/scaleTotalMap.get(NO_SCALE_KEY)*scaleTotalNumMap.get(NO_SCALE_KEY)*500);
-			RatingComponent rc = new RatingComponent(toString(),backScore,forwardScore,playerScore,pms.getId(),matchLabel, scaledRating, unscaledRating, match.getForeignId());
+			RatingComponent rc = new RatingComponent(null/*toString()*/,backScore,forwardScore,playerScore,pms.getId(),matchLabel, scaledRating, unscaledRating, match.getForeignId(), cf.get(rf.get(match.getRoundId()).getCompId()).getForeignID());
 
-			rc.addRatingsDetails("Scaling\tValue\tScore\tRating\n----------------------------------------------------\n");
-			for (String key: scalingFactorMap.keySet()) {
-				rc.addRatingsDetails(key+"\t"+String.format("%.2f",scalingFactorMap.get(key))+"\t"+String.format("%.2f",playerScore*scalingFactorMap.get(key))+"\t"+Math.round(playerScore*scalingFactorMap.get(key)/scaleTotalMap.get(key)*scaleTotalNumMap.get(key)*500)+"\n");
-			}
+//			rc.addRatingsDetails("Scaling\tValue\tScore\tRating\n----------------------------------------------------\n");
+//			for (String key: scalingFactorMap.keySet()) {
+//				rc.addRatingsDetails(key+"\t"+String.format("%.2f",scalingFactorMap.get(key))+"\t"+String.format("%.2f",playerScore*scalingFactorMap.get(key))+"\t"+Math.round(playerScore*scalingFactorMap.get(key)/scaleTotalMap.get(key)*scaleTotalNumMap.get(key)*500)+"\n");
+//			}
 			return rc;
 			//return new RatingComponent(pms.getName() + "(" + pms.getTeamAbbr() + ")\n" + toString()+"\nTime scale factor: " + timescale + "; numRecords: " + numPlayers + " raw score: " + playerScore + " total raw: " + scaleTotalMap + "\n", computedRating, scaledRating, backScore, forwardScore, getPlayerScore(), pms.getId(), getMatchLabel(pms));
 
@@ -965,16 +965,12 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 
 					//finalizeRatingComponents(pr, playerScoreMap.get(pr.getPlayerId()));  // the stuff we are going to display to the endusers
 
-					StringBuilder sb = new StringBuilder();
-					sb.append(playerScoreMap.get(pr.getPlayerId()).get(0).getPlayerMatchStats().getName() + "\nMatch\tScore\tUnscaled\tScaled\tMatch Aged\tStandings\tCompetition\n-----------------------------------------------------------\n");
-
-					for (IPlayerStatShares s : playerScoreMap.get(pr.getPlayerId())) {
-						sb.append(s.getSummaryRow(scaleTotalNumMap, scaleTotalMap));						
-					}
-
-					// sort the rating components
-					//					List<RatingComponent> temp = new ArrayList<RatingComponent>();
-					//					temp.addAll(pr.getRatingComponents());
+//					StringBuilder sb = new StringBuilder();
+//					sb.append(playerScoreMap.get(pr.getPlayerId()).get(0).getPlayerMatchStats().getName() + "\nMatch\tScore\tUnscaled\tScaled\tMatch Aged\tStandings\tCompetition\n-----------------------------------------------------------\n");
+//
+//					for (IPlayerStatShares s : playerScoreMap.get(pr.getPlayerId())) {
+//						sb.append(s.getSummaryRow(scaleTotalNumMap, scaleTotalMap));						
+//					}
 
 					Collections.sort(pr.getRatingComponents(), new Comparator<RatingComponent>() {
 						@Override
@@ -988,11 +984,11 @@ public class ScrumQueryRatingEngineV100 implements IQueryRatingEngine  {
 						}
 					});
 
-					//					// seems kind of kludgey way to order it, but it didn't seem to work to just call sort on pro
-					//					pr.getRatingComponents().removeAll(temp);
-					//					pr.getRatingComponents().addAll(temp);
-
-					pr.setDetails(sb.toString());
+					if (pr.getPlayerId() != null) {
+						pr.setPlayer(pf.get(pr.getPlayerId()));
+					}
+					
+	//				pr.setDetails(sb.toString());
 					prf.put(pr);
 				} else {
 					break;

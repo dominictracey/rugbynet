@@ -136,7 +136,7 @@ public class Result implements EntryPoint, CompChangeListener, RoundChangeListen
 	public void roundChanged(final UniversalRound ur) {
 		String name = "";
 		if (resultPanel != null && resultPanel.scores != null) {
-			console("Result.roundChanged " + ur.longDesc + " " + ur.ordinal);
+			//console("Result.roundChanged " + ur.longDesc + " " + ur.ordinal);
 			resultPanel.scores.clear();
 			currentRound = null;
 			if (comp != null && !isVirtualComp) {

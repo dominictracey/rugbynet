@@ -1,2 +1,0 @@
-serviceClass: net.rugby.foundation.game1.client.Game1Service
-path: 48D5D86D29E04F3FF740E2002A2077A2.gwt.rpc

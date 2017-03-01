@@ -799,7 +799,7 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 				mr = getFromPeristentDatastore(id);
 
 				// upgrade server places if needed
-				if (mr.getContent() != null && !mr.getContent().isEmpty() && mr.getFeatureGuid() == null) {
+				if (mr != null && mr.getContent() != null && !mr.getContent().isEmpty() && mr.getFeatureGuid() == null) {
 					// and create a feature guid
 					IServerPlace p = spf.create();
 					createFeatureGuid(mr, p);
@@ -821,6 +821,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 					syncCache.put(id, yourBytes);
 					//Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"** getting item (and putting in memcache)" + mr.getId() + " *** \n" + syncCache.getStatistics());
 
+				} else {
+					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Attempt to get a non-existent TTL " + id);
 				}
 			} else {
 

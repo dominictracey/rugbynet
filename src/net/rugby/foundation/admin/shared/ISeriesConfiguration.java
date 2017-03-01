@@ -60,13 +60,9 @@ public interface ISeriesConfiguration  extends IHasId {
 	Date getLastError();
 	void setLastError(Date lastError);
 	Long getSeriesId();
-	IRatingSeries getSeries();
 	void setSeriesId(Long ratingSeriesId);
-	void setSeries(IRatingSeries ratingSeries);
 	String getPipelineId();
 	void setPipelineId(String pipelineId);
-	//void setComps(List<ICompetition> comps);
-	//List<ICompetition> getComps();
 	void setCompIds(List<Long> compIds);
 	List<Long> getCompIds();
 	void setActiveCriteria(List<Criteria> activeCriteria);

@@ -30,7 +30,7 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 
 		void deleteQuery(IRatingQuery query);
 
-		void portalViewCompPopulate(Long id);
+		void portalViewCompPopulate();
 		
 		//void setTimeSeries(boolean isTrue);
 
@@ -42,6 +42,7 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 	public abstract void setPresenter(PortalViewPresenter<T> p);
 
 	public abstract void showWait();
+	public abstract void hideWait();
 
 	public abstract PortalViewPresenter<T> getPresenter();
 
@@ -72,5 +73,7 @@ public interface PortalView<T extends IPlayerRating> extends IsWidget {
 	public abstract List<IPlayerRating> getCurrentList();
 
 	void setSchemas(List<ScrumMatchRatingEngineSchema> result);
+
+	
 
 }

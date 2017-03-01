@@ -1,2 +1,0 @@
-serviceClass: net.rugby.foundation.core.client.CoreService
-path: 074482CDA80DB96E48CBC095C10E04EC.gwt.rpc

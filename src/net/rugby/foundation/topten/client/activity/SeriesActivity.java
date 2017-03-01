@@ -350,7 +350,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "selectDefaultQuery");
 		IRatingQuery rq = null;
 		// prefer to have the same position selected if we change from one position view to another
-		if (view.getLastPosition() != -1) {
+		if (view.getSeries().getMode() == RatingMode.BY_POSITION && view.getLastPosition() != -1 && ratingQueries.size() >= view.getLastPosition()) {
 			view.setQuery(ratingQueries.get(view.getLastPosition()));
 		} else {
 

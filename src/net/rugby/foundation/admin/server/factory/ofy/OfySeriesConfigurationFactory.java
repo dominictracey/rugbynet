@@ -41,7 +41,7 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 		ISeriesConfiguration sc = ofy.get(new Key<BaseSeriesConfiguration>(BaseSeriesConfiguration.class, id));
 		sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
 		sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
-		sc.setSeries(sf.get(sc.getSeriesId()));
+		//sc.setSeries(sf.get(sc.getSeriesId()));
 		//		for (Long compId : sc.getCompIds()) {
 		//			sc.getComps().add(cf.get(compId));
 		//		}
@@ -83,7 +83,7 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 					rs.getActiveCriteria().addAll(sc.getActiveCriteria());
 				}
 				ofy.put(rs);
-				sc.setSeries(rs);
+				//sc.setSeries(rs);
 				sf.dropFromCache(rs.getId());
 			}
 
@@ -168,8 +168,8 @@ public class OfySeriesConfigurationFactory extends BaseCachingFactory<ISeriesCon
 			for (ISeriesConfiguration sc : retval) {
 				sc.setLastRound(urf.get(sc.getLastRoundOrdinal()));
 				sc.setTargetRound(urf.get(sc.getTargetRoundOrdinal()));
-				if (sc.getSeriesId() != null)
-					sc.setSeries(sf.get(sc.getSeriesId()));
+//				if (sc.getSeriesId() != null)
+//					sc.setSeries(sf.get(sc.getSeriesId()));
 			}
 			if (retval.size() == 1) {
 				return retval.get(0);

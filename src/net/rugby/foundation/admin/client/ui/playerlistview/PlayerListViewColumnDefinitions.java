@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Badge;
-import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;

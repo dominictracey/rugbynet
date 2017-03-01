@@ -47,8 +47,8 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	protected Date nextRun;
 	protected Date lastError;
 	
-	@Transient
-	protected IRatingSeries series;
+//	@Transient
+//	protected IRatingSeries series;
 	protected Long seriesId;
 	
 	protected String pipelineId;
@@ -137,14 +137,6 @@ public class BaseSeriesConfiguration implements ISeriesConfiguration, Serializab
 	@Override
 	public void setLastError(Date lastError) {
 		this.lastError = lastError;
-	}
-	@Override
-	public IRatingSeries getSeries() {
-		return series;
-	}
-	@Override
-	public void setSeries(IRatingSeries series) {
-		this.series = series;
 	}
 	@Override
 	public Long getSeriesId() {
