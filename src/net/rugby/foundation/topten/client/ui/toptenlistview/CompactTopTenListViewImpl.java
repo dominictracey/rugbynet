@@ -8,7 +8,9 @@ import net.rugby.foundation.topten.client.ClientFactory;
 import net.rugby.foundation.topten.model.shared.ITopTenList;
 import net.rugby.foundation.topten.model.shared.ITopTenItem;
 
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.ImageCell;
@@ -45,20 +47,14 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 
 	@UiField HTML generated;
 	@UiField HTML algorithm;
+	@UiField Div spinner;
 	
 	private ITopTenList list;
 	private int itemCount;
-
-
-
-
-
 	private TopTenListViewPresenter presenter;
 	private ClientFactory clientFactory;
 
-
 	private boolean showContent;
-
 
 	@UiTemplate("CompactTopTenListViewImpl.ui.xml")
 
@@ -66,12 +62,25 @@ public class CompactTopTenListViewImpl extends Composite implements TopTenListVi
 	{
 	}
 
+	@Override
+	public void showWait() {
+		items.setVisible(false);
+		spinner.setVisible(true);
+	}
+	
+	@Override
+	public void hideWait() {
+		items.setVisible(true);
+		spinner.setVisible(false);
+	}
 
 	public CompactTopTenListViewImpl()
 	{
 
 		initWidget(uiBinder.createAndBindUi(this));
-
+		topTenPanel.addStyleName("content-panel");
+		showWait();
+		
 		items.addColumn(new TextColumn<ITopTenItem>(){
 			@Override
 			public String getValue(ITopTenItem s)

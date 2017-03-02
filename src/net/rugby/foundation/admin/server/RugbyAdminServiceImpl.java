@@ -2569,7 +2569,7 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 							rgf.delete(rg);
 							rgf.dropFromCache(rgid);
 							series.getRatingGroupIds().remove(rgid);
-							series.getRatingGroups().remove(rg);
+//							series.getRatingGroups().remove(rg);
 							sc.setStatus(ISeriesConfiguration.Status.OK);
 							rsf.put(series);
 							rsf.dropFromCache(series.getId());

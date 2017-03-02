@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -117,6 +118,8 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 	@Override
 	public void process(SeriesPlace place) {
+		clientFactory.getSimpleView().showWait();
+		
 		sPlace = place;
 		// do we have a comp?
 		if (sPlace.getCompId() == null) {
@@ -163,13 +166,13 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 			
 			if (view.getSeries() != null && view.getSeries().getSponsor() != null && view.getSeries().getSponsor().getAbbr() != null)
 				clientFactory.recordAnalyticsEvent("sponsor", "show", view.getSeries().getSponsor().getAbbr(), 1);
-			
+			clientFactory.getSimpleView().hideWait();
 			refreshButtons();
 		}
 		
 	}
 
-	private void getAvailableSeries(Long compId) {
+	private void getAvailableSeries(final Long compId) {
 		
 		// allow other elements to display this comp
 		if (!Core.getCore().getCurrentCompId().equals(compId)) {
@@ -178,21 +181,20 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		}
 		
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "CALL getAvailableSeries");
-		clientFactory.getRpcService().getAvailableSeries(sPlace.getCompId(), new AsyncCallback<Map<RatingMode, Long>>() {
+		
+		Core.getCore().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("We're in trouble here...");								
+			
 			}
 
 			@Override
-			public void onSuccess(Map<RatingMode, Long> result) {
-				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getAvailableSeries");
-				if (result != null) {
-					view.setAvailableModes(result);
-				}
-			}
-
+			public void onSuccess(ICoreConfiguration conf) {
+				if (conf.getSeriesMap().containsKey(compId)) {
+					view.setAvailableModes(conf.getSeriesMap().get(compId));
+				}	
+			}		
 		});
 	}
 
@@ -247,7 +249,7 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 
 	private void getRatingGroup(Long groupId) {
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "CALL getRatingGroup");
-		clientFactory.getRpcService().getRatingGroup(groupId, new AsyncCallback<IRatingGroup>() {
+		clientFactory.getRatingGroupAsync(groupId, new AsyncCallback<IRatingGroup>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -308,21 +310,31 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 	}
 
 	private void getRatingMatrix(Long matrixId) {
-		Logger.getLogger("SeriesActivity").log(Level.INFO, "CALL getRatingMatrix");
-		clientFactory.getRpcService().getRatingMatrix(matrixId, new AsyncCallback<IRatingMatrix>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Failed to fetch matrix data.");
+//		Logger.getLogger("SeriesActivity").log(Level.INFO, "CALL getRatingMatrix");
+//		clientFactory.getRpcService().getRatingMatrix(matrixId, new AsyncCallback<IRatingMatrix>() {
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				Window.alert("Failed to fetch matrix data.");
+//			}
+//
+//			@Override
+//			public void onSuccess(IRatingMatrix result) {
+//				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getRatingMatrix");
+//				view.setMatrix(result);
+//			}
+//
+//		});
+		assert(view.getGroup() != null);
+		for (IRatingMatrix rm : view.getGroup().getRatingMatrices()) {
+			if (rm.getId().equals(matrixId)) {
+				view.setMatrix(rm);
+				return;
 			}
-
-			@Override
-			public void onSuccess(IRatingMatrix result) {
-				Logger.getLogger("SeriesActivity").log(Level.INFO, "RESPONSE getRatingMatrix");
-				view.setMatrix(result);
-			}
-
-		});
+		}
+		
+		// bad thing to get here
+		Notify.notify("Something bad happened fetching list. Please try again later.", NotifyType.WARNING);
 	}
 
 	private void getQueriesForMatrix(Long id) {
@@ -431,16 +443,29 @@ public class SeriesActivity extends AbstractActivity /*extends TopTenListActivit
 		// default group is latest
 		Logger.getLogger("SeriesActivity").log(Level.INFO, "selectRatingGroup");
 		IRatingSeries series = view.getSeries();
-		IRatingGroup latest = series.getRatingGroups().get(0);
 		assert (series != null);
-		for (IRatingGroup g : series.getRatingGroups()) {
-			if (g.getUniversalRoundOrdinal() > latest.getUniversalRoundOrdinal()) {
-				latest = g;
-			}
-		}
-		Core.getCore().setCurrentRoundOrdinal(latest.getUniversalRoundOrdinal(), true);
+		Long latest = series.getRatingGroupIds().get(0);
+//		for (IRatingGroup g : series.getRatingGroups()) {
+//			if (g.getUniversalRoundOrdinal() > latest.getUniversalRoundOrdinal()) {
+//				latest = g;
+//			}
+//		}
+		
+		clientFactory.getRatingGroupAsync(latest, new AsyncCallback<IRatingGroup>() {
 
-		view.setGroup(latest, true);	
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Problem changing week, please try again later.", NotifyType.WARNING);
+			}
+
+			@Override
+			public void onSuccess(IRatingGroup latest) {
+				Core.getCore().setCurrentRoundOrdinal(latest.getUniversalRoundOrdinal(), true);
+				view.setGroup(latest, true);
+			}
+			
+		});
+			
 	}
 
 	protected void setURL() {

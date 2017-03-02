@@ -18,6 +18,7 @@ import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.IServerPlace;
 import net.rugby.foundation.model.shared.ISponsor;
@@ -222,18 +223,18 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		final CompChangeListener _compListener = this;
 		final RoundChangeListener _roundListener = this;
 		final GuidChangeListener _guidListener = this;
-		console("doSetup");
+
 		if (coreConfig == null) {
 			Core.getInstance().getConfiguration(new AsyncCallback<ICoreConfiguration>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					Window.alert("Hmm, something is wrong...");
+					Window.alert("Server unavailable. Try again in a few minutes.");
 				}
 
 				@Override
 				public void onSuccess(final ICoreConfiguration config) {
-					console("getConfiguration.onSuccess");
+					//console("getConfiguration.onSuccess");
 					final Identity i = Core.getCore().getClientFactory().getIdentityManager();		
 					// where we keep the sign in/sign out
 					if (i.getNav() == null) {
@@ -256,10 +257,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 						@Override
 						public void onSuccess(LoginInfo result) {
 
-							console("login.onSuccess");
 							loginInfo = result;
 							coreConfig = config;
-
 
 							getSidebarView().setup(coreConfig);
 
@@ -282,10 +281,8 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 									getRpcService().getTeamLogoStyleMap( new AsyncCallback<HashMap<Long, String>>() {
 
 										@Override
-										public void onFailure(
-												Throwable caught) {
-											// TODO Auto-generated method stub
-
+										public void onFailure(Throwable caught) {
+											
 										}
 
 										@Override
@@ -297,19 +294,15 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 											Core.getCore().registerRoundChangeListener(_roundListener);
 											Core.getCore().registerGuidChangeListener(_guidListener);
 
-											//Core.getCore().setCurrentCompId(coreConfig.getDefaultCompId());
 											cb.onSuccess(coreConfig);
 
 											setupContent();
 										}
 
 									});
-
 								}
-
 							});
 						}
-
 					});
 				}
 			});
@@ -321,8 +314,12 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	private void setupContent() {
 		final ClientFactory _this = this;
 		final LoginInfo _loginInfo = loginInfo;
-		final Nav _nav = headerView.getNav();
-		console("setupContent.schedule for " + _loginInfo.isLoggedIn());
+		Nav nav = null;
+		if (Window.getClientWidth() >= 768) {
+			nav = headerView.getNav();
+		}
+		final Nav _nav = nav;
+		//console("setupContent.schedule for " + _loginInfo.isLoggedIn());
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			public void execute() {
 				// set up content 
@@ -333,36 +330,30 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 				if (_loginInfo != null) {
 					console("setupContent.populate");
 					navMgr.populateContent(_loginInfo);
-				}
-				
-						
-						//*** RATING DETAIL POPUP SETUP
-						if (ratingPopup == null) {
-							ratingPopup = new RatingPopupViewImpl<IPlayerRating>();
-							ratingPopup.setClientFactory(_this);
-							// do we have the contentId yet?
-							if (popupDetails.isEmpty()) {
-									Core.getCore().getContent("rating popup details", new AsyncCallback<IContent>() {
+				}					
+				//*** RATING DETAIL POPUP SETUP
+				if (ratingPopup == null) {
+					ratingPopup = new RatingPopupViewImpl<IPlayerRating>();
+					ratingPopup.setClientFactory(_this);
+					// do we have the contentId yet?
+					if (popupDetails.isEmpty()) {
+						Core.getCore().getContent("rating popup details", new AsyncCallback<IContent>() {
 
-										@Override
-										public void onFailure(Throwable caught) {
-											// TODO Auto-generated method stub
+							@Override
+							public void onFailure(Throwable caught) {
+								
+							}
 
-										}
+							@Override
+							public void onSuccess(IContent result) {
+								popupDetails = result.getBody();
+								ratingPopup.setContent(popupDetails);
+							}
 
-										@Override
-										public void onSuccess(IContent result) {
-											popupDetails = result.getBody();
-											ratingPopup.setContent(popupDetails);
-										}
-
-									});
-								}
-						}
-						//****/
+						});
 					}
-//				});
-//			}
+				}
+			}
 		});
 	}
 
@@ -379,7 +370,6 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 
 		return recentFeaturesView;
-
 	}
 
 	@Override
@@ -404,7 +394,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	public TopTenListView<ITopTenItem> getSimpleView() {
 		if (simpleView == null) {
 			simpleView = new CompactTopTenListViewImpl();
-			simpleView.setClientFactory(this);
+			simpleView.setClientFactory(this);			
 		}
 		return simpleView;
 	}
@@ -414,6 +404,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	public RatingPopupViewImpl<IPlayerRating> getRatingPopup() {
 		return ratingPopup;
 	}
+	
 	@Override
 	public SeriesListView<IRatingSeries> getSeriesView() {
 		if (seriesView == null) {
@@ -473,77 +464,73 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		}
 	}
 
-	//	@Override
-	//	public void setPlaceInUrl(SeriesPlace place) throws Exception {
-	////		UrlBuilder builder = Location.createUrlBuilder().setPath("/s/" + place.getToken()).removeParameter("listId").removeParameter("compId").removeParameter("playerId");
-	////		Window.Location.replace(builder.buildString());
-	//		throw new Exception("don't use");
-	//	}
-
-
 	@Override
 	public void renderNotes(final List<INote> notes, final ITopTenList ttl, final AsyncCallback<List<INote>> cb) {
 		// what player names do we need?
 		List<Long> needPlayerNames = determineNamesToFetch(notes);
 		final List<Long> needTTLNames = determineListNamesToFetch(notes);		
 
-		rpcService.getPlayerNames(needPlayerNames, new AsyncCallback<Map<Long, String>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onSuccess(Map<Long, String> result) {
-
-				// cache them
-				for (Long id : result.keySet()) {
-					playerNames.put(id, result.get(id));
+		if (needPlayerNames.size() > 0 || needTTLNames.size() > 0) {
+			rpcService.getPlayerNames(needPlayerNames, new AsyncCallback<Map<Long, String>>() {
+	
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+	
 				}
-
-
-				rpcService.getTTLNames(needTTLNames, new AsyncCallback<Map<Long, String>>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-
+	
+				@Override
+				public void onSuccess(Map<Long, String> result) {
+	
+					// cache them
+					for (Long id : result.keySet()) {
+						playerNames.put(id, result.get(id));
 					}
-
-					@Override
-					public void onSuccess(Map<Long, String> result) {
-						// cache them
-						for (Long id : result.keySet()) {
-							ttlNames.put(id, result.get(id));
+	
+	
+					rpcService.getTTLNames(needTTLNames, new AsyncCallback<Map<Long, String>>() {
+	
+						@Override
+						public void onFailure(Throwable caught) {
+							// TODO Auto-generated method stub
+	
 						}
-
-						rpcService.getTTLContexts(needTTLNames, new AsyncCallback<Map<Long, String>>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								// TODO Auto-generated method stub
-
+	
+						@Override
+						public void onSuccess(Map<Long, String> result) {
+							// cache them
+							for (Long id : result.keySet()) {
+								ttlNames.put(id, result.get(id));
 							}
-
-							@Override
-							public void onSuccess(Map<Long, String> result) {
-								// cache them
-								for (Long id : result.keySet()) {
-									ttlContexts.put(id, result.get(id));
-
-								}									
-								// we are ready for the NoteView to call render now...
-								cb.onSuccess(notes);
-
-							}
-						});
-					}
-
-				});
-			}
-
-		});
+	
+							rpcService.getTTLContexts(needTTLNames, new AsyncCallback<Map<Long, String>>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									// TODO Auto-generated method stub
+	
+								}
+	
+								@Override
+								public void onSuccess(Map<Long, String> result) {
+									// cache them
+									for (Long id : result.keySet()) {
+										ttlContexts.put(id, result.get(id));
+	
+									}									
+									// we are ready for the NoteView to call render now...
+									cb.onSuccess(notes);
+	
+								}
+							});
+						}
+	
+					});
+				}
+	
+			});
+		} else {
+			cb.onSuccess(notes);
+		}
 	}
 
 	@Override
@@ -695,7 +682,6 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 		Core.getCore().getComp(compId, new AsyncCallback<ICompetition>() {
 
-
 			@Override
 			public void onFailure(Throwable caught) {
 
@@ -707,9 +693,6 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 			}
 
 		});
-
-
-
 	}
 
 	@Override
@@ -739,14 +722,10 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 					p.setQueryId(place.getQueryId());
 					p.setSeriesId(place.getSeriesId());
 
-
-
 					getPlaceController().goTo(p);
 				}
 			}
-
 		});
-
 	}
 
 	@Override
@@ -762,8 +741,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 					@Override
 					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-
+						
 					}
 
 					@Override
@@ -782,6 +760,7 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 	}
 
 	private Element fbDiv = null;
+
 	@Override
 	public void showFacebookComments(String url) {
 		//<div class="fb-comments" data-href="**FACEBOOKDATAREF**" data-width="500" data-numposts="5" data-colorscheme="light"></div>
@@ -818,33 +797,33 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 		$wnd.ganew('send', 'event', cat, action, label, val);
 	}-*/;
 
-	public static native void loadWYSIWYGEditor(String text) /*-{
-
-		$wnd.LazyLoad.js(["/theme/js/editor/wysihtml5-0.3.0.js","/theme/js/editor/bootstrap3-wysihtml5.js"], function() {
-
-			$wnd.LazyLoad.css(["/theme/css/elements/form.css", "/theme/css/elements/bootstrap-wysihtml5.css"], function() { 
-
-			//js all loaded
-				$wnd.$('.textarea').wysihtml5({
-			        "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
-			        "emphasis": true, //Italics, bold, etc. Default true
-			        "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-			        "html": true, //Button which allows you to edit the generated HTML. Default false
-			        "link": true, //Button to insert a link. Default true
-			        "image": true, //Button to insert an image. Default true,
-			        "color": false, //Button to change color of font
-			        "size": 'sm' //Button size like sm, xs etc.
-			    });
-
-			    $wnd.$('#modal').on('hidden', function(){
-        			$wnd.$('.wysihtml5-sandbox, .wysihtml5-toolbar').remove();
-        			$wnd.$('#textarea').show();
-    			});
-
-			});
-		});
-
-	}-*/;
+//	public static native void loadWYSIWYGEditor(String text) /*-{
+//
+//		$wnd.LazyLoad.js(["/theme/js/editor/wysihtml5-0.3.0.js","/theme/js/editor/bootstrap3-wysihtml5.js"], function() {
+//
+//			$wnd.LazyLoad.css(["/theme/css/elements/form.css", "/theme/css/elements/bootstrap-wysihtml5.css"], function() { 
+//
+//			//js all loaded
+//				$wnd.$('.textarea').wysihtml5({
+//			        "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+//			        "emphasis": true, //Italics, bold, etc. Default true
+//			        "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+//			        "html": true, //Button which allows you to edit the generated HTML. Default false
+//			        "link": true, //Button to insert a link. Default true
+//			        "image": true, //Button to insert an image. Default true,
+//			        "color": false, //Button to change color of font
+//			        "size": 'sm' //Button size like sm, xs etc.
+//			    });
+//
+//			    $wnd.$('#modal').on('hidden', function(){
+//        			$wnd.$('.wysihtml5-sandbox, .wysihtml5-toolbar').remove();
+//        			$wnd.$('#textarea').show();
+//    			});
+//
+//			});
+//		});
+//
+//	}-*/;
 	@Override
 	public String getTeamLogoStyle(Long teamId) {
 		if (teamLogoStyleMap.containsKey(teamId)) {
@@ -906,6 +885,34 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 				console("show fb");
 			}
 		}
+	}
+	
+	private Map<Long, IRatingGroup> ratingGroupMap = new HashMap<Long, IRatingGroup>();
+	@Override
+	public void getRatingGroupAsync(final Long rgId, final AsyncCallback<IRatingGroup> cb) {
+		if (rgId != null) {
+			if (ratingGroupMap.containsKey(rgId)) {
+				cb.onSuccess(ratingGroupMap.get(rgId));
+			} else {
+				rpcService.getRatingGroup(rgId, new AsyncCallback<IRatingGroup>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						cb.onFailure(caught);
+					}
+
+					@Override
+					public void onSuccess(IRatingGroup result) {
+						ratingGroupMap.put(rgId, result);
+						cb.onSuccess(result);
+					}
+					
+				});
+			}
+		} else {
+			cb.onFailure(null);
+		}
+		
 	}
 
 

@@ -12,6 +12,7 @@ import net.rugby.foundation.core.server.BPMServletContextListener;
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
@@ -54,7 +55,8 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 	transient private IMatchGroupFactory mgf;
 	transient private ICompetitionFactory cf;
 	transient private ITeamGroupFactory tgf;
-
+	transient private IRatingGroupFactory rgf;
+	
 	private IRatingSeriesFactory rsf;
 
 
@@ -78,6 +80,7 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 		this.qref = injector.getInstance(IQueryRatingEngineFactory.class);
 		this.ttlf = injector.getInstance(ITopTenListFactory.class);
 		this.rsf = injector.getInstance(IRatingSeriesFactory.class);
+		this.rgf = injector.getInstance(IRatingGroupFactory.class);
 		
 		ProcessRatingQueryResult retval = new ProcessRatingQueryResult();
 		
@@ -91,7 +94,8 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 		IRatingQuery rq = null;
 		
 		boolean found = false;
-		for (IRatingGroup g: rs.getRatingGroups()) {
+		for (Long rgId : rs.getRatingGroupIds()) {
+			IRatingGroup g = rgf.get(rgId);
 			for (IRatingMatrix m : g.getRatingMatrices()) {
 				for (IRatingQuery q : m.getRatingQueries()) {
 					if (q.getId().equals(rqid)) {
@@ -287,10 +291,11 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 						++j;
 					}
 					
-					if (rs.getRatingGroups().size() > 1 && queryIndex != -1) {
+					if (rs.getRatingGroupIds().size() > 1 && queryIndex != -1) {
 						// we want to look back one ratingGroup - since new ones are added to the front of the list we look at index=1
 						Criteria criteria = rm.getCriteria();
-						for (IRatingMatrix m: rs.getRatingGroups().get(1).getRatingMatrices()) {
+						IRatingGroup backOneGroup = rgf.get(rs.getRatingGroupIds().get(1));
+						for (IRatingMatrix m: backOneGroup.getRatingMatrices()) {
 							if (rm.getCriteria().equals(criteria)) {
 								preQuery = m.getRatingQueries().get(queryIndex);
 								break;
@@ -376,10 +381,11 @@ public class ProcessRatingQuery extends Job2<ProcessRatingQueryResult, Long, Lon
 						++j;
 					}
 					
-					if (rs.getRatingGroups().size() > 1 && queryIndex != -1) {
+					if (rs.getRatingGroupIds().size() > 1 && queryIndex != -1) {
 						// we want to look back one ratingGroup - since new ones are added to the front of the list we look at index=1
 						Criteria criteria = rm.getCriteria();
-						for (IRatingMatrix m: rs.getRatingGroups().get(1).getRatingMatrices()) {
+						IRatingGroup backOneGroup = rgf.get(rs.getRatingGroupIds().get(1));
+						for (IRatingMatrix m: backOneGroup.getRatingMatrices()) {
 							if (rm.getCriteria().equals(criteria)) {
 								preQuery = m.getRatingQueries().get(queryIndex);
 								break;

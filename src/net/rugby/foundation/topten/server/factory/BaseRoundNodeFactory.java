@@ -14,6 +14,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -46,21 +47,22 @@ public abstract class BaseRoundNodeFactory extends BaseCachingFactory<RoundNode>
 	protected ITeamGroupFactory tf;
 	protected IPlayerFactory pf;
 	protected IUniversalRoundFactory urf;
+
+	private IRatingGroupFactory rgf;
 //	protected IPlayerMatchFactory pmf;
 
 	//@Inject
 	public BaseRoundNodeFactory(IRatingSeriesFactory rsf, IPlayerRatingFactory prf, IPlayerMatchStatsFactory pmsf, 
-			//IPlayerMatchFactory pmf,
-								IMatchGroupFactory mgf, IRoundFactory rf, ITeamGroupFactory tf, IPlayerFactory pf, IUniversalRoundFactory urf) {
+								IMatchGroupFactory mgf, IRoundFactory rf, ITeamGroupFactory tf, IPlayerFactory pf, IUniversalRoundFactory urf, IRatingGroupFactory rgf) {
 		this.rsf = rsf;
 		this.prf = prf;
 		this.pmsf = pmsf;
-//		this.pmf = pmf;
 		this.mgf = mgf;
 		this.rf = rf;
 		this.tf = tf;
 		this.pf = pf;
 		this.urf = urf;
+		this.rgf = rgf;
 	}
 
 	@Override 
@@ -86,7 +88,7 @@ public abstract class BaseRoundNodeFactory extends BaseCachingFactory<RoundNode>
 			IRatingSeries s = rsf.get(compId, RatingMode.BY_POSITION);
 
 			// is the latest RatingGroup for the series the same as the first one in the retval?
-			IRatingGroup g = s.getRatingGroups().get(0); //latest is first
+			IRatingGroup g = rgf.get(s.getRatingGroupIds().get(0)); //latest is first
 			
 			if (retval.size() == 0 || g.getUniversalRoundOrdinal() != retval.get(0).round)  {
 				rnMapMap.clear();
@@ -253,7 +255,8 @@ public abstract class BaseRoundNodeFactory extends BaseCachingFactory<RoundNode>
 	private void getRating(PlayerMatch pm, IRatingSeries ratingSeries, int urOrdinal, int positionOrdinal, Long playerId) {
 
 		boolean found = false;
-		for (IRatingGroup rg: ratingSeries.getRatingGroups()) {
+		for (Long rgId: ratingSeries.getRatingGroupIds()) {
+			IRatingGroup rg = rgf.get(rgId);
 			if (rg.getUniversalRoundOrdinal() == urOrdinal) {
 				for (IRatingMatrix m : rg.getRatingMatrices()) {
 					if (m.getCriteria().equals(Criteria.IN_FORM) || m.getCriteria().equals(Criteria.BEST_YEAR)) {

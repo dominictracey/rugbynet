@@ -220,7 +220,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		if (rg == null) {
 			
 			// first, cull out older groups so we don't go past the memcache limit of 1Mb
-			cullOldRatingGroups(rs);
+			//cullOldRatingGroups(rs);
 			
 			rg = rgf.create();
 			rg.setRatingSeries(rs);
@@ -250,7 +250,8 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			rgf.put(rg);
 			// put it at the right place (sort by UR ordinal)
 			int index = 0;
-			for (IRatingGroup cursor : rs.getRatingGroups()) {
+			for (Long cursorId : rs.getRatingGroupIds()) {
+				IRatingGroup cursor = rgf.get(cursorId);
 				if (cursor.getUniversalRoundOrdinal() < rg.getUniversalRoundOrdinal()) {
 					break;
 				}
@@ -258,7 +259,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			}
 
 			rs.getRatingGroupIds().add(index, rg.getId());
-			rs.getRatingGroups().add(index, rg);
+			//rs.getRatingGroups().add(index, rg);
 			rsf.put(rs);
 
 		} else { // graft new matrix(ices) and prune dead ones
@@ -317,56 +318,56 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 	 * 
 	 * @param rs
 	 */
-	private final int EVERY_WEEK_CUTOFF = 16;
-	private final int EVERY_OTHER_WEEK_CUTOFF = 12;
-	private final int EVERY_FOURTH_WEEK_CUTOFF = 24;
-	private void cullOldRatingGroups(IRatingSeries rs) {
-		
-		if (rs.getMode() == RatingMode.BY_MATCH) {
-			// don't flush the match series
-			return;
-		}
-		
-		if (rs.getRatingGroups().size() < 28) {
-			return;
-		}
-		
-		UniversalRound nowUR = urf.getCurrent();
-		
-		int everyWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF;
-		int everyOtherWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF - EVERY_OTHER_WEEK_CUTOFF;
-		int everyFourthWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF - EVERY_OTHER_WEEK_CUTOFF - EVERY_FOURTH_WEEK_CUTOFF;
-		
-		List<IRatingGroup> toDelete = new ArrayList<IRatingGroup>();
-		for (IRatingGroup rg : rs.getRatingGroups()) {
-			if (rg.getUniversalRoundOrdinal() < everyFourthWeekCutoff) {
-				// delete very old
-				toDelete.add(rg);
-			} else if (rg.getUniversalRoundOrdinal() < everyOtherWeekCutoff) {
-				// delete every fourth one
-				if ((rg.getUniversalRoundOrdinal() % 4) != 1) {
-					toDelete.add(rg);
-				}
-			} else if (rg.getUniversalRoundOrdinal() < everyWeekCutoff) {
-				// delete every fourth one
-				if ((rg.getUniversalRoundOrdinal() % 2) != 1) {
-					toDelete.add(rg);
-				}
-			}
-		}
-		
-		for (IRatingGroup rg : toDelete) {
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Removing rating group from RatingSeries " + rs.getDisplayName() + " for " + rg.getUniversalRound().longDesc);
-			rs.getRatingGroups().remove(rg);
-			rs.getRatingGroupIds().remove(rg);
-		}
-		
-		assert(rs.getRatingGroupIds().size() == rs.getRatingGroups().size());
-		assert(rs.getRatingGroupIds().size() <= 28);
-		
-		
-		rsf.put(rs);
-	}
+//	private final int EVERY_WEEK_CUTOFF = 16;
+//	private final int EVERY_OTHER_WEEK_CUTOFF = 12;
+//	private final int EVERY_FOURTH_WEEK_CUTOFF = 24;
+//	private void cullOldRatingGroups(IRatingSeries rs) {
+//		
+//		if (rs.getMode() == RatingMode.BY_MATCH) {
+//			// don't flush the match series
+//			return;
+//		}
+//		
+//		if (rs.getRatingGroups().size() < 28) {
+//			return;
+//		}
+//		
+//		UniversalRound nowUR = urf.getCurrent();
+//		
+//		int everyWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF;
+//		int everyOtherWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF - EVERY_OTHER_WEEK_CUTOFF;
+//		int everyFourthWeekCutoff = nowUR.ordinal - EVERY_WEEK_CUTOFF - EVERY_OTHER_WEEK_CUTOFF - EVERY_FOURTH_WEEK_CUTOFF;
+//		
+//		List<IRatingGroup> toDelete = new ArrayList<IRatingGroup>();
+//		for (IRatingGroup rg : rs.getRatingGroups()) {
+//			if (rg.getUniversalRoundOrdinal() < everyFourthWeekCutoff) {
+//				// delete very old
+//				toDelete.add(rg);
+//			} else if (rg.getUniversalRoundOrdinal() < everyOtherWeekCutoff) {
+//				// delete every fourth one
+//				if ((rg.getUniversalRoundOrdinal() % 4) != 1) {
+//					toDelete.add(rg);
+//				}
+//			} else if (rg.getUniversalRoundOrdinal() < everyWeekCutoff) {
+//				// delete every fourth one
+//				if ((rg.getUniversalRoundOrdinal() % 2) != 1) {
+//					toDelete.add(rg);
+//				}
+//			}
+//		}
+//		
+//		for (IRatingGroup rg : toDelete) {
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Removing rating group from RatingSeries " + rs.getDisplayName() + " for " + rg.getUniversalRound().longDesc);
+//			rs.getRatingGroups().remove(rg);
+//			rs.getRatingGroupIds().remove(rg);
+//		}
+//		
+//		assert(rs.getRatingGroupIds().size() == rs.getRatingGroups().size());
+//		assert(rs.getRatingGroupIds().size() <= 28);
+//		
+//		
+//		rsf.put(rs);
+//	}
 
 
 	private List<Long> findRoundsForRatingMatrices(IRatingMatrix rm) {

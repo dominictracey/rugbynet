@@ -3,7 +3,6 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
   <ui:style>
     .textAreaStyle { height: 200px; }
-
   </ui:style>
 	<b:Well ui:field="root">
 		<b:Form>

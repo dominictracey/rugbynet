@@ -9,6 +9,7 @@ import net.rugby.foundation.core.client.Identity.Presenter;
 import net.rugby.foundation.model.shared.IContent;
 import net.rugby.foundation.model.shared.ICoreConfiguration;
 import net.rugby.foundation.model.shared.IPlayerRating;
+import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingSeries;
 import net.rugby.foundation.model.shared.ISponsor;
 import net.rugby.foundation.model.shared.LoginInfo;
@@ -104,4 +105,6 @@ public interface ClientFactory {
 	void recordAnalyticsEvent(String cat, String action, String label, int val);
 
 	void showExternalLink(String string);
+
+	void getRatingGroupAsync(Long rgId, AsyncCallback<IRatingGroup> asyncCallback);
 }

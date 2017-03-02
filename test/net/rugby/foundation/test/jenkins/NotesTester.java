@@ -79,22 +79,22 @@ public class NotesTester {
 //			ttl = ttlf.get(ttlid);
 //		}
 		
-		List<INote> notes = creator.createNotes(rs.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(0));
-
-		assert(notes != null);
-		assert(notes.size() == 10);
-		
-		ITopTenList ttl = ttlf.get(rs.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(0).getTopTenListId());
-		
-		String val = renderer.render(notes, ttl, false);
-		
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, val);
-		
-		val = renderer.render(notes, null, true);
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Top Ten:\n" + val);
-		
-		val = twitter.render(notes, null, true);
-		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Twitter:\n" + val);
+//		List<INote> notes = creator.createNotes(rs.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(0));
+//
+//		assert(notes != null);
+//		assert(notes.size() == 10);
+//		
+//		ITopTenList ttl = ttlf.get(rs.getRatingGroups().get(0).getRatingMatrices().get(0).getRatingQueries().get(0).getTopTenListId());
+//		
+//		String val = renderer.render(notes, ttl, false);
+//		
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, val);
+//		
+//		val = renderer.render(notes, null, true);
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Top Ten:\n" + val);
+//		
+//		val = twitter.render(notes, null, true);
+//		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, "Twitter:\n" + val);
 
 
 	}

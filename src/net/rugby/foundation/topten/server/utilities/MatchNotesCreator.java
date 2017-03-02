@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.IRatingGroup;
 import net.rugby.foundation.model.shared.IRatingMatrix;
@@ -33,10 +34,11 @@ public class MatchNotesCreator implements INotesCreator {
 	private TopTenNotesCreator ttc;
 	private ITopTenListFactory ttlf;
 	private IRatingSeriesFactory rsf;
+	private IRatingGroupFactory rgf;
 
 	@Inject
 	public MatchNotesCreator(TopTenNotesCreator ttc, TacklesNotesCreator tnc, TriesScoredNotesCreator tsnc, INoteFactory nf, INoteRefFactory nrf,
-			ITopTenListFactory ttlf, IRatingSeriesFactory rsf) {
+			ITopTenListFactory ttlf, IRatingSeriesFactory rsf, IRatingGroupFactory rgf) {
 		this.ttc = ttc;
 		this.tsnc = tsnc;
 		this.tnc = tnc;
@@ -44,6 +46,7 @@ public class MatchNotesCreator implements INotesCreator {
 		this.nrf = nrf;
 		this.ttlf = ttlf;
 		this.rsf = rsf;
+		this.rgf = rgf;
 	}
 
 	@SuppressWarnings("unused")
@@ -98,10 +101,10 @@ public class MatchNotesCreator implements INotesCreator {
 						IRatingSeries series = rsf.get(compId, mode);
 						if (series != null ) { //&& !series.getId().equals(rq.getRatingMatrix().getRatingGroup().getRatingSeriesId())) {
 							// get the right RatingGroup
-							List<IRatingGroup> groups = series.getRatingGroups();
-							if (groups.size() > 0) {
-								int i = groups.size()-1;
-								IRatingGroup group = groups.get(i);
+							List<Long> groupIds = series.getRatingGroupIds();
+							if (groupIds.size() > 0) {
+								int i = groupIds.size()-1;
+								IRatingGroup group = rgf.get(groupIds.get(i));
 								// go backwards
 								while (group != null) {
 									if (group.getUniversalRoundOrdinal() == uro) {
@@ -110,7 +113,7 @@ public class MatchNotesCreator implements INotesCreator {
 									if (i == 0) {
 										group = null;
 									} else {
-										group = groups.get(--i);
+										group = rgf.get(groupIds.get(--i));
 									}
 								}
 

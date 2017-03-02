@@ -29,14 +29,19 @@ public abstract class BaseRatingGroupFactory extends BaseCachingFactory<IRatingG
 	
 	protected IRatingGroup build(IRatingGroup t) {
 		try {
+			
+
+			
 			if (t.getRatingMatrixIds() != null && !t.getRatingMatrixIds().isEmpty()) {
 				assert (t.getRatingMatrices() != null);
 				if (!t.getRatingMatrices().isEmpty()) {
 					t.getRatingMatrices().clear();
 				}
-				for (Long rgid : t.getRatingMatrixIds()){
+				for (Long rmid : t.getRatingMatrixIds()){
 					// this will populate down to the RatingQuery
-					t.getRatingMatrices().add(rmf.get(rgid));
+					IRatingMatrix rm = rmf.get(rmid);
+					rm.setRatingGroup(t);
+					t.getRatingMatrices().add(rm);
 				}
 			}
 			

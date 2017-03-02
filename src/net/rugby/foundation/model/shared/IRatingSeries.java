@@ -3,6 +3,7 @@ package net.rugby.foundation.model.shared;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface IRatingSeries extends IHasId {
 
@@ -42,15 +43,9 @@ public interface IRatingSeries extends IHasId {
 
 	public abstract List<Long> getCompIds();
 
-	//public abstract List<ICompetition> getComps();
-
 	public abstract Boolean isGlobal();
 
 	public abstract void isGlobal(Boolean isGlobal);
-
-	public abstract List<IRatingGroup> getRatingGroups();
-
-	public abstract void setRatingGroups(List<IRatingGroup> ratingGroups);
 
 	public abstract List<Long> getRatingGroupIds();
 
@@ -72,5 +67,7 @@ public interface IRatingSeries extends IHasId {
 	Sponsor getSponsor();
 	void setSponsorId(Long sponsorId);
 	Long getSponsorId();
+
+	public abstract Map<Long,String> getRatingGroupNameMap();
 
 }

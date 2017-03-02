@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 
 import net.rugby.foundation.core.server.factory.ICompetitionFactory;
 import net.rugby.foundation.core.server.factory.IConfigurationFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.ICompetition;
@@ -25,13 +26,15 @@ public class CompetitionListGenerator {
 	private ITopTenListFactory ttlf;
 	private IConfigurationFactory ccf;
 	private ICompetitionFactory cf;
+	private IRatingGroupFactory rgf;
 
 	@Inject
-	public CompetitionListGenerator(IRatingSeriesFactory rsf, ITopTenListFactory ttlf, IConfigurationFactory ccf, ICompetitionFactory cf) {
+	public CompetitionListGenerator(IRatingSeriesFactory rsf, ITopTenListFactory ttlf, IConfigurationFactory ccf, ICompetitionFactory cf, IRatingGroupFactory rgf) {
 		this.rsf = rsf;
 		this.ttlf = ttlf;
 		this.ccf = ccf;
 		this.cf = cf;
+		this.rgf = rgf;
 	}
 
 	public String get(Boolean comps, Boolean regions) {
@@ -57,10 +60,10 @@ public class CompetitionListGenerator {
 				} else {
 
 					// and the latest RatingGroup
-					if (rs.getRatingGroups() == null || rs.getRatingGroups().size() == 0) {
+					if (rs.getRatingGroupIds() == null || rs.getRatingGroupIds().size() == 0) {
 						Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "<!-- no rating groups found for position series of compId " + compId + " -->");
 					} else {
-						IRatingGroup rg = rs.getRatingGroups().get(0); // first is most recent
+						IRatingGroup rg = rgf.get(rs.getRatingGroupIds().get(0)); // first is most recent
 	
 						// and the in form list is preferred
 						if (rg.getRatingMatrices() == null || rg.getRatingMatrices().size() == 0) {

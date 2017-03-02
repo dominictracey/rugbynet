@@ -1124,7 +1124,8 @@ public abstract class BaseTopTenListFactory implements ITopTenListFactory {
 		UniversalRound ur = urf.get(r);
 		if (series != null) {
 			IRatingGroup rg = null;
-			for (IRatingGroup rgi : series.getRatingGroups()) {
+			for (Long rgId : series.getRatingGroupIds()) {
+				IRatingGroup rgi = rgf.get(rgId);
 				if (rgi.getUniversalRoundOrdinal() == ur.ordinal) {
 					rg = rgi;
 					break;

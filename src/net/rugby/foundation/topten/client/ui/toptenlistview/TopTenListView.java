@@ -37,5 +37,6 @@ public interface TopTenListView<T extends ITopTenItem> extends IsWidget
 	int getItemCount();
 	void setItemCount(int i);
 
-	
+	void showWait();
+	void hideWait();
 }

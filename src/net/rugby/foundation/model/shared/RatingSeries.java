@@ -3,7 +3,9 @@ package net.rugby.foundation.model.shared;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -34,8 +36,6 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	protected List<Criteria> activeCriteria;
 
 	private List<Long> compIds;
-//	@Transient
-//	private List<ICompetition> comps;
 	
 	private Long hostCompId;
 	@Transient
@@ -43,23 +43,23 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	
 	private Boolean isGlobal;
 
-	@Transient
-	private List<IRatingGroup> ratingGroups;
 	private List<Long> ratingGroupIds;
 	
 	private Long sponsorId;
 	@Transient
 	private Sponsor sponsor;
+
+	@Transient
+	private HashMap<Long, String> ratingGroupNameMap;
 	
 	public RatingSeries()
 	{
 		setCountryIds(new ArrayList<Long>());
 		setCompIds(new ArrayList<Long>());
 		setCountries(new ArrayList<ICountry>());
-//		setComps(new ArrayList<ICompetition>());	
 		setActiveCriteria(new ArrayList<Criteria>());
 		setRatingGroupIds(new ArrayList<Long>());
-		setRatingGroups(new ArrayList<IRatingGroup>());
+
 		isGlobal = false;
 	}
 
@@ -221,16 +221,6 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	}
 
 	@Override
-	public List<IRatingGroup> getRatingGroups() {
-		return ratingGroups;
-	}
-
-	@Override
-	public void setRatingGroups(List<IRatingGroup> ratingGroups) {
-		this.ratingGroups = ratingGroups;
-	}
-
-	@Override
 	public List<Long> getRatingGroupIds() {
 		return ratingGroupIds;
 	}
@@ -286,5 +276,14 @@ public class RatingSeries implements Serializable, IRatingSeries {
 	@Override
 	public void setSponsor(Sponsor sponsor) {
 		this.sponsor = sponsor;
+	}
+
+
+	@Override
+	public Map<Long, String> getRatingGroupNameMap() {
+		if (this.ratingGroupNameMap == null) {
+			ratingGroupNameMap = new HashMap<Long,String>();
+		}
+		return ratingGroupNameMap;
 	}
 }

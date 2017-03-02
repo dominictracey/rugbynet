@@ -44,15 +44,6 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 	public IRatingSeries build(IRatingSeries rs)
 	{
 		try {
-//			if (rs.getCompIds() != null && !rs.getCompIds().isEmpty()) {
-//				assert(rs.getComps() != null);
-//				if (!rs.getComps().isEmpty()) {
-//					rs.getComps().clear();
-//				}
-//				for (Long cid : rs.getCompIds()) {
-//					rs.getComps().add(cf.get(cid));
-//				}
-//			}
 			
 			if (rs.getCountryIds() != null && !rs.getCountryIds().isEmpty()) {
 				assert (rs.getCountries() != null);
@@ -64,48 +55,63 @@ public abstract class BaseRatingSeriesFactory extends BaseCachingFactory<IRating
 				}
 			}
 			
+//			List<Long> badRatingGroupIds = new ArrayList<Long>();
+//			if (rs.getRatingGroupIds() != null && !rs.getRatingGroupIds().isEmpty()) {
+//				assert (rs.getRatingGroups() != null);
+//				if (!rs.getRatingGroups().isEmpty()) {
+//					rs.getRatingGroups().clear();
+//				}
+//				for (Long rgid : rs.getRatingGroupIds()){
+//					// check for bad groups
+//					IRatingGroup rg = rgf.get(rgid);
+//					if (rg == null) {
+//						badRatingGroupIds.add(rgid);
+//					} else {
+//						// this will populate down to the RatingQuery
+//						rs.getRatingGroups().add(rg);
+//					}
+//				}
+//				
+//				if (badRatingGroupIds.size() > 0) {
+//					// now just drop any groups that are dangling IDs
+//					for (Long badId : badRatingGroupIds) {
+//						rs.getRatingGroupIds().remove(badId);
+//					}
+//					
+//					putToPersistentDatastore(rs);
+//				}
+//			}
+			
+			// build the map of ratingGroupId > rgLabel
 			List<Long> badRatingGroupIds = new ArrayList<Long>();
-			if (rs.getRatingGroupIds() != null && !rs.getRatingGroupIds().isEmpty()) {
-				assert (rs.getRatingGroups() != null);
-				if (!rs.getRatingGroups().isEmpty()) {
-					rs.getRatingGroups().clear();
-				}
-				for (Long rgid : rs.getRatingGroupIds()){
-					// check for bad groups
-					IRatingGroup rg = rgf.get(rgid);
-					if (rg == null) {
-						badRatingGroupIds.add(rgid);
-					} else {
-						// this will populate down to the RatingQuery
-						rs.getRatingGroups().add(rg);
-					}
-				}
-				
-				if (badRatingGroupIds.size() > 0) {
-					// now just drop any groups that are dangling IDs
-					for (Long badId : badRatingGroupIds) {
-						rs.getRatingGroupIds().remove(badId);
-					}
-					
-					putToPersistentDatastore(rs);
+			for (Long rgId : rs.getRatingGroupIds()) {
+				IRatingGroup rg = rgf.get(rgId);
+				if (rg != null) {
+					rs.getRatingGroupNameMap().put(rg.getId(), rg.getLabel());
+				} else {
+					// bad ratingGroup
+					badRatingGroupIds.add(rgId);
 				}
 			}
 			
-			// now do a traversal of the tree to do the up links
-			for (IRatingGroup rg : rs.getRatingGroups()) {
-				rg.setRatingSeries(rs);
-				for (IRatingMatrix rm : rg.getRatingMatrices()) {
-					rm.setRatingGroup(rg);
-					for (IRatingQuery rq : rm.getRatingQueries()) {
-						rq.setRatingMatrix(rm);
-					}
-				}
-			}
-			
-			// tell the configuration object to repull from cache
-			if (rs.getId() != null) {
-				scf.dropFromCache(scf.getForSeriesId(rs.getId()).getId());
-			}
+			// just drop any dangling group IDs			
+			if (badRatingGroupIds.size() > 0) {				
+				for (Long badId : badRatingGroupIds) {
+					rs.getRatingGroupIds().remove(badId);
+				}			
+				putToPersistentDatastore(rs);
+			}		
+ 			
+//			// now do a traversal of the tree to do the up links
+//			for (IRatingGroup rg : rs.getRatingGroups()) {
+//				rg.setRatingSeries(rs);
+//				for (IRatingMatrix rm : rg.getRatingMatrices()) {
+//					rm.setRatingGroup(rg);
+//					for (IRatingQuery rq : rm.getRatingQueries()) {
+//						rq.setRatingMatrix(rm);
+//					}
+//				}
+//			}
 			
 			return rs;
 			

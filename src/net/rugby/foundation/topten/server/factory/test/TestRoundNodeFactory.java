@@ -8,6 +8,7 @@ import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IPlayerFactory;
 import net.rugby.foundation.core.server.factory.IPlayerMatchStatsFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -25,9 +26,9 @@ public class TestRoundNodeFactory extends BaseRoundNodeFactory implements IRound
 			IPlayerRatingFactory prf, IPlayerMatchStatsFactory pmsf,
 			//IPlayerMatchFactory pmf, 
 			IMatchGroupFactory mgf, IRoundFactory rf,
-			ITeamGroupFactory tf, IPlayerFactory pf, IUniversalRoundFactory urf) {
+			ITeamGroupFactory tf, IPlayerFactory pf, IUniversalRoundFactory urf, IRatingGroupFactory rgf) {
 		super(rsf, prf, pmsf, //pmf,
-				mgf, rf, tf, pf, urf);
+				mgf, rf, tf, pf, urf, rgf);
 		// TODO Auto-generated constructor stub
 	}
 

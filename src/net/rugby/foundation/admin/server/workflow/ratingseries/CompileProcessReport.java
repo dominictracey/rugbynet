@@ -77,7 +77,6 @@ public class CompileProcessReport extends Job4<MS8Rated, List<ProcessRatingQuery
 			//IRatingSeries rs = sc.getSeries();
 			IRatingSeries rs = rsf.get(sc.getSeriesId());
 			// find the RatingGroup for the target round
-			assert (rs.getRatingGroups() != null);
 			IRatingGroup rg = rgf.getForUR(rs.getId(), targetUROrdinal);
 			//				if (rg.getUniversalRoundOrdinal() == sc.getTargetRoundOrdinal()) {
 			assert (rg.getRatingMatrices() != null);

@@ -184,7 +184,6 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 		sponsorLink.addStyleName("trn-sponsor-link");
 		compLink.addStyleName("trn-comp-link");
-
 	}
 
 	@UiHandler("promote")
@@ -219,12 +218,15 @@ public class SeriesListViewImpl extends Composite implements SeriesListView<IRat
 
 
 
-			for (IRatingGroup rg : series.getRatingGroups()) {
+			//for (IRatingGroup rg : series.getRatingGroups()) {
+			for (Long rgId : series.getRatingGroupIds()) {
+				
 				// add item to date dropdown
-				final AnchorListItem nl = new AnchorListItem(rg.getLabel());
-				final Long gid = rg.getId();
-				final String label = rg.getLabel();
-				nl.setText(rg.getLabel());
+				final String label = series.getRatingGroupNameMap().get(rgId);
+				final AnchorListItem nl = new AnchorListItem(label);
+				final Long gid = rgId;		
+				nl.setText(label);
+				
 				nl.addClickHandler(new ClickHandler() {
 
 					@Override

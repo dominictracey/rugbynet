@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import com.google.inject.Inject;
 
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
 import net.rugby.foundation.core.server.factory.IRatingSeriesFactory;
 import net.rugby.foundation.model.shared.Criteria;
 import net.rugby.foundation.model.shared.IRatingGroup;
@@ -18,11 +19,13 @@ public class PositionListGenerator {
 	
 	private IRatingSeriesFactory rsf;
 	private ITopTenListFactory ttlf;
+	private IRatingGroupFactory rgf;
 
 	@Inject
-	public PositionListGenerator(IRatingSeriesFactory rsf, ITopTenListFactory ttlf) {
+	public PositionListGenerator(IRatingSeriesFactory rsf, ITopTenListFactory ttlf, IRatingGroupFactory rgf) {
 		this.rsf = rsf;
 		this.ttlf = ttlf;
+		this.rgf = rgf;
 	}
 	
 	public String getForComp(Long compId) {
@@ -47,10 +50,10 @@ public class PositionListGenerator {
 		}
 		
 		// and the latest RatingGroup
-		if (rs.getRatingGroups() == null || rs.getRatingGroups().size() == 0) {
+		if (rs.getRatingGroupIds() == null || rs.getRatingGroupIds().size() == 0) {
 			return "<!-- no rating groups found for position series of compId " + compId + " -->";
 		}
-		IRatingGroup rg = rs.getRatingGroups().get(rs.getRatingGroups().size()-1);
+		IRatingGroup rg = rgf.get(rs.getRatingGroupIds().get(rs.getRatingGroupIds().size()-1));
 		
 		// and the in form list is preferred
 		if (rg.getRatingMatrices() == null || rg.getRatingMatrices().size() == 0) {
