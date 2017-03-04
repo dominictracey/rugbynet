@@ -3,6 +3,7 @@ package net.rugby.foundation.topten.server.utilities;
 import java.util.List;
 
 import net.rugby.foundation.model.shared.IRatingQuery;
+import net.rugby.foundation.model.shared.RatingMode;
 import net.rugby.foundation.topten.model.shared.INote;
 
 /**
@@ -12,5 +13,5 @@ import net.rugby.foundation.topten.model.shared.INote;
  */
 public interface INotesCreator {
 
-	List<INote> createNotes(IRatingQuery rq);
+	List<INote> createNotes(IRatingQuery rq, RatingMode mode);
 }

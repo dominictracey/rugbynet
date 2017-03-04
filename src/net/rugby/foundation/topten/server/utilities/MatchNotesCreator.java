@@ -51,7 +51,7 @@ public class MatchNotesCreator implements INotesCreator {
 
 	@SuppressWarnings("unused")
 	@Override
-	public List<INote> createNotes(IRatingQuery rq) {
+	public List<INote> createNotes(IRatingQuery rq, RatingMode mode1) {
 
 		ITopTenList ttl = ttlf.get(rq.getTopTenListId());
 		
@@ -79,11 +79,11 @@ public class MatchNotesCreator implements INotesCreator {
 
 			// Now create new notes for this list
 			// tackle notes
-			List<INote> retval = tnc.createNotes(rq);
+			List<INote> retval = tnc.createNotes(rq, mode1);
 			// tries scored notes
-			retval.addAll(tsnc.createNotes(rq));
+			retval.addAll(tsnc.createNotes(rq, mode1));
 			// izzon notes
-			retval.addAll(ttc.createNotes(rq));
+			retval.addAll(ttc.createNotes(rq, mode1));
 
 			// save notes
 			for (INote note : retval) {

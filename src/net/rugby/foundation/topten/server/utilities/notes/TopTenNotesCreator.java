@@ -49,11 +49,11 @@ public class TopTenNotesCreator implements INotesCreator {
 	}
 
 	@Override
-	public List<INote> createNotes(IRatingQuery rq) {
+	public List<INote> createNotes(IRatingQuery rq, RatingMode mode) {
 		List<INote> retval = new ArrayList<INote>();
 
 		if (rq.getRatingMatrix() != null) {
-			RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
+			//RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
 			
 			//if (rq.getRatingMatrix().getCriteria().equals(Criteria.ROUND)) {				
 				ITopTenList ttl = ttlf.get(rq.getTopTenListId());

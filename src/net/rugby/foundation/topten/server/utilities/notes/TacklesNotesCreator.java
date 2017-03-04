@@ -48,7 +48,7 @@ public class TacklesNotesCreator implements INotesCreator {
 	}
 
 	@Override
-	public List<INote> createNotes(IRatingQuery rq) {
+	public List<INote> createNotes(IRatingQuery rq, RatingMode mode) {
 		List<INote> retval = new ArrayList<INote>();
 
 		// if it's just for the last round, check how many tackles they made in the match and report the top players
@@ -89,7 +89,7 @@ public class TacklesNotesCreator implements INotesCreator {
 					// player1, player2 and player3 the top tacklers (Optional #) in [Context]
 					List<Long> playerIds = new ArrayList<Long>();
 					int i = 0;
-					while (stats.get(i).getTacklesMade().equals(tacklesMade)) {
+					while (i < stats.size() && stats.get(i).getTacklesMade().equals(tacklesMade)) {
 						playerIds.add(stats.get(i).getPlayerId());
 						++i;
 					}
@@ -114,7 +114,7 @@ public class TacklesNotesCreator implements INotesCreator {
 					if (ttl != null) {
 
 						// the context is either a match or a whole round
-						RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
+						//RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
 						if (mode.equals(RatingMode.BY_MATCH)) {
 
 							note.setMatchId(prl.get(0).getMatchStats().get(0).getMatchId());

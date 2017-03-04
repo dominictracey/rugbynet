@@ -43,7 +43,7 @@ public class TriesScoredNotesCreator implements INotesCreator {
 //	protected final String moreTriesTemplate_EN = Note.PLAYER1 + " had" + Note.DETAILS + " tries" + Note.CONTEXT + " " + Note.LINK;
 
 	@Override
-	public List<INote> createNotes(IRatingQuery rq) {
+	public List<INote> createNotes(IRatingQuery rq, RatingMode mode) {
 		List<INote> retval = new ArrayList<INote>();
 		if (rq.getRatingMatrix() != null) {
 			if (rq.getRatingMatrix().getCriteria().equals(Criteria.ROUND)) {
@@ -102,7 +102,7 @@ public class TriesScoredNotesCreator implements INotesCreator {
 						note.setTeamId(stats.get(0).getTeamId());
 
 						// the context of scoring tries is a match
-						RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
+						//RatingMode mode = rq.getRatingMatrix().getRatingGroup().getRatingSeries().getMode();
 						if (mode.equals(RatingMode.BY_MATCH)) {
 
 							note.setMatchId(prl.get(0).getMatchStats().get(0).getMatchId());
