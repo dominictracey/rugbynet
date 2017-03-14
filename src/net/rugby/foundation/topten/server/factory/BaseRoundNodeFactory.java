@@ -143,6 +143,7 @@ public abstract class BaseRoundNodeFactory extends BaseCachingFactory<RoundNode>
 
 		List<IPlayerRating> prq = prf.query(rq);
 		Map<String,Long> players = new HashMap<String,Long>();
+		IRatingSeries rs = rsf.get(g.getRatingSeriesId());
 		
 		for (IPlayerRating pr : prq) {
 			for (RatingComponent rc : pr.getRatingComponents()) {
@@ -164,7 +165,7 @@ public abstract class BaseRoundNodeFactory extends BaseCachingFactory<RoundNode>
 					pm.teamAbbr = tf.get(pms.getTeamId()).getAbbr();
 					pm.playerId = pms.getPlayerId();
 					
-					getRating(pm, g.getRatingSeries(), r.getUrOrdinal(), positionOrdinal, pms.getPlayerId());
+					getRating(pm, rs, r.getUrOrdinal(), positionOrdinal, pms.getPlayerId());
 					setNotes(pm, pms);
 					
 					IPlayer p = pf.get(pms.getPlayerId());

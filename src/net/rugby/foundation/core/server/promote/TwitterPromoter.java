@@ -79,7 +79,7 @@ public class TwitterPromoter implements IPromoter {
 		try {
 
 			// is this a recent save?
-			if (tti.getPlayer().getTwitterHandle() == null) {
+			if (tti.getPlayer().getTwitterHandle() == null) { 			//TODO - sometimes this line throws a null pointer exception
 				IPlayer p = pf.get(tti.getPlayerId());
 				ITeamGroup t = tgf.get(tti.getTeamId());
 				if (p.getTwitterHandle() != null && !p.getTwitterHandle().isEmpty()) {
