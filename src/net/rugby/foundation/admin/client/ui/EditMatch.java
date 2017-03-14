@@ -5,6 +5,9 @@ package net.rugby.foundation.admin.client.ui;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.Status;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
@@ -99,6 +102,8 @@ public class EditMatch extends Composite {
 	@UiField
 	TextBox visitorScore;
 	@UiField
+	TextBox espnStreamId;
+	@UiField
 	Button saveScore;
 	@UiField
 	Button showLog;
@@ -112,18 +117,22 @@ public class EditMatch extends Composite {
 
 	@UiHandler("save")
 	void onClickSave(ClickEvent e) {
-		matchGroup.setDisplayName(displayName.getText());
-		matchGroup.setDate(new Date(scheduled.getText()));
-		matchGroup.setLocked(locked.getValue());
-		if (scrumId.getText() != null && !scrumId.getText().isEmpty() && scrumId.getText().matches("[0-9]*")) {
-			matchGroup.setForeignId(Long.parseLong(scrumId.getText()));
+		try {
+			matchGroup.setDisplayName(displayName.getText());
+			matchGroup.setDate(new Date(scheduled.getText()));
+			matchGroup.setLocked(locked.getValue());
+			if (scrumId.getText() != null && !scrumId.getText().isEmpty() && scrumId.getText().matches("[0-9]*")) {
+				matchGroup.setForeignId(Long.parseLong(scrumId.getText()));
+			}
+			int selected = status.getSelectedIndex();
+			matchGroup.setStatus(Status.valueOf(Status.class, status.getItemText(selected)));
+			selected = workFlowStatus.getSelectedIndex();
+			matchGroup.setWorkflowStatus(WorkflowStatus.valueOf(WorkflowStatus.class,workFlowStatus.getItemText(selected)));
+			matchGroup.setESPNStreamId(Long.parseLong(espnStreamId.getText()));
+			listener.saveMatchInfo(matchGroup);
+		} catch(Exception ex) {
+			Notify.notify("Bad data. Not saved.", NotifyType.DANGER);
 		}
-		int selected = status.getSelectedIndex();
-		matchGroup.setStatus(Status.valueOf(Status.class, status.getItemText(selected)));
-		selected = workFlowStatus.getSelectedIndex();
-		matchGroup.setWorkflowStatus(WorkflowStatus.valueOf(WorkflowStatus.class,workFlowStatus.getItemText(selected)));
-		
-		listener.saveMatchInfo(matchGroup);
 	}
 
 	@UiHandler("lock")
@@ -162,7 +171,11 @@ public class EditMatch extends Composite {
 	}
 	public void ShowMatch(IMatchGroup match) {
 		matchGroup = match;
-
+		if (match.getESPNStreamId() != null) {
+			espnStreamId.setText(match.getESPNStreamId().toString());
+		} else {
+			espnStreamId.setText("");
+		}
 		displayName.setText(match.getDisplayName());
 		scheduled.setText(match.getDate().toString());
 		int selectedIndex = 0;

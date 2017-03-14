@@ -66,6 +66,8 @@ public class Competition implements Serializable, ICompetition {
 	@Transient
 	private List<Long> componentCompIds = new ArrayList<Long>();
 	
+	protected String ESPNStreamCategory;
+	
 	public Long getCompClubhouse() {
 		return compClubhouse;
 	}
@@ -480,6 +482,14 @@ public class Competition implements Serializable, ICompetition {
 	@Override
 	public void setTableURL(String tableURL) {
 		this.tableURL = tableURL;
+	}
+	@Override
+	public String getESPNStreamCategory() {
+		return ESPNStreamCategory;
+	}
+	@Override
+	public void setESPNStreamCategory(String eSPNStreamCategory) {
+		ESPNStreamCategory = eSPNStreamCategory;
 	}
 
 

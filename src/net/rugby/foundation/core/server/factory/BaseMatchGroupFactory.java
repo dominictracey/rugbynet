@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.rugby.foundation.model.shared.ICompetition;
 import net.rugby.foundation.model.shared.IMatchGroup;
 import net.rugby.foundation.model.shared.IMatchGroup.WorkflowStatus;
 import net.rugby.foundation.model.shared.IMatchResult;
@@ -74,6 +75,15 @@ public abstract class BaseMatchGroupFactory extends BaseCachingFactory<IMatchGro
 				g.setWorkflowStatus(WorkflowStatus.FETCHED);
 			}
 
+			
+			// self-cleaning oven
+			if (g.getCompId() == null) {
+				IRound r = rf.get(g.getRoundId());
+				if (r != null) {
+					g.setCompId(r.getCompId());			
+				}				
+			}
+			
 			g = super.put(g);
 
 			// force top-level reload

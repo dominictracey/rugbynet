@@ -54,6 +54,9 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Unindexed
 	private List<String> workflowLog;
 
+	protected Long ESPNStreamId;
+	protected Long compId;
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -351,6 +354,22 @@ public class MatchGroup extends Group implements IMatchGroup {
 	@Override
 	public void setForeignLeagueId(Long foreignLeagueId) {
 		this.foreignLeagueId = foreignLeagueId;
+	}
+	@Override
+	public Long getESPNStreamId() {
+		return ESPNStreamId;
+	}
+	@Override
+	public void setESPNStreamId(Long eSPNStreamId) {
+		ESPNStreamId = eSPNStreamId;
+	}
+	@Override
+	public Long getCompId() {
+		return compId;
+	}
+	@Override
+	public void setCompId(Long compId) {
+		this.compId = compId;
 	}
 
 }

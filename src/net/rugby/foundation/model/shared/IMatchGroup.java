@@ -89,5 +89,13 @@ public interface IMatchGroup extends IGroup  {
 	Long getForeignLeagueId();
 
 	void setForeignLeagueId(Long foreignLeagueId);
+
+	Long getESPNStreamId();
+
+	void setESPNStreamId(Long eSPNStreamId);
+
+	Long getCompId();
+
+	void setCompId(Long compId);
 	
 }

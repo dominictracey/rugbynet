@@ -62,6 +62,8 @@ public class EditComp extends Composite {
 	@UiField
 	TextBox espnId;
 	@UiField
+	TextBox streamCategory;
+	@UiField
 	TextBox ccid;
 	@UiField
 	CheckBox underway;
@@ -89,6 +91,7 @@ public class EditComp extends Composite {
 		comp.setAbbr(abbr.getText());
 		comp.setTTLTitleDesc(ttlDesc.getText());
 		comp.setTwitter(twitter.getText());
+		comp.setESPNStreamCategory(streamCategory.getText());
 		if (!espnId.getText().isEmpty())
 			comp.setForeignID(Long.parseLong(espnId.getText()));
 		if (!ccid.getText().isEmpty())
@@ -111,6 +114,7 @@ public class EditComp extends Composite {
 		comp.setAbbr(abbr.getText());
 		comp.setTTLTitleDesc(ttlDesc.getText());
 		comp.setTwitter(twitter.getText());
+		comp.setESPNStreamCategory(streamCategory.getText());
 		comp.setCompClubhouseId(Long.parseLong(ccid.getText()));
 		if (espnId.getText() != null && !espnId.getText().isEmpty())
 			comp.setForeignID(Long.parseLong(espnId.getText()));
@@ -154,6 +158,7 @@ public class EditComp extends Composite {
 		underway.setValue(comp.getUnderway());
 		showInClient.setValue(comp.getShowToClient());
 		tableUrl.setText(comp.getTableURL());
+		streamCategory.setText(comp.getESPNStreamCategory());
 		if (comp.getForeignID() != null)
 			espnId.setText(comp.getForeignID().toString());
 		

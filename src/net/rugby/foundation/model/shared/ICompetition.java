@@ -193,6 +193,8 @@ public interface ICompetition extends IHasId {
 	Boolean getShowToClient();
 	String getTableURL();
 	void setTableURL(String tableURL);
+	String getESPNStreamCategory();
+	void setESPNStreamCategory(String eSPNStreamCategory);
 	
 	// don't put getNextRound and getPrevRound in here, see note at bottom of Competition.java
 	//public abstract void setNextAndPrevRound();
