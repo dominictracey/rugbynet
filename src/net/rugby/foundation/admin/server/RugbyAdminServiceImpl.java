@@ -47,6 +47,7 @@ import net.rugby.foundation.admin.server.util.DigestEmailer;
 import net.rugby.foundation.admin.server.workflow.IWorkflowConfigurationFactory;
 import net.rugby.foundation.admin.server.workflow.fetchstats.ESPN6FetchTeamMatchStats;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
+import net.rugby.foundation.admin.server.workflow.weekend.RJ0ProcessRound;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchTeamMatchStats;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions;
 import net.rugby.foundation.admin.shared.AdminOrchestrationActions.MatchActions;
@@ -3013,6 +3014,60 @@ public class RugbyAdminServiceImpl extends RemoteServiceServlet implements Rugby
 				if (m != null) {
 					return m.getWorkflowLog();
 				}
+			}
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public IRound initiateWorkflow(Long roundId) {
+		try {
+			if (checkAdmin()) {
+				PipelineService service = PipelineServiceFactory.newPipelineService();
+				String pipelineId = "";
+				JobSetting backOffFactor = new JobSetting.BackoffFactor(1);
+				JobSetting backOffSeconds = new JobSetting.BackoffSeconds(30*60); // retry every 30 minutes
+				JobSetting maxAttempts = new JobSetting.MaxAttempts(200); // about 4 days
+				
+				IRound r = rf.get(roundId);
+				if (r != null && r.getWeekendProcessingPipelineId() == null) {
+					pipelineId = service.startNewPipeline(new RJ0ProcessRound(), roundId, backOffFactor, backOffSeconds, maxAttempts);
+					r.setWeekendProcessingPipelineId(pipelineId);
+					rf.put(r);
+					return r;
+				} else {
+					// I guess just return it since there's already one going?
+					return r;
+				}
+			}
+			return null;			
+		} catch (Throwable ex) {
+			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, ex.getMessage(), ex);		
+			return null;
+		}
+	}
+
+	@Override
+	public IRound cancelWorkflow(Long roundId) {
+		try {
+			if (checkAdmin()) {
+				IRound r = rf.get(roundId);
+				if (r != null && r.getWeekendProcessingPipelineId() != null) {
+					PipelineService service = PipelineServiceFactory.newPipelineService();
+					// check the pipeline for each comp's round
+					String pipelineId = r.getWeekendProcessingPipelineId();
+					if (pipelineId != null && !pipelineId.isEmpty()) {
+						// destroy the pipeline
+						service.deletePipelineRecords(pipelineId,true,false);					
+					}
+	
+					r.setWeekendProcessingPipelineId(null);
+					rf.put(r);
+				}		
+				return r;
 			}
 			return null;			
 		} catch (Throwable ex) {

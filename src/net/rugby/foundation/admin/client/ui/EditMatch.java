@@ -128,10 +128,12 @@ public class EditMatch extends Composite {
 			matchGroup.setStatus(Status.valueOf(Status.class, status.getItemText(selected)));
 			selected = workFlowStatus.getSelectedIndex();
 			matchGroup.setWorkflowStatus(WorkflowStatus.valueOf(WorkflowStatus.class,workFlowStatus.getItemText(selected)));
-			matchGroup.setESPNStreamId(Long.parseLong(espnStreamId.getText()));
+			if (espnStreamId.getText() != null && !espnStreamId.getText().isEmpty() && espnStreamId.getText().matches("[0-9]*")) {
+				matchGroup.setESPNStreamId(Long.parseLong(espnStreamId.getText()));
+			}
 			listener.saveMatchInfo(matchGroup);
 		} catch(Exception ex) {
-			Notify.notify("Bad data. Not saved.", NotifyType.DANGER);
+			Notify.notify("Bad data. Not saved. " , NotifyType.DANGER);
 		}
 	}
 

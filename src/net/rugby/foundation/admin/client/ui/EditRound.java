@@ -50,6 +50,10 @@ public class EditRound extends Composite {
 		void fetchRoundStandings(IRound round);
 		
 		void addMatch(IRound round);
+
+		void cancelWorkflow(IRound round);
+
+		void initiateWorkflow(IRound round);
 	} 
 	
 	public EditRound() {
@@ -89,6 +93,8 @@ public class EditRound extends Composite {
 	Button fetch;
 	@UiField
 	Button addMatch;
+	@UiField
+	Button workflow;
 	@UiField
 	TextBox name;
 	@UiField
@@ -131,6 +137,14 @@ public class EditRound extends Composite {
 	void onClickAddMatch(ClickEvent e) {
 		listener.addMatch(round);
 	}
+	@UiHandler("workflow")
+	void onClickWorkflow(ClickEvent e) {
+		if (round.getWeekendProcessingPipelineId() != null && !round.getWeekendProcessingPipelineId().isEmpty()) {
+			listener.cancelWorkflow(round);
+		} else {
+			listener.initiateWorkflow(round);
+		}
+	}
 	
 	public void ShowRound(IRound round, List<IStandingFull> result) {
 		this.round = round;
@@ -158,11 +172,14 @@ public class EditRound extends Composite {
 		if (round.getWeekendProcessingPipelineId() != null && !round.getWeekendProcessingPipelineId().isEmpty()) {
 			roundPipelineLink.setVisible(true);
 			roundPipelineLink.setHref("/_ah/pipeline/status?root=" + round.getWeekendProcessingPipelineId());
-			roundPipelineLink.setText("Round processing pipeline");
-			roundPipelineLink.setTarget("_blank");			
+			roundPipelineLink.setText("Round processing pipeline (URO: " + round.getUrOrdinal() +")");
+			roundPipelineLink.setTarget("_blank");	
+			workflow.setText("Cancel Workflow");
 		} else {
 			roundPipelineLink.setVisible(true);
 			roundPipelineLink.setText("Universal round ordinal " + round.getUrOrdinal());
+			roundPipelineLink.setHref("");
+			workflow.setText("Initiate Workflow");
 		}
 	}
 

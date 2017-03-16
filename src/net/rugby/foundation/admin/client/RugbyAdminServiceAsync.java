@@ -220,6 +220,6 @@ public interface RugbyAdminServiceAsync {
 	public void bulkUploadEmails(List<String> emailsValid, AsyncCallback<List<String>> asyncCallback);
 	public void FetchLineups(Long id, AsyncCallback<IMatchGroup> asyncCallback);
 	public void getMatchWorkflowLog(Long id, AsyncCallback<List<String>> asyncCallback);
-
-
+	public void initiateWorkflow(Long roundId, AsyncCallback<IRound> asyncCallback);
+	public void cancelWorkflow(Long roundId, AsyncCallback<IRound> asyncCallback);
 }

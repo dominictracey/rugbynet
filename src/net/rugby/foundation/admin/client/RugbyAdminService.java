@@ -169,5 +169,6 @@ public interface RugbyAdminService extends RemoteService {
 	List<String> bulkUploadEmails(List<String> emailsValid);
 	IMatchGroup FetchLineups(Long id);
 	List<String> getMatchWorkflowLog(Long id);
-	
+	IRound initiateWorkflow(Long roundId);
+	IRound cancelWorkflow(Long roundId);
 }

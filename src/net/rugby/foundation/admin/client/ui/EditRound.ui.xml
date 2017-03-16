@@ -29,6 +29,7 @@
 		<g:Button styleName="{style.important}" ui:field="fetch">Fetch</g:Button>
 		<g:Button styleName="{style.important}" ui:field="save">Save</g:Button>
 		<g:Button styleName="{style.important}" ui:field="addMatch">Add Match</g:Button>
+		<g:Button styleName="{style.important}" ui:field="workflow">Initiate Workflow</g:Button>
 		<g:Anchor ui:field="roundPipelineLink">Round Processing Pipeline UI</g:Anchor>
 	</g:HTMLPanel>
 	

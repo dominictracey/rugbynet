@@ -1869,6 +1869,73 @@ RoundPresenter, AddRoundPopupPresenter, AddMatchPopupPresenter {
 
 
 
+	@Override
+	public void cancelWorkflow(final IRound round) {
+		clientFactory.getRpcService().cancelWorkflow(round.getId(), new AsyncCallback<IRound>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Workflow cancel failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
+			}
+
+			@Override
+			public void onSuccess(final IRound result) {
+				if (result != null && result.getWeekendProcessingPipelineId() == null) {
+					
+					clientFactory.getRpcService().getStandings(round.getId(), new AsyncCallback<List<IStandingFull>>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							Notify.notify("Workflow cancel failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
+						}
+						
+						@Override
+						public void onSuccess(List<IStandingFull> standings) {
+							Notify.notify("Workflow canceled.", NotifyType.SUCCESS);
+							er.ShowRound(result, standings);
+						}
+					});							
+				} else {
+					Notify.notify("Workflow not canceled.", NotifyType.WARNING);
+				}
+			}	
+		});
+	}
+
+
+
+	@Override
+	public void initiateWorkflow(final IRound round) {
+		clientFactory.getRpcService().initiateWorkflow(round.getId(), new AsyncCallback<IRound>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notify.notify("Workflow cancel failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
+			}
+
+			@Override
+			public void onSuccess(final IRound result) {
+				if (result != null && result.getWeekendProcessingPipelineId() != null) {
+					Notify.notify("Workflow initiated.", NotifyType.SUCCESS);
+					clientFactory.getRpcService().getStandings(round.getId(), new AsyncCallback<List<IStandingFull>>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							Notify.notify("Workflow cancel failure: " + caught.getLocalizedMessage(),NotifyType.DANGER);
+						}
+						
+						@Override
+						public void onSuccess(List<IStandingFull> standings) {
+							er.ShowRound(result, standings);
+						}
+					});	
+				} else {
+					Notify.notify("Workflow not initiated.", NotifyType.WARNING);
+				}
+			}	
+		});
+	}
+
+
+
 
 
 
