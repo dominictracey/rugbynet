@@ -68,7 +68,10 @@ public class TopTenV1 {
 		public List<IStandingFull> standings = new ArrayList<IStandingFull>();
 	}
 	protected class CompetitionFandR {
+		public String id;
 		public Long compId; // compId
+		public Long roundId;
+		public int universalRoundOrdinal;
 		public List<IMatchGroup> matches = new ArrayList<IMatchGroup>();
 	}
 	protected class UniversalRoundFandR {
@@ -240,7 +243,10 @@ public class TopTenV1 {
 			IRound r = rf.getForUR(compId, uro);
 			if (r != null) {
 				CompetitionFandR results = new CompetitionFandR();
+				results.id = uro + compId.toString();
 				results.compId = compId;
+				results.roundId = r.getId();
+				results.universalRoundOrdinal = uro;
 				results.matches = r.getMatches();
 				retval.compFandRs.add(results);
 			}			
