@@ -8,6 +8,10 @@ import java.util.logging.Logger;
 
 import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.workflow.ratingseries.ProcessRatingQuery;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
+import net.rugby.foundation.model.shared.IRatingGroup;
+import net.rugby.foundation.model.shared.IRatingMatrix;
 import net.rugby.foundation.model.shared.IRatingQuery;
 
 import com.google.appengine.api.taskqueue.TaskOptions;
@@ -23,11 +27,14 @@ import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 public class RerunRatingOrchestration extends OrchestrationCore<IRatingQuery> {
 
 	private Long compId;
+	private IRatingGroupFactory rgf;
+	private IRatingMatrixFactory rmf;
 
 
 
-	public RerunRatingOrchestration() {
-
+	public RerunRatingOrchestration( IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
+		this.rgf = rgf;
+		this.rmf = rmf;
 	}
 
 	/* (non-Javadoc)
@@ -53,7 +60,20 @@ public class RerunRatingOrchestration extends OrchestrationCore<IRatingQuery> {
 			String pipelineId = "";
 
 			try {
-				pipelineId = service.startNewPipeline(new ProcessRatingQuery(), rq.getId(), rq.getRatingMatrix().getRatingGroup().getRatingSeriesId(), new JobSetting.MaxAttempts(3));
+				if (rq.getRatingMatrixId() != null) {
+					IRatingMatrix rm = rmf.get(rq.getRatingMatrixId());
+					if (rm != null && rm.getRatingGroupId() != null) {
+						IRatingGroup rg = rgf.get(rm.getRatingGroupId());
+						if (rg != null) {
+							pipelineId = service.startNewPipeline(new ProcessRatingQuery(), rq.getId(), rg.getRatingSeriesId(), new JobSetting.MaxAttempts(3));
+						}
+					}
+				}
+				
+				if (!pipelineId.isEmpty()) {
+					
+				}
+				
 			} catch (RetriesExhaustedException ree) {
 				Logger.getLogger(this.getClass().getCanonicalName()).log(Level.WARNING, "Giving up", ree);
 				return;

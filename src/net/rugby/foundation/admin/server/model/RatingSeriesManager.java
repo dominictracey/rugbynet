@@ -372,9 +372,11 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 
 	private List<Long> findRoundsForRatingMatrices(IRatingMatrix rm) {
 		List<Long> rids = new ArrayList<Long>();
-		assert(rm != null);
+		assert(rm != null && rm.getRatingGroupId() != null);
 		try {
-			IRatingSeries rs = rm.getRatingGroup().getRatingSeries();
+			IRatingGroup rg = rgf.get(rm.getRatingGroupId());
+			assert rg != null && rg.getRatingSeriesId() != null;
+			IRatingSeries rs = rsf.get(rg.getRatingSeriesId());
 
 			for (Long compId : rs.getCompIds()) {
 				ICompetition comp = cf.get(compId);
@@ -447,7 +449,10 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 		boolean scaleTime = rm.getCriteria() == Criteria.IN_FORM;  // can also be BEST_YEAR
 		boolean scaleMinutesPlayed = rm.getCriteria() == Criteria.AVERAGE_IMPACT;
 		List<Long> rids = findRoundsForRatingMatrices(rm);
-		if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_POSITION) {
+		IRatingGroup rg = rgf.get(rm.getRatingGroupId());
+		assert rg != null && rg.getRatingSeriesId() != null;
+		IRatingSeries rs = rsf.get(rg.getRatingSeriesId());
+		if (rs.getMode() == RatingMode.BY_POSITION) {
 
 			for (position pos : Position.position.values()) {
 				if (pos != position.RESERVE && pos != position.NONE) {
@@ -455,10 +460,10 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rq.setRatingMatrix(rm);
 					rq.getPositions().add(pos);
 					rq.setLabel(pos.getName());
-					rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
-					rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
+					rq.setCompIds(rs.getCompIds());
+					rq.setCountryIds(rs.getCountryIds());
 					rq.setScaleStanding(true);
-					rq.setScaleComp(rm.getRatingGroup().getRatingSeries().getCompIds().size() > 1);
+					rq.setScaleComp(rs.getCompIds().size() > 1);
 					rq.setScaleTime(scaleTime);
 					rq.setScaleMinutesPlayed(scaleMinutesPlayed);
 					if (scaleMinutesPlayed) {
@@ -484,25 +489,14 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 			// finally, save the matrix
 			rmf.put(rm);
 			
-		} else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_TEAM) {
+		} else if (rs.getMode() == RatingMode.BY_TEAM) {
 			
 			// first get a list of teams
 			List<ITeamGroup> teams = new ArrayList<ITeamGroup>();
-//			for (Long rid : rids) {
-//				IRound targetRound = rf.get(rid);
-//				for (IMatchGroup m: targetRound.getMatches()) {
-//					if (!teams.contains(m.getHomeTeam())) {
-//						teams.add(m.getHomeTeam());
-//					}
-//					if (!teams.contains(m.getVisitingTeam())) {
-//						teams.add(m.getVisitingTeam());
-//					}
-//				}
-//			}
 			
-			ICompetition hostComp = rm.getRatingGroup().getRatingSeries().getHostComp();
-			if (hostComp == null && rm.getRatingGroup().getRatingSeries().getHostCompId() != null) {
-				hostComp = cf.get(rm.getRatingGroup().getRatingSeries().getHostCompId());
+			ICompetition hostComp = rs.getHostComp();
+			if (hostComp == null && rs.getHostCompId() != null) {
+				hostComp = cf.get(rs.getHostCompId());
 			}
 			
 			if (hostComp != null) {
@@ -529,10 +523,10 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 				rq.setRatingMatrix(rm);
 				rq.getTeamIds().add(team.getId());
 				rq.setLabel(team.getDisplayName());
-				rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
-				rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
+				rq.setCompIds(rs.getCompIds());
+				rq.setCountryIds(rs.getCountryIds());
 				rq.setScaleStanding(true);
-				rq.setScaleComp(rm.getRatingGroup().getRatingSeries().getCompIds().size() > 1);
+				rq.setScaleComp(rs.getCompIds().size() > 1);
 				rq.setScaleTime(scaleTime);
 				rq.setScaleMinutesPlayed(scaleMinutesPlayed);
 				if (scaleMinutesPlayed) {
@@ -548,7 +542,7 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 				rmf.put(rm);
 				
 			}		
-		} else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_MATCH) {
+		} else if (rs.getMode() == RatingMode.BY_MATCH) {
 
 			for (Long rid : rids) {
 				IRound targetRound = rf.get(rid);
@@ -571,60 +565,35 @@ public class RatingSeriesManager implements IRatingSeriesManager {
 					rmf.put(rm);
 				}
 			}
-		}  else if (rm.getRatingGroup().getRatingSeries().getMode() == RatingMode.BY_COMP) {
+		}  else if (rs.getMode() == RatingMode.BY_COMP) {
 
-			//for (Long rid : rids) {
-			//IRound targetRound = rf.get(rid);
 			IRatingQuery rq = createRatingQuery(rm);
 
 			rq.setScaleStanding(true);
 			rq.setScaleComp(true);
 			rq.setScaleTime(scaleTime);
 
-			rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
-			rq.setCountryIds(rm.getRatingGroup().getRatingSeries().getCountryIds());
+			rq.setCompIds(rs.getCompIds());
+			rq.setCountryIds(rs.getCountryIds());
 			rq.setRoundIds(rids);
 			rq.setRatingMatrixId(rm.getId());
-			rq.setLabel(rm.getRatingGroup().getUniversalRound().longDesc);
+			rq.setLabel(rg.getUniversalRound().longDesc);
 			rqf.put(rq);
 			rm.getRatingQueries().add(rq);
 			rm.getRatingQueryIds().add(rq.getId());
 			rmf.put(rm);
-			//}
 		}
-
 	}
-
-
-
 
 	private IRatingQuery createRatingQuery(IRatingMatrix rm) {
 		IRatingQuery rq = rqf.create();
 		rq.setStatus(Status.NEW);
 		rq.setRatingMatrix(rm);
 		rq.setRatingMatrixId(rm.getId());
-		rq.setCompIds(rm.getRatingGroup().getRatingSeries().getCompIds());
+		IRatingGroup rg = rgf.get(rm.getRatingGroupId());
+		assert rg != null && rg.getRatingSeriesId() != null;
+		IRatingSeries rs = rsf.get(rg.getRatingSeriesId());
+		rq.setCompIds(rs.getCompIds());
 		return rq;
 	}
-
-
-
-	//	public void generateRatings(IRatingSeries rs)
-	//	{
-	//		for (IRatingGroup rg : rs.getRatingGroups())
-	//		{
-	//			for (IRatingMatrix rm : rg.getRatingMatrices()) {
-	//				for (IRatingQuery rq : rm.getRatingQueries()) {
-	//					IQueryRatingEngine qre = qref.get(mresf.getDefault());
-	//					qre.setQuery(rq);
-	//					qre.generate(mresf.getDefault(), true, true, true, false);
-	//					Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,qre.getMetrics());
-	//				}
-	//			}
-	//		}
-	//	}
-
-
-
-
 }

@@ -25,6 +25,8 @@ import net.rugby.foundation.core.server.factory.IConfigurationFactory;
 import net.rugby.foundation.core.server.factory.IMatchGroupFactory;
 import net.rugby.foundation.core.server.factory.IMatchResultFactory;
 import net.rugby.foundation.core.server.factory.IPlayerRatingFactory;
+import net.rugby.foundation.core.server.factory.IRatingGroupFactory;
+import net.rugby.foundation.core.server.factory.IRatingMatrixFactory;
 import net.rugby.foundation.core.server.factory.IRatingQueryFactory;
 import net.rugby.foundation.core.server.factory.IRoundFactory;
 import net.rugby.foundation.core.server.factory.ITeamGroupFactory;
@@ -89,6 +91,8 @@ IOrchestrationFactory {
 	private IBlurbFactory bf;
 	private IDigestEmailFactory def;
 	private IConfigurationFactory ccf;
+	private IRatingGroupFactory rgf;
+	private IRatingMatrixFactory rmf;
 
 	//@REX this is probably horrendously inefficient
 	@Inject
@@ -102,7 +106,8 @@ IOrchestrationFactory {
 			IMatchRatingEngineSchemaFactory mresf, IQueryRatingEngineFactory qref,
 			IRatingQueryFactory rqf, IAdminTaskFactory atf, IPlayerRatingFactory prf,
 			ISeriesConfigurationFactory scf, ITopTenListFactory ttlf,
-			IBlurbFactory bf, IDigestEmailFactory def, IConfigurationFactory ccf) {
+			IBlurbFactory bf, IDigestEmailFactory def, IConfigurationFactory ccf,
+			 IRatingGroupFactory rgf, IRatingMatrixFactory rmf) {
 		this.cf = cf;
 		this.mf = mf;
 		//this.mf.setFactories(rf, tf);
@@ -128,6 +133,8 @@ IOrchestrationFactory {
 		this.bf = bf;
 		this.def = def;
 		this.ccf = ccf;
+		this.rgf = rgf;
+		this.rmf = rmf;
 	}
 	/* (non-Javadoc)
 	 * @see net.rugby.foundation.admin.server.factory.IOrchestrationFactory#get(net.rugby.foundation.model.shared.IMatchGroup, net.rugby.foundation.admin.server.factory.IOrchestrationActions)
@@ -279,7 +286,7 @@ IOrchestrationFactory {
 			o.setTarget(target);
 			return o;
 		}  else if (action.equals(AdminOrchestrationActions.RatingActions.RERUN)) {
-			IOrchestration<IRatingQuery> o = new RerunRatingOrchestration();
+			IOrchestration<IRatingQuery> o = new RerunRatingOrchestration(rgf, rmf);
 			o.setTarget(target);
 			return o;
 		} 

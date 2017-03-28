@@ -136,7 +136,7 @@ public class EspnSimpleScoreFetcher extends JsonFetcher implements IResultFetche
 		try {
 			IMatchResult r = _getResult(match, false);
 			if (r != null) {
-				if (r.getStatus().toString().contains("FINAL") ) {
+				if (r.getStatus() != null && r.getStatus().toString() != null && r.getStatus().toString().contains("FINAL") ) {
 					return true;
 				}
 			}
