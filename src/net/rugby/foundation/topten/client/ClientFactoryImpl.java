@@ -346,8 +346,10 @@ public class ClientFactoryImpl implements ClientFactory, Presenter, CompChangeLi
 
 							@Override
 							public void onSuccess(IContent result) {
-								popupDetails = result.getBody();
-								ratingPopup.setContent(popupDetails);
+								if (result != null) {
+									popupDetails = result.getBody();
+									ratingPopup.setContent(popupDetails);
+								}
 							}
 
 						});
