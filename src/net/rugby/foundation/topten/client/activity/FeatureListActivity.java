@@ -108,7 +108,7 @@ public class FeatureListActivity extends AbstractActivity implements FeatureList
 									_panel.setWidget(view.asWidget());
 
 									setURL();
-
+									clientFactory.getSimpleView().hideWait();
 									// show facebook comments				
 									clientFactory.showFacebookComments(_coreConfig.getBaseToptenUrl() + ttl.getFeatureGuid() + "/");
 									
