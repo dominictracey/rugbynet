@@ -53,8 +53,6 @@ public class ESPN0FetchMatchStats extends FetchMatchStats {
 		this.rf = injector.getInstance(IRoundFactory.class);
 		
 		IMatchGroup match = mgf.get(matchId);
-		IRound r = rf.get(match.getRoundId());
-		ICompetition comp = cf.get(r.getCompId());
 		
 		if (match == null) {
 			GenerateFetchMatchResults retval = new GenerateFetchMatchResults(null, null, null, null, "");
@@ -63,6 +61,9 @@ public class ESPN0FetchMatchStats extends FetchMatchStats {
 			wrapper.fetchSubTreeResults = retval;
 			return immediate(wrapper);
 		}
+		
+		IRound r = rf.get(match.getRoundId());
+		ICompetition comp = cf.get(r.getCompId());
 		
 		if (match.getForeignUrl() == null) {
 			// need to get score and find match details url before we do this
@@ -74,18 +75,21 @@ public class ESPN0FetchMatchStats extends FetchMatchStats {
 			return immediate(wrapper);
 		}
 
-		//String url = match.getForeignUrl(); //+"?view=scorecard";
+		// job settings controlling retries
+		JobSetting tmsBackOffSeconds = new JobSetting.BackoffSeconds(10); // retry at 10, 200 and 4000 seconds?
+		JobSetting tmsBackOffFactor = new JobSetting.BackoffFactor(2);
+		JobSetting tmsMaxAttempts = new JobSetting.MaxAttempts(12); // final wait time is about 21 minutes
 
 		Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,"Starting generate match ratings for match " + match.getDisplayName());
 
-		FutureValue<Long> homeTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.HOME), null);
-		FutureValue<Long> visitorTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.VISITOR), homeTeamStats);
-		
+		FutureValue<Long> homeTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.HOME), null, tmsBackOffFactor, tmsBackOffSeconds, tmsMaxAttempts);
+		FutureValue<Long> visitorTeamStats = futureCall(new ESPN6FetchTeamMatchStats(), immediate(match), immediate(Home_or_Visitor.VISITOR), homeTeamStats, tmsBackOffFactor, tmsBackOffSeconds, tmsMaxAttempts);
+
 		// job settings controlling retries
 		JobSetting nowBackOffFactor = new JobSetting.BackoffFactor(2);
 		JobSetting nowBackOffSeconds = new JobSetting.BackoffSeconds(10); // retry at 10, 200 and 4000 seconds?
 		JobSetting nowMaxAttempts = new JobSetting.MaxAttempts(7); // 
-			
+		
 		FutureValue<MS3LineupsAnnounced> lineups = futureCall(new ESPN2FetchLineups(), immediate(matchId), nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
 		//Value<List<ILineupSlot>> visitLineups = getIds(Home_or_Visitor.VISITOR, url);
 
@@ -94,7 +98,7 @@ public class ESPN0FetchMatchStats extends FetchMatchStats {
 						
    
 
-		FutureValue<List<Long>> playerMatchStats = futureCall(new ESPN3GenerateFetchPlayerMatchStats(), lineups, nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts);
+		FutureValue<List<Long>> playerMatchStats = futureCall(new ESPN3GenerateFetchPlayerMatchStats(), lineups, nowBackOffFactor, nowBackOffSeconds, nowMaxAttempts, waitFor(homeTeamStats));
 
 
 		//FutureList<IPlayerMatchStats> vpms = new FutureList<IPlayerMatchStats>(visitorPlayerMatchStats);

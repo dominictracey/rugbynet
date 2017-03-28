@@ -3,6 +3,8 @@ package net.rugby.foundation.admin.server.workflow.fetchstats;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import net.rugby.foundation.admin.client.place.AdminTaskPlace;
 import net.rugby.foundation.admin.server.AdminEmailer;
 import net.rugby.foundation.admin.server.factory.IAdminTaskFactory;
@@ -10,6 +12,7 @@ import net.rugby.foundation.admin.server.factory.IPlayerMatchStatsFetcherFactory
 import net.rugby.foundation.admin.server.factory.espnscrum.ITeamMatchStatsFetcherFactory;
 import net.rugby.foundation.admin.server.model.IPlayerMatchStatsFetcher;
 import net.rugby.foundation.admin.server.model.ITeamMatchStatsFetcher;
+import net.rugby.foundation.admin.server.workflow.RetryRequestException;
 import net.rugby.foundation.admin.server.workflow.fetchstats.FetchMatchStats.Home_or_Visitor;
 import net.rugby.foundation.admin.shared.IAdminTask;
 import net.rugby.foundation.core.server.BPMServletContextListener;
@@ -37,7 +40,7 @@ import com.google.appengine.tools.pipeline.PromisedValue;
 import com.google.appengine.tools.pipeline.Value;
 import com.google.inject.Injector;
 
-public class ESPN6FetchTeamMatchStats extends Job3<Long, IMatchGroup, Home_or_Visitor, Long> {
+public class ESPN6FetchTeamMatchStats extends Job3<Long, IMatchGroup, Home_or_Visitor, Long>  {
 	private static Injector injector = null;
 
 	private transient ITeamMatchStatsFactory tmsf;
@@ -66,7 +69,7 @@ public class ESPN6FetchTeamMatchStats extends Job3<Long, IMatchGroup, Home_or_Vi
 	 * @return
 	 */
 	@Override
-	public Value<Long> run(IMatchGroup match, Home_or_Visitor hov, Long blockingTMSid) {
+	public Value<Long> run(IMatchGroup match, Home_or_Visitor hov, Long blockingTMSid) throws RetryRequestException {
 
 		Logger.getLogger(this.getClass().getCanonicalName()).setLevel(Level.FINE);
 		if (injector == null) {
@@ -117,39 +120,46 @@ public class ESPN6FetchTeamMatchStats extends Job3<Long, IMatchGroup, Home_or_Vi
 			return immediate(tms.getId());
 		} else { // blocking process
 
-			// at least we have the matchId and teamId?
-			ITeamMatchStats stats = fetcher.getStats();
-			if (stats == null) {
-				stats = tmsf.create();
-			}
-
-			tmsf.put(stats);
-
-			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting team match stats for " + team.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());
-			PromisedValue<Long> x = newPromise(Long.class);
-			IAdminTask task = atf.getNewEditTeamMatchStatsTask("Problem getting team match stats for " + team.getDisplayName() + " in match " + match.getDisplayName(), fetcher.getErrorCode() + ": " + fetcher.getErrorMessage(), team, match, hov, stats, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
-			atf.put(task);
-			stats.getBlockingTaskIds().add(task.getId());
-			tmsf.put(stats);
-
-			// send an admin email
-			this.ccf = injector.getInstance(IConfigurationFactory.class);
-			AdminTaskPlace atp = new AdminTaskPlace();
-			atp.setFilter("ALL");
-			atp.setTaskId(task.getId().toString());
-			String taskUrl = ccf.get().getBaseToptenUrl() + "Admin.html#AdminTaskPlace:" + atp.getToken();
-
-			AdminEmailer emailer = new AdminEmailer();
-			emailer.setSubject("TASK: Problem getting team match stats for " + team.getDisplayName() + " in match " + match.getDisplayName());
-			StringBuilder message = new StringBuilder();
-			message.append("<h3>Workflow halted</h3>");
-			message.append("<a href=\"" + taskUrl + "\" target=\"blank\">" + team.getDisplayName() + " in " + match.getDisplayName() + "</a><br/>");
-			message.append("<a href=\"" + match.getForeignUrl() + " target=\"blank\">" + match.getDisplayName() + " on ESPN.</a><br/>");
-
-			emailer.setMessage(message.toString());
-			emailer.send();
-
-			return x;
+			throw new RetryRequestException("No stats found for " + team.getDisplayName() + " at " + DateTime.now().toString());
+			
+//			// at least we have the matchId and teamId?
+//			ITeamMatchStats stats = fetcher.getStats();
+//			if (stats == null) {
+//				throw new RetryRequestException("No stats found for " + team.getDisplayName() + " at " + DateTime.now().toString());
+//			}
+//			
+//			if (fetcher.getErrorCode().equals("SCRAPER_MATCH_STATS_NOT_AVAILABLE")) {
+//				throw new RetryRequestException("No stats found for " + team.getDisplayName() + " at " + DateTime.now().toString());
+//			}
+//
+//			tmsf.put(stats);
+//
+//			Logger.getLogger(this.getClass().getCanonicalName()).log(Level.SEVERE, "Problem getting team match stats for " + team.getDisplayName() + " in match " + match.getDisplayName() + " : " + fetcher.getErrorMessage());
+//			PromisedValue<Long> x = newPromise(Long.class);
+//			IAdminTask task = atf.getNewEditTeamMatchStatsTask("Problem getting team match stats for " + team.getDisplayName() + " in match " + match.getDisplayName(), fetcher.getErrorCode() + ": " + fetcher.getErrorMessage(), team, match, hov, stats, true, getPipelineKey().getName(), getJobKey().getName(), x.getHandle());		
+//			atf.put(task);
+//			stats.getBlockingTaskIds().add(task.getId());
+//			tmsf.put(stats);
+//
+//			// send an admin email
+//			this.ccf = injector.getInstance(IConfigurationFactory.class);
+//			AdminTaskPlace atp = new AdminTaskPlace();
+//			atp.setFilter("ALL");
+//			atp.setTaskId(task.getId().toString());
+//			String taskUrl = ccf.get().getBaseToptenUrl() + "Admin.html#AdminTaskPlace:" + atp.getToken();
+//
+//			AdminEmailer emailer = new AdminEmailer();
+//			emailer.setSubject("TASK: Problem getting team match stats for " + team.getDisplayName() + " in match " + match.getDisplayName());
+//			StringBuilder message = new StringBuilder();
+//			message.append("<h3>Workflow halted</h3>");
+//			message.append(fetcher.getErrorCode() + ": " + fetcher.getErrorMessage()); 
+//			message.append("<a href=\"" + taskUrl + "\" target=\"blank\">" + team.getDisplayName() + " in " + match.getDisplayName() + "</a><br/>");
+//			message.append("<a href=\"" + match.getForeignUrl() + " target=\"blank\">" + match.getDisplayName() + " on ESPN.</a><br/>");
+//
+//			emailer.setMessage(message.toString());
+//			emailer.send();
+//
+//			return x;
 		}
 	}
 

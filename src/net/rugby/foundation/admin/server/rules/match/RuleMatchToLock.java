@@ -43,7 +43,7 @@ public class RuleMatchToLock extends CoreRule<IMatchGroup> {
 			cal.add(Calendar.HOUR, LOCK_OFFSET);
 	   		//log = "RuleMatchToLock for Match " + target.getDisplayName() + " (" + target.getId().toString() + ") time: " + target.getDate().toString() + " offset " + cal.getTime().toString() + " now " + now.toString();
 
-			if (now.after(cal.getTime()) && (target.getLocked() == null || !target.getLocked())) {
+			if (now.after(cal.getTime())) { // && (target.getLocked() == null || !target.getLocked())) { << Take out this lock logic, we can probably just use UNDERWAY...
 				lock = true;
 				log += "lock needed at " + now.toString();
 				Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Ready to lock match " + target.getDisplayName() +"("+ target.getId() + ")");
